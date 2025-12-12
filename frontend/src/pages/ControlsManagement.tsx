@@ -1,4 +1,5 @@
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useState } from 'react';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Add, CheckCircle, Warning } from '@mui/icons-material';
 
 const controls = [
@@ -31,8 +32,25 @@ const getStatusColor = (status: string) => {
 };
 
 export default function ControlsManagement() {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newControl, setNewControl] = useState({
+    name: '',
+    type: 'Preventive',
+    category: '',
+    description: '',
+    owner: ''
+  });
+
   const operational = controls.filter(c => c.status === 'Operational').length;
   const avgEffectiveness = (controls.reduce((sum, c) => sum + c.effectiveness, 0) / controls.length).toFixed(1);
+
+  const handleAddControl = () => {
+    if (newControl.name && newControl.category && newControl.owner) {
+      alert(`Control "${newControl.name}" created successfully!\n\nType: ${newControl.type}\nCategory: ${newControl.category}\n\nThe control has been added to the registry.`);
+      setOpenDialog(false);
+      setNewControl({ name: '', type: 'Preventive', category: '', description: '', owner: '' });
+    }
+  };
 
   return (
     <Box>
@@ -48,6 +66,7 @@ export default function ControlsManagement() {
         <Button
           variant="contained"
           startIcon={<Add />}
+          onClick={() => setOpenDialog(true)}
           sx={{
             background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
             color: '#000',
@@ -56,7 +75,7 @@ export default function ControlsManagement() {
             },
           }}
         >
-          New Control
+          Add Control
         </Button>
       </Box>
 
@@ -104,13 +123,13 @@ export default function ControlsManagement() {
       <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-            Control Inventory
+            Control Registry
           </Typography>
           <TableContainer component={Paper} sx={{ bgcolor: 'transparent' }}>
             <Table>
               <TableHead>
-                <TableRow>
-                  <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Control</TableCell>
+                <TableRow sx={{ bgcolor: 'rgba(255,255,255,0.05)' }}>
+                  <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Control Name</TableCell>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Type</TableCell>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Category</TableCell>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Effectiveness</TableCell>
@@ -122,7 +141,10 @@ export default function ControlsManagement() {
                 {controls.map((control) => (
                   <TableRow
                     key={control.id}
-                    sx={{ '&:hover': { bgcolor: 'rgba(102, 126, 234, 0.05)' }, cursor: 'pointer' }}
+                    sx={{
+                      '&:hover': { bgcolor: 'rgba(67, 233, 123, 0.05)' },
+                      cursor: 'pointer',
+                    }}
                   >
                     <TableCell sx={{ color: 'white', fontWeight: 600 }}>{control.name}</TableCell>
                     <TableCell>
@@ -135,28 +157,25 @@ export default function ControlsManagement() {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)' }}>{control.category}</TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        {[...Array(5)].map((_, i) => (
-                          <Box
-                            key={i}
-                            sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: '50%',
-                              bgcolor: i < control.effectiveness ? '#43e97b' : 'rgba(255,255,255,0.2)',
-                            }}
-                          />
-                        ))}
-                        <Typography sx={{ color: '#43e97b', ml: 1 }}>{control.effectiveness}/5</Typography>
-                      </Box>
+                      <Chip
+                        label={control.category}
+                        size="small"
+                        sx={{ bgcolor: 'rgba(102, 126, 234, 0.2)', color: '#667eea' }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ color: 'white' }}>
+                      {control.effectiveness}/5
+                      {control.effectiveness >= 4 ? (
+                        <CheckCircle sx={{ color: '#43e97b', fontSize: 16, ml: 1, verticalAlign: 'middle' }} />
+                      ) : (
+                        <Warning sx={{ color: '#fee140', fontSize: 16, ml: 1, verticalAlign: 'middle' }} />
+                      )}
                     </TableCell>
                     <TableCell>
                       <Chip
                         label={control.status}
                         size="small"
-                        icon={control.status === 'Operational' ? <CheckCircle /> : <Warning />}
                         sx={{
                           bgcolor: `${getStatusColor(control.status)}20`,
                           color: getStatusColor(control.status),
@@ -171,6 +190,102 @@ export default function ControlsManagement() {
           </TableContainer>
         </CardContent>
       </Card>
+
+      {/* Add Control Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1f3a',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>Add New Control</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Control Name"
+                value={newControl.name}
+                onChange={(e) => setNewControl({ ...newControl, name: e.target.value })}
+                required
+                placeholder="e.g., Multi-Factor Authentication"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Control Type</InputLabel>
+                <Select
+                  value={newControl.type}
+                  onChange={(e) => setNewControl({ ...newControl, type: e.target.value })}
+                  label="Control Type"
+                >
+                  <MenuItem value="Preventive">Preventive</MenuItem>
+                  <MenuItem value="Detective">Detective</MenuItem>
+                  <MenuItem value="Corrective">Corrective</MenuItem>
+                  <MenuItem value="Directive">Directive</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={newControl.category}
+                  onChange={(e) => setNewControl({ ...newControl, category: e.target.value })}
+                  label="Category"
+                >
+                  <MenuItem value="Access Control">Access Control</MenuItem>
+                  <MenuItem value="Data Protection">Data Protection</MenuItem>
+                  <MenuItem value="Network Security">Network Security</MenuItem>
+                  <MenuItem value="Monitoring">Monitoring</MenuItem>
+                  <MenuItem value="Incident Management">Incident Management</MenuItem>
+                  <MenuItem value="Physical Security">Physical Security</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Control Owner"
+                value={newControl.owner}
+                onChange={(e) => setNewControl({ ...newControl, owner: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label="Control Description"
+                value={newControl.description}
+                onChange={(e) => setNewControl({ ...newControl, description: e.target.value })}
+                placeholder="Describe the control's purpose and implementation..."
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleAddControl}
+            variant="contained"
+            disabled={!newControl.name || !newControl.category || !newControl.owner}
+            sx={{
+              background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+              color: '#000'
+            }}
+          >
+            Add Control
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
