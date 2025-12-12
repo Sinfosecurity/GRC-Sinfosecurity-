@@ -13,6 +13,7 @@ import Analytics from './pages/Analytics';
 import Tasks from './pages/Tasks';
 import WorkflowBuilder from './pages/WorkflowBuilder';
 import BusinessContinuity from './pages/BusinessContinuity';
+import AIInsights from './pages/AIInsights';
 import ISO27001 from './pages/ISO27001';
 import TISAX from './pages/TISAX';
 import Settings from './pages/Settings';
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="workflows" element={<WorkflowBuilder />} />
                 <Route path="business-continuity" element={<BusinessContinuity />} />
+                <Route path="ai-insights" element={<AIInsights />} />
                 <Route path="iso27001" element={<ISO27001 />} />
                 <Route path="tisax" element={<TISAX />} />
                 <Route path="settings" element={<Settings />} />
