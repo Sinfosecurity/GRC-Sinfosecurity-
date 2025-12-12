@@ -7,6 +7,7 @@ import ControlsManagement from './pages/ControlsManagement';
 import IncidentManagement from './pages/IncidentManagement';
 import PolicyManagement from './pages/PolicyManagement';
 import DocumentManagement from './pages/DocumentManagement';
+import ActivityLog from './pages/ActivityLog';
 import ISO27001 from './pages/ISO27001';
 import TISAX from './pages/TISAX';
 import Settings from './pages/Settings';
@@ -23,6 +24,7 @@ export default function App() {
                 <Route path="incidents" element={<IncidentManagement />} />
                 <Route path="policies" element={<PolicyManagement />} />
                 <Route path="documents" element={<DocumentManagement />} />
+                <Route path="activity-log" element={<ActivityLog />} />
                 <Route path="iso27001" element={<ISO27001 />} />
                 <Route path="tisax" element={<TISAX />} />
                 <Route path="settings" element={<Settings />} />
