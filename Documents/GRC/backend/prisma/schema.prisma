@@ -1,0 +1,371 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users and Authentication
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          Role     @default(USER)
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastLogin     DateTime?
+  
+  risks         Risk[]
+  incidents     Incident[]
+  policies      Policy[]
+  audits        AuditLog[]
+  
+  @@index([email])
+  @@index([organizationId])
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  COMPLIANCE_OFFICER
+  RISK_MANAGER
+  AUDITOR
+  USER
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  industry    String?
+  country     String
+  size        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  users       User[]
+  risks       Risk[]
+  controls    Control[]
+  incidents   Incident[]
+  policies    Policy[]
+  compliance  ComplianceFramework[]
+}
+
+// Risk Management
+model Risk {
+  id            String        @id @default(uuid())
+  title         String
+  description   String
+  category      RiskCategory
+  likelihood    Int // 1-5
+  impact        Int // 1-5
+  riskScore     Int // likelihood * impact
+  status        RiskStatus    @default(IDENTIFIED)
+  owner         User          @relation(fields: [ownerId], references: [id])
+  ownerId       String
+  organization  Organization  @relation(fields: [organizationId], references: [id])
+  organizationId String
+  mitigation    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  controls      RiskControl[]
+  assessments   RiskAssessment[]
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([riskScore])
+}
+
+enum RiskCategory {
+  CYBERSECURITY
+  DATA_PRIVACY
+  OPERATIONAL
+  FINANCIAL
+  COMPLIANCE
+  REPUTATIONAL
+  STRATEGIC
+}
+
+enum RiskStatus {
+  IDENTIFIED
+  ASSESSED
+  MITIGATED
+  ACCEPTED
+  TRANSFERRED
+  CLOSED
+}
+
+model RiskAssessment {
+  id          String   @id @default(uuid())
+  risk        Risk     @relation(fields: [riskId], references: [id])
+  riskId      String
+  likelihood  Int
+  impact      Int
+  score       Int
+  notes       String?
+  assessedAt  DateTime @default(now())
+  
+  @@index([riskId])
+}
+
+// Controls Management
+model Control {
+  id            String         @id @default(uuid())
+  name          String
+  description   String
+  type          ControlType
+  category      String
+  status        ControlStatus  @default(PLANNED)
+  effectiveness Int? // 1-5
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  organizationId String
+  implementedAt DateTime?
+  lastTested    DateTime?
+  nextTest      DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  risks         RiskControl[]
+  compliance    ComplianceControl[]
+  tests         ControlTest[]
+  
+  @@index([organizationId])
+  @@index([status])
+}
+
+enum ControlType {
+  PREVENTIVE
+  DETECTIVE
+  CORRECTIVE
+  DIRECTIVE
+}
+
+enum ControlStatus {
+  PLANNED
+  IMPLEMENTED
+  TESTING
+  OPERATIONAL
+  INEFFECTIVE
+  RETIRED
+}
+
+model RiskControl {
+  id         String   @id @default(uuid())
+  risk       Risk     @relation(fields: [riskId], references: [id])
+  riskId     String
+  control    Control  @relation(fields: [controlId], references: [id])
+  controlId  String
+  assignedAt DateTime @default(now())
+  
+  @@unique([riskId, controlId])
+  @@index([riskId])
+  @@index([controlId])
+}
+
+model ControlTest {
+  id          String   @id @default(uuid())
+  control     Control  @relation(fields: [controlId], references: [id])
+  controlId   String
+  result      TestResult
+  notes       String?
+  testedAt    DateTime @default(now())
+  
+  @@index([controlId])
+}
+
+enum TestResult {
+  PASSED
+  FAILED
+  PARTIAL
+  NOT_APPLICABLE
+}
+
+// Compliance Management
+model ComplianceFramework {
+  id              String              @id @default(uuid())
+  name            String
+  type            FrameworkType
+  version         String?
+  organization    Organization        @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  score           Int?                @default(0)
+  lastAssessed    DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  
+  requirements    ComplianceRequirement[]
+  controls        ComplianceControl[]
+  gapAnalyses     GapAnalysis[]
+  
+  @@index([organizationId])
+}
+
+enum FrameworkType {
+  GDPR
+  HIPAA
+  CCPA
+  LGPD
+  APPI
+  ISO27001
+  TISAX
+  SOC2
+  PCI_DSS
+  CUSTOM
+}
+
+model ComplianceRequirement {
+  id            String              @id @default(uuid())
+  framework     ComplianceFramework @relation(fields: [frameworkId], references: [id])
+  frameworkId   String
+  code          String
+  title         String
+  description   String
+  mandatory     Boolean             @default(true)
+  status        ComplianceStatus    @default(NOT_IMPLEMENTED)
+  
+  controls      ComplianceControl[]
+  
+  @@index([frameworkId])
+}
+
+model ComplianceControl {
+  id             String                @id @default(uuid())
+  requirement    ComplianceRequirement @relation(fields: [requirementId], references: [id])
+  requirementId  String
+  control        Control               @relation(fields: [controlId], references: [id])
+  controlId      String
+  framework      ComplianceFramework   @relation(fields: [frameworkId], references: [id])
+  frameworkId    String
+  mappedAt       DateTime              @default(now())
+  
+  @@unique([requirementId, controlId])
+  @@index([requirementId])
+  @@index([controlId])
+  @@index([frameworkId])
+}
+
+enum ComplianceStatus {
+  NOT_IMPLEMENTED
+  IN_PROGRESS
+  IMPLEMENTED
+  COMPLIANT
+  NON_COMPLIANT
+}
+
+model GapAnalysis {
+  id            String              @id @default(uuid())
+  framework     ComplianceFramework @relation(fields: [frameworkId], references: [id])
+  frameworkId   String
+  findings      Json // Array of gap findings
+  score         Int
+  recommendations Json
+  status        AnalysisStatus      @default(PENDING)
+  analyzedAt    DateTime            @default(now())
+  
+  @@index([frameworkId])
+  @@index([status])
+}
+
+enum AnalysisStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REVIEWED
+}
+
+// Incident Management
+model Incident {
+  id            String         @id @default(uuid())
+  title         String
+  description   String
+  severity      Severity
+  status        IncidentStatus @default(REPORTED)
+  category      String
+  reporter      User           @relation(fields: [reporterId], references: [id])
+  reporterId    String
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  organizationId String
+  rootCause     String?
+  resolution    String?
+  reportedAt    DateTime       @default(now())
+  resolvedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([severity])
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncidentStatus {
+  REPORTED
+  INVESTIGATING
+  CONTAINED
+  RESOLVED
+  CLOSED
+}
+
+// Policy Management
+model Policy {
+  id            String       @id @default(uuid())
+  title         String
+  description   String?
+  content       String
+  version       String       @default("1.0")
+  status        PolicyStatus @default(DRAFT)
+  category      String
+  owner         User         @relation(fields: [ownerId], references: [id])
+  ownerId       String
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  approvedAt    DateTime?
+  effectiveDate DateTime?
+  reviewDate    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  @@index([organizationId])
+  @@index([status])
+}
+
+enum PolicyStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+// Audit Log
+model AuditLog {
+  id            String   @id @default(uuid())
+  action        String
+  entity        String
+  entityId      String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  changes       Json?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}

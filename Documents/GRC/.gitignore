@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+**/node_modules/
+/.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# Build artifacts
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Uploads
+uploads/
+temp/
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
