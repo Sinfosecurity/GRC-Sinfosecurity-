@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Add, TrendingUp, TrendingDown } from '@mui/icons-material';
 
 const mockRisks = [
@@ -11,10 +11,10 @@ const mockRisks = [
 ];
 
 const getRiskColor = (score: number) => {
-  if (score >= 15) return '#f5576c'; // Critical/High
-  if (score >= 10) return '#fa709a'; // High
-  if (score >= 5) return '#fee140'; // Medium
-  return '#43e97b'; // Low
+  if (score >= 15) return '#f5576c';
+  if (score >= 10) return '#fa709a';
+  if (score >= 5) return '#fee140';
+  return '#43e97b';
 };
 
 const getStatusColor = (status: string) => {
@@ -30,12 +30,34 @@ const getStatusColor = (status: string) => {
 
 export default function RiskManagement() {
   const [risks] = useState(mockRisks);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newRisk, setNewRisk] = useState({
+    title: '',
+    category: '',
+    likelihood: 3,
+    impact: 3,
+    owner: '',
+    description: ''
+  });
 
-  // Calculate stats
   const criticalRisks = risks.filter(r => r.score >= 15).length;
   const highRisks = risks.filter(r => r.score >= 10 && r.score < 15).length;
   const totalRiskScore = risks.reduce((sum, r) => sum + r.score, 0);
   const avgRiskScore = (totalRiskScore / risks.length).toFixed(1);
+
+  const calculatedScore = newRisk.likelihood * newRisk.impact;
+
+  const handleAddRisk = () => {
+    if (newRisk.title && newRisk.category && newRisk.owner) {
+      alert(`Risk "${newRisk.title}" created!\n\nCalculated Score: ${calculatedScore}\nSeverity: ${calculatedScore >= 15 ? 'Critical' : calculatedScore >= 10 ? 'High' : calculatedScore >= 5 ? 'Medium' : 'Low'}`);
+      setOpenDialog(false);
+      setNewRisk({ title: '', category: '', likelihood: 3, impact: 3, owner: '', description: '' });
+    }
+  };
+
+  React.useEffect(() => {
+    console.log('Dialog state changed:', openDialog);
+  }, [openDialog]);
 
   return (
     <Box>
@@ -51,6 +73,10 @@ export default function RiskManagement() {
         <Button
           variant="contained"
           startIcon={<Add />}
+          onClick={() => {
+            console.log('Button clicked! Opening dialog...');
+            setOpenDialog(true);
+          }}
           sx={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             '&:hover': {
@@ -114,7 +140,7 @@ export default function RiskManagement() {
         </Grid>
       </Grid>
 
-      {/* Risks Table */}
+      {/* Risk Register */}
       <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
@@ -123,7 +149,7 @@ export default function RiskManagement() {
           <TableContainer component={Paper} sx={{ bgcolor: 'transparent' }}>
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow sx={{ bgcolor: 'rgba(255,255,255,0.05)' }}>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Risk</TableCell>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Category</TableCell>
                   <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Likelihood</TableCell>
@@ -158,11 +184,14 @@ export default function RiskManagement() {
                     <TableCell sx={{ color: 'white' }}>{risk.impact}/5</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography sx={{ color: getRiskColor(risk.score), fontWeight: 700 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: getRiskColor(risk.score) }}>
                           {risk.score}
                         </Typography>
-                        {risk.score >= 15 ? <TrendingUp sx={{ color: '#f5576c', fontSize: 20 }} /> :
-                          <TrendingDown sx={{ color: '#43e97b', fontSize: 20 }} />}
+                        {risk.score >= 15 ? (
+                          <TrendingUp sx={{ color: getRiskColor(risk.score), fontSize: 20 }} />
+                        ) : (
+                          <TrendingDown sx={{ color: getRiskColor(risk.score), fontSize: 20 }} />
+                        )}
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -175,7 +204,7 @@ export default function RiskManagement() {
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)' }}>{risk.owner}</TableCell>
+                    <TableCell sx={{ color: 'white' }}>{risk.owner}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -183,6 +212,117 @@ export default function RiskManagement() {
           </TableContainer>
         </CardContent>
       </Card>
+
+      {/* New Risk Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1f3a',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>New Risk Assessment</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Risk Title"
+                value={newRisk.title}
+                onChange={(e) => setNewRisk({ ...newRisk, title: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={newRisk.category}
+                  onChange={(e) => setNewRisk({ ...newRisk, category: e.target.value })}
+                  label="Category"
+                >
+                  <MenuItem value="Cybersecurity">Cybersecurity</MenuItem>
+                  <MenuItem value="Compliance">Compliance</MenuItem>
+                  <MenuItem value="Operational">Operational</MenuItem>
+                  <MenuItem value="Financial">Financial</MenuItem>
+                  <MenuItem value="Data Privacy">Data Privacy</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Risk Owner"
+                value={newRisk.owner}
+                onChange={(e) => setNewRisk({ ...newRisk, owner: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Likelihood (1-5)</InputLabel>
+                <Select
+                  value={newRisk.likelihood}
+                  onChange={(e) => setNewRisk({ ...newRisk, likelihood: Number(e.target.value) })}
+                  label="Likelihood (1-5)"
+                >
+                  {[1, 2, 3, 4, 5].map(val => <MenuItem key={val} value={val}>{val}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Impact (1-5)</InputLabel>
+                <Select
+                  value={newRisk.impact}
+                  onChange={(e) => setNewRisk({ ...newRisk, impact: Number(e.target.value) })}
+                  label="Impact (1-5)"
+                >
+                  {[1, 2, 3, 4, 5].map(val => <MenuItem key={val} value={val}>{val}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Box sx={{ p: 2, bgcolor: `${getRiskColor(calculatedScore)}20`, borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ color: getRiskColor(calculatedScore), fontWeight: 700 }}>
+                  Calculated Risk Score: {calculatedScore}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                  {calculatedScore >= 15 ? 'CRITICAL' : calculatedScore >= 10 ? 'HIGH' : calculatedScore >= 5 ? 'MEDIUM' : 'LOW'} Risk
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label="Risk Description"
+                value={newRisk.description}
+                onChange={(e) => setNewRisk({ ...newRisk, description: e.target.value })}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleAddRisk}
+            variant="contained"
+            disabled={!newRisk.title || !newRisk.category || !newRisk.owner}
+            sx={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            }}
+          >
+            Create Risk
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, Button, LinearProgress, Chip, List, ListItem, ListItemText } from '@mui/material';
-import { Add, CheckCircle, Warning } from '@mui/icons-material';
+import { Box, Typography, Grid, Card, CardContent, Button, LinearProgress, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Add, CheckCircle, Warning, Assessment } from '@mui/icons-material';
 
 const frameworks = [
   { id: 1, name: 'GDPR', type: 'Data Protection', score: 92, requirements: 99, implemented: 91, status: 'Compliant' },
@@ -37,6 +37,16 @@ const getSeverityColor = (severity: string) => {
 
 export default function ComplianceManagement() {
   const [selectedFramework, setSelectedFramework] = useState(frameworks[0]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedAnalysisFramework, setSelectedAnalysisFramework] = useState('');
+
+  const handleRunAnalysis = () => {
+    if (selectedAnalysisFramework) {
+      alert(`Running gap analysis for ${selectedAnalysisFramework}...\n\nAnalysis will identify missing controls and compliance gaps.`);
+      setOpenDialog(false);
+      setSelectedAnalysisFramework('');
+    }
+  };
 
   return (
     <Box>
@@ -52,6 +62,7 @@ export default function ComplianceManagement() {
         <Button
           variant="contained"
           startIcon={<Add />}
+          onClick={() => setOpenDialog(true)}
           sx={{
             background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
             '&:hover': {
@@ -154,22 +165,6 @@ export default function ComplianceManagement() {
                   </Box>
                 </Grid>
               </Grid>
-              <Box sx={{ mt: 3 }}>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  sx={{
-                    borderColor: '#00f2fe',
-                    color: '#00f2fe',
-                    '&:hover': {
-                      borderColor: '#4facfe',
-                      bgcolor: 'rgba(0, 242, 254, 0.1)',
-                    },
-                  }}
-                >
-                  View Detailed Requirements
-                </Button>
-              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -221,6 +216,59 @@ export default function ComplianceManagement() {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Gap Analysis Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1f3a',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Assessment sx={{ color: '#00f2fe' }} />
+            Run Gap Analysis
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2 }}>
+            <Typography variant="body2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
+              Select a framework to analyze compliance gaps and identify missing controls.
+            </Typography>
+            <FormControl fullWidth required>
+              <InputLabel>Framework</InputLabel>
+              <Select
+                value={selectedAnalysisFramework}
+                onChange={(e) => setSelectedAnalysisFramework(e.target.value)}
+                label="Framework"
+              >
+                {frameworks.map(fw => (
+                  <MenuItem key={fw.id} value={fw.name}>{fw.name} - {fw.type}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleRunAnalysis}
+            variant="contained"
+            disabled={!selectedAnalysisFramework}
+            sx={{
+              background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+            }}
+          >
+            Run Analysis
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

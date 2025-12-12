@@ -1,4 +1,5 @@
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, List, ListItem, ListItemText } from '@mui/material';
+import { useState } from 'react';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Add, Description, CheckCircle } from '@mui/icons-material';
 
 const policies = [
@@ -20,6 +21,14 @@ const getStatusColor = (status: string) => {
 };
 
 export default function PolicyManagement() {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newPolicy, setNewPolicy] = useState({
+    title: '',
+    category: '',
+    owner: '',
+    description: ''
+  });
+
   const published = policies.filter(p => p.status === 'Published').length;
   const needReview = policies.filter(p => {
     if (!p.reviewDate) return false;
@@ -28,6 +37,14 @@ export default function PolicyManagement() {
     const daysUntilReview = Math.floor((reviewDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return daysUntilReview <= 30;
   }).length;
+
+  const handleCreate = () => {
+    if (newPolicy.title && newPolicy.category && newPolicy.owner) {
+      alert(`Policy "${newPolicy.title}" created successfully!\n\nYou can now edit and publish the policy.`);
+      setOpenDialog(false);
+      setNewPolicy({ title: '', category: '', owner: '', description: '' });
+    }
+  };
 
   return (
     <Box>
@@ -43,6 +60,7 @@ export default function PolicyManagement() {
         <Button
           variant="contained"
           startIcon={<Add />}
+          onClick={() => setOpenDialog(true)}
           sx={{
             background: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
             '&:hover': {
@@ -168,6 +186,83 @@ export default function PolicyManagement() {
           </List>
         </CardContent>
       </Card>
+
+      {/* New Policy Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1f3a',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>Create New Policy</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Policy Title"
+                value={newPolicy.title}
+                onChange={(e) => setNewPolicy({ ...newPolicy, title: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={newPolicy.category}
+                  onChange={(e) => setNewPolicy({ ...newPolicy, category: e.target.value })}
+                  label="Category"
+                >
+                  <MenuItem value="Data Protection">Data Protection</MenuItem>
+                  <MenuItem value="Security">Security</MenuItem>
+                  <MenuItem value="Incident Management">Incident Management</MenuItem>
+                  <MenuItem value="Governance">Governance</MenuItem>
+                  <MenuItem value="Third Party">Third Party</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Policy Owner"
+                value={newPolicy.owner}
+                onChange={(e) => setNewPolicy({ ...newPolicy, owner: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label="Description / Purpose"
+                value={newPolicy.description}
+                onChange={(e) => setNewPolicy({ ...newPolicy, description: e.target.value })}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleCreate}
+            variant="contained"
+            disabled={!newPolicy.title || !newPolicy.category || !newPolicy.owner}
+            sx={{
+              background: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+            }}
+          >
+            Create Policy
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

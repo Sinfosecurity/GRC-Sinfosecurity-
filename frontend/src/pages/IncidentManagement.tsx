@@ -1,12 +1,12 @@
-import { Box, Typography, Grid, Card, CardContent, Button, Chip } from '@mui/material';
-import { Add, Error, Warning, Info } from '@mui/icons-material';
+import { useState } from 'react';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Add, Circle } from '@mui/icons-material';
 
 const incidents = [
-  { id: 1, title: 'Suspicious Login Attempts', severity: 'High', status: 'Investigating', category: 'Security', reportedAt: '2024-12-11 14:30', reporter: 'Security Team' },
-  { id: 2, title: 'Data Exfiltration Alert', severity: 'Critical', status: 'Contained', category: 'Data Breach', reportedAt: '2024-12-10 09:15', reporter: 'SIEM System' },
-  { id: 3, title: 'Policy Violation - USB Device', severity: 'Medium', status: 'Resolved', category: 'Policy', reportedAt: '2024-12-09 11:45', reporter: 'John Doe' },
-  { id: 4, title: 'Phishing Email Campaign', severity: 'High', status: 'Investigating', category: 'Security', reportedAt: '2024-12-08 16:20', reporter: 'Email Gateway' },
-  { id: 5, title: 'Unauthorized Access Attempt', severity: 'Medium', status: 'Resolved', category: 'Access Control', reportedAt: '2024-12-07 08:30', reporter: 'IAM System' },
+  { id: 1, title: 'Phishing Email Detected', severity: 'Medium', status: 'Resolved', reported: '2024-12-10 09:15', resolved: '2024-12-10 14:30' },
+  { id: 2, title: 'Unauthorized Access Attempt', severity: 'High', status: 'In Progress', reported: '2024-12-11 16:45', resolved: null },
+  { id: 3, title: 'Data Breach Alert', severity: 'Critical', status: 'In Progress', reported: '2024-12-12 08:00', resolved: null },
+  { id: 4, title: 'Malware Detection', severity: 'Medium', status: 'Resolved', reported: '2024-12-09 11:22', resolved: '2024-12-09 17:00' },
 ];
 
 const getSeverityColor = (severity: string) => {
@@ -19,26 +19,33 @@ const getSeverityColor = (severity: string) => {
   return colors[severity] || '#667eea';
 };
 
-const getSeverityIcon = (severity: string) => {
-  if (severity === 'Critical' || severity === 'High') return <Error />;
-  if (severity === 'Medium') return <Warning />;
-  return <Info />;
-};
-
 const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    'Reported': '#667eea',
-    'Investigating': '#00f2fe',
-    'Contained': '#fee140',
-    'Resolved': '#43e97b',
-    'Closed': '#888',
-  };
-  return colors[status] || '#667eea';
+  if (status === 'Resolved') return '#43e97b';
+  if (status === 'In Progress') return '#00f2fe';
+  return '#fee140';
 };
 
 export default function IncidentManagement() {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newIncident, setNewIncident] = useState({
+    title: '',
+    description: '',
+    severity: 'Medium',
+    category: '',
+    reportedBy: ''
+  });
+
   const critical = incidents.filter(i => i.severity === 'Critical').length;
-  const open = incidents.filter(i => i.status !== 'Resolved' && i.status !== 'Closed').length;
+  const inProgress = incidents.filter(i => i.status === 'In Progress').length;
+  const resolved = incidents.filter(i => i.status === 'Resolved').length;
+
+  const handleReportIncident = () => {
+    if (newIncident.title && newIncident.category && newIncident.reportedBy) {
+      alert(`Incident "${newIncident.title}" reported successfully!\n\nSeverity: ${newIncident.severity}\nIncident tracking number will be generated.`);
+      setOpenDialog(false);
+      setNewIncident({ title: '', description: '', severity: 'Medium', category: '', reportedBy: '' });
+    }
+  };
 
   return (
     <Box>
@@ -54,6 +61,7 @@ export default function IncidentManagement() {
         <Button
           variant="contained"
           startIcon={<Add />}
+          onClick={() => setOpenDialog(true)}
           sx={{
             background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
             color: '#000',
@@ -84,10 +92,10 @@ export default function IncidentManagement() {
           <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
             <CardContent>
               <Typography variant="h3" sx={{ color: '#00f2fe', fontWeight: 700 }}>
-                {open}
+                {inProgress}
               </Typography>
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                Open Incidents
+                In Progress
               </Typography>
             </CardContent>
           </Card>
@@ -96,68 +104,39 @@ export default function IncidentManagement() {
           <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
             <CardContent>
               <Typography variant="h3" sx={{ color: '#43e97b', fontWeight: 700 }}>
-                24h
+                {resolved}
               </Typography>
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                Avg Response Time
+                Resolved
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Incident Timeline */}
+      {/* Incident List */}
       <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-            Incident Timeline
+            Recent Incidents
           </Typography>
-          <Box sx={{ position: 'relative', pl: 4 }}>
-            {/* Vertical line */}
-            <Box sx={{
-              position: 'absolute',
-              left: '12px',
-              top: '20px',
-              bottom: '20px',
-              width: '2px',
-              bgcolor: 'rgba(255,255,255,0.2)'
-            }} />
-
+          <List>
             {incidents.map((incident) => (
-              <Box key={incident.id} sx={{ position: 'relative', mb: 3 }}>
-                {/* Dot */}
-                <Box sx={{
-                  position: 'absolute',
-                  left: '-28px',
-                  top: '20px',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  bgcolor: getSeverityColor(incident.severity),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 1
-                }}>
-                  {getSeverityIcon(incident.severity)}
-                </Box>
-
-                <Card sx={{ bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {incident.title}
-                      </Typography>
-                      <Chip
-                        label={incident.status}
-                        size="small"
-                        sx={{
-                          bgcolor: `${getStatusColor(incident.status)}20`,
-                          color: getStatusColor(incident.status),
-                        }}
-                      />
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <ListItem
+                key={incident.id}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.05)',
+                  borderRadius: 2,
+                  mb: 2,
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  alignItems: 'flex-start'
+                }}
+              >
+                <Circle sx={{ color: getSeverityColor(incident.severity), mr: 2, mt: 0.5 }} />
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Typography variant="h6">{incident.title}</Typography>
                       <Chip
                         label={incident.severity}
                         size="small"
@@ -167,21 +146,121 @@ export default function IncidentManagement() {
                         }}
                       />
                       <Chip
-                        label={incident.category}
+                        label={incident.status}
                         size="small"
-                        sx={{ bgcolor: 'rgba(102, 126, 234, 0.2)', color: '#667eea' }}
+                        sx={{
+                          bgcolor: `${getStatusColor(incident.status)}20`,
+                          color: getStatusColor(incident.status),
+                        }}
                       />
                     </Box>
+                  }
+                  secondary={
                     <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                      Reported by {incident.reporter} at {incident.reportedAt}
+                      Reported: {incident.reported}
+                      {incident.resolved && ` • Resolved: ${incident.resolved}`}
                     </Typography>
-                  </CardContent>
-                </Card>
-              </Box>
+                  }
+                />
+              </ListItem>
             ))}
-          </Box>
+          </List>
         </CardContent>
       </Card>
+
+      {/* Report Incident Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1f3a',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>Report Security Incident</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Incident Title"
+                value={newIncident.title}
+                onChange={(e) => setNewIncident({ ...newIncident, title: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Severity</InputLabel>
+                <Select
+                  value={newIncident.severity}
+                  onChange={(e) => setNewIncident({ ...newIncident, severity: e.target.value })}
+                  label="Severity"
+                >
+                  <MenuItem value="Low">Low</MenuItem>
+                  <MenuItem value="Medium">Medium</MenuItem>
+                  <MenuItem value="High">High</MenuItem>
+                  <MenuItem value="Critical">Critical</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Category</InputLabel>
+                <Select
+                  value={newIncident.category}
+                  onChange={(e) => setNewIncident({ ...newIncident, category: e.target.value })}
+                  label="Category"
+                >
+                  <MenuItem value="Data Breach">Data Breach</MenuItem>
+                  <MenuItem value="Unauthorized Access">Unauthorized Access</MenuItem>
+                  <MenuItem value="Malware">Malware</MenuItem>
+                  <MenuItem value="Phishing">Phishing</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Reported By"
+                value={newIncident.reportedBy}
+                onChange={(e) => setNewIncident({ ...newIncident, reportedBy: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label="Incident Description"
+                value={newIncident.description}
+                onChange={(e) => setNewIncident({ ...newIncident, description: e.target.value })}
+                placeholder="Describe what happened, when it was discovered, and any immediate actions taken..."
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleReportIncident}
+            variant="contained"
+            disabled={!newIncident.title || !newIncident.category || !newIncident.reportedBy}
+            sx={{
+              background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+              color: '#000'
+            }}
+          >
+            Report Incident
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

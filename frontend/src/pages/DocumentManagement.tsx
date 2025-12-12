@@ -1,5 +1,6 @@
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Add, Folder, InsertDriveFile, PictureAsPdf, Description, Image } from '@mui/icons-material';
+import { useState } from 'react';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, List, ListItem, ListItemIcon, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Add, Folder, InsertDriveFile, PictureAsPdf, Description, Image, CloudUpload } from '@mui/icons-material';
 
 const documents = [
   { id: 1, name: 'Risk Assessment Report Q4 2024.pdf', type: 'PDF', category: 'Risk Management', size: '2.4 MB', uploadedAt: '2024-12-10', uploadedBy: 'Jane Smith' },
@@ -18,10 +19,25 @@ const getFileIcon = (type: string) => {
 };
 
 export default function DocumentManagement() {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newDocument, setNewDocument] = useState({
+    name: '',
+    category: '',
+    description: ''
+  });
+
   const totalSize = documents.reduce((sum, doc) => {
     const size = parseFloat(doc.size);
     return sum + (doc.size.includes('MB') ? size : size / 1024);
   }, 0);
+
+  const handleUpload = () => {
+    if (newDocument.name && newDocument.category) {
+      alert(`Document "${newDocument.name}" uploaded successfully!\n\nThe document has been added to the ${newDocument.category} category.`);
+      setOpenDialog(false);
+      setNewDocument({ name: '', category: '', description: '' });
+    }
+  };
 
   return (
     <Box>
@@ -37,6 +53,7 @@ export default function DocumentManagement() {
         <Button
           variant="contained"
           startIcon={<Add />}
+          onClick={() => setOpenDialog(true)}
           sx={{
             background: 'linear-gradient(135deg, #fed6e3 0%, #fe90af 100%)',
             color: '#000',
@@ -137,6 +154,105 @@ export default function DocumentManagement() {
           </List>
         </CardContent>
       </Card>
+
+      {/* Upload Document Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1f3a',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: 'white' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CloudUpload sx={{ color: '#fe90af' }} />
+            Upload Document
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Document Name"
+                value={newDocument.name}
+                onChange={(e) => setNewDocument({ ...newDocument, name: e.target.value })}
+                required
+                placeholder="e.g., Risk Assessment Report Q1 2025"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                select
+                label="Category"
+                value={newDocument.category}
+                onChange={(e) => setNewDocument({ ...newDocument, category: e.target.value })}
+                required
+                SelectProps={{ native: true }}
+              >
+                <option value=""></option>
+                <option value="Risk Management">Risk Management</option>
+                <option value="Compliance">Compliance</option>
+                <option value="Controls">Controls</option>
+                <option value="Incident Management">Incident Management</option>
+                <option value="Policies">Policies</option>
+                <option value="Other">Other</option>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                label="Description (Optional)"
+                value={newDocument.description}
+                onChange={(e) => setNewDocument({ ...newDocument, description: e.target.value })}
+                placeholder="Brief description of the document content..."
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="outlined"
+                component="label"
+                fullWidth
+                startIcon={<CloudUpload />}
+                sx={{
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  color: 'white',
+                  py: 2,
+                  '&:hover': {
+                    borderColor: '#fe90af',
+                    bgcolor: 'rgba(254, 144, 175, 0.1)'
+                  }
+                }}
+              >
+                Choose File to Upload
+                <input type="file" hidden accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg" />
+              </Button>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleUpload}
+            variant="contained"
+            disabled={!newDocument.name || !newDocument.category}
+            sx={{
+              background: 'linear-gradient(135deg, #fed6e3 0%, #fe90af 100%)',
+              color: '#000'
+            }}
+          >
+            Upload Document
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
