@@ -10,6 +10,8 @@ import DocumentManagement from './pages/DocumentManagement';
 import ActivityLog from './pages/ActivityLog';
 import UserManagement from './pages/UserManagement';
 import Analytics from './pages/Analytics';
+import Tasks from './pages/Tasks';
+import WorkflowBuilder from './pages/WorkflowBuilder';
 import ISO27001 from './pages/ISO27001';
 import TISAX from './pages/TISAX';
 import Settings from './pages/Settings';
@@ -29,6 +31,8 @@ export default function App() {
                 <Route path="activity-log" element={<ActivityLog />} />
                 <Route path="user-management" element={<UserManagement />} />
                 <Route path="analytics" element={<Analytics />} />
+                <Route path="tasks" element={<Tasks />} />
+                <Route path="workflows" element={<WorkflowBuilder />} />
                 <Route path="iso27001" element={<ISO27001 />} />
                 <Route path="tisax" element={<TISAX />} />
                 <Route path="settings" element={<Settings />} />
