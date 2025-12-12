@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:4000/api/v1';
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -56,7 +57,9 @@ export const documentsAPI = {
 // Health check
 export const healthCheck = async () => {
     try {
-        const response = await axios.get('http://localhost:4000/health');
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
+        const healthUrl = baseUrl.replace('/api/v1', '/health');
+        const response = await axios.get(healthUrl);
         return response.data;
     } catch (error) {
         console.error('Backend health check failed:', error);
