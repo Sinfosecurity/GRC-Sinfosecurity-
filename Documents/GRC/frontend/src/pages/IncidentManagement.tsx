@@ -123,7 +123,7 @@ export default function IncidentManagement() {
               bgcolor: 'rgba(255,255,255,0.2)'
             }} />
 
-            {incidents.map((incident, index) => (
+            {incidents.map((incident) => (
               <Box key={incident.id} sx={{ position: 'relative', mb: 3 }}>
                 {/* Dot */}
                 <Box sx={{
