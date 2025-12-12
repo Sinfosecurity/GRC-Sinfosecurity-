@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, Card, CardContent, Button, LinearProgress } from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, LinearProgress } from '@mui/material';
 import { Security, CheckCircle } from '@mui/icons-material';
 
 const domains = [

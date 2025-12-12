@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent } from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip } from '@mui/material';
 import { Add, Error, Warning, Info } from '@mui/icons-material';
 
 const incidents = [
@@ -42,7 +42,7 @@ export default function IncidentManagement() {
 
   return (
     <Box>
-      <Box sx={{ display: ' flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
             Incident Management
@@ -112,55 +112,74 @@ export default function IncidentManagement() {
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
             Incident Timeline
           </Typography>
-          <Timeline sx={{ mt: 0, pt: 0 }}>
+          <Box sx={{ position: 'relative', pl: 4 }}>
+            {/* Vertical line */}
+            <Box sx={{
+              position: 'absolute',
+              left: '12px',
+              top: '20px',
+              bottom: '20px',
+              width: '2px',
+              bgcolor: 'rgba(255,255,255,0.2)'
+            }} />
+
             {incidents.map((incident, index) => (
-              <TimelineItem key={incident.id}>
-                <TimelineSeparator>
-                  <TimelineDot sx={{ bgcolor: getSeverityColor(incident.severity), border: 'none' }}>
-                    {getSeverityIcon(incident.severity)}
-                  </TimelineDot>
-                  {index < incidents.length - 1 && <TimelineConnector sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />}
-                </TimelineSeparator>
-                <TimelineContent>
-                  <Card sx={{ bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', mb: 2 }}>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {incident.title}
-                        </Typography>
-                        <Chip
-                          label={incident.status}
-                          size="small"
-                          sx={{
-                            bgcolor: `${getStatusColor(incident.status)}20`,
-                            color: getStatusColor(incident.status),
-                          }}
-                        />
-                      </Box>
-                      <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                        <Chip
-                          label={incident.severity}
-                          size="small"
-                          sx={{
-                            bgcolor: `${getSeverityColor(incident.severity)}20`,
-                            color: getSeverityColor(incident.severity),
-                          }}
-                        />
-                        <Chip
-                          label={incident.category}
-                          size="small"
-                          sx={{ bgcolor: 'rgba(102, 126, 234, 0.2)', color: '#667eea' }}
-                        />
-                      </Box>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                        Reported by {incident.reporter} at {incident.reportedAt}
+              <Box key={incident.id} sx={{ position: 'relative', mb: 3 }}>
+                {/* Dot */}
+                <Box sx={{
+                  position: 'absolute',
+                  left: '-28px',
+                  top: '20px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  bgcolor: getSeverityColor(incident.severity),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 1
+                }}>
+                  {getSeverityIcon(incident.severity)}
+                </Box>
+
+                <Card sx={{ bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {incident.title}
                       </Typography>
-                    </CardContent>
-                  </Card>
-                </TimelineContent>
-              </TimelineItem>
+                      <Chip
+                        label={incident.status}
+                        size="small"
+                        sx={{
+                          bgcolor: `${getStatusColor(incident.status)}20`,
+                          color: getStatusColor(incident.status),
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                      <Chip
+                        label={incident.severity}
+                        size="small"
+                        sx={{
+                          bgcolor: `${getSeverityColor(incident.severity)}20`,
+                          color: getSeverityColor(incident.severity),
+                        }}
+                      />
+                      <Chip
+                        label={incident.category}
+                        size="small"
+                        sx={{ bgcolor: 'rgba(102, 126, 234, 0.2)', color: '#667eea' }}
+                      />
+                    </Box>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                      Reported by {incident.reporter} at {incident.reportedAt}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
             ))}
-          </Timeline>
+          </Box>
         </CardContent>
       </Card>
     </Box>
