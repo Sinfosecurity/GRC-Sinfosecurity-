@@ -25,7 +25,13 @@ import {
     MenuItem,
     Tabs,
     Tab,
-    LinearProgress
+    LinearProgress,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    Stepper,
+    Step,
+    StepLabel,
 } from '@mui/material';
 import { Add, Business, Assessment, CheckCircle, Warning, Error as ErrorIcon } from '@mui/icons-material';
 
@@ -152,6 +158,9 @@ export default function VendorManagement() {
     const [tabValue, setTabValue] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+    const [assessmentDialog, setAssessmentDialog] = useState(false);
+    const [assessmentStep, setAssessmentStep] = useState(0);
+    const [assessmentAnswers, setAssessmentAnswers] = useState<Record<string, string>>({});
     const [newVendor, setNewVendor] = useState({
         name: '',
         category: '',
@@ -189,6 +198,204 @@ export default function VendorManagement() {
 
     const handleViewVendor = (vendor: Vendor) => {
         setSelectedVendor(vendor);
+    };
+
+    const handleStartAssessment = () => {
+        setSelectedVendor(null);
+        setAssessmentDialog(true);
+        setAssessmentStep(0);
+        setAssessmentAnswers({});
+    };
+
+    const assessmentSections = [
+        {
+            title: 'Information Security',
+            questions: [
+                {
+                    id: 'sec_1',
+                    question: 'Does the vendor maintain ISO 27001, SOC 2, or equivalent certification?',
+                    options: ['Yes - ISO 27001', 'Yes - SOC 2 Type II', 'Yes - Both', 'No certification', 'In progress'],
+                    weight: 10
+                },
+                {
+                    id: 'sec_2',
+                    question: 'How does the vendor handle data encryption?',
+                    options: ['Encryption at rest and in transit (AES-256/TLS 1.3)', 'Encryption at rest only', 'Encryption in transit only', 'No encryption', 'Unknown'],
+                    weight: 9
+                },
+                {
+                    id: 'sec_3',
+                    question: 'What is the vendor\'s incident response time commitment?',
+                    options: ['< 1 hour (Critical incidents)', '< 4 hours', '< 24 hours', 'No SLA defined', 'Unknown'],
+                    weight: 8
+                },
+                {
+                    id: 'sec_4',
+                    question: 'Does the vendor conduct regular penetration testing?',
+                    options: ['Quarterly by third-party', 'Annually by third-party', 'Internal testing only', 'No testing', 'Unknown'],
+                    weight: 7
+                }
+            ]
+        },
+        {
+            title: 'Data Privacy & Compliance',
+            questions: [
+                {
+                    id: 'priv_1',
+                    question: 'Is the vendor GDPR compliant (if processing EU data)?',
+                    options: ['Yes - Fully compliant with DPA', 'Yes - Standard contractual clauses', 'Partially compliant', 'Not applicable', 'No'],
+                    weight: 10
+                },
+                {
+                    id: 'priv_2',
+                    question: 'Where is customer data stored geographically?',
+                    options: ['EU/EEA only', 'US with Privacy Shield', 'Multi-region with data residency options', 'Outside EU/US', 'Unknown'],
+                    weight: 8
+                },
+                {
+                    id: 'priv_3',
+                    question: 'Does the vendor have a Data Processing Agreement (DPA)?',
+                    options: ['Yes - Signed and current', 'Yes - Pending signature', 'Standard terms only', 'No DPA', 'Not required'],
+                    weight: 9
+                },
+                {
+                    id: 'priv_4',
+                    question: 'How does the vendor handle data subject requests (GDPR Art. 15-22)?',
+                    options: ['Automated portal < 30 days', 'Manual process < 30 days', 'Manual process > 30 days', 'No defined process', 'Unknown'],
+                    weight: 7
+                }
+            ]
+        },
+        {
+            title: 'Access Control & Authentication',
+            questions: [
+                {
+                    id: 'access_1',
+                    question: 'Does the vendor support Multi-Factor Authentication (MFA)?',
+                    options: ['Yes - Mandatory for all users', 'Yes - Optional', 'Yes - Admin only', 'No', 'Unknown'],
+                    weight: 9
+                },
+                {
+                    id: 'access_2',
+                    question: 'What is the vendor\'s password policy?',
+                    options: ['Complex passwords + MFA + rotation', 'Complex passwords + rotation', 'Basic password requirements', 'No specific policy', 'Unknown'],
+                    weight: 7
+                },
+                {
+                    id: 'access_3',
+                    question: 'Does the vendor support SSO (Single Sign-On)?',
+                    options: ['Yes - SAML 2.0', 'Yes - OAuth 2.0', 'Yes - Both', 'No', 'Enterprise plan only'],
+                    weight: 6
+                },
+                {
+                    id: 'access_4',
+                    question: 'How are user access reviews conducted?',
+                    options: ['Automated quarterly reviews', 'Manual quarterly reviews', 'Annual reviews', 'No formal process', 'Unknown'],
+                    weight: 7
+                }
+            ]
+        },
+        {
+            title: 'Business Continuity & Availability',
+            questions: [
+                {
+                    id: 'bc_1',
+                    question: 'What is the vendor\'s uptime SLA?',
+                    options: ['99.99% (4 nines)', '99.9% (3 nines)', '99.5%', 'No SLA', 'Unknown'],
+                    weight: 8
+                },
+                {
+                    id: 'bc_2',
+                    question: 'Does the vendor have a documented Business Continuity Plan (BCP)?',
+                    options: ['Yes - Tested annually', 'Yes - Tested bi-annually', 'Yes - Not tested', 'No', 'Unknown'],
+                    weight: 9
+                },
+                {
+                    id: 'bc_3',
+                    question: 'What is the vendor\'s Recovery Time Objective (RTO)?',
+                    options: ['< 1 hour', '< 4 hours', '< 24 hours', '> 24 hours', 'Not defined'],
+                    weight: 8
+                },
+                {
+                    id: 'bc_4',
+                    question: 'Does the vendor have redundant infrastructure?',
+                    options: ['Multi-region active-active', 'Multi-region active-passive', 'Single region redundant', 'No redundancy', 'Unknown'],
+                    weight: 7
+                }
+            ]
+        },
+        {
+            title: 'Vendor Management & Due Diligence',
+            questions: [
+                {
+                    id: 'mgmt_1',
+                    question: 'How long has the vendor been in business?',
+                    options: ['10+ years', '5-10 years', '2-5 years', '< 2 years', 'Startup'],
+                    weight: 6
+                },
+                {
+                    id: 'mgmt_2',
+                    question: 'Does the vendor have cyber insurance?',
+                    options: ['Yes - $10M+ coverage', 'Yes - $5M-$10M', 'Yes - < $5M', 'No', 'Unknown'],
+                    weight: 7
+                },
+                {
+                    id: 'mgmt_3',
+                    question: 'Has the vendor had any security breaches in the past 3 years?',
+                    options: ['No breaches', 'Minor breach - quickly resolved', 'Major breach - resolved', 'Multiple breaches', 'Unknown'],
+                    weight: 10
+                },
+                {
+                    id: 'mgmt_4',
+                    question: 'Does the vendor conduct third-party security audits?',
+                    options: ['Yes - Annually', 'Yes - Every 2 years', 'Rarely', 'No', 'Unknown'],
+                    weight: 8
+                }
+            ]
+        }
+    ];
+
+    const calculateAssessmentScore = () => {
+        let totalScore = 0;
+        let maxScore = 0;
+
+        assessmentSections.forEach(section => {
+            section.questions.forEach(q => {
+                maxScore += q.weight * 4; // Max points = weight * 4 (best answer)
+                const answer = assessmentAnswers[q.id];
+                if (answer) {
+                    const answerIndex = q.options.indexOf(answer);
+                    // Score: first option = full points, decreasing for each subsequent option
+                    const points = answerIndex >= 0 ? (4 - answerIndex) * q.weight : 0;
+                    totalScore += Math.max(0, points);
+                }
+            });
+        });
+
+        return Math.round((totalScore / maxScore) * 100);
+    };
+
+    const handleCompleteAssessment = () => {
+        const score = calculateAssessmentScore();
+        const riskScore = 100 - score; // Inverse of compliance score
+        
+        if (selectedVendor) {
+            const updatedVendor = {
+                ...selectedVendor,
+                riskScore,
+                complianceScore: score,
+                lastAssessment: new Date().toISOString().split('T')[0],
+                assessmentStatus: 'Completed' as const
+            };
+            
+            setVendors(vendors.map(v => v.id === selectedVendor.id ? updatedVendor : v));
+        }
+        
+        alert(`Vendor Assessment Completed!\n\nCompliance Score: ${score}%\nRisk Score: ${riskScore}%\n\nRisk Level: ${riskScore < 30 ? 'Low' : riskScore < 50 ? 'Medium' : riskScore < 70 ? 'High' : 'Critical'}\n\nRecommendation: ${riskScore < 30 ? 'Approved for engagement' : riskScore < 50 ? 'Approved with monitoring' : riskScore < 70 ? 'Additional controls required' : 'High risk - executive approval needed'}`);
+        
+        setAssessmentDialog(false);
+        setAssessmentStep(0);
+        setAssessmentAnswers({});
     };
 
     return (
@@ -644,6 +851,7 @@ export default function VendorManagement() {
                             <Button
                                 variant="contained"
                                 startIcon={<Assessment />}
+                                onClick={handleStartAssessment}
                                 sx={{
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 }}
@@ -653,6 +861,175 @@ export default function VendorManagement() {
                         </DialogActions>
                     </>
                 )}
+            </Dialog>
+
+            {/* Vendor Risk Assessment Dialog */}
+            <Dialog
+                open={assessmentDialog}
+                onClose={() => setAssessmentDialog(false)}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#1a1f3a',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        minHeight: '600px'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ color: 'white', pb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                        <Assessment sx={{ fontSize: 32, color: '#667eea' }} />
+                        <Box>
+                            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                Vendor Risk Assessment
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                                {selectedVendor?.name || 'Third-Party Risk Evaluation'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    
+                    {/* Progress Stepper */}
+                    <Stepper activeStep={assessmentStep} sx={{ mt: 2 }}>
+                        {assessmentSections.map((section, index) => (
+                            <Step key={index}>
+                                <StepLabel
+                                    sx={{
+                                        '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' },
+                                        '& .Mui-active': { color: '#667eea' },
+                                        '& .Mui-completed': { color: '#43e97b' }
+                                    }}
+                                >
+                                    {section.title}
+                                </StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    
+                    {/* Progress Bar */}
+                    <Box sx={{ mt: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                                Overall Progress
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#667eea', fontWeight: 600 }}>
+                                {Math.round((Object.keys(assessmentAnswers).length / (assessmentSections.reduce((sum, s) => sum + s.questions.length, 0))) * 100)}%
+                            </Typography>
+                        </Box>
+                        <LinearProgress
+                            variant="determinate"
+                            value={(Object.keys(assessmentAnswers).length / (assessmentSections.reduce((sum, s) => sum + s.questions.length, 0))) * 100}
+                            sx={{
+                                height: 8,
+                                borderRadius: 4,
+                                bgcolor: 'rgba(255,255,255,0.1)',
+                                '& .MuiLinearProgress-bar': {
+                                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                                },
+                            }}
+                        />
+                    </Box>
+                </DialogTitle>
+
+                <DialogContent sx={{ pt: 3 }}>
+                    {assessmentStep < assessmentSections.length && (
+                        <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#667eea' }}>
+                                {assessmentSections[assessmentStep].title}
+                            </Typography>
+                            
+                            {assessmentSections[assessmentStep].questions.map((q, qIndex) => (
+                                <Box
+                                    key={q.id}
+                                    sx={{
+                                        mb: 4,
+                                        p: 3,
+                                        bgcolor: 'rgba(102, 126, 234, 0.05)',
+                                        borderRadius: 2,
+                                        border: '1px solid rgba(102, 126, 234, 0.2)',
+                                    }}
+                                >
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: 'white' }}>
+                                        {qIndex + 1}. {q.question}
+                                    </Typography>
+                                    
+                                    <RadioGroup
+                                        value={assessmentAnswers[q.id] || ''}
+                                        onChange={(e) => setAssessmentAnswers({ ...assessmentAnswers, [q.id]: e.target.value })}
+                                    >
+                                        {q.options.map((option, optIndex) => (
+                                            <FormControlLabel
+                                                key={optIndex}
+                                                value={option}
+                                                control={
+                                                    <Radio
+                                                        sx={{
+                                                            color: 'rgba(255,255,255,0.5)',
+                                                            '&.Mui-checked': { color: '#667eea' },
+                                                        }}
+                                                    />
+                                                }
+                                                label={
+                                                    <Typography variant="body2" sx={{ color: 'white' }}>
+                                                        {option}
+                                                    </Typography>
+                                                }
+                                                sx={{
+                                                    mb: 1,
+                                                    ml: 0,
+                                                    p: 1.5,
+                                                    borderRadius: 1,
+                                                    '&:hover': {
+                                                        bgcolor: 'rgba(102, 126, 234, 0.1)',
+                                                    },
+                                                }}
+                                            />
+                                        ))}
+                                    </RadioGroup>
+                                </Box>
+                            ))}
+                        </Box>
+                    )}
+                </DialogContent>
+
+                <DialogActions sx={{ p: 3, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <Button onClick={() => setAssessmentDialog(false)}>Cancel</Button>
+                    
+                    {assessmentStep > 0 && (
+                        <Button
+                            onClick={() => setAssessmentStep(assessmentStep - 1)}
+                            variant="outlined"
+                        >
+                            Previous
+                        </Button>
+                    )}
+                    
+                    {assessmentStep < assessmentSections.length - 1 ? (
+                        <Button
+                            onClick={() => setAssessmentStep(assessmentStep + 1)}
+                            variant="contained"
+                            sx={{
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            }}
+                        >
+                            Next Section
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={handleCompleteAssessment}
+                            variant="contained"
+                            disabled={Object.keys(assessmentAnswers).length < assessmentSections.reduce((sum, s) => sum + s.questions.length, 0)}
+                            sx={{
+                                background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                                color: '#000',
+                                fontWeight: 600,
+                            }}
+                        >
+                            Complete Assessment
+                        </Button>
+                    )}
+                </DialogActions>
             </Dialog>
         </Box>
     );
