@@ -1023,8 +1023,13 @@ export default function VendorManagement() {
                             sx={{
                                 background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                                 color: '#000',
-                                fontWeight: 600,
-                                fontSize: '0.95rem',
+                                fontWeight: 700,
+                                fontSize: '1rem',
+                                px: 4,
+                                '&.Mui-disabled': {
+                                    background: 'rgba(255,255,255,0.12)',
+                                    color: 'rgba(255,255,255,0.3)',
+                                },
                             }}
                         >
                             Complete
