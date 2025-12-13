@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import Landing from './pages/Landing';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RiskManagement from './pages/RiskManagement';
@@ -25,9 +26,9 @@ import Settings from './pages/Settings';
 export default function App() {
     return (
         <Routes>
-            <Route path="/" element={<Layout />}>
-                <Route index element={<Navigate to="/dashboard" replace />} />
-                <Route path="dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Landing />} />
+            <Route element={<Layout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="risk-management" element={<RiskManagement />} />
                 <Route path="compliance" element={<ComplianceManagement />} />
                 <Route path="controls" element={<ControlsManagement />} />
