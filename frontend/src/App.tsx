@@ -19,6 +19,7 @@ import AIInsights from './pages/AIInsights';
 import PredictiveAnalytics from './pages/PredictiveAnalytics';
 import Reports from './pages/Reports';
 import VendorManagement from './pages/VendorManagement';
+import SOCReports from './pages/SOCReports';
 import OnboardingWizard from './pages/OnboardingWizard';
 import ISO27001 from './pages/ISO27001';
 import TISAX from './pages/TISAX';
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="predictive-analytics" element={<PredictiveAnalytics />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="vendor-management" element={<VendorManagement />} />
+                <Route path="soc-reports" element={<SOCReports />} />
                 <Route path="onboarding" element={<OnboardingWizard />} />
                 <Route path="iso27001" element={<ISO27001 />} />
                 <Route path="tisax" element={<TISAX />} />

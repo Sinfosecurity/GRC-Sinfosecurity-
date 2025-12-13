@@ -36,6 +36,7 @@ const menuItems = [
     { text: 'Documents', path: '/documents', icon: <DocumentIcon />, color: '#fed6e3' },
     { text: 'ISO 27001', path: '/iso27001', icon: <ISOIcon />, color: '#fecfef' },
     { text: 'TISAX', path: '/tisax', icon: <TISAXIcon />, color: '#fcb69f' },
+    { text: 'SOC Reports', path: '/soc-reports', icon: <ISOIcon />, color: '#43e97b' },
     { text: 'Activity Log', path: '/activity-log', icon: <ActivityIcon />, color: '#a29bfe' },
     { text: 'User Management', path: '/user-management', icon: <UserIcon />, color: '#fd79a8' },
     { text: 'Analytics', path: '/analytics', icon: <AnalyticsIcon />, color: '#74b9ff' },
