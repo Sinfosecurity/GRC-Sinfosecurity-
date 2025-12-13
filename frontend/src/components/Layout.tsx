@@ -1,3 +1,4 @@
+```
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Typography, Avatar, Stack } from '@mui/material';
 import {
@@ -11,6 +12,16 @@ import {
     Security as ISOIcon,
     DirectionsCar as TISAXIcon,
     Settings as SettingsIcon,
+    History as ActivityIcon,
+    People as UserIcon,
+    Analytics as AnalyticsIcon,
+    Assignment as TaskIcon,
+    AccountTree as WorkflowIcon,
+    Business as BCPIcon,
+    Psychology as AIIcon,
+    Timeline as PredictiveIcon,
+    Assessment as ReportIcon,
+    Store as VendorIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 280;
@@ -25,6 +36,16 @@ const menuItems = [
     { text: 'Documents', path: '/documents', icon: <DocumentIcon />, color: '#fed6e3' },
     { text: 'ISO 27001', path: '/iso27001', icon: <ISOIcon />, color: '#fecfef' },
     { text: 'TISAX', path: '/tisax', icon: <TISAXIcon />, color: '#fcb69f' },
+    { text: 'Activity Log', path: '/activity-log', icon: <ActivityIcon />, color: '#a29bfe' },
+    { text: 'User Management', path: '/user-management', icon: <UserIcon />, color: '#fd79a8' },
+    { text: 'Analytics', path: '/analytics', icon: <AnalyticsIcon />, color: '#74b9ff' },
+    { text: 'Tasks', path: '/tasks', icon: <TaskIcon />, color: '#fab1a0' },
+    { text: 'Workflows', path: '/workflows', icon: <WorkflowIcon />, color: '#55efc4' },
+    { text: 'Business Continuity', path: '/business-continuity', icon: <BCPIcon />, color: '#ffeaa7' },
+    { text: 'AI Insights', path: '/ai-insights', icon: <AIIcon />, color: '#a29bfe' },
+    { text: 'Predictive Analytics', path: '/predictive-analytics', icon: <PredictiveIcon />, color: '#fd79a8' },
+    { text: 'Reports', path: '/reports', icon: <ReportIcon />, color: '#dfe6e9' },
+    { text: 'Vendor Management', path: '/vendor-management', icon: <VendorIcon />, color: '#81ecec' },
 ];
 
 export default function Layout() {
@@ -77,10 +98,10 @@ export default function Layout() {
                                     mb: 1,
                                     borderRadius: 2,
                                     cursor: 'pointer',
-                                    background: isActive ? `linear-gradient(135deg, ${item.color} 0%, ${item.color}cc 100%)` : 'transparent',
+                                    background: isActive ? `linear - gradient(135deg, ${ item.color } 0 %, ${ item.color }cc 100 %)` : 'transparent',
                                     color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
                                     '&:hover': {
-                                        background: isActive ? `linear-gradient(135deg, ${item.color} 0%, ${item.color}cc 100%)` : 'rgba(102, 126, 234, 0.1)',
+                                        background: isActive ? `linear - gradient(135deg, ${ item.color } 0 %, ${ item.color }cc 100 %)` : 'rgba(102, 126, 234, 0.1)',
                                         transform: 'translateX(4px)',
                                     },
                                     transition: 'all 0.3s ease',
