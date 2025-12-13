@@ -92,7 +92,7 @@ const initialUsers = [
 ];
 
 export default function UserManagement() {
-    const [users, setUsers] = useState(initialUsers);
+    const [users] = useState(initialUsers);
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserRole, setNewUserRole] = useState('VIEWER');

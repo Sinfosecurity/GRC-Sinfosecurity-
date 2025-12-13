@@ -13,7 +13,6 @@ import {
     TableHead,
     TableRow,
     Chip,
-    LinearProgress,
 } from '@mui/material';
 import {
     Business,

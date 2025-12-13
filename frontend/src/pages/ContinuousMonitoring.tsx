@@ -18,7 +18,6 @@ import {
     Switch,
     FormControlLabel,
     Alert,
-    IconButton,
     Tooltip,
 } from '@mui/material';
 import {
@@ -30,7 +29,6 @@ import {
     TrendingUp,
     TrendingDown,
     Security,
-    Assessment,
     Speed,
 } from '@mui/icons-material';
 
@@ -72,21 +70,6 @@ const getStatusIcon = (status: string) => {
             return <Error sx={{ color: '#f5576c', fontSize: 24 }} />;
         default:
             return <Security sx={{ color: '#667eea', fontSize: 24 }} />;
-    }
-};
-
-const getSeverityColor = (severity: string) => {
-    switch (severity) {
-        case 'critical':
-            return '#f5576c';
-        case 'high':
-            return '#fa709a';
-        case 'medium':
-            return '#fee140';
-        case 'low':
-            return '#43e97b';
-        default:
-            return '#667eea';
     }
 };
 

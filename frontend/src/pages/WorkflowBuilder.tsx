@@ -69,7 +69,7 @@ const mockWorkflows = [
 ];
 
 export default function WorkflowBuilder() {
-    const [workflows, setWorkflows] = useState(mockWorkflows);
+    const [workflows] = useState(mockWorkflows);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
     const getStatusColor = (status: string) => {

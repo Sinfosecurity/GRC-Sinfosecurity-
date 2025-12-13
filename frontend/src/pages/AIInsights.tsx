@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
     Box,
     Typography,
@@ -9,8 +9,6 @@ import {
     LinearProgress,
     List,
     ListItem,
-    ListItemIcon,
-    ListItemText,
 } from '@mui/material';
 import {
     Psychology,

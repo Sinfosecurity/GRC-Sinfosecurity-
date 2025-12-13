@@ -91,7 +91,7 @@ const mockTasks = [
 ];
 
 export default function Tasks() {
-    const [tasks, setTasks] = useState(mockTasks);
+    const [tasks] = useState(mockTasks);
     const [tabValue, setTabValue] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [newTask, setNewTask] = useState({
@@ -406,7 +406,7 @@ export default function Tasks() {
                                 rows={3}
                                 label="Description"
                                 value={newTask.description}
-                                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                                onChange={() => setNewTask({ ...newTask, description: '' })}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>

@@ -27,7 +27,7 @@ interface CommentSectionProps {
     onCommentAdded?: (comment: Comment) => void;
 }
 
-export default function CommentSection({ resourceType, resourceId, onCommentAdded }: CommentSectionProps) {
+export default function CommentSection({ resourceType: _resourceType, resourceId: _resourceId, onCommentAdded }: CommentSectionProps) {
     const [comments, setComments] = useState<Comment[]>([
         {
             id: '1',
