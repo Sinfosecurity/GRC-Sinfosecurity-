@@ -406,7 +406,7 @@ export default function Tasks() {
                                 rows={3}
                                 label="Description"
                                 value={newTask.description}
-                                onChange={() => setNewTask({ ...newTask, description: '' })}
+                                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
