@@ -17,6 +17,13 @@ import controlsRoutes from './routes/controls.routes';
 import incidentRoutes from './routes/incident.routes';
 import policyRoutes from './routes/policy.routes';
 import documentRoutes from './routes/document.routes';
+import auditRoutes from './routes/audit.routes';
+import userRoutes from './routes/user.routes';
+import notificationRoutes from './routes/notification.routes';
+import taskRoutes from './routes/task.routes';
+import workflowRoutes from './routes/workflow.routes';
+import reportRoutes from './routes/report.routes';
+import mobileRoutes from './routes/mobile.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -69,6 +76,13 @@ app.use(`${API_PREFIX}/controls`, controlsRoutes);
 app.use(`${API_PREFIX}/incidents`, incidentRoutes);
 app.use(`${API_PREFIX}/policies`, policyRoutes);
 app.use(`${API_PREFIX}/documents`, documentRoutes);
+app.use(`${API_PREFIX}/audit`, auditRoutes);
+app.use(`${API_PREFIX}/users`, userRoutes);
+app.use(`${API_PREFIX}/notifications`, notificationRoutes);
+app.use(`${API_PREFIX}/tasks`, taskRoutes);
+app.use(`${API_PREFIX}/workflows`, workflowRoutes);
+app.use(`${API_PREFIX}/reports`, reportRoutes);
+app.use(`${API_PREFIX}/mobile`, mobileRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
