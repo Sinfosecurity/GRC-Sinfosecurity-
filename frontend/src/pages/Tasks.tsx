@@ -93,6 +93,15 @@ const mockTasks = [
 export default function Tasks() {
     const [tasks, setTasks] = useState(mockTasks);
     const [tabValue, setTabValue] = useState(0);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newTask, setNewTask] = useState({
+        title: '',
+        description: '',
+        type: 'compliance',
+        assignedTo: '',
+        dueDate: '',
+        priority: 'medium'
+    });
 
     const getPriorityColor = (priority: string) => {
         switch (priority) {
@@ -131,6 +140,14 @@ export default function Tasks() {
         // In production, call API to complete task
     };
 
+    const handleCreateTask = () => {
+        if (newTask.title && newTask.assignedTo && newTask.dueDate) {
+            alert(`Task "${newTask.title}" created successfully!\n\nAssigned to: ${newTask.assignedTo}\nDue: ${newTask.dueDate}\nPriority: ${newTask.priority}`);
+            setOpenDialog(false);
+            setNewTask({ title: '', description: '', type: 'compliance', assignedTo: '', dueDate: '', priority: 'medium' });
+        }
+    };
+
     return (
         <Box>
             {/* Header */}
@@ -146,6 +163,7 @@ export default function Tasks() {
                 <Button
                     variant="contained"
                     startIcon={<Assignment />}
+                    onClick={() => setOpenDialog(true)}
                     sx={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         '&:hover': {
@@ -355,6 +373,109 @@ export default function Tasks() {
                     </TableContainer>
                 </CardContent>
             </Card>
+
+            {/* Create Task Dialog */}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#1a1f3a',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ color: 'white' }}>Create New Task</DialogTitle>
+                <DialogContent>
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Task Title"
+                                value={newTask.title}
+                                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                label="Description"
+                                value={newTask.description}
+                                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth required>
+                                <InputLabel>Task Type</InputLabel>
+                                <Select
+                                    value={newTask.type}
+                                    onChange={(e) => setNewTask({ ...newTask, type: e.target.value })}
+                                    label="Task Type"
+                                >
+                                    <MenuItem value="compliance">Compliance</MenuItem>
+                                    <MenuItem value="risk_assessment">Risk Assessment</MenuItem>
+                                    <MenuItem value="audit">Audit</MenuItem>
+                                    <MenuItem value="policy_review">Policy Review</MenuItem>
+                                    <MenuItem value="control_testing">Control Testing</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth required>
+                                <InputLabel>Priority</InputLabel>
+                                <Select
+                                    value={newTask.priority}
+                                    onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                                    label="Priority"
+                                >
+                                    <MenuItem value="low">Low</MenuItem>
+                                    <MenuItem value="medium">Medium</MenuItem>
+                                    <MenuItem value="high">High</MenuItem>
+                                    <MenuItem value="critical">Critical</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Assigned To"
+                                value={newTask.assignedTo}
+                                onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                type="date"
+                                label="Due Date"
+                                value={newTask.dueDate}
+                                onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                                InputLabelProps={{ shrink: true }}
+                                required
+                            />
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+                    <Button
+                        onClick={handleCreateTask}
+                        variant="contained"
+                        disabled={!newTask.title || !newTask.assignedTo || !newTask.dueDate}
+                        sx={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        }}
+                    >
+                        Create Task
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
