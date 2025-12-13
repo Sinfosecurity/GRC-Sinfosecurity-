@@ -32,57 +32,126 @@ import {
     Security,
     Visibility,
     VerifiedUser,
+    SupervisorAccount,
+    ManageAccounts,
+    Assessment,
+    Groups,
+    Create,
 } from '@mui/icons-material';
 
-// User roles
-const roles = ['ADMIN', 'COMPLIANCE_OFFICER', 'AUDITOR', 'VIEWER'];
+// Enhanced organization roles (8 roles)
+const roles = [
+    'ORG_OWNER',
+    'ORG_ADMIN',
+    'COMPLIANCE_MANAGER',
+    'RISK_MANAGER',
+    'AUDITOR',
+    'DEPARTMENT_MANAGER',
+    'CONTRIBUTOR',
+    'VIEWER',
+];
 
 const roleIcons: Record<string, JSX.Element> = {
-    ADMIN: <AdminPanelSettings sx={{ color: '#f5576c' }} />,
-    COMPLIANCE_OFFICER: <VerifiedUser sx={{ color: '#667eea' }} />,
+    ORG_OWNER: <SupervisorAccount sx={{ color: '#f5576c' }} />,
+    ORG_ADMIN: <AdminPanelSettings sx={{ color: '#f5576c' }} />,
+    COMPLIANCE_MANAGER: <VerifiedUser sx={{ color: '#667eea' }} />,
+    RISK_MANAGER: <Assessment sx={{ color: '#667eea' }} />,
     AUDITOR: <Security sx={{ color: '#43e97b' }} />,
+    DEPARTMENT_MANAGER: <ManageAccounts sx={{ color: '#feca57' }} />,
+    CONTRIBUTOR: <Create sx={{ color: '#43e97b' }} />,
     VIEWER: <Visibility sx={{ color: '#feca57' }} />,
 };
 
 const roleColors: Record<string, string> = {
-    ADMIN: '#f5576c',
-    COMPLIANCE_OFFICER: '#667eea',
+    ORG_OWNER: '#f5576c',
+    ORG_ADMIN: '#f5576c',
+    COMPLIANCE_MANAGER: '#667eea',
+    RISK_MANAGER: '#667eea',
     AUDITOR: '#43e97b',
+    DEPARTMENT_MANAGER: '#feca57',
+    CONTRIBUTOR: '#43e97b',
     VIEWER: '#feca57',
 };
 
-// Mock user data
+const roleDescriptions: Record<string, string> = {
+    ORG_OWNER: 'Full control including billing and organization management',
+    ORG_ADMIN: 'User management and settings (no billing access)',
+    COMPLIANCE_MANAGER: 'Full GRC operations and compliance management',
+    RISK_MANAGER: 'Risk assessment, incident management, and controls',
+    AUDITOR: 'Read-only access to all modules with export capability',
+    DEPARTMENT_MANAGER: 'Manage assigned tasks within department',
+    CONTRIBUTOR: 'Create and edit assigned items',
+    VIEWER: 'Read-only access to dashboards and reports',
+};
+
+// Mock user data with 8 roles
 const initialUsers = [
     {
         id: 'user_1',
+        name: 'Organization Owner',
+        email: 'owner@sinfosecurity.com',
+        role: 'ORG_OWNER',
+        department: 'Executive',
+        status: 'active',
+        lastLogin: '1 hour ago',
+    },
+    {
+        id: 'user_2',
         name: 'Admin User',
         email: 'admin@sinfosecurity.com',
-        role: 'ADMIN',
+        role: 'ORG_ADMIN',
         department: 'IT',
         status: 'active',
         lastLogin: '2 hours ago',
     },
     {
-        id: 'user_2',
-        name: 'Compliance Officer',
+        id: 'user_3',
+        name: 'Compliance Manager',
         email: 'compliance@sinfosecurity.com',
-        role: 'COMPLIANCE_OFFICER',
+        role: 'COMPLIANCE_MANAGER',
         department: 'Compliance',
         status: 'active',
         lastLogin: '1 day ago',
     },
     {
-        id: 'user_3',
+        id: 'user_4',
+        name: 'Risk Manager',
+        email: 'risk@sinfosecurity.com',
+        role: 'RISK_MANAGER',
+        department: 'Risk',
+        status: 'active',
+        lastLogin: '3 days ago',
+    },
+    {
+        id: 'user_5',
         name: 'Internal Auditor',
         email: 'auditor@sinfosecurity.com',
         role: 'AUDITOR',
         department: 'Audit',
         status: 'active',
-        lastLogin: '3 days ago',
+        lastLogin: '5 days ago',
     },
     {
-        id: 'user_4',
-        name: 'Management Viewer',
+        id: 'user_6',
+        name: 'Department Manager',
+        email: 'dept.manager@sinfosecurity.com',
+        role: 'DEPARTMENT_MANAGER',
+        department: 'Finance',
+        status: 'active',
+        lastLogin: '2 days ago',
+    },
+    {
+        id: 'user_7',
+        name: 'Team Contributor',
+        email: 'contributor@sinfosecurity.com',
+        role: 'CONTRIBUTOR',
+        department: 'Operations',
+        status: 'active',
+        lastLogin: '1 day ago',
+    },
+    {
+        id: 'user_8',
+        name: 'Executive Viewer',
         email: 'viewer@sinfosecurity.com',
         role: 'VIEWER',
         department: 'Executive',
@@ -96,13 +165,16 @@ export default function UserManagement() {
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
     const [newUserEmail, setNewUserEmail] = useState('');
     const [newUserRole, setNewUserRole] = useState('VIEWER');
+    const [newUserDepartment, setNewUserDepartment] = useState('');
 
     const handleInviteUser = () => {
         if (newUserEmail) {
             console.log(`Inviting ${newUserEmail} as ${newUserRole}`);
+            alert(`Invitation sent to ${newUserEmail} as ${newUserRole}`);
             setInviteDialogOpen(false);
             setNewUserEmail('');
             setNewUserRole('VIEWER');
+            setNewUserDepartment('');
         }
     };
 
@@ -344,12 +416,26 @@ export default function UserManagement() {
                                     <MenuItem key={role} value={role}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             {roleIcons[role]}
-                                            <Typography>{role.replace('_', ' ')}</Typography>
+                                            <Box>
+                                                <Typography sx={{ fontWeight: 600 }}>
+                                                    {role.replace(/_/g, ' ')}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                                                    {roleDescriptions[role]}
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
+                        <TextField
+                            fullWidth
+                            label="Department (Optional)"
+                            value={newUserDepartment}
+                            onChange={(e) => setNewUserDepartment(e.target.value)}
+                            placeholder="e.g., IT, Compliance, Finance"
+                        />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>

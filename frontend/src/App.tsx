@@ -10,6 +10,7 @@ import PolicyManagement from './pages/PolicyManagement';
 import DocumentManagement from './pages/DocumentManagement';
 import ActivityLog from './pages/ActivityLog';
 import UserManagement from './pages/UserManagement';
+import OrganizationSettings from './pages/OrganizationSettings';
 import Analytics from './pages/Analytics';
 import Tasks from './pages/Tasks';
 import WorkflowBuilder from './pages/WorkflowBuilder';
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="documents" element={<DocumentManagement />} />
                 <Route path="activity-log" element={<ActivityLog />} />
                 <Route path="user-management" element={<UserManagement />} />
+                <Route path="organization-settings" element={<OrganizationSettings />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="workflows" element={<WorkflowBuilder />} />

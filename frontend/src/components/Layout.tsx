@@ -11,6 +11,7 @@ import {
     Security as ISOIcon,
     DirectionsCar as TISAXIcon,
     Settings as SettingsIcon,
+    Business as OrgIcon,
     History as ActivityIcon,
     People as UserIcon,
     Analytics as AnalyticsIcon,
@@ -123,6 +124,23 @@ export default function Layout() {
 
                 {/* Settings at bottom */}
                 <List sx={{ px: 2, pb: 2 }}>
+                    <ListItem
+                        onClick={() => navigate('/organization-settings')}
+                        sx={{
+                            borderRadius: 2,
+                            cursor: 'pointer',
+                            color: 'rgba(255,255,255,0.7)',
+                            mb: 1,
+                            '&:hover': {
+                                background: 'rgba(102, 126, 234, 0.1)',
+                            },
+                        }}
+                    >
+                        <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
+                            <OrgIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Organization" />
+                    </ListItem>
                     <ListItem
                         onClick={() => navigate('/settings')}
                         sx={{
