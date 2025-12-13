@@ -13,12 +13,22 @@ import {
     TableHead,
     TableRow,
     Chip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from '@mui/material';
 import {
     Business,
     Schedule,
     Speed,
     CheckCircle,
+    Add,
 } from '@mui/icons-material';
 
 // Mock data
@@ -46,7 +56,16 @@ const mockProcesses = [
 ];
 
 export default function BusinessContinuity() {
-    const [processes] = useState(mockProcesses);
+    const [processes, setProcesses] = useState(mockProcesses);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newProcess, setNewProcess] = useState({
+        name: '',
+        owner: '',
+        criticalityLevel: 'medium',
+        rto: '',
+        rpo: '',
+        financialImpact: '',
+    });
 
     const getCriticalityColor = (level: string) => {
         const colors: Record<string, string> = {
@@ -56,6 +75,34 @@ export default function BusinessContinuity() {
             low: '#43e97b',
         };
         return colors[level] || '#667eea';
+    };
+
+    const handleCreateProcess = () => {
+        if (newProcess.name && newProcess.owner && newProcess.rto && newProcess.rpo && newProcess.financialImpact) {
+            const process = {
+                id: `bp_${processes.length + 1}`,
+                name: newProcess.name,
+                owner: newProcess.owner,
+                criticalityLevel: newProcess.criticalityLevel,
+                rto: parseFloat(newProcess.rto),
+                rpo: parseFloat(newProcess.rpo),
+                financialImpact: parseFloat(newProcess.financialImpact),
+                lastTested: new Date().toISOString().split('T')[0],
+            };
+            
+            setProcesses([...processes, process]);
+            setOpenDialog(false);
+            setNewProcess({
+                name: '',
+                owner: '',
+                criticalityLevel: 'medium',
+                rto: '',
+                rpo: '',
+                financialImpact: '',
+            });
+            
+            alert(`Business process "${newProcess.name}" created successfully!`);
+        }
     };
 
     return (
@@ -159,6 +206,8 @@ export default function BusinessContinuity() {
                         </Typography>
                         <Button
                             variant="contained"
+                            startIcon={<Add />}
+                            onClick={() => setOpenDialog(true)}
                             sx={{
                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 '&:hover': { background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)' },
@@ -236,6 +285,200 @@ export default function BusinessContinuity() {
                     </TableContainer>
                 </CardContent>
             </Card>
+
+            {/* New Process Dialog */}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#1a1f3a',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                    },
+                }}
+            >
+                <DialogTitle sx={{ color: 'white' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Business sx={{ color: '#667eea', fontSize: 32 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            Add Critical Business Process
+                        </Typography>
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <Grid container spacing={3} sx={{ mt: 1 }}>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Process Name"
+                                value={newProcess.name}
+                                onChange={(e) => setNewProcess({ ...newProcess, name: e.target.value })}
+                                placeholder="e.g., Customer Payment Processing"
+                                required
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Process Owner"
+                                value={newProcess.owner}
+                                onChange={(e) => setNewProcess({ ...newProcess, owner: e.target.value })}
+                                placeholder="e.g., Finance Director"
+                                required
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth required>
+                                <InputLabel>Criticality Level</InputLabel>
+                                <Select
+                                    value={newProcess.criticalityLevel}
+                                    label="Criticality Level"
+                                    onChange={(e) => setNewProcess({ ...newProcess, criticalityLevel: e.target.value })}
+                                >
+                                    <MenuItem value="critical">
+                                        <Chip
+                                            label="CRITICAL"
+                                            size="small"
+                                            sx={{
+                                                bgcolor: '#f5576c20',
+                                                color: '#f5576c',
+                                                fontWeight: 600,
+                                            }}
+                                        />
+                                    </MenuItem>
+                                    <MenuItem value="high">
+                                        <Chip
+                                            label="HIGH"
+                                            size="small"
+                                            sx={{
+                                                bgcolor: '#ff980020',
+                                                color: '#ff9800',
+                                                fontWeight: 600,
+                                            }}
+                                        />
+                                    </MenuItem>
+                                    <MenuItem value="medium">
+                                        <Chip
+                                            label="MEDIUM"
+                                            size="small"
+                                            sx={{
+                                                bgcolor: '#feca5720',
+                                                color: '#feca57',
+                                                fontWeight: 600,
+                                            }}
+                                        />
+                                    </MenuItem>
+                                    <MenuItem value="low">
+                                        <Chip
+                                            label="LOW"
+                                            size="small"
+                                            sx={{
+                                                bgcolor: '#43e97b20',
+                                                color: '#43e97b',
+                                                fontWeight: 600,
+                                            }}
+                                        />
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="RTO (Recovery Time Objective)"
+                                type="number"
+                                value={newProcess.rto}
+                                onChange={(e) => setNewProcess({ ...newProcess, rto: e.target.value })}
+                                placeholder="Hours"
+                                helperText="Max acceptable downtime"
+                                required
+                                InputProps={{
+                                    endAdornment: <Typography sx={{ color: 'rgba(255,255,255,0.5)' }}>hours</Typography>,
+                                }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="RPO (Recovery Point Objective)"
+                                type="number"
+                                value={newProcess.rpo}
+                                onChange={(e) => setNewProcess({ ...newProcess, rpo: e.target.value })}
+                                placeholder="Hours"
+                                helperText="Max acceptable data loss"
+                                required
+                                InputProps={{
+                                    endAdornment: <Typography sx={{ color: 'rgba(255,255,255,0.5)' }}>hours</Typography>,
+                                }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                label="Financial Impact"
+                                type="number"
+                                value={newProcess.financialImpact}
+                                onChange={(e) => setNewProcess({ ...newProcess, financialImpact: e.target.value })}
+                                placeholder="Per hour"
+                                helperText="Cost per hour of downtime"
+                                required
+                                InputProps={{
+                                    startAdornment: <Typography sx={{ color: 'rgba(255,255,255,0.5)', mr: 0.5 }}>$</Typography>,
+                                    endAdornment: <Typography sx={{ color: 'rgba(255,255,255,0.5)' }}>/hr</Typography>,
+                                }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Box sx={{
+                                p: 2,
+                                bgcolor: 'rgba(102, 126, 234, 0.05)',
+                                borderRadius: 1,
+                                border: '1px solid rgba(102, 126, 234, 0.2)',
+                            }}>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block', mb: 1 }}>
+                                    <strong>Definitions:</strong>
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }}>
+                                    • <strong>RTO:</strong> Maximum acceptable time to restore the process after disruption
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }}>
+                                    • <strong>RPO:</strong> Maximum acceptable amount of data loss measured in time
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }}>
+                                    • <strong>Criticality:</strong> Impact level on business operations if process fails
+                                </Typography>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 3 }}>
+                    <Button onClick={() => setOpenDialog(false)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleCreateProcess}
+                        disabled={!newProcess.name || !newProcess.owner || !newProcess.rto || !newProcess.rpo || !newProcess.financialImpact}
+                        startIcon={<Add />}
+                        sx={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                            },
+                        }}
+                    >
+                        Create Process
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
