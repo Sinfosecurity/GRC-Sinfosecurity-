@@ -261,7 +261,7 @@ export default function Tasks() {
                     {/* Tabs */}
                     <Tabs
                         value={tabValue}
-                        onChange={(e, newValue) => setTabValue(newValue)}
+                        onChange={(_, newValue) => setTabValue(newValue)}
                         sx={{
                             mb: 3,
                             '& .MuiTab-root': { color: 'rgba(255,255,255,0.7)' },
