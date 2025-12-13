@@ -62,14 +62,14 @@ export default function Layout() {
                     borderRight: '1px solid rgba(102, 126, 234, 0.1)',
                     display: 'flex',
                     flexDirection: 'column',
-               }}
+              }}
             >
                 {/* Logo */}
                 <Box
                     sx={{
                         p: 3,
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                   }}
+                  }}
                 >
                     <Stack direction="row" spacing={2} alignItems="center">
                         <Avatar sx={{ width: 48, height: 48, bgcolor: 'rgba(255,255,255,0.2)'}}>
@@ -98,14 +98,14 @@ export default function Layout() {
                                     mb: 1,
                                     borderRadius: 2,
                                     cursor: 'pointer',
-                                    background: isActive ? `linear - gradient(135deg, ${ item.color } 0 %, ${ item.color }cc 100 %)` : 'transparent',
+                                    background: isActive ? `linear-gradient(135deg, ${item.color}0%, ${item.color}cc100%)` : 'transparent',
                                     color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
                                     '&:hover': {
-                                        background: isActive ? `linear - gradient(135deg, ${ item.color } 0 %, ${ item.color }cc 100 %)` : 'rgba(102, 126, 234, 0.1)',
+                                        background: isActive ? `linear-gradient(135deg, ${item.color}0%, ${item.color}cc100%)` : 'rgba(102, 126, 234, 0.1)',
                                         transform: 'translateX(4px)',
-                                   },
+                                  },
                                     transition: 'all 0.3s ease',
-                               }}
+                              }}
                             >
                                 <ListItemIcon sx={{ color: 'inherit', minWidth: 40}}>
                                     {item.icon}
@@ -115,11 +115,11 @@ export default function Layout() {
                                     primaryTypographyProps={{
                                         fontWeight: isActive ? 600 : 500,
                                         fontSize: '0.95rem',
-                                   }}
+                                  }}
                                 />
                             </ListItem>
                         );
-                   })}
+                  })}
                 </List>
 
                 {/* Settings at bottom */}
@@ -132,8 +132,8 @@ export default function Layout() {
                             color: 'rgba(255,255,255,0.7)',
                             '&:hover': {
                                 background: 'rgba(102, 126, 234, 0.1)',
-                           },
-                       }}
+                          },
+                      }}
                     >
                         <ListItemIcon sx={{ color: 'inherit', minWidth: 40}}>
                             <SettingsIcon />
@@ -151,7 +151,7 @@ export default function Layout() {
                     bgcolor: '#0a0e27',
                     color: 'white',
                     minHeight: '100vh',
-               }}
+              }}
             >
                 <Outlet />
             </Box>
