@@ -1024,9 +1024,10 @@ export default function VendorManagement() {
                                 background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                                 color: '#000',
                                 fontWeight: 600,
+                                fontSize: '0.95rem',
                             }}
                         >
-                            Complete Assessment
+                            Complete
                         </Button>
                     )}
                 </DialogActions>
