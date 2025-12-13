@@ -98,10 +98,10 @@ export default function Layout() {
                                     mb: 1,
                                     borderRadius: 2,
                                     cursor: 'pointer',
-                                    background: isActive ? `linear-gradient(135deg, ${item.color}0%, ${item.color}cc100%)` : 'transparent',
+                                    background: isActive ? `linear - gradient(135deg, ${ item.color } 0 %, ${ item.color }cc 100 %)` : 'transparent',
                                     color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
                                     '&:hover': {
-                                        background: isActive ? `linear-gradient(135deg, ${item.color}0%, ${item.color}cc100%)` : 'rgba(102, 126, 234, 0.1)',
+                                        background: isActive ? `linear - gradient(135deg, ${ item.color } 0 %, ${ item.color }cc 100 %)` : 'rgba(102, 126, 234, 0.1)',
                                         transform: 'translateX(4px)',
                                    },
                                     transition: 'all 0.3s ease',
