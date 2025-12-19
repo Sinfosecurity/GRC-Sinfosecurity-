@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: grc_password
       POSTGRES_DB: grc_platform
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/database/seeds:/docker-entrypoint-initdb.d
@@ -45,7 +45,7 @@ services:
     image: redis:7-alpine
     container_name: grc-redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -81,5 +81,5 @@ volumes:
 
 
 networks:
-  default:
-    name: grc-network
+  grc-network:
+    driver: bridge

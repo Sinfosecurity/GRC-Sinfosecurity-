@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import Unauthorized from './pages/Unauthorized';
 import Dashboard from './pages/Dashboard';
 import RiskManagement from './pages/RiskManagement';
 import ComplianceManagement from './pages/ComplianceManagement';
@@ -29,7 +31,8 @@ export default function App() {
     return (
         <Routes>
             <Route path="/" element={<Landing />} />
-            <Route element={<Layout />}>
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="risk-management" element={<RiskManagement />} />
                 <Route path="compliance" element={<ComplianceManagement />} />
@@ -38,8 +41,8 @@ export default function App() {
                 <Route path="policies" element={<PolicyManagement />} />
                 <Route path="documents" element={<DocumentManagement />} />
                 <Route path="activity-log" element={<ActivityLog />} />
-                <Route path="user-management" element={<UserManagement />} />
-                <Route path="organization-settings" element={<OrganizationSettings />} />
+                <Route path="user-management" element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><UserManagement /></ProtectedRoute>} />
+                <Route path="organization-settings" element={<ProtectedRoute allowedRoles={['ADMIN']}><OrganizationSettings /></ProtectedRoute>} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="workflows" element={<WorkflowBuilder />} />

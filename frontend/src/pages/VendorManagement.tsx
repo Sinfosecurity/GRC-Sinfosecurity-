@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -32,8 +32,12 @@ import {
     Stepper,
     Step,
     StepLabel,
+    CircularProgress,
+    Alert,
+    Snackbar,
 } from '@mui/material';
 import { Add, Business, Assessment, CheckCircle, Warning, Error as ErrorIcon } from '@mui/icons-material';
+import { vendorAPI } from '../services/api';
 
 interface Vendor {
     id: number;
@@ -155,6 +159,10 @@ const getScoreColor = (score: number) => {
 
 export default function VendorManagement() {
     const [vendors, setVendors] = useState(mockVendors);
+    const [statistics, setStatistics] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
     const [tabValue, setTabValue] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
@@ -166,34 +174,102 @@ export default function VendorManagement() {
         category: '',
         tier: 'Medium' as const,
         contactEmail: '',
-        dataAccess: ''
+        dataAccess: '',
+        website: '',
+        primaryContact: '',
+        businessOwner: ''
     });
 
-    const criticalVendors = vendors.filter(v => v.tier === 'Critical').length;
-    const overdueAssessments = vendors.filter(v => v.assessmentStatus === 'Overdue').length;
-    const avgRiskScore = (vendors.reduce((sum, v) => sum + v.riskScore, 0) / vendors.length).toFixed(0);
-    // const avgComplianceScore = (vendors.reduce((sum, v) => sum + v.complianceScore, 0) / vendors.length).toFixed(0);
+    // Load vendors and statistics on mount
+    useEffect(() => {
+        loadVendors();
+        loadStatistics();
+    }, []);
 
-    const handleAddVendor = () => {
-        const vendor: Vendor = {
-            id: vendors.length + 1,
-            ...newVendor,
-            status: 'Active',
-            riskScore: 0,
-            complianceScore: 0,
-            lastAssessment: 'N/A',
-            nextReview: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            assessmentStatus: 'Not Started'
-        };
-        setVendors([...vendors, vendor]);
-        setOpenDialog(false);
-        setNewVendor({
-            name: '',
-            category: '',
-            tier: 'Medium',
-            contactEmail: '',
-            dataAccess: ''
-        });
+    const loadVendors = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await vendorAPI.getAll();
+            if (response.data.vendors) {
+                // Map backend data to frontend format
+                const mappedVendors = response.data.vendors.map((v: any) => ({
+                    id: v.id,
+                    name: v.name,
+                    category: v.category,
+                    tier: v.tier,
+                    status: v.status,
+                    riskScore: v.inherentRiskScore || 0,
+                    complianceScore: 100 - (v.inherentRiskScore || 0),
+                    lastAssessment: v.lastAssessmentDate ? new Date(v.lastAssessmentDate).toISOString().split('T')[0] : 'N/A',
+                    nextReview: v.nextReviewDate ? new Date(v.nextReviewDate).toISOString().split('T')[0] : 'N/A',
+                    contactEmail: v.primaryContact || 'N/A',
+                    dataAccess: v.dataCategories?.join(', ') || 'N/A',
+                    assessmentStatus: v.assessmentStatus || 'Not Started'
+                }));
+                setVendors(mappedVendors);
+            }
+        } catch (err: any) {
+            console.error('Failed to load vendors:', err);
+            setError(err.response?.data?.message || 'Failed to load vendors. Using mock data.');
+            // Keep using mock data on error
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadStatistics = async () => {
+        try {
+            const response = await vendorAPI.getStatistics();
+            setStatistics(response.data);
+        } catch (err) {
+            console.error('Failed to load statistics:', err);
+        }
+    };
+
+    const criticalVendors = statistics?.tierDistribution?.Critical || vendors.filter(v => v.tier === 'Critical').length;
+    const overdueAssessments = vendors.filter(v => v.assessmentStatus === 'Overdue').length;
+    const avgRiskScore = statistics?.averageRiskScore || (vendors.reduce((sum, v) => sum + v.riskScore, 0) / vendors.length).toFixed(0);
+
+    const handleAddVendor = async () => {
+        try {
+            setLoading(true);
+            const response = await vendorAPI.create({
+                name: newVendor.name,
+                category: newVendor.category,
+                tier: newVendor.tier,
+                primaryContact: newVendor.contactEmail,
+                website: newVendor.website,
+                businessOwner: newVendor.businessOwner,
+                dataCategories: newVendor.dataAccess ? [newVendor.dataAccess] : [],
+                services: []
+            });
+            
+            setSnackbar({ open: true, message: 'Vendor added successfully!', severity: 'success' });
+            setOpenDialog(false);
+            setNewVendor({
+                name: '',
+                category: '',
+                tier: 'Medium',
+                contactEmail: '',
+                dataAccess: '',
+                website: '',
+                primaryContact: '',
+                businessOwner: ''
+            });
+            
+            // Reload vendors
+            await loadVendors();
+        } catch (err: any) {
+            console.error('Failed to add vendor:', err);
+            setSnackbar({ 
+                open: true, 
+                message: err.response?.data?.message || 'Failed to add vendor', 
+                severity: 'error' 
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleViewVendor = (vendor: Vendor) => {
@@ -400,6 +476,17 @@ export default function VendorManagement() {
 
     return (
         <Box>
+            {/* Snackbar for notifications */}
+            <Snackbar 
+                open={snackbar.open} 
+                autoHideDuration={6000} 
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                 <Box>
                     <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
@@ -413,6 +500,7 @@ export default function VendorManagement() {
                     variant="contained"
                     startIcon={<Add />}
                     onClick={() => setOpenDialog(true)}
+                    disabled={loading}
                     sx={{
                         background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                         color: '#000',
@@ -424,6 +512,20 @@ export default function VendorManagement() {
                     Add Vendor
                 </Button>
             </Box>
+
+            {/* Error Alert */}
+            {error && (
+                <Alert severity="warning" sx={{ mb: 3 }} onClose={() => setError(null)}>
+                    {error}
+                </Alert>
+            )}
+
+            {/* Loading State */}
+            {loading && vendors.length === 0 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+                    <CircularProgress />
+                </Box>
+            )}
 
             {/* Stats Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>

@@ -51,12 +51,34 @@ model Organization {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  users       User[]
-  risks       Risk[]
-  controls    Control[]
-  incidents   Incident[]
-  policies    Policy[]
-  compliance  ComplianceFramework[]
+  users                       User[]
+  risks                       Risk[]
+  controls                    Control[]
+  incidents                   Incident[]
+  policies                    Policy[]
+  compliance                  ComplianceFramework[]
+  vendors                     Vendor[]
+  vendorAssessments           VendorAssessment[]
+  vendorContracts             VendorContract[]
+  vendorIssues                VendorIssue[]
+  vendorDocuments             VendorDocument[]
+  vendorMonitoring            VendorMonitoring[]
+  vendorReviews               VendorReview[]
+  
+  // Enterprise Audit & Compliance Relations
+  vendorApprovalWorkflows     VendorApprovalWorkflow[]
+  vendorDueDiligenceScopes    VendorDueDiligenceScope[]
+  vendorRiskControls          VendorRiskControl[]
+  vendorIssueRCAs             VendorIssueRCA[]
+  vendorIssueEscalations      VendorIssueEscalation[]
+  vendorRiskHistory           VendorRiskHistory[]
+  vendorDocumentAlerts        VendorDocumentAlert[]
+  managementAttestations      ManagementAttestation[]
+  vendorExceptions            VendorException[]
+  vendorSOCScopes             VendorSOCScope[]
+  fourthParties               FourthParty[]
+  vendorExitRiskAssessments   VendorExitRiskAssessment[]
+  vendorExitClosures          VendorExitClosure[]
 }
 
 // Risk Management
@@ -137,6 +159,7 @@ model Control {
   risks         RiskControl[]
   compliance    ComplianceControl[]
   tests         ControlTest[]
+  vendorRiskControls VendorRiskControl[]
   
   @@index([organizationId])
   @@index([status])
@@ -368,4 +391,1277 @@ model AuditLog {
   @@index([userId])
   @@index([entity, entityId])
   @@index([createdAt])
+}
+
+// ==========================================
+// TPRM (Third-Party Risk Management) Models
+// ==========================================
+
+// Vendor/Third-Party Inventory
+model Vendor {
+  id                    String              @id @default(uuid())
+  name                  String
+  legalName             String?
+  vendorType            VendorType
+  category              VendorCategory
+  tier                  VendorTier
+  status                VendorStatus        @default(PROPOSED)
+  organization          Organization        @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  // Contact Information
+  primaryContact        String
+  contactEmail          String
+  contactPhone          String?
+  website               String?
+  
+  // Risk Classification
+  inherentRiskScore     Int                 @default(0) // 0-100
+  residualRiskScore     Int                 @default(0) // 0-100
+  criticalityLevel      CriticalityLevel    @default(MEDIUM)
+  
+  // Business Details
+  businessOwner         String?             // Internal business owner
+  relationshipOwner     String?             // Internal relationship manager
+  servicesProvided      String              // Description of services
+  contractValue         Decimal?            @db.Decimal(15, 2)
+  currency              String?             @default("USD")
+  
+  // Data & Compliance
+  dataTypesAccessed     String[]            // ["PII", "PHI", "PCI", "IP", etc.]
+  geographicFootprint   String[]            // Countries where vendor operates
+  regulatoryScope       String[]            // ["GDPR", "HIPAA", "SOC2", etc.]
+  
+  // Fourth-Party Risk
+  hasSubcontractors     Boolean             @default(false)
+  fourthParties         Json?               // Array of subcontractors/fourth parties
+  
+  // Metadata
+  onboardedAt           DateTime?
+  lastReviewDate        DateTime?
+  nextReviewDate        DateTime?
+  terminatedAt          DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  // Relations
+  assessments           VendorAssessment[]
+  contracts             VendorContract[]
+  issues                VendorIssue[]
+  documents             VendorDocument[]
+  contacts              VendorContact[]
+  monitoringRecords     VendorMonitoring[]
+  reviews               VendorReview[]
+  
+  // Enterprise Audit Relations
+  approvalWorkflows     VendorApprovalWorkflow[]
+  dueDiligenceScope     VendorDueDiligenceScope?
+  riskControls          VendorRiskControl[]
+  issueRCAs             VendorIssueRCA[]
+  issueEscalations      VendorIssueEscalation[]
+  riskHistory           VendorRiskHistory[]
+  documentAlerts        VendorDocumentAlert[]
+  exceptions            VendorException[]
+  socScope              VendorSOCScope?
+  fourthPartiesList     FourthParty[]
+  exitRiskAssessment    VendorExitRiskAssessment?
+  exitClosure           VendorExitClosure?
+  
+  @@index([organizationId])
+  @@index([tier])
+  @@index([status])
+  @@index([vendorType])
+  @@index([nextReviewDate])
+}
+
+enum VendorType {
+  IT_SERVICE
+  CLOUD_SERVICE
+  SAAS
+  PAAS
+  IAAS
+  PROFESSIONAL_SERVICES
+  CONSULTING
+  OUTSOURCING
+  STAFFING
+  SUPPLY_CHAIN
+  MANUFACTURING
+  LOGISTICS
+  CRITICAL_INFRASTRUCTURE
+  OTHER
+}
+
+enum VendorCategory {
+  TECHNOLOGY
+  CYBERSECURITY
+  CLOUD_HOSTING
+  DATA_PROCESSING
+  PAYMENT_PROCESSING
+  HR_PAYROLL
+  MARKETING
+  ANALYTICS
+  COMMUNICATION
+  LEGAL
+  FINANCIAL
+  INSURANCE
+  FACILITIES
+  OTHER
+}
+
+enum VendorTier {
+  CRITICAL      // Highest risk - quarterly assessments
+  HIGH          // High risk - semi-annual assessments
+  MEDIUM        // Medium risk - annual assessments
+  LOW           // Low risk - biennial assessments
+}
+
+enum VendorStatus {
+  PROPOSED      // Under evaluation
+  APPROVED      // Approved but not onboarded
+  ACTIVE        // Currently engaged
+  SUSPENDED     // Temporarily suspended
+  TERMINATED    // Relationship ended
+  REJECTED      // Not approved
+}
+
+enum CriticalityLevel {
+  CRITICAL      // Business-critical, no alternatives
+  HIGH          // Important, limited alternatives
+  MEDIUM        // Moderate impact
+  LOW           // Minimal impact
+}
+
+// Vendor Contacts
+model VendorContact {
+  id                String   @id @default(uuid())
+  vendor            Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId          String
+  name              String
+  title             String?
+  email             String
+  phone             String?
+  role              ContactRole
+  isPrimary         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([vendorId])
+}
+
+enum ContactRole {
+  ACCOUNT_MANAGER
+  SECURITY_CONTACT
+  COMPLIANCE_CONTACT
+  TECHNICAL_SUPPORT
+  EXECUTIVE_SPONSOR
+  LEGAL
+  DPO
+  OTHER
+}
+
+// Vendor Risk Assessments
+model VendorAssessment {
+  id                    String              @id @default(uuid())
+  vendor                Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization        @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  assessmentType        AssessmentType
+  frameworkUsed         String?             // "SIG", "CAIQ", "Custom", etc.
+  status                AssessmentStatus    @default(NOT_STARTED)
+  
+  // Scoring
+  overallScore          Int?                // 0-100
+  securityScore         Int?
+  privacyScore          Int?
+  complianceScore       Int?
+  operationalScore      Int?
+  financialScore        Int?
+  
+  // Risk Results
+  identifiedRisks       Json?               // Array of identified risks
+  gapsIdentified        Json?               // Array of gaps
+  recommendations       Json?               // Array of recommendations
+  
+  // Workflow
+  assignedTo            String?
+  reviewer              String?
+  approver              String?
+  dueDate               DateTime?
+  completedAt           DateTime?
+  approvedAt            DateTime?
+  
+  // Evidence
+  evidenceCollected     Boolean             @default(false)
+  evidenceCount         Int                 @default(0)
+  
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  // Relations
+  responses             AssessmentResponse[]
+  evidence              VendorDocument[]
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+enum AssessmentType {
+  INITIAL_DUE_DILIGENCE
+  ANNUAL_REVIEW
+  TRIGGERED_REASSESSMENT
+  CONTRACT_RENEWAL
+  POST_INCIDENT
+  CONTINUOUS_MONITORING
+  FOURTH_PARTY_REVIEW
+}
+
+enum AssessmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  PENDING_REVIEW
+  PENDING_APPROVAL
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+// Assessment Questions & Responses
+model AssessmentResponse {
+  id                String             @id @default(uuid())
+  assessment        VendorAssessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId      String
+  
+  questionId        String             // Reference to question template
+  questionText      String
+  questionCategory  String             // "Security", "Privacy", "Compliance", etc.
+  weight            Int                @default(1)
+  
+  response          String?
+  score             Int?               // Points earned for this response
+  maxScore          Int                // Maximum possible points
+  
+  hasEvidence       Boolean            @default(false)
+  evidenceRequired  Boolean            @default(false)
+  notes             String?
+  
+  respondedBy       String?
+  respondedAt       DateTime?
+  
+  @@index([assessmentId])
+}
+
+// Vendor Contracts & Agreements
+model VendorContract {
+  id                    String            @id @default(uuid())
+  vendor                Vendor            @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization      @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  contractType          ContractType
+  contractNumber        String?
+  title                 String
+  description           String?
+  
+  // Contract Terms
+  effectiveDate         DateTime
+  expirationDate        DateTime
+  renewalDate           DateTime?
+  autoRenewal           Boolean           @default(false)
+  noticePeriod          Int?              // Days notice required for termination
+  
+  // Financial
+  contractValue         Decimal           @db.Decimal(15, 2)
+  currency              String            @default("USD")
+  paymentTerms          String?
+  
+  // SLA & Performance
+  slaCommitments        Json?             // Array of SLA metrics
+  performanceMetrics    Json?             // KPIs and targets
+  
+  // Risk & Compliance Clauses
+  hasDataProtectionClause     Boolean     @default(false)
+  hasRightToAudit             Boolean     @default(false)
+  hasBreachNotification       Boolean     @default(false)
+  hasInsuranceRequirement     Boolean     @default(false)
+  hasSubcontractorControls    Boolean     @default(false)
+  hasTerminationRights        Boolean     @default(false)
+  hasIPProtection             Boolean     @default(false)
+  
+  // Data Processing Agreement
+  hasDPA                Boolean           @default(false)
+  dpaSignedDate         DateTime?
+  dpaExpiryDate         DateTime?
+  
+  // Document Management
+  documentUrl           String?
+  documentHash          String?
+  
+  status                ContractStatus    @default(DRAFT)
+  
+  // Approval Workflow
+  approvedBy            String?
+  approvedAt            DateTime?
+  legalReviewedBy       String?
+  legalReviewedAt       DateTime?
+  
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  
+  // Relations
+  slaTracking           SLATracking[]
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([expirationDate])
+  @@index([status])
+}
+
+enum ContractType {
+  MASTER_SERVICE_AGREEMENT
+  STATEMENT_OF_WORK
+  DATA_PROCESSING_AGREEMENT
+  NON_DISCLOSURE_AGREEMENT
+  SERVICE_LEVEL_AGREEMENT
+  PURCHASE_ORDER
+  LICENSE_AGREEMENT
+  SUBSCRIPTION_AGREEMENT
+  OTHER
+}
+
+enum ContractStatus {
+  DRAFT
+  PENDING_REVIEW
+  PENDING_APPROVAL
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  TERMINATED
+  RENEWED
+}
+
+// SLA Tracking & Monitoring
+model SLATracking {
+  id                String          @id @default(uuid())
+  contract          VendorContract  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId        String
+  
+  metricName        String          // "Uptime", "Response Time", etc.
+  metricType        SLAMetricType
+  
+  target            Decimal         @db.Decimal(10, 4)
+  actual            Decimal?        @db.Decimal(10, 4)
+  unit              String          // "%", "hours", "minutes", etc.
+  
+  period            String          // "Monthly", "Quarterly", "Annual"
+  periodStart       DateTime
+  periodEnd         DateTime
+  
+  status            SLAStatus
+  breachCount       Int             @default(0)
+  
+  notes             String?
+  measuredAt        DateTime        @default(now())
+  
+  @@index([contractId])
+  @@index([periodStart])
+}
+
+enum SLAMetricType {
+  UPTIME
+  AVAILABILITY
+  RESPONSE_TIME
+  RESOLUTION_TIME
+  THROUGHPUT
+  ERROR_RATE
+  SECURITY_INCIDENTS
+  DATA_BREACH_NOTIFICATION
+  OTHER
+}
+
+enum SLAStatus {
+  MET
+  BREACHED
+  AT_RISK
+  NOT_MEASURED
+}
+
+// Vendor Issues & Remediation
+model VendorIssue {
+  id                    String              @id @default(uuid())
+  vendor                Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization        @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  title                 String
+  description           String
+  issueType             VendorIssueType
+  severity              IssueSeverity
+  priority              IssuePriority
+  
+  // Source
+  source                IssueSource
+  identifiedDate        DateTime            @default(now())
+  identifiedBy          String
+  
+  // Categorization
+  category              String              // "Security", "Compliance", "Performance", etc.
+  riskRating            String?             // "Critical", "High", "Medium", "Low"
+  impactDescription     String?
+  
+  // Status & Workflow
+  status                VendorIssueStatus   @default(OPEN)
+  assignedTo            String?
+  
+  // Remediation
+  correctiveActionPlan  String?
+  targetRemediationDate DateTime?
+  actualRemediationDate DateTime?
+  
+  // Validation
+  validationRequired    Boolean             @default(false)
+  validatedBy           String?
+  validatedAt           DateTime?
+  validationNotes       String?
+  
+  // Evidence
+  evidenceUrl           String?
+  closureEvidence       String?
+  
+  closedAt              DateTime?
+  closedBy              String?
+  closureNotes          String?
+  
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  // Enterprise Relations
+  rootCauseAnalysis     VendorIssueRCA?
+  escalations           VendorIssueEscalation[]
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([severity])
+  @@index([targetRemediationDate])
+}
+
+enum VendorIssueType {
+  SECURITY_VULNERABILITY
+  COMPLIANCE_GAP
+  CONTRACT_BREACH
+  SLA_BREACH
+  PERFORMANCE_ISSUE
+  DATA_BREACH
+  CONTROL_FAILURE
+  AUDIT_FINDING
+  REGULATORY_VIOLATION
+  FINANCIAL_CONCERN
+  REPUTATIONAL_RISK
+  OTHER
+}
+
+enum IssueSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IssuePriority {
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IssueSource {
+  INTERNAL_ASSESSMENT
+  EXTERNAL_AUDIT
+  VENDOR_DISCLOSURE
+  CONTINUOUS_MONITORING
+  INCIDENT_RESPONSE
+  THIRD_PARTY_REPORT
+  REGULATORY_FINDING
+  NEWS_MEDIA
+  OTHER
+}
+
+enum VendorIssueStatus {
+  OPEN
+  IN_PROGRESS
+  PENDING_VENDOR
+  PENDING_VALIDATION
+  RESOLVED
+  CLOSED
+  RISK_ACCEPTED
+  ESCALATED
+}
+
+// Vendor Documents & Evidence
+model VendorDocument {
+  id                String              @id @default(uuid())
+  vendor            Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId          String
+  assessment        VendorAssessment?   @relation(fields: [assessmentId], references: [id])
+  assessmentId      String?
+  organization      Organization        @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  
+  documentType      VendorDocumentType
+  title             String
+  description       String?
+  
+  fileName          String
+  fileSize          Int                 // Bytes
+  fileType          String              // MIME type
+  fileUrl           String              // S3/Azure Blob URL
+  fileHash          String?             // SHA-256 for integrity
+  
+  category          String?             // "Certification", "Policy", "Report", etc.
+  confidentiality   ConfidentialityLevel @default(INTERNAL)
+  
+  validFrom         DateTime?
+  validUntil        DateTime?
+  
+  uploadedBy        String
+  uploadedAt        DateTime            @default(now())
+  lastAccessedAt    DateTime?
+  
+  // Enterprise Relations
+  versions              VendorDocumentVersion[]
+  alerts                VendorDocumentAlert[]
+  
+  @@index([vendorId])
+  @@index([assessmentId])
+  @@index([organizationId])
+  @@index([documentType])
+  @@index([validUntil])
+}
+
+enum VendorDocumentType {
+  SOC2_REPORT
+  ISO27001_CERTIFICATE
+  PCI_DSS_AOC
+  PENETRATION_TEST_REPORT
+  VULNERABILITY_SCAN
+  INSURANCE_CERTIFICATE
+  FINANCIAL_STATEMENT
+  SECURITY_POLICY
+  PRIVACY_POLICY
+  INCIDENT_RESPONSE_PLAN
+  BCP_DRP_PLAN
+  DATA_PROCESSING_AGREEMENT
+  CONTRACT
+  SLA_DOCUMENT
+  AUDIT_REPORT
+  RISK_ASSESSMENT
+  SECURITY_QUESTIONNAIRE
+  REFERENCE_LETTER
+  OTHER
+}
+
+enum ConfidentialityLevel {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  HIGHLY_CONFIDENTIAL
+}
+
+// Continuous Vendor Monitoring
+model VendorMonitoring {
+  id                    String                @id @default(uuid())
+  vendor                Vendor                @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization          @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  monitoringType        VendorMonitoringType
+  source                String                // "Bitsight", "SecurityScorecard", "News API", etc.
+  
+  // Risk Signals
+  riskIndicator         String
+  riskLevel             String                // "Critical", "High", "Medium", "Low"
+  riskDescription       String
+  
+  // Data
+  currentValue          String?
+  previousValue         String?
+  changeDetected        Boolean               @default(false)
+  
+  // Context
+  url                   String?
+  rawData               Json?
+  
+  // Response
+  requiresAction        Boolean               @default(false)
+  actionTaken           String?
+  actionTakenBy         String?
+  actionTakenAt         DateTime?
+  
+  detectedAt            DateTime              @default(now())
+  acknowledgedAt        DateTime?
+  resolvedAt            DateTime?
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([detectedAt])
+  @@index([requiresAction])
+}
+
+enum VendorMonitoringType {
+  SECURITY_RATING
+  CYBER_THREAT_INTEL
+  BREACH_NOTIFICATION
+  VULNERABILITY_DISCLOSURE
+  NEWS_MENTION
+  FINANCIAL_HEALTH
+  REGULATORY_ACTION
+  CERTIFICATE_EXPIRY
+  DOMAIN_MONITORING
+  DARK_WEB_MENTION
+  SOCIAL_MEDIA
+  LEGAL_ACTION
+  M_AND_A_ACTIVITY
+  OTHER
+}
+
+// Vendor Reviews & Audits
+model VendorReview {
+  id                String        @id @default(uuid())
+  vendor            Vendor        @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId          String
+  organization      Organization  @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  
+  reviewType        VendorReviewType
+  reviewDate        DateTime
+  nextReviewDate    DateTime?
+  
+  reviewer          String
+  participants      String[]      // Array of participant IDs
+  
+  // Outcomes
+  overallRating     Int?          // 1-5 scale
+  findings          Json?         // Array of findings
+  recommendations   Json?         // Array of recommendations
+  actionItems       Json?         // Array of action items
+  
+  // Decisions
+  decision          ReviewDecision
+  tierChange        String?       // If tier was changed
+  statusChange      String?       // If status was changed
+  
+  notes             String?
+  meetingNotes      String?
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([reviewDate])
+  @@index([nextReviewDate])
+}
+
+enum VendorReviewType {
+  ANNUAL_REVIEW
+  QUARTERLY_REVIEW
+  CONTRACT_RENEWAL
+  POST_INCIDENT
+  TRIGGERED_REVIEW
+  OFFBOARDING_REVIEW
+  AUDIT
+}
+
+enum ReviewDecision {
+  APPROVED_NO_CHANGE
+  APPROVED_WITH_CONDITIONS
+  TIER_UPGRADE
+  TIER_DOWNGRADE
+  TERMINATE
+  SUSPEND
+  EXTEND_REVIEW
+}
+
+// ==========================================
+// ENTERPRISE AUDIT & COMPLIANCE ENHANCEMENTS
+// ==========================================
+
+// Vendor Approval Workflows
+model VendorApprovalWorkflow {
+  id                String            @id @default(uuid())
+  vendor            Vendor            @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId          String
+  organization      Organization      @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  workflowType      WorkflowType
+  
+  status            WorkflowStatus    @default(PENDING)
+  initiatedBy       String
+  initiatedAt       DateTime          @default(now())
+  completedAt       DateTime?
+  
+  // Approval Chain Configuration
+  approvalSteps     Json              // Ordered array of required approvers
+  currentStep       Int               @default(1)
+  
+  // Metadata
+  businessJustification String?
+  riskAssessmentSummary String?
+  
+  steps             VendorApprovalStep[]
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([workflowType])
+}
+
+model VendorApprovalStep {
+  id                String             @id @default(uuid())
+  workflow          VendorApprovalWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowId        String
+  stepOrder         Int
+  
+  // Approver
+  approverRole      String             // "RISK_MANAGER", "CISO", "CFO", "BOARD", "COMPLIANCE_OFFICER"
+  approverUserId    String?
+  approverName      String?
+  requiredAt        DateTime           @default(now())
+  
+  // Decision
+  decision          ApprovalDecision?
+  decidedBy         String?
+  decidedAt         DateTime?
+  comments          String?
+  conditions        String[]           // Conditions if conditionally approved
+  
+  // Audit Trail
+  digitalSignature  String?
+  ipAddress         String?
+  userAgent         String?
+  
+  @@index([workflowId])
+  @@index([approverUserId])
+  @@index([stepOrder])
+}
+
+enum WorkflowType {
+  ONBOARDING
+  CONTRACT_RENEWAL
+  TIER_CHANGE
+  REASSESSMENT_APPROVAL
+  RISK_ACCEPTANCE
+  TERMINATION
+  FOURTH_PARTY_APPROVAL
+}
+
+enum WorkflowStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  ESCALATED
+  CANCELLED
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  CONDITIONALLY_APPROVED
+  ESCALATED
+  DEFERRED
+}
+
+// Due Diligence Scope Documentation
+model VendorDueDiligenceScope {
+  id                        String   @id @default(uuid())
+  vendor                    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId                  String   @unique
+  organization              Organization @relation(fields: [organizationId], references: [id])
+  organizationId            String
+  
+  determinedBy              String
+  determinedAt              DateTime @default(now())
+  
+  // Scope Determination
+  scopeLevel                String   // "Full", "Limited", "Standard", "Enhanced"
+  scopeJustification        String
+  tierJustification         String
+  
+  // Risk Factors Considered
+  contractValue             Decimal? @db.Decimal(15, 2)
+  dataTypes                 String[]
+  regulatoryRequirements    String[]
+  geographicRisk            String[]
+  fourthPartyRisk           Boolean  @default(false)
+  
+  // Scope Decisions
+  assessmentDepth           String   // "Basic", "Standard", "Comprehensive"
+  requiredCertifications    String[]
+  onSiteAuditRequired       Boolean  @default(false)
+  backgroundCheckRequired   Boolean  @default(false)
+  financialReviewRequired   Boolean  @default(false)
+  
+  // Approval
+  approvedBy                String?
+  approvedAt                DateTime?
+  approvalNotes             String?
+  
+  version                   Int      @default(1)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  
+  @@index([vendorId])
+  @@index([organizationId])
+}
+
+// Vendor Risk Control Effectiveness
+model VendorRiskControl {
+  id                        String   @id @default(uuid())
+  vendor                    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId                  String
+  control                   Control? @relation(fields: [controlId], references: [id])
+  controlId                 String?
+  organization              Organization @relation(fields: [organizationId], references: [id])
+  organizationId            String
+  
+  // Control Details
+  controlName               String
+  controlDescription        String?
+  controlType               ControlType
+  controlOwner              String
+  
+  // Effectiveness Assessment
+  designEffectiveness       EffectivenessRating
+  operatingEffectiveness    EffectivenessRating?
+  
+  lastTestedDate            DateTime?
+  nextTestDate              DateTime?
+  testingFrequency          TestingFrequency
+  
+  testResult                TestResult?
+  testEvidence              String?
+  testerName                String?
+  
+  // Deficiencies
+  deficienciesFound         String[]
+  remediationRequired       Boolean  @default(false)
+  remediationStatus         String?
+  remediationDueDate        DateTime?
+  
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  
+  @@index([vendorId])
+  @@index([controlId])
+  @@index([organizationId])
+  @@index([nextTestDate])
+}
+
+enum EffectivenessRating {
+  EFFECTIVE
+  PARTIALLY_EFFECTIVE
+  INEFFECTIVE
+  NOT_TESTED
+}
+
+enum TestingFrequency {
+  MONTHLY
+  QUARTERLY
+  SEMI_ANNUAL
+  ANNUAL
+  AD_HOC
+}
+
+enum TestResult {
+  PASSED
+  PASSED_WITH_EXCEPTIONS
+  FAILED
+  NOT_APPLICABLE
+}
+
+// Root Cause Analysis
+model VendorIssueRCA {
+  id                    String       @id @default(uuid())
+  issue                 VendorIssue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issueId               String       @unique
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  // RCA Details
+  conductedBy           String
+  conductedDate         DateTime
+  methodology           String       // "5 Whys", "Fishbone", "Fault Tree Analysis"
+  
+  // Analysis
+  problemStatement      String
+  rootCause             String
+  contributingFactors   String[]
+  
+  // Evidence
+  analysisEvidence      String[]
+  dataReviewed          String[]
+  interviewsHeld        String[]
+  
+  // Prevention
+  preventiveMeasures    String[]
+  systemicImpact        String       // "Isolated", "Vendor-Specific", "Category-Wide", "Systemic"
+  affectsOtherVendors   Boolean      @default(false)
+  relatedVendorIds      String[]
+  
+  // Review
+  reviewedBy            String?
+  reviewedAt            DateTime?
+  approvedBy            String?
+  approvedAt            DateTime?
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([issueId])
+  @@index([vendorId])
+  @@index([organizationId])
+}
+
+// Issue Escalation Trail
+model VendorIssueEscalation {
+  id                        String       @id @default(uuid())
+  issue                     VendorIssue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issueId                   String
+  vendor                    Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId                  String
+  organization              Organization @relation(fields: [organizationId], references: [id])
+  organizationId            String
+  
+  escalationLevel           Int          // 1, 2, 3, etc.
+  escalatedFrom             String
+  escalatedTo               String
+  escalationReason          String
+  escalatedAt               DateTime     @default(now())
+  
+  // Urgency Flags
+  requiresBoardNotification Boolean      @default(false)
+  requiresRegulatoryNotification Boolean  @default(false)
+  requiresCustomerNotification Boolean    @default(false)
+  
+  // Response
+  acknowledgedBy            String?
+  acknowledgedAt            DateTime?
+  responseNotes             String?
+  actionTaken               String?
+  resolvedAt                DateTime?
+  
+  @@index([issueId])
+  @@index([vendorId])
+  @@index([escalatedTo])
+  @@index([escalatedAt])
+}
+
+// Vendor Risk History for Trending
+model VendorRiskHistory {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  recordedAt            DateTime     @default(now())
+  inherentRiskScore     Int
+  residualRiskScore     Int
+  
+  // Contributing Factors
+  assessmentScore       Int?
+  openIssuesCount       Int          @default(0)
+  criticalIssuesCount   Int          @default(0)
+  monitoringAlertsCount Int          @default(0)
+  slaBreachCount        Int          @default(0)
+  
+  // Changes
+  changeReason          String?
+  changedBy             String?
+  
+  // Snapshot
+  vendorStatus          VendorStatus
+  vendorTier            VendorTier
+  
+  @@index([vendorId])
+  @@index([recordedAt])
+  @@index([organizationId])
+}
+
+// Document Versioning and Lineage
+model VendorDocumentVersion {
+  id                    String         @id @default(uuid())
+  document              VendorDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId            String
+  version               Int
+  
+  previousVersionId     String?
+  changeReason          String
+  changedBy             String
+  changedAt             DateTime       @default(now())
+  
+  // File Details
+  fileUrl               String
+  fileHash              String         // SHA-256 for integrity
+  fileSize              Int
+  
+  @@index([documentId])
+  @@index([version])
+}
+
+// Document Expiry Alerts
+model VendorDocumentAlert {
+  id                    String         @id @default(uuid())
+  document              VendorDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId            String
+  vendor                Vendor         @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization   @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  alertType             String         // "EXPIRING_SOON", "EXPIRED", "RENEWAL_REQUIRED"
+  alertDate             DateTime       @default(now())
+  expiryDate            DateTime
+  daysUntilExpiry       Int
+  
+  // Notification
+  notifiedUsers         String[]
+  notificationSent      Boolean        @default(false)
+  notificationDate      DateTime?
+  
+  // Resolution
+  acknowledged          Boolean        @default(false)
+  acknowledgedBy        String?
+  acknowledgedAt        DateTime?
+  renewalDocumentId     String?
+  
+  @@index([documentId])
+  @@index([vendorId])
+  @@index([expiryDate])
+  @@index([organizationId])
+}
+
+// Management Attestations
+model ManagementAttestation {
+  id                    String       @id @default(uuid())
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  attestationType       String       // "Quarterly TPRM Review", "Annual SOC 2", "Board Certification"
+  period                String       // "Q4 2025", "FY 2025"
+  attestationScope      String       // "All Vendors", "Critical Vendors", "SOC 2 Vendors"
+  
+  attestedBy            String       // Executive (CRO, CISO, CEO)
+  attestedByRole        String
+  attestedAt            DateTime     @default(now())
+  
+  statement             String
+  digitalSignature      String?
+  
+  // Attestation Content
+  controlsOperating     Boolean      @default(true)
+  exceptionsDocumented  Boolean      @default(true)
+  risksWithinAppetite   Boolean      @default(true)
+  
+  supportingEvidence    String[]
+  
+  @@index([organizationId])
+  @@index([attestationType])
+  @@index([period])
+}
+
+// Vendor Exception Tracking
+model VendorException {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  exceptionType         String       // "Policy Waiver", "Risk Acceptance", "Control Exception"
+  policyViolated        String
+  requirementWaived     String
+  
+  justification         String
+  riskLevel             String       // "High", "Medium", "Low"
+  
+  requestedBy           String
+  requestedAt           DateTime     @default(now())
+  
+  approvedBy            String?
+  approvedAt            DateTime?
+  approvalComments      String?
+  
+  expiryDate            DateTime
+  expired               Boolean      @default(false)
+  
+  // Mitigation
+  compensatingControls  String[]
+  monitoringRequired    Boolean      @default(false)
+  
+  @@index([vendorId])
+  @@index([expiryDate])
+  @@index([organizationId])
+  @@index([expired])
+}
+
+// SOC 2 Subservice Organization Tracking
+model VendorSOCScope {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String       @unique
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  inSOCScope            Boolean      @default(false)
+  socType               String?      // "SOC 1", "SOC 2 Type I", "SOC 2 Type II"
+  
+  // Subservice Organization Classification
+  subserviceOrg         Boolean      @default(false)
+  carveOut              Boolean      @default(false)
+  inclusive             Boolean      @default(false)
+  
+  // SOC Report Details
+  hasSOCReport          Boolean      @default(false)
+  socReportDate         DateTime?
+  socReportExpiry       DateTime?
+  socReportUrl          String?
+  
+  // Trust Service Criteria Covered
+  trustServiceCriteria  String[]     // ["CC1.1", "CC2.1", etc.]
+  
+  disclosureText        String?
+  riskRating            String?      // "Low", "Medium", "High"
+  
+  lastReviewed          DateTime?
+  reviewedBy            String?
+  nextReview            DateTime?
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([inSOCScope])
+}
+
+// Fourth-Party (Subcontractor) Tracking
+model FourthParty {
+  id                    String       @id @default(uuid())
+  primaryVendor         Vendor       @relation(fields: [primaryVendorId], references: [id], onDelete: Cascade)
+  primaryVendorId       String
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  name                  String
+  legalName             String?
+  serviceProvided       String
+  dataAccess            String[]
+  geographicLocation    String[]
+  
+  // Risk Assessment
+  riskAssessed          Boolean      @default(false)
+  assessmentDate        DateTime?
+  riskLevel             String?      // "Critical", "High", "Medium", "Low"
+  riskScore             Int?
+  
+  // Documentation
+  hasContract           Boolean      @default(false)
+  contractReviewDate    DateTime?
+  hasNDA                Boolean      @default(false)
+  
+  // Monitoring
+  monitoringRequired    Boolean      @default(false)
+  lastMonitored         DateTime?
+  
+  status                String       @default("Active") // "Active", "Inactive", "Under Review"
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([primaryVendorId])
+  @@index([organizationId])
+  @@index([riskLevel])
+}
+
+// Exit Risk Assessment
+model VendorExitRiskAssessment {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String       @unique
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  assessmentDate        DateTime     @default(now())
+  assessedBy            String
+  
+  // Exit Risks
+  dataResidualRisk      String       // "High", "Medium", "Low"
+  knowledgeTransferRisk String
+  serviceTransitionRisk String
+  reputationalRisk      String
+  legalRisk             String
+  
+  // Mitigation Plans
+  mitigationPlan        String
+  transitionPlan        String
+  transitionDuration    Int?         // Days
+  
+  // Completion Criteria
+  allDataReturned       Boolean      @default(false)
+  allDataDestroyed      Boolean      @default(false)
+  accessRevoked         Boolean      @default(false)
+  contractuallyClosed   Boolean      @default(false)
+  noOutstandingPayments Boolean      @default(false)
+  
+  // Final Review
+  reviewedBy            String?
+  reviewedAt            DateTime?
+  approvedBy            String?
+  approvedAt            DateTime?
+  
+  @@index([vendorId])
+  @@index([organizationId])
+}
+
+// Vendor Exit Closure
+model VendorExitClosure {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String       @unique
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  closureDate           DateTime     @default(now())
+  closedBy              String
+  
+  // Residual Risks
+  residualRisks         Json         // Array of remaining risks
+  riskAcceptance        String       // "Accepted", "Mitigated", "Transferred"
+  acceptedBy            String?
+  acceptanceDate        DateTime?
+  
+  // Attestations
+  legalSignOff          Boolean      @default(false)
+  securitySignOff       Boolean      @default(false)
+  complianceSignOff     Boolean      @default(false)
+  financeSignOff        Boolean      @default(false)
+  
+  // Final Artifacts
+  exitReport            String?
+  closureEvidence       String[]
+  lessonsLearned        String?
+  
+  @@index([vendorId])
+  @@index([organizationId])
 }

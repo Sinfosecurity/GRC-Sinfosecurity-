@@ -210,235 +210,235 @@ class ReportGenerator {
     /**
      * Update template
      */
-    updateTemplate(templateId: string, updates: Partial<ReportTemplate>): Report Template | null {
-    const template = templates.get(templateId);
+    updateTemplate(templateId: string, updates: Partial<ReportTemplate>): ReportTemplate | null {
+        const template = templates.get(templateId);
 
-    if (!template) {
-        return null;
+        if (!template) {
+            return null;
+        }
+
+        const updated = { ...template, ...updates };
+        templates.set(templateId, updated);
+
+        return updated;
     }
 
-    const updated = { ...template, ...updates };
-    templates.set(templateId, updated);
+    /**
+     * Delete template
+     */
+    deleteTemplate(templateId: string): boolean {
+        const template = templates.get(templateId);
 
-    return updated;
-}
+        if (!template) {
+            return false;
+        }
 
-/**
- * Delete template
- */
-deleteTemplate(templateId: string): boolean {
-    const template = templates.get(templateId);
+        templates.delete(templateId);
 
-    if (!template) {
-        return false;
+        AuditService.log({
+            userId: 'system',
+            userName: 'System',
+            action: 'delete_report_template',
+            resourceType: 'ReportTemplate',
+            resourceId: templateId,
+            resourceName: template.name,
+            status: 'success',
+        });
+
+        return true;
     }
 
-    templates.delete(templateId);
+    /**
+     * Generate report from template
+     */
+    async generateReport(
+        templateId: string,
+        format: ReportFormat = 'pdf',
+        generatedBy: string = 'system'
+    ): Promise<GeneratedReport> {
+        const template = templates.get(templateId);
 
-    AuditService.log({
-        userId: 'system',
-        userName: 'System',
-        action: 'delete_report_template',
-        resourceType: 'ReportTemplate',
-        resourceId: templateId,
-        resourceName: template.name,
-        status: 'success',
-    });
+        if (!template) {
+            throw new Error('Template not found');
+        }
 
-    return true;
-}
+        // Collect data for each section
+        const sectionData = await Promise.all(
+            template.sections.map(section => this.getSectionData(section))
+        );
 
-  /**
-   * Generate report from template
-   */
-  async generateReport(
-    templateId: string,
-    format: ReportFormat = 'pdf',
-    generatedBy: string = 'system'
-): Promise < GeneratedReport > {
-    const template = templates.get(templateId);
-
-    if(!template) {
-        throw new Error('Template not found');
-    }
-
-    // Collect data for each section
-    const sectionData = await Promise.all(
-        template.sections.map(section => this.getSectionData(section))
-    );
-
-    const report: GeneratedReport = {
-        id: `rpt_${Date.now()}`,
-        templateId,
-        generatedAt: new Date(),
-        generatedBy,
-        format,
-        data: {
-            template: template.name,
-            sections: sectionData,
-            metadata: {
-                generatedAt: new Date().toISOString(),
-                generatedBy,
+        const report: GeneratedReport = {
+            id: `rpt_${Date.now()}`,
+            templateId,
+            generatedAt: new Date(),
+            generatedBy,
+            format,
+            data: {
+                template: template.name,
+                sections: sectionData,
+                metadata: {
+                    generatedAt: new Date().toISOString(),
+                    generatedBy,
+                },
             },
-        },
-    };
+        };
 
-    // In production, generate actual file (PDF/Excel/CSV)
-    // For now, we'll just store the data
-    reports.set(report.id, report);
+        // In production, generate actual file (PDF/Excel/CSV)
+        // For now, we'll just store the data
+        reports.set(report.id, report);
 
-    AuditService.log({
-        userId: generatedBy,
-        userName: 'User',
-        action: 'generate_report',
-        resourceType: 'Report',
-        resourceId: report.id,
-        resourceName: template.name,
-        status: 'success',
-        details: `Generated ${format.toUpperCase()} report`,
-    });
+        AuditService.log({
+            userId: generatedBy,
+            userName: 'User',
+            action: 'generate_report',
+            resourceType: 'Report',
+            resourceId: report.id,
+            resourceName: template.name,
+            status: 'success',
+            details: `Generated ${format.toUpperCase()} report`,
+        });
 
-    return report;
-}
+        return report;
+    }
 
-  /**
-   * Get data for a report section
-   */
-  private async getSectionData(section: ReportSection): Promise < any > {
-    // Mock data - in production would query actual data sources
-    const mockData: Record<string, any> = {
-    risks: {
-        total: 42,
-            critical: 3,
+    /**
+     * Get data for a report section
+     */
+    private async getSectionData(section: ReportSection): Promise<any> {
+        // Mock data - in production would query actual data sources
+        const mockData: Record<string, any> = {
+            risks: {
+                total: 42,
+                critical: 3,
                 high: 8,
-                    medium: 20,
-                        low: 11,
-                            byCategory: [
-                                { category: 'Cybersecurity', count: 15 },
-                                { category: 'Operational', count: 12 },
-                                { category: 'Financial', count: 8 },
-                                { category: 'Compliance', count: 7 },
-                            ],
-      },
-    compliance: {
-        total: 5,
-            compliant: 4,
+                medium: 20,
+                low: 11,
+                byCategory: [
+                    { category: 'Cybersecurity', count: 15 },
+                    { category: 'Operational', count: 12 },
+                    { category: 'Financial', count: 8 },
+                    { category: 'Compliance', count: 7 },
+                ],
+            },
+            compliance: {
+                total: 5,
+                compliant: 4,
                 nonCompliant: 1,
-                    frameworks: [
-                        { name: 'ISO 27001', status: 'Compliant', score: 95 },
-                        { name: 'SOC 2', status: 'Compliant', score: 92 },
-                        { name: 'GDPR', status: 'Compliant', score: 88 },
-                        { name: 'HIPAA', status: 'Non-Compliant', score: 72 },
-                        { name: 'TISAX', status: 'Compliant', score: 90 },
-                    ],
-      },
-    controls: {
-        total: 156,
-            passing: 143,
+                frameworks: [
+                    { name: 'ISO 27001', status: 'Compliant', score: 95 },
+                    { name: 'SOC 2', status: 'Compliant', score: 92 },
+                    { name: 'GDPR', status: 'Compliant', score: 88 },
+                    { name: 'HIPAA', status: 'Non-Compliant', score: 72 },
+                    { name: 'TISAX', status: 'Compliant', score: 90 },
+                ],
+            },
+            controls: {
+                total: 156,
+                passing: 143,
                 failing: 13,
-                    effectivenessRate: 92,
-      },
-    incidents: {
-        total: 15,
-            open: 3,
+                effectivenessRate: 92,
+            },
+            incidents: {
+                total: 15,
+                open: 3,
                 closed: 12,
-                    critical: 2,
-                        high: 5,
-                            medium: 6,
-                                low: 2,
-      },
-};
+                critical: 2,
+                high: 5,
+                medium: 6,
+                low: 2,
+            },
+        };
 
-return {
-    title: section.title,
-    type: section.type,
-    data: mockData[section.dataSource] || {},
-};
-  }
-
-/**
- * Schedule recurring report
- */
-scheduleReport(data: Omit<ReportSchedule, 'id' | 'nextRun'>): ReportSchedule {
-    const schedule: ReportSchedule = {
-        id: `sch_${Date.now()}`,
-        ...data,
-        nextRun: this.calculateNextRun(data.frequency),
-    };
-
-    schedules.set(schedule.id, schedule);
-
-    return schedule;
-}
-
-/**
- * Get all schedules
- */
-getAllSchedules(): ReportSchedule[] {
-    return Array.from(schedules.values());
-}
-
-  /**
-   * Calculate next run time based on frequency
-   */
-  private calculateNextRun(frequency: ReportFrequency): Date {
-    const now = new Date();
-
-    switch (frequency) {
-        case 'daily':
-            now.setDate(now.getDate() + 1);
-            break;
-        case 'weekly':
-            now.setDate(now.getDate() + 7);
-            break;
-        case 'monthly':
-            now.setMonth(now.getMonth() + 1);
-            break;
-        case 'quarterly':
-            now.setMonth(now.getMonth() + 3);
-            break;
-        default:
-            // once - set to far future
-            now.setFullYear(now.getFullYear() + 10);
+        return {
+            title: section.title,
+            type: section.type,
+            data: mockData[section.dataSource] || {},
+        };
     }
 
-    return now;
-}
+    /**
+     * Schedule recurring report
+     */
+    scheduleReport(data: Omit<ReportSchedule, 'id' | 'nextRun'>): ReportSchedule {
+        const schedule: ReportSchedule = {
+            id: `sch_${Date.now()}`,
+            ...data,
+            nextRun: this.calculateNextRun(data.frequency),
+        };
 
-/**
- * Get all generated reports
- */
-getAllReports(): GeneratedReport[] {
-    return Array.from(reports.values())
-        .sort((a, b) => b.generatedAt.getTime() - a.generatedAt.getTime());
-}
+        schedules.set(schedule.id, schedule);
 
-/**
- * Export report data to CSV format
- */
-exportToCSV(data: any[]): string {
-    if (!data || data.length === 0) {
-        return '';
+        return schedule;
     }
 
-    // Get headers from first object
-    const headers = Object.keys(data[0]);
-    const csvHeaders = headers.join(',');
+    /**
+     * Get all schedules
+     */
+    getAllSchedules(): ReportSchedule[] {
+        return Array.from(schedules.values());
+    }
 
-    // Convert data to CSV rows
-    const csvRows = data.map(row =>
-        headers.map(header => {
-            const value = row[header];
-            // Escape commas and quotes
-            if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-                return `"${value.replace(/"/g, '""')}"`;
-            }
-            return value;
-        }).join(',')
-    );
+    /**
+     * Calculate next run time based on frequency
+     */
+    private calculateNextRun(frequency: ReportFrequency): Date {
+        const now = new Date();
 
-    return `${csvHeaders}\n${csvRows.join('\n')}`;
-}
+        switch (frequency) {
+            case 'daily':
+                now.setDate(now.getDate() + 1);
+                break;
+            case 'weekly':
+                now.setDate(now.getDate() + 7);
+                break;
+            case 'monthly':
+                now.setMonth(now.getMonth() + 1);
+                break;
+            case 'quarterly':
+                now.setMonth(now.getMonth() + 3);
+                break;
+            default:
+                // once - set to far future
+                now.setFullYear(now.getFullYear() + 10);
+        }
+
+        return now;
+    }
+
+    /**
+     * Get all generated reports
+     */
+    getAllReports(): GeneratedReport[] {
+        return Array.from(reports.values())
+            .sort((a, b) => b.generatedAt.getTime() - a.generatedAt.getTime());
+    }
+
+    /**
+     * Export report data to CSV format
+     */
+    exportToCSV(data: any[]): string {
+        if (!data || data.length === 0) {
+            return '';
+        }
+
+        // Get headers from first object
+        const headers = Object.keys(data[0]);
+        const csvHeaders = headers.join(',');
+
+        // Convert data to CSV rows
+        const csvRows = data.map(row =>
+            headers.map(header => {
+                const value = row[header];
+                // Escape commas and quotes
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            }).join(',')
+        );
+
+        return `${csvHeaders}\n${csvRows.join('\n')}`;
+    }
 }
 
 // Export singleton instance
