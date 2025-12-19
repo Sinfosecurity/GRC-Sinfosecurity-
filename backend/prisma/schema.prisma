@@ -79,6 +79,10 @@ model Organization {
   fourthParties               FourthParty[]
   vendorExitRiskAssessments   VendorExitRiskAssessment[]
   vendorExitClosures          VendorExitClosure[]
+  riskAppetites               RiskAppetite[]
+  businessProcessMappings     BusinessProcessVendorMapping[]
+  vendorBAAs                  VendorBAA[]
+  vendorISOControlMappings    VendorISOControlMapping[]
 }
 
 // Risk Management
@@ -466,6 +470,9 @@ model Vendor {
   fourthPartiesList     FourthParty[]
   exitRiskAssessment    VendorExitRiskAssessment?
   exitClosure           VendorExitClosure?
+  businessProcessMappings BusinessProcessVendorMapping[]
+  baa                   VendorBAA?
+  isoControlMappings    VendorISOControlMapping[]
   
   @@index([organizationId])
   @@index([tier])
@@ -1664,4 +1671,243 @@ model VendorExitClosure {
   
   @@index([vendorId])
   @@index([organizationId])
+}
+
+// Risk Appetite Framework - SOC 2 / ISO 27001 Requirement
+model RiskAppetite {
+  id                    String       @id @default(uuid())
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  // Risk Category
+  category              String       // "Third Party Risk", "Cyber Risk", "Operational Risk", etc.
+  subcategory           String?
+  
+  // Appetite Definition
+  appetiteStatement     String       // Board-approved risk appetite statement
+  quantitativeThreshold Float?       // Numeric threshold (e.g., risk score)
+  qualitativeThreshold  String?      // "High", "Medium", "Low"
+  
+  // Limits
+  riskTolerance         Float        // Maximum acceptable risk level
+  earlyWarningThreshold Float        // Threshold for proactive intervention
+  
+  // Monitoring
+  currentRiskLevel      Float        @default(0)
+  breachStatus          RiskAppetiteStatus @default(WITHIN_APPETITE)
+  lastCalculated        DateTime     @default(now())
+  
+  // Governance
+  approvedBy            String
+  approvalDate          DateTime
+  effectiveFrom         DateTime     @default(now())
+  effectiveUntil        DateTime?
+  reviewFrequency       Int          // Days
+  nextReviewDate        DateTime
+  
+  // Documentation
+  rationaleDocument     String?
+  boardApprovalEvidence String?
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  // Relations
+  breaches              RiskAppetiteBreach[]
+  
+  @@index([organizationId])
+  @@index([category])
+  @@index([breachStatus])
+}
+
+enum RiskAppetiteStatus {
+  WITHIN_APPETITE
+  APPROACHING_LIMIT
+  BREACH
+  CRITICAL_BREACH
+}
+
+// Risk Appetite Breaches - Automated Alerting
+model RiskAppetiteBreach {
+  id                    String       @id @default(uuid())
+  riskAppetite          RiskAppetite @relation(fields: [riskAppetiteId], references: [id], onDelete: Cascade)
+  riskAppetiteId        String
+  
+  // Breach Details
+  breachDate            DateTime     @default(now())
+  breachType            String       // "Threshold Breach", "Tolerance Exceeded", "Early Warning"
+  actualRiskLevel       Float
+  thresholdExceeded     Float
+  excessAmount          Float        // How much over the limit
+  
+  // Root Cause
+  triggerEvent          String       // What caused the breach
+  contributingFactors   Json         // Array of factors
+  vendorIds             String[]     // Affected vendors, if applicable
+  
+  // Response
+  notifiedPersonnel     String[]     // Emails/User IDs notified
+  notificationSent      Boolean      @default(false)
+  notificationSentAt    DateTime?
+  
+  // Resolution
+  status                String       @default("OPEN") // "OPEN", "UNDER_REVIEW", "MITIGATED", "CLOSED"
+  mitigationPlan        String?
+  mitigationOwner       String?
+  targetResolutionDate  DateTime?
+  resolvedAt            DateTime?
+  resolutionNotes       String?
+  
+  // Escalation
+  escalatedToBoard      Boolean      @default(false)
+  boardNotificationDate DateTime?
+  boardActionRequired   Boolean      @default(false)
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([riskAppetiteId])
+  @@index([breachDate])
+  @@index([status])
+}
+
+// Business Process Vendor Mapping - Critical Dependency Analysis
+model BusinessProcessVendorMapping {
+  id                    String       @id @default(uuid())
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  
+  // Business Process Details
+  processName           String       // "Payment Processing", "Customer Onboarding", "Data Analytics", etc.
+  processOwner          String
+  processCategory       String       // "Core", "Supporting", "Management"
+  processCriticality    String       // "Critical", "Important", "Standard"
+  
+  // Dependency Analysis
+  dependencyType        String       // "Sole Provider", "Primary Provider", "Backup Provider", "Optional"
+  usagePercentage       Float        // % of process that depends on this vendor
+  
+  // Impact Assessment
+  rto                   Int?         // Recovery Time Objective (hours)
+  rpo                   Int?         // Recovery Point Objective (hours)
+  impactIfUnavailable   String       // "Severe", "High", "Moderate", "Low"
+  alternativeAvailable  Boolean      @default(false)
+  alternativeVendor     String?
+  
+  // Concentration Risk
+  revenueAtRisk         Float?       // $ amount
+  customersImpacted     Int?
+  regulatoryImpact      String?      // GDPR, SOX, etc.
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([processCriticality])
+}
+
+// HIPAA Business Associate Agreement (BAA) Tracking
+model VendorBAA {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String       @unique
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  // BAA Details
+  baaRequired           Boolean      @default(true)
+  baaStatus             String       // "EXECUTED", "PENDING", "NOT_REQUIRED", "EXPIRED"
+  baaExecutionDate      DateTime?
+  baaEffectiveDate      DateTime?
+  baaExpirationDate     DateTime?
+  
+  // PHI Handling
+  phiAccess             Boolean      @default(false)
+  phiTypes              String[]     // ["Clinical Data", "Payment Info", "Insurance Data"]
+  phiVolume             String?      // "Low", "Moderate", "High"
+  phiUsage              String?      // Purpose of PHI access
+  
+  // Safeguards
+  encryptionRequired    Boolean      @default(true)
+  encryptionInTransit   Boolean      @default(false)
+  encryptionAtRest      Boolean      @default(false)
+  accessControls        String?
+  auditLogsRequired     Boolean      @default(true)
+  
+  // Breach Notification
+  breachNotification24Hr Boolean     @default(true)
+  breachContactEmail    String?
+  breachContactPhone    String?
+  
+  // Subcontractor Management
+  subcontractorsAllowed Boolean      @default(false)
+  subcontractorBAAsRequired Boolean  @default(true)
+  subcontractors        Json?        // Array of subcontractor details
+  
+  // Attestations
+  lastAttestation       DateTime?
+  attestationFrequency  Int?         // Days
+  nextAttestationDue    DateTime?
+  
+  // Documents
+  baaDocumentUrl        String?
+  baaSignedCopy         String?
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([baaStatus])
+  @@index([baaExpirationDate])
+}
+
+// ISO 27001/27036 Control Mapping
+model VendorISOControlMapping {
+  id                    String       @id @default(uuid())
+  vendor                Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  
+  // ISO Control Reference
+  isoStandard           String       // "ISO 27001:2013", "ISO 27036-1:2021"
+  controlId             String       // "A.5.1.1", "A.15.1.2"
+  controlName           String       // "Policies for information security"
+  controlCategory       String       // "Organizational", "People", "Physical", "Technological"
+  
+  // Applicability
+  applicable            Boolean      @default(true)
+  applicabilityJustification String?
+  
+  // Implementation Status
+  implementationStatus  String       // "IMPLEMENTED", "PARTIALLY_IMPLEMENTED", "NOT_IMPLEMENTED", "NOT_APPLICABLE"
+  vendorEvidence        String?      // URL/reference to vendor evidence
+  evidenceType          String?      // "SOC 2 Report", "ISO Certificate", "Policy Document"
+  
+  // Assessment
+  assessmentDate        DateTime?
+  assessedBy            String?
+  assessmentNotes       String?
+  controlEffectiveness  String?      // "Effective", "Needs Improvement", "Ineffective"
+  
+  // Compensating Controls
+  compensatingControl   String?
+  compensatingControlOwner String?
+  
+  // Residual Risk
+  residualRisk          String?      // "Low", "Medium", "High"
+  riskAcceptance        String?
+  acceptedBy            String?
+  
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  
+  @@index([vendorId])
+  @@index([organizationId])
+  @@index([controlId])
+  @@index([implementationStatus])
 }

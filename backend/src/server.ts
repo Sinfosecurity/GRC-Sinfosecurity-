@@ -33,6 +33,10 @@ import workflowRoutes from './routes/workflow.routes';
 import reportRoutes from './routes/report.routes';
 import mobileRoutes from './routes/mobile.routes';
 import vendorRoutes from './routes/vendor.routes';
+import approvalRoutes from './routes/approval.routes';
+import concentrationRoutes from './routes/concentration.routes';
+import riskHistoryRoutes from './routes/risk-history.routes';
+import riskAppetiteRoutes from './routes/risk-appetite.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -161,6 +165,10 @@ app.use(`${API_PREFIX}/workflows`, workflowRoutes);
 app.use(`${API_PREFIX}/reports`, reportRoutes);
 app.use(`${API_PREFIX}/mobile`, mobileRoutes);
 app.use(`${API_PREFIX}/vendors`, vendorRoutes);
+app.use(`${API_PREFIX}/vendors/approvals`, approvalRoutes);
+app.use(`${API_PREFIX}/vendors/concentration-risk`, concentrationRoutes);
+app.use(`${API_PREFIX}/vendors/risk-history`, riskHistoryRoutes);
+app.use(`${API_PREFIX}/risk-appetite`, riskAppetiteRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
