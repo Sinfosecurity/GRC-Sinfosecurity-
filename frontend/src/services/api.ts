@@ -10,6 +10,55 @@ const api = axios.create({
     },
 });
 
+// Request interceptor - Add JWT token to all requests
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Response interceptor - Handle errors globally
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+        // Handle 401 Unauthorized - redirect to login
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            
+            // Clear auth data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            // Redirect to login page
+            window.location.href = '/';
+            
+            return Promise.reject(error);
+        }
+
+        // Handle 403 Forbidden - redirect to unauthorized page
+        if (error.response?.status === 403) {
+            window.location.href = '/unauthorized';
+            return Promise.reject(error);
+        }
+
+        // Handle network errors
+        if (!error.response) {
+            console.error('Network error - backend may be offline');
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 // Auth
 export const authAPI = {
     login: (credentials: { email: string; password: string }) =>
@@ -52,6 +101,71 @@ export const policiesAPI = {
 // Documents
 export const documentsAPI = {
     getAll: () => api.get('/documents'),
+};
+
+// Vendors (TPRM)
+export const vendorAPI = {
+    // Vendor Management
+    getAll: (filters?: any) => api.get('/vendors', { params: filters }),
+    getById: (id: string) => api.get(`/vendors/${id}`),
+    create: (data: any) => api.post('/vendors', data),
+    update: (id: string, data: any) => api.put(`/vendors/${id}`, data),
+    delete: (id: string) => api.delete(`/vendors/${id}`),
+    getStatistics: () => api.get('/vendors/statistics'),
+    getRequiringAttention: () => api.get('/vendors/requiring-attention'),
+    offboard: (id: string, data: any) => api.post(`/vendors/${id}/offboard`, data),
+    
+    // Vendor Assessments
+    getAssessments: (vendorId: string) => api.get(`/vendors/${vendorId}/assessments`),
+    createAssessment: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/assessments`, data),
+    getAssessmentById: (vendorId: string, assessmentId: string) => 
+        api.get(`/vendors/${vendorId}/assessments/${assessmentId}`),
+    submitResponse: (vendorId: string, assessmentId: string, data: any) => 
+        api.post(`/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
+    completeAssessment: (vendorId: string, assessmentId: string) => 
+        api.post(`/vendors/${vendorId}/assessments/${assessmentId}/complete`),
+    
+    // Vendor Contracts
+    getContracts: (vendorId: string) => api.get(`/vendors/${vendorId}/contracts`),
+    createContract: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/contracts`, data),
+    getContractById: (vendorId: string, contractId: string) => 
+        api.get(`/vendors/${vendorId}/contracts/${contractId}`),
+    updateContract: (vendorId: string, contractId: string, data: any) => 
+        api.put(`/vendors/${vendorId}/contracts/${contractId}`, data),
+    trackSLA: (vendorId: string, contractId: string, data: any) => 
+        api.post(`/vendors/${vendorId}/contracts/${contractId}/sla`, data),
+    getExpiringContracts: (days?: number) => api.get('/vendors/contracts/expiring', { params: { days } }),
+    
+    // Vendor Issues
+    getIssues: (vendorId: string) => api.get(`/vendors/${vendorId}/issues`),
+    createIssue: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/issues`, data),
+    getIssueById: (vendorId: string, issueId: string) => 
+        api.get(`/vendors/${vendorId}/issues/${issueId}`),
+    updateIssue: (vendorId: string, issueId: string, data: any) => 
+        api.put(`/vendors/${vendorId}/issues/${issueId}`, data),
+    submitCAP: (vendorId: string, issueId: string, data: any) => 
+        api.post(`/vendors/${vendorId}/issues/${issueId}/corrective-action`, data),
+    validateRemediation: (vendorId: string, issueId: string, data: any) => 
+        api.post(`/vendors/${vendorId}/issues/${issueId}/validate`, data),
+    
+    // Continuous Monitoring
+    getMonitoring: (vendorId: string) => api.get(`/vendors/${vendorId}/monitoring`),
+    recordSignal: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/monitoring`, data),
+    
+    // AI Intelligence
+    getRiskSummary: (vendorId: string) => api.get(`/vendors/${vendorId}/ai/risk-summary`),
+    analyzeAssessment: (vendorId: string, assessmentId: string) => 
+        api.get(`/vendors/${vendorId}/ai/assessment-analysis/${assessmentId}`),
+    reviewContract: (vendorId: string, contractId: string) => 
+        api.get(`/vendors/${vendorId}/ai/contract-review/${contractId}`),
+    generateAuditPackage: (vendorId: string) => api.get(`/vendors/${vendorId}/ai/audit-package`),
+    
+    // Reporting
+    getExecutiveDashboard: () => api.get('/vendors/reports/executive-dashboard'),
+    getRiskHeatmap: () => api.get('/vendors/reports/risk-heatmap'),
+    getVendorScorecard: (vendorId: string) => api.get(`/vendors/${vendorId}/reports/scorecard`),
+    getTrendAnalysis: (months?: number) => api.get('/vendors/reports/trends', { params: { months } }),
+    exportBoardReport: (format: string) => api.get('/vendors/reports/board-report', { params: { format } }),
 };
 
 // Health check
