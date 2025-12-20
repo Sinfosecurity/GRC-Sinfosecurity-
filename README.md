@@ -126,12 +126,34 @@ npm run test
 npm run lint
 ```
 
+## Deployment
+
+### Deploy to Railway (Recommended)
+
+```bash
+# Quick deployment
+./deploy-railway.sh
+
+# Or follow the guide
+See RAILWAY-QUICKSTART.md
+```
+
+### Deploy to Vercel (Frontend only)
+
+```bash
+vercel
+```
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full deployment instructions.
+
 ## Documentation
 
 - [Architecture Documentation](./docs/architecture.md)
 - [API Documentation](./docs/api.md)
 - [User Guide](./docs/user-guide.md)
-- [Deployment Guide](./docs/deployment.md)
+- [Railway Deployment Guide](./RAILWAY-DEPLOYMENT.md)
+- [Railway Quick Start](./RAILWAY-QUICKSTART.md)
+- [Vercel Deployment Guide](./DEPLOYMENT.md)
 
 ## License
 

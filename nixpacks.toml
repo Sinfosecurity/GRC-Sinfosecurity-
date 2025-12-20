@@ -1,0 +1,3 @@
+# Nixpacks configuration for monorepo detection
+[phases.setup]
+nixPkgs = ["nodejs_20", "python311"]

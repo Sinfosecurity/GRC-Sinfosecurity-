@@ -1,0 +1,19 @@
+# Nixpacks configuration for Backend
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "postgresql"]
+
+[phases.install]
+cmds = [
+    "npm install --include=dev"
+]
+
+[phases.build]
+cmds = [
+    "npx prisma generate",
+    "npm run build"
+]
+
+[start]
+cmd = "npm run db:migrate && npm start"

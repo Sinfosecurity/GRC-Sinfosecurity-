@@ -1,0 +1,18 @@
+# Nixpacks configuration for AI Service
+providers = ["python"]
+
+[phases.setup]
+nixPkgs = ["python311", "gcc", "g++"]
+
+[phases.install]
+cmds = [
+    "pip install --upgrade pip",
+    "pip install -r requirements.txt",
+    "python -m spacy download en_core_web_sm"
+]
+
+[phases.build]
+cmds = ["echo 'Build phase complete'"]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
