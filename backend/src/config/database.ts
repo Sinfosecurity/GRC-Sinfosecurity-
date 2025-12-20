@@ -3,9 +3,16 @@ import mongoose from 'mongoose';
 import { createClient } from 'redis';
 import logger from './logger';
 
-// PostgreSQL (Prisma)
+export { mongoose };
+
+// PostgreSQL (Prisma) with connection pooling
 export const prisma = new PrismaClient({
-    log: ['query', 'error', 'warn'],
+    log: process.env.NODE_ENV === 'production' ? ['error', 'warn'] : ['query', 'error', 'warn'],
+    datasources: {
+        db: {
+            url: process.env.DATABASE_URL,
+        },
+    },
 });
 
 // MongoDB
@@ -14,7 +21,12 @@ let mongooseConnection: typeof mongoose | null = null;
 export async function connectMongoDB() {
     try {
         const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/grc_documents';
-        mongooseConnection = await mongoose.connect(mongoUri);
+        mongooseConnection = await mongoose.connect(mongoUri, {
+            maxPoolSize: 10,
+            minPoolSize: 2,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        });
         logger.info('✅ MongoDB connected successfully');
     } catch (error) {
         logger.error('❌ MongoDB connection error:', error);
@@ -22,9 +34,21 @@ export async function connectMongoDB() {
     }
 }
 
-// Redis
+// Redis with optimized configuration
 export const redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    url: process.env.REDIS_URL || 'redis://localhost:6380',
+    password: process.env.REDIS_PASSWORD,
+    socket: {
+        reconnectStrategy: (retries) => {
+            if (retries > 10) {
+                logger.error('Redis: Max reconnection attempts reached');
+                return new Error('Max reconnection attempts reached');
+            }
+            return Math.min(retries * 100, 3000);
+        },
+        connectTimeout: 10000,
+    },
+    pingInterval: 30000,
 });
 
 redisClient.on('error', (err) => logger.error('Redis Client Error', err));

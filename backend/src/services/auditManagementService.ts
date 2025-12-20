@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Audit Management Service
  * Full audit lifecycle management: planning, scheduling, execution, findings tracking
@@ -92,7 +93,7 @@ class AuditManagementService {
         };
 
         auditPlans.set(audit.id, audit);
-        console.log(`📋 Audit plan created: ${audit.title}`);
+        logger.info(`📋 Audit plan created: ${audit.title}`);
 
         return audit;
     }
@@ -150,7 +151,7 @@ class AuditManagementService {
         };
 
         auditFindings.set(finding.id, finding);
-        console.log(`🔍 Audit finding created: ${finding.title}`);
+        logger.info(`🔍 Audit finding created: ${finding.title}`);
 
         return finding;
     }

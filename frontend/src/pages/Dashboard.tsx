@@ -39,31 +39,12 @@ export default function Dashboard() {
             const health = await healthCheck();
             if (health) {
                 setBackendStatus('connected');
-
-                // Fetch real data
-                try {
-                    const risksResponse = await risksAPI.getAll();
-                    if (risksResponse.data.data) {
-                        setRisksCount(risksResponse.data.data.length);
-                    }
-                } catch (error) {
-                    console.log('Using mock data');
-                }
-
-                try {
-                    const complianceResponse = await complianceAPI.getFrameworks();
-                    if (complianceResponse.data.data) {
-                        setComplianceData(complianceResponse.data.data.map((item: any) => ({
-                            name: item.name,
-                            score: item.score
-                        })));
-                    }
-                } catch (error) {
-                    console.log('Using mock compliance data');
-                }
             } else {
                 setBackendStatus('disconnected');
             }
+            
+            // For now, use mock data until backend routes are fully implemented
+            // This prevents 401 errors that would clear authentication
         };
 
         checkBackend();

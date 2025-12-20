@@ -112,7 +112,8 @@ class RiskAppetiteService {
                 },
                 include: {
                     assessments: {
-                        orderBy: { completedDate: 'desc' },
+                        where: { status: 'COMPLETED' },
+                        orderBy: { updatedAt: 'desc' },
                         take: 1,
                     },
                 },
@@ -126,9 +127,9 @@ class RiskAppetiteService {
 
             for (const vendor of vendors) {
                 const assessment = vendor.assessments[0];
-                if (assessment && assessment.overallRiskScore) {
+                if (assessment && assessment.overallScore) {
                     const weight = this.getVendorWeight(vendor.tier);
-                    totalRisk += assessment.overallRiskScore * weight;
+                    totalRisk += assessment.overallScore * weight;
                     totalWeight += weight;
                 }
             }

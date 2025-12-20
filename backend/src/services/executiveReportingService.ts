@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Executive Reporting Service
  * Board-ready reports, executive dashboards, C-suite risk views
@@ -181,7 +182,7 @@ class ExecutiveReportingService {
         };
 
         executiveReports.set(report.id, report);
-        console.log(`📊 Executive report generated: ${report.title}`);
+        logger.info(`📊 Executive report generated: ${report.title}`);
 
         return report;
     }

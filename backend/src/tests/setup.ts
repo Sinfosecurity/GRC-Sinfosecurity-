@@ -18,7 +18,7 @@ jest.mock('../config/logger', () => ({
 }));
 
 // Global test utilities
-global.testUtils = {
+(global as any).testUtils = {
   generateMockUser: (overrides = {}) => ({
     id: 'test-user-id',
     email: 'test@example.com',

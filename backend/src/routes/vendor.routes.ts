@@ -104,20 +104,6 @@ router.use(authenticate);
  *                   type: number
  *       401:
  *         $ref: '#/components/responses/Unauthorized'
- *         description: List of vendors
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Vendor'
- *                 meta:
- *                   $ref: '#/components/schemas/PaginationMeta'
- *       401:
- *         $ref: '#/components/responses/Unauthorized'
  *       429:
  *         $ref: '#/components/responses/RateLimitExceeded'
  */

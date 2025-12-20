@@ -14,7 +14,7 @@ datasource db {
 model User {
   id            String   @id @default(uuid())
   email         String   @unique
-  password      String
+  hashedPassword String
   firstName     String
   lastName      String
   role          Role     @default(USER)
@@ -109,6 +109,11 @@ model Risk {
   @@index([organizationId])
   @@index([status])
   @@index([riskScore])
+  @@index([organizationId, status])
+  @@index([organizationId, riskScore])
+  @@index([ownerId])
+  @@index([createdAt])
+  @@index([category, status])
 }
 
 enum RiskCategory {
@@ -207,13 +212,6 @@ model ControlTest {
   testedAt    DateTime @default(now())
   
   @@index([controlId])
-}
-
-enum TestResult {
-  PASSED
-  FAILED
-  PARTIAL
-  NOT_APPLICABLE
 }
 
 // Compliance Management
@@ -479,6 +477,12 @@ model Vendor {
   @@index([status])
   @@index([vendorType])
   @@index([nextReviewDate])
+  @@index([organizationId, status])
+  @@index([organizationId, tier])
+  @@index([organizationId, nextReviewDate])
+  @@index([status, tier])
+  @@index([createdAt])
+  @@index([lastReviewDate])
 }
 
 enum VendorType {
@@ -614,6 +618,10 @@ model VendorAssessment {
   @@index([organizationId])
   @@index([status])
   @@index([dueDate])
+  @@index([organizationId, status])
+  @@index([vendorId, status])
+  @@index([organizationId, dueDate])
+  @@index([assignedTo])
 }
 
 enum AssessmentType {

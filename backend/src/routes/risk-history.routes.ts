@@ -86,9 +86,7 @@ router.get('/:vendorId', validateUUID('vendorId'), async (req: any, res) => {
         const riskTrend = await vendorRiskHistory.getVendorRiskTrend(
             req.params.vendorId,
             req.user.organizationId,
-            startDate,
-            endDate,
-            limit
+            12
         );
 
         res.json({
@@ -137,7 +135,7 @@ router.get('/:vendorId', validateUUID('vendorId'), async (req: any, res) => {
  */
 router.post('/:vendorId/snapshot',
     validateUUID('vendorId'),
-    authorize(['ADMIN', 'RISK_MANAGER']),
+    authorize('ADMIN', 'RISK_MANAGER'),
     async (req: any, res) => {
         try {
             const snapshot = await vendorRiskHistory.recordRiskSnapshot(
@@ -201,20 +199,18 @@ router.post('/:vendorId/snapshot',
  *         description: Risk trends for all vendors
  */
 router.get('/trends', 
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
     async (req: any, res) => {
         try {
-            const startDate = req.query.startDate ? new Date(req.query.startDate) : undefined;
-            const endDate = req.query.endDate ? new Date(req.query.endDate) : undefined;
+            const months = req.query.months ? parseInt(req.query.months) : 6;
 
-            const trends = await vendorRiskHistory.getAllVendorTrends(
+            const result = await vendorRiskHistory.getAllVendorTrends(
                 req.user.organizationId,
-                startDate,
-                endDate
+                months
             );
 
             // Apply filters
-            let filteredTrends = trends;
+            let filteredTrends = result.trends;
 
             if (req.query.trendDirection) {
                 filteredTrends = filteredTrends.filter(
@@ -225,7 +221,7 @@ router.get('/trends',
             if (req.query.minRiskScore) {
                 const minScore = parseFloat(req.query.minRiskScore);
                 filteredTrends = filteredTrends.filter(
-                    t => t.trend.currentScore >= minScore
+                    (t: any) => t.currentRiskScore >= minScore
                 );
             }
 
@@ -239,7 +235,9 @@ router.get('/trends',
                 success: true,
                 data: filteredTrends,
                 count: filteredTrends.length,
-                totalCount: trends.length,
+                totalCount: result.trends.length,
+                summary: result.summary,
+                period: result.period,
             });
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
@@ -264,16 +262,16 @@ router.get('/trends',
  *         description: Vendors with increasing risk
  */
 router.get('/trends/increasing',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
     async (req: any, res) => {
         try {
-            const trends = await vendorRiskHistory.getAllVendorTrends(
+            const result = await vendorRiskHistory.getAllVendorTrends(
                 req.user.organizationId
             );
 
-            const increasingRiskVendors = trends.filter(
-                t => t.trend.direction === 'INCREASING'
-            ).sort((a, b) => b.trend.changePercent - a.trend.changePercent);
+            const increasingRiskVendors = result.trends.filter(
+                (t: any) => t.trend.direction === 'INCREASING'
+            ).sort((a: any, b: any) => b.trend.changePercent - a.trend.changePercent);
 
             res.json({
                 success: true,
@@ -303,15 +301,15 @@ router.get('/trends/increasing',
  *         description: Vendors with volatile risk
  */
 router.get('/trends/volatile',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
     async (req: any, res) => {
         try {
-            const trends = await vendorRiskHistory.getAllVendorTrends(
+            const result = await vendorRiskHistory.getAllVendorTrends(
                 req.user.organizationId
             );
 
-            const volatileVendors = trends.filter(
-                t => t.trend.volatility === 'HIGH'
+            const volatileVendors = result.trends.filter(
+                (t: any) => t.trend.volatility === 'HIGH'
             );
 
             res.json({
@@ -349,10 +347,10 @@ router.get('/trends/volatile',
  *         description: Risk trend report
  */
 router.get('/trends/export',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
     async (req: any, res) => {
         try {
-            const trends = await vendorRiskHistory.getAllVendorTrends(
+            const result = await vendorRiskHistory.getAllVendorTrends(
                 req.user.organizationId
             );
 
@@ -361,15 +359,15 @@ router.get('/trends/export',
             if (format === 'json') {
                 res.json({
                     success: true,
-                    data: trends,
+                    data: result,
                     exportDate: new Date().toISOString(),
                 });
             } else if (format === 'csv') {
                 // Generate CSV
                 const csv = [
-                    'Vendor ID,Vendor Name,Current Score,Previous Score,Trend Direction,Change %,Volatility,Recent Peak,Recent Low',
-                    ...trends.map(t => 
-                        `${t.vendorId},${t.vendorName},${t.trend.currentScore},${t.trend.previousScore},${t.trend.direction},${t.trend.changePercent},${t.trend.volatility},${t.trend.recentPeak},${t.trend.recentLow}`
+                    'Vendor ID,Vendor Name,Current Score,Trend Direction,Change %,Volatility',
+                    ...result.trends.map((t: any) => 
+                        `${t.vendorId},${t.vendorName},${t.currentRiskScore},${t.trend.direction},${t.trend.changePercent},${t.trend.volatility}`
                     )
                 ].join('\n');
 

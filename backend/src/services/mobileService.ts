@@ -60,7 +60,7 @@ class MobileService {
         };
 
         devices.set(deviceId, device);
-        console.log(`📱 Registered ${platform} device for user ${userId}`);
+        logger.info(`📱 Registered ${platform} device for user ${userId}`);
 
         return device;
     }
@@ -72,7 +72,7 @@ class MobileService {
         const device = devices.get(deviceId);
 
         if (!device || !device.pushToken) {
-            console.log(`❌ Cannot send push: device not found or no push token`);
+            logger.info(`❌ Cannot send push: device not found or no push token`);
             return false;
         }
 
@@ -88,9 +88,9 @@ class MobileService {
 
         notifications.set(notification.id, notification);
 
-        console.log(`📲 Push notification sent to ${device.platform} device`);
-        console.log(`   Title: ${title}`);
-        console.log(`   Body: ${body}`);
+        logger.info(`📲 Push notification sent to ${device.platform} device`);
+        logger.info(`   Title: ${title}`);
+        logger.info(`   Body: ${body}`);
 
         // In production, use Firebase Cloud Messaging (Android) or APNs (iOS)
         // Example for FCM:
@@ -187,8 +187,8 @@ class MobileService {
      * Submit mobile workflow
      */
     submitWorkflow(workflowId: string, formData: Record<string, any>): boolean {
-        console.log(`📋 Mobile workflow ${workflowId} submitted`);
-        console.log('Form data:', formData);
+        logger.info(`📋 Mobile workflow ${workflowId} submitted`);
+        logger.info('Form data:', formData);
         return true;
     }
 

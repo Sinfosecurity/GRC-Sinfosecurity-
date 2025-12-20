@@ -49,7 +49,7 @@ router.use(authenticate);
  *                       type: array
  */
 router.get('/', 
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
@@ -83,12 +83,13 @@ router.get('/',
  *         description: Spend concentration metrics
  */
 router.get('/spend',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'CFO']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'CFO'),
     async (req: any, res) => {
         try {
-            const spendAnalysis = await vendorConcentrationRisk.analyzeSpendConcentration(
+            const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
                 req.user.organizationId
             );
+            const spendAnalysis = analysis.spendConcentration;
 
             res.json({
                 success: true,
@@ -117,12 +118,13 @@ router.get('/spend',
  *         description: Geographic concentration analysis
  */
 router.get('/geographic',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
     async (req: any, res) => {
         try {
-            const geoAnalysis = await vendorConcentrationRisk.analyzeGeographicConcentration(
+            const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
                 req.user.organizationId
             );
+            const geoAnalysis = analysis.geographicConcentration;
 
             res.json({
                 success: true,
@@ -151,12 +153,13 @@ router.get('/geographic',
  *         description: Single point of failure vendors
  */
 router.get('/single-points-of-failure',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
     async (req: any, res) => {
         try {
-            const spofs = await vendorConcentrationRisk.identifySinglePointsOfFailure(
+            const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
                 req.user.organizationId
             );
+            const spofs = analysis.singlePointsOfFailure;
 
             res.json({
                 success: true,
@@ -201,14 +204,13 @@ router.get('/single-points-of-failure',
  *               format: binary
  */
 router.get('/board-report',
-    authorize(['ADMIN', 'EXECUTIVE', 'BOARD_MEMBER']),
+    authorize('ADMIN', 'EXECUTIVE', 'BOARD_MEMBER'),
     async (req: any, res) => {
         try {
             const format = (req.query.format as 'pdf' | 'docx' | 'json') || 'json';
             
             const report = await vendorConcentrationRisk.exportBoardReport(
-                req.user.organizationId,
-                format
+                req.user.organizationId
             );
 
             if (format === 'json') {
@@ -248,7 +250,7 @@ router.get('/board-report',
  *         description: Analysis refreshed
  */
 router.post('/refresh',
-    authorize(['ADMIN', 'RISK_MANAGER']),
+    authorize('ADMIN', 'RISK_MANAGER'),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(

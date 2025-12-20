@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Integration Marketplace Service
  * Manage integrations, pre-built connectors, integration library
@@ -236,7 +237,7 @@ class IntegrationMarketplaceService {
         integration.status = 'installed';
         integration.installedAt = new Date();
 
-        console.log(`📦 Integration installed: ${integration.name}`);
+        logger.info(`📦 Integration installed: ${integration.name}`);
         return true;
     }
 
@@ -250,7 +251,7 @@ class IntegrationMarketplaceService {
         integration.status = 'configured';
         integration.lastSyncedAt = new Date();
 
-        console.log(`⚙️ Integration configured: ${integration.name}`);
+        logger.info(`⚙️ Integration configured: ${integration.name}`);
         return true;
     }
 
@@ -262,7 +263,7 @@ class IntegrationMarketplaceService {
         if (!integration) return false;
 
         integration.status = 'disabled';
-        console.log(`🔌 Integration disabled: ${integration.name}`);
+        logger.info(`🔌 Integration disabled: ${integration.name}`);
         return true;
     }
 

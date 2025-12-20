@@ -1,4 +1,5 @@
 /**
+import logger from '../config/logger';
  * Continuous Monitoring Service
  * Real-time monitoring of compliance status, control effectiveness, and risk levels
  */
@@ -129,7 +130,7 @@ class ContinuousMonitoringService {
      * Run all enabled monitoring checks
      */
     async runAllChecks(): Promise<MonitoringResult[]> {
-        console.log('🔍 Running continuous monitoring checks...');
+        logger.info('🔍 Running continuous monitoring checks...');
         
         const results: MonitoringResult[] = [];
         
@@ -175,7 +176,7 @@ class ContinuousMonitoringService {
      * Run a specific monitoring check
      */
     private async runCheck(check: MonitoringCheck): Promise<MonitoringResult> {
-        console.log(`  ↳ Running: ${check.name}`);
+        logger.info(`  ↳ Running: ${check.name}`);
 
         // Simulate different check types
         // In production, these would call actual monitoring logic
@@ -421,7 +422,7 @@ class ContinuousMonitoringService {
             .filter(f => f.severity === 'critical' || f.severity === 'high');
 
         if (criticalFindings.length > 0) {
-            console.log(`⚠️  ${criticalFindings.length} critical/high findings detected`);
+            logger.info(`⚠️  ${criticalFindings.length} critical/high findings detected`);
             
             // Send notification
             await notificationService.notify({

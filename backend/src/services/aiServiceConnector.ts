@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * AI Service Connector
  * Connects to Python AI services for risk prediction, gap analysis, and recommendations
@@ -51,7 +52,7 @@ class AIServiceConnector {
      */
     async predictRisk(riskData: any): Promise<RiskPrediction> {
         try {
-            console.log('🤖 Calling AI service for risk prediction...');
+            logger.info('🤖 Calling AI service for risk prediction...');
 
             // In production, make actual HTTP request to Python AI service
             // const response = await fetch(`${this.config.aiServiceUrl}/api/predict-risk`, {
@@ -80,7 +81,7 @@ class AIServiceConnector {
 
             return mockPrediction;
         } catch (error) {
-            console.error('AI service error:', error);
+            logger.error('AI service error:', error);
             throw new Error('Failed to get risk prediction');
         }
     }
@@ -90,7 +91,7 @@ class AIServiceConnector {
      */
     async analyzeGaps(framework: string, currentControls: any[]): Promise<GapAnalysisResult> {
         try {
-            console.log(`🤖 Analyzing gaps for ${framework}...`);
+            logger.info(`🤖 Analyzing gaps for ${framework}...`);
 
             // Mock response
             const mockResult: GapAnalysisResult = {
@@ -121,7 +122,7 @@ class AIServiceConnector {
 
             return mockResult;
         } catch (error) {
-            console.error('Gap analysis error:', error);
+            logger.error('Gap analysis error:', error);
             throw new Error('Failed to perform gap analysis');
         }
     }
@@ -131,7 +132,7 @@ class AIServiceConnector {
      */
     async getRecommendations(context: string): Promise<AIRecommendation[]> {
         try {
-            console.log('🤖 Getting AI recommendations...');
+            logger.info('🤖 Getting AI recommendations...');
 
             // Mock recommendations
             const mockRecommendations: AIRecommendation[] = [
@@ -163,7 +164,7 @@ class AIServiceConnector {
 
             return mockRecommendations.sort((a, b) => b.priority - a.priority);
         } catch (error) {
-            console.error('Recommendations error:', error);
+            logger.error('Recommendations error:', error);
             throw new Error('Failed to get AI recommendations');
         }
     }
@@ -173,7 +174,7 @@ class AIServiceConnector {
      */
     async analyzeDocument(document: { name: string; content: string }): Promise<any> {
         try {
-            console.log(`🤖 Analyzing document: ${document.name}...`);
+            logger.info(`🤖 Analyzing document: ${document.name}...`);
 
             // Mock analysis
             return {
@@ -194,7 +195,7 @@ class AIServiceConnector {
                 ],
             };
         } catch (error) {
-            console.error('Document analysis error:', error);
+            logger.error('Document analysis error:', error);
             throw new Error('Failed to analyze document');
         }
     }
@@ -222,7 +223,7 @@ class AIServiceConnector {
      * Get smart risk score using ML
      */
     async getSmartRiskScore(risk: any): Promise<{ score: number; trend: 'increasing' | 'stable' | 'decreasing' }> {
-        console.log('🤖 Calculating smart risk score...');
+        logger.info('🤖 Calculating smart risk score...');
 
         // Mock ML-based scoring
         const baseScore = this.severityToScore(risk.severity);

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../config/logger';
 
 interface AuditLog {
     id: string;
@@ -31,7 +32,7 @@ export class AuditService {
         };
 
         auditLogs.push(auditEntry);
-        console.log('[AUDIT]', JSON.stringify(auditEntry, null, 2));
+        logger.info('[AUDIT]', JSON.stringify(auditEntry, null, 2));
 
         // Keep only last 1000 entries in memory
         if (auditLogs.length > 1000) {

@@ -4,7 +4,8 @@ import { authAPI } from '../services/api';
 interface User {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   role: 'ADMIN' | 'MANAGER' | 'USER' | 'AUDITOR';
   organizationId: string;
 }
@@ -45,9 +46,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
 
+        console.log('Initializing auth from localStorage:', { hasToken: !!storedToken, hasUser: !!storedUser });
+
         if (storedToken && storedUser) {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
+          console.log('Auth initialized successfully');
         }
       } catch (error) {
         console.error('Failed to initialize auth:', error);
@@ -67,7 +71,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       const response = await authAPI.login({ email, password });
       
-      const { token: newToken, user: newUser } = response.data;
+      // Backend returns { success: true, data: { token, user } }
+      const { token: newToken, user: newUser } = response.data.data;
+
+      console.log('Login successful:', { token: newToken, user: newUser });
 
       // Store in state
       setToken(newToken);
@@ -76,6 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Persist to localStorage
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(newUser));
+      
+      console.log('Auth state updated:', { isAuthenticated: !!newToken && !!newUser });
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

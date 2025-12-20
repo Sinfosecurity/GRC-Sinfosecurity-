@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Vendor Contract & SLA Management Service
  * Enterprise contract lifecycle and SLA tracking
@@ -53,7 +54,7 @@ class VendorContractService {
             },
         });
 
-        console.log(`✅ Created contract: ${contract.title} for ${contract.vendor.name}`);
+        logger.info(`✅ Created contract: ${contract.title} for ${contract.vendor.name}`);
         return contract;
     }
 
@@ -224,7 +225,7 @@ class VendorContractService {
             }
         }
 
-        console.log(`✅ SLA tracked: ${data.metricName} - ${status}`);
+        logger.info(`✅ SLA tracked: ${data.metricName} - ${status}`);
         return slaRecord;
     }
 

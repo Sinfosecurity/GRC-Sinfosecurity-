@@ -1,4 +1,5 @@
 /**
+import logger from '../config/logger';
  * GRC Maturity Assessment Service
  * Maturity scoring, benchmarking, capability models
  */
@@ -133,7 +134,7 @@ class GRCMaturityService {
         };
 
         assessments.set(assessment.id, assessment);
-        console.log(`📊 Maturity assessment created for ${assessment.framework}`);
+        logger.info(`📊 Maturity assessment created for ${assessment.framework}`);
 
         return assessment;
     }

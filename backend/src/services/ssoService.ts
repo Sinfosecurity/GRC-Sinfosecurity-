@@ -4,6 +4,12 @@
  */
 
 import jwt from 'jsonwebtoken';
+import logger from '../config/logger';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+}
 
 export interface SSOProvider {
     id: string;
@@ -157,7 +163,7 @@ class SSOService {
         };
 
         ssoProviders.set(providerId, updated);
-        console.log(`✅ SSO Provider configured: ${updated.name}`);
+        logger.info(`✅ SSO Provider configured: ${updated.name}`);
         return updated;
     }
 
@@ -170,7 +176,7 @@ class SSOService {
 
         provider.enabled = enabled;
         ssoProviders.set(providerId, provider);
-        console.log(`${enabled ? '✅ Enabled' : '❌ Disabled'} SSO: ${provider.name}`);
+        logger.info(`${enabled ? '✅ Enabled' : '❌ Disabled'} SSO: ${provider.name}`);
         return true;
     }
 
@@ -192,7 +198,7 @@ class SSOService {
 
         const url = `${config.entryPoint}?SAMLRequest=${encodeURIComponent(encodedRequest)}&RelayState=${relayState}`;
 
-        console.log('📤 SAML AuthnRequest generated');
+        logger.info('📤 SAML AuthnRequest generated');
         return { url, relayState };
     }
 
@@ -203,7 +209,7 @@ class SSOService {
         // In production, validate SAML response signature, assertions, etc.
         // Use passport-saml or node-saml library
 
-        console.log('📥 Processing SAML response');
+        logger.info('📥 Processing SAML response');
 
         // Mock parsing for demo
         const decoded = Buffer.from(samlResponse, 'base64').toString('utf-8');
@@ -217,7 +223,7 @@ class SSOService {
             attributes: {}
         };
 
-        console.log(`✅ SAML authentication successful: ${user.email}`);
+        logger.info(`✅ SAML authentication successful: ${user.email}`);
         return user;
     }
 
@@ -244,7 +250,7 @@ class SSOService {
         });
 
         const url = `${config.authorizationUrl}?${params.toString()}`;
-        console.log('📤 OAuth2 authorization URL generated');
+        logger.info('📤 OAuth2 authorization URL generated');
         return { url, state };
     }
 
@@ -260,13 +266,13 @@ class SSOService {
         const config = provider.config as OAuth2Config;
 
         // In production, make actual API calls
-        console.log('📥 Exchanging OAuth2 code for tokens');
+        logger.info('📥 Exchanging OAuth2 code for tokens');
 
         // Mock token exchange
         const accessToken = 'mock_access_token';
 
         // Fetch user info
-        console.log('📥 Fetching user info from OAuth2 provider');
+        logger.info('📥 Fetching user info from OAuth2 provider');
         
         // Mock user info for demo
         const user: SSOUser = {
@@ -279,7 +285,7 @@ class SSOService {
             }
         };
 
-        console.log(`✅ OAuth2 authentication successful: ${user.email}`);
+        logger.info(`✅ OAuth2 authentication successful: ${user.email}`);
         return user;
     }
 
@@ -297,7 +303,7 @@ class SSOService {
         const nonce = this.generateState();
 
         // In production, fetch discovery document
-        console.log('📥 Fetching OIDC discovery document');
+        logger.info('📥 Fetching OIDC discovery document');
 
         const params = new URLSearchParams({
             client_id: config.clientId,
@@ -312,7 +318,7 @@ class SSOService {
         const authorizationEndpoint = config.discoveryUrl.replace('/.well-known/openid-configuration', '/authorize');
         const url = `${authorizationEndpoint}?${params.toString()}`;
 
-        console.log('📤 OIDC authorization URL generated');
+        logger.info('📤 OIDC authorization URL generated');
         return { url, state, nonce };
     }
 
@@ -325,7 +331,7 @@ class SSOService {
             throw new Error('Invalid OIDC provider');
         }
 
-        console.log('📥 Processing OIDC ID token');
+        logger.info('📥 Processing OIDC ID token');
 
         // In production:
         // 1. Exchange code for tokens
@@ -345,7 +351,7 @@ class SSOService {
             }
         };
 
-        console.log(`✅ OIDC authentication successful: ${user.email}`);
+        logger.info(`✅ OIDC authentication successful: ${user.email}`);
         return user;
     }
 
@@ -364,8 +370,8 @@ class SSOService {
             exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret');
-        console.log(`🔑 JWT token generated for SSO user: ${user.email}`);
+        const token = jwt.sign(payload, JWT_SECRET);
+        logger.info(`🔑 JWT token generated for SSO user: ${user.email}`);
         return token;
     }
 
@@ -374,7 +380,7 @@ class SSOService {
      */
     validateSSOSession(token: string): boolean {
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as any;
+            const decoded = jwt.verify(token, JWT_SECRET) as any;
             return decoded.authMethod === 'SSO';
         } catch {
             return false;

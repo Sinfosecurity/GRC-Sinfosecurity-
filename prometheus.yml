@@ -1,0 +1,66 @@
+# Prometheus Configuration for GRC Platform
+# This file configures Prometheus to scrape metrics from the GRC backend
+
+global:
+  scrape_interval: 15s       # How often to scrape targets
+  evaluation_interval: 15s   # How often to evaluate rules
+  
+  # External labels to add to all metrics
+  external_labels:
+    cluster: 'grc-platform'
+    environment: 'production'
+
+# Alerting configuration (optional - requires alertmanager)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Rule files for alerting (optional)
+# rule_files:
+#   - 'alerts.yml'
+
+# Scrape configurations
+scrape_configs:
+  # GRC Backend API
+  - job_name: 'grc-backend'
+    static_configs:
+      - targets: ['host.docker.internal:4000']  # Use host.docker.internal for Docker on Mac/Windows
+        # For Linux, use: - targets: ['172.17.0.1:4000']
+        # For production, use actual hostname/IP
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    
+  # GRC Frontend (if implementing client-side metrics)
+  - job_name: 'grc-frontend'
+    static_configs:
+      - targets: ['host.docker.internal:5173']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+
+  # Node Exporter (system metrics - optional)
+  # Uncomment if you're running node-exporter
+  # - job_name: 'node-exporter'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #   scrape_interval: 30s
+
+  # PostgreSQL Exporter (optional)
+  # - job_name: 'postgres-exporter'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #   scrape_interval: 30s
+
+  # Redis Exporter (optional)
+  # - job_name: 'redis-exporter'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #   scrape_interval: 30s

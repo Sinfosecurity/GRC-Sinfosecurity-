@@ -12,6 +12,8 @@ import {
     Grid,
     Chip,
     alpha,
+    Alert,
+    CircularProgress,
 } from '@mui/material';
 import {
     Security,
@@ -24,16 +26,32 @@ import {
     CloudDone,
     Shield,
 } from '@mui/icons-material';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Landing() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (email && password) {
+        if (!email || !password) {
+            setError('Please enter both email and password');
+            return;
+        }
+
+        try {
+            setError('');
+            setIsLoading(true);
+            await login(email, password);
             navigate('/dashboard');
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -394,11 +412,20 @@ export default function Landing() {
                                                 },
                                             }}
                                         />
+
+                                        {error && (
+                                            <Alert severity="error" sx={{ borderRadius: 2 }}>
+                                                {error}
+                                            </Alert>
+                                        )}
+
                                         <Button
                                             type="submit"
                                             variant="contained"
                                             size="large"
                                             fullWidth
+                                            disabled={isLoading}
+                                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
                                             sx={{
                                                 py: 1.8,
                                                 borderRadius: 2,
@@ -413,9 +440,12 @@ export default function Landing() {
                                                     boxShadow: '0 12px 32px rgba(102,126,234,0.5)',
                                                     transform: 'translateY(-2px)',
                                                 },
+                                                '&:disabled': {
+                                                    opacity: 0.7,
+                                                },
                                             }}
                                         >
-                                            Sign In
+                                            {isLoading ? 'Signing In...' : 'Sign In'}
                                         </Button>
 
                                         <Box sx={{ textAlign: 'center', position: 'relative' }}>

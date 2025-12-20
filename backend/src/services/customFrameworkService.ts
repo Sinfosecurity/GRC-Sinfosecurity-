@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Custom Framework Builder Service
  * Build custom compliance frameworks, control libraries, custom workflows
@@ -148,7 +149,7 @@ class CustomFrameworkService {
         };
 
         customFrameworks.set(framework.id, framework);
-        console.log(`🏗️ Custom framework created: ${framework.name}`);
+        logger.info(`🏗️ Custom framework created: ${framework.name}`);
 
         return framework;
     }
@@ -224,7 +225,7 @@ class CustomFrameworkService {
         };
 
         controlMappings.push(newMapping);
-        console.log(`🔗 Control mapping created: ${mapping.sourceFramework}.${mapping.sourceControl} → ${mapping.targetFramework}.${mapping.targetControl}`);
+        logger.info(`🔗 Control mapping created: ${mapping.sourceFramework}.${mapping.sourceControl} → ${mapping.targetFramework}.${mapping.targetControl}`);
 
         return newMapping;
     }

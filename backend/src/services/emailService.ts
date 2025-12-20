@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Email Service
  * Handles sending emails via SendGrid
@@ -325,14 +326,14 @@ class EmailService {
 
         // In development mode, just log the email
         if (this.isDevelopment || !this.apiKey) {
-            console.log('\n📧 EMAIL NOTIFICATION (Development Mode)');
-            console.log('═══════════════════════════════════════');
-            console.log(`From: ${from}`);
-            console.log(`To: ${recipients.join(', ')}`);
-            console.log(`Subject: ${options.subject}`);
-            console.log('───────────────────────────────────────');
-            console.log(options.text || this.htmlToText(options.html));
-            console.log('═══════════════════════════════════════\n');
+            logger.info('\n📧 EMAIL NOTIFICATION (Development Mode)');
+            logger.info('═══════════════════════════════════════');
+            logger.info(`From: ${from}`);
+            logger.info(`To: ${recipients.join(', ')}`);
+            logger.info(`Subject: ${options.subject}`);
+            logger.info('───────────────────────────────────────');
+            logger.info(options.text || this.htmlToText(options.html));
+            logger.info('═══════════════════════════════════════\n');
             return true;
         }
 
@@ -350,10 +351,10 @@ class EmailService {
             };
 
             await sgMail.send(msg);
-            console.log(`✅ Email sent successfully to ${recipients.join(', ')}`);
+            logger.info(`✅ Email sent successfully to ${recipients.join(', ')}`);
             return true;
         } catch (error) {
-            console.error('❌ Error sending email:', error);
+            logger.error('❌ Error sending email:', error);
             return false;
         }
     }
@@ -369,7 +370,7 @@ class EmailService {
         const template = templates[templateName];
 
         if (!template) {
-            console.error(`Template "${templateName}" not found`);
+            logger.error(`Template "${templateName}" not found`);
             return false;
         }
 

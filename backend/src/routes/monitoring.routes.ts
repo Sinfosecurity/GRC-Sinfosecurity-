@@ -1,11 +1,133 @@
 import express, { Request, Response } from 'express';
 import continuousMonitoringService from '../services/continuousMonitoringService';
+import { authenticate } from '../middleware/auth';
+import { monitoringService } from '../utils/monitoring';
+import { errorTracker } from '../utils/errorTracking';
+import { performanceReporter } from '../utils/performanceMonitoring';
+import { alertManager } from '../utils/alerting';
+import { businessMetricsCollector } from '../utils/businessMetrics';
+import { asyncHandler } from '../middleware/errorHandler';
+import logger from '../config/logger';
 
 const router = express.Router();
 
 /**
+ * GET /api/monitoring/dashboard
+ * Get comprehensive monitoring dashboard data
+ */
+router.get('/dashboard', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const [
+        performanceReport,
+        errorStats,
+        alertStats,
+        businessMetrics,
+    ] = await Promise.all([
+        performanceReporter.generateReport(),
+        errorTracker.getStatistics(),
+        alertManager.getStatistics(),
+        businessMetricsCollector.getMetricsSummary(),
+    ]);
+
+    res.json({
+        performance: performanceReport,
+        errors: errorStats,
+        alerts: alertStats,
+        business: businessMetrics,
+        timestamp: new Date().toISOString(),
+    });
+}));
+
+/**
+ * GET /api/monitoring/performance
+ * Get performance metrics
+ */
+router.get('/performance', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const report = await performanceReporter.generateReport();
+    res.json(report);
+}));
+
+/**
+ * GET /api/monitoring/errors
+ * Get error statistics
+ */
+router.get('/errors', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const stats = errorTracker.getStatistics();
+    res.json(stats);
+}));
+
+/**
+ * GET /api/monitoring/alerts
+ * Get active alerts
+ */
+router.get('/alerts', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const activeAlerts = alertManager.getActiveAlerts();
+    res.json({
+        alerts: activeAlerts,
+        count: activeAlerts.length,
+    });
+}));
+
+/**
+ * POST /api/monitoring/alerts/:alertId/resolve
+ * Resolve an alert
+ */
+router.post('/alerts/:alertId/resolve', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const { alertId } = req.params;
+    alertManager.resolveAlert(alertId);
+    
+    res.json({
+        message: 'Alert resolved successfully',
+        alertId,
+    });
+}));
+
+/**
+ * GET /api/monitoring/business
+ * Get business metrics summary
+ */
+router.get('/business', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const summary = await businessMetricsCollector.getMetricsSummary();
+    res.json(summary);
+}));
+
+/**
+ * GET /api/monitoring/status
+ * Get overall monitoring system status
+ */
+router.get('/status', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const alertStats = alertManager.getStatistics();
+    const errorStats = errorTracker.getStatistics();
+    
+    const status = {
+        monitoring: {
+            enabled: true,
+            uptime: process.uptime(),
+            memoryUsage: process.memoryUsage(),
+        },
+        alerts: {
+            active: alertStats.activeAlerts,
+            total: alertStats.totalAlerts,
+            critical: alertStats.bySeverity.critical,
+        },
+        errors: {
+            last24Hours: errorStats.totalErrors,
+            buffer: errorStats.bufferSize,
+        },
+        services: {
+            errorTracking: true,
+            performanceMonitoring: true,
+            businessMetrics: true,
+            alertManager: true,
+        },
+        timestamp: new Date().toISOString(),
+    };
+
+    res.json(status);
+}));
+
+/**
  * GET /api/monitoring/checks
- * Get all monitoring checks
+ * Get all monitoring checks (legacy endpoint)
  */
 router.get('/checks', (req: Request, res: Response) => {
     try {

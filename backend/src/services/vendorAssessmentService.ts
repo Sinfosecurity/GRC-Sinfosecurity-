@@ -68,7 +68,7 @@ class VendorAssessmentService {
         // Generate assessment questions based on template
         await this.generateAssessmentQuestions(assessment.id, data.frameworkUsed || 'Custom');
 
-        console.log(`✅ Created assessment for vendor: ${assessment.vendor.name}`);
+        logger.info(`✅ Created assessment for vendor: ${assessment.vendor.name}`);
         return assessment;
     }
 
@@ -175,7 +175,7 @@ class VendorAssessmentService {
             });
         }
 
-        console.log(`✅ Response submitted for question: ${data.questionId}`);
+        logger.info(`✅ Response submitted for question: ${data.questionId}`);
     }
 
     /**
@@ -229,7 +229,7 @@ class VendorAssessmentService {
                     where: { id: assessment.vendorId },
                     data: {
                         residualRiskScore: newRiskScore,
-                        lastAssessmentDate: new Date(),
+                        lastReviewDate: new Date(),
                         updatedAt: new Date(),
                     },
                 });
@@ -285,7 +285,7 @@ class VendorAssessmentService {
             data: questions,
         });
 
-        console.log(`✅ Generated ${questions.length} questions for assessment`);
+        logger.info(`✅ Generated ${questions.length} questions for assessment`);
     }
 
     /**
@@ -410,7 +410,7 @@ class VendorAssessmentService {
             },
         });
 
-        console.log(`✅ Updated vendor risk score to: ${riskScore}`);
+        logger.info(`✅ Updated vendor risk score to: ${riskScore}`);
     }
 
     /**

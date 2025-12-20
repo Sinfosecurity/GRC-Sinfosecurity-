@@ -1,4 +1,5 @@
 /**
+import logger from '../config/logger';
  * Document Storage Service
  * Supports AWS S3 and Azure Blob Storage
  * Includes virus scanning, encryption, and retention policies
@@ -166,10 +167,10 @@ class DocumentStorageService {
 
         documents.set(fileId, document);
 
-        console.log(`📄 Document uploaded: ${options.fileName} (${fileId})`);
-        console.log(`   Provider: ${this.config.provider}`);
-        console.log(`   Encrypted: ${this.config.encryption}`);
-        console.log(`   Virus Scan: ${virusScanResult}`);
+        logger.info(`📄 Document uploaded: ${options.fileName} (${fileId})`);
+        logger.info(`   Provider: ${this.config.provider}`);
+        logger.info(`   Encrypted: ${this.config.encryption}`);
+        logger.info(`   Virus Scan: ${virusScanResult}`);
 
         return document;
     }
@@ -191,7 +192,7 @@ class DocumentStorageService {
             fileBuffer = this.decryptFile(fileBuffer);
         }
 
-        console.log(`📥 Document downloaded: ${document.fileName}`);
+        logger.info(`📥 Document downloaded: ${document.fileName}`);
         return fileBuffer;
     }
 
@@ -210,8 +211,8 @@ class DocumentStorageService {
 
         // Schedule physical deletion after retention period
         // In production, use a background job
-        console.log(`🗑️  Document marked for deletion: ${document.fileName}`);
-        console.log(`   Will be permanently deleted after retention period`);
+        logger.info(`🗑️  Document marked for deletion: ${document.fileName}`);
+        logger.info(`   Will be permanently deleted after retention period`);
 
         return true;
     }
@@ -231,7 +232,7 @@ class DocumentStorageService {
         // Remove from database
         documents.delete(documentId);
 
-        console.log(`💥 Document permanently deleted: ${document.fileName}`);
+        logger.info(`💥 Document permanently deleted: ${document.fileName}`);
         return true;
     }
 
@@ -280,7 +281,7 @@ class DocumentStorageService {
             deletedCount++;
         }
 
-        console.log(`🧹 Retention policy applied: ${deletedCount} documents deleted`);
+        logger.info(`🧹 Retention policy applied: ${deletedCount} documents deleted`);
         return deletedCount;
     }
 
@@ -339,7 +340,7 @@ class DocumentStorageService {
 
     private async scanForViruses(buffer: Buffer): Promise<'CLEAN' | 'INFECTED' | 'UNKNOWN'> {
         // In production, integrate with ClamAV or cloud scanning service
-        console.log('🦠 Scanning file for viruses...');
+        logger.info('🦠 Scanning file for viruses...');
         
         // Simulate virus scan
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -366,7 +367,7 @@ class DocumentStorageService {
             cipher.getAuthTag()
         ]);
 
-        console.log('🔒 File encrypted');
+        logger.info('🔒 File encrypted');
         return encrypted;
     }
 
@@ -390,7 +391,7 @@ class DocumentStorageService {
             decipher.final()
         ]);
 
-        console.log('🔓 File decrypted');
+        logger.info('🔓 File decrypted');
         return decrypted;
     }
 
@@ -410,7 +411,7 @@ class DocumentStorageService {
         // await s3.upload({ Bucket: this.config.s3Bucket, Key: fileId, Body: buffer });
         
         const url = `https://${this.config.s3Bucket}.s3.${this.config.s3Region}.amazonaws.com/${fileId}`;
-        console.log(`☁️  Uploaded to AWS S3: ${url}`);
+        logger.info(`☁️  Uploaded to AWS S3: ${url}`);
         return url;
     }
 
@@ -420,7 +421,7 @@ class DocumentStorageService {
         // await blockBlobClient.uploadData(buffer);
         
         const url = `https://${this.config.azureAccountName}.blob.core.windows.net/${this.config.azureContainerName}/${fileId}`;
-        console.log(`☁️  Uploaded to Azure Blob: ${url}`);
+        logger.info(`☁️  Uploaded to Azure Blob: ${url}`);
         return url;
     }
 
@@ -430,13 +431,13 @@ class DocumentStorageService {
         // await fs.writeFile(path.join(this.config.localPath!, fileId), buffer);
         
         const url = `/uploads/${fileId}`;
-        console.log(`💾 Saved locally: ${url}`);
+        logger.info(`💾 Saved locally: ${url}`);
         return url;
     }
 
     private async downloadFromProvider(fileUrl: string): Promise<Buffer> {
         // In production, download from actual storage
-        console.log(`📥 Downloading from: ${fileUrl}`);
+        logger.info(`📥 Downloading from: ${fileUrl}`);
         
         // Return mock buffer for demo
         return Buffer.from('mock file content');
@@ -444,7 +445,7 @@ class DocumentStorageService {
 
     private async deleteFromProvider(fileUrl: string): Promise<void> {
         // In production, delete from actual storage
-        console.log(`💥 Deleting from storage: ${fileUrl}`);
+        logger.info(`💥 Deleting from storage: ${fileUrl}`);
     }
 
     private groupBy(docs: StoredDocument[], field: keyof StoredDocument): Record<string, number> {

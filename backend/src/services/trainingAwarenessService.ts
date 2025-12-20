@@ -86,7 +86,7 @@ class TrainingAwarenessService {
         };
 
         trainingCourses.set(course.id, course);
-        console.log(`📚 Training course created: ${course.title}`);
+        logger.info(`📚 Training course created: ${course.title}`);
 
         return course;
     }
@@ -129,7 +129,7 @@ class TrainingAwarenessService {
         };
 
         trainingAssignments.set(assignment.id, assignment);
-        console.log(`✅ Training assigned to user ${userId}`);
+        logger.info(`✅ Training assigned to user ${userId}`);
 
         return assignment;
     }
@@ -159,10 +159,10 @@ class TrainingAwarenessService {
         if (score >= passedScore) {
             assignment.status = 'completed';
             assignment.completedAt = new Date();
-            console.log(`✅ Training completed with score ${score}%`);
+            logger.info(`✅ Training completed with score ${score}%`);
             return true;
         } else {
-            console.log(`❌ Training failed with score ${score}% (required: ${passedScore}%)`);
+            logger.info(`❌ Training failed with score ${score}% (required: ${passedScore}%)`);
             return false;
         }
     }
@@ -197,7 +197,7 @@ class TrainingAwarenessService {
         };
 
         awarenessCampaigns.set(campaign.id, campaign);
-        console.log(`📢 Awareness campaign created: ${campaign.name}`);
+        logger.info(`📢 Awareness campaign created: ${campaign.name}`);
 
         return campaign;
     }
@@ -264,7 +264,7 @@ class TrainingAwarenessService {
   /**
    * Get compliance training report
    */
-  getCompliance Report(framework: string): {
+  getComplianceReport(framework: string): {
         framework: string;
         requiredCourses: TrainingCourse[];
         completionRate: number;

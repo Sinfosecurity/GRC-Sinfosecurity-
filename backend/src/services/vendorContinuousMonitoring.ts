@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Vendor Continuous Monitoring Service
  * Real-time vendor risk signals and automated monitoring
@@ -53,7 +54,7 @@ class VendorContinuousMonitoringService {
             await this.triggerReassessment(data.vendorId, data.riskIndicator);
         }
 
-        console.log(`✅ Monitoring signal recorded: ${data.riskIndicator} for ${signal.vendor.name}`);
+        logger.info(`✅ Monitoring signal recorded: ${data.riskIndicator} for ${signal.vendor.name}`);
         return signal;
     }
 
@@ -364,7 +365,7 @@ class VendorContinuousMonitoringService {
             });
         }
 
-        console.log(`✅ Scheduled monitoring for ${vendors.length} vendors`);
+        logger.info(`✅ Scheduled monitoring for ${vendors.length} vendors`);
         return checks;
     }
 
@@ -435,7 +436,7 @@ class VendorContinuousMonitoringService {
             },
         });
 
-        console.log(`🚨 Created critical issue from monitoring signal: ${signal.riskIndicator}`);
+        logger.info(`🚨 Created critical issue from monitoring signal: ${signal.riskIndicator}`);
     }
 
     /**
@@ -460,7 +461,7 @@ class VendorContinuousMonitoringService {
             },
         });
 
-        console.log(`✅ Triggered reassessment for vendor: ${vendorId} - Reason: ${reason}`);
+        logger.info(`✅ Triggered reassessment for vendor: ${vendorId} - Reason: ${reason}`);
     }
 
     /**
@@ -503,7 +504,7 @@ class VendorContinuousMonitoringService {
     /**
      * Map monitoring type to issue type
      */
-    private mapMonitoringTypeToIssueType(monitoringType: string): string {
+    private mapMonitoringTypeToIssueType(monitoringType: string): any {
         const mapping: any = {
             SECURITY_RATING: 'SECURITY_VULNERABILITY',
             BREACH_NOTIFICATION: 'DATA_BREACH',

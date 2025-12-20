@@ -94,13 +94,13 @@ class NotificationService {
      * Send a notification event
      */
     async notify(event: NotificationEvent): Promise<void> {
-        console.log(`\n🔔 Processing notification: ${event.type} (${event.severity})`);
+        logger.info(`\n🔔 Processing notification: ${event.type} (${event.severity})`);
 
         // Determine recipients
         const recipients = event.recipients || this.getDefaultRecipients(event.type);
 
         if (recipients.length === 0) {
-            console.log('⚠️ No recipients configured for this notification type');
+            logger.info('⚠️ No recipients configured for this notification type');
             return;
         }
 
@@ -108,7 +108,7 @@ class NotificationService {
         const eligibleRecipients = this.filterByPreferences(recipients, event.type);
 
         if (eligibleRecipients.length === 0) {
-            console.log('⚠️ All recipients have disabled this notification type');
+            logger.info('⚠️ All recipients have disabled this notification type');
             return;
         }
 
@@ -270,7 +270,7 @@ class NotificationService {
      * This should be called by a scheduled job (cron)
      */
     async checkComplianceDeadlines(): Promise<void> {
-        console.log('🔍 Checking compliance deadlines...');
+        logger.info('🔍 Checking compliance deadlines...');
 
         // Mock data - in production, query from database
         const upcomingDeadlines = [
@@ -303,7 +303,7 @@ class NotificationService {
      * This should be called by a scheduled job (cron)
      */
     async checkOverdueAssessments(): Promise<void> {
-        console.log('🔍 Checking overdue assessments...');
+        logger.info('🔍 Checking overdue assessments...');
 
         // Mock data - in production, query from database
         const overdueAssessments: any[] = [];

@@ -52,7 +52,7 @@ class VendorIssueService {
         // Create notification
         await this.notifyIssueStakeholders(issue);
 
-        console.log(`✅ Created issue: ${issue.title} for ${issue.vendor.name}`);
+        logger.info(`✅ Created issue: ${issue.title} for ${issue.vendor.name}`);
         return issue;
     }
 
@@ -137,7 +137,7 @@ class VendorIssueService {
             },
         });
 
-        console.log(`✅ Remediation submitted for issue: ${issueId}`);
+        logger.info(`✅ Remediation submitted for issue: ${issueId}`);
         return issue;
     }
 
@@ -168,9 +168,9 @@ class VendorIssueService {
         });
 
         if (approved) {
-            console.log(`✅ Issue resolved: ${issueId}`);
+            logger.info(`✅ Issue resolved: ${issueId}`);
         } else {
-            console.log(`⚠️ Remediation rejected for issue: ${issueId}`);
+            logger.info(`⚠️ Remediation rejected for issue: ${issueId}`);
         }
 
         return issue;
@@ -248,7 +248,7 @@ class VendorIssueService {
         });
 
         // Send escalation notification
-        console.log(`🚨 Issue escalated: ${issueId} - ${escalationReason}`);
+        logger.info(`🚨 Issue escalated: ${issueId} - ${escalationReason}`);
         return issue;
     }
 
@@ -384,7 +384,7 @@ class VendorIssueService {
     private async autoAssignIssue(issueId: string, severity: IssueSeverity) {
         // In production, this would query users with appropriate roles
         // For now, just log
-        console.log(`Auto-assigning ${severity} issue: ${issueId}`);
+        logger.info(`Auto-assigning ${severity} issue: ${issueId}`);
     }
 
     /**
@@ -392,7 +392,7 @@ class VendorIssueService {
      */
     private async notifyIssueStakeholders(issue: VendorIssue) {
         // In production, send emails/Slack notifications
-        console.log(`Notifying stakeholders about issue: ${issue.title}`);
+        logger.info(`Notifying stakeholders about issue: ${issue.title}`);
     }
 
     /**

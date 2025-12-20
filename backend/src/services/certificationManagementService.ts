@@ -1,4 +1,5 @@
 /**
+import logger from '../config/logger';
  * Compliance Certification Management Service
  * Track certification timelines, readiness scoring, renewal alerts
  */
@@ -149,7 +150,7 @@ class CertificationManagementService {
         };
 
         certifications.set(cert.id, cert);
-        console.log(`📜 Certification tracking created: ${cert.framework}`);
+        logger.info(`📜 Certification tracking created: ${cert.framework}`);
 
         return cert;
     }

@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticate, authorize } from '../middleware/auth';
 import { validateBody, validateUUID } from '../middleware/validation';
+import { CreateWorkflowSchema, SubmitDecisionSchema } from '../validators/approval.validators';
 import vendorApprovalWorkflow from '../services/vendorApprovalWorkflow';
 
 const router = express.Router();
@@ -62,11 +63,7 @@ router.use(authenticate);
  *       404:
  *         description: Vendor not found
  */
-router.post('/workflows', validateBody({
-    vendorId: { type: 'string', required: true },
-    workflowType: { type: 'string', required: true },
-    approvalChain: { type: 'array', required: true },
-}), async (req: any, res) => {
+router.post('/workflows', validateBody(CreateWorkflowSchema), async (req: any, res) => {
     try {
         const workflow = await vendorApprovalWorkflow.createWorkflow({
             ...req.body,
@@ -313,7 +310,7 @@ router.get('/pending', async (req: any, res) => {
  */
 router.post('/workflows/:workflowId/cancel',
     validateUUID('workflowId'),
-    authorize(['ADMIN', 'RISK_MANAGER']),
+    authorize('ADMIN', 'RISK_MANAGER'),
     async (req: any, res) => {
         try {
             const workflow = await vendorApprovalWorkflow.cancelWorkflow(
@@ -362,7 +359,7 @@ router.post('/workflows/:workflowId/cancel',
  *         description: Workflow statistics
  */
 router.get('/statistics', 
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
     async (req: any, res) => {
         try {
             const startDate = req.query.startDate ? new Date(req.query.startDate) : undefined;

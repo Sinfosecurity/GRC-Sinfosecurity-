@@ -1,4 +1,5 @@
 /**
+import logger from '../config/logger';
  * Multi-Factor Authentication (MFA) Service
  * Supports TOTP, SMS, Email, and Backup Codes
  */
@@ -106,7 +107,7 @@ class MFAService {
         const userConfigs = mfaConfigs.get(userId) || [];
         mfaConfigs.set(userId, [...userConfigs.filter(c => c.method !== 'TOTP'), config]);
         
-        console.log(`📱 TOTP setup initiated for user: ${userId}`);
+        logger.info(`📱 TOTP setup initiated for user: ${userId}`);
         
         return {
             secret,
@@ -133,11 +134,11 @@ class MFAService {
             totpConfig.verified = true;
             totpConfig.lastUsedAt = new Date();
             mfaConfigs.set(userId, userConfigs);
-            console.log(`✅ TOTP verified and enabled for user: ${userId}`);
+            logger.info(`✅ TOTP verified and enabled for user: ${userId}`);
             return true;
         }
         
-        console.log(`❌ Invalid TOTP code for user: ${userId}`);
+        logger.info(`❌ Invalid TOTP code for user: ${userId}`);
         return false;
     }
 
@@ -169,8 +170,8 @@ class MFAService {
         });
         
         // In production, send SMS via Twilio, AWS SNS, etc.
-        console.log(`📱 SMS verification code sent to ${phoneNumber}: ${code}`);
-        console.log(`   (In production, this would be sent via SMS API)`);
+        logger.info(`📱 SMS verification code sent to ${phoneNumber}: ${code}`);
+        logger.info(`   (In production, this would be sent via SMS API)`);
         
         // Store challenge
         this.storeChallenge(userId, 'SMS', code);
@@ -206,8 +207,8 @@ class MFAService {
         });
         
         // In production, send email
-        console.log(`📧 Email verification code sent to ${email}: ${code}`);
-        console.log(`   (In production, this would be sent via email service)`);
+        logger.info(`📧 Email verification code sent to ${email}: ${code}`);
+        logger.info(`   (In production, this would be sent via email service)`);
         
         // Store challenge
         this.storeChallenge(userId, 'EMAIL', code);
@@ -252,11 +253,11 @@ class MFAService {
             }
             
             mfaChallenges.delete(challengeKey);
-            console.log(`✅ ${method} verified and enabled for user: ${userId}`);
+            logger.info(`✅ ${method} verified and enabled for user: ${userId}`);
             return true;
         }
         
-        console.log(`❌ Invalid ${method} code for user: ${userId} (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
+        logger.info(`❌ Invalid ${method} code for user: ${userId} (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
         return false;
     }
 
@@ -298,13 +299,13 @@ class MFAService {
         if (selectedMethod === 'SMS') {
             const userConfigs = mfaConfigs.get(userId) || [];
             const smsConfig = userConfigs.find(c => c.method === 'SMS');
-            console.log(`📱 MFA code sent via SMS to ${smsConfig?.phoneNumber}: ${code}`);
+            logger.info(`📱 MFA code sent via SMS to ${smsConfig?.phoneNumber}: ${code}`);
         } else if (selectedMethod === 'EMAIL') {
             const userConfigs = mfaConfigs.get(userId) || [];
             const emailConfig = userConfigs.find(c => c.method === 'EMAIL');
-            console.log(`📧 MFA code sent via Email to ${emailConfig?.email}: ${code}`);
+            logger.info(`📧 MFA code sent via Email to ${emailConfig?.email}: ${code}`);
         } else if (selectedMethod === 'TOTP') {
-            console.log(`📱 TOTP challenge issued for user: ${userId}`);
+            logger.info(`📱 TOTP challenge issued for user: ${userId}`);
         }
         
         return { challengeId, method: selectedMethod };
@@ -357,11 +358,11 @@ class MFAService {
             }
             
             mfaChallenges.delete(challengeId);
-            console.log(`✅ MFA challenge verified for user: ${challenge.userId}`);
+            logger.info(`✅ MFA challenge verified for user: ${challenge.userId}`);
             return true;
         }
         
-        console.log(`❌ Invalid MFA code (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
+        logger.info(`❌ Invalid MFA code (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
         return false;
     }
 
@@ -376,7 +377,7 @@ class MFAService {
         
         config.enabled = false;
         mfaConfigs.set(userId, userConfigs);
-        console.log(`❌ MFA ${method} disabled for user: ${userId}`);
+        logger.info(`❌ MFA ${method} disabled for user: ${userId}`);
         return true;
     }
 
@@ -394,7 +395,7 @@ class MFAService {
             mfaConfigs.set(userId, userConfigs);
         }
         
-        console.log(`🔄 Backup codes regenerated for user: ${userId}`);
+        logger.info(`🔄 Backup codes regenerated for user: ${userId}`);
         return newCodes;
     }
 
@@ -502,7 +503,7 @@ class MFAService {
             // Remove used backup code
             totpConfig.backupCodes.splice(index, 1);
             mfaConfigs.set(userId, userConfigs);
-            console.log(`✅ Backup code used for user: ${userId} (${totpConfig.backupCodes.length} remaining)`);
+            logger.info(`✅ Backup code used for user: ${userId} (${totpConfig.backupCodes.length} remaining)`);
             return true;
         }
         

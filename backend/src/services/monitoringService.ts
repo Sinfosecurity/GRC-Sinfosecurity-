@@ -50,7 +50,7 @@ class MonitoringService {
     startMonitoring() {
         if (this.monitoringInterval) return;
 
-        console.log('🔍 Starting real-time monitoring service...');
+        logger.info('🔍 Starting real-time monitoring service...');
 
         // Initial check
         this.performMonitoringCheck();
@@ -68,7 +68,7 @@ class MonitoringService {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
             this.monitoringInterval = null;
-            console.log('⏹️  Stopped monitoring service');
+            logger.info('⏹️  Stopped monitoring service');
         }
     }
 
@@ -76,7 +76,7 @@ class MonitoringService {
      * Perform monitoring check
      */
     private async performMonitoringCheck() {
-        console.log('🔍 Running monitoring check...');
+        logger.info('🔍 Running monitoring check...');
 
         // Check compliance drift
         await this.checkComplianceDrift();
@@ -213,7 +213,7 @@ class MonitoringService {
         };
 
         alerts.set(alert.id, alert);
-        console.log(`🚨 Alert created: ${alert.title}`);
+        logger.info(`🚨 Alert created: ${alert.title}`);
 
         // In production, send notifications via email, Slack, etc.
         return alert;

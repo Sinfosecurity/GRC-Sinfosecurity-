@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Issue/Action Item Management Service
  * Enhanced task management with links to risks, controls, audits, and remediation tracking
@@ -102,7 +103,7 @@ class IssueActionItemService {
         };
 
         actionItems.set(item.id, item);
-        console.log(`📋 Action item created: ${item.title}`);
+        logger.info(`📋 Action item created: ${item.title}`);
 
         // Create workflow if remediation type
         if (item.type === 'remediation' || item.type === 'audit_finding') {

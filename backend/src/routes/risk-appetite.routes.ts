@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticate, authorize } from '../middleware/auth';
 import { validateBody, validateUUID } from '../middleware/validation';
+import { CreateRiskAppetiteSchema, UpdateRiskAppetiteSchema, ResolveBreachSchema } from '../validators/risk-appetite.validators';
 import riskAppetiteService from '../services/riskAppetite';
 
 const router = express.Router();
@@ -120,7 +121,7 @@ router.post('/',
  *         description: List of risk appetites
  */
 router.get('/',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR'),
     async (req: any, res) => {
         try {
             const appetites = await riskAppetiteService.listRiskAppetites(
@@ -181,7 +182,7 @@ router.get('/',
  */
 router.put('/:id',
     validateUUID('id'),
-    authorize(['ADMIN', 'RISK_MANAGER', 'EXECUTIVE']),
+    authorize('ADMIN', 'RISK_MANAGER', 'EXECUTIVE'),
     async (req: any, res) => {
         try {
             const riskAppetite = await riskAppetiteService.updateRiskAppetite(
@@ -225,7 +226,7 @@ router.put('/:id',
  */
 router.post('/:id/monitor',
     validateUUID('id'),
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
     async (req: any, res) => {
         try {
             const result = await riskAppetiteService.monitorRiskAppetite(
@@ -260,7 +261,7 @@ router.post('/:id/monitor',
  *         description: All risk appetites monitored
  */
 router.post('/monitor-all',
-    authorize(['ADMIN', 'RISK_MANAGER']),
+    authorize('ADMIN', 'RISK_MANAGER'),
     async (req: any, res) => {
         try {
             const results = await riskAppetiteService.monitorAllRiskAppetites(
@@ -301,7 +302,7 @@ router.post('/monitor-all',
  *         description: List of breaches
  */
 router.get('/breaches',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR'),
     async (req: any, res) => {
         try {
             const breaches = await riskAppetiteService.listBreaches(
@@ -361,11 +362,8 @@ router.get('/breaches',
  */
 router.post('/breaches/:breachId/resolve',
     validateUUID('breachId'),
-    authorize(['ADMIN', 'RISK_MANAGER', 'EXECUTIVE']),
-    validateBody({
-        mitigationPlan: { type: 'string', required: true },
-        mitigationOwner: { type: 'string', required: true },
-    }),
+    authorize('ADMIN', 'RISK_MANAGER', 'EXECUTIVE'),
+    validateBody(ResolveBreachSchema),
     async (req: any, res) => {
         try {
             const breach = await riskAppetiteService.resolveBreach(
@@ -403,7 +401,7 @@ router.post('/breaches/:breachId/resolve',
  *         description: Risk appetite dashboard
  */
 router.get('/dashboard',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'BOARD_MEMBER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'BOARD_MEMBER'),
     async (req: any, res) => {
         try {
             const dashboard = await riskAppetiteService.getDashboard(
@@ -437,7 +435,7 @@ router.get('/dashboard',
  *         description: Appetites requiring review
  */
 router.get('/review-required',
-    authorize(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER']),
+    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
     async (req: any, res) => {
         try {
             const appetites = await riskAppetiteService.getAppetitesRequiringReview(

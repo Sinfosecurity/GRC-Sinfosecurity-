@@ -90,7 +90,7 @@ class RegulatoryChangeService {
     startRegulatoryScan() {
         if (this.scanInterval) return;
 
-        console.log('🔍 Starting regulatory change scanning...');
+        logger.info('🔍 Starting regulatory change scanning...');
 
         // Initial scan
         this.performRegulatoryScan();
@@ -108,7 +108,7 @@ class RegulatoryChangeService {
         if (this.scanInterval) {
             clearInterval(this.scanInterval);
             this.scanInterval = null;
-            console.log('⏹️  Stopped regulatory scanning');
+            logger.info('⏹️  Stopped regulatory scanning');
         }
     }
 
@@ -116,7 +116,7 @@ class RegulatoryChangeService {
      * Perform regulatory scan
      */
     private async performRegulatoryScan() {
-        console.log('🔍 Scanning for regulatory changes...');
+        logger.info('🔍 Scanning for regulatory changes...');
 
         // In production, integrate with:
         // - Thomson Reuters Regulatory Intelligence
@@ -163,7 +163,7 @@ class RegulatoryChangeService {
             deadline: change.effectiveDate,
         });
 
-        console.log(`📋 Regulatory change tracked: ${change.title}`);
+        logger.info(`📋 Regulatory change tracked: ${change.title}`);
         return change;
     }
 
@@ -223,7 +223,7 @@ class RegulatoryChangeService {
             deadline: update.complianceDeadline,
         });
 
-        console.log(`🔄 Framework update tracked: ${update.framework} ${update.version}`);
+        logger.info(`🔄 Framework update tracked: ${update.framework} ${update.version}`);
         return update;
     }
 

@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Evidence Collection Service
  * Automated collection and management of audit evidence
@@ -255,7 +256,7 @@ class EvidenceCollectionService {
             return null;
         }
 
-        console.log(`🤖 Auto-collecting evidence: ${rule.name}`);
+        logger.info(`🤖 Auto-collecting evidence: ${rule.name}`);
 
         // Simulate evidence collection
         const evidence: Evidence = {
@@ -459,7 +460,7 @@ class EvidenceCollectionService {
      * Should be called by cron job
      */
     async runScheduledCollection(): Promise<Evidence[]> {
-        console.log('📋 Running scheduled evidence collection...');
+        logger.info('📋 Running scheduled evidence collection...');
         
         const collected: Evidence[] = [];
         const now = new Date();
@@ -473,7 +474,7 @@ class EvidenceCollectionService {
             }
         }
 
-        console.log(`✅ Collected ${collected.length} evidence items`);
+        logger.info(`✅ Collected ${collected.length} evidence items`);
         return collected;
     }
 }

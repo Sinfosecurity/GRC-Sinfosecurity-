@@ -18,11 +18,19 @@ export async function authenticate(
     next: NextFunction
 ) {
     try {
-        // Try JWT token first
-        const token = req.headers.authorization?.replace('Bearer ', '');
+        // Try JWT token from cookie first, then Authorization header
+        let token = req.cookies?.token;
+        
+        if (!token) {
+            token = req.headers.authorization?.replace('Bearer ', '');
+        }
 
         if (token) {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret') as {
+            if (!process.env.JWT_SECRET) {
+                throw new ApiError(500, 'JWT_SECRET not configured');
+            }
+            
+            const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
                 id: string;
                 email: string;
                 role: string;
@@ -44,23 +52,7 @@ export async function authenticate(
             // Update last login
             userService.updateLastLogin(user.id);
         } else {
-            // For development, use x-user-id header or default to admin
-            const userId = req.headers['x-user-id'] as string || 'user_1';
-            const user = userService.getUserById(userId);
-
-            if (!user || user.status !== 'active') {
-                throw new ApiError(401, 'Invalid or inactive user');
-            }
-
-            req.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            };
-
-            // Update last login
-            userService.updateLastLogin(user.id);
+            throw new ApiError(401, 'Authentication token required');
         }
 
         next();

@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import { createServer } from 'http';
 import swaggerUi from 'swagger-ui-express';
 
@@ -37,16 +39,30 @@ import approvalRoutes from './routes/approval.routes';
 import concentrationRoutes from './routes/concentration.routes';
 import riskHistoryRoutes from './routes/risk-history.routes';
 import riskAppetiteRoutes from './routes/risk-appetite.routes';
+import monitoringTestRoutes from './routes/monitoring.test.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
 import { standardTimeout } from './middleware/timeout';
 import { requestId, requestLogger, performanceMonitor } from './middleware/logging';
+import { sanitizeInput } from './middleware/sanitization';
 
 // Import config
 import { connectDatabase, prisma, mongoose, redisClient } from './config/database';
 import logger from './config/logger';
+import {
+    registerDefaultHealthChecks,
+    healthCheckHandler,
+    readinessCheckHandler,
+    livenessCheckHandler,
+    gracefulShutdown,
+} from './utils/healthCheck';
+import { monitoringService } from './utils/monitoring';
+import { errorTracker } from './utils/errorTracking';
+import { performanceMiddleware, databasePerformanceMonitor } from './utils/performanceMonitoring';
+import { alertManager } from './utils/alerting';
+import { businessMetricsCollector } from './utils/businessMetrics';
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -55,7 +71,44 @@ const httpServer = createServer(app);
 const DEV_MODE = process.env.DEV_MODE === 'true';
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'"],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"],
+        },
+    },
+    hsts: {
+        maxAge: 31536000, // 1 year
+        includeSubDomains: true,
+        preload: true
+    },
+    frameguard: {
+        action: 'deny'
+    },
+    noSniff: true,
+    xssFilter: true
+}));
+
+// Compression middleware - compress all responses
+app.use(compression({
+    filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+            return false;
+        }
+        return compression.filter(req, res);
+    },
+    level: 6, // Compression level (0-9)
+    threshold: 1024 // Only compress responses > 1KB
+}));
+
 app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
@@ -63,12 +116,16 @@ app.use(cors({
 
 // Request tracking and logging
 app.use(requestId());
-app.use(performanceMonitor());
+app.use(performanceMiddleware());
 app.use(requestLogger({ logBody: false, logResponse: false }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
+
+// Input sanitization to prevent XSS and injection attacks
+app.use(sanitizeInput);
 
 // Request timeout (30s default)
 app.use(standardTimeout);
@@ -89,62 +146,32 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 
 // Metrics endpoint for Prometheus
-app.get('/metrics', metricsEndpoint);
-
-// Health check with dependency checks
-app.get('/health', async (req: Request, res: Response) => {
-    const health: any = {
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV,
-        devMode: DEV_MODE,
-        version: process.env.npm_package_version || '1.0.0',
-        checks: {},
-    };
-
-    if (!DEV_MODE) {
-        try {
-            // Check PostgreSQL
-            await prisma.$queryRaw`SELECT 1`;
-            health.checks.database = { status: 'healthy', type: 'postgresql' };
-        } catch (error: any) {
-            health.checks.database = { status: 'unhealthy', error: error.message, type: 'postgresql' };
-            health.status = 'degraded';
-        }
-
-        try {
-            // Check MongoDB
-            await mongoose.connection.db?.admin().ping();
-            health.checks.mongodb = { status: 'healthy' };
-        } catch (error: any) {
-            health.checks.mongodb = { status: 'unhealthy', error: error.message };
-            health.status = 'degraded';
-        }
-
-        try {
-            // Check Redis
-            await redisClient.ping();
-            health.checks.redis = { status: 'healthy' };
-        } catch (error: any) {
-            health.checks.redis = { status: 'unhealthy', error: error.message };
-            health.status = 'degraded';
-        }
-    } else {
-        health.checks.note = 'Running in DEV_MODE - database checks skipped';
+app.get('/metrics', async (req: Request, res: Response) => {
+    try {
+        res.set('Content-Type', 'text/plain');
+        const metrics = await monitoringService.getMetrics();
+        res.send(metrics);
+    } catch (error) {
+        logger.error('Error getting metrics:', error);
+        res.status(500).send('Error retrieving metrics');
     }
-
-    // Memory usage
-    const memUsage = process.memoryUsage();
-    health.memory = {
-        rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`,
-        heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`,
-        heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`,
-    };
-
-    const statusCode = health.status === 'healthy' ? 200 : 503;
-    res.status(statusCode).json(health);
 });
+
+// Metrics JSON endpoint
+app.get('/metrics/json', async (req: Request, res: Response) => {
+    try {
+        const metrics = await monitoringService.getMetricsJSON();
+        res.json(metrics);
+    } catch (error) {
+        logger.error('Error getting metrics JSON:', error);
+        res.status(500).json({ error: 'Error retrieving metrics' });
+    }
+});
+
+// Health check endpoints
+app.get('/health', healthCheckHandler); // Comprehensive health check with all dependencies
+app.get('/health/ready', readinessCheckHandler); // Kubernetes readiness probe
+app.get('/health/live', livenessCheckHandler); // Kubernetes liveness probe
 
 // API Routes
 const API_PREFIX = `/api/${process.env.API_VERSION || 'v1'}`;
@@ -169,6 +196,7 @@ app.use(`${API_PREFIX}/vendors/approvals`, approvalRoutes);
 app.use(`${API_PREFIX}/vendors/concentration-risk`, concentrationRoutes);
 app.use(`${API_PREFIX}/vendors/risk-history`, riskHistoryRoutes);
 app.use(`${API_PREFIX}/risk-appetite`, riskAppetiteRoutes);
+app.use(`${API_PREFIX}/monitoring`, monitoringTestRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -199,6 +227,59 @@ async function startServer() {
             // Schedule recurring background jobs
             await scheduleRecurringJobs();
             logger.info('✅ Background jobs scheduled');
+            
+            // Register health checks
+            registerDefaultHealthChecks();
+            logger.info('✅ Health checks registered');
+            
+            // Start monitoring services
+            monitoringService.start();
+            logger.info('✅ Monitoring service started');
+            
+            // Start error tracking
+            errorTracker.start();
+            logger.info('✅ Error tracking started');
+            
+            // Start alert manager
+            alertManager.start();
+            logger.info('✅ Alert manager started');
+            
+            // Start business metrics collection
+            businessMetricsCollector.start();
+            logger.info('✅ Business metrics collector started');
+            
+            // Enable database performance monitoring
+            databasePerformanceMonitor.monitorPrisma(prisma);
+            logger.info('✅ Database performance monitoring enabled');
+            
+            // Setup graceful shutdown handlers
+            gracefulShutdown.setupSignalHandlers();
+            
+            // Register cleanup handlers
+            gracefulShutdown.onShutdown(async () => {
+                logger.info('Closing HTTP server...');
+                await new Promise<void>((resolve) => {
+                    httpServer.close(() => resolve());
+                });
+                logger.info('HTTP server closed');
+            });
+            
+            gracefulShutdown.onShutdown(async () => {
+                logger.info('Shutting down job queues...');
+                await shutdownQueues();
+                logger.info('Job queues shutdown complete');
+            });
+            
+            gracefulShutdown.onShutdown(async () => {
+                logger.info('Stopping monitoring services...');
+                monitoringService.stop();
+                errorTracker.stop();
+                alertManager.stop();
+                businessMetricsCollector.stop();
+                logger.info('Monitoring services stopped');
+            });
+            
+            logger.info('✅ Graceful shutdown handlers configured');
         } else {
             logger.warn('⚠️  Running in DEV_MODE - databases disabled, using mock data');
         }
@@ -221,20 +302,8 @@ async function startServer() {
     }
 }
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-    logger.info('SIGTERM signal received: closing HTTP server');
-    
-    // Close job queues
-    if (!DEV_MODE) {
-        await shutdownQueues();
-    }
-    
-    httpServer.close(() => {
-        logger.info('HTTP server closed');
-        process.exit(0);
-    });
-});
+// Graceful shutdown is now handled by the GracefulShutdown utility
+// No need for manual SIGTERM handler
 
 // Only start server if not imported (e.g., for testing)
 if (require.main === module) {

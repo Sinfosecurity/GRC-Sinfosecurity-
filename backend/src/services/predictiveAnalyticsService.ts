@@ -1,3 +1,4 @@
+import logger from '../config/logger';
 /**
  * Predictive Analytics Service
  * ML-powered risk forecasting, compliance predictions, and anomaly detection
@@ -38,7 +39,7 @@ class PredictiveAnalyticsService {
      * Predict risk trends for next 30/60/90 days
      */
     async predictRiskTrends(riskId: string, days: number = 30): Promise<RiskForecast[]> {
-        console.log(`🔮 Predicting risk trends for ${days} days...`);
+        logger.info(`🔮 Predicting risk trends for ${days} days...`);
 
         // Mock ML-based prediction
         const forecasts: RiskForecast[] = [];
@@ -71,7 +72,7 @@ class PredictiveAnalyticsService {
      * Forecast compliance scores for frameworks
      */
     async forecastCompliance(framework: string, months: number = 6): Promise<ComplianceForecast[]> {
-        console.log(`📊 Forecasting compliance for ${framework}...`);
+        logger.info(`📊 Forecasting compliance for ${framework}...`);
 
         const forecasts: ComplianceForecast[] = [];
         const currentScore = 78;
@@ -105,7 +106,7 @@ class PredictiveAnalyticsService {
      * Detect anomalies in GRC data using ML
      */
     async detectAnomalies(dataSource: string): Promise<Anomaly[]> {
-        console.log(`🔍 Running anomaly detection on ${dataSource}...`);
+        logger.info(`🔍 Running anomaly detection on ${dataSource}...`);
 
         // Mock anomaly detection
         const anomalies: Anomaly[] = [
@@ -165,7 +166,7 @@ class PredictiveAnalyticsService {
         trainingDataSize: number;
         completedAt: Date;
     }> {
-        console.log(`🤖 Training ${modelType} model...`);
+        logger.info(`🤖 Training ${modelType} model...`);
 
         // Simulate model training
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -209,7 +210,7 @@ class PredictiveAnalyticsService {
         date: Date;
         heatMap: number[][];
     }[]> {
-        console.log(`🗓️ Generating risk heat predictions for ${days} days...`);
+        logger.info(`🗓️ Generating risk heat predictions for ${days} days...`);
 
         const predictions = [];
         for (let i = 7; i <= days; i += 7) {

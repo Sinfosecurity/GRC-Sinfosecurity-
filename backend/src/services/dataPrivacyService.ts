@@ -1,4 +1,5 @@
 /**
+import logger from '../config/logger';
  * Data Privacy Management Service
  * DSR portal, data mapping, Privacy Impact Assessments (PIA)
  */
@@ -96,7 +97,7 @@ class DataPrivacyService {
         };
 
         dsrRequests.set(dsr.id, dsr);
-        console.log(`📨 DSR submitted: ${dsr.type} for ${dsr.subjectEmail}`);
+        logger.info(`📨 DSR submitted: ${dsr.type} for ${dsr.subjectEmail}`);
 
         return dsr;
     }
@@ -148,7 +149,7 @@ class DataPrivacyService {
         };
 
         dataMappings.set(mapping.id, mapping);
-        console.log(`🗺️ Data mapping added: ${mapping.dataCategory}`);
+        logger.info(`🗺️ Data mapping added: ${mapping.dataCategory}`);
 
         return mapping;
     }
@@ -173,7 +174,7 @@ class DataPrivacyService {
         };
 
         piaAssessments.set(pia.id, pia);
-        console.log(`🔒 PIA created: ${pia.project}`);
+        logger.info(`🔒 PIA created: ${pia.project}`);
 
         return pia;
     }

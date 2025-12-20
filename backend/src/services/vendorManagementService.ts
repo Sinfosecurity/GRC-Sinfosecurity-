@@ -92,7 +92,7 @@ class VendorManagementService {
                     residualRiskScore: inherentRiskScore, // Initially same as inherent
                     nextReviewDate,
                     status: VendorStatus.PROPOSED,
-                    criticalityLevel: this.mapTierToCriticality(data.tier),
+                    criticalityLevel: this.mapTierToCriticality(data.tier) as any,
                 },
             });
 
@@ -256,7 +256,7 @@ class VendorManagementService {
             },
         });
 
-        console.log(`✅ Updated vendor: ${vendorId}`);
+        logger.info(`✅ Updated vendor: ${vendorId}`);
         return await this.getVendorById(vendorId, organizationId) as Vendor;
     }
 
@@ -275,7 +275,7 @@ class VendorManagementService {
             },
         });
 
-        console.log(`✅ Terminated vendor: ${vendorId}`);
+        logger.info(`✅ Terminated vendor: ${vendorId}`);
     }
 
     /**
@@ -612,8 +612,8 @@ class VendorManagementService {
 
                 // Close all monitoring records
                 await tx.vendorMonitoring.updateMany({
-                    where: { vendorId, acknowledged: false },
-                    data: { acknowledged: true, acknowledgedAt: new Date() },
+                    where: { vendorId, acknowledgedAt: null },
+                    data: { acknowledgedAt: new Date() },
                 });
 
                 // Create offboarding review record
