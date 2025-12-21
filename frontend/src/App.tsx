@@ -1,4 +1,5 @@
-import { Routes, Route, lazy, Suspense } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';

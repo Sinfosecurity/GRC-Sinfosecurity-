@@ -19,7 +19,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Paper,
+    // Paper,
     LinearProgress,
 } from '@mui/material';
 import {
@@ -204,7 +204,7 @@ const ConcentrationRiskDashboard: React.FC = () => {
                         <Chip
                             label={analysis.regulatoryStatus}
                             color={getStatusColor(analysis.regulatoryStatus)}
-                            size="large"
+                            size="medium"
                         />
                     </Box>
                     {analysis.regulatoryStatus === 'BREACH' && (
@@ -251,7 +251,7 @@ const ConcentrationRiskDashboard: React.FC = () => {
                                         fill="#8884d8"
                                         dataKey="percentage"
                                     >
-                                        {analysis.spendConcentration.topVendors.slice(0, 6).map((entry, index) => (
+                                        {analysis.spendConcentration.topVendors.slice(0, 6).map((_entry, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>

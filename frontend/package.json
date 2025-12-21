@@ -50,6 +50,7 @@
         "eslint-plugin-react-refresh": "^0.4.5",
         "happy-dom": "^20.0.11",
         "rollup-plugin-visualizer": "^6.0.5",
+        "terser": "^5.44.1",
         "typescript": "^5.2.2",
         "vite": "^5.0.8",
         "vitest": "^1.1.0"

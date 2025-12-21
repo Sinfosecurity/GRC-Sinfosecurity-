@@ -106,7 +106,7 @@ export default function OrganizationSettings() {
     const [organization, setOrganization] = useState(mockOrganization);
     const [editMode, setEditMode] = useState(false);
     const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
-    const [logoFile, setLogoFile] = useState<File | null>(null);
+    const [, setLogoFile] = useState<File | null>(null);
 
     const handleSaveChanges = () => {
         // In production, call API to update organization

@@ -30,10 +30,10 @@ import {
     Stepper,
     Step,
     StepLabel,
-    Paper,
+    // Paper,
     Grid,
     IconButton,
-    Tooltip,
+    // Tooltip,
 } from '@mui/material';
 import {
     CheckCircle,
@@ -42,9 +42,9 @@ import {
     Warning,
     Visibility,
     ThumbUp,
-    ThumbDown,
+    // ThumbDown,
 } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+// import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 interface ApprovalWorkflow {
@@ -78,7 +78,7 @@ interface ApprovalStep {
 }
 
 const ApprovalWorkflows: React.FC = () => {
-    const { user } = useAuth();
+    // const { user } = useAuth();
     const [workflows, setWorkflows] = useState<ApprovalWorkflow[]>([]);
     const [pendingApprovals, setPendingApprovals] = useState<ApprovalWorkflow[]>([]);
     const [selectedWorkflow, setSelectedWorkflow] = useState<ApprovalWorkflow | null>(null);
@@ -374,7 +374,7 @@ const ApprovalWorkflows: React.FC = () => {
                                     Approval Steps
                                 </Typography>
                                 <Stepper activeStep={selectedWorkflow.currentStep - 1} orientation="vertical">
-                                    {selectedWorkflow.steps.map((step, index) => (
+                                    {selectedWorkflow.steps.map((step) => (
                                         <Step key={step.id}>
                                             <StepLabel
                                                 error={step.decision === 'REJECTED'}
