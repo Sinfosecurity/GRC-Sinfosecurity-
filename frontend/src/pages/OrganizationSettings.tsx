@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import {
     Business,
-    Settings,
+    // Settings,
     People,
     Security,
     Palette,

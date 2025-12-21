@@ -234,7 +234,7 @@ export default function VendorManagement() {
     const handleAddVendor = async () => {
         try {
             setLoading(true);
-            const response = await vendorAPI.create({
+            await vendorAPI.create({
                 name: newVendor.name,
                 category: newVendor.category,
                 tier: newVendor.tier,
