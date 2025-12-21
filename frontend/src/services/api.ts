@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://grc-backend-production-5586.up.railway.app/api/v1';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -33,7 +33,7 @@ api.interceptors.response.use(
         // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-            
+
             // Only clear auth and redirect if it's an auth endpoint failure
             // For other endpoints, just reject the promise (they'll handle it)
             if (originalRequest.url?.includes('/auth/')) {
@@ -41,7 +41,7 @@ api.interceptors.response.use(
                 localStorage.removeItem('user');
                 window.location.href = '/';
             }
-            
+
             return Promise.reject(error);
         }
 
@@ -119,52 +119,52 @@ export const vendorAPI = {
     getStatistics: () => api.get('/vendors/statistics'),
     getRequiringAttention: () => api.get('/vendors/requiring-attention'),
     offboard: (id: string, data: any) => api.post(`/vendors/${id}/offboard`, data),
-    
+
     // Vendor Assessments
     getAssessments: (vendorId: string) => api.get(`/vendors/${vendorId}/assessments`),
     createAssessment: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/assessments`, data),
-    getAssessmentById: (vendorId: string, assessmentId: string) => 
+    getAssessmentById: (vendorId: string, assessmentId: string) =>
         api.get(`/vendors/${vendorId}/assessments/${assessmentId}`),
-    submitResponse: (vendorId: string, assessmentId: string, data: any) => 
+    submitResponse: (vendorId: string, assessmentId: string, data: any) =>
         api.post(`/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
-    completeAssessment: (vendorId: string, assessmentId: string) => 
+    completeAssessment: (vendorId: string, assessmentId: string) =>
         api.post(`/vendors/${vendorId}/assessments/${assessmentId}/complete`),
-    
+
     // Vendor Contracts
     getContracts: (vendorId: string) => api.get(`/vendors/${vendorId}/contracts`),
     createContract: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/contracts`, data),
-    getContractById: (vendorId: string, contractId: string) => 
+    getContractById: (vendorId: string, contractId: string) =>
         api.get(`/vendors/${vendorId}/contracts/${contractId}`),
-    updateContract: (vendorId: string, contractId: string, data: any) => 
+    updateContract: (vendorId: string, contractId: string, data: any) =>
         api.put(`/vendors/${vendorId}/contracts/${contractId}`, data),
-    trackSLA: (vendorId: string, contractId: string, data: any) => 
+    trackSLA: (vendorId: string, contractId: string, data: any) =>
         api.post(`/vendors/${vendorId}/contracts/${contractId}/sla`, data),
     getExpiringContracts: (days?: number) => api.get('/vendors/contracts/expiring', { params: { days } }),
-    
+
     // Vendor Issues
     getIssues: (vendorId: string) => api.get(`/vendors/${vendorId}/issues`),
     createIssue: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/issues`, data),
-    getIssueById: (vendorId: string, issueId: string) => 
+    getIssueById: (vendorId: string, issueId: string) =>
         api.get(`/vendors/${vendorId}/issues/${issueId}`),
-    updateIssue: (vendorId: string, issueId: string, data: any) => 
+    updateIssue: (vendorId: string, issueId: string, data: any) =>
         api.put(`/vendors/${vendorId}/issues/${issueId}`, data),
-    submitCAP: (vendorId: string, issueId: string, data: any) => 
+    submitCAP: (vendorId: string, issueId: string, data: any) =>
         api.post(`/vendors/${vendorId}/issues/${issueId}/corrective-action`, data),
-    validateRemediation: (vendorId: string, issueId: string, data: any) => 
+    validateRemediation: (vendorId: string, issueId: string, data: any) =>
         api.post(`/vendors/${vendorId}/issues/${issueId}/validate`, data),
-    
+
     // Continuous Monitoring
     getMonitoring: (vendorId: string) => api.get(`/vendors/${vendorId}/monitoring`),
     recordSignal: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/monitoring`, data),
-    
+
     // AI Intelligence
     getRiskSummary: (vendorId: string) => api.get(`/vendors/${vendorId}/ai/risk-summary`),
-    analyzeAssessment: (vendorId: string, assessmentId: string) => 
+    analyzeAssessment: (vendorId: string, assessmentId: string) =>
         api.get(`/vendors/${vendorId}/ai/assessment-analysis/${assessmentId}`),
-    reviewContract: (vendorId: string, contractId: string) => 
+    reviewContract: (vendorId: string, contractId: string) =>
         api.get(`/vendors/${vendorId}/ai/contract-review/${contractId}`),
     generateAuditPackage: (vendorId: string) => api.get(`/vendors/${vendorId}/ai/audit-package`),
-    
+
     // Reporting
     getExecutiveDashboard: () => api.get('/vendors/reports/executive-dashboard'),
     getRiskHeatmap: () => api.get('/vendors/reports/risk-heatmap'),
@@ -176,7 +176,7 @@ export const vendorAPI = {
 // Health check
 export const healthCheck = async () => {
     try {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
+        const baseUrl = import.meta.env.VITE_API_URL || 'https://grc-backend-production-5586.up.railway.app/api/v1';
         const healthUrl = baseUrl.replace('/api/v1', '/health');
         const response = await axios.get(healthUrl, { timeout: 2000 });
         return response.data;
