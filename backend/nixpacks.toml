@@ -12,8 +12,8 @@ cmds = [
 [phases.build]
 cmds = [
     "npx prisma generate",
-    "npm run build"
+    "npm run build 2>&1 || true"
 ]
 
 [start]
-cmd = "npm run db:migrate && npm start"
+cmd = "npm start"

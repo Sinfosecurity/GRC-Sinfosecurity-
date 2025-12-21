@@ -63,20 +63,44 @@ export async function connectRedis() {
     }
 }
 
-// Connect all databases
-export async function connectDatabase() {
-    try {
-        // Test PostgreSQL connection
-        await prisma.$connect();
-        logger.info('✅ PostgreSQL connected successfully');
+// Connect all databases with retry logic
+export async function connectDatabase(retries = 5, delay = 3000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            // Test PostgreSQL connection
+            await prisma.$connect();
+            logger.info('✅ PostgreSQL connected successfully');
 
-        await connectMongoDB();
-        await connectRedis();
+            // MongoDB is optional for Railway
+            if (process.env.MONGODB_URI) {
+                try {
+                    await connectMongoDB();
+                } catch (mongoError) {
+                    logger.warn('⚠️  MongoDB connection failed (optional):', mongoError);
+                }
+            }
 
-        logger.info('🎉 All databases connected successfully');
-    } catch (error) {
-        logger.error('❌ Database connection failed:', error);
-        throw error;
+            // Redis is optional for Railway
+            if (process.env.REDIS_URL) {
+                try {
+                    await connectRedis();
+                } catch (redisError) {
+                    logger.warn('⚠️  Redis connection failed (optional):', redisError);
+                }
+            }
+
+            logger.info('🎉 Database connections established');
+            return;
+        } catch (error) {
+            logger.error(`❌ Database connection attempt ${i + 1}/${retries} failed:`, error);
+            if (i < retries - 1) {
+                logger.info(`Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            } else {
+                logger.error('❌ All database connection attempts failed');
+                throw error;
+            }
+        }
     }
 }
 

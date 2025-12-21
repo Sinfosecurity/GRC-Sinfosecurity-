@@ -220,13 +220,21 @@ async function startServer() {
             await connectDatabase();
             logger.info('✅ Database connections established');
             
-            // Initialize cache service
-            const cacheService = new CacheService(redisClient);
-            logger.info('✅ Cache service initialized');
+            // Initialize cache service only if Redis is available
+            if (process.env.REDIS_URL && redisClient.isReady) {
+                const cacheService = new CacheService(redisClient);
+                logger.info('✅ Cache service initialized');
+            } else {
+                logger.warn('⚠️  Redis not available, cache service disabled');
+            }
             
             // Schedule recurring background jobs
-            await scheduleRecurringJobs();
-            logger.info('✅ Background jobs scheduled');
+            try {
+                await scheduleRecurringJobs();
+                logger.info('✅ Background jobs scheduled');
+            } catch (jobError) {
+                logger.warn('⚠️  Failed to schedule background jobs:', jobError);
+            }
             
             // Register health checks
             registerDefaultHealthChecks();
