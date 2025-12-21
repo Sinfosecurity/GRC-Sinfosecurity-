@@ -70,6 +70,12 @@ const httpServer = createServer(app);
 // Check if running in dev mode
 const DEV_MODE = process.env.DEV_MODE === 'true';
 
+// CRITICAL: Basic health check BEFORE any middleware for Railway
+// This must respond immediately for health checks during startup
+app.get('/health/basic', (req: Request, res: Response) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Middleware
 app.use(helmet({
     contentSecurityPolicy: {
@@ -292,14 +298,14 @@ async function startServer() {
             logger.warn('⚠️  Running in DEV_MODE - databases disabled, using mock data');
         }
 
-        httpServer.listen(PORT, () => {
+        httpServer.listen(PORT, '0.0.0.0', () => {
             logger.info(`🚀 Server running on port ${PORT}`);
             logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
             logger.info(`🔧 Dev Mode: ${DEV_MODE ? 'ENABLED' : 'DISABLED'}`);
-            logger.info(`🔗 API URL: http://localhost:${PORT}${API_PREFIX}`);
-            logger.info(`💚 Health check: http://localhost:${PORT}/health`);
-            logger.info(`📚 API Docs: http://localhost:${PORT}/api-docs`);
-            logger.info(`📊 Metrics: http://localhost:${PORT}/metrics`);
+            logger.info(`🔗 API URL: http://0.0.0.0:${PORT}${API_PREFIX}`);
+            logger.info(`💚 Health check: http://0.0.0.0:${PORT}/health/basic`);
+            logger.info(`📚 API Docs: http://0.0.0.0:${PORT}/api-docs`);
+            logger.info(`📊 Metrics: http://0.0.0.0:${PORT}/metrics`);
         });
     } catch (error) {
         logger.error('Failed to start server:', error);
