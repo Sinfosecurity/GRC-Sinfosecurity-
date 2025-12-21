@@ -5,13 +5,10 @@ providers = ["node"]
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = [
-    "npm install",
-    "npm install -g serve"
-]
+cmds = ["npm ci"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "serve -s dist -l $PORT"
+cmd = "npx serve -s dist -l $PORT -n"
