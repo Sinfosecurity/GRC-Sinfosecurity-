@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Chip } from '@mui/material';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { healthCheck, risksAPI, complianceAPI } from '../services/api';
+import { healthCheck } from '../services/api';
 
 // Mock data as fallback
 const complianceDataMock = [
@@ -30,8 +30,8 @@ const incidentTypes = [
 
 export default function Dashboard() {
     const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');
-    const [complianceData, setComplianceData] = useState(complianceDataMock);
-    const [risksCount, setRisksCount] = useState(47);
+    const [complianceData] = useState(complianceDataMock);
+    const [risksCount] = useState(47);
 
     useEffect(() => {
         // Check backend health
