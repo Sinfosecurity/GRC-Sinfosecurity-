@@ -197,8 +197,8 @@ declare class VendorManagementService {
             updatedAt: Date;
             title: string | null;
             vendorId: string;
-            phone: string | null;
             isPrimary: boolean;
+            phone: string | null;
         }[];
         monitoringRecords: {
             url: string | null;

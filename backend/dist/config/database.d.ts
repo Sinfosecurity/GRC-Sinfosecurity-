@@ -3,6 +3,11 @@ import mongoose from 'mongoose';
 export { mongoose };
 export declare const prisma: PrismaClient<{
     log: ("error" | "query" | "warn")[];
+    datasources: {
+        db: {
+            url: string | undefined;
+        };
+    };
 }, never, import("@prisma/client/runtime/library").DefaultArgs>;
 export declare function connectMongoDB(): Promise<void>;
 export declare const redisClient: import("@redis/client").RedisClientType<{
@@ -296,6 +301,6 @@ export declare const redisClient: import("@redis/client").RedisClientType<{
     };
 } & import("redis").RedisModules, import("redis").RedisFunctions, import("redis").RedisScripts>;
 export declare function connectRedis(): Promise<void>;
-export declare function connectDatabase(): Promise<void>;
+export declare function connectDatabase(retries?: number, delay?: number): Promise<void>;
 export declare function disconnectDatabase(): Promise<void>;
 //# sourceMappingURL=database.d.ts.map

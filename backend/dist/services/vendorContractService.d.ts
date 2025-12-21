@@ -75,12 +75,12 @@ declare class VendorContractService {
         slaTracking: {
             id: string;
             status: import(".prisma/client").$Enums.SLAStatus;
+            target: import("@prisma/client/runtime/library").Decimal;
             notes: string | null;
             contractId: string;
             periodStart: Date;
             metricName: string;
             metricType: import(".prisma/client").$Enums.SLAMetricType;
-            target: import("@prisma/client/runtime/library").Decimal;
             actual: import("@prisma/client/runtime/library").Decimal | null;
             unit: string;
             period: string;
@@ -238,12 +238,12 @@ declare class VendorContractService {
     }): Promise<{
         id: string;
         status: import(".prisma/client").$Enums.SLAStatus;
+        target: import("@prisma/client/runtime/library").Decimal;
         notes: string | null;
         contractId: string;
         periodStart: Date;
         metricName: string;
         metricType: import(".prisma/client").$Enums.SLAMetricType;
-        target: import("@prisma/client/runtime/library").Decimal;
         actual: import("@prisma/client/runtime/library").Decimal | null;
         unit: string;
         period: string;

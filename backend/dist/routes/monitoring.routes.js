@@ -5,10 +5,114 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const continuousMonitoringService_1 = __importDefault(require("../services/continuousMonitoringService"));
+const auth_1 = require("../middleware/auth");
+const errorTracking_1 = require("../utils/errorTracking");
+const performanceMonitoring_1 = require("../utils/performanceMonitoring");
+const alerting_1 = require("../utils/alerting");
+const businessMetrics_1 = require("../utils/businessMetrics");
+const errorHandler_1 = require("../middleware/errorHandler");
 const router = express_1.default.Router();
 /**
+ * GET /api/monitoring/dashboard
+ * Get comprehensive monitoring dashboard data
+ */
+router.get('/dashboard', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const [performanceReport, errorStats, alertStats, businessMetrics,] = await Promise.all([
+        performanceMonitoring_1.performanceReporter.generateReport(),
+        errorTracking_1.errorTracker.getStatistics(),
+        alerting_1.alertManager.getStatistics(),
+        businessMetrics_1.businessMetricsCollector.getMetricsSummary(),
+    ]);
+    res.json({
+        performance: performanceReport,
+        errors: errorStats,
+        alerts: alertStats,
+        business: businessMetrics,
+        timestamp: new Date().toISOString(),
+    });
+}));
+/**
+ * GET /api/monitoring/performance
+ * Get performance metrics
+ */
+router.get('/performance', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const report = await performanceMonitoring_1.performanceReporter.generateReport();
+    res.json(report);
+}));
+/**
+ * GET /api/monitoring/errors
+ * Get error statistics
+ */
+router.get('/errors', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const stats = errorTracking_1.errorTracker.getStatistics();
+    res.json(stats);
+}));
+/**
+ * GET /api/monitoring/alerts
+ * Get active alerts
+ */
+router.get('/alerts', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const activeAlerts = alerting_1.alertManager.getActiveAlerts();
+    res.json({
+        alerts: activeAlerts,
+        count: activeAlerts.length,
+    });
+}));
+/**
+ * POST /api/monitoring/alerts/:alertId/resolve
+ * Resolve an alert
+ */
+router.post('/alerts/:alertId/resolve', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const { alertId } = req.params;
+    alerting_1.alertManager.resolveAlert(alertId);
+    res.json({
+        message: 'Alert resolved successfully',
+        alertId,
+    });
+}));
+/**
+ * GET /api/monitoring/business
+ * Get business metrics summary
+ */
+router.get('/business', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const summary = await businessMetrics_1.businessMetricsCollector.getMetricsSummary();
+    res.json(summary);
+}));
+/**
+ * GET /api/monitoring/status
+ * Get overall monitoring system status
+ */
+router.get('/status', auth_1.authenticate, (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const alertStats = alerting_1.alertManager.getStatistics();
+    const errorStats = errorTracking_1.errorTracker.getStatistics();
+    const status = {
+        monitoring: {
+            enabled: true,
+            uptime: process.uptime(),
+            memoryUsage: process.memoryUsage(),
+        },
+        alerts: {
+            active: alertStats.activeAlerts,
+            total: alertStats.totalAlerts,
+            critical: alertStats.bySeverity.critical,
+        },
+        errors: {
+            last24Hours: errorStats.totalErrors,
+            buffer: errorStats.bufferSize,
+        },
+        services: {
+            errorTracking: true,
+            performanceMonitoring: true,
+            businessMetrics: true,
+            alertManager: true,
+        },
+        timestamp: new Date().toISOString(),
+    };
+    res.json(status);
+}));
+/**
  * GET /api/monitoring/checks
- * Get all monitoring checks
+ * Get all monitoring checks (legacy endpoint)
  */
 router.get('/checks', (req, res) => {
     try {

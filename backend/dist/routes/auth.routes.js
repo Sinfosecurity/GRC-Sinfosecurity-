@@ -94,6 +94,7 @@ router.post('/register', async (req, res) => {
     res.json({
         success: true,
         data: {
+            token,
             user: {
                 id: newUser.id,
                 email: newUser.email,
@@ -148,6 +149,7 @@ router.post('/login', async (req, res) => {
         return res.json({
             success: true,
             data: {
+                token,
                 user: {
                     id: user.id,
                     email: user.email,

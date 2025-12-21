@@ -220,51 +220,70 @@ const PORT = parseInt(process.env.PORT || '4000', 10);
 
 async function startServer() {
     try {
-        // Connect to databases only if not in DEV_MODE
+        // Start server FIRST for Railway health checks
+        httpServer.listen(PORT, '0.0.0.0', () => {
+            logger.info(`🚀 Server running on port ${PORT}`);
+            logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
+            logger.info(`🔧 Dev Mode: ${DEV_MODE ? 'ENABLED' : 'DISABLED'}`);
+            logger.info(`🔗 API URL: http://0.0.0.0:${PORT}${API_PREFIX}`);
+            logger.info(`💚 Health check: http://0.0.0.0:${PORT}/health/basic`);
+            logger.info(`📚 API Docs: http://0.0.0.0:${PORT}/api-docs`);
+            logger.info(`📊 Metrics: http://0.0.0.0:${PORT}/metrics`);
+        });
+
+        // Connect to databases AFTER server is listening
         if (!DEV_MODE) {
             logger.info('Connecting to databases...');
             await connectDatabase();
             logger.info('✅ Database connections established');
             
-            // Initialize cache service only if Redis is available
-            if (process.env.REDIS_URL && redisClient.isReady) {
-                const cacheService = new CacheService(redisClient);
-                logger.info('✅ Cache service initialized');
-            } else {
-                logger.warn('⚠️  Redis not available, cache service disabled');
-            }
-            
-            // Schedule recurring background jobs
-            try {
-                await scheduleRecurringJobs();
-                logger.info('✅ Background jobs scheduled');
-            } catch (jobError) {
-                logger.warn('⚠️  Failed to schedule background jobs:', jobError);
-            }
-            
-            // Register health checks
-            registerDefaultHealthChecks();
-            logger.info('✅ Health checks registered');
-            
-            // Start monitoring services
-            monitoringService.start();
-            logger.info('✅ Monitoring service started');
-            
-            // Start error tracking
-            errorTracker.start();
-            logger.info('✅ Error tracking started');
-            
-            // Start alert manager
-            alertManager.start();
-            logger.info('✅ Alert manager started');
-            
-            // Start business metrics collection
-            businessMetricsCollector.start();
-            logger.info('✅ Business metrics collector started');
-            
-            // Enable database performance monitoring
-            databasePerformanceMonitor.monitorPrisma(prisma);
-            logger.info('✅ Database performance monitoring enabled');
+            // Initialize optional services (non-blocking)
+            setImmediate(async () => {
+                try {
+                    // Initialize cache service only if Redis is available
+                    if (process.env.REDIS_URL && redisClient.isReady) {
+                        const cacheService = new CacheService(redisClient);
+                        logger.info('✅ Cache service initialized');
+                    } else {
+                        logger.warn('⚠️  Redis not available, cache service disabled');
+                    }
+                    
+                    // Schedule recurring background jobs
+                    try {
+                        await scheduleRecurringJobs();
+                        logger.info('✅ Background jobs scheduled');
+                    } catch (jobError) {
+                        logger.warn('⚠️  Failed to schedule background jobs:', jobError);
+                    }
+                    
+                    // Register health checks
+                    registerDefaultHealthChecks();
+                    logger.info('✅ Health checks registered');
+                    
+                    // Start monitoring services
+                    monitoringService.start();
+                    logger.info('✅ Monitoring service started');
+                    
+                    // Start error tracking
+                    errorTracker.start();
+                    logger.info('✅ Error tracking started');
+                    
+                    // Start alert manager
+                    alertManager.start();
+                    logger.info('✅ Alert manager started');
+                    
+                    // Start business metrics collection
+                    businessMetricsCollector.start();
+                    logger.info('✅ Business metrics collector started');
+                    
+                    // Enable database performance monitoring
+                    databasePerformanceMonitor.monitorPrisma(prisma);
+                    logger.info('✅ Database performance monitoring enabled');
+                } catch (error) {
+                    logger.error('⚠️  Error initializing optional services:', error);
+                    // Don't crash - these are non-critical
+                }
+            });
             
             // Setup graceful shutdown handlers
             gracefulShutdown.setupSignalHandlers();
@@ -296,17 +315,13 @@ async function startServer() {
             logger.info('✅ Graceful shutdown handlers configured');
         } else {
             logger.warn('⚠️  Running in DEV_MODE - databases disabled, using mock data');
+            
+            // Start server in DEV_MODE
+            httpServer.listen(PORT, '0.0.0.0', () => {
+                logger.info(`🚀 Server running on port ${PORT} (DEV MODE)`);
+                logger.info(`💚 Health check: http://0.0.0.0:${PORT}/health/basic`);
+            });
         }
-
-        httpServer.listen(PORT, '0.0.0.0', () => {
-            logger.info(`🚀 Server running on port ${PORT}`);
-            logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
-            logger.info(`🔧 Dev Mode: ${DEV_MODE ? 'ENABLED' : 'DISABLED'}`);
-            logger.info(`🔗 API URL: http://0.0.0.0:${PORT}${API_PREFIX}`);
-            logger.info(`💚 Health check: http://0.0.0.0:${PORT}/health/basic`);
-            logger.info(`📚 API Docs: http://0.0.0.0:${PORT}/api-docs`);
-            logger.info(`📊 Metrics: http://0.0.0.0:${PORT}/metrics`);
-        });
     } catch (error) {
         logger.error('Failed to start server:', error);
         if (!DEV_MODE) {
