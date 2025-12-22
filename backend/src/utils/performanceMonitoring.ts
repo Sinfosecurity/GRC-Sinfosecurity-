@@ -118,7 +118,7 @@ export function performanceMiddleware() {
 
         // Record request size
         const requestSize = req.get('content-length');
-        if (requestSize) {
+        if (requestSize && req.body && typeof req.body === 'object') {
             const size = parseInt(requestSize, 10);
             if (!isNaN(size)) {
                 req.body._contentLength = size;

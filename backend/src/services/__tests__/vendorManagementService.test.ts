@@ -4,7 +4,7 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals';
-import vendorManagementService from '../services/vendorManagementService';
+import vendorManagementService from '../vendorManagementService';
 
 describe('VendorManagementService', () => {
     const mockOrganizationId = 'org_test_123';
@@ -90,7 +90,7 @@ describe('VendorManagementService', () => {
                 { tier: 'Critical' }
             );
             
-            criticalVendors.forEach(vendor => {
+            criticalVendors.forEach((vendor: any) => {
                 expect(vendor.tier).toBe('Critical');
             });
         });
@@ -101,7 +101,7 @@ describe('VendorManagementService', () => {
                 { status: 'Active' }
             );
             
-            activeVendors.forEach(vendor => {
+            activeVendors.forEach((vendor: any) => {
                 expect(vendor.status).toBe('Active');
             });
         });

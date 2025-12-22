@@ -11,6 +11,31 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Railway Environment Variables Checklist
+echo "\n==== Railway Environment Variables Checklist ===="
+
+echo "\n[Backend]"
+echo "DATABASE_URL=    # (Railway PostgreSQL connection string, auto-set if using Railway DB)"
+echo "JWT_SECRET=      # (Set a secure random value, min 32 chars)"
+echo "NODE_ENV=production"
+echo "CORS_ORIGIN=https://<your-frontend-url>.railway.app"
+echo "AI_SERVICE_URL=https://<your-ai-service-url>.railway.app"
+echo "# (No need to set PORT, Railway injects it)"
+
+echo "\n[AI Service]"
+echo "CORS_ORIGINS=https://<your-frontend-url>.railway.app,https://<your-backend-url>.railway.app"
+echo "BACKEND_URL=https://<your-backend-url>.railway.app"
+echo "# (No need to set PORT, Railway injects it)"
+
+echo "\n[Frontend]"
+echo "VITE_API_URL=https://<your-backend-url>.railway.app"
+echo "VITE_AI_SERVICE_URL=https://<your-ai-service-url>.railway.app"
+echo "# (No need to set PORT, Railway injects it)"
+
+echo "\nAfter setting these, redeploy each service in Railway."
+echo "If you change any variable, trigger a redeploy for that service!"
+echo "\n==== End Checklist ===="
+
 echo -e "${BLUE}🚂 Railway Environment Variables Setup${NC}"
 echo "=========================================="
 echo ""
