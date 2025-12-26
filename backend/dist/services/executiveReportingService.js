@@ -211,7 +211,7 @@ class ExecutiveReportingService {
      * Export to PDF-ready format
      */
     exportToPDF(reportId) {
-        return this.getReport(reportId);
+        return this.getReport(reportId) || null;
     }
     /**
      * Get C-suite risk view

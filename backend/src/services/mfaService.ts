@@ -1,8 +1,8 @@
 /**
-import logger from '../config/logger';
  * Multi-Factor Authentication (MFA) Service
  * Supports TOTP, SMS, Email, and Backup Codes
  */
+import logger from '../config/logger';
 
 import crypto from 'crypto';
 

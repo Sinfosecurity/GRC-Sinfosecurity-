@@ -1,9 +1,9 @@
 /**
-import logger from '../config/logger';
  * Document Storage Service
  * Supports AWS S3 and Azure Blob Storage
  * Includes virus scanning, encryption, and retention policies
  */
+import logger from '../config/logger';
 
 import crypto from 'crypto';
 import path from 'path';

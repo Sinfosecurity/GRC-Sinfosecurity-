@@ -1,13 +1,13 @@
 "use strict";
-/**
-import logger from '../config/logger';
- * Continuous Monitoring Service
- * Real-time monitoring of compliance status, control effectiveness, and risk levels
- */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Continuous Monitoring Service
+ * Real-time monitoring of compliance status, control effectiveness, and risk levels
+ */
+const logger_1 = __importDefault(require("../config/logger"));
 const auditService_1 = require("./auditService");
 const notificationService_1 = __importDefault(require("./notificationService"));
 class ContinuousMonitoringService {
@@ -80,7 +80,7 @@ class ContinuousMonitoringService {
      * Run all enabled monitoring checks
      */
     async runAllChecks() {
-        logger.info('🔍 Running continuous monitoring checks...');
+        logger_1.default.info('🔍 Running continuous monitoring checks...');
         const results = [];
         for (const [_, check] of this.monitoringChecks) {
             if (check.enabled) {
@@ -116,7 +116,7 @@ class ContinuousMonitoringService {
      * Run a specific monitoring check
      */
     async runCheck(check) {
-        logger.info(`  ↳ Running: ${check.name}`);
+        logger_1.default.info(`  ↳ Running: ${check.name}`);
         // Simulate different check types
         // In production, these would call actual monitoring logic
         switch (check.id) {
@@ -337,7 +337,7 @@ class ContinuousMonitoringService {
             .flatMap(r => r.findings)
             .filter(f => f.severity === 'critical' || f.severity === 'high');
         if (criticalFindings.length > 0) {
-            logger.info(`⚠️  ${criticalFindings.length} critical/high findings detected`);
+            logger_1.default.info(`⚠️  ${criticalFindings.length} critical/high findings detected`);
             // Send notification
             await notificationService_1.default.notify({
                 type: 'CONTROL_FAILURE',

@@ -27,11 +27,11 @@ declare class VendorIssueService {
     /**
      * Get issue by ID
      */
-    getIssueById(issueId: string, organizationId: string): Promise<({
+    getIssueById(issueId: string, organizationId: string): Promise<{
         vendor: {
-            name: string;
             id: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             organizationId: string;
             createdAt: Date;
             updatedAt: Date;
@@ -64,14 +64,14 @@ declare class VendorIssueService {
     } & {
         id: string;
         status: import(".prisma/client").$Enums.VendorIssueStatus;
+        description: string;
         priority: import(".prisma/client").$Enums.IssuePriority;
         organizationId: string;
         createdAt: Date;
         severity: import(".prisma/client").$Enums.IssueSeverity;
-        assignedTo: string | null;
         updatedAt: Date;
         title: string;
-        description: string;
+        assignedTo: string | null;
         category: string;
         vendorId: string;
         source: import(".prisma/client").$Enums.IssueSource;
@@ -92,21 +92,21 @@ declare class VendorIssueService {
         closedAt: Date | null;
         closedBy: string | null;
         closureNotes: string | null;
-    }) | null>;
+    }>;
     /**
      * List issues for vendor
      */
     listVendorIssues(vendorId: string, organizationId: string, status?: VendorIssueStatus): Promise<{
         id: string;
         status: import(".prisma/client").$Enums.VendorIssueStatus;
+        description: string;
         priority: import(".prisma/client").$Enums.IssuePriority;
         organizationId: string;
         createdAt: Date;
         severity: import(".prisma/client").$Enums.IssueSeverity;
-        assignedTo: string | null;
         updatedAt: Date;
         title: string;
-        description: string;
+        assignedTo: string | null;
         category: string;
         vendorId: string;
         source: import(".prisma/client").$Enums.IssueSource;
@@ -163,14 +163,14 @@ declare class VendorIssueService {
     } & {
         id: string;
         status: import(".prisma/client").$Enums.VendorIssueStatus;
+        description: string;
         priority: import(".prisma/client").$Enums.IssuePriority;
         organizationId: string;
         createdAt: Date;
         severity: import(".prisma/client").$Enums.IssueSeverity;
-        assignedTo: string | null;
         updatedAt: Date;
         title: string;
-        description: string;
+        assignedTo: string | null;
         category: string;
         vendorId: string;
         source: import(".prisma/client").$Enums.IssueSource;

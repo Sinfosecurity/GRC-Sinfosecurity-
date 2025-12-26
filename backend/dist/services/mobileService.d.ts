@@ -1,7 +1,3 @@
-/**
- * Mobile Service
- * API endpoints and services optimized for mobile apps (iOS/Android)
- */
 export interface MobileDevice {
     deviceId: string;
     userId: string;

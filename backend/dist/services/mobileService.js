@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Mobile Service
  * API endpoints and services optimized for mobile apps (iOS/Android)
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../config/logger"));
 // In-memory storage
 const devices = new Map();
 const notifications = new Map();
@@ -22,7 +26,7 @@ class MobileService {
             lastActive: new Date(),
         };
         devices.set(deviceId, device);
-        logger.info(`📱 Registered ${platform} device for user ${userId}`);
+        logger_1.default.info(`📱 Registered ${platform} device for user ${userId}`);
         return device;
     }
     /**
@@ -31,7 +35,7 @@ class MobileService {
     async sendPushNotification(deviceId, title, body, data) {
         const device = devices.get(deviceId);
         if (!device || !device.pushToken) {
-            logger.info(`❌ Cannot send push: device not found or no push token`);
+            logger_1.default.info(`❌ Cannot send push: device not found or no push token`);
             return false;
         }
         const notification = {
@@ -44,9 +48,9 @@ class MobileService {
             status: 'sent',
         };
         notifications.set(notification.id, notification);
-        logger.info(`📲 Push notification sent to ${device.platform} device`);
-        logger.info(`   Title: ${title}`);
-        logger.info(`   Body: ${body}`);
+        logger_1.default.info(`📲 Push notification sent to ${device.platform} device`);
+        logger_1.default.info(`   Title: ${title}`);
+        logger_1.default.info(`   Body: ${body}`);
         // In production, use Firebase Cloud Messaging (Android) or APNs (iOS)
         // Example for FCM:
         // await admin.messaging().send({
@@ -131,8 +135,8 @@ class MobileService {
      * Submit mobile workflow
      */
     submitWorkflow(workflowId, formData) {
-        logger.info(`📋 Mobile workflow ${workflowId} submitted`);
-        logger.info('Form data:', formData);
+        logger_1.default.info(`📋 Mobile workflow ${workflowId} submitted`);
+        logger_1.default.info('Form data:', formData);
         return true;
     }
     /**

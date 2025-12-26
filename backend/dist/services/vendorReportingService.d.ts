@@ -61,11 +61,7 @@ declare class VendorReportingService {
             resolvedIssues: number;
             newIssues: number;
         };
-        recommendations: {
-            priority: string;
-            title: string;
-            description: string;
-        }[];
+        recommendations: any[];
     }>;
     /**
      * Generate Vendor Risk Heatmap Data
@@ -109,8 +105,8 @@ declare class VendorReportingService {
         };
         metrics: {
             assessmentHistory: {
-                date: Date | null;
-                score: number | null;
+                date: Date;
+                score: number;
             }[];
             openIssues: number;
             resolvedIssues: number;
@@ -127,10 +123,10 @@ declare class VendorReportingService {
         startDate: string;
         endDate: string;
         trends: {
-            vendorGrowth: never[];
-            riskScores: never[];
-            assessments: never[];
-            issues: never[];
+            vendorGrowth: any[];
+            riskScores: any[];
+            assessments: any[];
+            issues: any[];
         };
         insights: string[];
     }>;
@@ -206,26 +202,14 @@ declare class VendorReportingService {
         } | {
             title: string;
             content: {
-                name: string;
-                category: import(".prisma/client").$Enums.VendorCategory;
-                tier: import(".prisma/client").$Enums.VendorTier;
-                residualRiskScore: number;
-                _count: {
-                    issues: number;
-                };
-            }[];
-            type: string;
-        } | {
-            title: string;
-            content: {
                 period: string;
                 startDate: string;
                 endDate: string;
                 trends: {
-                    vendorGrowth: never[];
-                    riskScores: never[];
-                    assessments: never[];
-                    issues: never[];
+                    vendorGrowth: any[];
+                    riskScores: any[];
+                    assessments: any[];
+                    issues: any[];
                 };
                 insights: string[];
             };
@@ -241,11 +225,7 @@ declare class VendorReportingService {
             type: string;
         } | {
             title: string;
-            content: {
-                priority: string;
-                title: string;
-                description: string;
-            }[];
+            content: any[];
             type: string;
         })[];
     }>;
@@ -264,9 +244,9 @@ declare class VendorReportingService {
         vendors: {
             name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
-            complianceScore: number | null;
+            complianceScore: number;
             openGaps: number;
-            lastAssessed: Date | null;
+            lastAssessed: Date;
         }[];
     }>;
     private getVendorStatistics;

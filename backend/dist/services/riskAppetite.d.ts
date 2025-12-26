@@ -110,12 +110,7 @@ declare class RiskAppetiteService {
     /**
      * Monitor all risk appetites for an organization
      */
-    monitorAllRiskAppetites(organizationId: string): Promise<{
-        currentRiskLevel: number;
-        breachStatus: import(".prisma/client").$Enums.RiskAppetiteStatus;
-        id: string;
-        category: string;
-    }[]>;
+    monitorAllRiskAppetites(organizationId: string): Promise<any[]>;
     /**
      * Record a risk appetite breach
      */

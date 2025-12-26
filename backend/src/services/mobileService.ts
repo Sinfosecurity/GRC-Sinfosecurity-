@@ -2,6 +2,7 @@
  * Mobile Service
  * API endpoints and services optimized for mobile apps (iOS/Android)
  */
+import logger from '../config/logger';
 
 export interface MobileDevice {
     deviceId: string;

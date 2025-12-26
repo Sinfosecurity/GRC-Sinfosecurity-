@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
-import logger from '../config/logger';
  * Data Privacy Management Service
  * DSR portal, data mapping, Privacy Impact Assessments (PIA)
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../config/logger"));
 // In-memory storage
 const dsrRequests = new Map();
 const dataMappings = new Map();
@@ -49,7 +52,7 @@ class DataPrivacyService {
             status: 'submitted',
         };
         dsrRequests.set(dsr.id, dsr);
-        logger.info(`📨 DSR submitted: ${dsr.type} for ${dsr.subjectEmail}`);
+        logger_1.default.info(`📨 DSR submitted: ${dsr.type} for ${dsr.subjectEmail}`);
         return dsr;
     }
     /**
@@ -90,7 +93,7 @@ class DataPrivacyService {
             lastUpdated: new Date(),
         };
         dataMappings.set(mapping.id, mapping);
-        logger.info(`🗺️ Data mapping added: ${mapping.dataCategory}`);
+        logger_1.default.info(`🗺️ Data mapping added: ${mapping.dataCategory}`);
         return mapping;
     }
     /**
@@ -111,7 +114,7 @@ class DataPrivacyService {
             assessmentDate: new Date(),
         };
         piaAssessments.set(pia.id, pia);
-        logger.info(`🔒 PIA created: ${pia.project}`);
+        logger_1.default.info(`🔒 PIA created: ${pia.project}`);
         return pia;
     }
     /**

@@ -1,8 +1,3 @@
-/**
-import logger from '../config/logger';
- * Compliance Certification Management Service
- * Track certification timelines, readiness scoring, renewal alerts
- */
 export interface Certification {
     id: string;
     framework: string;

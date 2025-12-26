@@ -1,8 +1,3 @@
-/**
-import logger from '../config/logger';
- * Multi-Factor Authentication (MFA) Service
- * Supports TOTP, SMS, Email, and Backup Codes
- */
 export type MFAMethod = 'TOTP' | 'SMS' | 'EMAIL' | 'BACKUP_CODES';
 export interface MFAConfig {
     userId: string;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma, redisClient, mongoose } from '../config/database';
+import { prisma, redisClient } from '../config/database';
 import logger from '../config/logger';
 import { circuitBreakerManager } from './resilience';
 

@@ -214,7 +214,7 @@ async function startServer() {
             setImmediate(async () => {
                 try {
                     // Initialize cache service only if Redis is available
-                    if (process.env.REDIS_URL && database_1.redisClient.isReady) {
+                    if (process.env.REDIS_URL && database_1.redisClient && database_1.redisClient.isReady) {
                         const cacheService = new cacheService_1.CacheService(database_1.redisClient);
                         logger_1.default.info('✅ Cache service initialized');
                     }

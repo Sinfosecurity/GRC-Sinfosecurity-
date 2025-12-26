@@ -1,8 +1,8 @@
 /**
-import logger from '../config/logger';
  * Data Privacy Management Service
  * DSR portal, data mapping, Privacy Impact Assessments (PIA)
  */
+import logger from '../config/logger';
 
 export interface DataSubjectRequest {
     id: string;

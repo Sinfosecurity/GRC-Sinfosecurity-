@@ -282,7 +282,7 @@ class ExecutiveReportingService {
      * Export to PDF-ready format
      */
     exportToPDF(reportId: string): ExecutiveReport | null {
-        return this.getReport(reportId);
+        return this.getReport(reportId) || null;
     }
 
     /**

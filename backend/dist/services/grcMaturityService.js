@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
-import logger from '../config/logger';
  * GRC Maturity Assessment Service
  * Maturity scoring, benchmarking, capability models
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../config/logger"));
 // In-memory storage
 const assessments = new Map();
 const benchmarks = new Map();
@@ -92,7 +95,7 @@ class GRCMaturityService {
             status: 'draft',
         };
         assessments.set(assessment.id, assessment);
-        logger.info(`📊 Maturity assessment created for ${assessment.framework}`);
+        logger_1.default.info(`📊 Maturity assessment created for ${assessment.framework}`);
         return assessment;
     }
     /**

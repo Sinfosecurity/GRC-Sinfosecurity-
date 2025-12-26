@@ -1,14 +1,14 @@
 "use strict";
-/**
-import logger from '../config/logger';
- * Document Storage Service
- * Supports AWS S3 and Azure Blob Storage
- * Includes virus scanning, encryption, and retention policies
- */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Document Storage Service
+ * Supports AWS S3 and Azure Blob Storage
+ * Includes virus scanning, encryption, and retention policies
+ */
+const logger_1 = __importDefault(require("../config/logger"));
 const crypto_1 = __importDefault(require("crypto"));
 // In-memory storage for demo
 const documents = new Map();
@@ -96,10 +96,10 @@ class DocumentStorageService {
             expiresAt
         };
         documents.set(fileId, document);
-        logger.info(`📄 Document uploaded: ${options.fileName} (${fileId})`);
-        logger.info(`   Provider: ${this.config.provider}`);
-        logger.info(`   Encrypted: ${this.config.encryption}`);
-        logger.info(`   Virus Scan: ${virusScanResult}`);
+        logger_1.default.info(`📄 Document uploaded: ${options.fileName} (${fileId})`);
+        logger_1.default.info(`   Provider: ${this.config.provider}`);
+        logger_1.default.info(`   Encrypted: ${this.config.encryption}`);
+        logger_1.default.info(`   Virus Scan: ${virusScanResult}`);
         return document;
     }
     /**
@@ -116,7 +116,7 @@ class DocumentStorageService {
         if (document.encrypted) {
             fileBuffer = this.decryptFile(fileBuffer);
         }
-        logger.info(`📥 Document downloaded: ${document.fileName}`);
+        logger_1.default.info(`📥 Document downloaded: ${document.fileName}`);
         return fileBuffer;
     }
     /**
@@ -132,8 +132,8 @@ class DocumentStorageService {
         documents.set(documentId, document);
         // Schedule physical deletion after retention period
         // In production, use a background job
-        logger.info(`🗑️  Document marked for deletion: ${document.fileName}`);
-        logger.info(`   Will be permanently deleted after retention period`);
+        logger_1.default.info(`🗑️  Document marked for deletion: ${document.fileName}`);
+        logger_1.default.info(`   Will be permanently deleted after retention period`);
         return true;
     }
     /**
@@ -148,7 +148,7 @@ class DocumentStorageService {
         await this.deleteFromProvider(document.fileUrl);
         // Remove from database
         documents.delete(documentId);
-        logger.info(`💥 Document permanently deleted: ${document.fileName}`);
+        logger_1.default.info(`💥 Document permanently deleted: ${document.fileName}`);
         return true;
     }
     /**
@@ -186,7 +186,7 @@ class DocumentStorageService {
             await this.permanentlyDeleteDocument(doc.id);
             deletedCount++;
         }
-        logger.info(`🧹 Retention policy applied: ${deletedCount} documents deleted`);
+        logger_1.default.info(`🧹 Retention policy applied: ${deletedCount} documents deleted`);
         return deletedCount;
     }
     /**
@@ -234,7 +234,7 @@ class DocumentStorageService {
     }
     async scanForViruses(buffer) {
         // In production, integrate with ClamAV or cloud scanning service
-        logger.info('🦠 Scanning file for viruses...');
+        logger_1.default.info('🦠 Scanning file for viruses...');
         // Simulate virus scan
         await new Promise(resolve => setTimeout(resolve, 100));
         // For demo, always return CLEAN
@@ -252,7 +252,7 @@ class DocumentStorageService {
             cipher.final(),
             cipher.getAuthTag()
         ]);
-        logger.info('🔒 File encrypted');
+        logger_1.default.info('🔒 File encrypted');
         return encrypted;
     }
     decryptFile(buffer) {
@@ -267,7 +267,7 @@ class DocumentStorageService {
             decipher.update(encrypted),
             decipher.final()
         ]);
-        logger.info('🔓 File decrypted');
+        logger_1.default.info('🔓 File decrypted');
         return decrypted;
     }
     async uploadToProvider(fileId, buffer, options) {
@@ -286,7 +286,7 @@ class DocumentStorageService {
         // const s3 = new AWS.S3({ ... });
         // await s3.upload({ Bucket: this.config.s3Bucket, Key: fileId, Body: buffer });
         const url = `https://${this.config.s3Bucket}.s3.${this.config.s3Region}.amazonaws.com/${fileId}`;
-        logger.info(`☁️  Uploaded to AWS S3: ${url}`);
+        logger_1.default.info(`☁️  Uploaded to AWS S3: ${url}`);
         return url;
     }
     async uploadToAzure(fileId, buffer, options) {
@@ -294,7 +294,7 @@ class DocumentStorageService {
         // const blobServiceClient = BlobServiceClient.fromConnectionString(...);
         // await blockBlobClient.uploadData(buffer);
         const url = `https://${this.config.azureAccountName}.blob.core.windows.net/${this.config.azureContainerName}/${fileId}`;
-        logger.info(`☁️  Uploaded to Azure Blob: ${url}`);
+        logger_1.default.info(`☁️  Uploaded to Azure Blob: ${url}`);
         return url;
     }
     async uploadToLocal(fileId, buffer, options) {
@@ -302,18 +302,18 @@ class DocumentStorageService {
         // const fs = require('fs').promises;
         // await fs.writeFile(path.join(this.config.localPath!, fileId), buffer);
         const url = `/uploads/${fileId}`;
-        logger.info(`💾 Saved locally: ${url}`);
+        logger_1.default.info(`💾 Saved locally: ${url}`);
         return url;
     }
     async downloadFromProvider(fileUrl) {
         // In production, download from actual storage
-        logger.info(`📥 Downloading from: ${fileUrl}`);
+        logger_1.default.info(`📥 Downloading from: ${fileUrl}`);
         // Return mock buffer for demo
         return Buffer.from('mock file content');
     }
     async deleteFromProvider(fileUrl) {
         // In production, delete from actual storage
-        logger.info(`💥 Deleting from storage: ${fileUrl}`);
+        logger_1.default.info(`💥 Deleting from storage: ${fileUrl}`);
     }
     groupBy(docs, field) {
         return docs.reduce((acc, doc) => {

@@ -16,7 +16,7 @@ export declare const activeConnections: Gauge<string>;
  */
 export declare const databaseQueryCounter: Counter<"operation" | "model" | "success">;
 export declare const databaseQueryDuration: Histogram<"operation" | "model">;
-export declare const databaseConnectionPool: Gauge<"state" | "database">;
+export declare const databaseConnectionPool: Gauge<"database" | "state">;
 export declare const databaseErrors: Counter<"model" | "error_code">;
 /**
  * Cache Metrics
@@ -30,7 +30,7 @@ export declare const cacheSize: Gauge<string>;
  */
 export declare const vendorCount: Gauge<"status" | "tier" | "organization_id">;
 export declare const assessmentCount: Gauge<"status" | "type" | "organization_id">;
-export declare const riskCount: Gauge<"status" | "level" | "category" | "organization_id">;
+export declare const riskCount: Gauge<"status" | "category" | "organization_id" | "level">;
 export declare const controlCount: Gauge<"status" | "organization_id" | "framework">;
 export declare const incidentCount: Counter<"status" | "severity" | "organization_id">;
 export declare const assessmentCompletionTime: Histogram<"type" | "organization_id">;

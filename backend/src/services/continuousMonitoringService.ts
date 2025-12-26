@@ -1,8 +1,8 @@
 /**
-import logger from '../config/logger';
  * Continuous Monitoring Service
  * Real-time monitoring of compliance status, control effectiveness, and risk levels
  */
+import logger from '../config/logger';
 
 import { AuditService } from './auditService';
 import notificationService from './notificationService';

@@ -95,7 +95,7 @@ declare class CustomFrameworkService {
         draft: number;
         totalControls: number;
         totalMappings: number;
-        industries: (string | undefined)[];
+        industries: string[];
     };
 }
 declare const _default: CustomFrameworkService;

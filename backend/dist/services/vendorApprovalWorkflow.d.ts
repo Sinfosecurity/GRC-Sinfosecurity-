@@ -54,9 +54,9 @@ declare class VendorApprovalWorkflowService {
             digitalSignature: string | null;
         }[];
         vendor: {
-            name: string;
             id: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
         };
     } & {
@@ -122,9 +122,9 @@ declare class VendorApprovalWorkflowService {
     listPendingApprovals(userId: string, organizationId: string): Promise<({
         workflow: {
             vendor: {
-                name: string;
                 id: string;
                 status: import(".prisma/client").$Enums.VendorStatus;
+                name: string;
                 tier: import(".prisma/client").$Enums.VendorTier;
             };
         } & {

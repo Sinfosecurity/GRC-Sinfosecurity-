@@ -75,8 +75,8 @@ declare class VendorManagementService {
             status: import(".prisma/client").$Enums.AssessmentStatus;
             organizationId: string;
             createdAt: Date;
-            assignedTo: string | null;
             updatedAt: Date;
+            assignedTo: string | null;
             dueDate: Date | null;
             completedAt: Date | null;
             vendorId: string;
@@ -85,13 +85,13 @@ declare class VendorManagementService {
             recommendations: import("@prisma/client/runtime/library").JsonValue | null;
             complianceScore: number | null;
             securityScore: number | null;
-            reviewer: string | null;
             frameworkUsed: string | null;
             privacyScore: number | null;
             operationalScore: number | null;
             financialScore: number | null;
             identifiedRisks: import("@prisma/client/runtime/library").JsonValue | null;
             gapsIdentified: import("@prisma/client/runtime/library").JsonValue | null;
+            reviewer: string | null;
             approver: string | null;
             approvedAt: Date | null;
             evidenceCollected: boolean;
@@ -100,14 +100,14 @@ declare class VendorManagementService {
         issues: {
             id: string;
             status: import(".prisma/client").$Enums.VendorIssueStatus;
+            description: string;
             priority: import(".prisma/client").$Enums.IssuePriority;
             organizationId: string;
             createdAt: Date;
             severity: import(".prisma/client").$Enums.IssueSeverity;
-            assignedTo: string | null;
             updatedAt: Date;
             title: string;
-            description: string;
+            assignedTo: string | null;
             category: string;
             vendorId: string;
             source: import(".prisma/client").$Enums.IssueSource;
@@ -132,11 +132,11 @@ declare class VendorManagementService {
         contracts: {
             id: string;
             status: import(".prisma/client").$Enums.ContractStatus;
+            description: string | null;
             organizationId: string;
             createdAt: Date;
             updatedAt: Date;
             title: string;
-            description: string | null;
             contractValue: import("@prisma/client/runtime/library").Decimal;
             vendorId: string;
             contractType: import(".prisma/client").$Enums.ContractType;
@@ -169,36 +169,36 @@ declare class VendorManagementService {
         }[];
         documents: {
             id: string;
+            description: string | null;
             organizationId: string;
             title: string;
-            description: string | null;
             category: string | null;
             vendorId: string;
             documentType: import(".prisma/client").$Enums.VendorDocumentType;
             fileName: string;
             uploadedAt: Date;
             assessmentId: string | null;
-            fileUrl: string;
             fileSize: number;
             fileType: string;
-            confidentiality: import(".prisma/client").$Enums.ConfidentialityLevel;
-            uploadedBy: string;
+            fileUrl: string;
             fileHash: string | null;
+            confidentiality: import(".prisma/client").$Enums.ConfidentialityLevel;
             validFrom: Date | null;
             validUntil: Date | null;
+            uploadedBy: string;
             lastAccessedAt: Date | null;
         }[];
         contacts: {
-            name: string;
             email: string;
             id: string;
             role: import(".prisma/client").$Enums.ContactRole;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
             title: string | null;
             vendorId: string;
-            isPrimary: boolean;
             phone: string | null;
+            isPrimary: boolean;
         }[];
         monitoringRecords: {
             url: string | null;
@@ -244,9 +244,9 @@ declare class VendorManagementService {
             meetingNotes: string | null;
         }[];
     } & {
-        name: string;
         id: string;
         status: import(".prisma/client").$Enums.VendorStatus;
+        name: string;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;
@@ -287,9 +287,9 @@ declare class VendorManagementService {
                 contracts: number;
             };
         } & {
-            name: string;
             id: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             organizationId: string;
             createdAt: Date;
             updatedAt: Date;
@@ -363,30 +363,30 @@ declare class VendorManagementService {
      */
     getVendorsRequiringAttention(organizationId: string): Promise<{
         overdueReviews: {
-            name: string;
             id: string;
+            name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
-            nextReviewDate: Date | null;
+            nextReviewDate: Date;
             residualRiskScore: number;
         }[];
         upcomingReviews: {
-            name: string;
             id: string;
+            name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
-            nextReviewDate: Date | null;
+            nextReviewDate: Date;
         }[];
         highRiskWithIssues: ({
             issues: {
                 id: string;
                 status: import(".prisma/client").$Enums.VendorIssueStatus;
+                description: string;
                 priority: import(".prisma/client").$Enums.IssuePriority;
                 organizationId: string;
                 createdAt: Date;
                 severity: import(".prisma/client").$Enums.IssueSeverity;
-                assignedTo: string | null;
                 updatedAt: Date;
                 title: string;
-                description: string;
+                assignedTo: string | null;
                 category: string;
                 vendorId: string;
                 source: import(".prisma/client").$Enums.IssueSource;
@@ -409,9 +409,9 @@ declare class VendorManagementService {
                 closureNotes: string | null;
             }[];
         } & {
-            name: string;
             id: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             organizationId: string;
             createdAt: Date;
             updatedAt: Date;
@@ -443,8 +443,8 @@ declare class VendorManagementService {
         })[];
         criticalAlerts: ({
             vendor: {
-                name: string;
                 id: string;
+                name: string;
                 tier: import(".prisma/client").$Enums.VendorTier;
             };
         } & {

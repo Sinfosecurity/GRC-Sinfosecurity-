@@ -25,7 +25,7 @@ export declare function subdomainMiddleware(req: Request, res: Response, next: N
  * Require organization middleware
  * Use this on routes that MUST have an organization context
  */
-export declare function requireOrganization(req: Request, res: Response, next: NextFunction): Response<any, Record<string, any>> | undefined;
+export declare function requireOrganization(req: Request, res: Response, next: NextFunction): Response<any, Record<string, any>>;
 /**
  * Optional organization middleware
  * Adds organization context if available, but doesn't require it
@@ -35,12 +35,12 @@ export declare function optionalOrganization(req: Request, res: Response, next: 
  * Feature check middleware factory
  * Use: requireFeature('aiInsights')
  */
-export declare function requireFeature(feature: string): (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+export declare function requireFeature(feature: string): (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
 /**
  * Module check middleware factory
  * Use: requireModule('vendor')
  */
-export declare function requireModule(module: string): (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+export declare function requireModule(module: string): (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
 declare const _default: {
     subdomainMiddleware: typeof subdomainMiddleware;
     requireOrganization: typeof requireOrganization;

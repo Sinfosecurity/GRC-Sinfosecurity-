@@ -76,15 +76,7 @@ router.use(auth_1.authenticate);
  *       400:
  *         description: Invalid input
  */
-router.post('/', (0, auth_1.authorize)(['ADMIN', 'RISK_MANAGER', 'EXECUTIVE', 'BOARD_MEMBER']), (0, validation_1.validateBody)({
-    category: { type: 'string', required: true },
-    appetiteStatement: { type: 'string', required: true },
-    riskTolerance: { type: 'number', required: true },
-    earlyWarningThreshold: { type: 'number', required: true },
-    approvedBy: { type: 'string', required: true },
-    approvalDate: { type: 'string', required: true },
-    reviewFrequency: { type: 'number', required: true },
-}), async (req, res) => {
+router.post('/', (0, auth_1.authorize)(['ADMIN', 'RISK_MANAGER', 'EXECUTIVE', 'BOARD_MEMBER']), (0, validation_1.validateBody)(risk_appetite_validators_1.CreateRiskAppetiteSchema), async (req, res) => {
     try {
         const riskAppetite = await riskAppetite_1.default.createRiskAppetite({
             ...req.body,
@@ -116,7 +108,7 @@ router.post('/', (0, auth_1.authorize)(['ADMIN', 'RISK_MANAGER', 'EXECUTIVE', 'B
  *       200:
  *         description: List of risk appetites
  */
-router.get('/', (0, auth_1.authorize)('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR'), async (req, res) => {
+router.get('/', (0, auth_1.authorize)(['ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR']), async (req, res) => {
     try {
         const appetites = await riskAppetite_1.default.listRiskAppetites(req.user.organizationId);
         res.json({

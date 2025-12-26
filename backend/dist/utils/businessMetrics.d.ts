@@ -60,7 +60,7 @@ export declare class BusinessMetricsCollector {
         controls: number;
         incidents: number;
         timestamp: string;
-    } | null>;
+    }>;
 }
 export declare const businessMetricsCollector: BusinessMetricsCollector;
 //# sourceMappingURL=businessMetrics.d.ts.map

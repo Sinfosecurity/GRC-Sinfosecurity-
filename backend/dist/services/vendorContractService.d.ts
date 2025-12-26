@@ -38,11 +38,11 @@ declare class VendorContractService {
     /**
      * Get contract by ID
      */
-    getContractById(contractId: string, organizationId: string): Promise<({
+    getContractById(contractId: string, organizationId: string): Promise<{
         vendor: {
-            name: string;
             id: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             organizationId: string;
             createdAt: Date;
             updatedAt: Date;
@@ -91,11 +91,11 @@ declare class VendorContractService {
     } & {
         id: string;
         status: import(".prisma/client").$Enums.ContractStatus;
+        description: string | null;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;
         title: string;
-        description: string | null;
         contractValue: import("@prisma/client/runtime/library").Decimal;
         vendorId: string;
         contractType: import(".prisma/client").$Enums.ContractType;
@@ -125,18 +125,18 @@ declare class VendorContractService {
         approvedBy: string | null;
         legalReviewedBy: string | null;
         legalReviewedAt: Date | null;
-    }) | null>;
+    }>;
     /**
      * List contracts for vendor
      */
     listVendorContracts(vendorId: string, organizationId: string): Promise<{
         id: string;
         status: import(".prisma/client").$Enums.ContractStatus;
+        description: string | null;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;
         title: string;
-        description: string | null;
         contractValue: import("@prisma/client/runtime/library").Decimal;
         vendorId: string;
         contractType: import(".prisma/client").$Enums.ContractType;
@@ -186,11 +186,11 @@ declare class VendorContractService {
     } & {
         id: string;
         status: import(".prisma/client").$Enums.ContractStatus;
+        description: string | null;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;
         title: string;
-        description: string | null;
         contractValue: import("@prisma/client/runtime/library").Decimal;
         vendorId: string;
         contractType: import(".prisma/client").$Enums.ContractType;

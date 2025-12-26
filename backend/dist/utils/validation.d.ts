@@ -23,25 +23,25 @@ export declare const commonSchemas: {
         sortBy: z.ZodOptional<z.ZodString>;
         sortOrder: z.ZodDefault<z.ZodEnum<["asc", "desc"]>>;
     }, "strip", z.ZodTypeAny, {
-        page: number;
-        limit: number;
-        sortOrder: "asc" | "desc";
-        sortBy?: string | undefined;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        sortOrder?: "asc" | "desc";
     }, {
-        page?: number | undefined;
-        limit?: number | undefined;
-        sortBy?: string | undefined;
-        sortOrder?: "asc" | "desc" | undefined;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        sortOrder?: "asc" | "desc";
     }>;
     dateRange: z.ZodObject<{
         startDate: z.ZodDate;
         endDate: z.ZodDate;
     }, "strip", z.ZodTypeAny, {
-        startDate: Date;
-        endDate: Date;
+        startDate?: Date;
+        endDate?: Date;
     }, {
-        startDate: Date;
-        endDate: Date;
+        startDate?: Date;
+        endDate?: Date;
     }>;
     status: z.ZodEnum<["ACTIVE", "INACTIVE", "PENDING", "SUSPENDED"]>;
     riskLevel: z.ZodEnum<["CRITICAL", "HIGH", "MEDIUM", "LOW"]>;
@@ -62,54 +62,54 @@ export declare const vendorSchemas: {
             businessCritical: z.ZodDefault<z.ZodBoolean>;
             dataProcessingAgreement: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            name: string;
-            tier: "TIER_1" | "TIER_2" | "TIER_3";
-            contactEmail: string;
-            businessCritical: boolean;
-            dataProcessingAgreement: boolean;
-            description?: string | undefined;
-            website?: string | undefined;
-            contactPhone?: string | undefined;
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         }, {
-            name: string;
-            tier: "TIER_1" | "TIER_2" | "TIER_3";
-            contactEmail: string;
-            description?: string | undefined;
-            website?: string | undefined;
-            contactPhone?: string | undefined;
-            businessCritical?: boolean | undefined;
-            dataProcessingAgreement?: boolean | undefined;
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            name: string;
-            tier: "TIER_1" | "TIER_2" | "TIER_3";
-            contactEmail: string;
-            businessCritical: boolean;
-            dataProcessingAgreement: boolean;
-            description?: string | undefined;
-            website?: string | undefined;
-            contactPhone?: string | undefined;
+        body?: {
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         };
     }, {
-        body: {
-            name: string;
-            tier: "TIER_1" | "TIER_2" | "TIER_3";
-            contactEmail: string;
-            description?: string | undefined;
-            website?: string | undefined;
-            contactPhone?: string | undefined;
-            businessCritical?: boolean | undefined;
-            dataProcessingAgreement?: boolean | undefined;
+        body?: {
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         };
     }>;
     update: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
         body: z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
@@ -122,72 +122,72 @@ export declare const vendorSchemas: {
             dataProcessingAgreement: z.ZodOptional<z.ZodBoolean>;
             status: z.ZodOptional<z.ZodEnum<["ACTIVE", "INACTIVE", "PENDING", "SUSPENDED"]>>;
         }, "strip", z.ZodTypeAny, {
-            name?: string | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            description?: string | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            website?: string | undefined;
-            contactEmail?: string | undefined;
-            contactPhone?: string | undefined;
-            businessCritical?: boolean | undefined;
-            dataProcessingAgreement?: boolean | undefined;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         }, {
-            name?: string | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            description?: string | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            website?: string | undefined;
-            contactEmail?: string | undefined;
-            contactPhone?: string | undefined;
-            businessCritical?: boolean | undefined;
-            dataProcessingAgreement?: boolean | undefined;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            name?: string | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            description?: string | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            website?: string | undefined;
-            contactEmail?: string | undefined;
-            contactPhone?: string | undefined;
-            businessCritical?: boolean | undefined;
-            dataProcessingAgreement?: boolean | undefined;
+        body?: {
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        body: {
-            name?: string | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            description?: string | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            website?: string | undefined;
-            contactEmail?: string | undefined;
-            contactPhone?: string | undefined;
-            businessCritical?: boolean | undefined;
-            dataProcessingAgreement?: boolean | undefined;
+        body?: {
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            name?: string;
+            description?: string;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            website?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+            businessCritical?: boolean;
+            dataProcessingAgreement?: boolean;
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     get: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     list: z.ZodObject<{
@@ -202,45 +202,45 @@ export declare const vendorSchemas: {
             search: z.ZodOptional<z.ZodString>;
             businessCritical: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            search?: string | undefined;
-            sortBy?: string | undefined;
-            businessCritical?: boolean | undefined;
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            search?: string;
+            limit?: number;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            businessCritical?: boolean;
         }, {
-            page?: number | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            limit?: number | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            search?: string | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
-            businessCritical?: boolean | undefined;
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            search?: string;
+            limit?: number;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            businessCritical?: boolean;
         }>;
     }, "strip", z.ZodTypeAny, {
-        query: {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            search?: string | undefined;
-            sortBy?: string | undefined;
-            businessCritical?: boolean | undefined;
+        query?: {
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            search?: string;
+            limit?: number;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            businessCritical?: boolean;
         };
     }, {
-        query: {
-            page?: number | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED" | undefined;
-            limit?: number | undefined;
-            tier?: "TIER_1" | "TIER_2" | "TIER_3" | undefined;
-            search?: string | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
-            businessCritical?: boolean | undefined;
+        query?: {
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
+            search?: string;
+            limit?: number;
+            tier?: "TIER_1" | "TIER_2" | "TIER_3";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            businessCritical?: boolean;
         };
     }>;
 };
@@ -255,38 +255,38 @@ export declare const assessmentSchemas: {
             dueDate: z.ZodDate;
             assignedTo: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            type: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
-            dueDate: Date;
-            vendorId: string;
-            assignedTo?: string | undefined;
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            assignedTo?: string;
+            dueDate?: Date;
+            vendorId?: string;
         }, {
-            type: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
-            dueDate: Date;
-            vendorId: string;
-            assignedTo?: string | undefined;
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            assignedTo?: string;
+            dueDate?: Date;
+            vendorId?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            type: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
-            dueDate: Date;
-            vendorId: string;
-            assignedTo?: string | undefined;
+        body?: {
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            assignedTo?: string;
+            dueDate?: Date;
+            vendorId?: string;
         };
     }, {
-        body: {
-            type: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
-            dueDate: Date;
-            vendorId: string;
-            assignedTo?: string | undefined;
+        body?: {
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            assignedTo?: string;
+            dueDate?: Date;
+            vendorId?: string;
         };
     }>;
     update: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
         body: z.ZodObject<{
             status: z.ZodOptional<z.ZodEnum<["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "OVERDUE"]>>;
@@ -296,52 +296,52 @@ export declare const assessmentSchemas: {
             findings: z.ZodOptional<z.ZodString>;
             recommendations: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            assignedTo?: string | undefined;
-            dueDate?: Date | undefined;
-            completedAt?: Date | undefined;
-            recommendations?: string | undefined;
-            findings?: string | undefined;
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            assignedTo?: string;
+            dueDate?: Date;
+            completedAt?: Date;
+            recommendations?: string;
+            findings?: string;
         }, {
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            assignedTo?: string | undefined;
-            dueDate?: Date | undefined;
-            completedAt?: Date | undefined;
-            recommendations?: string | undefined;
-            findings?: string | undefined;
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            assignedTo?: string;
+            dueDate?: Date;
+            completedAt?: Date;
+            recommendations?: string;
+            findings?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            assignedTo?: string | undefined;
-            dueDate?: Date | undefined;
-            completedAt?: Date | undefined;
-            recommendations?: string | undefined;
-            findings?: string | undefined;
+        body?: {
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            assignedTo?: string;
+            dueDate?: Date;
+            completedAt?: Date;
+            recommendations?: string;
+            findings?: string;
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        body: {
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            assignedTo?: string | undefined;
-            dueDate?: Date | undefined;
-            completedAt?: Date | undefined;
-            recommendations?: string | undefined;
-            findings?: string | undefined;
+        body?: {
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            assignedTo?: string;
+            dueDate?: Date;
+            completedAt?: Date;
+            recommendations?: string;
+            findings?: string;
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     submitResponse: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
         body: z.ZodObject<{
             responses: z.ZodArray<z.ZodObject<{
@@ -350,54 +350,54 @@ export declare const assessmentSchemas: {
                 evidence: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 notes: z.ZodOptional<z.ZodString>;
             }, "strip", z.ZodTypeAny, {
-                questionId: string;
-                answer: string | number | boolean;
-                notes?: string | undefined;
-                evidence?: string[] | undefined;
+                notes?: string;
+                questionId?: string;
+                answer?: string | number | boolean;
+                evidence?: string[];
             }, {
-                questionId: string;
-                answer: string | number | boolean;
-                notes?: string | undefined;
-                evidence?: string[] | undefined;
+                notes?: string;
+                questionId?: string;
+                answer?: string | number | boolean;
+                evidence?: string[];
             }>, "many">;
         }, "strip", z.ZodTypeAny, {
-            responses: {
-                questionId: string;
-                answer: string | number | boolean;
-                notes?: string | undefined;
-                evidence?: string[] | undefined;
+            responses?: {
+                notes?: string;
+                questionId?: string;
+                answer?: string | number | boolean;
+                evidence?: string[];
             }[];
         }, {
-            responses: {
-                questionId: string;
-                answer: string | number | boolean;
-                notes?: string | undefined;
-                evidence?: string[] | undefined;
+            responses?: {
+                notes?: string;
+                questionId?: string;
+                answer?: string | number | boolean;
+                evidence?: string[];
             }[];
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            responses: {
-                questionId: string;
-                answer: string | number | boolean;
-                notes?: string | undefined;
-                evidence?: string[] | undefined;
+        body?: {
+            responses?: {
+                notes?: string;
+                questionId?: string;
+                answer?: string | number | boolean;
+                evidence?: string[];
             }[];
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        body: {
-            responses: {
-                questionId: string;
-                answer: string | number | boolean;
-                notes?: string | undefined;
-                evidence?: string[] | undefined;
+        body?: {
+            responses?: {
+                notes?: string;
+                questionId?: string;
+                answer?: string | number | boolean;
+                evidence?: string[];
             }[];
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     list: z.ZodObject<{
@@ -412,45 +412,45 @@ export declare const assessmentSchemas: {
             type: z.ZodOptional<z.ZodEnum<["INITIAL", "ANNUAL", "TRIGGER_BASED", "CONTINUOUS"]>>;
             assignedTo: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED" | undefined;
-            assignedTo?: string | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
+            page?: number;
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            limit?: number;
+            assignedTo?: string;
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
         }, {
-            page?: number | undefined;
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED" | undefined;
-            limit?: number | undefined;
-            assignedTo?: string | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
+            page?: number;
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            limit?: number;
+            assignedTo?: string;
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
         }>;
     }, "strip", z.ZodTypeAny, {
-        query: {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED" | undefined;
-            assignedTo?: string | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
+        query?: {
+            page?: number;
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            limit?: number;
+            assignedTo?: string;
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
         };
     }, {
-        query: {
-            page?: number | undefined;
-            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE" | undefined;
-            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED" | undefined;
-            limit?: number | undefined;
-            assignedTo?: string | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
+        query?: {
+            page?: number;
+            status?: "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "OVERDUE";
+            type?: "INITIAL" | "ANNUAL" | "CONTINUOUS" | "TRIGGER_BASED";
+            limit?: number;
+            assignedTo?: string;
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
         };
     }>;
 };
@@ -468,50 +468,50 @@ export declare const riskSchemas: {
             vendorId: z.ZodOptional<z.ZodString>;
             ownerId: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            title: string;
-            description: string;
-            category: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
-            likelihood: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
-            impact: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
-            ownerId: string;
-            vendorId?: string | undefined;
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            ownerId?: string;
         }, {
-            title: string;
-            description: string;
-            category: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
-            likelihood: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
-            impact: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
-            ownerId: string;
-            vendorId?: string | undefined;
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            ownerId?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            title: string;
-            description: string;
-            category: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
-            likelihood: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
-            impact: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
-            ownerId: string;
-            vendorId?: string | undefined;
+        body?: {
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            ownerId?: string;
         };
     }, {
-        body: {
-            title: string;
-            description: string;
-            category: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
-            likelihood: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
-            impact: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
-            ownerId: string;
-            vendorId?: string | undefined;
+        body?: {
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            ownerId?: string;
         };
     }>;
     update: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
         body: z.ZodObject<{
             title: z.ZodOptional<z.ZodString>;
@@ -524,55 +524,55 @@ export declare const riskSchemas: {
             residualLikelihood: z.ZodOptional<z.ZodEnum<["RARE", "UNLIKELY", "POSSIBLE", "LIKELY", "ALMOST_CERTAIN"]>>;
             residualImpact: z.ZodOptional<z.ZodEnum<["INSIGNIFICANT", "MINOR", "MODERATE", "MAJOR", "CATASTROPHIC"]>>;
         }, "strip", z.ZodTypeAny, {
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
-            mitigation?: string | undefined;
-            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            mitigation?: string;
+            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
         }, {
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
-            mitigation?: string | undefined;
-            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            mitigation?: string;
+            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
-            mitigation?: string | undefined;
-            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
+        body?: {
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            mitigation?: string;
+            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        body: {
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
-            mitigation?: string | undefined;
-            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN" | undefined;
-            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC" | undefined;
+        body?: {
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            description?: string;
+            title?: string;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            likelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            impact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
+            mitigation?: string;
+            residualLikelihood?: "RARE" | "UNLIKELY" | "POSSIBLE" | "LIKELY" | "ALMOST_CERTAIN";
+            residualImpact?: "INSIGNIFICANT" | "MINOR" | "MODERATE" | "MAJOR" | "CATASTROPHIC";
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     list: z.ZodObject<{
@@ -588,49 +588,49 @@ export declare const riskSchemas: {
             status: z.ZodOptional<z.ZodEnum<["IDENTIFIED", "ASSESSING", "TREATING", "MONITORING", "CLOSED"]>>;
             ownerId: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
-            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | undefined;
-            ownerId?: string | undefined;
+            page?: number;
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            limit?: number;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+            ownerId?: string;
         }, {
-            page?: number | undefined;
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            limit?: number | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
-            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | undefined;
-            ownerId?: string | undefined;
+            page?: number;
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            limit?: number;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+            ownerId?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        query: {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
-            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | undefined;
-            ownerId?: string | undefined;
+        query?: {
+            page?: number;
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            limit?: number;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+            ownerId?: string;
         };
     }, {
-        query: {
-            page?: number | undefined;
-            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING" | undefined;
-            limit?: number | undefined;
-            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC" | undefined;
-            vendorId?: string | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
-            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | undefined;
-            ownerId?: string | undefined;
+        query?: {
+            page?: number;
+            status?: "IDENTIFIED" | "CLOSED" | "ASSESSING" | "TREATING" | "MONITORING";
+            limit?: number;
+            category?: "CYBERSECURITY" | "FINANCIAL" | "OPERATIONAL" | "COMPLIANCE" | "REPUTATIONAL" | "STRATEGIC";
+            vendorId?: string;
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            riskLevel?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+            ownerId?: string;
         };
     }>;
 };
@@ -648,50 +648,50 @@ export declare const controlSchemas: {
             ownerId: z.ZodString;
             automated: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            title: string;
-            description: string;
-            automated: boolean;
-            frequency: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
-            category: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
-            ownerId: string;
-            framework: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         }, {
-            title: string;
-            description: string;
-            frequency: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
-            category: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
-            ownerId: string;
-            framework: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
-            automated?: boolean | undefined;
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            title: string;
-            description: string;
-            automated: boolean;
-            frequency: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
-            category: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
-            ownerId: string;
-            framework: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
+        body?: {
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         };
     }, {
-        body: {
-            title: string;
-            description: string;
-            frequency: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
-            category: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
-            ownerId: string;
-            framework: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
-            automated?: boolean | undefined;
+        body?: {
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         };
     }>;
     update: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
         body: z.ZodObject<{
             title: z.ZodOptional<z.ZodString>;
@@ -703,60 +703,60 @@ export declare const controlSchemas: {
             effectiveness: z.ZodOptional<z.ZodEnum<["EFFECTIVE", "INEFFECTIVE", "NEEDS_IMPROVEMENT"]>>;
             automated: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            automated?: boolean | undefined;
-            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY" | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
-            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT" | undefined;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
+            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT";
         }, {
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            automated?: boolean | undefined;
-            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY" | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
-            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT" | undefined;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
+            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT";
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            automated?: boolean | undefined;
-            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY" | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
-            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT" | undefined;
+        body?: {
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
+            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT";
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        body: {
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            title?: string | undefined;
-            description?: string | undefined;
-            automated?: boolean | undefined;
-            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY" | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
-            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT" | undefined;
+        body?: {
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            description?: string;
+            title?: string;
+            automated?: boolean;
+            frequency?: "CONTINUOUS" | "QUARTERLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
+            effectiveness?: "INEFFECTIVE" | "EFFECTIVE" | "NEEDS_IMPROVEMENT";
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     testControl: z.ZodObject<{
         params: z.ZodObject<{
             id: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            id: string;
+            id?: string;
         }, {
-            id: string;
+            id?: string;
         }>;
         body: z.ZodObject<{
             testDate: z.ZodDate;
@@ -765,39 +765,39 @@ export declare const controlSchemas: {
             evidence: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             testedBy: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            findings: string;
-            testDate: Date;
-            testResult: "PASS" | "FAIL" | "PARTIAL";
-            testedBy: string;
-            evidence?: string[] | undefined;
+            evidence?: string[];
+            findings?: string;
+            testDate?: Date;
+            testResult?: "PASS" | "FAIL" | "PARTIAL";
+            testedBy?: string;
         }, {
-            findings: string;
-            testDate: Date;
-            testResult: "PASS" | "FAIL" | "PARTIAL";
-            testedBy: string;
-            evidence?: string[] | undefined;
+            evidence?: string[];
+            findings?: string;
+            testDate?: Date;
+            testResult?: "PASS" | "FAIL" | "PARTIAL";
+            testedBy?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            findings: string;
-            testDate: Date;
-            testResult: "PASS" | "FAIL" | "PARTIAL";
-            testedBy: string;
-            evidence?: string[] | undefined;
+        body?: {
+            evidence?: string[];
+            findings?: string;
+            testDate?: Date;
+            testResult?: "PASS" | "FAIL" | "PARTIAL";
+            testedBy?: string;
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }, {
-        body: {
-            findings: string;
-            testDate: Date;
-            testResult: "PASS" | "FAIL" | "PARTIAL";
-            testedBy: string;
-            evidence?: string[] | undefined;
+        body?: {
+            evidence?: string[];
+            findings?: string;
+            testDate?: Date;
+            testResult?: "PASS" | "FAIL" | "PARTIAL";
+            testedBy?: string;
         };
-        params: {
-            id: string;
+        params?: {
+            id?: string;
         };
     }>;
     list: z.ZodObject<{
@@ -813,49 +813,49 @@ export declare const controlSchemas: {
             ownerId: z.ZodOptional<z.ZodString>;
             automated: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            automated?: boolean | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            sortBy?: string | undefined;
-            ownerId?: string | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            limit?: number;
+            automated?: boolean;
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         }, {
-            page?: number | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            limit?: number | undefined;
-            automated?: boolean | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
-            ownerId?: string | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            limit?: number;
+            automated?: boolean;
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         }>;
     }, "strip", z.ZodTypeAny, {
-        query: {
-            page: number;
-            limit: number;
-            sortOrder: "asc" | "desc";
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            automated?: boolean | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            sortBy?: string | undefined;
-            ownerId?: string | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
+        query?: {
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            limit?: number;
+            automated?: boolean;
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         };
     }, {
-        query: {
-            page?: number | undefined;
-            status?: "ACTIVE" | "INACTIVE" | "PENDING" | undefined;
-            limit?: number | undefined;
-            automated?: boolean | undefined;
-            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING" | undefined;
-            sortBy?: string | undefined;
-            sortOrder?: "asc" | "desc" | undefined;
-            ownerId?: string | undefined;
-            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST" | undefined;
+        query?: {
+            page?: number;
+            status?: "ACTIVE" | "INACTIVE" | "PENDING";
+            limit?: number;
+            automated?: boolean;
+            category?: "PREVENTIVE" | "DETECTIVE" | "CORRECTIVE" | "COMPENSATING";
+            sortBy?: string;
+            sortOrder?: "asc" | "desc";
+            ownerId?: string;
+            framework?: "GDPR" | "HIPAA" | "CUSTOM" | "SOC2" | "ISO27001" | "NIST";
         };
     }>;
 };
@@ -871,33 +871,33 @@ export declare const userSchemas: {
             lastName: z.ZodString;
             organizationName: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            email: string;
-            password: string;
-            firstName: string;
-            lastName: string;
-            organizationName?: string | undefined;
+            email?: string;
+            password?: string;
+            firstName?: string;
+            lastName?: string;
+            organizationName?: string;
         }, {
-            email: string;
-            password: string;
-            firstName: string;
-            lastName: string;
-            organizationName?: string | undefined;
+            email?: string;
+            password?: string;
+            firstName?: string;
+            lastName?: string;
+            organizationName?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            email: string;
-            password: string;
-            firstName: string;
-            lastName: string;
-            organizationName?: string | undefined;
+        body?: {
+            email?: string;
+            password?: string;
+            firstName?: string;
+            lastName?: string;
+            organizationName?: string;
         };
     }, {
-        body: {
-            email: string;
-            password: string;
-            firstName: string;
-            lastName: string;
-            organizationName?: string | undefined;
+        body?: {
+            email?: string;
+            password?: string;
+            firstName?: string;
+            lastName?: string;
+            organizationName?: string;
         };
     }>;
     login: z.ZodObject<{
@@ -905,21 +905,21 @@ export declare const userSchemas: {
             email: z.ZodString;
             password: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            email: string;
-            password: string;
+            email?: string;
+            password?: string;
         }, {
-            email: string;
-            password: string;
+            email?: string;
+            password?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            email: string;
-            password: string;
+        body?: {
+            email?: string;
+            password?: string;
         };
     }, {
-        body: {
-            email: string;
-            password: string;
+        body?: {
+            email?: string;
+            password?: string;
         };
     }>;
     updateProfile: z.ZodObject<{
@@ -929,29 +929,29 @@ export declare const userSchemas: {
             phone: z.ZodOptional<z.ZodString>;
             timezone: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            firstName?: string | undefined;
-            lastName?: string | undefined;
-            phone?: string | undefined;
-            timezone?: string | undefined;
+            firstName?: string;
+            lastName?: string;
+            phone?: string;
+            timezone?: string;
         }, {
-            firstName?: string | undefined;
-            lastName?: string | undefined;
-            phone?: string | undefined;
-            timezone?: string | undefined;
+            firstName?: string;
+            lastName?: string;
+            phone?: string;
+            timezone?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            firstName?: string | undefined;
-            lastName?: string | undefined;
-            phone?: string | undefined;
-            timezone?: string | undefined;
+        body?: {
+            firstName?: string;
+            lastName?: string;
+            phone?: string;
+            timezone?: string;
         };
     }, {
-        body: {
-            firstName?: string | undefined;
-            lastName?: string | undefined;
-            phone?: string | undefined;
-            timezone?: string | undefined;
+        body?: {
+            firstName?: string;
+            lastName?: string;
+            phone?: string;
+            timezone?: string;
         };
     }>;
     changePassword: z.ZodObject<{
@@ -959,21 +959,21 @@ export declare const userSchemas: {
             currentPassword: z.ZodString;
             newPassword: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            currentPassword: string;
-            newPassword: string;
+            currentPassword?: string;
+            newPassword?: string;
         }, {
-            currentPassword: string;
-            newPassword: string;
+            currentPassword?: string;
+            newPassword?: string;
         }>;
     }, "strip", z.ZodTypeAny, {
-        body: {
-            currentPassword: string;
-            newPassword: string;
+        body?: {
+            currentPassword?: string;
+            newPassword?: string;
         };
     }, {
-        body: {
-            currentPassword: string;
-            newPassword: string;
+        body?: {
+            currentPassword?: string;
+            newPassword?: string;
         };
     }>;
 };

@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
-import logger from '../config/logger';
  * Compliance Certification Management Service
  * Track certification timelines, readiness scoring, renewal alerts
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../config/logger"));
 // In-memory storage
 const certifications = new Map();
 const milestones = new Map();
@@ -88,7 +91,7 @@ class CertificationManagementService {
             updatedAt: new Date(),
         };
         certifications.set(cert.id, cert);
-        logger.info(`📜 Certification tracking created: ${cert.framework}`);
+        logger_1.default.info(`📜 Certification tracking created: ${cert.framework}`);
         return cert;
     }
     /**

@@ -19,7 +19,7 @@ export declare const validateUUID: (field: string) => ValidationChain;
 /**
  * Check validation result and return errors
  */
-export declare const checkValidation: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+export declare const checkValidation: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
 /**
  * Prevent SQL injection by escaping dangerous characters
  */
@@ -31,16 +31,16 @@ export declare const validateSearchQuery: () => ValidationChain;
 /**
  * Rate limit validation for file uploads
  */
-export declare const validateFileUpload: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+export declare const validateFileUpload: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
 declare const _default: {
     sanitizeInput: (req: Request, res: Response, next: NextFunction) => void;
     validateEmail: () => ValidationChain;
     validatePassword: () => ValidationChain;
     validateUUID: (field: string) => ValidationChain;
-    checkValidation: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+    checkValidation: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
     escapeSQLInput: (input: string) => string;
     validateSearchQuery: () => ValidationChain;
-    validateFileUpload: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+    validateFileUpload: (req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>>;
 };
 export default _default;
 //# sourceMappingURL=sanitization.d.ts.map

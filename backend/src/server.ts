@@ -49,7 +49,7 @@ import { requestId, requestLogger, performanceMonitor } from './middleware/loggi
 import { sanitizeInput } from './middleware/sanitization';
 
 // Import config
-import { connectDatabase, prisma, mongoose, redisClient } from './config/database';
+import { connectDatabase, prisma, redisClient } from './config/database';
 import logger from './config/logger';
 import {
     registerDefaultHealthChecks,
@@ -105,7 +105,7 @@ app.use(helmet({
 
 // Compression middleware - compress all responses
 app.use(compression({
-    filter: (req, res) => {
+    filter: (req: Request, res: Response) => {
         if (req.headers['x-no-compression']) {
             return false;
         }
@@ -241,8 +241,8 @@ async function startServer() {
             setImmediate(async () => {
                 try {
                     // Initialize cache service only if Redis is available
-                    if (process.env.REDIS_URL && redisClient.isReady) {
-                        const cacheService = new CacheService(redisClient);
+                    if (process.env.REDIS_URL && redisClient && redisClient.isReady) {
+                        const cacheService = new CacheService(redisClient as any);
                         logger.info('✅ Cache service initialized');
                     } else {
                         logger.warn('⚠️  Redis not available, cache service disabled');

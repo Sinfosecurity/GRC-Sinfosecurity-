@@ -1,9 +1,3 @@
-/**
-import logger from '../config/logger';
- * Document Storage Service
- * Supports AWS S3 and Azure Blob Storage
- * Includes virus scanning, encryption, and retention policies
- */
 export interface StorageConfig {
     provider: 'S3' | 'AZURE_BLOB' | 'LOCAL';
     s3Region?: string;

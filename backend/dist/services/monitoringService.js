@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Real-Time Monitoring Service
  * Continuous monitoring for compliance drift, control failures, and risk changes
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+const logger_1 = __importDefault(require("../config/logger"));
 // In-memory storage (in production, use Redis for real-time data)
 const alerts = new Map();
 const complianceStatuses = new Map();
@@ -17,7 +21,7 @@ class MonitoringService {
     startMonitoring() {
         if (this.monitoringInterval)
             return;
-        logger.info('🔍 Starting real-time monitoring service...');
+        logger_1.default.info('🔍 Starting real-time monitoring service...');
         // Initial check
         this.performMonitoringCheck();
         // Schedule recurring checks
@@ -32,14 +36,14 @@ class MonitoringService {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
             this.monitoringInterval = null;
-            logger.info('⏹️  Stopped monitoring service');
+            logger_1.default.info('⏹️  Stopped monitoring service');
         }
     }
     /**
      * Perform monitoring check
      */
     async performMonitoringCheck() {
-        logger.info('🔍 Running monitoring check...');
+        logger_1.default.info('🔍 Running monitoring check...');
         // Check compliance drift
         await this.checkComplianceDrift();
         // Check control failures
@@ -153,7 +157,7 @@ class MonitoringService {
             status: 'active',
         };
         alerts.set(alert.id, alert);
-        logger.info(`🚨 Alert created: ${alert.title}`);
+        logger_1.default.info(`🚨 Alert created: ${alert.title}`);
         // In production, send notifications via email, Slack, etc.
         return alert;
     }

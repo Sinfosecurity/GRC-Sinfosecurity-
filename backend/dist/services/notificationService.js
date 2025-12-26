@@ -1,12 +1,13 @@
 "use strict";
-/**
- * Notification Service
- * Orchestrates all notifications and alerts across the GRC platform
- */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Notification Service
+ * Orchestrates all notifications and alerts across the GRC platform
+ */
+const logger_1 = __importDefault(require("../config/logger"));
 const emailService_1 = __importDefault(require("./emailService"));
 const auditService_1 = require("./auditService");
 // In-memory storage for user preferences (will be moved to database later)
@@ -67,17 +68,17 @@ class NotificationService {
      * Send a notification event
      */
     async notify(event) {
-        logger.info(`\n🔔 Processing notification: ${event.type} (${event.severity})`);
+        logger_1.default.info(`\n🔔 Processing notification: ${event.type} (${event.severity})`);
         // Determine recipients
         const recipients = event.recipients || this.getDefaultRecipients(event.type);
         if (recipients.length === 0) {
-            logger.info('⚠️ No recipients configured for this notification type');
+            logger_1.default.info('⚠️ No recipients configured for this notification type');
             return;
         }
         // Filter recipients based on their preferences
         const eligibleRecipients = this.filterByPreferences(recipients, event.type);
         if (eligibleRecipients.length === 0) {
-            logger.info('⚠️ All recipients have disabled this notification type');
+            logger_1.default.info('⚠️ All recipients have disabled this notification type');
             return;
         }
         // Send notifications based on event type
@@ -222,7 +223,7 @@ class NotificationService {
      * This should be called by a scheduled job (cron)
      */
     async checkComplianceDeadlines() {
-        logger.info('🔍 Checking compliance deadlines...');
+        logger_1.default.info('🔍 Checking compliance deadlines...');
         // Mock data - in production, query from database
         const upcomingDeadlines = [
             {
@@ -249,7 +250,7 @@ class NotificationService {
      * This should be called by a scheduled job (cron)
      */
     async checkOverdueAssessments() {
-        logger.info('🔍 Checking overdue assessments...');
+        logger_1.default.info('🔍 Checking overdue assessments...');
         // Mock data - in production, query from database
         const overdueAssessments = [];
         for (const assessment of overdueAssessments) {

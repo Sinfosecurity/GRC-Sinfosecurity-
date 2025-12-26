@@ -1,7 +1,3 @@
-/**
- * Notification Service
- * Orchestrates all notifications and alerts across the GRC platform
- */
 export interface NotificationPreferences {
     userId: string;
     email: string;

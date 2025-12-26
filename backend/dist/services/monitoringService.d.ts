@@ -1,7 +1,3 @@
-/**
- * Real-Time Monitoring Service
- * Continuous monitoring for compliance drift, control failures, and risk changes
- */
 export interface MonitoringAlert {
     id: string;
     type: 'compliance_drift' | 'control_failure' | 'risk_increase' | 'deadline_approaching';

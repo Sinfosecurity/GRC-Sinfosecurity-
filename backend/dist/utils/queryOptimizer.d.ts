@@ -39,9 +39,9 @@ export declare const vendorQueries: {
      * Get vendor details with full relations (for detail view)
      */
     getVendorDetails(vendorId: string): Promise<{
-        name: string;
         id: string;
         status: import(".prisma/client").$Enums.VendorStatus;
+        name: string;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;
@@ -70,14 +70,14 @@ export declare const vendorQueries: {
         onboardedAt: Date | null;
         lastReviewDate: Date | null;
         terminatedAt: Date | null;
-    } | null>;
+    }>;
     /**
      * Get vendors due for review (optimized query)
      */
     getVendorsDueForReview(organizationId: string, daysAhead?: number): Promise<{
-        name: string;
         id: string;
         status: import(".prisma/client").$Enums.VendorStatus;
+        name: string;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;
@@ -119,9 +119,9 @@ export declare const batchOperations: {
         id: string;
         data: any;
     }>): Promise<{
-        name: string;
         id: string;
         status: import(".prisma/client").$Enums.VendorStatus;
+        name: string;
         organizationId: string;
         createdAt: Date;
         updatedAt: Date;

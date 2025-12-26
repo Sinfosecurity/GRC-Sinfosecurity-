@@ -1,8 +1,3 @@
-/**
-import logger from '../config/logger';
- * Continuous Monitoring Service
- * Real-time monitoring of compliance status, control effectiveness, and risk levels
- */
 export interface MonitoringCheck {
     id: string;
     name: string;

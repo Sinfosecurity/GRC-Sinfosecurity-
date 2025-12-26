@@ -2,6 +2,7 @@
  * Real-Time Monitoring Service
  * Continuous monitoring for compliance drift, control failures, and risk changes
  */
+import logger from '../config/logger';
 
 export interface MonitoringAlert {
     id: string;

@@ -76,16 +76,8 @@ router.use(authenticate);
  *         description: Invalid input
  */
 router.post('/', 
-    authorize(['ADMIN', 'RISK_MANAGER', 'EXECUTIVE', 'BOARD_MEMBER']),
-    validateBody({
-        category: { type: 'string', required: true },
-        appetiteStatement: { type: 'string', required: true },
-        riskTolerance: { type: 'number', required: true },
-        earlyWarningThreshold: { type: 'number', required: true },
-        approvedBy: { type: 'string', required: true },
-        approvalDate: { type: 'string', required: true },
-        reviewFrequency: { type: 'number', required: true },
-    }),
+    authorize('ADMIN', 'RISK_MANAGER', 'EXECUTIVE', 'BOARD_MEMBER'),
+    validateBody(CreateRiskAppetiteSchema),
     async (req: any, res) => {
         try {
             const riskAppetite = await riskAppetiteService.createRiskAppetite({

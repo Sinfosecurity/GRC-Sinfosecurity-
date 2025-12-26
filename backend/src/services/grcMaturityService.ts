@@ -1,8 +1,8 @@
 /**
-import logger from '../config/logger';
  * GRC Maturity Assessment Service
  * Maturity scoring, benchmarking, capability models
  */
+import logger from '../config/logger';
 
 export interface MaturityAssessment {
     id: string;

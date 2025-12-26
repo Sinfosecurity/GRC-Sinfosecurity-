@@ -81,7 +81,7 @@ declare class OrganizationService {
         isTrialExpired: boolean;
         enabledModules: string[];
         enabledFeatures: string[];
-    } | null;
+    };
 }
 declare const _default: OrganizationService;
 export default _default;

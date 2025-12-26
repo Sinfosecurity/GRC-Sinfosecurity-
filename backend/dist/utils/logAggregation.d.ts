@@ -105,27 +105,27 @@ export declare const logAggregator: LogAggregator;
 export declare const logAggregationConfig: {
     elasticsearch: {
         enabled: boolean;
-        url: string | undefined;
+        url: string;
         index: string;
-        username: string | undefined;
-        password: string | undefined;
+        username: string;
+        password: string;
     };
     datadog: {
         enabled: boolean;
-        apiKey: string | undefined;
+        apiKey: string;
         service: string;
         hostname: string;
         source: string;
     };
     cloudwatch: {
         enabled: boolean;
-        logGroupName: string | undefined;
-        logStreamName: string | undefined;
+        logGroupName: string;
+        logStreamName: string;
         region: string;
     };
     loki: {
         enabled: boolean;
-        url: string | undefined;
+        url: string;
         labels: {
             app: string;
             env: string;

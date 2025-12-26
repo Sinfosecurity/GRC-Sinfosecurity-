@@ -22,7 +22,7 @@ declare class VendorRiskHistoryService {
             criticalIssues: number;
             tier: import(".prisma/client").$Enums.VendorTier;
             status: import(".prisma/client").$Enums.VendorStatus;
-            changeReason: string | null;
+            changeReason: string;
         }[];
         trend: {
             direction: string;

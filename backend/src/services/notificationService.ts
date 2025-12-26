@@ -2,7 +2,7 @@
  * Notification Service
  * Orchestrates all notifications and alerts across the GRC platform
  */
-
+import logger from '../config/logger';
 import emailService from './emailService';
 import { AuditService } from './auditService';
 

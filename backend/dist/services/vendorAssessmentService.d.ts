@@ -44,32 +44,32 @@ declare class VendorAssessmentService {
     /**
      * Get assessment by ID with all responses
      */
-    getAssessmentById(assessmentId: string, organizationId: string): Promise<({
+    getAssessmentById(assessmentId: string, organizationId: string): Promise<{
         evidence: {
             id: string;
+            description: string | null;
             organizationId: string;
             title: string;
-            description: string | null;
             category: string | null;
             vendorId: string;
             documentType: import(".prisma/client").$Enums.VendorDocumentType;
             fileName: string;
             uploadedAt: Date;
             assessmentId: string | null;
-            fileUrl: string;
             fileSize: number;
             fileType: string;
-            confidentiality: import(".prisma/client").$Enums.ConfidentialityLevel;
-            uploadedBy: string;
+            fileUrl: string;
             fileHash: string | null;
+            confidentiality: import(".prisma/client").$Enums.ConfidentialityLevel;
             validFrom: Date | null;
             validUntil: Date | null;
+            uploadedBy: string;
             lastAccessedAt: Date | null;
         }[];
         vendor: {
-            name: string;
             id: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             organizationId: string;
             createdAt: Date;
             updatedAt: Date;
@@ -120,8 +120,8 @@ declare class VendorAssessmentService {
         status: import(".prisma/client").$Enums.AssessmentStatus;
         organizationId: string;
         createdAt: Date;
-        assignedTo: string | null;
         updatedAt: Date;
+        assignedTo: string | null;
         dueDate: Date | null;
         completedAt: Date | null;
         vendorId: string;
@@ -130,18 +130,18 @@ declare class VendorAssessmentService {
         recommendations: import("@prisma/client/runtime/library").JsonValue | null;
         complianceScore: number | null;
         securityScore: number | null;
-        reviewer: string | null;
         frameworkUsed: string | null;
         privacyScore: number | null;
         operationalScore: number | null;
         financialScore: number | null;
         identifiedRisks: import("@prisma/client/runtime/library").JsonValue | null;
         gapsIdentified: import("@prisma/client/runtime/library").JsonValue | null;
+        reviewer: string | null;
         approver: string | null;
         approvedAt: Date | null;
         evidenceCollected: boolean;
         evidenceCount: number;
-    }) | null>;
+    }>;
     /**
      * List assessments for a vendor
      */
@@ -155,8 +155,8 @@ declare class VendorAssessmentService {
         status: import(".prisma/client").$Enums.AssessmentStatus;
         organizationId: string;
         createdAt: Date;
-        assignedTo: string | null;
         updatedAt: Date;
+        assignedTo: string | null;
         dueDate: Date | null;
         completedAt: Date | null;
         vendorId: string;
@@ -165,13 +165,13 @@ declare class VendorAssessmentService {
         recommendations: import("@prisma/client/runtime/library").JsonValue | null;
         complianceScore: number | null;
         securityScore: number | null;
-        reviewer: string | null;
         frameworkUsed: string | null;
         privacyScore: number | null;
         operationalScore: number | null;
         financialScore: number | null;
         identifiedRisks: import("@prisma/client/runtime/library").JsonValue | null;
         gapsIdentified: import("@prisma/client/runtime/library").JsonValue | null;
+        reviewer: string | null;
         approver: string | null;
         approvedAt: Date | null;
         evidenceCollected: boolean;
@@ -189,8 +189,8 @@ declare class VendorAssessmentService {
         status: import(".prisma/client").$Enums.AssessmentStatus;
         organizationId: string;
         createdAt: Date;
-        assignedTo: string | null;
         updatedAt: Date;
+        assignedTo: string | null;
         dueDate: Date | null;
         completedAt: Date | null;
         vendorId: string;
@@ -199,13 +199,13 @@ declare class VendorAssessmentService {
         recommendations: import("@prisma/client/runtime/library").JsonValue | null;
         complianceScore: number | null;
         securityScore: number | null;
-        reviewer: string | null;
         frameworkUsed: string | null;
         privacyScore: number | null;
         operationalScore: number | null;
         financialScore: number | null;
         identifiedRisks: import("@prisma/client/runtime/library").JsonValue | null;
         gapsIdentified: import("@prisma/client/runtime/library").JsonValue | null;
+        reviewer: string | null;
         approver: string | null;
         approvedAt: Date | null;
         evidenceCollected: boolean;
@@ -252,8 +252,8 @@ declare class VendorAssessmentService {
         status: import(".prisma/client").$Enums.AssessmentStatus;
         organizationId: string;
         createdAt: Date;
-        assignedTo: string | null;
         updatedAt: Date;
+        assignedTo: string | null;
         dueDate: Date | null;
         completedAt: Date | null;
         vendorId: string;
@@ -262,13 +262,13 @@ declare class VendorAssessmentService {
         recommendations: import("@prisma/client/runtime/library").JsonValue | null;
         complianceScore: number | null;
         securityScore: number | null;
-        reviewer: string | null;
         frameworkUsed: string | null;
         privacyScore: number | null;
         operationalScore: number | null;
         financialScore: number | null;
         identifiedRisks: import("@prisma/client/runtime/library").JsonValue | null;
         gapsIdentified: import("@prisma/client/runtime/library").JsonValue | null;
+        reviewer: string | null;
         approver: string | null;
         approvedAt: Date | null;
         evidenceCollected: boolean;

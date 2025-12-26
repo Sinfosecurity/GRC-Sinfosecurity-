@@ -1,13 +1,13 @@
 "use strict";
-/**
-import logger from '../config/logger';
- * Multi-Factor Authentication (MFA) Service
- * Supports TOTP, SMS, Email, and Backup Codes
- */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Multi-Factor Authentication (MFA) Service
+ * Supports TOTP, SMS, Email, and Backup Codes
+ */
+const logger_1 = __importDefault(require("../config/logger"));
 const crypto_1 = __importDefault(require("crypto"));
 // In-memory storage
 const mfaConfigs = new Map();
@@ -66,7 +66,7 @@ class MFAService {
         };
         const userConfigs = mfaConfigs.get(userId) || [];
         mfaConfigs.set(userId, [...userConfigs.filter(c => c.method !== 'TOTP'), config]);
-        logger.info(`📱 TOTP setup initiated for user: ${userId}`);
+        logger_1.default.info(`📱 TOTP setup initiated for user: ${userId}`);
         return {
             secret,
             qrCode,
@@ -88,10 +88,10 @@ class MFAService {
             totpConfig.verified = true;
             totpConfig.lastUsedAt = new Date();
             mfaConfigs.set(userId, userConfigs);
-            logger.info(`✅ TOTP verified and enabled for user: ${userId}`);
+            logger_1.default.info(`✅ TOTP verified and enabled for user: ${userId}`);
             return true;
         }
-        logger.info(`❌ Invalid TOTP code for user: ${userId}`);
+        logger_1.default.info(`❌ Invalid TOTP code for user: ${userId}`);
         return false;
     }
     /**
@@ -118,8 +118,8 @@ class MFAService {
             expiresAt: new Date(Date.now() + this.CODE_EXPIRY_MINUTES * 60 * 1000)
         });
         // In production, send SMS via Twilio, AWS SNS, etc.
-        logger.info(`📱 SMS verification code sent to ${phoneNumber}: ${code}`);
-        logger.info(`   (In production, this would be sent via SMS API)`);
+        logger_1.default.info(`📱 SMS verification code sent to ${phoneNumber}: ${code}`);
+        logger_1.default.info(`   (In production, this would be sent via SMS API)`);
         // Store challenge
         this.storeChallenge(userId, 'SMS', code);
         return { verificationToken: token };
@@ -148,8 +148,8 @@ class MFAService {
             expiresAt: new Date(Date.now() + this.CODE_EXPIRY_MINUTES * 60 * 1000)
         });
         // In production, send email
-        logger.info(`📧 Email verification code sent to ${email}: ${code}`);
-        logger.info(`   (In production, this would be sent via email service)`);
+        logger_1.default.info(`📧 Email verification code sent to ${email}: ${code}`);
+        logger_1.default.info(`   (In production, this would be sent via email service)`);
         // Store challenge
         this.storeChallenge(userId, 'EMAIL', code);
         return { verificationToken: token };
@@ -184,10 +184,10 @@ class MFAService {
                 mfaConfigs.set(userId, userConfigs);
             }
             mfaChallenges.delete(challengeKey);
-            logger.info(`✅ ${method} verified and enabled for user: ${userId}`);
+            logger_1.default.info(`✅ ${method} verified and enabled for user: ${userId}`);
             return true;
         }
-        logger.info(`❌ Invalid ${method} code for user: ${userId} (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
+        logger_1.default.info(`❌ Invalid ${method} code for user: ${userId} (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
         return false;
     }
     /**
@@ -221,15 +221,15 @@ class MFAService {
         if (selectedMethod === 'SMS') {
             const userConfigs = mfaConfigs.get(userId) || [];
             const smsConfig = userConfigs.find(c => c.method === 'SMS');
-            logger.info(`📱 MFA code sent via SMS to ${smsConfig?.phoneNumber}: ${code}`);
+            logger_1.default.info(`📱 MFA code sent via SMS to ${smsConfig?.phoneNumber}: ${code}`);
         }
         else if (selectedMethod === 'EMAIL') {
             const userConfigs = mfaConfigs.get(userId) || [];
             const emailConfig = userConfigs.find(c => c.method === 'EMAIL');
-            logger.info(`📧 MFA code sent via Email to ${emailConfig?.email}: ${code}`);
+            logger_1.default.info(`📧 MFA code sent via Email to ${emailConfig?.email}: ${code}`);
         }
         else if (selectedMethod === 'TOTP') {
-            logger.info(`📱 TOTP challenge issued for user: ${userId}`);
+            logger_1.default.info(`📱 TOTP challenge issued for user: ${userId}`);
         }
         return { challengeId, method: selectedMethod };
     }
@@ -273,10 +273,10 @@ class MFAService {
                 config.lastUsedAt = new Date();
             }
             mfaChallenges.delete(challengeId);
-            logger.info(`✅ MFA challenge verified for user: ${challenge.userId}`);
+            logger_1.default.info(`✅ MFA challenge verified for user: ${challenge.userId}`);
             return true;
         }
-        logger.info(`❌ Invalid MFA code (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
+        logger_1.default.info(`❌ Invalid MFA code (Attempt ${challenge.attempts}/${this.MAX_ATTEMPTS})`);
         return false;
     }
     /**
@@ -289,7 +289,7 @@ class MFAService {
             return false;
         config.enabled = false;
         mfaConfigs.set(userId, userConfigs);
-        logger.info(`❌ MFA ${method} disabled for user: ${userId}`);
+        logger_1.default.info(`❌ MFA ${method} disabled for user: ${userId}`);
         return true;
     }
     /**
@@ -303,7 +303,7 @@ class MFAService {
             totpConfig.backupCodes = newCodes.map(c => this.hashCode(c));
             mfaConfigs.set(userId, userConfigs);
         }
-        logger.info(`🔄 Backup codes regenerated for user: ${userId}`);
+        logger_1.default.info(`🔄 Backup codes regenerated for user: ${userId}`);
         return newCodes;
     }
     /**
@@ -387,7 +387,7 @@ class MFAService {
             // Remove used backup code
             totpConfig.backupCodes.splice(index, 1);
             mfaConfigs.set(userId, userConfigs);
-            logger.info(`✅ Backup code used for user: ${userId} (${totpConfig.backupCodes.length} remaining)`);
+            logger_1.default.info(`✅ Backup code used for user: ${userId} (${totpConfig.backupCodes.length} remaining)`);
             return true;
         }
         return false;

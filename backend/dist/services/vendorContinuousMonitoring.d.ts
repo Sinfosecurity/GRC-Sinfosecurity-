@@ -117,7 +117,7 @@ declare class VendorContinuousMonitoringService {
     /**
      * Monitor certificate expiry
      */
-    monitorCertificateExpiry(vendorId: string, organizationId: string, certificateType: string, expiryDate: Date): Promise<({
+    monitorCertificateExpiry(vendorId: string, organizationId: string, certificateType: string, expiryDate: Date): Promise<{
         vendor: {
             name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
@@ -143,7 +143,7 @@ declare class VendorContinuousMonitoringService {
         actionTakenAt: Date | null;
         acknowledgedAt: Date | null;
         resolvedAt: Date | null;
-    }) | undefined>;
+    }>;
     /**
      * Monitor news mentions
      */
@@ -154,7 +154,7 @@ declare class VendorContinuousMonitoringService {
         keywords: string[];
         url: string;
         publishedDate: Date;
-    }): Promise<({
+    }): Promise<{
         vendor: {
             name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
@@ -180,7 +180,7 @@ declare class VendorContinuousMonitoringService {
         actionTakenAt: Date | null;
         acknowledgedAt: Date | null;
         resolvedAt: Date | null;
-    }) | undefined>;
+    }>;
     /**
      * Monitor financial health
      */
@@ -190,7 +190,7 @@ declare class VendorContinuousMonitoringService {
         profitabilityStatus: 'Profitable' | 'Break-even' | 'Loss';
         cashFlowStatus: 'Positive' | 'Negative';
         source: string;
-    }): Promise<({
+    }): Promise<{
         vendor: {
             name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
@@ -216,7 +216,7 @@ declare class VendorContinuousMonitoringService {
         actionTakenAt: Date | null;
         acknowledgedAt: Date | null;
         resolvedAt: Date | null;
-    }) | undefined>;
+    }>;
     /**
      * Monitor M&A activity
      */
@@ -260,8 +260,8 @@ declare class VendorContinuousMonitoringService {
      */
     getActiveSignals(organizationId: string, vendorId?: string): Promise<({
         vendor: {
-            name: string;
             status: import(".prisma/client").$Enums.VendorStatus;
+            name: string;
             tier: import(".prisma/client").$Enums.VendorTier;
         };
     } & {
@@ -297,13 +297,7 @@ declare class VendorContinuousMonitoringService {
     /**
      * Schedule automated monitoring checks
      */
-    scheduleMonitoringChecks(organizationId: string): Promise<{
-        vendorId: string;
-        vendorName: string;
-        frequency: string;
-        nextCheck: Date;
-        checksEnabled: string[];
-    }[]>;
+    scheduleMonitoringChecks(organizationId: string): Promise<any[]>;
     /**
      * Get monitoring statistics
      */
