@@ -1,19 +1,14 @@
 import axios from 'axios';
 
-// Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-const AI_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL;
+// Use environment variable for API URL, fallback to hardcoded for Railway deployment
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://grc-backend-production-5586.up.railway.app/api/v1';
+const AI_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'https://grc-ai-service.up.railway.app';
 
-if (!API_BASE_URL) {
-    throw new Error(
-        'VITE_API_URL is not set. Please set it in your Railway frontend environment variables and redeploy.'
-    );
-}
-if (!AI_SERVICE_URL) {
-    throw new Error(
-        'VITE_AI_SERVICE_URL is not set. Please set it in your Railway frontend environment variables and redeploy.'
-    );
-}
+console.log('🔗 API Configuration:', {
+    API_BASE_URL,
+    AI_SERVICE_URL,
+    env: import.meta.env.MODE
+});
 
 const api = axios.create({
     baseURL: API_BASE_URL,
