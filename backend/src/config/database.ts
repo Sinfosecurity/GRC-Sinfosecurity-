@@ -3,115 +3,108 @@ import mongoose from 'mongoose';
 import { createClient } from 'redis';
 import logger from './logger';
 
-export { mongoose };
-
-// PostgreSQL (Prisma) with connection pooling
+// Prisma Client (PostgreSQL)
 export const prisma = new PrismaClient({
-    log: process.env.NODE_ENV === 'production' ? ['error', 'warn'] : ['query', 'error', 'warn'],
-    datasources: {
-        db: {
-            url: process.env.DATABASE_URL,
-        },
-    },
+    log: process.env.NODE_ENV === 'development' 
+        ? ['query', 'error', 'warn'] 
+        : ['error'],
 });
 
-// MongoDB
-let mongooseConnection: typeof mongoose | null = null;
+// Redis Client (optional, for caching)
+let redisClient: ReturnType<typeof createClient> | null = null;
 
-export async function connectMongoDB() {
+export async function connectDatabase() {
     try {
-        const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/grc_documents';
-        mongooseConnection = await mongoose.connect(mongoUri, {
-            maxPoolSize: 10,
-            minPoolSize: 2,
-            serverSelectionTimeoutMS: 5000,
-            socketTimeoutMS: 45000,
-        });
-        logger.info('✅ MongoDB connected successfully');
-    } catch (error) {
-        logger.error('❌ MongoDB connection error:', error);
-        throw error;
-    }
-}
+        // Connect to PostgreSQL via Prisma
+        await prisma.$connect();
+        logger.info('✅ PostgreSQL connected via Prisma');
 
-// Redis with optimized configuration
-export const redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6380',
-    password: process.env.REDIS_PASSWORD,
-    socket: {
-        reconnectStrategy: (retries) => {
-            if (retries > 10) {
-                logger.error('Redis: Max reconnection attempts reached');
-                return new Error('Max reconnection attempts reached');
-            }
-            return Math.min(retries * 100, 3000);
-        },
-        connectTimeout: 10000,
-    },
-    pingInterval: 30000,
-});
+        // Test the connection
+        await prisma.$queryRaw`SELECT 1`;
+        logger.info('✅ PostgreSQL connection verified');
 
-redisClient.on('error', (err) => logger.error('Redis Client Error', err));
-redisClient.on('connect', () => logger.info('✅ Redis connected successfully'));
+        // Connect to Redis if URL provided
+        if (process.env.REDIS_URL) {
+            redisClient = createClient({
+                url: process.env.REDIS_URL,
+            });
 
-export async function connectRedis() {
-    try {
-        await redisClient.connect();
-    } catch (error) {
-        logger.error('❌ Redis connection error:', error);
-        throw error;
-    }
-}
+            redisClient.on('error', (err) => {
+                logger.error('Redis Client Error:', err);
+            });
 
-// Connect all databases with retry logic
-export async function connectDatabase(retries = 5, delay = 3000) {
-    for (let i = 0; i < retries; i++) {
-        try {
-            // Test PostgreSQL connection
-            await prisma.$connect();
-            logger.info('✅ PostgreSQL connected successfully');
-
-            // MongoDB is optional for Railway
-            if (process.env.MONGODB_URI) {
-                try {
-                    await connectMongoDB();
-                } catch (mongoError) {
-                    logger.warn('⚠️  MongoDB connection failed (optional):', mongoError);
-                }
-            }
-
-            // Redis is optional for Railway
-            if (process.env.REDIS_URL) {
-                try {
-                    await connectRedis();
-                } catch (redisError) {
-                    logger.warn('⚠️  Redis connection failed (optional):', redisError);
-                }
-            }
-
-            logger.info('🎉 Database connections established');
-            return;
-        } catch (error) {
-            logger.error(`❌ Database connection attempt ${i + 1}/${retries} failed:`, error);
-            if (i < retries - 1) {
-                logger.info(`Retrying in ${delay}ms...`);
-                await new Promise(resolve => setTimeout(resolve, delay));
-            } else {
-                logger.error('❌ All database connection attempts failed');
-                throw error;
-            }
+            await redisClient.connect();
+            logger.info('✅ Redis connected');
         }
+
+        // Connect to MongoDB if URL provided (optional)
+        if (process.env.MONGODB_URL) {
+            await mongoose.connect(process.env.MONGODB_URL);
+            logger.info('✅ MongoDB connected');
+        }
+
+    } catch (error) {
+        logger.error('❌ Database connection failed:', error);
+        throw error;
     }
 }
 
-// Disconnect all databases
 export async function disconnectDatabase() {
     try {
         await prisma.$disconnect();
-        await mongoose.disconnect();
-        await redisClient.quit();
-        logger.info('✅ All databases disconnected');
+        logger.info('PostgreSQL disconnected');
+
+        if (redisClient) {
+            await redisClient.quit();
+            logger.info('Redis disconnected');
+        }
+
+        if (mongoose.connection.readyState === 1) {
+            await mongoose.disconnect();
+            logger.info('MongoDB disconnected');
+        }
     } catch (error) {
-        logger.error('❌ Database disconnection error:', error);
+        logger.error('Error disconnecting databases:', error);
     }
 }
+
+// Health check function
+export async function checkDatabaseHealth(): Promise<{
+    postgres: boolean;
+    redis?: boolean;
+    mongodb?: boolean;
+}> {
+    const health: any = {
+        postgres: false,
+        redis: undefined,
+        mongodb: undefined,
+    };
+
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        health.postgres = true;
+    } catch (error) {
+        logger.error('PostgreSQL health check failed:', error);
+    }
+
+    if (redisClient) {
+        try {
+            await redisClient.ping();
+            health.redis = true;
+        } catch (error) {
+            logger.error('Redis health check failed:', error);
+            health.redis = false;
+        }
+    }
+
+    if (mongoose.connection.readyState === 1) {
+        health.mongodb = true;
+    } else if (process.env.MONGODB_URL) {
+        health.mongodb = false;
+    }
+
+    return health;
+}
+
+export { redisClient };
+export default prisma;

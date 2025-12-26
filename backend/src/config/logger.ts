@@ -1,43 +1,70 @@
 import winston from 'winston';
 
-const { combine, timestamp, printf, colorize, errors } = winston.format;
+const logLevels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    debug: 4,
+};
 
-// Custom log format
-const logFormat = printf(({ level, message, timestamp, stack }) => {
-    return `${timestamp} [${level}]: ${stack || message}`;
-});
+const logColors = {
+    error: 'red',
+    warn: 'yellow',
+    info: 'green',
+    http: 'magenta',
+    debug: 'blue',
+};
 
-// Create logger instance
+winston.addColors(logColors);
+
+const format = winston.format.combine(
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+    winston.format.colorize({ all: true }),
+    winston.format.printf(
+        (info) => `${info.timestamp} ${info.level}: ${info.message}`,
+    ),
+);
+
+const transports = [
+    new winston.transports.Console(),
+    new winston.transports.File({
+        filename: 'logs/error.log',
+        level: 'error',
+    }),
+    new winston.transports.File({ filename: 'logs/all.log' }),
+];
+
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
-    format: combine(
-        errors({ stack: true }),
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        logFormat
-    ),
-    transports: [
-        // Console transport
-        new winston.transports.Console({
-            format: combine(
-                colorize(),
-                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                logFormat
-            ),
-        }),
-        // File transport for errors
-        new winston.transports.File({
-            filename: 'logs/error.log',
-            level: 'error',
-            maxsize: 5242880, // 5MB
-            maxFiles: 5,
-        }),
-        // File transport for all logs
-        new winston.transports.File({
-            filename: 'logs/combined.log',
-            maxsize: 5242880, // 5MB
-            maxFiles: 5,
-        }),
-    ],
+    levels: logLevels,
+    format,
+    transports,
 });
+
+// Create error logger with additional context
+export const logError = (error: Error, context?: Record<string, any>) => {
+    logger.error({
+        message: error.message,
+        stack: error.stack,
+        ...context,
+    });
+};
+
+// Create info logger with context
+export const logInfo = (message: string, context?: Record<string, any>) => {
+    logger.info({
+        message,
+        ...context,
+    });
+};
+
+// Create debug logger
+export const logDebug = (message: string, data?: any) => {
+    logger.debug({
+        message,
+        data,
+    });
+};
 
 export default logger;
