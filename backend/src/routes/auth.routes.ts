@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import prisma from '../config/database';
+import { JwtClaims } from '../middleware/auth';
 
 const router = Router();
-
 const DEV_MODE = process.env.DEV_MODE === 'true';
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -11,62 +12,53 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
 
-// Mock users for DEV_MODE - passwords are bcrypt hashed
-// admin@sinfosecurity.com: demo123
-// demo: demo
 const mockUsers = [
   {
-    id: 'user-1',
-    email: 'admin@sinfosecurity.com',
-    hashedPassword: '$2b$10$08OU9WS/bk6Gun6J2/5ooOjD/oY9sUeyG94bR47dnciRxtBbM1Es6', // demo123
-    firstName: 'Admin',
-    lastName: 'User',
-    role: 'ADMIN',
-    organizationId: 'org-1',
-    organization: {
-      id: 'org-1',
-      name: 'Sinfosecurity',
-    },
+    id: 'user-1', email: 'admin@sinfosecurity.com',
+    hashedPassword: '$2b$10$08OU9WS/bk6Gun6J2/5ooOjD/oY9sUeyG94bR47dnciRxtBbM1Es6',
+    firstName: 'Admin', lastName: 'User', role: 'ADMIN' as const, organizationId: 'org-1',
   },
   {
-    id: 'user-2',
-    email: 'demo',
-    hashedPassword: '$2b$10$9O7Jhiani1rWIc6s4sTC9OTOmcfkoJHm5YY1rroB2NvZ3P79blQHO', // demo
-    firstName: 'Demo',
-    lastName: 'User',
-    role: 'USER',
-    organizationId: 'org-1',
-    organization: {
-      id: 'org-1',
-      name: 'Sinfosecurity',
-    },
+    id: 'user-2', email: 'demo',
+    hashedPassword: '$2b$10$9O7Jhiani1rWIc6s4sTC9OTOmcfkoJHm5YY1rroB2NvZ3P79blQHO',
+    firstName: 'Demo', lastName: 'User', role: 'USER' as const, organizationId: 'org-1',
   },
 ];
 
-// POST /api/v1/auth/register
+const signToken = (user: { id: string; email: string; role: any; organizationId: string }) =>
+  jwt.sign(
+    { id: user.id, email: user.email, role: user.role, organizationId: user.organizationId } satisfies JwtClaims,
+    JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+const setAuthCookie = (res: Response, token: string) => {
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+};
+
 router.post('/register', async (req: Request, res: Response) => {
   if (!DEV_MODE) {
-    return res.status(501).json({ 
-      success: false, 
-      error: 'Registration requires database configuration. Set DEV_MODE=false and configure DATABASE_URL.' 
+    return res.status(403).json({
+      success: false,
+      error: 'Public registration is disabled. Users must be provisioned by an authorized administrator.',
     });
   }
 
   const { email, password, firstName, lastName } = req.body;
-
-  // Check if user already exists
-  const existingUser = mockUsers.find(u => u.email === email);
-  if (existingUser) {
-    return res.status(400).json({ 
-      success: false, 
-      error: 'User already exists' 
-    });
+  if (!email || !password || !firstName || !lastName) {
+    return res.status(400).json({ success: false, error: 'email, password, firstName, and lastName are required' });
   }
 
-  // Hash password before storing
+  if (mockUsers.some(u => u.email === email)) {
+    return res.status(400).json({ success: false, error: 'User already exists' });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  
-  // Create new mock user
   const newUser = {
     id: `user-${mockUsers.length + 1}`,
     email,
@@ -75,100 +67,46 @@ router.post('/register', async (req: Request, res: Response) => {
     lastName,
     role: 'USER' as const,
     organizationId: 'org-1',
-    organization: {
-      id: 'org-1',
-      name: 'Sinfosecurity',
-    },
   };
-
   mockUsers.push(newUser);
 
-  // Generate token
-  const token = jwt.sign(
-    {
-      userId: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-      organizationId: newUser.organizationId,
-    },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  // Set token in httpOnly cookie for security
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  });
-
-  res.json({
+  const token = signToken(newUser);
+  setAuthCookie(res, token);
+  return res.status(201).json({
     success: true,
-    data: {
-      token,
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        role: newUser.role,
-        organizationId: newUser.organizationId,
-      },
-    },
+    data: { token, user: { id: newUser.id, email, firstName, lastName, role: newUser.role, organizationId: newUser.organizationId } },
   });
 });
 
-// POST /api/v1/auth/login
 router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
   if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      error: 'Email and password are required',
-    });
+    return res.status(400).json({ success: false, error: 'Email and password are required' });
   }
 
-  if (DEV_MODE) {
-    // DEV_MODE: Use mock authentication
-    const user = mockUsers.find((u) => u.email === email);
+  try {
+    if (DEV_MODE) {
+      const user = mockUsers.find(u => u.email === email);
+      if (!user || !(await bcrypt.compare(password, user.hashedPassword))) {
+        return res.status(401).json({ success: false, error: 'Invalid credentials' });
+      }
 
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials',
+      const token = signToken(user);
+      setAuthCookie(res, token);
+      return res.json({
+        success: true,
+        data: { token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role, organizationId: user.organizationId } },
       });
     }
 
-    // Verify password using bcrypt
-    const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials',
-      });
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.hashedPassword))) {
+      return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        organizationId: user.organizationId,
-      },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Set token in httpOnly cookie for security
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
+    const token = signToken(user);
+    setAuthCookie(res, token);
+    await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
 
     return res.json({
       success: true,
@@ -184,75 +122,42 @@ router.post('/login', async (req: Request, res: Response) => {
         },
       },
     });
+  } catch {
+    return res.status(503).json({ success: false, error: 'Authentication service unavailable' });
   }
-
-  // Production mode requires database
-  return res.status(501).json({
-    success: false,
-    error: 'Authentication requires database configuration. Set DEV_MODE=false and configure DATABASE_URL.',
-  });
 });
 
-// POST /api/v1/auth/refresh
 router.post('/refresh', async (req: Request, res: Response) => {
-  // Get token from cookie or body
   const token = req.cookies?.token || req.body.token;
-
-  if (!token) {
-    return res.status(400).json({
-      success: false,
-      error: 'Token is required',
-    });
-  }
+  if (!token) return res.status(400).json({ success: false, error: 'Token is required' });
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtClaims;
+    if (!decoded.id || !decoded.organizationId) {
+      return res.status(401).json({ success: false, error: 'Invalid token claims' });
+    }
 
-    // Generate new token
-    const newToken = jwt.sign(
-      {
-        userId: decoded.userId,
-        email: decoded.email,
-        role: decoded.role,
-        organizationId: decoded.organizationId,
-      },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    const user = DEV_MODE
+      ? mockUsers.find(u => u.id === decoded.id && u.organizationId === decoded.organizationId)
+      : await prisma.user.findFirst({ where: { id: decoded.id, organizationId: decoded.organizationId } });
 
-    // Set token in httpOnly cookie
-    res.cookie('token', newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
+    if (!user) return res.status(401).json({ success: false, error: 'Invalid user or organization membership' });
 
-    res.json({
-      success: true,
-      data: { message: 'Token refreshed successfully' },
-    });
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      error: 'Invalid or expired token',
-    });
+    const newToken = signToken(user);
+    setAuthCookie(res, newToken);
+    return res.json({ success: true, data: { message: 'Token refreshed successfully' } });
+  } catch {
+    return res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
 });
 
-// POST /api/v1/auth/logout
-router.post('/logout', (req: Request, res: Response) => {
-  // Clear the token cookie
+router.post('/logout', (_req: Request, res: Response) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'strict',
   });
-
-  res.json({
-    success: true,
-    data: { message: 'Logged out successfully' },
-  });
+  res.json({ success: true, data: { message: 'Logged out successfully' } });
 });
 
 export default router;
