@@ -1,7 +1,8 @@
 /**
- * Jira Integration
- * Create and manage Jira tickets for incidents and tasks
+ * Jira Integration — real REST calls when configured. Never invents issue keys.
  */
+
+import { providerState, IntegrationResult } from './integrationProvider';
 
 interface JiraConfig {
     host: string;
@@ -20,19 +21,45 @@ interface JiraIssue {
     labels?: string[];
 }
 
-class JiraIntegration {
-    private config: JiraConfig;
+function envConfig(): JiraConfig | null {
+    if (!process.env.JIRA_BASE_URL || !process.env.JIRA_API_TOKEN || !process.env.JIRA_EMAIL) {
+        return null;
+    }
+    return {
+        host: process.env.JIRA_BASE_URL,
+        email: process.env.JIRA_EMAIL,
+        apiToken: process.env.JIRA_API_TOKEN,
+        projectKey: process.env.JIRA_PROJECT_KEY || 'SR',
+    };
+}
 
-    constructor(config: JiraConfig) {
-        this.config = config;
+class JiraIntegration {
+    private config: JiraConfig | null;
+
+    constructor(config?: JiraConfig) {
+        this.config = config || envConfig();
     }
 
-    /**
-     * Create Jira issue
-     */
-    async createIssue(issue: JiraIssue): Promise<string | null> {
-        try {
-            const payload = {
+    status() {
+        return providerState('jira');
+    }
+
+    private headers() {
+        return {
+            Authorization: `Basic ${Buffer.from(`${this.config!.email}:${this.config!.apiToken}`).toString('base64')}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        };
+    }
+
+    async createIssue(issue: JiraIssue): Promise<IntegrationResult<{ key: string }>> {
+        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+            return { status: 'NOT_CONFIGURED' };
+        }
+        const response = await fetch(`${this.config.host.replace(/\/$/, '')}/rest/api/3/issue`, {
+            method: 'POST',
+            headers: this.headers(),
+            body: JSON.stringify({
                 fields: {
                     project: { key: this.config.projectKey },
                     summary: issue.summary,
@@ -41,83 +68,37 @@ class JiraIntegration {
                     priority: { name: issue.priority },
                     labels: issue.labels || [],
                 },
-            };
-
-            console.log(`📝 Creating Jira ${issue.issueType} in project ${this.config.projectKey}`);
-            console.log('Summary:', issue.summary);
-
-            // In production, make actual API call
-            // const response = await fetch(`${this.config.host}/rest/api/3/issue`, {
-            //   method: 'POST',
-            //   headers: {
-            //     'Authorization': `Basic ${Buffer.from(`${this.config.email}:${this.config.apiToken}`).toString('base64')}`,
-            //     'Content-Type': 'application/json',
-            //   },
-            //   body: JSON.stringify(payload),
-            // });
-            // const data = await response.json();
-            // return data.key;
-
-            const mockKey = `${this.config.projectKey}-${Math.floor(Math.random() * 1000)}`;
-            console.log(`✅ Created Jira issue: ${mockKey}`);
-            return mockKey;
-        } catch (error) {
-            console.error('Failed to create Jira issue:', error);
-            return null;
+            }),
+        });
+        if (!response.ok) {
+            return { status: 'ERROR', error: `Jira returned ${response.status}` };
         }
+        const data = (await response.json()) as { key?: string };
+        if (!data.key) {
+            return { status: 'ERROR', error: 'Jira did not return an issue key' };
+        }
+        return { status: 'CONNECTED', data: { key: data.key } };
     }
 
-    /**
-     * Create incident ticket
-     */
-    async createIncidentTicket(incident: any): Promise<string | null> {
+    async createIncidentTicket(incident: { title: string; severity: string; category: string; status: string }) {
         return this.createIssue({
             summary: `[INCIDENT] ${incident.title}`,
-            description: `
-**Severity**: ${incident.severity}
-**Category**: ${incident.category}
-**Status**: ${incident.status}
-**Detected**: ${new Date().toISOString()}
-
-**Description**:
-${incident.description || 'No description provided'}
-      `.trim(),
+            description: `Severity: ${incident.severity}\nCategory: ${incident.category}\nStatus: ${incident.status}`,
             issueType: 'Incident',
-            priority: this.mapSeverityToPriority(incident.severity),
-            labels: ['grc-platform', 'security-incident', incident.category.toLowerCase()],
+            priority: incident.severity === 'CRITICAL' ? 'Highest' : 'High',
         });
     }
 
-    /**
-     * Create remediation task
-     */
-    async createRemediationTask(risk: any): Promise<string | null> {
-        return this.createIssue({
-            summary: `[REMEDIATION] ${risk.title}`,
-            description: `
-**Risk Level**: ${risk.severity}
-**Category**: ${risk.category}
-
-**Remediation Actions Required**:
-${risk.mitigationPlan || 'To be determined'}
-      `.trim(),
-            issueType: 'Task',
-            priority: this.mapSeverityToPriority(risk.severity),
-            labels: ['grc-platform', 'risk-remediation'],
+    async testConnection() {
+        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+            return { status: 'NOT_CONFIGURED' as const };
+        }
+        const response = await fetch(`${this.config.host.replace(/\/$/, '')}/rest/api/3/myself`, {
+            headers: this.headers(),
         });
-    }
-
-    /**
-     * Map severity to Jira priority
-     */
-    private mapSeverityToPriority(severity: string): 'Highest' | 'High' | 'Medium' | 'Low' | 'Lowest' {
-        const mapping: Record<string, any> = {
-            critical: 'Highest',
-            high: 'High',
-            medium: 'Medium',
-            low: 'Low',
-        };
-        return mapping[severity.toLowerCase()] || 'Medium';
+        return response.ok
+            ? { status: 'CONNECTED' as const }
+            : { status: 'ERROR' as const, error: `Jira returned ${response.status}` };
     }
 }
 

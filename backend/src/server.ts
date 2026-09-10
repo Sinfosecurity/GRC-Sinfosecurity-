@@ -11,6 +11,8 @@ import swaggerUi from 'swagger-ui-express';
 
 // Load environment variables
 dotenv.config();
+import { validateEnv } from './config/env';
+validateEnv();
 
 // Import Swagger and metrics
 import { swaggerSpec } from './config/swagger';
@@ -40,6 +42,13 @@ import concentrationRoutes from './routes/concentration.routes';
 import riskHistoryRoutes from './routes/risk-history.routes';
 import riskAppetiteRoutes from './routes/risk-appetite.routes';
 import monitoringTestRoutes from './routes/monitoring.test.routes';
+import monitoringRoutes from './routes/monitoring.routes';
+import billingRoutes from './routes/billing.routes';
+import aiRoutes from './routes/ai.routes';
+import exportRoutes from './routes/export.routes';
+import organizationSaasRoutes from './routes/organization.saas.routes';
+import integrationRoutes from './routes/integration.routes';
+import questionnaireRoutes from './routes/questionnaire.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -67,8 +76,8 @@ import { businessMetricsCollector } from './utils/businessMetrics';
 const app: Application = express();
 const httpServer = createServer(app);
 
-// Check if running in dev mode
-const DEV_MODE = process.env.DEV_MODE === 'true';
+// DEV_MODE may skip optional Redis/Mongo only. It is never an authentication path.
+const DEV_MODE = process.env.DEV_MODE === 'true' && process.env.NODE_ENV !== 'production';
 
 // CRITICAL: Basic health check BEFORE any middleware for Railway
 // This must respond immediately for health checks during startup
@@ -125,7 +134,14 @@ app.use(requestId());
 app.use(performanceMiddleware());
 app.use(requestLogger({ logBody: false, logResponse: false }));
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({
+    limit: '10mb',
+    verify: (req: any, _res, buf) => {
+        if (req.originalUrl?.includes('/billing/webhook')) {
+            req.rawBody = buf;
+        }
+    },
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
@@ -202,7 +218,14 @@ app.use(`${API_PREFIX}/vendors/approvals`, approvalRoutes);
 app.use(`${API_PREFIX}/vendors/concentration-risk`, concentrationRoutes);
 app.use(`${API_PREFIX}/vendors/risk-history`, riskHistoryRoutes);
 app.use(`${API_PREFIX}/risk-appetite`, riskAppetiteRoutes);
-app.use(`${API_PREFIX}/monitoring`, monitoringTestRoutes);
+app.use(`${API_PREFIX}/monitoring`, monitoringRoutes);
+app.use(`${API_PREFIX}/monitoring/test`, monitoringTestRoutes);
+app.use(`${API_PREFIX}/billing`, billingRoutes);
+app.use(`${API_PREFIX}/ai`, aiRoutes);
+app.use(`${API_PREFIX}/exports`, exportRoutes);
+app.use(`${API_PREFIX}/organization`, organizationSaasRoutes);
+app.use(`${API_PREFIX}/integrations`, integrationRoutes);
+app.use(`${API_PREFIX}/questionnaires`, questionnaireRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -231,11 +254,13 @@ async function startServer() {
             logger.info(`📊 Metrics: http://0.0.0.0:${PORT}/metrics`);
         });
 
-        // Connect to databases AFTER server is listening
-        if (!DEV_MODE) {
-            logger.info('Connecting to databases...');
-            await connectDatabase();
-            logger.info('✅ Database connections established');
+        logger.info('Connecting to databases...');
+        await connectDatabase();
+        logger.info('✅ Database connections established');
+        if (DEV_MODE) {
+            logger.warn('DEV_MODE is enabled for optional services only. Authentication uses the database.');
+        }
+        if (!DEV_MODE || process.env.NODE_ENV === 'production') {
             
             // Initialize optional services (non-blocking)
             setImmediate(async () => {
@@ -314,19 +339,11 @@ async function startServer() {
             
             logger.info('✅ Graceful shutdown handlers configured');
         } else {
-            logger.warn('⚠️  Running in DEV_MODE - databases disabled, using mock data');
-            
-            // Start server in DEV_MODE
-            httpServer.listen(PORT, '0.0.0.0', () => {
-                logger.info(`🚀 Server running on port ${PORT} (DEV MODE)`);
-                logger.info(`💚 Health check: http://0.0.0.0:${PORT}/health/basic`);
-            });
+            registerDefaultHealthChecks();
+            gracefulShutdown.setupSignalHandlers();
         }
     } catch (error) {
         logger.error('Failed to start server:', error);
-        if (!DEV_MODE) {
-            logger.error('💡 Tip: Set DEV_MODE=true in .env to run without databases');
-        }
         process.exit(1);
     }
 }

@@ -7,6 +7,8 @@ import { VendorAssessment, AssessmentType, AssessmentStatus } from '@prisma/clie
 import { prisma } from '../config/database';
 import { handlePrismaError, NotFoundError } from '../utils/errors';
 import logger from '../config/logger';
+import { getActiveTemplate } from './questionnaireService';
+import { calculateVendorRiskAt, RISK_SCORE_VERSION } from './deterministicRiskEngine';
 
 export interface QuestionTemplate {
     id: string;
@@ -50,10 +52,14 @@ class VendorAssessmentService {
      * Create a new vendor assessment
      */
     async createAssessment(data: CreateAssessmentInput): Promise<VendorAssessment> {
+        const template = await getActiveTemplate(data.organizationId, data.frameworkUsed || 'Custom');
         const assessment = await prisma.vendorAssessment.create({
             data: {
                 ...data,
                 status: AssessmentStatus.NOT_STARTED,
+                templateId: template.id,
+                templateVersion: template.version,
+                scoreVersion: RISK_SCORE_VERSION,
             },
             include: {
                 vendor: {
@@ -263,16 +269,16 @@ class VendorAssessmentService {
      * Generate assessment questions from template
      */
     private async generateAssessmentQuestions(assessmentId: string, frameworkUsed: string) {
-        const template = this.getAssessmentTemplate(frameworkUsed);
-
+        const assessment = await prisma.vendorAssessment.findUnique({ where: { id: assessmentId } });
+        const template = await getActiveTemplate(assessment?.organizationId || '', frameworkUsed);
         const questions: any[] = [];
 
-        template.sections.forEach(section => {
-            section.questions.forEach(q => {
+        template.sections.forEach((section) => {
+            section.questions.forEach((q) => {
                 questions.push({
                     assessmentId,
-                    questionId: q.id,
-                    questionText: q.question,
+                    questionId: q.questionKey,
+                    questionText: q.questionText,
                     questionCategory: q.category,
                     weight: q.weight,
                     maxScore: 10,
@@ -285,7 +291,7 @@ class VendorAssessmentService {
             data: questions,
         });
 
-        logger.info(`✅ Generated ${questions.length} questions for assessment`);
+        logger.info(`Generated ${questions.length} questions from template ${template.version}`);
     }
 
     /**
@@ -358,12 +364,9 @@ class VendorAssessmentService {
     }
 
     /**
-     * Generate AI-powered recommendations
+     * Rule-based recommendations. AI analysis is a separate, labeled capability.
      */
     private async generateRecommendations(vendorId: string, gaps: any[]) {
-        // This would integrate with AI service
-        // For now, generate rule-based recommendations
-
         const recommendations = gaps.map(gap => {
             let recommendation = '';
             let priority = 'Medium';
@@ -398,19 +401,45 @@ class VendorAssessmentService {
      * Update vendor's residual risk score based on assessment
      */
     private async updateVendorRiskScore(vendorId: string, assessmentScore: number) {
-        // Risk score is inverse of assessment score
-        // High assessment score = Low risk
-        const riskScore = Math.max(0, 100 - assessmentScore);
-
+        const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } });
+        if (!vendor) return;
+        const issues = await prisma.vendorIssue.findMany({
+            where: { vendorId, status: { in: ['OPEN', 'IN_PROGRESS', 'PENDING_VALIDATION'] } },
+        });
+        const result = calculateVendorRiskAt(
+            {
+                vendorCriticality: vendor.tier,
+                dataSensitivityCount: vendor.dataTypesAccessed.length,
+                regulatoryCount: vendor.regulatoryScope.length,
+                hasSubcontractors: vendor.hasSubcontractors,
+                controlMaturity: Math.round(assessmentScore / 20),
+                questionScores: [{ score: assessmentScore, maxScore: 100, weight: 10 }],
+                openFindings: issues.map((issue) => ({ severity: issue.severity })),
+            },
+            new Date()
+        );
         await prisma.vendor.update({
             where: { id: vendorId },
             data: {
-                residualRiskScore: riskScore,
+                inherentRiskScore: result.inherentRisk,
+                residualRiskScore: result.residualRisk,
                 lastReviewDate: new Date(),
             },
         });
-
-        logger.info(`✅ Updated vendor risk score to: ${riskScore}`);
+        await prisma.scoreCalculation.create({
+            data: {
+                organizationId: vendor.organizationId,
+                vendorId,
+                scoreVersion: result.scoreVersion,
+                inherentRisk: result.inherentRisk,
+                controlEffectiveness: result.controlEffectiveness,
+                residualRisk: result.residualRisk,
+                riskBand: result.riskBand,
+                inputs: result.inputs as object,
+                explanation: result.explanation,
+            },
+        });
+        logger.info(`Updated vendor risk score using ${result.scoreVersion}`);
     }
 
     /**

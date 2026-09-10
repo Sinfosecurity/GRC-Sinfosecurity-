@@ -6,7 +6,8 @@
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgresql://localhost:5432/grc_test';
-process.env.JWT_SECRET = 'test-jwt-secret-key';
+process.env.JWT_SECRET = 'test-jwt-secret-key-which-is-long-enough';
+process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-key-which-is-long-enough';
 process.env.JWT_EXPIRES_IN = '1h';
 
 // Mock logger in tests

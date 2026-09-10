@@ -5,7 +5,7 @@
 import { Router, Request, Response } from 'express';
 import taskService from '../services/taskService';
 import { authenticate, requirePermission } from '../middleware/auth';
-import { Permission } from '../services/userService';
+import { LegacyPermission as Permission } from '../security/rbac';
 
 const router = Router();
 

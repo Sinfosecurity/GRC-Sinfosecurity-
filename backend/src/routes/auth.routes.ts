@@ -1,258 +1,164 @@
-import { Router, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import { Router, Request, Response, NextFunction } from 'express';
+import { authService } from '../services/authService';
+import { authenticate, AuthRequest } from '../middleware/auth';
+import { ApiError } from '../middleware/errorHandler';
 
 const router = Router();
 
-const DEV_MODE = process.env.DEV_MODE === 'true';
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
+function meta(req: Request) {
+    return {
+        ip: req.ip,
+        userAgent: req.get('user-agent') || undefined,
+        requestId: (req as any).id || (req.headers['x-request-id'] as string | undefined),
+    };
 }
 
-// Mock users for DEV_MODE - passwords are bcrypt hashed
-// admin@sinfosecurity.com: demo123
-// demo: demo
-const mockUsers = [
-  {
-    id: 'user-1',
-    email: 'admin@sinfosecurity.com',
-    hashedPassword: '$2b$10$08OU9WS/bk6Gun6J2/5ooOjD/oY9sUeyG94bR47dnciRxtBbM1Es6', // demo123
-    firstName: 'Admin',
-    lastName: 'User',
-    role: 'ADMIN',
-    organizationId: 'org-1',
-    organization: {
-      id: 'org-1',
-      name: 'Sinfosecurity',
-    },
-  },
-  {
-    id: 'user-2',
-    email: 'demo',
-    hashedPassword: '$2b$10$9O7Jhiani1rWIc6s4sTC9OTOmcfkoJHm5YY1rroB2NvZ3P79blQHO', // demo
-    firstName: 'Demo',
-    lastName: 'User',
-    role: 'USER',
-    organizationId: 'org-1',
-    organization: {
-      id: 'org-1',
-      name: 'Sinfosecurity',
-    },
-  },
-];
-
-// POST /api/v1/auth/register
-router.post('/register', async (req: Request, res: Response) => {
-  if (!DEV_MODE) {
-    return res.status(501).json({ 
-      success: false, 
-      error: 'Registration requires database configuration. Set DEV_MODE=false and configure DATABASE_URL.' 
-    });
-  }
-
-  const { email, password, firstName, lastName } = req.body;
-
-  // Check if user already exists
-  const existingUser = mockUsers.find(u => u.email === email);
-  if (existingUser) {
-    return res.status(400).json({ 
-      success: false, 
-      error: 'User already exists' 
-    });
-  }
-
-  // Hash password before storing
-  const hashedPassword = await bcrypt.hash(password, 10);
-  
-  // Create new mock user
-  const newUser = {
-    id: `user-${mockUsers.length + 1}`,
-    email,
-    hashedPassword,
-    firstName,
-    lastName,
-    role: 'USER' as const,
-    organizationId: 'org-1',
-    organization: {
-      id: 'org-1',
-      name: 'Sinfosecurity',
-    },
-  };
-
-  mockUsers.push(newUser);
-
-  // Generate token
-  const token = jwt.sign(
-    {
-      userId: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-      organizationId: newUser.organizationId,
-    },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  // Set token in httpOnly cookie for security
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  });
-
-  res.json({
-    success: true,
-    data: {
-      token,
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        role: newUser.role,
-        organizationId: newUser.organizationId,
-      },
-    },
-  });
-});
-
-// POST /api/v1/auth/login
-router.post('/login', async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      error: 'Email and password are required',
-    });
-  }
-
-  if (DEV_MODE) {
-    // DEV_MODE: Use mock authentication
-    const user = mockUsers.find((u) => u.email === email);
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials',
-      });
+router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, password, firstName, lastName, organizationName, country } = req.body || {};
+        if (!email || !password || !firstName || !lastName || !organizationName) {
+            throw new ApiError(400, 'Email, password, name, and organization name are required');
+        }
+        const result = await authService.signup({
+            email,
+            password,
+            firstName,
+            lastName,
+            organizationName,
+            country,
+        });
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.status(201).json({ success: true, data: result });
+    } catch (error) {
+        next(error);
     }
+});
 
-    // Verify password using bcrypt
-    const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid credentials',
-      });
+router.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, password, firstName, lastName, organizationName, country } = req.body || {};
+        if (!email || !password || !firstName || !lastName || !organizationName) {
+            throw new ApiError(400, 'Email, password, name, and organization name are required');
+        }
+        const result = await authService.signup({
+            email,
+            password,
+            firstName,
+            lastName,
+            organizationName,
+            country,
+        });
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.status(201).json({ success: true, data: result });
+    } catch (error) {
+        next(error);
     }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        organizationId: user.organizationId,
-      },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Set token in httpOnly cookie for security
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-
-    return res.json({
-      success: true,
-      data: {
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          organizationId: user.organizationId,
-        },
-      },
-    });
-  }
-
-  // Production mode requires database
-  return res.status(501).json({
-    success: false,
-    error: 'Authentication requires database configuration. Set DEV_MODE=false and configure DATABASE_URL.',
-  });
 });
 
-// POST /api/v1/auth/refresh
-router.post('/refresh', async (req: Request, res: Response) => {
-  // Get token from cookie or body
-  const token = req.cookies?.token || req.body.token;
-
-  if (!token) {
-    return res.status(400).json({
-      success: false,
-      error: 'Token is required',
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-
-    // Generate new token
-    const newToken = jwt.sign(
-      {
-        userId: decoded.userId,
-        email: decoded.email,
-        role: decoded.role,
-        organizationId: decoded.organizationId,
-      },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Set token in httpOnly cookie
-    res.cookie('token', newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-
-    res.json({
-      success: true,
-      data: { message: 'Token refreshed successfully' },
-    });
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      error: 'Invalid or expired token',
-    });
-  }
+router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, password } = req.body || {};
+        if (!email || !password) {
+            throw new ApiError(400, 'Email and password are required');
+        }
+        const result = await authService.login(email, password, meta(req));
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
 });
 
-// POST /api/v1/auth/logout
-router.post('/logout', (req: Request, res: Response) => {
-  // Clear the token cookie
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  });
+router.post('/refresh', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const refreshToken = req.body?.refreshToken || req.cookies?.refreshToken;
+        if (!refreshToken) {
+            throw new ApiError(400, 'Refresh token is required');
+        }
+        const result = await authService.refresh(refreshToken);
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+});
 
-  res.json({
-    success: true,
-    data: { message: 'Logged out successfully' },
-  });
+router.post('/logout', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        await authService.logout(req.body?.refreshToken, req.user?.id);
+        res.clearCookie('token', authService.cookieOptions());
+        res.json({ success: true, data: { message: 'Logged out successfully' } });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/me', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const user = await authService.me(req.user!.id);
+        res.json({ success: true, data: { user } });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/change-password', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { currentPassword, newPassword } = req.body || {};
+        if (!currentPassword || !newPassword) {
+            throw new ApiError(400, 'Current and new passwords are required');
+        }
+        await authService.changePassword(req.user!.id, currentPassword, newPassword);
+        res.json({ success: true, data: { message: 'Password updated' } });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/forgot-password', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email } = req.body || {};
+        if (!email) {
+            throw new ApiError(400, 'Email is required');
+        }
+        const result = await authService.requestPasswordReset(email);
+        res.json({
+            success: true,
+            data: {
+                message: 'If an account exists, a reset email will be sent.',
+                ...(result.resetToken ? { resetToken: result.resetToken } : {}),
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/reset-password', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { token, password } = req.body || {};
+        if (!token || !password) {
+            throw new ApiError(400, 'Token and password are required');
+        }
+        await authService.resetPassword(token, password);
+        res.json({ success: true, data: { message: 'Password has been reset' } });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/activate', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { token, password, firstName, lastName } = req.body || {};
+        if (!token || !password || !firstName || !lastName) {
+            throw new ApiError(400, 'Invitation token, password, and name are required');
+        }
+        const result = await authService.acceptInvitation(token, { password, firstName, lastName });
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
 });
 
 export default router;

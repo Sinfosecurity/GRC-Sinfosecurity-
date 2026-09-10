@@ -1,146 +1,93 @@
 /**
- * ServiceNow Integration
- * Create incidents and change requests in ServiceNow
+ * ServiceNow Integration — real Table API when configured. Never invents INC/CHG numbers.
  */
 
+import { providerState, IntegrationResult } from './integrationProvider';
+
 interface ServiceNowConfig {
-    instance: string; // e.g., 'yourcompany.service-now.com'
+    instance: string;
     username: string;
     password: string;
 }
 
-interface ServiceNowIncident {
-    sys_id?: string;
-    number?: string;
-    short_description: string;
-    description: string;
-    urgency: '1' | '2' | '3'; // 1=High, 2=Medium, 3=Low
-    impact: '1' | '2' | '3';
-    category?: string;
-    assigned_to?: string;
+function envConfig(): ServiceNowConfig | null {
+    if (!process.env.SERVICENOW_INSTANCE || !process.env.SERVICENOW_USER || !process.env.SERVICENOW_PASSWORD) {
+        return null;
+    }
+    return {
+        instance: process.env.SERVICENOW_INSTANCE,
+        username: process.env.SERVICENOW_USER,
+        password: process.env.SERVICENOW_PASSWORD,
+    };
 }
 
 class ServiceNowIntegration {
-    private config: ServiceNowConfig;
-    private baseUrl: string;
+    private config: ServiceNowConfig | null;
 
-    constructor(config: ServiceNowConfig) {
-        this.config = config;
-        this.baseUrl = `https://${config.instance}/api/now/table`;
+    constructor(config?: ServiceNowConfig) {
+        this.config = config || envConfig();
     }
 
-    /**
-     * Create incident in ServiceNow
-     */
-    async createIncident(incident: ServiceNowIncident): Promise<string | null> {
-        try {
-            console.log(`🎫 Creating ServiceNow incident`);
-            console.log('Short Description:', incident.short_description);
+    status() {
+        return providerState('servicenow');
+    }
 
-            // In production, make actual API call
-            // const response = await fetch(`${this.baseUrl}/incident`, {
-            //   method: 'POST',
-            //   headers: {
-            //     'Authorization': `Basic ${Buffer.from(`${this.config.username}:${this.config.password}`).toString('base64')}`,
-            //     'Content-Type': 'application/json',
-            //   },
-            //   body: JSON.stringify(incident),
-            // });
-            // const data = await response.json();
-            // return data.result.number;
+    private headers() {
+        return {
+            Authorization: `Basic ${Buffer.from(`${this.config!.username}:${this.config!.password}`).toString('base64')}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        };
+    }
 
-            const mockNumber = `INC${String(Math.floor(Math.random() * 10000)).padStart(7, '0')}`;
-            console.log(`✅ Created ServiceNow incident: ${mockNumber}`);
-            return mockNumber;
-        } catch (error) {
-            console.error('Failed to create ServiceNow incident:', error);
-            return null;
+    private async createRecord(table: string, body: Record<string, unknown>): Promise<IntegrationResult<{ number: string }>> {
+        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+            return { status: 'NOT_CONFIGURED' };
         }
+        const host = this.config.instance.replace(/\/$/, '');
+        const response = await fetch(`${host}/api/now/table/${table}`, {
+            method: 'POST',
+            headers: this.headers(),
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            return { status: 'ERROR', error: `ServiceNow returned ${response.status}` };
+        }
+        const data = (await response.json()) as { result?: { number?: string } };
+        if (!data.result?.number) {
+            return { status: 'ERROR', error: 'ServiceNow did not return a record number' };
+        }
+        return { status: 'CONNECTED', data: { number: data.result.number } };
     }
 
-    /**
-     * Create incident from GRC risk
-     */
-    async createIncidentFromRisk(risk: any): Promise<string | null> {
-        return this.createIncident({
-            short_description: `[GRC] High Risk: ${risk.title}`,
-            description: `
-Risk ID: ${risk.id}
-Severity: ${risk.severity}
-Category: ${risk.category}
-Status: ${risk.status}
-
-Description:
-${risk.description || 'No description provided'}
-
-Mitigation Plan:
-${risk.mitigationPlan || 'To be determined'}
-      `.trim(),
-            urgency: this.mapSeverityToUrgency(risk.severity),
-            impact: this.mapSeverityToImpact(risk.severity),
-            category: 'Security',
+    async createIncident(incident: { title: string; description?: string; severity?: string }) {
+        return this.createRecord('incident', {
+            short_description: incident.title,
+            description: incident.description || '',
+            urgency: incident.severity === 'CRITICAL' ? '1' : '2',
         });
     }
 
-    /**
-     * Create change request
-     */
-    async createChangeRequest(change: any): Promise<string | null> {
-        try {
-            console.log(`📋 Creating ServiceNow change request`);
-            console.log('Change:', change.title);
+    async createChange(change: { title: string; description?: string }) {
+        return this.createRecord('change_request', {
+            short_description: change.title,
+            description: change.description || '',
+        });
+    }
 
-            // Mock change request number
-            const mockNumber = `CHG${String(Math.floor(Math.random() * 10000)).padStart(7, '0')}`;
-            console.log(`✅ Created ServiceNow change request: ${mockNumber}`);
-            return mockNumber;
-        } catch (error) {
-            console.error('Failed to create change request:', error);
-            return null;
+    async testConnection() {
+        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+            return { status: 'NOT_CONFIGURED' as const };
         }
-    }
-
-    /**
-     * Update incident
-     */
-    async updateIncident(incidentNumber: string, updates: Partial<ServiceNowIncident>): Promise<boolean> {
-        try {
-            console.log(`🔄 Updating ServiceNow incident ${incidentNumber}`);
-
-            // In production, make PATCH request
-            return true;
-        } catch (error) {
-            console.error('Failed to update incident:', error);
-            return false;
-        }
-    }
-
-    /**
-     * Map GRC severity to ServiceNow urgency
-     */
-    private mapSeverityToUrgency(severity: string): '1' | '2' | '3' {
-        const mapping: Record<string, '1' | '2' | '3'> = {
-            critical: '1',
-            high: '1',
-            medium: '2',
-            low: '3',
-        };
-        return mapping[severity.toLowerCase()] || '2';
-    }
-
-    /**
-     * Map GRC severity to ServiceNow impact
-     */
-    private mapSeverityToImpact(severity: string): '1' | '2' | '3' {
-        const mapping: Record<string, '1' | '2' | '3'> = {
-            critical: '1',
-            high: '2',
-            medium: '2',
-            low: '3',
-        };
-        return mapping[severity.toLowerCase()] || '2';
+        const host = this.config.instance.replace(/\/$/, '');
+        const response = await fetch(`${host}/api/now/table/sys_user?sysparm_limit=1`, {
+            headers: this.headers(),
+        });
+        return response.ok
+            ? { status: 'CONNECTED' as const }
+            : { status: 'ERROR' as const, error: `ServiceNow returned ${response.status}` };
     }
 }
 
 export default ServiceNowIntegration;
-export { ServiceNowConfig, ServiceNowIncident };
+export { ServiceNowConfig };

@@ -133,12 +133,13 @@ router.post('/sso/saml/callback', async (req: Request, res: Response) => {
             });
         }
         
-        // Generate JWT token
-        const token = ssoService.generateJWTForSSOUser(ssoUser, 'org_demo');
-        
         res.clearCookie('saml_relay_state');
+        return res.status(503).json({
+            status: 'NOT_CONFIGURED',
+            error: 'SSO is not configured for a persistent organization',
+        });
         res.json({
-            token,
+            token: null,
             user: {
                 email: ssoUser.email,
                 name: `${ssoUser.firstName} ${ssoUser.lastName}`,
@@ -194,12 +195,13 @@ router.get('/sso/oauth/callback', async (req: Request, res: Response) => {
         // Exchange code for tokens
         const ssoUser = await ssoService.exchangeOAuth2Code(provider as string, code as string);
         
-        // Generate JWT token
-        const token = ssoService.generateJWTForSSOUser(ssoUser, 'org_demo');
-        
         res.clearCookie('oauth_state');
+        return res.status(503).json({
+            status: 'NOT_CONFIGURED',
+            error: 'SSO is not configured for a persistent organization',
+        });
         res.json({
-            token,
+            token: null,
             user: {
                 email: ssoUser.email,
                 name: `${ssoUser.firstName} ${ssoUser.lastName}`,
@@ -265,13 +267,14 @@ router.get('/sso/oidc/callback', async (req: Request, res: Response) => {
             storedNonce
         );
         
-        // Generate JWT token
-        const token = ssoService.generateJWTForSSOUser(ssoUser, 'org_demo');
-        
         res.clearCookie('oidc_state');
         res.clearCookie('oidc_nonce');
+        return res.status(503).json({
+            status: 'NOT_CONFIGURED',
+            error: 'SSO is not configured for a persistent organization',
+        });
         res.json({
-            token,
+            token: null,
             user: {
                 email: ssoUser.email,
                 name: `${ssoUser.firstName} ${ssoUser.lastName}`,
@@ -456,15 +459,9 @@ router.post('/mfa/verify-challenge', (req: Request, res: Response) => {
             // Decode temp token and generate real JWT
             const { userId, email } = JSON.parse(Buffer.from(tempToken, 'base64').toString());
             
-            const token = ssoService.generateJWTForSSOUser(
-                { email, firstName: 'User', lastName: '' },
-                'org_demo'
-            );
-            
-            res.json({
-                token,
-                user: { email },
-                message: 'MFA verification successful'
+            return res.status(503).json({
+                status: 'NOT_CONFIGURED',
+                error: 'MFA completion requires a persistent identity provider configuration',
             });
         } else {
             res.status(400).json({ error: 'Invalid verification code' });

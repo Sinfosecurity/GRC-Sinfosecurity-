@@ -2,6 +2,7 @@
  * Training & Awareness Service
  * Security awareness training, compliance learning management, campaign tracking
  */
+import logger from '../config/logger';
 
 export interface TrainingCourse {
     id: string;

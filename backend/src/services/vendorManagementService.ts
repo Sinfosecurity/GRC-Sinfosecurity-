@@ -7,6 +7,9 @@ import { Vendor, VendorTier, VendorStatus, VendorType } from '@prisma/client';
 import { prisma } from '../config/database';
 import { handlePrismaError, NotFoundError, ValidationError, BusinessLogicError } from '../utils/errors';
 import logger from '../config/logger';
+import { calculateVendorRiskAt } from './deterministicRiskEngine';
+import { assertVendorTransition } from './vendorLifecycle';
+import { recordAudit } from './auditEventService';
 
 export interface CreateVendorInput {
     name: string;
@@ -237,14 +240,23 @@ class VendorManagementService {
         organizationId: string,
         data: UpdateVendorInput
     ): Promise<Vendor> {
-        // If tier is changing, recalculate review date
+        const existing = await prisma.vendor.findFirst({
+            where: { id: vendorId, organizationId },
+        });
+        if (!existing) {
+            throw new NotFoundError('Vendor', vendorId);
+        }
+        if (data.status && data.status !== existing.status) {
+            assertVendorTransition(existing.status, data.status);
+        }
+
         let additionalData: any = {};
         if (data.tier) {
             additionalData.nextReviewDate = this.calculateNextReviewDate(data.tier);
             additionalData.criticalityLevel = this.mapTierToCriticality(data.tier);
         }
 
-        const vendor = await prisma.vendor.updateMany({
+        await prisma.vendor.updateMany({
             where: {
                 id: vendorId,
                 organizationId,
@@ -256,7 +268,16 @@ class VendorManagementService {
             },
         });
 
-        logger.info(`✅ Updated vendor: ${vendorId}`);
+        await recordAudit({
+            organizationId,
+            action: 'vendor.update',
+            resourceType: 'Vendor',
+            resourceId: vendorId,
+            result: 'success',
+            metadata: { status: data.status, tier: data.tier },
+        });
+
+        logger.info(`Updated vendor: ${vendorId}`);
         return await this.getVendorById(vendorId, organizationId) as Vendor;
     }
 
@@ -466,37 +487,16 @@ class VendorManagementService {
         dataTypes: string[],
         hasSubcontractors: boolean
     ): number {
-        let score = 0;
-
-        // Base score by tier
-        switch (tier) {
-            case VendorTier.CRITICAL:
-                score = 80;
-                break;
-            case VendorTier.HIGH:
-                score = 60;
-                break;
-            case VendorTier.MEDIUM:
-                score = 40;
-                break;
-            case VendorTier.LOW:
-                score = 20;
-                break;
-        }
-
-        // Add points for sensitive data
         const sensitiveDataTypes = ['PII', 'PHI', 'PCI', 'Financial', 'IP'];
-        const sensitiveCount = dataTypes.filter(dt =>
-            sensitiveDataTypes.includes(dt)
-        ).length;
-        score += sensitiveCount * 3;
-
-        // Add points for subcontractors (fourth-party risk)
-        if (hasSubcontractors) {
-            score += 10;
-        }
-
-        return Math.min(score, 100); // Cap at 100
+        const sensitiveCount = dataTypes.filter((dt) => sensitiveDataTypes.includes(dt)).length;
+        return calculateVendorRiskAt(
+            {
+                vendorCriticality: tier,
+                dataSensitivityCount: sensitiveCount,
+                hasSubcontractors,
+            },
+            new Date()
+        ).inherentRisk;
     }
 
     /**

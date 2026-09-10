@@ -1,14 +1,50 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { UserAccountStatus } from '@prisma/client';
 import { ApiError } from './errorHandler';
-import userService, { Permission } from '../services/userService';
+import { prisma } from '../config/database';
+import { getEnv } from '../config/env';
+import { Permission, hasAnyPermission, permissionsForRole, roleMatches } from '../security/rbac';
+import { LegacyPermission } from '../security/rbac';
+
+export interface AuthUser {
+    id: string;
+    userId: string;
+    email: string;
+    name: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    organizationId: string;
+    permissions: string[];
+}
 
 export interface AuthRequest extends Request {
-    user?: {
-        id: string;
-        email: string;
-        name: string;
-        role: string;
+    user?: AuthUser;
+}
+
+function attachUser(req: AuthRequest, user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    organizationId: string;
+    status: UserAccountStatus;
+}) {
+    if (user.status !== UserAccountStatus.ACTIVE) {
+        throw new ApiError(401, 'Invalid or expired token');
+    }
+    req.user = {
+        id: user.id,
+        userId: user.id,
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        organizationId: user.organizationId,
+        permissions: permissionsForRole(user.role),
     };
 }
 
@@ -18,45 +54,47 @@ export async function authenticate(
     next: NextFunction
 ) {
     try {
-        // Try JWT token from cookie first, then Authorization header
         let token = req.cookies?.token;
-        
         if (!token) {
             token = req.headers.authorization?.replace('Bearer ', '');
         }
-
-        if (token) {
-            if (!process.env.JWT_SECRET) {
-                throw new ApiError(500, 'JWT_SECRET not configured');
-            }
-            
-            const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
-                id: string;
-                email: string;
-                role: string;
-            };
-
-            const user = userService.getUserById(decoded.id);
-
-            if (!user || user.status !== 'active') {
-                throw new ApiError(401, 'Invalid or inactive user');
-            }
-
-            req.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            };
-
-            // Update last login
-            userService.updateLastLogin(user.id);
-        } else {
+        if (!token) {
             throw new ApiError(401, 'Authentication token required');
         }
 
+        const env = getEnv();
+        const decoded = jwt.verify(token, env.jwtSecret) as {
+            id?: string;
+            userId?: string;
+            email: string;
+            role: string;
+            organizationId?: string;
+        };
+
+        const userId = decoded.userId || decoded.id;
+        if (!userId) {
+            throw new ApiError(401, 'Invalid or expired token');
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { organization: true },
+        });
+
+        if (!user) {
+            throw new ApiError(401, 'Invalid or expired token');
+        }
+
+        if (user.organization.status === 'SUSPENDED' || user.organization.status === 'CANCELLED') {
+            throw new ApiError(403, 'Organization is not active');
+        }
+
+        attachUser(req, user);
         next();
     } catch (error) {
+        if (error instanceof ApiError) {
+            return next(error);
+        }
         next(new ApiError(401, 'Invalid or expired token'));
     }
 }
@@ -66,57 +104,39 @@ export function authorize(...roles: string[]) {
         if (!req.user) {
             return next(new ApiError(401, 'Authentication required'));
         }
-
-        if (roles.length && !roles.includes(req.user.role)) {
+        if (roles.length && !roleMatches(req.user.role, roles)) {
             return next(new ApiError(403, 'Insufficient permissions'));
         }
-
         next();
     };
 }
 
-// Alias for backward compatibility
 export const requireRole = authorize;
 
-/**
- * Check if user has required permission
- */
-export function requirePermission(...permissions: Permission[]) {
+export function requirePermission(...permissions: Array<Permission | LegacyPermission | string>) {
     return (req: AuthRequest, res: Response, next: NextFunction) => {
         if (!req.user) {
             return next(new ApiError(401, 'Authentication required'));
         }
-
-        const hasPermission = permissions.some(permission =>
-            userService.hasPermission(req.user!.id, permission)
-        );
-
-        if (!hasPermission) {
+        const needed = permissions.map((p) => String(p)) as Permission[];
+        if (!hasAnyPermission(req.user.role, needed)) {
             return next(new ApiError(403, 'Forbidden: Insufficient permissions'));
         }
-
         next();
     };
 }
 
-/**
- * Optional authentication - attaches user if available but doesn't require it
- */
 export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction) {
-    const userId = req.headers['x-user-id'] as string;
-
-    if (userId) {
-        const user = userService.getUserById(userId);
-
-        if (user && user.status === 'active') {
-            req.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-            };
-        }
+    const header = req.headers.authorization?.replace('Bearer ', '') || req.cookies?.token;
+    if (!header) {
+        return next();
     }
-
-    next();
+    authenticate(req, res, (err?: unknown) => {
+        if (err) {
+            return next();
+        }
+        next();
+    });
 }
+
+export { Permission, LegacyPermission };

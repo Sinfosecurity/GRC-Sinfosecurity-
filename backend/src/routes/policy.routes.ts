@@ -1,34 +1,55 @@
-import { Router } from 'express';
-import { authenticate } from '../middleware/auth';
+import { Router, Response, NextFunction } from 'express';
+import { prisma } from '../config/database';
+import { authenticate, AuthRequest, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
+import { tenantById, tenantWhere } from '../security/tenant';
+import { ApiError } from '../middleware/errorHandler';
 
 const router = Router();
-
-// All routes require authentication
 router.use(authenticate);
 
-// GET /policys
-router.get('/', async (req, res) => {
-  res.json({ message: 'List policys - Coming soon', data: [] });
+router.get('/', requirePermission(PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const items = await prisma.policy.findMany({
+            where: tenantWhere(req.user!.organizationId),
+            orderBy: { createdAt: 'desc' },
+            take: 200,
+        });
+        res.json({ success: true, data: items });
+    } catch (error) {
+        next(error);
+    }
 });
 
-// GET /policys/:id
-router.get('/:id', async (req, res) => {
-  res.json({ message: 'Get policy details - Coming soon', id: req.params.id });
+router.get('/:id', requirePermission(PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const item = await prisma.policy.findFirst({ where: tenantById(req.params.id, req.user!.organizationId) });
+        if (!item) throw new ApiError(404, 'Policy not found');
+        res.json({ success: true, data: item });
+    } catch (error) {
+        next(error);
+    }
 });
 
-// POST /policys
-router.post('/', async (req, res) => {
-  res.json({ message: 'Create policy - Coming soon', data: req.body });
-});
-
-// PUT /policys/:id
-router.put('/:id', async (req, res) => {
-  res.json({ message: 'Update policy - Coming soon', id: req.params.id, data: req.body });
-});
-
-// DELETE /policys/:id
-router.delete('/:id', async (req, res) => {
-  res.json({ message: 'Delete policy - Coming soon', id: req.params.id });
+router.post('/', requirePermission(PERMISSIONS['vendor.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { title, content, category } = req.body || {};
+        if (!title || !content) {
+            throw new ApiError(400, 'Title and content are required');
+        }
+        const item = await prisma.policy.create({
+            data: {
+                title,
+                content,
+                category: category || 'General',
+                ownerId: req.user!.id,
+                organizationId: req.user!.organizationId,
+            },
+        });
+        res.status(201).json({ success: true, data: item });
+    } catch (error) {
+        next(error);
+    }
 });
 
 export default router;

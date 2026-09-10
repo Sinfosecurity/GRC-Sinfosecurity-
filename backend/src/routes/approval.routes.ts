@@ -179,6 +179,7 @@ router.post('/workflows/:workflowId/steps/:stepOrder/approve',
         try {
             const workflow = await vendorApprovalWorkflow.submitApprovalDecision({
                 workflowId: req.params.workflowId,
+                organizationId: req.user.organizationId,
                 stepOrder: parseInt(req.params.stepOrder),
                 decision: req.body.decision,
                 decidedBy: req.user.id,

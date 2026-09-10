@@ -24,6 +24,7 @@ export interface CreateWorkflowInput {
 
 export interface ApprovalStepInput {
     workflowId: string;
+    organizationId: string;
     stepOrder: number;
     decision: ApprovalDecision;
     decidedBy: string;
@@ -32,6 +33,7 @@ export interface ApprovalStepInput {
     digitalSignature?: string;
     ipAddress?: string;
     userAgent?: string;
+    allowSelfApproval?: boolean;
 }
 
 class VendorApprovalWorkflowService {
@@ -149,8 +151,11 @@ class VendorApprovalWorkflowService {
         try {
             return await prisma.$transaction(async (tx) => {
                 // Get workflow
-                const workflow = await tx.vendorApprovalWorkflow.findUnique({
-                    where: { id: data.workflowId },
+                const workflow = await tx.vendorApprovalWorkflow.findFirst({
+                    where: {
+                        id: data.workflowId,
+                        organizationId: data.organizationId,
+                    },
                     include: {
                         steps: {
                             orderBy: { stepOrder: 'asc' },
@@ -160,6 +165,10 @@ class VendorApprovalWorkflowService {
 
                 if (!workflow) {
                     throw new NotFoundError('Approval Workflow', data.workflowId);
+                }
+
+                if (!data.allowSelfApproval && workflow.initiatedBy === data.decidedBy) {
+                    throw new BusinessLogicError('Self-approval is not permitted for this workflow');
                 }
 
                 // Validate workflow is not already completed

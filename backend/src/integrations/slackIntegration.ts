@@ -1,7 +1,8 @@
 /**
- * Slack Integration
- * Send notifications to Slack channels
+ * Slack Integration — real outbound webhook when configured.
  */
+
+import { providerState, testHttp, IntegrationResult } from './integrationProvider';
 
 interface SlackConfig {
     webhookUrl: string;
@@ -22,47 +23,51 @@ interface SlackAttachment {
     fields?: { title: string; value: string; short?: boolean }[];
 }
 
+function envConfig(): SlackConfig | null {
+    const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+    if (!webhookUrl) return null;
+    return {
+        webhookUrl,
+        channel: process.env.SLACK_CHANNEL,
+        username: process.env.SLACK_USERNAME || 'Supreme Risk',
+        iconEmoji: process.env.SLACK_ICON || ':shield:',
+    };
+}
+
 class SlackIntegration {
-    private config: SlackConfig;
+    private config: SlackConfig | null;
 
-    constructor(config: SlackConfig) {
-        this.config = config;
+    constructor(config?: SlackConfig) {
+        this.config = config || envConfig();
     }
 
-    /**
-     * Send message to Slack
-     */
-    async sendMessage(message: SlackMessage): Promise<boolean> {
-        try {
-            const payload = {
-                username: this.config.username || 'GRC Platform',
-                icon_emoji: this.config.iconEmoji || ':shield:',
-                channel: this.config.channel,
-                ...message,
-            };
+    status() {
+        return providerState('slack');
+    }
 
-            console.log(`📤 Sending Slack notification to ${this.config.channel || 'default channel'}`);
-            console.log('Message:', message.text);
-
-            // In production, send actual HTTP request
-            // const response = await fetch(this.config.webhookUrl, {
-            //   method: 'POST',
-            //   body: JSON.stringify(payload),
-            // });
-
-            return true;
-        } catch (error) {
-            console.error('Failed to send Slack message:', error);
-            return false;
+    async sendMessage(message: SlackMessage): Promise<IntegrationResult<{ delivered: boolean }>> {
+        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+            return { status: 'NOT_CONFIGURED' };
         }
+        const payload = {
+            username: this.config.username,
+            icon_emoji: this.config.iconEmoji,
+            channel: this.config.channel,
+            ...message,
+        };
+        const result = await testHttp(this.config.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        return result.status === 'CONNECTED'
+            ? { status: 'CONNECTED', data: { delivered: true } }
+            : { status: result.status, error: result.error };
     }
 
-    /**
-     * Send high-risk incident alert
-     */
-    async notifyHighRiskIncident(incident: any): Promise<boolean> {
+    async notifyHighRiskIncident(incident: { title: string; severity: string; status: string; category: string }) {
         return this.sendMessage({
-            text: '🚨 High Risk Incident Detected',
+            text: 'High Risk Incident Detected',
             attachments: [
                 {
                     color: 'danger',
@@ -71,49 +76,28 @@ class SlackIntegration {
                         { title: 'Severity', value: incident.severity, short: true },
                         { title: 'Status', value: incident.status, short: true },
                         { title: 'Category', value: incident.category, short: true },
-                        { title: 'Detected', value: new Date().toISOString(), short: true },
                     ],
                 },
             ],
         });
     }
 
-    /**
-     * Send compliance deadline reminder
-     */
-    async notifyComplianceDeadline(framework: string, dueDate: string): Promise<boolean> {
+    async notifyComplianceDeadline(framework: string, dueDate: string) {
         return this.sendMessage({
-            text: '⏰ Compliance Deadline Approaching',
-            attachments: [
-                {
-                    color: 'warning',
-                    title: `${framework} Compliance Review`,
-                    fields: [
-                        { title: 'Framework', value: framework, short: true },
-                        { title: 'Due Date', value: dueDate, short: true },
-                    ],
-                },
-            ],
+            text: 'Compliance Deadline Approaching',
+            attachments: [{ color: 'warning', title: `${framework} Compliance Review`, fields: [{ title: 'Due Date', value: dueDate, short: true }] }],
         });
     }
 
-    /**
-     * Send task assignment notification
-     */
-    async notifyTaskAssignment(task: any, assignee: string): Promise<boolean> {
+    async notifyTaskAssignment(task: { title: string; priority: string; dueDate: string }, assignee: string) {
         return this.sendMessage({
-            text: `📋 New task assigned to ${assignee}`,
-            attachments: [
-                {
-                    color: 'good',
-                    title: task.title,
-                    fields: [
-                        { title: 'Priority', value: task.priority, short: true },
-                        { title: 'Due Date', value: task.dueDate, short: true },
-                    ],
-                },
-            ],
+            text: `Task assigned to ${assignee}`,
+            attachments: [{ color: 'good', title: task.title, fields: [{ title: 'Priority', value: task.priority, short: true }, { title: 'Due Date', value: task.dueDate, short: true }] }],
         });
+    }
+
+    async testConnection() {
+        return this.sendMessage({ text: 'Supreme Risk connection test' });
     }
 }
 

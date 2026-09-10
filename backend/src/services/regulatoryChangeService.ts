@@ -2,6 +2,7 @@
  * Regulatory Change Management Service
  * Track regulatory changes, automated framework updates, compliance horizon scanning
  */
+import logger from '../config/logger';
 
 export interface RegulatoryChange {
     id: string;
