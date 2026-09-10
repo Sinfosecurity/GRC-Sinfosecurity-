@@ -96,6 +96,8 @@ model Organization {
   aiOperationLogs             AiOperationLog[]
   scoreCalculations           ScoreCalculation[]
   riskDecisionBriefs          RiskDecisionBrief[]
+  evidenceLinks               EvidenceLink[]
+  scoringMethodologies        ScoringMethodology[]
   subscriptionEvents          SubscriptionEvent[]
   risks                       Risk[]
   controls                    Control[]
@@ -2104,6 +2106,7 @@ model StoredObject {
   scanStatus     ScanStatus   @default(NOT_CONFIGURED)
   retentionStatus String      @default("ACTIVE")
   deletedAt      DateTime?
+  evidenceLinks  EvidenceLink[]
 
   @@index([organizationId])
   @@index([ownerType, ownerId])
@@ -2295,4 +2298,40 @@ model SubscriptionEvent {
   processedAt    DateTime     @default(now())
 
   @@index([organizationId])
+}
+
+model EvidenceLink {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  storedObject   StoredObject @relation(fields: [storedObjectId], references: [id], onDelete: Cascade)
+  storedObjectId String
+  vendorId       String?
+  assessmentId   String?
+  issueId        String?
+  questionId     String?
+  createdBy      String
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId])
+  @@index([storedObjectId])
+  @@index([vendorId])
+  @@index([assessmentId])
+  @@index([issueId])
+}
+
+model ScoringMethodology {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  version        String
+  name           String
+  isActive       Boolean      @default(true)
+  weights        Json
+  notes          String?
+  createdBy      String
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, version])
+  @@index([organizationId, isActive])
 }

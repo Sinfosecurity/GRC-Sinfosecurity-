@@ -126,6 +126,20 @@ class VendorIssueService {
         });
     }
 
+    async listOrganizationIssues(organizationId: string, filters?: { status?: VendorIssueStatus; severity?: IssueSeverity; vendorId?: string }) {
+        return prisma.vendorIssue.findMany({
+            where: {
+                organizationId,
+                ...(filters?.status ? { status: filters.status } : {}),
+                ...(filters?.severity ? { severity: filters.severity } : {}),
+                ...(filters?.vendorId ? { vendorId: filters.vendorId } : {}),
+            },
+            include: { vendor: { select: { id: true, name: true, tier: true } } },
+            orderBy: [{ severity: 'desc' }, { identifiedDate: 'desc' }],
+            take: 300,
+        });
+    }
+
     /**
      * Update Corrective Action Plan (CAP)
      */

@@ -9,6 +9,7 @@ import { objectStorageService } from '../services/objectStorageService';
 import { prisma } from '../config/database';
 import { tenantWhere } from '../security/tenant';
 import { monitoringCredentialsConfigured, resolveMonitoringProviderStatus } from '../services/monitoringProviderStatus';
+import tprmOperationsRoutes from './tprm.operations.routes';
 
 const router = Router();
 router.use(authenticate);
@@ -157,5 +158,7 @@ router.get('/monitoring/signals', requirePermission(PERMISSIONS['monitoring.read
         next(error);
     }
 });
+
+router.use(tprmOperationsRoutes);
 
 export default router;

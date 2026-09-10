@@ -349,25 +349,25 @@ describe('API Service', () => {
 
     it('gets vendor assessments', async () => {
       await vendorAPI.getAssessments('vendor-123');
-      expect(api.get).toHaveBeenCalledWith('/vendors/vendor-123/assessments');
+      expect(api.get).toHaveBeenCalledWith('/tprm/vendors/vendor-123/assessments');
     });
 
     it('creates vendor assessment', async () => {
       const assessmentData = { type: 'security', dueDate: '2025-12-31' };
       await vendorAPI.createAssessment('vendor-123', assessmentData);
-      expect(api.post).toHaveBeenCalledWith('/vendors/vendor-123/assessments', assessmentData);
+      expect(api.post).toHaveBeenCalledWith('/tprm/vendors/vendor-123/assessments', assessmentData);
     });
 
     it('gets assessment by id', async () => {
       await vendorAPI.getAssessmentById('vendor-123', 'assessment-456');
-      expect(api.get).toHaveBeenCalledWith('/vendors/vendor-123/assessments/assessment-456');
+      expect(api.get).toHaveBeenCalledWith('/tprm/vendors/vendor-123/assessments/assessment-456');
     });
 
     it('submits assessment response', async () => {
       const responseData = { answers: [{ questionId: '1', answer: 'yes' }] };
       await vendorAPI.submitResponse('vendor-123', 'assessment-456', responseData);
       expect(api.post).toHaveBeenCalledWith(
-        '/vendors/vendor-123/assessments/assessment-456/responses', 
+        '/tprm/vendors/vendor-123/assessments/assessment-456/responses', 
         responseData
       );
     });
@@ -375,7 +375,7 @@ describe('API Service', () => {
     it('completes assessment', async () => {
       await vendorAPI.completeAssessment('vendor-123', 'assessment-456');
       expect(api.post).toHaveBeenCalledWith(
-        '/vendors/vendor-123/assessments/assessment-456/complete'
+        '/tprm/vendors/vendor-123/assessments/assessment-456/complete'
       );
     });
   });

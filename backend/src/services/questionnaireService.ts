@@ -67,3 +67,15 @@ export async function listTemplates(organizationId: string) {
         orderBy: { updatedAt: 'desc' },
     });
 }
+
+export async function getTemplateById(organizationId: string, templateId: string) {
+    await ensureDefaultQuestionnaire();
+    return prisma.questionnaireTemplate.findFirst({
+        where: {
+            id: templateId,
+            isActive: true,
+            OR: [{ organizationId }, { organizationId: null }],
+        },
+        include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
+    });
+}

@@ -7,6 +7,28 @@ export const RISK_SCORE_VERSION = 'supreme-risk-1.1.0';
 
 export type FindingSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
+export type ScoringWeights = {
+    tierBase?: Partial<Record<'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW', number>>;
+    dataSensitivityMultiplier?: number;
+    regulatoryMultiplier?: number;
+    fourthPartyPoints?: number;
+    findingPoints?: Partial<Record<FindingSeverity, number>>;
+    monitoringEventPoints?: number;
+    monitoringEventCap?: number;
+    compensatingControlPoints?: number;
+};
+
+export const DEFAULT_SCORING_WEIGHTS: Required<ScoringWeights> = {
+    tierBase: { CRITICAL: 80, HIGH: 60, MEDIUM: 40, LOW: 20 },
+    dataSensitivityMultiplier: 3,
+    regulatoryMultiplier: 2,
+    fourthPartyPoints: 10,
+    findingPoints: { CRITICAL: 12, HIGH: 8, MEDIUM: 4, LOW: 2 },
+    monitoringEventPoints: 2,
+    monitoringEventCap: 10,
+    compensatingControlPoints: 3,
+};
+
 export type RiskEngineInput = {
     questionScores?: Array<{ score: number; maxScore: number; weight: number }>;
     categoryWeights?: Record<string, number>;
@@ -18,6 +40,8 @@ export type RiskEngineInput = {
     openFindings?: Array<{ severity: FindingSeverity }>;
     monitoringEvents?: number;
     compensatingControls?: number;
+    methodology?: ScoringWeights;
+    methodologyVersion?: string;
 };
 
 export type RiskFactorGroup = 'inherent' | 'control' | 'residual';
@@ -42,19 +66,19 @@ export type RiskEngineResult = {
     calculatedAt: string;
 };
 
-const TIER_BASE: Record<string, number> = {
-    CRITICAL: 80,
-    HIGH: 60,
-    MEDIUM: 40,
-    LOW: 20,
-};
-
-const FINDING_POINTS: Record<FindingSeverity, number> = {
-    CRITICAL: 12,
-    HIGH: 8,
-    MEDIUM: 4,
-    LOW: 2,
-};
+function resolveWeights(input: RiskEngineInput): Required<ScoringWeights> {
+    const methodology = input.methodology || {};
+    return {
+        tierBase: { ...DEFAULT_SCORING_WEIGHTS.tierBase, ...methodology.tierBase },
+        dataSensitivityMultiplier: methodology.dataSensitivityMultiplier ?? DEFAULT_SCORING_WEIGHTS.dataSensitivityMultiplier,
+        regulatoryMultiplier: methodology.regulatoryMultiplier ?? DEFAULT_SCORING_WEIGHTS.regulatoryMultiplier,
+        fourthPartyPoints: methodology.fourthPartyPoints ?? DEFAULT_SCORING_WEIGHTS.fourthPartyPoints,
+        findingPoints: { ...DEFAULT_SCORING_WEIGHTS.findingPoints, ...methodology.findingPoints },
+        monitoringEventPoints: methodology.monitoringEventPoints ?? DEFAULT_SCORING_WEIGHTS.monitoringEventPoints,
+        monitoringEventCap: methodology.monitoringEventCap ?? DEFAULT_SCORING_WEIGHTS.monitoringEventCap,
+        compensatingControlPoints: methodology.compensatingControlPoints ?? DEFAULT_SCORING_WEIGHTS.compensatingControlPoints,
+    };
+}
 
 function clamp(value: number, min = 0, max = 100): number {
     return Math.max(min, Math.min(max, Math.round(value)));
@@ -69,9 +93,10 @@ function band(score: number): RiskEngineResult['riskBand'] {
 
 export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
     const tier = input.vendorCriticality || 'MEDIUM';
+    const weights = resolveWeights(input);
     const factors: RiskFactor[] = [];
 
-    const criticalityPoints = TIER_BASE[tier] ?? 40;
+    const criticalityPoints = weights.tierBase[tier] ?? 40;
     factors.push({
         code: 'criticality',
         label: `${tier} business criticality`,
@@ -80,25 +105,25 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
         rationale: `Base inherent score for ${tier} tier vendors`,
     });
 
-    const dataPoints = (input.dataSensitivityCount || 0) * 3;
+    const dataPoints = (input.dataSensitivityCount || 0) * weights.dataSensitivityMultiplier;
     factors.push({
         code: 'data_sensitivity',
         label: 'Sensitive data exposure',
         group: 'inherent',
         points: dataPoints,
-        rationale: `${input.dataSensitivityCount || 0} sensitive data types × 3`,
+        rationale: `${input.dataSensitivityCount || 0} sensitive data types × ${weights.dataSensitivityMultiplier}`,
     });
 
-    const regulatoryPoints = (input.regulatoryCount || 0) * 2;
+    const regulatoryPoints = (input.regulatoryCount || 0) * weights.regulatoryMultiplier;
     factors.push({
         code: 'regulatory_scope',
         label: 'Regulatory exposure',
         group: 'inherent',
         points: regulatoryPoints,
-        rationale: `${input.regulatoryCount || 0} regulatory scopes × 2`,
+        rationale: `${input.regulatoryCount || 0} regulatory scopes × ${weights.regulatoryMultiplier}`,
     });
 
-    const fourthPartyPoints = input.hasSubcontractors ? 10 : 0;
+    const fourthPartyPoints = input.hasSubcontractors ? weights.fourthPartyPoints : 0;
     factors.push({
         code: 'fourth_party',
         label: 'Fourth-party / subcontractor exposure',
@@ -127,7 +152,7 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
     if (typeof input.controlMaturity === 'number') {
         controlEffectiveness = (controlEffectiveness + clamp(input.controlMaturity * 20, 0, 100)) / 2;
     }
-    controlEffectiveness += (input.compensatingControls || 0) * 3;
+    controlEffectiveness += (input.compensatingControls || 0) * weights.compensatingControlPoints;
     controlEffectiveness = clamp(controlEffectiveness);
 
     const afterControls = inherent * (1 - controlEffectiveness / 140);
@@ -141,7 +166,7 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
 
     let residual = afterControls;
     for (const finding of input.openFindings || []) {
-        const points = FINDING_POINTS[finding.severity] || 0;
+        const points = weights.findingPoints[finding.severity] || 0;
         residual += points;
         factors.push({
             code: `finding_${finding.severity.toLowerCase()}`,
@@ -151,14 +176,15 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
             rationale: `Open ${finding.severity} finding adds ${points}`,
         });
     }
-    const monitoringPoints = Math.min(input.monitoringEvents || 0, 10) * 2;
+    const monitoringCap = weights.monitoringEventCap;
+    const monitoringPoints = Math.min(input.monitoringEvents || 0, monitoringCap) * weights.monitoringEventPoints;
     residual += monitoringPoints;
     factors.push({
         code: 'monitoring_events',
         label: 'Monitoring events',
         group: 'residual',
         points: monitoringPoints,
-        rationale: `${Math.min(input.monitoringEvents || 0, 10)} capped events × 2`,
+        rationale: `${Math.min(input.monitoringEvents || 0, monitoringCap)} capped events × ${weights.monitoringEventPoints}`,
     });
     residual = clamp(residual);
 
@@ -172,6 +198,7 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
         `${input.monitoringEvents || 0} monitoring events`,
         `residual risk ${residual} (${band(residual)})`,
         `score version ${RISK_SCORE_VERSION}`,
+        input.methodologyVersion ? `methodology ${input.methodologyVersion}` : 'default methodology',
     ].join('; ');
 
     return {

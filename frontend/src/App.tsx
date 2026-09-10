@@ -39,6 +39,9 @@ const Billing = lazy(() => import('./pages/Billing'));
 const Integrations = lazy(() => import('./pages/Integrations'));
 const DecisionBriefs = lazy(() => import('./pages/DecisionBriefs'));
 const ContinuousMonitoring = lazy(() => import('./pages/ContinuousMonitoring'));
+const Assessments = lazy(() => import('./pages/Assessments'));
+const FindingsRemediation = lazy(() => import('./pages/FindingsRemediation'));
+const Questionnaires = lazy(() => import('./pages/Questionnaires'));
 
 // Loading component
 const LoadingFallback = () => (
@@ -78,11 +81,11 @@ export default function App() {
                     <Route path="predictive-analytics" element={<PredictiveAnalytics />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="vendor-management" element={<VendorManagement />} />
-                    <Route path="assessments" element={<VendorManagement />} />
-                    <Route path="findings" element={<VendorManagement />} />
+                    <Route path="assessments" element={<Assessments />} />
+                    <Route path="findings" element={<FindingsRemediation />} />
                     <Route path="decision-briefs" element={<DecisionBriefs />} />
                     <Route path="monitoring" element={<ContinuousMonitoring />} />
-                    <Route path="questionnaires" element={<VendorManagement />} />
+                    <Route path="questionnaires" element={<Questionnaires />} />
                     <Route path="billing" element={<Billing />} />
                     <Route path="integrations" element={<Integrations />} />
                     <Route path="soc-reports" element={<SOCReports />} />

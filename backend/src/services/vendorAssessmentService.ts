@@ -7,7 +7,8 @@ import { VendorAssessment, AssessmentType, AssessmentStatus } from '@prisma/clie
 import { prisma } from '../config/database';
 import { handlePrismaError, NotFoundError } from '../utils/errors';
 import logger from '../config/logger';
-import { getActiveTemplate } from './questionnaireService';
+import { getActiveTemplate, getTemplateById } from './questionnaireService';
+import { ApiError } from '../middleware/errorHandler';
 import { calculateVendorRiskAt, RISK_SCORE_VERSION } from './deterministicRiskEngine';
 
 export interface QuestionTemplate {
@@ -37,13 +38,18 @@ export interface CreateAssessmentInput {
     frameworkUsed?: string;
     assignedTo?: string;
     dueDate?: Date;
+    templateId?: string;
 }
 
 export interface SubmitAssessmentResponseInput {
     assessmentId: string;
+    organizationId: string;
+    vendorId?: string;
     questionId: string;
-    response: string;
+    response?: string;
+    answer?: string;
     notes?: string;
+    reviewerComment?: string;
     evidenceIds?: string[];
 }
 
@@ -52,10 +58,16 @@ class VendorAssessmentService {
      * Create a new vendor assessment
      */
     async createAssessment(data: CreateAssessmentInput): Promise<VendorAssessment> {
-        const template = await getActiveTemplate(data.organizationId, data.frameworkUsed || 'Custom');
+        const { templateId, ...rest } = data;
+        const template = templateId
+            ? await getTemplateById(data.organizationId, templateId)
+            : await getActiveTemplate(data.organizationId, data.frameworkUsed || 'Custom');
+        if (!template) {
+            throw new ApiError(404, 'Questionnaire template not found');
+        }
         const assessment = await prisma.vendorAssessment.create({
             data: {
-                ...data,
+                ...rest,
                 status: AssessmentStatus.NOT_STARTED,
                 templateId: template.id,
                 templateVersion: template.version,
@@ -71,8 +83,7 @@ class VendorAssessmentService {
             },
         });
 
-        // Generate assessment questions based on template
-        await this.generateAssessmentQuestions(assessment.id, data.frameworkUsed || 'Custom');
+        await this.generateAssessmentQuestionsFromTemplate(assessment.id, template);
 
         logger.info(`✅ Created assessment for vendor: ${assessment.vendor.name}`);
         return assessment;
@@ -120,19 +131,39 @@ class VendorAssessmentService {
         });
     }
 
+    async listOrganizationAssessments(organizationId: string) {
+        return prisma.vendorAssessment.findMany({
+            where: { organizationId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                vendor: { select: { id: true, name: true, tier: true } },
+                _count: { select: { responses: true, evidence: true } },
+            },
+            take: 200,
+        });
+    }
+
     /**
      * Submit response to assessment question
      */
     async submitResponse(data: SubmitAssessmentResponseInput, respondedBy: string) {
-        const assessment = await prisma.vendorAssessment.findUnique({
-            where: { id: data.assessmentId },
+        const assessment = await prisma.vendorAssessment.findFirst({
+            where: {
+                id: data.assessmentId,
+                organizationId: data.organizationId,
+                ...(data.vendorId ? { vendorId: data.vendorId } : {}),
+            },
         });
 
         if (!assessment) {
-            throw new Error('Assessment not found');
+            throw new ApiError(404, 'Assessment not found');
         }
 
-        // Find or create response
+        const answer = (data.response || data.answer || '').trim();
+        if (!answer) {
+            throw new ApiError(400, 'Response is required');
+        }
+
         const existingResponse = await prisma.assessmentResponse.findFirst({
             where: {
                 assessmentId: data.assessmentId,
@@ -140,59 +171,57 @@ class VendorAssessmentService {
             },
         });
 
-        // Calculate score based on response
-        const score = this.calculateResponseScore(data.response);
+        const score = this.calculateResponseScore(answer);
 
         if (existingResponse) {
-            // Update existing response
             await prisma.assessmentResponse.update({
                 where: { id: existingResponse.id },
                 data: {
-                    response: data.response,
+                    response: answer,
                     notes: data.notes,
+                    reviewerComment: data.reviewerComment,
                     score,
                     respondedBy,
                     respondedAt: new Date(),
                 },
             });
         } else {
-            // Create new response
             await prisma.assessmentResponse.create({
                 data: {
                     assessmentId: data.assessmentId,
                     questionId: data.questionId,
-                    response: data.response,
+                    response: answer,
                     notes: data.notes,
+                    reviewerComment: data.reviewerComment,
                     score,
                     respondedBy,
                     respondedAt: new Date(),
-                    questionText: '', // Will be populated from template
+                    questionText: '',
                     questionCategory: '',
                     maxScore: 10,
                 },
             });
         }
 
-        // Update assessment status if it was NOT_STARTED
         if (assessment.status === AssessmentStatus.NOT_STARTED) {
             await prisma.vendorAssessment.update({
-                where: { id: data.assessmentId },
+                where: { id: assessment.id },
                 data: { status: AssessmentStatus.IN_PROGRESS },
             });
         }
 
         logger.info(`✅ Response submitted for question: ${data.questionId}`);
+        return this.getAssessmentById(data.assessmentId, data.organizationId);
     }
 
     /**
      * Complete assessment and calculate final scores
      */
-    async completeAssessment(assessmentId: string, completedBy: string) {
+    async completeAssessment(assessmentId: string, completedBy: string, organizationId?: string) {
         try {
-            // Use transaction to ensure assessment completion and vendor update are atomic
             const result = await prisma.$transaction(async (tx) => {
                 const assessment = await tx.vendorAssessment.findFirst({
-                    where: { id: assessmentId },
+                    where: { id: assessmentId, ...(organizationId ? { organizationId } : {}) },
                     include: {
                         _count: { select: { evidence: true } },
                     },
@@ -202,16 +231,10 @@ class VendorAssessmentService {
                     throw new NotFoundError('Assessment', assessmentId);
                 }
 
-                // Calculate scores by category
                 const scores = await this.calculateAssessmentScores(assessmentId);
-
-                // Identify gaps (questions with low scores)
                 const gaps = await this.identifyGaps(assessmentId);
-
-                // Generate AI recommendations
                 const recommendations = await this.generateRecommendations(assessment.vendorId, gaps);
 
-                // Update assessment with final results
                 const updated = await tx.vendorAssessment.update({
                     where: { id: assessmentId },
                     data: {
@@ -229,14 +252,10 @@ class VendorAssessmentService {
                     },
                 });
 
-                // Update vendor's residual risk score atomically
-                const newRiskScore = Math.max(0, 100 - scores.overall);
-                await tx.vendor.update({
-                    where: { id: assessment.vendorId },
+                await tx.vendor.updateMany({
+                    where: { id: assessment.vendorId, organizationId: assessment.organizationId },
                     data: {
-                        residualRiskScore: newRiskScore,
                         lastReviewDate: new Date(),
-                        updatedAt: new Date(),
                     },
                 });
 
@@ -249,7 +268,6 @@ class VendorAssessmentService {
                 completedBy,
             });
 
-            // Record risk history snapshot
             const vendorRiskHistory = await import('./vendorRiskHistory');
             await vendorRiskHistory.default.recordRiskSnapshot(
                 result.updated.vendorId,
@@ -258,11 +276,31 @@ class VendorAssessmentService {
                 completedBy
             );
 
+            const { explainableRiskService } = await import('./explainableRiskService');
+            await explainableRiskService.recalculate(result.updated.organizationId, result.updated.vendorId);
+
             return result.updated;
         } catch (error: any) {
             logger.error('Failed to complete assessment', { error: error.message, assessmentId });
-            throw error instanceof NotFoundError ? error : handlePrismaError(error);
+            throw error instanceof NotFoundError || error instanceof ApiError ? error : handlePrismaError(error);
         }
+    }
+
+    private async generateAssessmentQuestionsFromTemplate(assessmentId: string, template: { version: string; sections: Array<{ questions: Array<{ questionKey: string; questionText: string; category: string; weight: number; evidenceRequired: boolean }> }> }) {
+        const questions = template.sections.flatMap((section) =>
+            section.questions.map((q) => ({
+                assessmentId,
+                questionId: q.questionKey,
+                questionText: q.questionText,
+                questionCategory: q.category,
+                weight: q.weight,
+                maxScore: 10,
+                evidenceRequired: q.evidenceRequired || false,
+            }))
+        );
+
+        await prisma.assessmentResponse.createMany({ data: questions });
+        logger.info(`Generated ${questions.length} questions from template ${template.version}`);
     }
 
     /**
@@ -271,27 +309,7 @@ class VendorAssessmentService {
     private async generateAssessmentQuestions(assessmentId: string, frameworkUsed: string) {
         const assessment = await prisma.vendorAssessment.findUnique({ where: { id: assessmentId } });
         const template = await getActiveTemplate(assessment?.organizationId || '', frameworkUsed);
-        const questions: any[] = [];
-
-        template.sections.forEach((section) => {
-            section.questions.forEach((q) => {
-                questions.push({
-                    assessmentId,
-                    questionId: q.questionKey,
-                    questionText: q.questionText,
-                    questionCategory: q.category,
-                    weight: q.weight,
-                    maxScore: 10,
-                    evidenceRequired: q.evidenceRequired || false,
-                });
-            });
-        });
-
-        await prisma.assessmentResponse.createMany({
-            data: questions,
-        });
-
-        logger.info(`Generated ${questions.length} questions from template ${template.version}`);
+        await this.generateAssessmentQuestionsFromTemplate(assessmentId, template);
     }
 
     /**
@@ -418,8 +436,8 @@ class VendorAssessmentService {
             },
             new Date()
         );
-        await prisma.vendor.update({
-            where: { id: vendorId },
+        await prisma.vendor.updateMany({
+            where: { id: vendorId, organizationId: vendor.organizationId },
             data: {
                 inherentRiskScore: result.inherentRisk,
                 residualRiskScore: result.residualRisk,

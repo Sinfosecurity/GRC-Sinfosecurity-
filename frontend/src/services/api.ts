@@ -161,8 +161,39 @@ export const tprmAPI = {
     generateBrief: (vendorId: string) => api.post(`/tprm/vendors/${vendorId}/decision-briefs`),
     getBrief: (briefId: string) => api.get(`/tprm/decision-briefs/${briefId}`),
     decideBrief: (briefId: string, data: unknown) => api.post(`/tprm/decision-briefs/${briefId}/decide`, data),
+    downloadBriefPdf: (briefId: string) => api.get(`/tprm/decision-briefs/${briefId}/pdf`, { responseType: 'blob' }),
     evidence: (vendorId?: string) => api.get('/tprm/evidence', { params: vendorId ? { vendorId } : undefined }),
+    uploadEvidence: (form: FormData) =>
+        api.post('/tprm/evidence/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } }),
     monitoringSignals: () => api.get('/tprm/monitoring/signals'),
+    questionnaires: () => api.get('/tprm/questionnaires'),
+    listAssessments: () => api.get('/tprm/assessments'),
+    listVendorAssessments: (vendorId: string) => api.get(`/tprm/vendors/${vendorId}/assessments`),
+    createAssessment: (vendorId: string, data: unknown) => api.post(`/tprm/vendors/${vendorId}/assessments`, data),
+    getAssessment: (vendorId: string, assessmentId: string) =>
+        api.get(`/tprm/vendors/${vendorId}/assessments/${assessmentId}`),
+    submitAssessmentResponse: (vendorId: string, assessmentId: string, data: unknown) =>
+        api.post(`/tprm/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
+    completeAssessment: (vendorId: string, assessmentId: string) =>
+        api.post(`/tprm/vendors/${vendorId}/assessments/${assessmentId}/complete`),
+    listFindings: (params?: unknown) => api.get('/tprm/findings', { params }),
+    createFinding: (vendorId: string, data: unknown) => api.post(`/tprm/vendors/${vendorId}/findings`, data),
+    updateFindingCap: (issueId: string, data: unknown) => api.post(`/tprm/findings/${issueId}/cap`, data),
+    validateFinding: (issueId: string, data: unknown) => api.post(`/tprm/findings/${issueId}/validate`, data),
+    closeFinding: (issueId: string, data: unknown) => api.post(`/tprm/findings/${issueId}/close`, data),
+    scoringMethodology: () => api.get('/tprm/scoring-methodology'),
+    publishScoringMethodology: (data: unknown) => api.put('/tprm/scoring-methodology', data),
+    downloadExecutivePdf: (params?: unknown) => api.get('/tprm/reports/executive.pdf', { responseType: 'blob', params }),
+    downloadScorecardPdf: (vendorId: string) =>
+        api.get(`/tprm/reports/vendors/${vendorId}/scorecard.pdf`, { responseType: 'blob' }),
+    downloadAssessmentPdf: (assessmentId: string) =>
+        api.get(`/tprm/reports/assessments/${assessmentId}/pdf`, { responseType: 'blob' }),
+    downloadFindings: (format: 'pdf' | 'csv' | 'xlsx', params?: unknown) =>
+        api.get(`/tprm/reports/findings.${format}`, { responseType: 'blob', params }),
+    downloadMonitoring: (format: 'pdf' | 'csv', params?: unknown) =>
+        api.get(`/tprm/reports/monitoring.${format}`, { responseType: 'blob', params }),
+    downloadBoard: (format: 'pdf' | 'pptx', params?: unknown) =>
+        api.get(`/tprm/reports/board.${format}`, { responseType: 'blob', params }),
 };
 
 export const vendorAPI = {
@@ -174,14 +205,14 @@ export const vendorAPI = {
     getStatistics: () => api.get('/vendors/statistics'),
     getRequiringAttention: () => api.get('/vendors/attention'),
     offboard: (id: string, data: unknown) => api.post(`/vendors/${id}/offboard`, data),
-    getAssessments: (vendorId: string) => api.get(`/vendors/${vendorId}/assessments`),
-    createAssessment: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/assessments`, data),
+    getAssessments: (vendorId: string) => api.get(`/tprm/vendors/${vendorId}/assessments`),
+    createAssessment: (vendorId: string, data: unknown) => api.post(`/tprm/vendors/${vendorId}/assessments`, data),
     getAssessmentById: (vendorId: string, assessmentId: string) =>
-        api.get(`/vendors/${vendorId}/assessments/${assessmentId}`),
+        api.get(`/tprm/vendors/${vendorId}/assessments/${assessmentId}`),
     submitResponse: (vendorId: string, assessmentId: string, data: unknown) =>
-        api.post(`/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
+        api.post(`/tprm/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
     completeAssessment: (vendorId: string, assessmentId: string) =>
-        api.post(`/vendors/${vendorId}/assessments/${assessmentId}/complete`),
+        api.post(`/tprm/vendors/${vendorId}/assessments/${assessmentId}/complete`),
     getContracts: (vendorId: string) => api.get(`/vendors/${vendorId}/contracts`),
     createContract: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/contracts`, data),
     getIssues: (vendorId: string) => api.get(`/vendors/${vendorId}/issues`),

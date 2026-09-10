@@ -1,479 +1,127 @@
-import { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Grid,
-    Card,
-    CardContent,
-    Button,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Chip,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper
-} from '@mui/material';
-import { Download, PictureAsPdf, TableChart, Assessment } from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { tprmAPI, vendorAPI } from '../services/api';
+import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 
-interface Report {
-    id: number;
+type CatalogItem = {
+    id: string;
     name: string;
-    type: string;
     description: string;
-    lastGenerated: string;
-    frequency: string;
-}
-
-const reportTemplates: Report[] = [
-    {
-        id: 1,
-        name: 'Executive Compliance Summary',
-        type: 'Executive',
-        description: 'High-level compliance posture for leadership',
-        lastGenerated: '2024-12-10',
-        frequency: 'Monthly'
-    },
-    {
-        id: 2,
-        name: 'Risk Assessment Report',
-        type: 'Risk',
-        description: 'Detailed risk analysis and trends',
-        lastGenerated: '2024-12-08',
-        frequency: 'Quarterly'
-    },
-    {
-        id: 3,
-        name: 'Control Effectiveness Report',
-        type: 'Controls',
-        description: 'Control maturity and testing results',
-        lastGenerated: '2024-12-05',
-        frequency: 'Quarterly'
-    },
-    {
-        id: 4,
-        name: 'Vendor Risk Assessment',
-        type: 'Vendor',
-        description: 'Third-party risk summary',
-        lastGenerated: '2024-12-01',
-        frequency: 'Monthly'
-    },
-    {
-        id: 5,
-        name: 'Incident Response Summary',
-        type: 'Incident',
-        description: 'Security incidents and response metrics',
-        lastGenerated: '2024-12-12',
-        frequency: 'Weekly'
-    },
-    {
-        id: 6,
-        name: 'Audit Readiness Report',
-        type: 'Audit',
-        description: 'Comprehensive audit preparation',
-        lastGenerated: '2024-11-30',
-        frequency: 'On-Demand'
-    }
-];
-
-const reportTypes = ['All', 'Executive', 'Risk', 'Controls', 'Vendor', 'Incident', 'Audit'];
-// const frequencies = ['Weekly', 'Monthly', 'Quarterly', 'Annually', 'On-Demand'];
-const formats = ['PDF', 'Excel', 'CSV', 'HTML'];
-
-const getTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-        'Executive': '#667eea',
-        'Risk': '#f5576c',
-        'Controls': '#43e97b',
-        'Vendor': '#00f2fe',
-        'Incident': '#fa709a',
-        'Audit': '#fee140'
-    };
-    return colors[type] || '#667eea';
+    formats: string[];
+    requiresVendor?: boolean;
+    requiresAssessment?: boolean;
 };
 
+const catalog: CatalogItem[] = [
+    { id: 'executive', name: 'Executive report', description: 'Portfolio overview, attention, trend, top risk vendors, recommendations.', formats: ['PDF'] },
+    { id: 'scorecard', name: 'Vendor scorecard', description: 'Profile, score, trend, assessments, evidence, findings, monitoring, decision status.', formats: ['PDF'], requiresVendor: true },
+    { id: 'assessment', name: 'Assessment report', description: 'Persisted questionnaire, responses, scoring, evidence, gaps, outcome.', formats: ['PDF'], requiresAssessment: true },
+    { id: 'findings', name: 'Findings report', description: 'Vendor, severity, owner, age, remediation, evidence, risk acceptance.', formats: ['PDF', 'CSV', 'XLSX'] },
+    { id: 'monitoring', name: 'Monitoring report', description: 'Provider status plus recorded VendorMonitoring signals only.', formats: ['PDF', 'CSV'] },
+    { id: 'board', name: 'Board report', description: 'Executive summary, heatmap, trend, findings, decisions, recommendations.', formats: ['PDF', 'PPTX'] },
+];
+
 export default function Reports() {
-    const [filterType, setFilterType] = useState('All');
-    const [openGenerateDialog, setOpenGenerateDialog] = useState(false);
-    const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-    const [generateConfig, setGenerateConfig] = useState({
-        format: 'PDF',
-        dateRange: '30',
-        includeCharts: true,
-        includeDetails: true
-    });
+    const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
+    const [assessments, setAssessments] = useState<Array<{ id: string; vendor?: { name: string }; assessmentType: string }>>([]);
+    const [vendorId, setVendorId] = useState('');
+    const [assessmentId, setAssessmentId] = useState('');
+    const [busyId, setBusyId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
-    const filteredReports = reportTemplates.filter(
-        report => filterType === 'All' || report.type === filterType
-    );
+    useEffect(() => {
+        Promise.all([vendorAPI.getAll(), tprmAPI.listAssessments()])
+            .then(([vendorRes, assessmentRes]) => {
+                const vendorRows = vendorRes.data.vendors || vendorRes.data.data || vendorRes.data || [];
+                setVendors(Array.isArray(vendorRows) ? vendorRows : []);
+                setAssessments(assessmentRes.data.data || []);
+            })
+            .catch((err) => setError(err.message));
+    }, []);
 
-    const handleGenerateReport = (report: Report) => {
-        setSelectedReport(report);
-        setOpenGenerateDialog(true);
+    const unavailableReason = (item: CatalogItem) => {
+        if (item.requiresVendor && !vendorId) return 'Select a vendor before generating a scorecard.';
+        if (item.requiresAssessment && !assessmentId) return 'Select a persisted assessment before generating this report.';
+        return null;
     };
 
-    const handleConfirmGenerate = () => {
-        // In production, this would call the API to generate the report
-        console.log('Generating report:', selectedReport?.name, 'with config:', generateConfig);
-        setOpenGenerateDialog(false);
+    const run = async (item: CatalogItem, format: string) => {
+        const blocked = unavailableReason(item);
+        if (blocked) {
+            setError(blocked);
+            return;
+        }
+        setBusyId(`${item.id}-${format}`);
+        setError(null);
+        setSuccess(null);
+        try {
+            const fmt = format.toLowerCase();
+            let response;
+            if (item.id === 'executive') response = await tprmAPI.downloadExecutivePdf();
+            else if (item.id === 'scorecard') response = await tprmAPI.downloadScorecardPdf(vendorId);
+            else if (item.id === 'assessment') response = await tprmAPI.downloadAssessmentPdf(assessmentId);
+            else if (item.id === 'findings') response = await tprmAPI.downloadFindings(fmt as 'pdf' | 'csv' | 'xlsx');
+            else if (item.id === 'monitoring') response = await tprmAPI.downloadMonitoring(fmt as 'pdf' | 'csv');
+            else response = await tprmAPI.downloadBoard(fmt as 'pdf' | 'pptx');
+            const filename = await downloadBinaryResponse(response, `Supreme-Risk-${item.id}.${fmt}`);
+            setSuccess(`Downloaded ${filename}`);
+        } catch (err) {
+            setError(downloadErrorMessage(err));
+        } finally {
+            setBusyId(null);
+        }
     };
 
     return (
-        <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                        Reports & Analytics
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Generate compliance and risk reports
-                    </Typography>
-                </Box>
-                <FormControl sx={{ minWidth: 200 }}>
-                    <InputLabel>Filter by Type</InputLabel>
-                    <Select
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        label="Filter by Type"
-                    >
-                        {reportTypes.map(type => (
-                            <MenuItem key={type} value={type}>{type}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </Box>
-
-            {/* Report Stats */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: '#667eea', fontWeight: 700 }}>
-                                {reportTemplates.length}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Report Templates
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: '#43e97b', fontWeight: 700 }}>
-                                24
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Reports This Month
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: '#00f2fe', fontWeight: 700 }}>
-                                5
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Scheduled Reports
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: '#fee140', fontWeight: 700 }}>
-                                3
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Pending Generation
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-
-            {/* Report Templates Grid */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                {filteredReports.map((report) => (
-                    <Grid item xs={12} md={6} key={report.id}>
-                        <Card sx={{
-                            bgcolor: '#1a1f3a',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            '&:hover': {
-                                borderColor: getTypeColor(report.type),
-                                transform: 'translateY(-2px)',
-                                transition: 'all 0.3s'
-                            }
-                        }}>
+        <Box sx={{ maxWidth: 1100 }}>
+            <Typography variant="overline" sx={{ color: '#94a3b8', fontWeight: 800, letterSpacing: '0.14em' }}>Reports</Typography>
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Generate and download</Typography>
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
+                Files are generated on the server from tenant-scoped records. Buttons that cannot produce a real file stay disabled.
+            </Typography>
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
+                <TextField select label="Vendor scope" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 260 }}>
+                    <MenuItem value="">All vendors</MenuItem>
+                    {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                </TextField>
+                <TextField select label="Assessment" value={assessmentId} onChange={(e) => setAssessmentId(e.target.value)} sx={{ minWidth: 280 }}>
+                    <MenuItem value="">Select assessment</MenuItem>
+                    {assessments.map((row) => <MenuItem key={row.id} value={row.id}>{row.vendor?.name || 'Vendor'} · {row.assessmentType}</MenuItem>)}
+                </TextField>
+            </Stack>
+            <Stack spacing={2}>
+                {catalog.map((item) => {
+                    const reason = unavailableReason(item);
+                    return (
+                        <Card key={item.id} sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
                             <CardContent>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                                            {report.name}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 2 }}>
-                                            {report.description}
-                                        </Typography>
+                                <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
+                                    <Box>
+                                        <Typography fontWeight={800}>{item.name}</Typography>
+                                        <Typography color="text.secondary">{item.description}</Typography>
+                                        {reason && <Chip size="small" sx={{ mt: 1 }} label={reason} />}
                                     </Box>
-                                    <Chip
-                                        label={report.type}
-                                        size="small"
-                                        sx={{
-                                            bgcolor: `${getTypeColor(report.type)}20`,
-                                            color: getTypeColor(report.type),
-                                            fontWeight: 600,
-                                            ml: 2
-                                        }}
-                                    />
-                                </Box>
-
-                                <Grid container spacing={1} sx={{ mb: 2 }}>
-                                    <Grid item xs={6}>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                                            Last Generated
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'white' }}>
-                                            {report.lastGenerated}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                                            Frequency
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'white' }}>
-                                            {report.frequency}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
-
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        startIcon={<Assessment />}
-                                        onClick={() => handleGenerateReport(report)}
-                                        sx={{
-                                            flex: 1,
-                                            background: `linear-gradient(135deg, ${getTypeColor(report.type)} 0%, ${getTypeColor(report.type)}99 100%)`,
-                                            '&:hover': {
-                                                background: `linear-gradient(135deg, ${getTypeColor(report.type)}99 0%, ${getTypeColor(report.type)} 100%)`,
-                                            }
-                                        }}
-                                    >
-                                        Generate
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        startIcon={<Download />}
-                                        sx={{
-                                            borderColor: 'rgba(255,255,255,0.3)',
-                                            color: 'white',
-                                            '&:hover': {
-                                                borderColor: getTypeColor(report.type),
-                                                bgcolor: `${getTypeColor(report.type)}10`
-                                            }
-                                        }}
-                                    >
-                                        Download Latest
-                                    </Button>
-                                </Box>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        {item.formats.map((format) => (
+                                            <Button
+                                                key={format}
+                                                variant="contained"
+                                                disabled={Boolean(reason) || busyId !== null}
+                                                onClick={() => run(item, format)}
+                                            >
+                                                {busyId === `${item.id}-${format}` ? <CircularProgress size={16} /> : `Download ${format}`}
+                                            </Button>
+                                        ))}
+                                    </Stack>
+                                </Stack>
                             </CardContent>
                         </Card>
-                    </Grid>
-                ))}
-            </Grid>
-
-            {/* Recent Reports Table */}
-            <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <CardContent>
-                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-                        Recently Generated Reports
-                    </Typography>
-                    <TableContainer component={Paper} sx={{ bgcolor: 'transparent' }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Report Name</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Type</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Generated</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Format</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Actions</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {reportTemplates.slice(0, 5).map((report) => (
-                                    <TableRow
-                                        key={report.id}
-                                        sx={{ '&:hover': { bgcolor: 'rgba(102, 126, 234, 0.05)' } }}
-                                    >
-                                        <TableCell sx={{ color: 'white' }}>{report.name}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={report.type}
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: `${getTypeColor(report.type)}20`,
-                                                    color: getTypeColor(report.type)
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                            {report.lastGenerated}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label="PDF"
-                                                size="small"
-                                                icon={<PictureAsPdf />}
-                                                sx={{ bgcolor: 'rgba(245, 87, 108, 0.2)', color: '#f5576c' }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                size="small"
-                                                startIcon={<Download />}
-                                                sx={{ color: '#43e97b' }}
-                                            >
-                                                Download
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </CardContent>
-            </Card>
-
-            {/* Generate Report Dialog */}
-            <Dialog
-                open={openGenerateDialog}
-                onClose={() => setOpenGenerateDialog(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        bgcolor: '#1a1f3a',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                    }
-                }}
-            >
-                <DialogTitle sx={{ color: 'white' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Assessment sx={{ color: '#667eea' }} />
-                        Generate Report
-                    </Box>
-                </DialogTitle>
-                <DialogContent>
-                    {selectedReport && (
-                        <Box sx={{ pt: 2 }}>
-                            <Typography variant="body2" sx={{ mb: 3 }}>
-                                <strong>{selectedReport.name}</strong>
-                                <br />
-                                {selectedReport.description}
-                            </Typography>
-
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth>
-                                        <InputLabel>Output Format</InputLabel>
-                                        <Select
-                                            value={generateConfig.format}
-                                            onChange={(e) => setGenerateConfig({ ...generateConfig, format: e.target.value })}
-                                            label="Output Format"
-                                        >
-                                            {formats.map(format => (
-                                                <MenuItem key={format} value={format}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        {format === 'PDF' && <PictureAsPdf />}
-                                                        {format === 'Excel' && <TableChart />}
-                                                        {format === 'CSV' && <TableChart />}
-                                                        {format}
-                                                    </Box>
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth>
-                                        <InputLabel>Date Range</InputLabel>
-                                        <Select
-                                            value={generateConfig.dateRange}
-                                            onChange={(e) => setGenerateConfig({ ...generateConfig, dateRange: e.target.value })}
-                                            label="Date Range"
-                                        >
-                                            <MenuItem value="7">Last 7 Days</MenuItem>
-                                            <MenuItem value="30">Last 30 Days</MenuItem>
-                                            <MenuItem value="90">Last 90 Days</MenuItem>
-                                            <MenuItem value="365">Last Year</MenuItem>
-                                            <MenuItem value="custom">Custom Range</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                        Additional Options
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                        <Chip
-                                            label="Include Charts"
-                                            onClick={() => setGenerateConfig({
-                                                ...generateConfig,
-                                                includeCharts: !generateConfig.includeCharts
-                                            })}
-                                            color={generateConfig.includeCharts ? 'primary' : 'default'}
-                                            sx={{
-                                                bgcolor: generateConfig.includeCharts ? '#43e97b' : 'rgba(255,255,255,0.1)',
-                                                color: generateConfig.includeCharts ? '#000' : '#fff'
-                                            }}
-                                        />
-                                        <Chip
-                                            label="Include Details"
-                                            onClick={() => setGenerateConfig({
-                                                ...generateConfig,
-                                                includeDetails: !generateConfig.includeDetails
-                                            })}
-                                            color={generateConfig.includeDetails ? 'primary' : 'default'}
-                                            sx={{
-                                                bgcolor: generateConfig.includeDetails ? '#43e97b' : 'rgba(255,255,255,0.1)',
-                                                color: generateConfig.includeDetails ? '#000' : '#fff'
-                                            }}
-                                        />
-                                    </Box>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenGenerateDialog(false)}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirmGenerate}
-                        variant="contained"
-                        sx={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        }}
-                    >
-                        Generate Report
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                    );
+                })}
+            </Stack>
         </Box>
     );
 }

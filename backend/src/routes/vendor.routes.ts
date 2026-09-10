@@ -343,7 +343,10 @@ router.post('/assessments/:assessmentId/responses', authorize('ADMIN', 'COMPLIAN
         await vendorAssessmentService.submitResponse(
             {
                 assessmentId: req.params.assessmentId,
-                ...req.body,
+                organizationId: req.user.organizationId,
+                questionId: req.body.questionId,
+                response: req.body.response || req.body.answer,
+                notes: req.body.notes,
             },
             req.user.id
         );
@@ -362,9 +365,61 @@ router.post('/assessments/:assessmentId/complete', authorize('ADMIN', 'COMPLIANC
     try {
         const assessment = await vendorAssessmentService.completeAssessment(
             req.params.assessmentId,
-            req.user.id
+            req.user.id,
+            req.user.organizationId
         );
 
+        res.json(assessment);
+    } catch (error: any) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.get('/:id/assessments/:assessmentId', validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
+    try {
+        const assessment = await vendorAssessmentService.getAssessmentById(
+            req.params.assessmentId,
+            req.user.organizationId
+        );
+        if (!assessment || assessment.vendorId !== req.params.id) {
+            return res.status(404).json({ error: 'Assessment not found' });
+        }
+        res.json(assessment);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/:id/assessments/:assessmentId/responses', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
+    try {
+        const data = await vendorAssessmentService.submitResponse(
+            {
+                assessmentId: req.params.assessmentId,
+                organizationId: req.user.organizationId,
+                vendorId: req.params.id,
+                questionId: req.body.questionId,
+                response: req.body.response || req.body.answer,
+                notes: req.body.notes,
+            },
+            req.user.id
+        );
+        res.json(data);
+    } catch (error: any) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/:id/assessments/:assessmentId/complete', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
+    try {
+        const existing = await vendorAssessmentService.getAssessmentById(req.params.assessmentId, req.user.organizationId);
+        if (!existing || existing.vendorId !== req.params.id) {
+            return res.status(404).json({ error: 'Assessment not found' });
+        }
+        const assessment = await vendorAssessmentService.completeAssessment(
+            req.params.assessmentId,
+            req.user.id,
+            req.user.organizationId
+        );
         res.json(assessment);
     } catch (error: any) {
         res.status(400).json({ error: error.message });

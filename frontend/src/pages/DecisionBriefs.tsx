@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardContent, CircularProgress, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import { tprmAPI, vendorAPI } from '../services/api';
+import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 
 type Brief = {
     id: string;
@@ -34,6 +35,8 @@ export default function DecisionBriefs() {
     const [decision, setDecision] = useState('APPROVE');
     const [conditions, setConditions] = useState('');
     const [analysis, setAnalysis] = useState('');
+    const [downloading, setDownloading] = useState(false);
+    const [downloadError, setDownloadError] = useState<string | null>(null);
 
     const load = async () => {
         setLoading(true);
@@ -71,6 +74,20 @@ export default function DecisionBriefs() {
         });
         setSelected(updated.data.data);
         await load();
+    };
+
+    const downloadPdf = async () => {
+        if (!selected) return;
+        setDownloading(true);
+        setDownloadError(null);
+        try {
+            const response = await tprmAPI.downloadBriefPdf(selected.id);
+            await downloadBinaryResponse(response, 'Supreme-Risk-Decision-Brief.pdf');
+        } catch (err) {
+            setDownloadError(downloadErrorMessage(err));
+        } finally {
+            setDownloading(false);
+        }
     };
 
     const factors = selected?.immutableSnapshot?.score?.factors || [];
@@ -116,6 +133,10 @@ export default function DecisionBriefs() {
                         <Card sx={{ flex: 2, bgcolor: 'rgba(15,23,42,0.8)', border: '1px solid rgba(251,191,36,0.2)' }}>
                             <CardContent>
                                 <Typography variant="h5" sx={{ mb: 1 }}>Why this risk is {selected.riskBand}</Typography>
+                                <Button variant="contained" sx={{ mb: 2 }} disabled={downloading} onClick={downloadPdf}>
+                                    {downloading ? <CircularProgress size={16} /> : 'Download PDF'}
+                                </Button>
+                                {downloadError && <Alert severity="error" sx={{ mb: 2 }}>{downloadError}</Alert>}
                                 <Typography sx={{ mb: 2 }}>
                                     Inherent {selected.inherentRisk} → residual {selected.residualRisk}. Evidence {selected.evidenceConfidence}. Findings {selected.openFindingsCount}. Monitoring {selected.monitoringAlertCount}.
                                 </Typography>

@@ -95,6 +95,7 @@ export const riskDecisionBriefService = {
         });
 
         const snapshot = {
+            organizationName: (await prisma.organization.findFirst({ where: { id: organizationId }, select: { name: true } }))?.name,
             vendor: {
                 id: vendor.id,
                 name: vendor.name,
@@ -107,11 +108,13 @@ export const riskDecisionBriefService = {
                 id: latest.id,
                 version: latest.scoreVersion,
                 inherentRisk: latest.inherentRisk,
+                controlEffectiveness: latest.controlEffectiveness,
                 residualRisk: latest.residualRisk,
                 riskBand: latest.riskBand,
                 factors: latest.factors,
                 explanation: latest.explanation,
                 calculatedAt: latest.calculatedAt,
+                methodologyVersion: (latest.inputs as { methodologyVersion?: string } | null)?.methodologyVersion,
             },
             assessmentStatus: latestAssessment?.status || 'NOT_STARTED',
             evidenceConfidence: confidence,
@@ -174,6 +177,11 @@ export const riskDecisionBriefService = {
 
         const nextReviewDate = input.nextReviewDate ? new Date(input.nextReviewDate) : brief.nextReviewDate;
         const decidedAt = new Date();
+        const actor = await prisma.user.findFirst({
+            where: { id: input.actorUserId, organizationId },
+            select: { firstName: true, lastName: true, email: true },
+        });
+        const decidedByName = actor ? `${actor.firstName} ${actor.lastName}`.trim() || actor.email : input.actorUserId;
         const updated = await prisma.riskDecisionBrief.update({
             where: { id: brief.id },
             data: {
@@ -191,6 +199,7 @@ export const riskDecisionBriefService = {
                         conditions: input.conditions,
                         reviewerAnalysis: input.reviewerAnalysis,
                         decidedByUserId: input.actorUserId,
+                        decidedByName,
                         decidedAt: decidedAt.toISOString(),
                     },
                     ...(input.decision === 'RISK_ACCEPTED'

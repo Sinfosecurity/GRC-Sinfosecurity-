@@ -10,6 +10,7 @@ jest.mock('../config/database', () => ({
             update: jest.fn(),
         },
         vendor: { updateMany: jest.fn() },
+        user: { findFirst: jest.fn() },
     },
 }));
 
@@ -26,6 +27,7 @@ jest.mock('../services/explainableRiskService', () => ({
 const mockedPrisma = prisma as unknown as {
     riskDecisionBrief: { findFirst: jest.Mock; update: jest.Mock };
     vendor: { updateMany: jest.Mock };
+    user: { findFirst: jest.Mock };
 };
 
 describe('RISK_ACCEPTED does not recalculate residual risk', () => {
@@ -43,6 +45,7 @@ describe('RISK_ACCEPTED does not recalculate residual risk', () => {
         mockedPrisma.riskDecisionBrief.findFirst.mockResolvedValue(brief);
         mockedPrisma.riskDecisionBrief.update.mockImplementation(async ({ data }) => ({ ...brief, ...data }));
         mockedPrisma.vendor.updateMany.mockResolvedValue({ count: 1 });
+        mockedPrisma.user.findFirst.mockResolvedValue({ firstName: 'Ada', lastName: 'Reviewer', email: 'ada@example.com' });
 
         const updated = await riskDecisionBriefService.decide('org-a', 'brief-1', {
             decision: 'RISK_ACCEPTED',

@@ -4,6 +4,7 @@ import { ApiError } from '../middleware/errorHandler';
 import { calculateVendorRiskAt, RISK_SCORE_VERSION, type RiskEngineInput, type RiskEngineResult } from './deterministicRiskEngine';
 import { tenantWhere } from '../security/tenant';
 import { recordAudit } from './auditEventService';
+import { scoringMethodologyService } from './scoringMethodologyService';
 
 function toInput(vendor: {
     tier: string;
@@ -61,20 +62,36 @@ export const explainableRiskService = {
         if (!vendor) {
             throw new ApiError(404, 'Vendor not found');
         }
-        const issues = await prisma.vendorIssue.findMany({
-            where: {
-                organizationId,
-                vendorId,
-                status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS, VendorIssueStatus.PENDING_VALIDATION] },
-            },
-        });
-        const monitoringEvents = await prisma.vendorMonitoring.count({
-            where: { organizationId, vendorId, requiresAction: true },
-        });
+        const [issues, monitoringEvents, latestAssessment, methodology] = await Promise.all([
+            prisma.vendorIssue.findMany({
+                where: {
+                    organizationId,
+                    vendorId,
+                    status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS, VendorIssueStatus.PENDING_VALIDATION] },
+                },
+            }),
+            prisma.vendorMonitoring.count({
+                where: { organizationId, vendorId, requiresAction: true },
+            }),
+            prisma.vendorAssessment.findFirst({
+                where: { organizationId, vendorId, status: 'COMPLETED' },
+                include: { responses: true },
+                orderBy: { completedAt: 'desc' },
+            }),
+            scoringMethodologyService.requireActive(organizationId),
+        ]);
         const result = calculateVendorRiskAt(
             toInput(vendor, {
                 openFindings: issues.map((issue) => ({ severity: issue.severity })),
                 monitoringEvents,
+                questionScores: latestAssessment?.responses
+                    .filter((row) => row.score != null)
+                    .map((row) => ({ score: row.score || 0, maxScore: row.maxScore || 10, weight: row.weight || 1 })),
+                controlMaturity: typeof latestAssessment?.overallScore === 'number'
+                    ? Math.round(latestAssessment.overallScore / 20)
+                    : undefined,
+                methodology: methodology.weights,
+                methodologyVersion: methodology.version,
             }),
             new Date()
         );
