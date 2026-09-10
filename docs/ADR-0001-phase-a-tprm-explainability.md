@@ -13,6 +13,6 @@ Supreme Risk differentiates on explainable third-party decisions. Rebuilding GRC
 
 ## Consequences
 
-- Historical numeric scores for `supreme-risk-1.0.0` remain reproducible.
+- Historical numeric scores for `supreme-risk-1.0.0` remain stored as written. New calculations use `supreme-risk-1.1.0`, which does not treat risk acceptance as a score input.
 - Org-admin methodology editing is NEXT, not CURRENT.
 - Decision briefs that are `DECIDED` are immutable; a new draft supersedes older drafts.

@@ -25,14 +25,17 @@ export async function persistVendorScore(params: {
     vendorId: string;
     result: RiskEngineResult;
 }) {
-    await prisma.vendor.update({
-        where: { id: params.vendorId },
+    const updated = await prisma.vendor.updateMany({
+        where: { id: params.vendorId, organizationId: params.organizationId },
         data: {
             inherentRiskScore: params.result.inherentRisk,
             residualRiskScore: params.result.residualRisk,
             lastReviewDate: new Date(),
         },
     });
+    if (updated.count !== 1) {
+        throw new ApiError(404, 'Vendor not found');
+    }
     return prisma.scoreCalculation.create({
         data: {
             organizationId: params.organizationId,
@@ -51,7 +54,7 @@ export async function persistVendorScore(params: {
 }
 
 export const explainableRiskService = {
-    async recalculate(organizationId: string, vendorId: string, extras: Partial<RiskEngineInput> = {}) {
+    async recalculate(organizationId: string, vendorId: string) {
         const vendor = await prisma.vendor.findFirst({
             where: tenantWhere(organizationId, { id: vendorId }),
         });
@@ -72,7 +75,6 @@ export const explainableRiskService = {
             toInput(vendor, {
                 openFindings: issues.map((issue) => ({ severity: issue.severity })),
                 monitoringEvents,
-                ...extras,
             }),
             new Date()
         );

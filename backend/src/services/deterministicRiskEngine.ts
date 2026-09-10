@@ -3,7 +3,7 @@
  * Identical inputs always produce identical outputs. No randomness.
  */
 
-export const RISK_SCORE_VERSION = 'supreme-risk-1.0.0';
+export const RISK_SCORE_VERSION = 'supreme-risk-1.1.0';
 
 export type FindingSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
@@ -18,7 +18,6 @@ export type RiskEngineInput = {
     openFindings?: Array<{ severity: FindingSeverity }>;
     monitoringEvents?: number;
     compensatingControls?: number;
-    riskAccepted?: boolean;
 };
 
 export type RiskFactorGroup = 'inherent' | 'control' | 'residual';
@@ -161,16 +160,6 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
         points: monitoringPoints,
         rationale: `${Math.min(input.monitoringEvents || 0, 10)} capped events × 2`,
     });
-    if (input.riskAccepted) {
-        residual -= 8;
-        factors.push({
-            code: 'risk_acceptance',
-            label: 'Documented risk acceptance',
-            group: 'residual',
-            points: -8,
-            rationale: 'Formal risk acceptance applied',
-        });
-    }
     residual = clamp(residual);
 
     const explanation = [
@@ -181,7 +170,6 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
         `control effectiveness ${controlEffectiveness}`,
         `${(input.openFindings || []).length} open findings`,
         `${input.monitoringEvents || 0} monitoring events`,
-        input.riskAccepted ? 'risk acceptance applied' : 'no risk acceptance',
         `residual risk ${residual} (${band(residual)})`,
         `score version ${RISK_SCORE_VERSION}`,
     ].join('; ');

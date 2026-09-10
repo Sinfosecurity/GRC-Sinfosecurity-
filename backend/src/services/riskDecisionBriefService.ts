@@ -173,6 +173,7 @@ export const riskDecisionBriefService = {
         }
 
         const nextReviewDate = input.nextReviewDate ? new Date(input.nextReviewDate) : brief.nextReviewDate;
+        const decidedAt = new Date();
         const updated = await prisma.riskDecisionBrief.update({
             where: { id: brief.id },
             data: {
@@ -181,7 +182,7 @@ export const riskDecisionBriefService = {
                 reviewerAnalysis: input.reviewerAnalysis,
                 nextReviewDate,
                 decidedByUserId: input.actorUserId,
-                decidedAt: new Date(),
+                decidedAt,
                 status: DecisionBriefStatus.DECIDED,
                 immutableSnapshot: {
                     ...(typeof brief.immutableSnapshot === 'object' && brief.immutableSnapshot ? brief.immutableSnapshot : {}),
@@ -190,8 +191,21 @@ export const riskDecisionBriefService = {
                         conditions: input.conditions,
                         reviewerAnalysis: input.reviewerAnalysis,
                         decidedByUserId: input.actorUserId,
-                        decidedAt: new Date().toISOString(),
+                        decidedAt: decidedAt.toISOString(),
                     },
+                    ...(input.decision === 'RISK_ACCEPTED'
+                        ? {
+                              acceptance: {
+                                  acceptedBy: input.actorUserId,
+                                  acceptedAt: decidedAt.toISOString(),
+                                  acceptanceReason: input.reviewerAnalysis || null,
+                                  acceptanceExpiry: nextReviewDate ? nextReviewDate.toISOString() : null,
+                                  conditions: input.conditions || null,
+                                  residualRisk: brief.residualRisk,
+                                  riskBand: brief.riskBand,
+                              },
+                          }
+                        : {}),
                 } as Prisma.InputJsonValue,
             },
         });
@@ -201,9 +215,6 @@ export const riskDecisionBriefService = {
                 where: { id: brief.vendorId, organizationId },
                 data: { nextReviewDate },
             });
-        }
-        if (input.decision === 'RISK_ACCEPTED') {
-            await explainableRiskService.recalculate(organizationId, brief.vendorId, { riskAccepted: true });
         }
 
         await recordAudit({

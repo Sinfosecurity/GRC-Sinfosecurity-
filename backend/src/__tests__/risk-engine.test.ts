@@ -10,7 +10,6 @@ describe('deterministic risk engine', () => {
         openFindings: [{ severity: 'HIGH' as const }],
         monitoringEvents: 1,
         compensatingControls: 0,
-        riskAccepted: false,
     };
 
     it('produces identical scores for identical inputs', () => {
@@ -55,5 +54,14 @@ describe('deterministic risk engine', () => {
         expect(inherent.find((f) => f.code === 'fourth_party')?.points).toBe(10);
         expect(result.inherentRisk).toBe(78);
         expect(result.explanation).toContain('score version');
+    });
+
+    it('does not reduce residual risk when risk is accepted as a governance decision', () => {
+        const before = calculateVendorRisk(base);
+        const afterAcceptance = calculateVendorRisk({ ...base, riskAccepted: true } as typeof base);
+        expect(afterAcceptance.residualRisk).toBe(before.residualRisk);
+        expect(afterAcceptance.riskBand).toBe(before.riskBand);
+        expect(afterAcceptance.factors.some((factor) => factor.code === 'risk_acceptance')).toBe(false);
+        expect(afterAcceptance.explanation).not.toContain('risk acceptance applied');
     });
 });

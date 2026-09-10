@@ -310,4 +310,21 @@ describe('two-tenant isolation (PostgreSQL)', () => {
         const res = await request(app).get(`${API}/vendors/${vendorA}`).set('Authorization', `Bearer ${tokenB}`);
         expectDenied(res.status);
     });
+
+    it('cannot persist a score for another tenant vendor id', async () => {
+        const { persistVendorScore } = await import('../services/explainableRiskService');
+        const { calculateVendorRiskAt } = await import('../services/deterministicRiskEngine');
+        const before = await prisma.vendor.findFirst({ where: { id: vendorB, organizationId: orgB } });
+        expect(before).toBeTruthy();
+        await expect(
+            persistVendorScore({
+                organizationId: orgA,
+                vendorId: vendorB,
+                result: calculateVendorRiskAt({ vendorCriticality: 'LOW' }, new Date()),
+            })
+        ).rejects.toMatchObject({ statusCode: 404 });
+        const after = await prisma.vendor.findFirst({ where: { id: vendorB, organizationId: orgB } });
+        expect(after?.residualRiskScore).toBe(before?.residualRiskScore);
+        expect(after?.inherentRiskScore).toBe(before?.inherentRiskScore);
+    });
 });

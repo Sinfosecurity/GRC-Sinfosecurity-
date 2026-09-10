@@ -8,6 +8,7 @@ import { riskDecisionBriefService } from '../services/riskDecisionBriefService';
 import { objectStorageService } from '../services/objectStorageService';
 import { prisma } from '../config/database';
 import { tenantWhere } from '../security/tenant';
+import { monitoringCredentialsConfigured, resolveMonitoringProviderStatus } from '../services/monitoringProviderStatus';
 
 const router = Router();
 router.use(authenticate);
@@ -125,16 +126,30 @@ router.get('/evidence', requirePermission(PERMISSIONS['evidence.read']), async (
 
 router.get('/monitoring/signals', requirePermission(PERMISSIONS['monitoring.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const signals = await prisma.vendorMonitoring.findMany({
-            where: { organizationId: req.user!.organizationId },
-            include: { vendor: { select: { id: true, name: true, tier: true } } },
-            orderBy: { detectedAt: 'desc' },
-            take: 100,
+        const [signals, connection] = await Promise.all([
+            prisma.vendorMonitoring.findMany({
+                where: { organizationId: req.user!.organizationId },
+                include: { vendor: { select: { id: true, name: true, tier: true } } },
+                orderBy: { detectedAt: 'desc' },
+                take: 100,
+            }),
+            prisma.integrationConnection.findFirst({
+                where: {
+                    organizationId: req.user!.organizationId,
+                    provider: { in: ['siem', 'monitoring'] },
+                },
+            }),
+        ]);
+        const providerStatus = resolveMonitoringProviderStatus({
+            credentialsConfigured: monitoringCredentialsConfigured(),
+            dbStatus: connection?.status,
+            lastError: connection?.lastError,
         });
         res.json({
             success: true,
             data: {
-                providerStatus: signals.length === 0 ? 'NOT_CONFIGURED' : 'CONNECTED',
+                providerStatus,
+                signalCount: signals.length,
                 signals,
             },
         });

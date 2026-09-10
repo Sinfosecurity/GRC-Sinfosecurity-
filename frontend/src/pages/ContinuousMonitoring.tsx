@@ -16,6 +16,7 @@ type Signal = {
 export default function ContinuousMonitoring() {
     const [signals, setSignals] = useState<Signal[]>([]);
     const [providerStatus, setProviderStatus] = useState('NOT_CONFIGURED');
+    const [signalCount, setSignalCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +25,7 @@ export default function ContinuousMonitoring() {
             .then((response) => {
                 setSignals(response.data.data.signals || []);
                 setProviderStatus(response.data.data.providerStatus || 'NOT_CONFIGURED');
+                setSignalCount(response.data.data.signalCount ?? response.data.data.signals?.length ?? 0);
             })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
@@ -35,7 +37,10 @@ export default function ContinuousMonitoring() {
             <Typography color="text.secondary" sx={{ mb: 2 }}>
                 Only recorded vendor signals are shown. External rating feeds are not simulated.
             </Typography>
-            <Chip label={providerStatus} sx={{ mb: 3 }} />
+            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
+                <Chip label={`Provider ${providerStatus}`} />
+                <Chip label={`Signals ${signalCount}`} variant="outlined" />
+            </Stack>
             <QueryState
                 loading={loading}
                 error={error}

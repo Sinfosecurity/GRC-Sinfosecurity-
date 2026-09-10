@@ -8,7 +8,7 @@ TPRM remains the commercial spearhead. Broader GRC grows around shared objects. 
 
 Phase A foundation on `supreme-risk-transformation`:
 
-- Explainable risk engine with named factors, methodology version `supreme-risk-1.0.0`, persisted `ScoreCalculation.factors`
+- Explainable risk engine with named factors, methodology version `supreme-risk-1.1.0`, persisted `ScoreCalculation.factors`
 - Risk Decision Brief (generate, human decision, immutable decided snapshots, AI summary status honesty)
 - What Needs Attention Today dashboard from live tenant records
 - AI Evidence Analyst UI wired to `/ai` with `NOT_CONFIGURED` when no key

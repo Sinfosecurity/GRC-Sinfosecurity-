@@ -19,7 +19,7 @@ describe('risk decision brief rules', () => {
             openFindings: [{ severity: 'HIGH' }],
         });
         expect(scored.residualRisk).toBeGreaterThan(0);
-        expect(scored.scoreVersion).toBe('supreme-risk-1.0.0');
+        expect(scored.scoreVersion).toBe('supreme-risk-1.1.0');
         expect(scored.factors.some((factor) => factor.code === 'criticality')).toBe(true);
     });
 });
