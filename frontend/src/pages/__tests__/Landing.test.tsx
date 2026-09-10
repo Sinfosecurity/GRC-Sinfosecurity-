@@ -14,7 +14,8 @@ describe('Landing Page', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText(/Supreme Risk/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Supreme Risk/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/DEVELOPMENT PREVIEW/i).length).toBeGreaterThan(0);
     });
 
     it('renders sign in form', () => {

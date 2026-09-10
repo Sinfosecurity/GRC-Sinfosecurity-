@@ -28,7 +28,10 @@ export default function Login() {
     return (
         <Container maxWidth="sm" sx={{ py: 12 }}>
             <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Supreme Risk</Typography>
-            <Typography color="text.secondary" sx={{ mb: 4 }}>Sign in to your organization</Typography>
+            <Typography color="warning.main" sx={{ mb: 1, fontWeight: 700 }}>
+                SUPREME RISK — DEVELOPMENT PREVIEW
+            </Typography>
+            <Typography color="text.secondary" sx={{ mb: 4 }}>Sign in to the local demo organization</Typography>
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             <Box component="form" onSubmit={handleSubmit}>
                 <Stack spacing={2}>

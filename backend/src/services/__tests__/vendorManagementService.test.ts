@@ -7,22 +7,37 @@ jest.mock('../../config/database', () => ({
         vendor: {
             create: jest.fn(),
             findFirst: jest.fn(),
+            findUnique: jest.fn(),
         },
     },
 }));
 
+jest.mock('../explainableRiskService', () => ({
+    explainableRiskService: {
+        recalculate: jest.fn().mockResolvedValue({ id: 'score-1' }),
+    },
+}));
+
 const mockedPrisma = prisma as unknown as {
-    vendor: { create: jest.Mock; findFirst: jest.Mock };
+    vendor: { create: jest.Mock; findFirst: jest.Mock; findUnique: jest.Mock };
 };
 
 describe('VendorManagementService tenant scoping', () => {
     beforeEach(() => {
         mockedPrisma.vendor.create.mockReset();
         mockedPrisma.vendor.findFirst.mockReset();
+        mockedPrisma.vendor.findUnique.mockReset();
     });
 
     it('creates vendors with the caller organizationId', async () => {
         mockedPrisma.vendor.create.mockResolvedValue({
+            id: 'vendor-1',
+            name: 'Acme',
+            organizationId: 'org-a',
+            tier: VendorTier.HIGH,
+            status: VendorStatus.PROPOSED,
+        });
+        mockedPrisma.vendor.findUnique.mockResolvedValue({
             id: 'vendor-1',
             name: 'Acme',
             organizationId: 'org-a',

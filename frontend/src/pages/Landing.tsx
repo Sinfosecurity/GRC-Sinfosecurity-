@@ -79,8 +79,8 @@ export default function Landing() {
                             <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>
                                 Supreme Risk
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                GRC Platform
+                            <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 700 }}>
+                                DEVELOPMENT PREVIEW
                             </Typography>
                         </Box>
                     </Stack>
@@ -191,7 +191,10 @@ export default function Landing() {
                             <Card className="glass" sx={{ position: 'relative', border: '1px solid rgba(255,255,255,0.1)', overflow: 'visible' }}>
                                 <CardContent sx={{ p: 4 }}>
                                     <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: 'white' }}>Welcome Back</Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>Login to your GRC Dashboard</Typography>
+                                    <Typography variant="body2" sx={{ color: 'warning.main', mb: 1, fontWeight: 700 }}>
+                                        SUPREME RISK — DEVELOPMENT PREVIEW
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>Login to the local demo workspace</Typography>
 
                                     <form onSubmit={handleLogin}>
                                         <Stack spacing={2}>

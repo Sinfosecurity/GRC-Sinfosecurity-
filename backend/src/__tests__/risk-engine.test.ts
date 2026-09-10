@@ -40,4 +40,20 @@ describe('deterministic risk engine', () => {
         expect(result.inherentRisk).toBeLessThanOrEqual(100);
         expect(result.residualRisk).toBeLessThanOrEqual(100);
     });
+
+    it('returns named factors that sum to inherent risk before clamp', () => {
+        const result = calculateVendorRisk({
+            vendorCriticality: 'HIGH',
+            dataSensitivityCount: 2,
+            regulatoryCount: 1,
+            hasSubcontractors: true,
+        });
+        const inherent = result.factors.filter((f) => f.group === 'inherent');
+        expect(inherent.find((f) => f.code === 'criticality')?.points).toBe(60);
+        expect(inherent.find((f) => f.code === 'data_sensitivity')?.points).toBe(6);
+        expect(inherent.find((f) => f.code === 'regulatory_scope')?.points).toBe(2);
+        expect(inherent.find((f) => f.code === 'fourth_party')?.points).toBe(10);
+        expect(result.inherentRisk).toBe(78);
+        expect(result.explanation).toContain('score version');
+    });
 });

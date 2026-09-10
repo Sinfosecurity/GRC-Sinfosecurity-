@@ -437,6 +437,7 @@ class VendorAssessmentService {
                 riskBand: result.riskBand,
                 inputs: result.inputs as object,
                 explanation: result.explanation,
+                factors: result.factors as object,
             },
         });
         logger.info(`Updated vendor risk score using ${result.scoreVersion}`);

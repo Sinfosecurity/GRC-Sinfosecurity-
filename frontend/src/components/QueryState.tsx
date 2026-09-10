@@ -28,7 +28,7 @@ export default function QueryState({
         );
     }
     if (notConfigured) {
-        return <Alert severity="info">Not configured</Alert>;
+        return <Alert severity="info">NOT CONFIGURED</Alert>;
     }
     if (error) {
         return <Alert severity="error">{error}</Alert>;

@@ -1,240 +1,138 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Chip, Card, CardContent, CardHeader, IconButton } from '@mui/material';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { MoreVert, Refresh } from '@mui/icons-material';
-import { healthCheck } from '../services/api';
+import { Box, Button, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import QueryState from '../components/QueryState';
+import { healthCheck, tprmAPI, vendorAPI } from '../services/api';
 
-// Mock data as fallback
-const complianceDataMock = [
-    { name: 'GDPR', score: 92 },
-    { name: 'HIPAA', score: 78 },
-    { name: 'CCPA', score: 85 },
-    { name: 'ISO 27001', score: 88 },
-    { name: 'TISAX', score: 75 },
-];
+type AttentionItem = {
+    id: string;
+    severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
+    action: string;
+    title: string;
+    detail: string;
+    vendorName?: string;
+    href: string;
+};
 
-const riskTrendData = [
-    { month: 'Jan', critical: 4, high: 12, medium: 28 },
-    { month: 'Feb', critical: 3, high: 10, medium: 25 },
-    { month: 'Mar', critical: 2, high: 8, medium: 22 },
-    { month: 'Apr', critical: 1, high: 6, medium: 20 },
-    { month: 'May', critical: 1, high: 5, medium: 18 },
-    { month: 'Jun', critical: 0, high: 4, medium: 15 },
-];
-
-const incidentTypes = [
-    { name: 'Data Breach', value: 12, color: '#f5576c' },
-    { name: 'Policy Violation', value: 28, color: '#ec4899' },
-    { name: 'Access Control', value: 35, color: '#f59e0b' },
-    { name: 'Other', value: 25, color: '#6366f1' },
-];
+const severityColor: Record<string, string> = {
+    CRITICAL: '#ef4444',
+    HIGH: '#f59e0b',
+    MEDIUM: '#38bdf8',
+};
 
 export default function Dashboard() {
-    const [backendStatus, setBackendStatus] = useState<'connected' | 'disconnected' | 'checking'>('checking');
-    const [complianceData] = useState(complianceDataMock);
-    const [risksCount] = useState(47);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [online, setOnline] = useState(false);
+    const [items, setItems] = useState<AttentionItem[]>([]);
+    const [stats, setStats] = useState<{ totalVendors?: number; highRiskVendors?: number; overdueReviews?: number; activeIssues?: number } | null>(null);
 
     useEffect(() => {
-        const checkBackend = async () => {
+        let cancelled = false;
+        (async () => {
             try {
-                const health = await healthCheck();
-                setBackendStatus(health?.status === 'ok' || health?.status === 'healthy' ? 'connected' : 'disconnected');
-            } catch {
-                setBackendStatus('disconnected');
+                const [health, attention, statistics] = await Promise.allSettled([
+                    healthCheck(),
+                    tprmAPI.attention(),
+                    vendorAPI.getStatistics(),
+                ]);
+                if (cancelled) return;
+                if (health.status === 'fulfilled') {
+                    setOnline(health.value?.status === 'ok' || health.value?.status === 'healthy');
+                }
+                if (attention.status === 'fulfilled') {
+                    setItems(attention.value.data.data.items || []);
+                } else {
+                    setError(attention.reason?.message || 'Unable to load attention queue');
+                }
+                if (statistics.status === 'fulfilled') {
+                    const body = statistics.value.data;
+                    setStats(body.summary || body);
+                }
+            } catch (err: any) {
+                if (!cancelled) setError(err.message || 'Unable to load dashboard');
+            } finally {
+                if (!cancelled) setLoading(false);
             }
+        })();
+        return () => {
+            cancelled = true;
         };
-        checkBackend();
     }, []);
 
     return (
-        <Box sx={{ maxWidth: 1600, margin: '0 auto' }}>
-            {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5 }}>
+        <Box sx={{ maxWidth: 1100 }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} sx={{ mb: 4 }}>
                 <Box>
-                    <Typography variant="h3" className="text-gradient-primary" sx={{ mb: 1 }}>
-                        Dashboard
+                    <Typography variant="overline" sx={{ color: '#fbbf24', letterSpacing: '0.16em', fontWeight: 800 }}>
+                        Home
                     </Typography>
-                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                        Real-time overview of your GRC posture
+                    <Typography variant="h3" sx={{ fontWeight: 800, letterSpacing: '-0.04em' }}>
+                        What needs attention today
+                    </Typography>
+                    <Typography color="text.secondary">
+                        Live third-party work from this tenant. Empty means nothing is overdue — it does not invent alerts.
                     </Typography>
                 </Box>
                 <Chip
-                    label={backendStatus === 'connected' ? '● System Online' : backendStatus === 'disconnected' ? '○ System Offline' : '○ Connectivity Check...'}
+                    label={online ? 'API connected' : 'API unreachable'}
                     sx={{
-                        bgcolor: backendStatus === 'connected' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                        color: backendStatus === 'connected' ? '#10b981' : '#ef4444',
-                        fontWeight: 600,
-                        border: `1px solid ${backendStatus === 'connected' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+                        alignSelf: 'flex-start',
+                        bgcolor: online ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
+                        color: online ? '#34d399' : '#f87171',
+                        fontWeight: 700,
                     }}
                 />
-            </Box>
+            </Stack>
 
-            {/* Stats Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
                 {[
-                    { label: 'Compliance Score', value: '87%', color: '#6366f1', trend: '+2.4%' },
-                    { label: 'Active Risks', value: risksCount.toString(), color: '#ec4899', trend: '-12%' },
-                    { label: 'Open Incidents', value: '8', color: '#f59e0b', trend: '-3' },
-                    { label: 'Controls Active', value: '234', color: '#10b981', trend: '+5' },
-                ].map((stat) => (
-                    <Grid item xs={12} sm={6} md={3} key={stat.label}>
-                        <Card className="hover-lift glass">
-                            <CardContent sx={{ p: 4 }}>
-                                <Typography variant="h2" sx={{ fontWeight: 700, color: stat.color, mb: 1, letterSpacing: '-0.02em' }}>
-                                    {stat.value}
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                        {stat.label}
-                                    </Typography>
-                                    <Chip
-                                        label={stat.trend}
-                                        size="small"
-                                        sx={{
-                                            bgcolor: `${stat.color}20`,
-                                            color: stat.color,
-                                            fontWeight: 600,
-                                            borderRadius: 1
-                                        }}
-                                    />
-                                </Box>
+                    { label: 'Vendors', value: stats?.totalVendors ?? '—' },
+                    { label: 'High residual', value: stats?.highRiskVendors ?? '—' },
+                    { label: 'Overdue reviews', value: stats?.overdueReviews ?? '—' },
+                    { label: 'Open issues', value: stats?.activeIssues ?? '—' },
+                ].map((card) => (
+                    <Card key={card.label} sx={{ flex: 1, bgcolor: 'rgba(15,23,42,0.7)', border: '1px solid rgba(251,191,36,0.18)' }}>
+                        <CardContent>
+                            <Typography variant="h4" sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 700 }}>
+                                {card.value}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">{card.label}</Typography>
+                        </CardContent>
+                    </Card>
+                ))}
+            </Stack>
+
+            <QueryState loading={loading} error={error} empty={items.length === 0} emptyTitle="Nothing needs attention" emptyBody="When reviews, findings, evidence, or monitoring signals require action, they will appear here.">
+                <Stack spacing={1.5}>
+                    {items.map((item, index) => (
+                        <Card
+                            key={item.id}
+                            sx={{
+                                bgcolor: 'rgba(15,23,42,0.85)',
+                                borderLeft: `4px solid ${severityColor[item.severity]}`,
+                                border: '1px solid rgba(255,255,255,0.06)',
+                            }}
+                        >
+                            <CardContent>
+                                <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ md: 'center' }}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ color: severityColor[item.severity], fontWeight: 800 }}>
+                                            {index + 1}. {item.severity}
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>{item.title}</Typography>
+                                        <Typography color="text.secondary">{item.detail}</Typography>
+                                    </Box>
+                                    <Button variant="contained" onClick={() => navigate(item.href)} sx={{ bgcolor: '#b45309', '&:hover': { bgcolor: '#92400e' } }}>
+                                        {item.action}
+                                    </Button>
+                                </Stack>
                             </CardContent>
                         </Card>
-                    </Grid>
-                ))}
-            </Grid>
-
-            {/* Charts Grid */}
-            <Grid container spacing={3}>
-                {/* Compliance Framework Scores */}
-                <Grid item xs={12} md={8}>
-                    <Card className="glass" sx={{ height: '100%', minHeight: 400 }}>
-                        <CardHeader
-                            title="Compliance Frameworks"
-                            action={
-                                <IconButton color="inherit" size="small"><MoreVert /></IconButton>
-                            }
-                            sx={{ pb: 0, '& .MuiCardHeader-title': { fontWeight: 600 } }}
-                        />
-                        <CardContent sx={{ height: 350 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={complianceData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                    <XAxis
-                                        dataKey="name"
-                                        stroke="rgba(255,255,255,0.4)"
-                                        tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                    />
-                                    <YAxis
-                                        stroke="rgba(255,255,255,0.4)"
-                                        tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            background: '#1e293b',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            borderRadius: 12,
-                                            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                                            color: 'white',
-                                        }}
-                                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                    />
-                                    <Bar dataKey="score" fill="url(#colorGradient)" radius={[6, 6, 0, 0]}>
-                                        {complianceData.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#6366f1' : '#8b5cf6'} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                {/* Incident Distribution */}
-                <Grid item xs={12} md={4}>
-                    <Card className="glass" sx={{ height: '100%', minHeight: 400 }}>
-                        <CardHeader
-                            title="Incidents"
-                            sx={{ pb: 0, '& .MuiCardHeader-title': { fontWeight: 600 } }}
-                        />
-                        <CardContent sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={incidentTypes}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={80}
-                                        outerRadius={100}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {incidentTypes.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            background: '#1e293b',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            borderRadius: 8,
-                                            color: 'white',
-                                        }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                {/* Risk Trend */}
-                <Grid item xs={12}>
-                    <Card className="glass">
-                        <CardHeader
-                            title="Risk Trends"
-                            action={<IconButton size="small"><Refresh /></IconButton>}
-                            sx={{ pb: 0, '& .MuiCardHeader-title': { fontWeight: 600 } }}
-                        />
-                        <CardContent sx={{ height: 300 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={riskTrendData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                    <XAxis
-                                        dataKey="month"
-                                        stroke="rgba(255,255,255,0.4)"
-                                        tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                        dy={10}
-                                    />
-                                    <YAxis
-                                        stroke="rgba(255,255,255,0.4)"
-                                        tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-                                        axisLine={false}
-                                        tickLine={false}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            background: '#1e293b',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            borderRadius: 8,
-                                            color: 'white',
-                                        }}
-                                    />
-                                    <Line type="monotone" dataKey="critical" stroke="#ef4444" strokeWidth={3} dot={false} activeDot={{ r: 8 }} />
-                                    <Line type="monotone" dataKey="high" stroke="#ec4899" strokeWidth={3} dot={false} />
-                                    <Line type="monotone" dataKey="medium" stroke="#f59e0b" strokeWidth={3} dot={false} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
+                    ))}
+                </Stack>
+            </QueryState>
         </Box>
     );
 }

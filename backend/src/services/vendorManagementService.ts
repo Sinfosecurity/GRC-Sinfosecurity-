@@ -8,6 +8,7 @@ import { prisma } from '../config/database';
 import { handlePrismaError, NotFoundError, ValidationError, BusinessLogicError } from '../utils/errors';
 import logger from '../config/logger';
 import { calculateVendorRiskAt } from './deterministicRiskEngine';
+import { explainableRiskService } from './explainableRiskService';
 import { assertVendorTransition } from './vendorLifecycle';
 import { recordAudit } from './auditEventService';
 
@@ -119,9 +120,11 @@ class VendorManagementService {
             const vendor = await prisma.vendor.create({
                 data: createData,
             });
+            await explainableRiskService.recalculate(vendor.organizationId, vendor.id);
+            const scored = await prisma.vendor.findUnique({ where: { id: vendor.id } });
 
             logger.info(`Vendor created successfully`, { vendorId: vendor.id, vendorName: vendor.name, tier: vendor.tier });
-            return vendor;
+            return scored || vendor;
         } catch (error: any) {
             logger.error('Failed to create vendor', { error: error.message, data });
             throw handlePrismaError(error);

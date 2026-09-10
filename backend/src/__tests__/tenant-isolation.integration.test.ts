@@ -169,6 +169,9 @@ describe('two-tenant isolation (PostgreSQL)', () => {
     });
 
     afterAll(async () => {
+        await prisma.riskDecisionBrief.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
+        await prisma.scoreCalculation.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
+        await prisma.aiOperationLog.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
         await prisma.storedObject.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
         await prisma.vendorApprovalStep.deleteMany({
             where: { workflow: { organizationId: { in: [orgA, orgB].filter(Boolean) } } },
@@ -268,6 +271,32 @@ describe('two-tenant isolation (PostgreSQL)', () => {
         expect(res.status).toBe(200);
         expect(res.text).not.toContain('VENDOR_B_ISOLATION_MARKER_');
         expect(res.text).toContain(`Vendor A Isolation ${suffix}`);
+    });
+
+    it('User A cannot read Vendor B risk explanation', async () => {
+        const res = await request(app)
+            .get(`${API}/tprm/vendors/${vendorB}/risk-explanation`)
+            .set('Authorization', `Bearer ${tokenA}`);
+        expectDenied(res.status);
+    });
+
+    it('User A cannot generate a decision brief for Vendor B', async () => {
+        const res = await request(app)
+            .post(`${API}/tprm/vendors/${vendorB}/decision-briefs`)
+            .set('Authorization', `Bearer ${tokenA}`);
+        expectDenied(res.status);
+    });
+
+    it('User B can generate and User A cannot read that decision brief', async () => {
+        const created = await request(app)
+            .post(`${API}/tprm/vendors/${vendorB}/decision-briefs`)
+            .set('Authorization', `Bearer ${tokenB}`);
+        expect(created.status).toBe(201);
+        const briefId = created.body.data.id;
+        const leaked = await request(app)
+            .get(`${API}/tprm/decision-briefs/${briefId}`)
+            .set('Authorization', `Bearer ${tokenA}`);
+        expectDenied(leaked.status);
     });
 
     it('rejects ID tampering of a non-existent vendor', async () => {

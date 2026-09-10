@@ -47,6 +47,7 @@ import exportRoutes from './routes/export.routes';
 import organizationSaasRoutes from './routes/organization.saas.routes';
 import integrationRoutes from './routes/integration.routes';
 import questionnaireRoutes from './routes/questionnaire.routes';
+import tprmRoutes from './routes/tprm.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -222,6 +223,7 @@ app.use(`${API_PREFIX}/exports`, exportRoutes);
 app.use(`${API_PREFIX}/organization`, organizationSaasRoutes);
 app.use(`${API_PREFIX}/integrations`, integrationRoutes);
 app.use(`${API_PREFIX}/questionnaires`, questionnaireRoutes);
+app.use(`${API_PREFIX}/tprm`, tprmRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Unauthorized from './pages/Unauthorized';
 import NotificationManager from './components/NotificationManager';
+import DevPreviewBanner from './components/DevPreviewBanner';
 import { CircularProgress, Box } from '@mui/material';
 
 // Lazy load heavy components
@@ -36,6 +37,7 @@ const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Billing = lazy(() => import('./pages/Billing'));
 const Integrations = lazy(() => import('./pages/Integrations'));
+const DecisionBriefs = lazy(() => import('./pages/DecisionBriefs'));
 const ContinuousMonitoring = lazy(() => import('./pages/ContinuousMonitoring'));
 
 // Loading component
@@ -48,6 +50,7 @@ const LoadingFallback = () => (
 export default function App() {
     return (
         <>
+            <DevPreviewBanner />
             <NotificationManager />
             <Suspense fallback={<LoadingFallback />}>
                 <Routes>
@@ -65,8 +68,8 @@ export default function App() {
                     <Route path="policies" element={<PolicyManagement />} />
                     <Route path="documents" element={<DocumentManagement />} />
                     <Route path="activity-log" element={<ActivityLog />} />
-                    <Route path="user-management" element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}><UserManagement /></ProtectedRoute>} />
-                    <Route path="organization-settings" element={<ProtectedRoute allowedRoles={['ADMIN']}><OrganizationSettings /></ProtectedRoute>} />
+                    <Route path="user-management" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><UserManagement /></ProtectedRoute>} />
+                    <Route path="organization-settings" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><OrganizationSettings /></ProtectedRoute>} />
                     <Route path="analytics" element={<Analytics />} />
                     <Route path="tasks" element={<Tasks />} />
                     <Route path="workflows" element={<WorkflowBuilder />} />
@@ -77,6 +80,7 @@ export default function App() {
                     <Route path="vendor-management" element={<VendorManagement />} />
                     <Route path="assessments" element={<VendorManagement />} />
                     <Route path="findings" element={<VendorManagement />} />
+                    <Route path="decision-briefs" element={<DecisionBriefs />} />
                     <Route path="monitoring" element={<ContinuousMonitoring />} />
                     <Route path="questionnaires" element={<VendorManagement />} />
                     <Route path="billing" element={<Billing />} />

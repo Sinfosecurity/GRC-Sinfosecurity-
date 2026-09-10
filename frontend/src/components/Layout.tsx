@@ -12,7 +12,6 @@ import {
     History as ActivityIcon,
     People as UserIcon,
     Analytics as AnalyticsIcon,
-    Assignment as TaskIcon,
     AccountTree as WorkflowIcon,
     Timeline as PredictiveIcon,
     Assessment as ReportIcon,
@@ -21,14 +20,29 @@ import {
 
 const drawerWidth = 280;
 
-const menuItems = [
-    { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon />, color: '#6366f1' },
-    { text: 'Vendors', path: '/vendor-management', icon: <VendorIcon />, color: '#14b8a6' },
-    { text: 'Assessments', path: '/assessments', icon: <RiskIcon />, color: '#06b6d4' },
-    { text: 'Findings', path: '/findings', icon: <IncidentIcon />, color: '#ef4444' },
-    { text: 'Monitoring', path: '/monitoring', icon: <PredictiveIcon />, color: '#f59e0b' },
-    { text: 'Reports', path: '/reports', icon: <ReportIcon />, color: '#94a3b8' },
-    { text: 'Tasks', path: '/tasks', icon: <TaskIcon />, color: '#f59e0b' },
+const menuSections = [
+    {
+        title: 'Home',
+        items: [{ text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon />, color: '#fbbf24' }],
+    },
+    {
+        title: 'Third Party',
+        items: [
+            { text: 'Vendors', path: '/vendor-management', icon: <VendorIcon />, color: '#14b8a6' },
+            { text: 'Assessments', path: '/assessments', icon: <RiskIcon />, color: '#06b6d4' },
+            { text: 'Evidence', path: '/documents', icon: <PolicyIcon />, color: '#a78bfa' },
+            { text: 'Findings', path: '/findings', icon: <IncidentIcon />, color: '#ef4444' },
+            { text: 'Monitoring', path: '/monitoring', icon: <PredictiveIcon />, color: '#f59e0b' },
+            { text: 'Decision Briefs', path: '/decision-briefs', icon: <ReportIcon />, color: '#fbbf24' },
+        ],
+    },
+    {
+        title: 'Intelligence',
+        items: [
+            { text: 'AI Analyst', path: '/ai-insights', icon: <AnalyticsIcon />, color: '#38bdf8' },
+            { text: 'Reports', path: '/reports', icon: <ReportIcon />, color: '#94a3b8' },
+        ],
+    },
 ];
 
 const adminItems = [
@@ -82,7 +96,7 @@ export default function Layout() {
                                 Supreme Risk
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-                                Third-party risk
+                                DEVELOPMENT PREVIEW
                             </Typography>
                         </Box>
                     </Stack>
@@ -90,49 +104,48 @@ export default function Layout() {
 
                 {/* Navigation */}
                 <List sx={{ flex: 1, px: 2, py: 1 }}>
-                    <Typography variant="overline" sx={{ px: 2, mb: 1, display: 'block', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
-                        Main Menu
-                    </Typography>
-                    {menuItems.map((item) => {
-                        const isActive = location.pathname === item.path;
-                        return (
-                            <ListItem
-                                key={item.text}
-                                onClick={() => navigate(item.path)}
-                                sx={{
-                                    mb: 0.5,
-                                    borderRadius: 2,
-                                    cursor: 'pointer',
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    background: isActive ? `linear-gradient(90deg, ${item.color}20 0%, transparent 100%)` : 'transparent',
-                                    borderLeft: isActive ? `3px solid ${item.color}` : '3px solid transparent',
-                                    '&:hover': {
-                                        background: 'rgba(255, 255, 255, 0.03)',
-                                    },
-                                    transition: 'all 0.2s ease',
-                                }}
-                            >
-                                <ListItemIcon sx={{ color: isActive ? item.color : 'rgba(255,255,255,0.5)', minWidth: 40, transition: 'color 0.2s' }}>
-                                    {item.icon}
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={item.text}
-                                    primaryTypographyProps={{
-                                        fontWeight: isActive ? 600 : 500,
-                                        fontSize: '0.9rem',
-                                        color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
-                                    }}
-                                />
-                            </ListItem>
-                        );
-                    })}
+                    {menuSections.map((section) => (
+                        <Box key={section.title} sx={{ mb: 2 }}>
+                            <Typography variant="overline" sx={{ px: 2, mb: 1, display: 'block', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
+                                {section.title}
+                            </Typography>
+                            {section.items.map((item) => {
+                                const isActive = location.pathname === item.path;
+                                return (
+                                    <ListItem
+                                        key={item.text}
+                                        onClick={() => navigate(item.path)}
+                                        sx={{
+                                            mb: 0.5,
+                                            borderRadius: 2,
+                                            cursor: 'pointer',
+                                            background: isActive ? `linear-gradient(90deg, ${item.color}20 0%, transparent 100%)` : 'transparent',
+                                            borderLeft: isActive ? `3px solid ${item.color}` : '3px solid transparent',
+                                            '&:hover': { background: 'rgba(255, 255, 255, 0.03)' },
+                                        }}
+                                    >
+                                        <ListItemIcon sx={{ color: isActive ? item.color : 'rgba(255,255,255,0.5)', minWidth: 40 }}>
+                                            {item.icon}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary={item.text}
+                                            primaryTypographyProps={{
+                                                fontWeight: isActive ? 600 : 500,
+                                                fontSize: '0.9rem',
+                                                color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
+                                            }}
+                                        />
+                                    </ListItem>
+                                );
+                            })}
+                        </Box>
+                    ))}
                 </List>
 
                 {/* Settings at bottom */}
                 <Box sx={{ p: 2, mt: 'auto', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                     <Typography variant="overline" sx={{ px: 1, mb: 1, display: 'block', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
-                        System
+                        Administration
                     </Typography>
                     <List disablePadding>
                         {adminItems.map((item) => (

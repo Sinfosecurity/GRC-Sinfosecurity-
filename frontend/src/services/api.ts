@@ -34,11 +34,13 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
     (response) => response,
-    async (error: AxiosError<{ error?: string; message?: string }>) => {
+    async (error: AxiosError<{ error?: string | { message?: string }; message?: string }>) => {
         const status = error.response?.status;
+        const payload = error.response?.data;
+        const nestedError = payload?.error;
         const message =
-            error.response?.data?.error ||
-            error.response?.data?.message ||
+            (typeof nestedError === 'string' ? nestedError : nestedError?.message) ||
+            payload?.message ||
             (status === 403
                 ? 'You do not have permission to perform this action.'
                 : status === 404
@@ -148,6 +150,19 @@ export const exportAPI = {
     vendorsCsv: () => api.get('/exports/vendors.csv', { responseType: 'blob' }),
     findingsCsv: () => api.get('/exports/findings.csv', { responseType: 'blob' }),
     board: () => api.get('/exports/board.json'),
+};
+
+export const tprmAPI = {
+    attention: () => api.get('/tprm/attention'),
+    riskExplanation: (vendorId: string) => api.get(`/tprm/vendors/${vendorId}/risk-explanation`),
+    scoreHistory: (vendorId: string) => api.get(`/tprm/vendors/${vendorId}/score-history`),
+    recalculateRisk: (vendorId: string) => api.post(`/tprm/vendors/${vendorId}/recalculate-risk`),
+    listBriefs: (vendorId?: string) => api.get('/tprm/decision-briefs', { params: vendorId ? { vendorId } : undefined }),
+    generateBrief: (vendorId: string) => api.post(`/tprm/vendors/${vendorId}/decision-briefs`),
+    getBrief: (briefId: string) => api.get(`/tprm/decision-briefs/${briefId}`),
+    decideBrief: (briefId: string, data: unknown) => api.post(`/tprm/decision-briefs/${briefId}/decide`, data),
+    evidence: (vendorId?: string) => api.get('/tprm/evidence', { params: vendorId ? { vendorId } : undefined }),
+    monitoringSignals: () => api.get('/tprm/monitoring/signals'),
 };
 
 export const vendorAPI = {

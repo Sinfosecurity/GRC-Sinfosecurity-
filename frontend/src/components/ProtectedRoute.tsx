@@ -8,6 +8,15 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
+const ADMIN_ROLES = new Set(['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']);
+
+function roleIsAllowed(userRole: string, allowedRoles: string[]): boolean {
+  if (allowedRoles.includes(userRole)) {
+    return true;
+  }
+  return allowedRoles.includes('ADMIN') && ADMIN_ROLES.has(userRole);
+}
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
@@ -34,8 +43,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  // Check role-based access
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  // Check role-based access. ORGANIZATION_ADMIN is the SaaS org-admin role.
+  if (allowedRoles && user && !roleIsAllowed(user.role, allowedRoles)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

@@ -95,6 +95,7 @@ model Organization {
   integrationConnections      IntegrationConnection[]
   aiOperationLogs             AiOperationLog[]
   scoreCalculations           ScoreCalculation[]
+  riskDecisionBriefs          RiskDecisionBrief[]
   subscriptionEvents          SubscriptionEvent[]
   risks                       Risk[]
   controls                    Control[]
@@ -2168,11 +2169,59 @@ model ScoreCalculation {
   riskBand       String
   inputs         Json
   explanation    String
+  factors        Json?
   calculatedAt   DateTime     @default(now())
 
   @@index([organizationId])
   @@index([vendorId])
   @@index([calculatedAt])
+}
+
+enum RiskDecision {
+  APPROVE
+  APPROVE_WITH_CONDITIONS
+  ESCALATE
+  REJECT
+  RISK_ACCEPTED
+}
+
+enum DecisionBriefStatus {
+  DRAFT
+  DECIDED
+  SUPERSEDED
+}
+
+model RiskDecisionBrief {
+  id                 String               @id @default(uuid())
+  organization       Organization         @relation(fields: [organizationId], references: [id])
+  organizationId     String
+  vendorId           String
+  engagementName     String?
+  scoreCalculationId String?
+  inherentRisk       Int
+  residualRisk       Int
+  riskBand           String
+  assessmentStatus   String?
+  evidenceConfidence String
+  openFindingsCount  Int                  @default(0)
+  monitoringAlertCount Int                @default(0)
+  reviewerAnalysis   String?
+  aiSummary          String?
+  aiSummaryStatus    String               @default("NOT_CONFIGURED")
+  humanDecision      RiskDecision?
+  conditions         String?
+  nextReviewDate     DateTime?
+  decidedByUserId    String?
+  decidedAt          DateTime?
+  status             DecisionBriefStatus  @default(DRAFT)
+  immutableSnapshot  Json
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([organizationId, status])
+  @@index([createdAt])
 }
 
 model InAppNotification {

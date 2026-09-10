@@ -21,6 +21,16 @@ export type RiskEngineInput = {
     riskAccepted?: boolean;
 };
 
+export type RiskFactorGroup = 'inherent' | 'control' | 'residual';
+
+export type RiskFactor = {
+    code: string;
+    label: string;
+    group: RiskFactorGroup;
+    points: number;
+    rationale: string;
+};
+
 export type RiskEngineResult = {
     scoreVersion: typeof RISK_SCORE_VERSION;
     inherentRisk: number;
@@ -28,6 +38,7 @@ export type RiskEngineResult = {
     residualRisk: number;
     riskBand: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
     explanation: string;
+    factors: RiskFactor[];
     inputs: RiskEngineInput;
     calculatedAt: string;
 };
@@ -59,12 +70,45 @@ function band(score: number): RiskEngineResult['riskBand'] {
 
 export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
     const tier = input.vendorCriticality || 'MEDIUM';
-    let inherent = TIER_BASE[tier] ?? 40;
-    inherent += (input.dataSensitivityCount || 0) * 3;
-    inherent += (input.regulatoryCount || 0) * 2;
-    if (input.hasSubcontractors) {
-        inherent += 10;
-    }
+    const factors: RiskFactor[] = [];
+
+    const criticalityPoints = TIER_BASE[tier] ?? 40;
+    factors.push({
+        code: 'criticality',
+        label: `${tier} business criticality`,
+        group: 'inherent',
+        points: criticalityPoints,
+        rationale: `Base inherent score for ${tier} tier vendors`,
+    });
+
+    const dataPoints = (input.dataSensitivityCount || 0) * 3;
+    factors.push({
+        code: 'data_sensitivity',
+        label: 'Sensitive data exposure',
+        group: 'inherent',
+        points: dataPoints,
+        rationale: `${input.dataSensitivityCount || 0} sensitive data types × 3`,
+    });
+
+    const regulatoryPoints = (input.regulatoryCount || 0) * 2;
+    factors.push({
+        code: 'regulatory_scope',
+        label: 'Regulatory exposure',
+        group: 'inherent',
+        points: regulatoryPoints,
+        rationale: `${input.regulatoryCount || 0} regulatory scopes × 2`,
+    });
+
+    const fourthPartyPoints = input.hasSubcontractors ? 10 : 0;
+    factors.push({
+        code: 'fourth_party',
+        label: 'Fourth-party / subcontractor exposure',
+        group: 'inherent',
+        points: fourthPartyPoints,
+        rationale: input.hasSubcontractors ? 'Subcontractors flagged' : 'No subcontractors flagged',
+    });
+
+    let inherent = criticalityPoints + dataPoints + regulatoryPoints + fourthPartyPoints;
     inherent = clamp(inherent);
 
     let controlEffectiveness = 50;
@@ -87,13 +131,45 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
     controlEffectiveness += (input.compensatingControls || 0) * 3;
     controlEffectiveness = clamp(controlEffectiveness);
 
-    let residual = inherent * (1 - controlEffectiveness / 140);
+    const afterControls = inherent * (1 - controlEffectiveness / 140);
+    factors.push({
+        code: 'control_effectiveness',
+        label: 'Control effectiveness haircut',
+        group: 'control',
+        points: clamp(controlEffectiveness) * -1,
+        rationale: `Controls scored ${clamp(controlEffectiveness)}; residual starts at ${Math.round(afterControls)}`,
+    });
+
+    let residual = afterControls;
     for (const finding of input.openFindings || []) {
-        residual += FINDING_POINTS[finding.severity] || 0;
+        const points = FINDING_POINTS[finding.severity] || 0;
+        residual += points;
+        factors.push({
+            code: `finding_${finding.severity.toLowerCase()}`,
+            label: `${finding.severity} open finding`,
+            group: 'residual',
+            points,
+            rationale: `Open ${finding.severity} finding adds ${points}`,
+        });
     }
-    residual += Math.min(input.monitoringEvents || 0, 10) * 2;
+    const monitoringPoints = Math.min(input.monitoringEvents || 0, 10) * 2;
+    residual += monitoringPoints;
+    factors.push({
+        code: 'monitoring_events',
+        label: 'Monitoring events',
+        group: 'residual',
+        points: monitoringPoints,
+        rationale: `${Math.min(input.monitoringEvents || 0, 10)} capped events × 2`,
+    });
     if (input.riskAccepted) {
         residual -= 8;
+        factors.push({
+            code: 'risk_acceptance',
+            label: 'Documented risk acceptance',
+            group: 'residual',
+            points: -8,
+            rationale: 'Formal risk acceptance applied',
+        });
     }
     residual = clamp(residual);
 
@@ -117,6 +193,7 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
         residualRisk: residual,
         riskBand: band(residual),
         explanation,
+        factors,
         inputs: input,
         calculatedAt: new Date(0).toISOString().replace('1970-01-01T00:00:00.000Z', 'deterministic'),
     };
