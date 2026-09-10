@@ -5,8 +5,11 @@
 1. Starting branch: `main`
 2. Starting SHA: `5916d7224ea5edef7f2b3726a452cc2261cb9b0d`
 3. Transformation branch: `supreme-risk-transformation`
-4. Final SHA: recorded after commits on this branch
-5. Commits created: phase commits on `supreme-risk-transformation` (not merged to main)
+4. Final SHA: `b55247ff264c47c702a2497cd7a971889d7997cc`
+5. Commits created:
+   - `a310024` Document the Supreme Risk baseline and add an additive SaaS schema migration
+   - `6224290` Replace prototype auth with Prisma identity, tenant RBAC, and truthful providers
+   - `b55247f` Rebrand the product UI as Supreme Risk and stop falling back to mock data
 
 ## Capability status
 
