@@ -5,7 +5,7 @@ import { Box, CircularProgress } from '@mui/material';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
-  allowedRoles?: Array<'ADMIN' | 'MANAGER' | 'USER' | 'AUDITOR'>;
+  allowedRoles?: string[];
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {

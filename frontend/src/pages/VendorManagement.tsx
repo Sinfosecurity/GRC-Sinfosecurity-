@@ -40,7 +40,7 @@ import { Add, Business, Assessment, CheckCircle, Warning, Error as ErrorIcon } f
 import { vendorAPI } from '../services/api';
 
 interface Vendor {
-    id: number;
+    id: string | number;
     name: string;
     category: string;
     tier: 'Critical' | 'High' | 'Medium' | 'Low';
@@ -53,79 +53,6 @@ interface Vendor {
     dataAccess: string;
     assessmentStatus: 'Not Started' | 'In Progress' | 'Completed' | 'Overdue';
 }
-
-const mockVendors: Vendor[] = [
-    {
-        id: 1,
-        name: 'CloudStorage Pro',
-        category: 'Cloud Services',
-        tier: 'Critical',
-        status: 'Active',
-        riskScore: 85,
-        complianceScore: 92,
-        lastAssessment: '2024-11-15',
-        nextReview: '2025-02-15',
-        contactEmail: 'security@cloudstorage.com',
-        dataAccess: 'Customer PII, Financial Data',
-        assessmentStatus: 'Completed'
-    },
-    {
-        id: 2,
-        name: 'SecurePayments Inc',
-        category: 'Payment Processing',
-        tier: 'Critical',
-        status: 'Active',
-        riskScore: 90,
-        complianceScore: 95,
-        lastAssessment: '2024-12-01',
-        nextReview: '2025-03-01',
-        contactEmail: 'compliance@securepay.com',
-        dataAccess: 'Payment Card Data',
-        assessmentStatus: 'Completed'
-    },
-    {
-        id: 3,
-        name: 'Analytics Dashboard',
-        category: 'Analytics',
-        tier: 'High',
-        status: 'Active',
-        riskScore: 75,
-        complianceScore: 80,
-        lastAssessment: '2024-10-20',
-        nextReview: '2025-01-20',
-        contactEmail: 'support@analytics.com',
-        dataAccess: 'Usage Data',
-        assessmentStatus: 'In Progress'
-    },
-    {
-        id: 4,
-        name: 'Email Marketing Suite',
-        category: 'Marketing',
-        tier: 'Medium',
-        status: 'Active',
-        riskScore: 70,
-        complianceScore: 75,
-        lastAssessment: '2024-09-10',
-        nextReview: '2024-12-10',
-        contactEmail: 'info@emailsuite.com',
-        dataAccess: 'Contact Information',
-        assessmentStatus: 'Overdue'
-    },
-    {
-        id: 5,
-        name: 'HR Software Solutions',
-        category: 'Human Resources',
-        tier: 'High',
-        status: 'Active',
-        riskScore: 78,
-        complianceScore: 88,
-        lastAssessment: '2024-11-01',
-        nextReview: '2025-02-01',
-        contactEmail: 'security@hrsolutions.com',
-        dataAccess: 'Employee Data',
-        assessmentStatus: 'Completed'
-    }
-];
 
 const categories = ['Cloud Services', 'Payment Processing', 'Analytics', 'Marketing', 'Human Resources', 'IT Services', 'Security', 'Other'];
 const tiers = ['Critical', 'High', 'Medium', 'Low'];
@@ -158,7 +85,7 @@ const getScoreColor = (score: number) => {
 };
 
 export default function VendorManagement() {
-    const [vendors, setVendors] = useState(mockVendors);
+    const [vendors, setVendors] = useState<Vendor[]>([]);
     const [statistics, setStatistics] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -211,8 +138,8 @@ export default function VendorManagement() {
             }
         } catch (err: any) {
             console.error('Failed to load vendors:', err);
-            setError(err.response?.data?.message || 'Failed to load vendors. Using mock data.');
-            // Keep using mock data on error
+            setError(err.message || 'Failed to load vendors.');
+            setVendors([]);
         } finally {
             setLoading(false);
         }

@@ -1,15 +1,12 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Typography, Avatar, Stack } from '@mui/material';
 import {
     Dashboard as DashboardIcon,
     Assessment as RiskIcon,
-    Verified as ComplianceIcon,
     Shield as ControlsIcon,
     Warning as IncidentIcon,
     Description as PolicyIcon,
-    Folder as DocumentIcon,
-    Security as ISOIcon,
-    DirectionsCar as TISAXIcon,
     Settings as SettingsIcon,
     Business as OrgIcon,
     History as ActivityIcon,
@@ -17,8 +14,6 @@ import {
     Analytics as AnalyticsIcon,
     Assignment as TaskIcon,
     AccountTree as WorkflowIcon,
-    Business as BCPIcon,
-    Psychology as AIIcon,
     Timeline as PredictiveIcon,
     Assessment as ReportIcon,
     Store as VendorIcon,
@@ -28,30 +23,28 @@ const drawerWidth = 280;
 
 const menuItems = [
     { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon />, color: '#6366f1' },
-    { text: 'Risk Management', path: '/risk-management', icon: <RiskIcon />, color: '#ec4899' },
-    { text: 'Compliance', path: '/compliance', icon: <ComplianceIcon />, color: '#10b981' },
-    { text: 'Controls', path: '/controls', icon: <ControlsIcon />, color: '#f59e0b' },
-    { text: 'Incidents', path: '/incidents', icon: <IncidentIcon />, color: '#ef4444' },
-    { text: 'Policies', path: '/policies', icon: <PolicyIcon />, color: '#06b6d4' },
-    { text: 'Documents', path: '/documents', icon: <DocumentIcon />, color: '#8b5cf6' },
-    { text: 'ISO 27001', path: '/iso27001', icon: <ISOIcon />, color: '#6366f1' },
-    { text: 'TISAX', path: '/tisax', icon: <TISAXIcon />, color: '#ec4899' },
-    { text: 'SOC Reports', path: '/soc-reports', icon: <ISOIcon />, color: '#10b981' },
-    { text: 'Activity Log', path: '/activity-log', icon: <ActivityIcon />, color: '#64748b' },
-    { text: 'User Management', path: '/user-management', icon: <UserIcon />, color: '#f43f5e' },
-    { text: 'Analytics', path: '/analytics', icon: <AnalyticsIcon />, color: '#3b82f6' },
-    { text: 'Tasks', path: '/tasks', icon: <TaskIcon />, color: '#f59e0b' },
-    { text: 'Workflows', path: '/workflows', icon: <WorkflowIcon />, color: '#10b981' },
-    { text: 'Business Continuity', path: '/business-continuity', icon: <BCPIcon />, color: '#f97316' },
-    { text: 'AI Insights', path: '/ai-insights', icon: <AIIcon />, color: '#8b5cf6' },
-    { text: 'Predictive Analytics', path: '/predictive-analytics', icon: <PredictiveIcon />, color: '#ec4899' },
+    { text: 'Vendors', path: '/vendor-management', icon: <VendorIcon />, color: '#14b8a6' },
+    { text: 'Assessments', path: '/assessments', icon: <RiskIcon />, color: '#06b6d4' },
+    { text: 'Findings', path: '/findings', icon: <IncidentIcon />, color: '#ef4444' },
+    { text: 'Monitoring', path: '/monitoring', icon: <PredictiveIcon />, color: '#f59e0b' },
     { text: 'Reports', path: '/reports', icon: <ReportIcon />, color: '#94a3b8' },
-    { text: 'Vendor Management', path: '/vendor-management', icon: <VendorIcon />, color: '#14b8a6' },
+    { text: 'Tasks', path: '/tasks', icon: <TaskIcon />, color: '#f59e0b' },
+];
+
+const adminItems = [
+    { text: 'Organization', path: '/organization-settings', icon: <OrgIcon />, color: '#64748b' },
+    { text: 'Users & Roles', path: '/user-management', icon: <UserIcon />, color: '#f43f5e' },
+    { text: 'Questionnaires', path: '/questionnaires', icon: <PolicyIcon />, color: '#06b6d4' },
+    { text: 'Integrations', path: '/integrations', icon: <WorkflowIcon />, color: '#10b981' },
+    { text: 'Billing', path: '/billing', icon: <AnalyticsIcon />, color: '#3b82f6' },
+    { text: 'Audit Log', path: '/activity-log', icon: <ActivityIcon />, color: '#64748b' },
+    { text: 'Security', path: '/settings', icon: <SettingsIcon />, color: '#8b5cf6' },
 ];
 
 export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user, logout } = useAuth();
 
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -86,10 +79,10 @@ export default function Layout() {
                         </Avatar>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: '-0.02em', color: 'white' }}>
-                                Sinfosecurity
+                                Supreme Risk
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-                                GRC Platform
+                                Third-party risk
                             </Typography>
                         </Box>
                     </Stack>
@@ -142,19 +135,28 @@ export default function Layout() {
                         System
                     </Typography>
                     <List disablePadding>
+                        {adminItems.map((item) => (
+                            <ListItem
+                                key={item.text}
+                                onClick={() => navigate(item.path)}
+                                sx={{ borderRadius: 2, mb: 0.5, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' } }}
+                            >
+                                <ListItemIcon sx={{ color: 'rgba(255,255,255,0.5)', minWidth: 40 }}>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text} primaryTypographyProps={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }} />
+                            </ListItem>
+                        ))}
                         <ListItem
-                            onClick={() => navigate('/organization-settings')}
-                            sx={{ borderRadius: 2, mb: 0.5, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' } }}
-                        >
-                            <ListItemIcon sx={{ color: 'rgba(255,255,255,0.5)', minWidth: 40 }}><OrgIcon /></ListItemIcon>
-                            <ListItemText primary="Organization" primaryTypographyProps={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }} />
-                        </ListItem>
-                        <ListItem
-                            onClick={() => navigate('/settings')}
+                            onClick={async () => {
+                                await logout();
+                                navigate('/login');
+                            }}
                             sx={{ borderRadius: 2, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' } }}
                         >
                             <ListItemIcon sx={{ color: 'rgba(255,255,255,0.5)', minWidth: 40 }}><SettingsIcon /></ListItemIcon>
-                            <ListItemText primary="Settings" primaryTypographyProps={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }} />
+                            <ListItemText
+                                primary={user ? `Sign out (${user.email})` : 'Sign out'}
+                                primaryTypographyProps={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}
+                            />
                         </ListItem>
                     </List>
                 </Box>

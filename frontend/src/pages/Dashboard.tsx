@@ -36,8 +36,12 @@ export default function Dashboard() {
 
     useEffect(() => {
         const checkBackend = async () => {
-            const health = await healthCheck();
-            setBackendStatus(health ? 'connected' : 'disconnected');
+            try {
+                const health = await healthCheck();
+                setBackendStatus(health?.status === 'ok' || health?.status === 'healthy' ? 'connected' : 'disconnected');
+            } catch {
+                setBackendStatus('disconnected');
+            }
         };
         checkBackend();
     }, []);

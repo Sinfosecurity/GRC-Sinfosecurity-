@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '../services/api';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: 'ADMIN' | 'MANAGER' | 'USER' | 'AUDITOR';
+  role: string;
   organizationId: string;
+  permissions?: string[];
 }
 
 interface AuthContextType {
@@ -16,7 +17,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  signup: (input: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    organizationName: string;
+  }) => Promise<void>;
+  logout: () => Promise<void>;
   updateUser: (user: User) => void;
 }
 
@@ -30,75 +38,70 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
+function persist(token: string, user: User) {
+  localStorage.setItem('token', token);
+  localStorage.setItem('user', JSON.stringify(user));
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize auth state from localStorage on mount
   useEffect(() => {
-    const initializeAuth = () => {
-      try {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
-
-        console.log('Initializing auth from localStorage:', { hasToken: !!storedToken, hasUser: !!storedUser });
-
-        if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
-          console.log('Auth initialized successfully');
-        }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        // Clear corrupted data
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+      authAPI.getCurrentUser()
+        .then((response) => {
+          const next = response.data.data.user;
+          setUser(next);
+          localStorage.setItem('user', JSON.stringify(next));
+        })
+        .catch(() => {
+          setToken(null);
+          setUser(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      const response = await authAPI.login({ email, password });
-      
-      // Backend returns { success: true, data: { token, user } }
-      const { token: newToken, user: newUser } = response.data.data;
-
-      console.log('Login successful:', { token: newToken, user: newUser });
-
-      // Store in state
-      setToken(newToken);
-      setUser(newUser);
-
-      // Persist to localStorage
-      localStorage.setItem('token', newToken);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      
-      console.log('Auth state updated:', { isAuthenticated: !!newToken && !!newUser });
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    const response = await authAPI.login({ email, password });
+    const { token: newToken, user: newUser } = response.data.data;
+    setToken(newToken);
+    setUser(newUser);
+    persist(newToken, newUser);
   };
 
-  const logout = () => {
-    // Clear state
+  const signup = async (input: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    organizationName: string;
+  }) => {
+    const response = await authAPI.signup(input);
+    const { token: newToken, user: newUser } = response.data.data;
+    setToken(newToken);
+    setUser(newUser);
+    persist(newToken, newUser);
+  };
+
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch {
+      // Clear local session even if the server call fails.
+    }
     setToken(null);
     setUser(null);
-
-    // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
@@ -108,15 +111,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
-  const value: AuthContextType = {
-    user,
-    token,
-    isAuthenticated: !!token && !!user,
-    isLoading,
-    login,
-    logout,
-    updateUser,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!token && !!user,
+        isLoading,
+        login,
+        signup,
+        logout,
+        updateUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

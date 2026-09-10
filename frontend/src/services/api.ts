@@ -1,197 +1,213 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
-// Use environment variable for API URL, fallback to hardcoded for Railway deployment
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://grc-backend-production-5586.up.railway.app/api/v1';
-const AI_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'https://grc-ai-service.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:4000/api/v1' : '');
 
-console.log('🔗 API Configuration:', {
-    API_BASE_URL,
-    AI_SERVICE_URL,
-    env: import.meta.env.MODE
-});
+if (!API_BASE_URL && import.meta.env.PROD) {
+    console.error('VITE_API_URL is not configured');
+}
 
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: API_BASE_URL || '/api/v1',
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 
-// Request interceptor - Add JWT token to all requests
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+export class ApiClientError extends Error {
+    status?: number;
+    code?: string;
+    constructor(message: string, status?: number, code?: string) {
+        super(message);
+        this.status = status;
+        this.code = code;
     }
-);
+}
 
-// Response interceptor - Handle errors globally
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 api.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
+    async (error: AxiosError<{ error?: string; message?: string }>) => {
+        const status = error.response?.status;
+        const message =
+            error.response?.data?.error ||
+            error.response?.data?.message ||
+            (status === 403
+                ? 'You do not have permission to perform this action.'
+                : status === 404
+                    ? 'The requested record was not found.'
+                    : status === 429
+                        ? 'Too many requests. Wait and try again.'
+                        : !error.response
+                            ? 'Network error. The server did not respond.'
+                            : 'The request failed.');
 
-        // Handle 401 Unauthorized
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-
-            // Only clear auth and redirect if it's an auth endpoint failure
-            // For other endpoints, just reject the promise (they'll handle it)
-            if (originalRequest.url?.includes('/auth/')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/';
+        if (status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            if (!window.location.pathname.startsWith('/login') && window.location.pathname !== '/') {
+                window.location.href = '/login';
             }
-
-            return Promise.reject(error);
         }
 
-        // Handle 403 Forbidden - just reject, don't redirect
-        // Pages can handle authorization errors themselves
-        if (error.response?.status === 403) {
-            return Promise.reject(error);
-        }
-
-        // Handle network errors
-        if (!error.response) {
-            console.error('Network error - backend may be offline');
-        }
-
-        return Promise.reject(error);
+        return Promise.reject(new ApiClientError(message, status, error.code));
     }
 );
 
-// Auth
 export const authAPI = {
     login: (credentials: { email: string; password: string }) =>
         api.post('/auth/login', credentials),
+    signup: (data: {
+        email: string;
+        password: string;
+        firstName: string;
+        lastName: string;
+        organizationName: string;
+        country?: string;
+    }) => api.post('/auth/signup', data),
     logout: () => api.post('/auth/logout'),
-    refreshToken: (refreshToken: string) =>
-        api.post('/auth/refresh', { refreshToken }),
+    refreshToken: (refreshToken: string) => api.post('/auth/refresh', { refreshToken }),
     getCurrentUser: () => api.get('/auth/me'),
+    forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
+    resetPassword: (token: string, password: string) => api.post('/auth/reset-password', { token, password }),
+    changePassword: (currentPassword: string, newPassword: string) =>
+        api.post('/auth/change-password', { currentPassword, newPassword }),
+    activate: (data: { token: string; password: string; firstName: string; lastName: string }) =>
+        api.post('/auth/activate', data),
 };
 
-// Risks
 export const risksAPI = {
     getAll: () => api.get('/risks'),
     getById: (id: string) => api.get(`/risks/${id}`),
-    create: (data: any) => api.post('/risks', data),
-    update: (id: string, data: any) => api.put(`/risks/${id}`, data),
+    create: (data: unknown) => api.post('/risks', data),
+    update: (id: string, data: unknown) => api.put(`/risks/${id}`, data),
     delete: (id: string) => api.delete(`/risks/${id}`),
 };
 
-// Compliance
 export const complianceAPI = {
     getFrameworks: () => api.get('/compliance'),
-    runGapAnalysis: (frameworkId: string) =>
-        api.post('/compliance/gap-analysis', { frameworkId }),
+    runGapAnalysis: (frameworkId: string) => api.post('/compliance/gap-analysis', { frameworkId }),
 };
 
-// Controls
 export const controlsAPI = {
     getAll: () => api.get('/controls'),
-    create: (data: any) => api.post('/controls', data),
+    create: (data: unknown) => api.post('/controls', data),
 };
 
-// Incidents
 export const incidentsAPI = {
     getAll: () => api.get('/incidents'),
-    create: (data: any) => api.post('/incidents', data),
+    create: (data: unknown) => api.post('/incidents', data),
 };
 
-// Policies
 export const policiesAPI = {
     getAll: () => api.get('/policies'),
 };
 
-// Documents
 export const documentsAPI = {
     getAll: () => api.get('/documents'),
 };
 
-// Vendors (TPRM)
+export const usersAPI = {
+    getAll: () => api.get('/users'),
+    invite: (data: { email: string; role: string }) => api.post('/users/invite', data),
+};
+
+export const organizationAPI = {
+    getCurrent: () => api.get('/organization/current'),
+    update: (data: unknown) => api.patch('/organization/current', data),
+};
+
+export const billingAPI = {
+    status: () => api.get('/billing/status'),
+    checkout: (plan: string) => api.post('/billing/checkout', { plan }),
+    portal: () => api.post('/billing/portal'),
+};
+
+export const aiAPI = {
+    status: () => api.get('/ai/status'),
+    analyze: (feature: string, context: string) => api.post('/ai/analyze', { feature, context }),
+};
+
+export const integrationAPI = {
+    status: () => api.get('/integrations/status'),
+    test: (provider: string) => api.post(`/integrations/${provider}/test`),
+};
+
+export const questionnaireAPI = {
+    list: () => api.get('/questionnaires'),
+};
+
+export const exportAPI = {
+    vendorsCsv: () => api.get('/exports/vendors.csv', { responseType: 'blob' }),
+    findingsCsv: () => api.get('/exports/findings.csv', { responseType: 'blob' }),
+    board: () => api.get('/exports/board.json'),
+};
+
 export const vendorAPI = {
-    // Vendor Management
-    getAll: (filters?: any) => api.get('/vendors', { params: filters }),
+    getAll: (filters?: unknown) => api.get('/vendors', { params: filters }),
     getById: (id: string) => api.get(`/vendors/${id}`),
-    create: (data: any) => api.post('/vendors', data),
-    update: (id: string, data: any) => api.put(`/vendors/${id}`, data),
+    create: (data: unknown) => api.post('/vendors', data),
+    update: (id: string, data: unknown) => api.put(`/vendors/${id}`, data),
     delete: (id: string) => api.delete(`/vendors/${id}`),
     getStatistics: () => api.get('/vendors/statistics'),
-    getRequiringAttention: () => api.get('/vendors/requiring-attention'),
-    offboard: (id: string, data: any) => api.post(`/vendors/${id}/offboard`, data),
-
-    // Vendor Assessments
+    getRequiringAttention: () => api.get('/vendors/attention'),
+    offboard: (id: string, data: unknown) => api.post(`/vendors/${id}/offboard`, data),
     getAssessments: (vendorId: string) => api.get(`/vendors/${vendorId}/assessments`),
-    createAssessment: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/assessments`, data),
+    createAssessment: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/assessments`, data),
     getAssessmentById: (vendorId: string, assessmentId: string) =>
         api.get(`/vendors/${vendorId}/assessments/${assessmentId}`),
-    submitResponse: (vendorId: string, assessmentId: string, data: any) =>
+    submitResponse: (vendorId: string, assessmentId: string, data: unknown) =>
         api.post(`/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
     completeAssessment: (vendorId: string, assessmentId: string) =>
         api.post(`/vendors/${vendorId}/assessments/${assessmentId}/complete`),
-
-    // Vendor Contracts
     getContracts: (vendorId: string) => api.get(`/vendors/${vendorId}/contracts`),
-    createContract: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/contracts`, data),
-    getContractById: (vendorId: string, contractId: string) =>
-        api.get(`/vendors/${vendorId}/contracts/${contractId}`),
-    updateContract: (vendorId: string, contractId: string, data: any) =>
-        api.put(`/vendors/${vendorId}/contracts/${contractId}`, data),
-    trackSLA: (vendorId: string, contractId: string, data: any) =>
-        api.post(`/vendors/${vendorId}/contracts/${contractId}/sla`, data),
-    getExpiringContracts: (days?: number) => api.get('/vendors/contracts/expiring', { params: { days } }),
-
-    // Vendor Issues
+    createContract: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/contracts`, data),
     getIssues: (vendorId: string) => api.get(`/vendors/${vendorId}/issues`),
-    createIssue: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/issues`, data),
-    getIssueById: (vendorId: string, issueId: string) =>
-        api.get(`/vendors/${vendorId}/issues/${issueId}`),
-    updateIssue: (vendorId: string, issueId: string, data: any) =>
-        api.put(`/vendors/${vendorId}/issues/${issueId}`, data),
-    submitCAP: (vendorId: string, issueId: string, data: any) =>
-        api.post(`/vendors/${vendorId}/issues/${issueId}/corrective-action`, data),
-    validateRemediation: (vendorId: string, issueId: string, data: any) =>
-        api.post(`/vendors/${vendorId}/issues/${issueId}/validate`, data),
-
-    // Continuous Monitoring
+    createIssue: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/issues`, data),
     getMonitoring: (vendorId: string) => api.get(`/vendors/${vendorId}/monitoring`),
-    recordSignal: (vendorId: string, data: any) => api.post(`/vendors/${vendorId}/monitoring`, data),
-
-    // AI Intelligence
     getRiskSummary: (vendorId: string) => api.get(`/vendors/${vendorId}/ai/risk-summary`),
     analyzeAssessment: (vendorId: string, assessmentId: string) =>
         api.get(`/vendors/${vendorId}/ai/assessment-analysis/${assessmentId}`),
     reviewContract: (vendorId: string, contractId: string) =>
         api.get(`/vendors/${vendorId}/ai/contract-review/${contractId}`),
     generateAuditPackage: (vendorId: string) => api.get(`/vendors/${vendorId}/ai/audit-package`),
-
-    // Reporting
     getExecutiveDashboard: () => api.get('/vendors/reports/executive-dashboard'),
     getRiskHeatmap: () => api.get('/vendors/reports/risk-heatmap'),
     getVendorScorecard: (vendorId: string) => api.get(`/vendors/${vendorId}/reports/scorecard`),
     getTrendAnalysis: (months?: number) => api.get('/vendors/reports/trends', { params: { months } }),
     exportBoardReport: (format: string) => api.get('/vendors/reports/board-report', { params: { format } }),
+    getContractById: (vendorId: string, contractId: string) =>
+        api.get(`/vendors/${vendorId}/contracts/${contractId}`),
+    updateContract: (vendorId: string, contractId: string, data: unknown) =>
+        api.put(`/vendors/${vendorId}/contracts/${contractId}`, data),
+    trackSLA: (vendorId: string, contractId: string, data: unknown) =>
+        api.post(`/vendors/${vendorId}/contracts/${contractId}/sla`, data),
+    getExpiringContracts: (days?: number) => api.get('/vendors/contracts/expiring', { params: { days } }),
+    getIssueById: (vendorId: string, issueId: string) => api.get(`/vendors/${vendorId}/issues/${issueId}`),
+    updateIssue: (vendorId: string, issueId: string, data: unknown) =>
+        api.put(`/vendors/${vendorId}/issues/${issueId}`, data),
+    submitCAP: (vendorId: string, issueId: string, data: unknown) =>
+        api.post(`/vendors/${vendorId}/issues/${issueId}/corrective-action`, data),
+    validateRemediation: (vendorId: string, issueId: string, data: unknown) =>
+        api.post(`/vendors/${vendorId}/issues/${issueId}/validate`, data),
+    recordSignal: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/monitoring`, data),
 };
 
-// Health check
 export const healthCheck = async () => {
-    try {
-        const baseUrl = import.meta.env.VITE_API_URL || 'https://grc-backend-production-5586.up.railway.app/api/v1';
-        const healthUrl = baseUrl.replace('/api/v1', '/health');
-        const response = await axios.get(healthUrl, { timeout: 2000 });
-        return response.data;
-    } catch (error) {
-        // Backend doesn't have /health endpoint yet, but that's okay
-        // Just return a mock response to indicate backend is accessible
-        return { status: 'ok', timestamp: Date.now() };
+    if (!API_BASE_URL && import.meta.env.PROD) {
+        throw new ApiClientError('API URL is not configured', 503, 'NOT_CONFIGURED');
     }
+    const baseUrl = API_BASE_URL || 'http://localhost:4000/api/v1';
+    const healthUrl = baseUrl.replace('/api/v1', '/health');
+    const response = await axios.get(healthUrl, { timeout: 4000 });
+    return response.data;
 };
 
 export default api;

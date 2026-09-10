@@ -31,6 +31,12 @@ const OnboardingWizard = lazy(() => import('./pages/OnboardingWizard'));
 const ISO27001 = lazy(() => import('./pages/ISO27001'));
 const TISAX = lazy(() => import('./pages/TISAX'));
 const Settings = lazy(() => import('./pages/Settings'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const Billing = lazy(() => import('./pages/Billing'));
+const Integrations = lazy(() => import('./pages/Integrations'));
+const ContinuousMonitoring = lazy(() => import('./pages/ContinuousMonitoring'));
 
 // Loading component
 const LoadingFallback = () => (
@@ -46,6 +52,9 @@ export default function App() {
             <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
@@ -66,6 +75,12 @@ export default function App() {
                     <Route path="predictive-analytics" element={<PredictiveAnalytics />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="vendor-management" element={<VendorManagement />} />
+                    <Route path="assessments" element={<VendorManagement />} />
+                    <Route path="findings" element={<VendorManagement />} />
+                    <Route path="monitoring" element={<ContinuousMonitoring />} />
+                    <Route path="questionnaires" element={<VendorManagement />} />
+                    <Route path="billing" element={<Billing />} />
+                    <Route path="integrations" element={<Integrations />} />
                     <Route path="soc-reports" element={<SOCReports />} />
                     <Route path="onboarding" element={<OnboardingWizard />} />
                     <Route path="iso27001" element={<ISO27001 />} />

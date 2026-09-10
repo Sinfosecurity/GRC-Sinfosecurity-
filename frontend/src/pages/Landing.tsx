@@ -29,7 +29,7 @@ export default function Landing() {
             await login(email, password);
             navigate('/dashboard');
         } catch (err: any) {
-            setError('Login failed. For demo use: admin@sinfosecurity.com / demo123');
+            setError(err.message || 'Unable to sign in');
         } finally {
             setIsLoading(false);
         }
@@ -77,7 +77,7 @@ export default function Landing() {
                         </Avatar>
                         <Box>
                             <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>
-                                Sinfosecurity
+                                Supreme Risk
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                                 GRC Platform
@@ -231,17 +231,9 @@ export default function Landing() {
                                     </form>
 
                                     <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
-                                            Demo Credentials:
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                                            Use your organization credentials. Demo accounts are not accepted in production.
                                         </Typography>
-                                        <Stack direction="row" spacing={1} alignItems="center">
-                                            <Typography variant="caption" sx={{ color: 'white', fontFamily: 'monospace', bgcolor: 'rgba(255,255,255,0.1)', px: 1, py: 0.5, borderRadius: 1 }}>
-                                                admin@sinfosecurity.com
-                                            </Typography>
-                                            <Typography variant="caption" sx={{ color: 'white', fontFamily: 'monospace', bgcolor: 'rgba(255,255,255,0.1)', px: 1, py: 0.5, borderRadius: 1 }}>
-                                                demo123
-                                            </Typography>
-                                        </Stack>
                                     </Box>
                                 </CardContent>
 

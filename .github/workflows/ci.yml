@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [supreme-risk-transformation, main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install backend
+        run: npm install
+      - name: Prisma generate
+        run: npx prisma generate
+      - name: Typecheck backend
+        run: npx tsc --noEmit
+      - name: Test backend
+        run: npm test -- --ci
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-jwt-secret-key-which-is-long-enough
+          JWT_REFRESH_SECRET: test-refresh-secret-key-which-is-long-enough
+          DATABASE_URL: postgresql://localhost:5432/grc_test
+      - name: Install frontend
+        working-directory: frontend
+        run: npm install
+      - name: Typecheck frontend
+        working-directory: frontend
+        run: npx tsc --noEmit
+      - name: Test frontend
+        working-directory: frontend
+        run: npm test -- --run
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost:4000/api/v1
