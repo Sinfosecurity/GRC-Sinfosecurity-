@@ -4,7 +4,7 @@ import logger from '../config/logger';
  * Enterprise contract lifecycle and SLA tracking
  */
 
-import { VendorContract, ContractType, ContractStatus } from '@prisma/client';
+import { ContractStatus, ContractType, Prisma, SLAMetricType, SLAStatus, VendorContract, VendorIssueStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 
 export interface CreateContractInput {
@@ -189,14 +189,25 @@ class VendorContractService {
         periodEnd: Date;
         notes?: string;
     }) {
-        const status = data.actual >= data.target ? 'MET' : 'BREACHED';
+        const status: SLAStatus = data.actual >= data.target ? SLAStatus.MET : SLAStatus.BREACHED;
+
+        const slaData: Prisma.SLATrackingUncheckedCreateInput = {
+            contractId: data.contractId,
+            metricName: data.metricName,
+            metricType: this.toSlaMetricType(data.metricType),
+            target: data.target,
+            actual: data.actual,
+            unit: data.unit,
+            period: data.period,
+            periodStart: data.periodStart,
+            periodEnd: data.periodEnd,
+            notes: data.notes,
+            status,
+            breachCount: status === SLAStatus.BREACHED ? 1 : 0,
+        };
 
         const slaRecord = await prisma.sLATracking.create({
-            data: {
-                ...data,
-                status,
-                breachCount: status === 'BREACHED' ? 1 : 0,
-            },
+            data: slaData,
         });
 
         // If SLA breached, create vendor issue
@@ -219,7 +230,7 @@ class VendorContractService {
                         source: 'CONTINUOUS_MONITORING',
                         identifiedBy: 'system',
                         category: 'Performance',
-                        status: 'OPEN',
+                        status: VendorIssueStatus.OPEN,
                     },
                 });
             }
@@ -448,6 +459,12 @@ class VendorContractService {
     /**
      * Helper: Get period start date
      */
+    private toSlaMetricType(value: string): SLAMetricType {
+        return (Object.values(SLAMetricType) as string[]).includes(value)
+            ? (value as SLAMetricType)
+            : SLAMetricType.OTHER;
+    }
+
     private getPeriodStartDate(period: 'MONTH' | 'QUARTER' | 'YEAR'): Date {
         const now = new Date();
         switch (period) {

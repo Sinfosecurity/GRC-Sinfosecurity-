@@ -1,3 +1,7 @@
+/**
+ * QUARANTINED monitoring test harness.
+ * Not mounted by src/server.ts.
+ */
 import { Router, Request, Response } from 'express';
 import { monitoringService } from '../utils/monitoring';
 import { errorTracker } from '../utils/errorTracking';

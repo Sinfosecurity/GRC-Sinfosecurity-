@@ -22,7 +22,6 @@ import { CacheService } from './services/cacheService';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
-import authEnhancedRoutes from './routes/auth.enhanced.routes';
 import riskRoutes from './routes/risk.routes';
 import complianceRoutes from './routes/compliance.routes';
 import controlsRoutes from './routes/controls.routes';
@@ -41,7 +40,6 @@ import approvalRoutes from './routes/approval.routes';
 import concentrationRoutes from './routes/concentration.routes';
 import riskHistoryRoutes from './routes/risk-history.routes';
 import riskAppetiteRoutes from './routes/risk-appetite.routes';
-import monitoringTestRoutes from './routes/monitoring.test.routes';
 import monitoringRoutes from './routes/monitoring.routes';
 import billingRoutes from './routes/billing.routes';
 import aiRoutes from './routes/ai.routes';
@@ -199,7 +197,6 @@ app.get('/health/live', livenessCheckHandler); // Kubernetes liveness probe
 const API_PREFIX = `/api/${process.env.API_VERSION || 'v1'}`;
 
 app.use(`${API_PREFIX}/auth`, authRoutes);
-app.use(`${API_PREFIX}/auth`, authEnhancedRoutes); // SSO and MFA routes
 app.use(`${API_PREFIX}/risks`, riskRoutes);
 app.use(`${API_PREFIX}/compliance`, complianceRoutes);
 app.use(`${API_PREFIX}/controls`, controlsRoutes);
@@ -213,13 +210,12 @@ app.use(`${API_PREFIX}/tasks`, taskRoutes);
 app.use(`${API_PREFIX}/workflows`, workflowRoutes);
 app.use(`${API_PREFIX}/reports`, reportRoutes);
 app.use(`${API_PREFIX}/mobile`, mobileRoutes);
-app.use(`${API_PREFIX}/vendors`, vendorRoutes);
 app.use(`${API_PREFIX}/vendors/approvals`, approvalRoutes);
 app.use(`${API_PREFIX}/vendors/concentration-risk`, concentrationRoutes);
 app.use(`${API_PREFIX}/vendors/risk-history`, riskHistoryRoutes);
+app.use(`${API_PREFIX}/vendors`, vendorRoutes);
 app.use(`${API_PREFIX}/risk-appetite`, riskAppetiteRoutes);
 app.use(`${API_PREFIX}/monitoring`, monitoringRoutes);
-app.use(`${API_PREFIX}/monitoring/test`, monitoringTestRoutes);
 app.use(`${API_PREFIX}/billing`, billingRoutes);
 app.use(`${API_PREFIX}/ai`, aiRoutes);
 app.use(`${API_PREFIX}/exports`, exportRoutes);

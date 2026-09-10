@@ -328,11 +328,12 @@ class RiskAppetiteService {
         }
 
         return prisma.riskAppetiteBreach.findMany({
-            where,
+            where: {
+                ...where,
+                riskAppetite: { organizationId },
+            },
             include: {
-                riskAppetite: {
-                    where: { organizationId },
-                },
+                riskAppetite: true,
             },
             orderBy: { breachDate: 'desc' },
         });

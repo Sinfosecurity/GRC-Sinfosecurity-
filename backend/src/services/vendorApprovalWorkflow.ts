@@ -203,7 +203,7 @@ class VendorApprovalWorkflowService {
                 });
 
                 // Determine workflow status based on decision
-                let newWorkflowStatus = workflow.status;
+                let newWorkflowStatus: WorkflowStatus = workflow.status;
                 let currentStepNumber = workflow.currentStep;
 
                 if (data.decision === ApprovalDecision.REJECTED) {

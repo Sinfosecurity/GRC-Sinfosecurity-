@@ -25,8 +25,9 @@ describe('AuthContext', () => {
     const mockUser = {
       id: '1',
       email: 'test@example.com',
-      name: 'Test User',
-      role: 'USER' as const,
+      firstName: 'Test',
+      lastName: 'User',
+      role: 'VIEWER',
       organizationId: 'org1',
     };
 
@@ -37,14 +38,15 @@ describe('AuthContext', () => {
     expect(result.current.user).toEqual(mockUser);
   });
 
-  it('clears user and token on logout', () => {
+  it('clears user and token on logout', async () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
 
     const mockUser = {
       id: '1',
       email: 'test@example.com',
-      name: 'Test User',
-      role: 'USER' as const,
+      firstName: 'Test',
+      lastName: 'User',
+      role: 'VIEWER',
       organizationId: 'org1',
     };
 
@@ -52,8 +54,8 @@ describe('AuthContext', () => {
       result.current.updateUser(mockUser);
     });
 
-    act(() => {
-      result.current.logout();
+    await act(async () => {
+      await result.current.logout();
     });
 
     expect(result.current.user).toBeNull();
@@ -67,8 +69,9 @@ describe('AuthContext', () => {
     const mockUser = {
       id: '1',
       email: 'test@example.com',
-      name: 'Test User',
-      role: 'USER' as const,
+      firstName: 'Test',
+      lastName: 'User',
+      role: 'VIEWER',
       organizationId: 'org1',
     };
 

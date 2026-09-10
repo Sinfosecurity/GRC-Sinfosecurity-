@@ -1,6 +1,6 @@
 /**
- * Organization API Routes
- * Handles organization (tenant) management endpoints
+ * QUARANTINED in-memory organization routes.
+ * Not mounted by src/server.ts. Production org APIs are organization.saas.routes.ts.
  */
 
 import express, { Request, Response } from 'express';

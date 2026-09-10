@@ -1,6 +1,7 @@
 /**
- * Organization (Tenant) Service
- * Manages multi-tenant organizations with complete data isolation
+ * QUARANTINED in-memory organization store.
+ * Production tenant records live in Prisma Organization.
+ * This module is not imported by src/server.ts.
  */
 
 import {
@@ -61,7 +62,9 @@ class OrganizationService {
                 amount: planConfig.price,
                 startDate: now,
                 endDate: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000), // 1 year
-                trialEndDate: isTrial ? new Date(now.getTime() + planConfig.duration * 24 * 60 * 60 * 1000) : undefined,
+                trialEndDate: isTrial
+                    ? new Date(now.getTime() + ('duration' in planConfig ? planConfig.duration : 14) * 24 * 60 * 60 * 1000)
+                    : undefined,
                 autoRenew: true,
             },
             

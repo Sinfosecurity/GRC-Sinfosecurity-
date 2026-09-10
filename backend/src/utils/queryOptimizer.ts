@@ -152,7 +152,7 @@ export const vendorQueries = {
                         },
                         assessments: {
                             where: { status: 'COMPLETED' },
-                            orderBy: { completedDate: 'desc' },
+                            orderBy: { completedAt: 'desc' },
                             take: 1,
                         },
                         issues: {
@@ -194,7 +194,7 @@ export const vendorQueries = {
                 name: true,
                 tier: true,
                 nextReviewDate: true,
-                riskScore: true,
+                residualRiskScore: true,
             },
             orderBy: {
                 nextReviewDate: 'asc',

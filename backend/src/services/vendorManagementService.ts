@@ -3,7 +3,7 @@
  * Enterprise-grade Third-Party Risk Management
  */
 
-import { Vendor, VendorTier, VendorStatus, VendorType } from '@prisma/client';
+import { CriticalityLevel, Prisma, Vendor, VendorCategory, VendorTier, VendorStatus, VendorType } from '@prisma/client';
 import { prisma } from '../config/database';
 import { handlePrismaError, NotFoundError, ValidationError, BusinessLogicError } from '../utils/errors';
 import logger from '../config/logger';
@@ -88,15 +88,36 @@ class VendorManagementService {
             // Calculate next review date based on tier
             const nextReviewDate = this.calculateNextReviewDate(data.tier);
 
+            const createData: Prisma.VendorUncheckedCreateInput = {
+                name: data.name,
+                legalName: data.legalName,
+                vendorType: data.vendorType,
+                category: this.toVendorCategory(data.category),
+                tier: data.tier,
+                primaryContact: data.primaryContact,
+                contactEmail: data.contactEmail,
+                contactPhone: data.contactPhone,
+                website: data.website,
+                businessOwner: data.businessOwner,
+                relationshipOwner: data.relationshipOwner,
+                servicesProvided: data.servicesProvided,
+                contractValue: data.contractValue,
+                currency: data.currency,
+                dataTypesAccessed: data.dataTypesAccessed || [],
+                geographicFootprint: data.geographicFootprint || [],
+                regulatoryScope: data.regulatoryScope || [],
+                hasSubcontractors: data.hasSubcontractors || false,
+                fourthParties: data.fourthParties,
+                organizationId: data.organizationId,
+                inherentRiskScore,
+                residualRiskScore: inherentRiskScore,
+                nextReviewDate,
+                status: VendorStatus.PROPOSED,
+                criticalityLevel: this.mapTierToCriticality(data.tier),
+            };
+
             const vendor = await prisma.vendor.create({
-                data: {
-                    ...data,
-                    inherentRiskScore,
-                    residualRiskScore: inherentRiskScore, // Initially same as inherent
-                    nextReviewDate,
-                    status: VendorStatus.PROPOSED,
-                    criticalityLevel: this.mapTierToCriticality(data.tier) as any,
-                },
+                data: createData,
             });
 
             logger.info(`Vendor created successfully`, { vendorId: vendor.id, vendorName: vendor.name, tier: vendor.tier });
@@ -285,6 +306,12 @@ class VendorManagementService {
      * Delete vendor (soft delete by setting status to TERMINATED)
      */
     async deleteVendor(vendorId: string, organizationId: string): Promise<void> {
+        const existing = await prisma.vendor.findFirst({
+            where: { id: vendorId, organizationId },
+        });
+        if (!existing) {
+            throw new NotFoundError('Vendor', vendorId);
+        }
         await prisma.vendor.updateMany({
             where: {
                 id: vendorId,
@@ -296,7 +323,7 @@ class VendorManagementService {
             },
         });
 
-        logger.info(`✅ Terminated vendor: ${vendorId}`);
+        logger.info(`Terminated vendor: ${vendorId}`);
     }
 
     /**
@@ -527,18 +554,24 @@ class VendorManagementService {
     /**
      * Map tier to criticality level
      */
-    private mapTierToCriticality(tier: VendorTier): string {
+    private toVendorCategory(value: string): VendorCategory {
+        return (Object.values(VendorCategory) as string[]).includes(value)
+            ? (value as VendorCategory)
+            : VendorCategory.OTHER;
+    }
+
+    private mapTierToCriticality(tier: VendorTier): CriticalityLevel {
         switch (tier) {
             case VendorTier.CRITICAL:
-                return 'CRITICAL';
+                return CriticalityLevel.CRITICAL;
             case VendorTier.HIGH:
-                return 'HIGH';
+                return CriticalityLevel.HIGH;
             case VendorTier.MEDIUM:
-                return 'MEDIUM';
+                return CriticalityLevel.MEDIUM;
             case VendorTier.LOW:
-                return 'LOW';
+                return CriticalityLevel.LOW;
             default:
-                return 'MEDIUM';
+                return CriticalityLevel.MEDIUM;
         }
     }
 

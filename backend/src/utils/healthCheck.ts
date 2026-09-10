@@ -213,8 +213,16 @@ export async function healthCheckHandler(req: Request, res: Response) {
 
     // Set appropriate status code
     const statusCode = result.status === 'healthy' ? 200 : result.status === 'degraded' ? 200 : 503;
+    const memory = process.memoryUsage();
 
-    res.status(statusCode).json(result);
+    res.status(statusCode).json({
+        ...result,
+        memory: {
+            rss: memory.rss,
+            heapUsed: memory.heapUsed,
+            heapTotal: memory.heapTotal,
+        },
+    });
 }
 
 /**

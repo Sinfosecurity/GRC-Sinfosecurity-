@@ -1,3 +1,8 @@
+/**
+ * QUARANTINED prototype entrypoint.
+ * Production and CI start `src/server.ts` / `dist/server.js` only.
+ * This file must never be used as a process entrypoint.
+ */
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -109,15 +114,9 @@ app.use((req: Request, res: Response) => {
     });
 });
 
-// Start server
-const PORT = process.env.PORT || 4000;
-
-app.listen(PORT, () => {
-    console.log(`🚀 Mock Backend running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 API URL: http://localhost:${PORT}${API_PREFIX}`);
-    console.log(`💚 Health check: http://localhost:${PORT}/health`);
-    console.log(`⚠️  Running in DEMO MODE (no database required)`);
-});
+// Quarantined: never bind a port. Production uses src/server.ts.
+if (require.main === module) {
+    throw new Error('server-simple.ts is quarantined and must not be started');
+}
 
 export default app;

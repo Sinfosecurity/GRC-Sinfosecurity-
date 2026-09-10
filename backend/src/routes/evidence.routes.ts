@@ -1,3 +1,7 @@
+/**
+ * QUARANTINED in-memory evidence collection routes.
+ * Not mounted by src/server.ts. Production evidence is evidence.storage.routes.ts.
+ */
 import express, { Request, Response } from 'express';
 import evidenceCollectionService from '../services/evidenceCollectionService';
 

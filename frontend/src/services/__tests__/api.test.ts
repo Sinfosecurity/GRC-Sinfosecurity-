@@ -151,9 +151,7 @@ describe('API Service', () => {
     it('returns null on health check failure', async () => {
       mockedAxios.get = vi.fn().mockRejectedValue(new Error('Network error'));
 
-      const result = await healthCheck();
-      
-      expect(result).toBeNull();
+      await expect(healthCheck()).rejects.toThrow('Network error');
     });
   });
 
@@ -333,7 +331,7 @@ describe('API Service', () => {
 
     it('gets vendors requiring attention', async () => {
       await vendorAPI.getRequiringAttention();
-      expect(api.get).toHaveBeenCalledWith('/vendors/requiring-attention');
+      expect(api.get).toHaveBeenCalledWith('/vendors/attention');
     });
 
     it('offboards a vendor', async () => {

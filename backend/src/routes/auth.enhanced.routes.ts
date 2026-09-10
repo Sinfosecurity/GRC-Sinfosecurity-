@@ -1,6 +1,6 @@
 /**
- * Enhanced Authentication Routes
- * Supports JWT, SSO (SAML/OAuth/OIDC), and MFA
+ * QUARANTINED in-memory SSO/MFA routes.
+ * Not mounted by src/server.ts. Production auth is Prisma + JWT in auth.routes.ts.
  */
 
 import { Router, Request, Response, NextFunction } from 'express';

@@ -11,6 +11,30 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    env:
+      NODE_ENV: test
+      JWT_SECRET: test-jwt-secret-key-which-is-long-enough
+      JWT_REFRESH_SECRET: test-refresh-secret-key-which-is-long-enough
+      JWT_EXPIRES_IN: 1h
+      DATABASE_URL: postgresql://supreme_test:supreme_test@localhost:5432/supreme_risk_test
+      TEST_DATABASE_URL: postgresql://supreme_test:supreme_test@localhost:5432/supreme_risk_test
+      ALLOW_PENDING_DOWNLOADS: "false"
+      ALLOW_UNSCANNED_DOWNLOADS: "false"
+      ALLOW_LOCAL_OBJECT_STORAGE: "true"
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: supreme_test
+          POSTGRES_PASSWORD: supreme_test
+          POSTGRES_DB: supreme_risk_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U supreme_test -d supreme_risk_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,13 +46,13 @@ jobs:
         run: npx prisma generate
       - name: Typecheck backend
         run: npx tsc --noEmit
+      - name: Security and schema checks
+        working-directory: .
+        run: bash backend/scripts/ci-security.sh
+      - name: Database migration rehearsal
+        run: bash scripts/rehearse-migration.sh
       - name: Test backend
-        run: npm test -- --ci
-        env:
-          NODE_ENV: test
-          JWT_SECRET: test-jwt-secret-key-which-is-long-enough
-          JWT_REFRESH_SECRET: test-refresh-secret-key-which-is-long-enough
-          DATABASE_URL: postgresql://localhost:5432/grc_test
+        run: npm test -- --ci --runInBand
       - name: Install frontend
         working-directory: frontend
         run: npm install

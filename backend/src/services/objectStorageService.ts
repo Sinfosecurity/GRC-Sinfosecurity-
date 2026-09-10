@@ -8,6 +8,66 @@ import { LocalStorageProvider } from '../storage/localStorageProvider';
 import { S3StorageProvider } from '../storage/s3StorageProvider';
 import { ALLOWED_CONTENT_TYPES, MAX_UPLOAD_BYTES, ObjectStorageProvider, sanitizeFilename } from '../storage/types';
 
+export type ScanDownloadPolicy = {
+    allowPendingDownloads: boolean;
+    allowUnscannedDownloads: boolean;
+};
+
+export type ScanDownloadDecision = {
+    allowed: boolean;
+    statusCode: 200 | 403;
+    reason: string;
+};
+
+export function scanDownloadPolicyFromEnv(env: NodeJS.ProcessEnv = process.env): ScanDownloadPolicy {
+    return {
+        allowPendingDownloads: env.ALLOW_PENDING_DOWNLOADS === 'true',
+        allowUnscannedDownloads: env.ALLOW_UNSCANNED_DOWNLOADS === 'true',
+    };
+}
+
+/**
+ * Evidence download policy. No scan state is treated as CLEAN unless it is CLEAN.
+ * PENDING / FAILED / INFECTED / NOT_CONFIGURED never succeed unless an explicit
+ * deployment flag permits that specific non-clean state.
+ */
+export function evaluateScanDownloadPolicy(
+    scanStatus: ScanStatus | string,
+    policy: ScanDownloadPolicy = scanDownloadPolicyFromEnv()
+): ScanDownloadDecision {
+    switch (scanStatus) {
+        case ScanStatus.CLEAN:
+            return { allowed: true, statusCode: 200, reason: 'File passed malware scanning' };
+        case ScanStatus.INFECTED:
+            return { allowed: false, statusCode: 403, reason: 'Download blocked: file marked infected' };
+        case ScanStatus.PENDING:
+            if (policy.allowPendingDownloads) {
+                return { allowed: true, statusCode: 200, reason: 'Pending scan download permitted by deployment policy' };
+            }
+            return { allowed: false, statusCode: 403, reason: 'Download blocked: malware scan is pending' };
+        case ScanStatus.FAILED:
+            return { allowed: false, statusCode: 403, reason: 'Download blocked: malware scan failed closed' };
+        case ScanStatus.NOT_CONFIGURED:
+            if (policy.allowUnscannedDownloads) {
+                return { allowed: true, statusCode: 200, reason: 'Unscanned download permitted by deployment policy' };
+            }
+            return {
+                allowed: false,
+                statusCode: 403,
+                reason: 'Download blocked: malware scanning is not configured',
+            };
+        default:
+            return { allowed: false, statusCode: 403, reason: 'Download blocked: unknown scan status' };
+    }
+}
+
+export function assertDownloadable(scanStatus: ScanStatus | string, policy?: ScanDownloadPolicy): void {
+    const decision = evaluateScanDownloadPolicy(scanStatus, policy);
+    if (!decision.allowed) {
+        throw new ApiError(decision.statusCode, decision.reason);
+    }
+}
+
 function malwareScanStatus(): ScanStatus {
     if (isProviderConfigured('MALWARE_SCAN_PROVIDER') || isProviderConfigured('CLAMAV_HOST')) {
         return ScanStatus.PENDING;
@@ -32,6 +92,7 @@ export const objectStorageService = {
         return {
             provider: s3.isConfigured() ? 's3' : process.env.NODE_ENV === 'production' ? 'NOT_CONFIGURED' : 'local',
             malwareScanning: malwareScanStatus(),
+            downloadPolicy: scanDownloadPolicyFromEnv(),
         };
     },
 
@@ -97,15 +158,9 @@ export const objectStorageService = {
         if (!stored) {
             throw new ApiError(404, 'Document not found');
         }
-        if (stored.scanStatus === ScanStatus.INFECTED) {
-            throw new ApiError(403, 'Download blocked: file marked infected');
-        }
+        assertDownloadable(stored.scanStatus);
         const store = provider();
         const buffer = await store.getObject(stored.storageKey);
-        await prisma.storedObject.update({
-            where: { id: stored.id },
-            data: {},
-        });
         await recordAudit({
             organizationId,
             actorUserId,
@@ -113,6 +168,7 @@ export const objectStorageService = {
             resourceType: 'StoredObject',
             resourceId: stored.id,
             result: 'success',
+            metadata: { scanStatus: stored.scanStatus },
         });
         return { stored, buffer };
     },

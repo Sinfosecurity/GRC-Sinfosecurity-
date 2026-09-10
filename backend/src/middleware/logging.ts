@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import logger from '../config/logger';
 
 export interface LoggingOptions {
@@ -18,12 +18,15 @@ export interface LoggingOptions {
  */
 export const requestId = () => {
     return (req: Request, res: Response, next: NextFunction) => {
-        // Generate or use existing request ID
-        const id = req.headers['x-request-id'] as string || uuidv4();
-        
+        const id = (req.headers['x-request-id'] as string) || randomUUID();
+        const started = Date.now();
         (req as any).id = id;
         res.setHeader('X-Request-ID', id);
-        
+        const originalWriteHead = res.writeHead.bind(res);
+        res.writeHead = ((...args: Parameters<typeof res.writeHead>) => {
+            res.setHeader('X-Response-Time', `${Date.now() - started}ms`);
+            return originalWriteHead(...args);
+        }) as typeof res.writeHead;
         next();
     };
 };

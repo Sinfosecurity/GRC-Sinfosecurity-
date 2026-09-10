@@ -176,7 +176,7 @@ router.get('/:id', validateUUID('id'), async (req: any, res) => {
 
         res.json(vendor);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(error.statusCode || 500).json({ error: error.message });
     }
 });
 
@@ -211,7 +211,7 @@ router.put('/:id', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), val
 
         res.json(vendor);
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 
@@ -224,7 +224,7 @@ router.delete('/:id', authorize('ADMIN'), validateUUID('id'), async (req: any, r
         await vendorManagementService.deleteVendor(req.params.id, req.user.organizationId);
         res.status(204).send();
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 

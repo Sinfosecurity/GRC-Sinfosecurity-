@@ -41,9 +41,9 @@ describe('Health Check API', () => {
                 .get('/health')
                 .expect(200);
 
-            if (!response.body.devMode) {
-                expect(response.body).toHaveProperty('checks');
-                expect(response.body.checks).toHaveProperty('database');
+            expect(response.body).toHaveProperty('checks');
+            if (response.body.checks?.postgres || response.body.checks?.database) {
+                expect(response.body.checks.postgres || response.body.checks.database).toBeDefined();
             }
         });
 

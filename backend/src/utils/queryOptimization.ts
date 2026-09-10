@@ -56,10 +56,10 @@ export const vendorMinimalSelect = {
 export const assessmentSelectFields = {
   id: true,
   vendorId: true,
-  type: true,
+  assessmentType: true,
   status: true,
   dueDate: true,
-  completedDate: true,
+  completedAt: true,
   overallScore: true,
   createdAt: true,
   updatedAt: true,
@@ -72,11 +72,11 @@ export const contractSelectFields = {
   id: true,
   vendorId: true,
   contractNumber: true,
-  startDate: true,
-  endDate: true,
-  value: true,
+  effectiveDate: true,
+  expirationDate: true,
+  contractValue: true,
   status: true,
-  autoRenew: true,
+  autoRenewal: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.VendorContractSelect;
@@ -126,7 +126,7 @@ export const vendorWithContracts = {
   contracts: {
     select: contractSelectFields,
     where: { status: 'ACTIVE' },
-    orderBy: { endDate: 'asc' as const },
+    orderBy: { expirationDate: 'asc' as const },
   },
 } satisfies Prisma.VendorInclude;
 

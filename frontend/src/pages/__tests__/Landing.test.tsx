@@ -1,46 +1,29 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../../store/slices/authSlice';
-import uiReducer from '../../store/slices/uiSlice';
-import vendorReducer from '../../store/slices/vendorSlice';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { AuthProvider } from '../../contexts/AuthContext';
 import Landing from '../Landing';
-
-// Create a mock store for testing
-const createMockStore = () => {
-    return configureStore({
-        reducer: {
-            auth: authReducer,
-            ui: uiReducer,
-            vendor: vendorReducer,
-        },
-    });
-};
 
 describe('Landing Page', () => {
     it('renders landing page with title', () => {
-        const store = createMockStore();
         render(
-            <Provider store={store}>
-                <BrowserRouter>
+            <MemoryRouter>
+                <AuthProvider>
                     <Landing />
-                </BrowserRouter>
-            </Provider>
+                </AuthProvider>
+            </MemoryRouter>
         );
 
-        expect(screen.getByText(/Governance, Risk & Compliance/i)).toBeInTheDocument();
+        expect(screen.getByText(/Supreme Risk/i)).toBeInTheDocument();
     });
 
     it('renders sign in form', () => {
-        const store = createMockStore();
         render(
-            <Provider store={store}>
-                <BrowserRouter>
+            <MemoryRouter>
+                <AuthProvider>
                     <Landing />
-                </BrowserRouter>
-            </Provider>
+                </AuthProvider>
+            </MemoryRouter>
         );
 
         expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
@@ -48,15 +31,14 @@ describe('Landing Page', () => {
     });
 
     it('displays demo button', () => {
-        const store = createMockStore();
         render(
-            <Provider store={store}>
-                <BrowserRouter>
+            <MemoryRouter>
+                <AuthProvider>
                     <Landing />
-                </BrowserRouter>
-            </Provider>
+                </AuthProvider>
+            </MemoryRouter>
         );
 
-        expect(screen.getByText(/Continue as Demo User/i)).toBeInTheDocument();
+        expect(screen.getByText(/View Demo/i)).toBeInTheDocument();
     });
 });

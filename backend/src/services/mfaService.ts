@@ -424,7 +424,7 @@ class MFAService {
     // ============= Private Helper Methods =============
 
     private generateTOTPSecret(): string {
-        return crypto.randomBytes(20).toString('base32').replace(/=/g, '');
+        return encodeBase32(crypto.randomBytes(20)).replace(/=/g, '');
     }
 
     private generateQRCodeURL(otpauthUrl: string): string {
@@ -477,7 +477,7 @@ class MFAService {
         const buffer = Buffer.alloc(8);
         buffer.writeBigInt64BE(BigInt(time));
         
-        const hmac = crypto.createHmac('sha1', Buffer.from(secret, 'base32'));
+        const hmac = crypto.createHmac('sha1', decodeBase32(secret));
         hmac.update(buffer);
         const hash = hmac.digest();
         
@@ -522,6 +522,49 @@ class MFAService {
             verified: false
         });
     }
+}
+
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+function encodeBase32(buffer: Buffer): string {
+    let bits = 0;
+    let value = 0;
+    let output = '';
+    for (const byte of buffer) {
+        value = (value << 8) | byte;
+        bits += 8;
+        while (bits >= 5) {
+            output += BASE32_ALPHABET[(value >>> (bits - 5)) & 31];
+            bits -= 5;
+        }
+    }
+    if (bits > 0) {
+        output += BASE32_ALPHABET[(value << (5 - bits)) & 31];
+    }
+    while (output.length % 8 !== 0) {
+        output += '=';
+    }
+    return output;
+}
+
+function decodeBase32(input: string): Buffer {
+    const cleaned = input.toUpperCase().replace(/=+$/g, '').replace(/[^A-Z2-7]/g, '');
+    let bits = 0;
+    let value = 0;
+    const bytes: number[] = [];
+    for (const char of cleaned) {
+        const idx = BASE32_ALPHABET.indexOf(char);
+        if (idx === -1) {
+            continue;
+        }
+        value = (value << 5) | idx;
+        bits += 5;
+        if (bits >= 8) {
+            bytes.push((value >>> (bits - 8)) & 0xff);
+            bits -= 8;
+        }
+    }
+    return Buffer.from(bytes);
 }
 
 export default new MFAService();

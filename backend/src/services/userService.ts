@@ -1,6 +1,7 @@
 /**
- * User Management Service
- * Handles user CRUD operations, roles, and permissions
+ * QUARANTINED in-memory user store.
+ * Production user routes use identityUserService (Prisma).
+ * This module is not imported by src/server.ts.
  */
 
 import { AuditService } from './auditService';

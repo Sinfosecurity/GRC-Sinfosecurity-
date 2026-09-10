@@ -3,7 +3,7 @@
  * Corrective Action Plans (CAPs) and issue lifecycle management
  */
 
-import { VendorIssue, VendorIssueStatus, IssueSeverity } from '@prisma/client';
+import { IssuePriority, IssueSeverity, IssueSource, Prisma, VendorIssue, VendorIssueStatus, VendorIssueType } from '@prisma/client';
 import { prisma } from '../config/database';
 import logger from '../config/logger';
 
@@ -29,12 +29,27 @@ class VendorIssueService {
      * Create vendor issue
      */
     async createIssue(data: CreateVendorIssueInput): Promise<VendorIssue> {
+        const createData: Prisma.VendorIssueUncheckedCreateInput = {
+            vendorId: data.vendorId,
+            organizationId: data.organizationId,
+            title: data.title,
+            description: data.description,
+            issueType: this.toIssueType(data.issueType),
+            severity: data.severity,
+            priority: this.toIssuePriority(data.priority),
+            source: this.toIssueSource(data.source),
+            identifiedBy: data.identifiedBy,
+            category: data.category,
+            riskRating: data.riskRating,
+            impactDescription: data.impactDescription,
+            assignedTo: data.assignedTo,
+            targetRemediationDate: data.targetRemediationDate,
+            status: VendorIssueStatus.OPEN,
+            identifiedDate: new Date(),
+        };
+
         const issue = await prisma.vendorIssue.create({
-            data: {
-                ...data,
-                status: VendorIssueStatus.OPEN,
-                identifiedDate: new Date(),
-            },
+            data: createData,
             include: {
                 vendor: {
                     select: {
@@ -53,8 +68,26 @@ class VendorIssueService {
         // Create notification
         await this.notifyIssueStakeholders(issue);
 
-        logger.info(`✅ Created issue: ${issue.title} for ${issue.vendor.name}`);
+        logger.info(`Created issue: ${issue.title} for ${issue.vendor.name}`);
         return issue;
+    }
+
+    private toIssueType(value: string): VendorIssueType {
+        return (Object.values(VendorIssueType) as string[]).includes(value)
+            ? (value as VendorIssueType)
+            : VendorIssueType.OTHER;
+    }
+
+    private toIssuePriority(value: string): IssuePriority {
+        return (Object.values(IssuePriority) as string[]).includes(value)
+            ? (value as IssuePriority)
+            : IssuePriority.MEDIUM;
+    }
+
+    private toIssueSource(value: string): IssueSource {
+        return (Object.values(IssueSource) as string[]).includes(value)
+            ? (value as IssueSource)
+            : IssueSource.OTHER;
     }
 
     /**
