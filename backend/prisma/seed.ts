@@ -9,13 +9,20 @@ async function main() {
     // Create demo organization
     const demoOrg = await prisma.organization.upsert({
         where: { id: 'demo-org-001' },
-        update: {},
+        update: {
+            isDemo: true,
+            slug: 'supreme-risk-demo',
+        },
         create: {
             id: 'demo-org-001',
-            name: 'Sinfosecurity Demo',
+            name: 'Supreme Risk Demo Workspace',
             industry: 'Information Technology',
             country: 'USA',
             size: '50-200',
+            slug: 'supreme-risk-demo',
+            status: 'TRIAL',
+            plan: 'PROFESSIONAL',
+            isDemo: true,
         },
     });
 
@@ -28,10 +35,10 @@ async function main() {
         update: {},
         create: {
             email: 'admin@sinfosecurity.com',
-            password: hashedPassword,
+            hashedPassword,
             firstName: 'Admin',
             lastName: 'User',
-            role: 'ADMIN',
+            role: 'ORGANIZATION_ADMIN',
             organizationId: demoOrg.id,
         },
     });
@@ -44,10 +51,10 @@ async function main() {
         update: {},
         create: {
             email: 'compliance@sinfosecurity.com',
-            password: await bcrypt.hash('Compliance@123', 10),
+            hashedPassword: await bcrypt.hash('Compliance@123', 10),
             firstName: 'Jane',
             lastName: 'Compliance',
-            role: 'COMPLIANCE_OFFICER',
+            role: 'ASSESSOR',
             organizationId: demoOrg.id,
         },
     });

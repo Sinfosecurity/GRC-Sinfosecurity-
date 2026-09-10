@@ -12,25 +12,43 @@ datasource db {
 
 // Users and Authentication
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
+  id             String            @id @default(uuid())
+  email          String            @unique
   hashedPassword String
-  firstName     String
-  lastName      String
-  role          Role     @default(USER)
-  organization  Organization @relation(fields: [organizationId], references: [id])
+  firstName      String
+  lastName       String
+  role           Role              @default(USER)
+  organization   Organization      @relation(fields: [organizationId], references: [id])
   organizationId String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  lastLogin     DateTime?
-  
-  risks         Risk[]
-  incidents     Incident[]
-  policies      Policy[]
-  audits        AuditLog[]
-  
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  lastLogin      DateTime?
+
+  status            UserAccountStatus @default(ACTIVE)
+  disabledAt        DateTime?
+  emailVerifiedAt   DateTime?
+  passwordChangedAt DateTime?
+  mfaEnabled        Boolean           @default(false)
+  mfaSecretEnc      String?
+
+  risks               Risk[]
+  incidents           Incident[]
+  policies            Policy[]
+  audits              AuditLog[]
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  sentInvitations     AccountInvitation[]  @relation("InvitedBy")
+  auditEvents         AuditEvent[]
+
   @@index([email])
   @@index([organizationId])
+  @@index([status])
+}
+
+enum UserAccountStatus {
+  ACTIVE
+  DISABLED
+  PENDING_ACTIVATION
 }
 
 enum Role {
@@ -40,6 +58,12 @@ enum Role {
   RISK_MANAGER
   AUDITOR
   USER
+  PLATFORM_ADMIN
+  ORGANIZATION_ADMIN
+  ASSESSOR
+  APPROVER
+  BUSINESS_OWNER
+  VIEWER
 }
 
 model Organization {
@@ -50,8 +74,28 @@ model Organization {
   size        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
+  slug               String?             @unique
+  status             OrganizationStatus  @default(TRIAL)
+  plan               String              @default("STARTER")
+  trialStart         DateTime?
+  trialEnd           DateTime?
+  subscriptionStatus String?
+  billingCustomerId  String?
+  isDemo             Boolean             @default(false)
+  timezone           String              @default("UTC")
+
   users                       User[]
+  invitations                 AccountInvitation[]
+  auditEvents                 AuditEvent[]
+  storedObjects               StoredObject[]
+  questionnaireTemplates      QuestionnaireTemplate[]
+  inAppNotifications          InAppNotification[]
+  notificationPreferences     NotificationPreference[]
+  integrationConnections      IntegrationConnection[]
+  aiOperationLogs             AiOperationLog[]
+  scoreCalculations           ScoreCalculation[]
+  subscriptionEvents          SubscriptionEvent[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -83,6 +127,18 @@ model Organization {
   businessProcessMappings     BusinessProcessVendorMapping[]
   vendorBAAs                  VendorBAA[]
   vendorISOControlMappings    VendorISOControlMapping[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([billingCustomerId])
+}
+
+enum OrganizationStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELLED
 }
 
 // Risk Management
@@ -531,6 +587,8 @@ enum VendorStatus {
   APPROVED      // Approved but not onboarded
   ACTIVE        // Currently engaged
   SUSPENDED     // Temporarily suspended
+  INACTIVE      // Inactive but retained
+  OFFBOARDING   // Offboarding in progress
   TERMINATED    // Relationship ended
   REJECTED      // Not approved
 }
@@ -582,6 +640,11 @@ model VendorAssessment {
   frameworkUsed         String?             // "SIG", "CAIQ", "Custom", etc.
   status                AssessmentStatus    @default(NOT_STARTED)
   
+  templateId            String?
+  templateVersion       String?
+  scoreVersion          String?
+  scoreMetadata         Json?
+
   // Scoring
   overallScore          Int?                // 0-100
   securityScore         Int?
@@ -662,6 +725,8 @@ model AssessmentResponse {
   hasEvidence       Boolean            @default(false)
   evidenceRequired  Boolean            @default(false)
   notes             String?
+  reviewerComment   String?
+  optionValue       String?
   
   respondedBy       String?
   respondedAt       DateTime?
@@ -912,6 +977,7 @@ enum VendorIssueStatus {
   IN_PROGRESS
   PENDING_VENDOR
   PENDING_VALIDATION
+  REMEDIATED
   RESOLVED
   CLOSED
   RISK_ACCEPTED
@@ -937,6 +1003,10 @@ model VendorDocument {
   fileType          String              // MIME type
   fileUrl           String              // S3/Azure Blob URL
   fileHash          String?             // SHA-256 for integrity
+  storageKey        String?
+  checksum          String?
+  scanStatus        ScanStatus          @default(NOT_CONFIGURED)
+  storedObjectId    String?
   
   category          String?             // "Certification", "Policy", "Report", etc.
   confidentiality   ConfidentialityLevel @default(INTERNAL)
@@ -1918,4 +1988,262 @@ model VendorISOControlMapping {
   @@index([organizationId])
   @@index([controlId])
   @@index([implementationStatus])
+}
+
+// ==========================================
+// Supreme Risk SaaS foundation
+// ==========================================
+
+enum ScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  FAILED
+  NOT_CONFIGURED
+}
+
+enum IntegrationStatus {
+  NOT_CONFIGURED
+  CONNECTED
+  DISCONNECTED
+  ERROR
+  DISABLED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AccountInvitation {
+  id             String           @id @default(uuid())
+  email          String
+  role           Role
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  invitedBy      User?            @relation("InvitedBy", fields: [invitedById], references: [id])
+  invitedById    String?
+  tokenHash      String           @unique
+  status         InvitationStatus @default(PENDING)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  @@index([organizationId])
+  @@index([email])
+  @@index([status])
+}
+
+model AuditEvent {
+  id             String       @id @default(uuid())
+  timestamp      DateTime     @default(now())
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  actor          User?        @relation(fields: [actorUserId], references: [id])
+  actorUserId    String?
+  action         String
+  resourceType   String
+  resourceId     String?
+  result         String
+  requestId      String?
+  ipAddress      String?
+  userAgent      String?
+  metadata       Json?
+
+  @@index([organizationId])
+  @@index([actorUserId])
+  @@index([action])
+  @@index([resourceType, resourceId])
+  @@index([timestamp])
+  @@index([organizationId, timestamp])
+}
+
+model StoredObject {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  ownerType      String
+  ownerId        String
+  filename       String
+  storageKey     String       @unique
+  contentType    String
+  size           Int
+  checksum       String
+  uploadedBy     String
+  uploadedAt     DateTime     @default(now())
+  classification String       @default("INTERNAL")
+  scanStatus     ScanStatus   @default(NOT_CONFIGURED)
+  retentionStatus String      @default("ACTIVE")
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([ownerType, ownerId])
+  @@index([scanStatus])
+}
+
+model QuestionnaireTemplate {
+  id             String                 @id @default(uuid())
+  organization   Organization?          @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  name           String
+  framework      String
+  version        String
+  isActive       Boolean                @default(true)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  sections       QuestionnaireSection[]
+
+  @@unique([organizationId, name, version])
+  @@index([organizationId])
+  @@index([framework, version])
+}
+
+model QuestionnaireSection {
+  id         String                  @id @default(uuid())
+  template   QuestionnaireTemplate   @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId String
+  title      String
+  sortOrder  Int
+  questions  QuestionnaireQuestion[]
+
+  @@index([templateId])
+}
+
+model QuestionnaireQuestion {
+  id                String               @id @default(uuid())
+  section           QuestionnaireSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sectionId         String
+  questionKey       String
+  questionText      String
+  questionType      String               @default("SINGLE_CHOICE")
+  category          String
+  weight            Int                  @default(1)
+  required          Boolean              @default(true)
+  evidenceRequired  Boolean              @default(false)
+  options           Json?
+  conditionalOnKey  String?
+  conditionalValue  String?
+  sortOrder         Int                  @default(0)
+
+  @@index([sectionId])
+}
+
+model ScoreCalculation {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  vendorId       String
+  scoreVersion   String
+  inherentRisk   Int
+  controlEffectiveness Int
+  residualRisk   Int
+  riskBand       String
+  inputs         Json
+  explanation    String
+  calculatedAt   DateTime     @default(now())
+
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([calculatedAt])
+}
+
+model InAppNotification {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  userId         String
+  eventType      String
+  title          String
+  body           String
+  resourceType   String?
+  resourceId     String?
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  dedupeKey      String?
+
+  @@unique([organizationId, dedupeKey])
+  @@index([organizationId, userId, createdAt])
+}
+
+model NotificationPreference {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  userId         String
+  eventType      String
+  inApp          Boolean      @default(true)
+  email          Boolean      @default(true)
+
+  @@unique([userId, eventType])
+  @@index([organizationId])
+}
+
+model IntegrationConnection {
+  id             String            @id @default(uuid())
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  organizationId String
+  provider       String
+  status         IntegrationStatus @default(NOT_CONFIGURED)
+  configEnc      String?
+  lastTestedAt   DateTime?
+  lastError      String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+}
+
+model AiOperationLog {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  feature        String
+  provider       String
+  model          String?
+  success        Boolean
+  latencyMs      Int?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, createdAt])
+}
+
+model SubscriptionEvent {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  stripeEventId  String       @unique
+  type           String
+  payloadSummary Json?
+  processedAt    DateTime     @default(now())
+
+  @@index([organizationId])
 }

@@ -1,4 +1,14 @@
-# GRC Platform - Sinfosecurity
+# Supreme Risk
+
+Commercial multi-tenant third-party risk management SaaS, evolved from this GRC/TPRM repository.
+
+Authoritative current behavior is documented under `docs/`. Historical Sinfosecurity README content below may describe aspirational features that are **not** all implemented.
+
+Transformation branch: `supreme-risk-transformation`. Do not treat unset providers as working — they return `NOT_CONFIGURED`.
+
+---
+
+# Historical README (Sinfosecurity GRC)
 
 A comprehensive AI-powered Governance, Risk, and Compliance (GRC) platform supporting global regulations (GDPR, HIPAA, CCPA, LGPD, APPI), ISO 27001, and TISAX.
 
