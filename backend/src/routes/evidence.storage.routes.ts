@@ -15,6 +15,15 @@ router.get('/status', (req: AuthRequest, res: Response) => {
     res.json({ success: true, data: objectStorageService.status() });
 });
 
+router.post('/reconcile', requirePermission(PERMISSIONS['evidence.delete']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const data = await objectStorageService.reconcileOrphans(req.user!.organizationId);
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/', requirePermission(PERMISSIONS['evidence.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const items = await prisma.storedObject.findMany({

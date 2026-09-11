@@ -124,8 +124,11 @@ export function registerDefaultHealthChecks() {
 
     // Redis check
     healthChecker.registerCheck('redis', async () => {
+        if (!process.env.REDIS_URL) {
+            return { status: 'degraded', message: 'NOT_CONFIGURED' };
+        }
         try {
-            if (!redisClient.isOpen) {
+            if (!redisClient || !redisClient.isOpen) {
                 return { status: 'down', message: 'Redis not connected' };
             }
             await redisClient.ping();
@@ -141,6 +144,9 @@ export function registerDefaultHealthChecks() {
 
     // MongoDB check
     healthChecker.registerCheck('mongodb', async () => {
+        if (!process.env.MONGODB_URI && !process.env.MONGO_URL) {
+            return { status: 'degraded', message: 'NOT_CONFIGURED' };
+        }
         try {
             if (mongoose.connection.readyState !== 1) {
                 return { status: 'down', message: 'MongoDB not connected' };
@@ -200,6 +206,39 @@ export function registerDefaultHealthChecks() {
             message: 'All circuit breakers operational',
             details: { totalBreakers: stats.length },
         };
+    });
+
+    healthChecker.registerCheck('storage', async () => {
+        const { objectStorageService } = await import('../services/objectStorageService');
+        const status = objectStorageService.status();
+        if (status.provider === 'NOT_CONFIGURED') {
+            return { status: 'degraded', message: 'NOT_CONFIGURED' };
+        }
+        return { status: 'up', message: `Object storage ${status.provider}`, details: status };
+    });
+
+    healthChecker.registerCheck('email', async () => {
+        const { emailStatus } = await import('../services/notificationDeliveryService');
+        const status = emailStatus();
+        return status === 'CONNECTED'
+            ? { status: 'up', message: 'Email provider connected' }
+            : { status: 'degraded', message: 'NOT_CONFIGURED' };
+    });
+
+    healthChecker.registerCheck('stripe', async () => {
+        const { billingStatus } = await import('../billing/stripeBillingService');
+        const status = billingStatus();
+        return status === 'CONNECTED'
+            ? { status: 'up', message: 'Stripe connected' }
+            : { status: 'degraded', message: 'NOT_CONFIGURED' };
+    });
+
+    healthChecker.registerCheck('ai', async () => {
+        const { isProviderConfigured } = await import('../config/env');
+        const configured = isProviderConfigured('OPENAI_API_KEY') || isProviderConfigured('AI_API_KEY');
+        return configured
+            ? { status: 'up', message: 'AI provider configured' }
+            : { status: 'degraded', message: 'NOT_CONFIGURED' };
     });
 
     logger.info('Default health checks registered');

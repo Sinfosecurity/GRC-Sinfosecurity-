@@ -1,6 +1,7 @@
 import { prisma } from '../config/database';
 import { isProviderConfigured } from '../config/env';
 import logger from '../config/logger';
+import { sendSmtpMail } from './smtpClient';
 
 export type NotificationEvent =
     | 'assessment.assigned'
@@ -17,8 +18,7 @@ export type NotificationEvent =
     | 'auth.password_reset';
 
 export function emailStatus() {
-    return isProviderConfigured('SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD') ||
-        isProviderConfigured('SENDGRID_API_KEY')
+    return isProviderConfigured('SENDGRID_API_KEY') || isProviderConfigured('SMTP_HOST')
         ? 'CONNECTED'
         : 'NOT_CONFIGURED';
 }
@@ -83,6 +83,12 @@ export async function notify(input: {
                     subject: input.title,
                     content: [{ type: 'text/plain', value: input.body }],
                 }),
+            });
+        } else if (isProviderConfigured('SMTP_HOST')) {
+            await sendSmtpMail({
+                to: input.emailTo,
+                subject: input.title,
+                body: input.body,
             });
         }
     }

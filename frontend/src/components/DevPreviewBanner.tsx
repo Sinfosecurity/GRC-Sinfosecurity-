@@ -1,9 +1,19 @@
 import { Box, Typography } from '@mui/material';
 
-export function environmentLabel(): 'STAGING' | 'DEVELOPMENT' | null {
-    if (import.meta.env.VITE_ENVIRONMENT === 'staging') return 'STAGING';
-    if (import.meta.env.DEV || import.meta.env.VITE_PREVIEW_LABEL === 'true') return 'DEVELOPMENT';
+type EnvironmentFlags = {
+    VITE_ENVIRONMENT?: string;
+    DEV?: boolean;
+    VITE_PREVIEW_LABEL?: string;
+};
+
+export function environmentLabelFrom(env: EnvironmentFlags): 'STAGING' | 'DEVELOPMENT' | null {
+    if (env.VITE_ENVIRONMENT === 'staging') return 'STAGING';
+    if (env.DEV || env.VITE_PREVIEW_LABEL === 'true') return 'DEVELOPMENT';
     return null;
+}
+
+export function environmentLabel(): 'STAGING' | 'DEVELOPMENT' | null {
+    return environmentLabelFrom(import.meta.env);
 }
 
 export function shouldShowDevPreviewBanner(): boolean {

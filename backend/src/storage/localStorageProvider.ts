@@ -34,4 +34,21 @@ export class LocalStorageProvider implements ObjectStorageProvider {
     async deleteObject(key: string): Promise<void> {
         await fs.unlink(path.join(this.root, key)).catch(() => undefined);
     }
+
+    async listKeys(prefix = ''): Promise<string[]> {
+        const keys: string[] = [];
+        const walk = async (dir: string, relative: string) => {
+            const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
+            for (const entry of entries) {
+                const nextRel = relative ? `${relative}/${entry.name}` : entry.name;
+                if (entry.isDirectory()) {
+                    await walk(path.join(dir, entry.name), nextRel);
+                } else if (nextRel.startsWith(prefix)) {
+                    keys.push(nextRel);
+                }
+            }
+        };
+        await walk(this.root, '');
+        return keys;
+    }
 }

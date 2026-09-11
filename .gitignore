@@ -21,7 +21,9 @@ ENV/
 # Environment variables
 .env
 .env.local
+.env.staging
 .env.*.local
+/backups/
 .env.docker
 .env.railway.backend
 .env.railway.frontend

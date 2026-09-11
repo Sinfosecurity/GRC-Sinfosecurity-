@@ -22,7 +22,7 @@ export default function Register() {
         setLoading(true);
         try {
             await signup(form);
-            navigate('/onboarding');
+            navigate('/dashboard');
         } catch (err: any) {
             setError(err.message || 'Unable to create account');
         } finally {

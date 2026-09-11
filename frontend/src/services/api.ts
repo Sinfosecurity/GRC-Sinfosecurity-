@@ -130,6 +130,7 @@ export const usersAPI = {
     invite: (data: { email: string; role: string }) => api.post('/users/invite', data),
     invitations: () => api.get('/users/invitations'),
     resendInvitation: (id: string) => api.post(`/users/invitations/${id}/resend`),
+    revokeInvitation: (id: string) => api.post(`/users/invitations/${id}/revoke`),
     updateRole: (id: string, role: string) => api.patch(`/users/${id}/role`, { role }),
     setStatus: (id: string, status: 'ACTIVE' | 'DISABLED') => api.patch(`/users/${id}/status`, { status }),
 };
@@ -141,6 +142,10 @@ export const auditAPI = {
 export const organizationAPI = {
     getCurrent: () => api.get('/organization/current'),
     update: (data: unknown) => api.patch('/organization/current', data),
+};
+
+export const systemAPI = {
+    status: () => api.get('/system/status'),
 };
 
 export const billingAPI = {

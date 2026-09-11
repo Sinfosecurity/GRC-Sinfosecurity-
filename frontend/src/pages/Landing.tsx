@@ -1,19 +1,22 @@
 import { useNavigate } from 'react-router-dom';
+import { environmentLabel } from '../components/DevPreviewBanner';
 import { Box, Button, Container, Typography, Grid, Stack, Card, CardContent, Avatar, TextField, CircularProgress } from '@mui/material';
 import {
     Shield as ShieldIcon,
     Speed as SpeedIcon,
-    Psychology as AIIcon,
+    AccountTree as DecisionIcon,
     Security as SecurityIcon,
     CheckCircle as CheckCircleIcon,
     ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Landing() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, isAuthenticated } = useAuth();
+    const loginCardRef = useRef<HTMLDivElement | null>(null);
+    const emailRef = useRef<HTMLInputElement | null>(null);
 
     // Login state
     const [email, setEmail] = useState('');
@@ -33,6 +36,19 @@ export default function Landing() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const focusLogin = () => {
+        loginCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        emailRef.current?.focus();
+    };
+
+    const handleLaunchDashboard = () => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+            return;
+        }
+        focusLogin();
     };
 
     return (
@@ -79,9 +95,11 @@ export default function Landing() {
                             <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>
                                 Supreme Risk
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 700 }}>
-                                DEVELOPMENT PREVIEW
-                            </Typography>
+                            {environmentLabel() && (
+                                <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 700 }}>
+                                    {environmentLabel() === 'STAGING' ? 'STAGING' : 'DEVELOPMENT PREVIEW'}
+                                </Typography>
+                            )}
                         </Box>
                     </Stack>
                     <Stack direction="row" spacing={2}>
@@ -116,19 +134,19 @@ export default function Landing() {
                                     display: 'block'
                                 }}
                             >
-                                NEXT GEN GRC PLATFORM
+                                SUPREME GOVERNANCE PLATFORM
                             </Typography>
                             <Typography variant="h1" sx={{ mb: 3, background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                                Secure Your Future with <span className="text-gradient-primary">Intelligent GRC</span>
+                                Govern Risk. Prove Compliance. <span className="text-gradient-primary">Make Better Decisions.</span>
                             </Typography>
                             <Typography variant="h5" sx={{ color: 'text.secondary', mb: 5, lineHeight: 1.6, fontWeight: 400 }}>
-                                Streamline compliance, manage risks, and automate controls with our AI-powered platform designed for modern enterprises.
+                                Supreme Risk turns third-party assessments, evidence, and findings into explainable scores and audit-traceable decision briefs.
                             </Typography>
                             <Stack direction="row" spacing={3}>
                                 <Button
                                     variant="contained"
                                     size="large"
-                                    onClick={() => navigate('/dashboard')}
+                                    onClick={handleLaunchDashboard}
                                     endIcon={<ArrowForwardIcon />}
                                     sx={{
                                         fontSize: '1.1rem',
@@ -137,11 +155,12 @@ export default function Landing() {
                                         background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
                                     }}
                                 >
-                                    Launch Dashboard
+                                    {isAuthenticated ? 'Launch Dashboard' : 'Sign In to Dashboard'}
                                 </Button>
                                 <Button
                                     variant="outlined"
                                     size="large"
+                                    onClick={() => navigate('/demo')}
                                     sx={{
                                         fontSize: '1.1rem',
                                         py: 1.5,
@@ -160,16 +179,16 @@ export default function Landing() {
 
                             <Stack direction="row" spacing={4} sx={{ mt: 8 }}>
                                 <Box>
-                                    <Typography variant="h3" sx={{ fontWeight: 700, color: 'white' }}>500+</Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Enterprise Clients</Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'white' }}>EXPLAINABLE RISK</Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Evidence-backed scoring</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="h3" sx={{ fontWeight: 700, color: 'white' }}>99.9%</Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Uptime SLA</Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'white' }}>DECISION READY</Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Audit-traceable approvals</Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="h3" sx={{ fontWeight: 700, color: 'white' }}>24/7</Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Expert Support</Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'white' }}>TENANT ISOLATED</Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Organization-scoped access</Typography>
                                 </Box>
                             </Stack>
                         </Box>
@@ -188,13 +207,26 @@ export default function Landing() {
                             }} />
 
                             {/* Login Card */}
-                            <Card className="glass" sx={{ position: 'relative', border: '1px solid rgba(255,255,255,0.1)', overflow: 'visible' }}>
+                            <Card
+                                id="landing-login"
+                                ref={loginCardRef}
+                                className="glass"
+                                sx={{ position: 'relative', border: '1px solid rgba(255,255,255,0.1)', overflow: 'visible' }}
+                            >
                                 <CardContent sx={{ p: 4 }}>
                                     <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: 'white' }}>Welcome Back</Typography>
-                                    <Typography variant="body2" sx={{ color: 'warning.main', mb: 1, fontWeight: 700 }}>
-                                        SUPREME RISK — DEVELOPMENT PREVIEW
+                                    {environmentLabel() && (
+                                        <Typography variant="body2" sx={{ color: 'warning.main', mb: 1, fontWeight: 700 }}>
+                                            {environmentLabel() === 'STAGING' ? 'SUPREME RISK — STAGING' : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
+                                        </Typography>
+                                    )}
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                                        {environmentLabel() === 'STAGING'
+                                            ? 'Sign in to the isolated staging organization'
+                                            : environmentLabel() === 'DEVELOPMENT'
+                                                ? 'Login to the local demo workspace'
+                                                : 'Sign in to your organization workspace'}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>Login to the local demo workspace</Typography>
 
                                     <form onSubmit={handleLogin}>
                                         <Stack spacing={2}>
@@ -202,6 +234,7 @@ export default function Landing() {
                                                 fullWidth
                                                 label="Email"
                                                 variant="outlined"
+                                                inputRef={emailRef}
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.05)' } }}
@@ -255,8 +288,8 @@ export default function Landing() {
                                             <CheckCircleIcon />
                                         </Avatar>
                                         <Box>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white' }}>Audit Ready</Typography>
-                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>ISO 27001 Compliant</Typography>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'white' }}>Audit-traceable</Typography>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Decisions recorded with evidence</Typography>
                                         </Box>
                                     </CardContent>
                                 </Card>
@@ -276,7 +309,7 @@ export default function Landing() {
                         Everything you need to <span className="text-gradient-secondary">stay compliant</span>
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'text.secondary', maxWidth: 800, mx: 'auto' }}>
-                        Our platform provides a comprehensive suite of tools to manage your Governance, Risk, and Compliance programs effectively.
+                        The production path today is Supreme Third Party: vendors, assessments, evidence, findings, explainable risk, decision briefs, and reports.
                     </Typography>
                 </Box>
 
@@ -284,18 +317,18 @@ export default function Landing() {
                     {[
                         {
                             icon: <SpeedIcon fontSize="large" sx={{ color: '#6366f1' }} />,
-                            title: 'Automated Workflows',
-                            desc: 'Streamline your compliance processes with intelligent automation and innovative workflow tools.'
+                            title: 'Evidence-driven assessments',
+                            desc: 'Run questionnaire assessments, attach evidence, and recalculate residual risk from recorded answers.'
                         },
                         {
-                            icon: <AIIcon fontSize="large" sx={{ color: '#ec4899' }} />,
-                            title: 'AI-Powered Insights',
-                            desc: 'Leverage machine learning to predict risks and identify control gaps before they become incidents.'
+                            icon: <DecisionIcon fontSize="large" sx={{ color: '#ec4899' }} />,
+                            title: 'Defensible decision briefs',
+                            desc: 'Generate a brief from the current score, record a human decision, and keep the snapshot immutable.'
                         },
                         {
                             icon: <SecurityIcon fontSize="large" sx={{ color: '#10b981' }} />,
-                            title: 'Real-time Monitoring',
-                            desc: 'Continuous monitoring of your control environment with instant alerts and dashboard visualization.'
+                            title: 'Continuous monitoring workspace',
+                            desc: 'Review monitoring signals when a provider is connected. Unavailable providers are shown as NOT_CONFIGURED.'
                         }
                     ].map((feature, index) => (
                         <Grid item xs={12} md={4} key={index}>

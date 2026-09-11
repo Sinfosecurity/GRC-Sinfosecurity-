@@ -125,6 +125,20 @@ export default function UserManagement() {
         }
     };
 
+    const revoke = async (id: string) => {
+        setBusyId(id);
+        setError(null);
+        try {
+            await usersAPI.revokeInvitation(id);
+            setMessage('Invitation revoked.');
+            await load();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setBusyId(null);
+        }
+    };
+
     const resend = async (id: string) => {
         setBusyId(id);
         setError(null);
@@ -232,6 +246,9 @@ export default function UserManagement() {
                                 <Chip size="small" label={inviteRow.status} />
                                 <Button size="small" disabled={inviteRow.status !== 'PENDING' || busyId === inviteRow.id} onClick={() => resend(inviteRow.id)}>
                                     Resend
+                                </Button>
+                                <Button size="small" color="warning" disabled={inviteRow.status !== 'PENDING' || busyId === inviteRow.id} onClick={() => revoke(inviteRow.id)}>
+                                    Revoke
                                 </Button>
                             </Stack>
                         ))}

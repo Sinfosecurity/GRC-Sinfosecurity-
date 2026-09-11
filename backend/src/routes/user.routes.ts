@@ -35,6 +35,20 @@ router.get('/invitations', requirePermission(PERMISSIONS['user.manage']), async 
     }
 });
 
+router.post('/invitations/:id/revoke', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const invitation = await identityUserService.revokeInvitation(
+            req.user!.organizationId,
+            req.params.id,
+            req.user!.id,
+            req.user!.role as Role
+        );
+        res.json({ success: true, data: invitation });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post('/invitations/:id/resend', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const result = await identityUserService.resendInvitation(

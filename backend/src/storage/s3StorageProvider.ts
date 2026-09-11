@@ -20,7 +20,17 @@ export class S3StorageProvider implements ObjectStorageProvider {
             PutObjectCommand,
             GetObjectCommand,
             DeleteObjectCommand,
-            client: new S3Client({ region: process.env.AWS_REGION || process.env.S3_REGION || 'us-east-1' }),
+            client: new S3Client({
+                region: process.env.AWS_REGION || process.env.S3_REGION || 'us-east-1',
+                endpoint: process.env.S3_ENDPOINT || undefined,
+                forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true' || Boolean(process.env.S3_ENDPOINT),
+                credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+                    ? {
+                        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                    }
+                    : undefined,
+            }),
         };
     }
 
@@ -91,5 +101,21 @@ export class S3StorageProvider implements ObjectStorageProvider {
             }),
             { expiresIn: 300 }
         );
+    }
+
+    async listKeys(prefix = ''): Promise<string[]> {
+        if (!this.isConfigured()) {
+            return [];
+        }
+        const { ListObjectsV2Command } = await import('@aws-sdk/client-s3');
+        const { client } = await this.client();
+        const result = await client.send(
+            new ListObjectsV2Command({
+                Bucket: process.env.S3_BUCKET || process.env.AWS_S3_BUCKET,
+                Prefix: prefix || undefined,
+                MaxKeys: 1000,
+            })
+        );
+        return (result.Contents || []).map((item) => item.Key).filter((key): key is string => Boolean(key));
     }
 }

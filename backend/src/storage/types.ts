@@ -14,6 +14,7 @@ export interface ObjectStorageProvider {
     getObject(key: string): Promise<Buffer>;
     deleteObject(key: string): Promise<void>;
     getDownloadUrl?(key: string, filename: string): Promise<string | null>;
+    listKeys?(prefix?: string): Promise<string[]>;
 }
 
 export const ALLOWED_CONTENT_TYPES = new Set([

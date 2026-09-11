@@ -232,4 +232,36 @@ export const identityUserService = {
             token: result.token,
         };
     },
+
+    async revokeInvitation(organizationId: string, invitationId: string, actorUserId: string, actorRole: Role) {
+        const invitation = await prisma.accountInvitation.findFirst({
+            where: { id: invitationId, organizationId },
+        });
+        if (!invitation) {
+            throw new ApiError(404, 'Invitation not found');
+        }
+        if (invitation.status !== 'PENDING') {
+            throw new ApiError(400, 'Only pending invitations can be revoked');
+        }
+        assertRoleAssignment({
+            actorId: actorUserId,
+            actorRole,
+            targetId: invitationId,
+            nextRole: invitation.role,
+            action: 'invite',
+        });
+        const updated = await prisma.accountInvitation.update({
+            where: { id: invitation.id },
+            data: { status: 'REVOKED' },
+        });
+        await recordAudit({
+            organizationId,
+            actorUserId,
+            action: 'user.invitation_revoked',
+            resourceType: 'AccountInvitation',
+            resourceId: invitation.id,
+            result: 'success',
+        });
+        return updated;
+    },
 };

@@ -85,6 +85,32 @@ INSERT INTO "Risk" (
   CURRENT_TIMESTAMP
 )
 ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "VendorAssessment" (
+  "id", "vendorId", "organizationId", "assessmentType", "status", "updatedAt"
+) VALUES (
+  'assess_rehearsal_baseline',
+  'vendor_rehearsal_baseline',
+  'org_rehearsal_baseline',
+  'INITIAL_DUE_DILIGENCE',
+  'COMPLETED',
+  CURRENT_TIMESTAMP
+)
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "VendorRiskHistory" (
+  "id", "vendorId", "organizationId", "inherentRiskScore", "residualRiskScore",
+  "vendorStatus", "vendorTier"
+) VALUES (
+  'score_rehearsal_baseline',
+  'vendor_rehearsal_baseline',
+  'org_rehearsal_baseline',
+  72,
+  55,
+  'ACTIVE',
+  'HIGH'
+)
+ON CONFLICT ("id") DO NOTHING;
 SQL
 
 VENDOR_BEFORE="$(npx prisma db execute --schema "$BASELINE_SCHEMA" --stdin <<'SQL'
@@ -98,8 +124,13 @@ npx prisma db execute --schema "$CURRENT_SCHEMA" --file "$MIGRATION"
 echo "==> Generating Prisma client for current schema"
 npx prisma generate --schema "$CURRENT_SCHEMA"
 
-echo "==> Verifying data, indexes, FKs, and new models"
-node "$ROOT/scripts/verify-rehearsal.js" | tee /tmp/supreme-risk-rehearsal-verify.txt
+if [[ "${SKIP_REHEARSAL_VERIFY:-}" == "1" ]]; then
+  echo "==> Skipping intermediate verify (later migrations still pending)"
+  echo "REHEARSAL_VERIFICATION=DEFERRED" | tee /tmp/supreme-risk-rehearsal-verify.txt
+else
+  echo "==> Verifying data, indexes, FKs, and new models"
+  node "$ROOT/scripts/verify-rehearsal.js" | tee /tmp/supreme-risk-rehearsal-verify.txt
+fi
 
 echo "==> Recording rehearsal report"
 mkdir -p "$(dirname "$REPORT")"

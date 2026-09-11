@@ -52,6 +52,7 @@ const adminItems = [
     { text: 'Integrations', path: '/integrations', icon: <WorkflowIcon />, color: '#10b981' },
     { text: 'Billing', path: '/billing', icon: <AnalyticsIcon />, color: '#3b82f6' },
     { text: 'Audit Log', path: '/activity-log', icon: <ActivityIcon />, color: '#64748b' },
+    { text: 'Environment', path: '/environment', icon: <SettingsIcon />, color: '#22d3ee' },
     { text: 'Security', path: '/settings', icon: <SettingsIcon />, color: '#8b5cf6' },
 ];
 

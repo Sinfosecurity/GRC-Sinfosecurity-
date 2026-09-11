@@ -45,6 +45,8 @@ const ContinuousMonitoring = lazy(() => import('./pages/ContinuousMonitoring'));
 const Assessments = lazy(() => import('./pages/Assessments'));
 const FindingsRemediation = lazy(() => import('./pages/FindingsRemediation'));
 const Questionnaires = lazy(() => import('./pages/Questionnaires'));
+const EnvironmentStatus = lazy(() => import('./pages/EnvironmentStatus'));
+const ProductDemo = lazy(() => import('./pages/ProductDemo'));
 
 // Loading component
 const LoadingFallback = () => (
@@ -61,6 +63,7 @@ export default function App() {
             <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/demo" element={<ProductDemo />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -96,6 +99,7 @@ export default function App() {
                     <Route path="iso27001" element={LEGACY_ENABLED ? <ISO27001 /> : <LegacyQuarantine />} />
                     <Route path="tisax" element={LEGACY_ENABLED ? <TISAX /> : <LegacyQuarantine />} />
                     <Route path="settings" element={<Settings />} />
+                    <Route path="environment" element={<EnvironmentStatus />} />
                 </Route>
             </Routes>
         </Suspense>

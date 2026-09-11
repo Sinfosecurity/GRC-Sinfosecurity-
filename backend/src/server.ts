@@ -45,6 +45,7 @@ import billingRoutes from './routes/billing.routes';
 import aiRoutes from './routes/ai.routes';
 import exportRoutes from './routes/export.routes';
 import organizationSaasRoutes from './routes/organization.saas.routes';
+import systemRoutes from './routes/system.routes';
 import integrationRoutes from './routes/integration.routes';
 import questionnaireRoutes from './routes/questionnaire.routes';
 import tprmRoutes from './routes/tprm.routes';
@@ -222,6 +223,7 @@ app.use(`${API_PREFIX}/billing`, billingRoutes);
 app.use(`${API_PREFIX}/ai`, aiRoutes);
 app.use(`${API_PREFIX}/exports`, exportRoutes);
 app.use(`${API_PREFIX}/organization`, organizationSaasRoutes);
+app.use(`${API_PREFIX}/system`, systemRoutes);
 app.use(`${API_PREFIX}/integrations`, integrationRoutes);
 app.use(`${API_PREFIX}/questionnaires`, questionnaireRoutes);
 app.use(`${API_PREFIX}/tprm`, tprmRoutes);
@@ -271,18 +273,16 @@ async function startServer() {
                     } else {
                         logger.warn('⚠️  Redis not available, cache service disabled');
                     }
+
+                    registerDefaultHealthChecks();
+                    logger.info('✅ Health checks registered');
                     
-                    // Schedule recurring background jobs
                     try {
                         await scheduleRecurringJobs();
                         logger.info('✅ Background jobs scheduled');
                     } catch (jobError) {
                         logger.warn('⚠️  Failed to schedule background jobs:', jobError);
                     }
-                    
-                    // Register health checks
-                    registerDefaultHealthChecks();
-                    logger.info('✅ Health checks registered');
                     
                     // Start monitoring services
                     monitoringService.start();

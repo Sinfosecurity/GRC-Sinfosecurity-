@@ -121,21 +121,27 @@ export const objectStorageService = {
         await store.putObject(storageKey, input.buffer, input.contentType);
         const scanStatus = malwareScanStatus();
 
-        const stored = await prisma.storedObject.create({
-            data: {
-                organizationId: input.organizationId,
-                ownerType: input.ownerType,
-                ownerId: input.ownerId,
-                filename: safeName,
-                storageKey,
-                contentType: input.contentType,
-                size: input.buffer.length,
-                checksum,
-                uploadedBy: input.uploadedBy,
-                classification: input.classification || 'INTERNAL',
-                scanStatus,
-            },
-        });
+        let stored;
+        try {
+            stored = await prisma.storedObject.create({
+                data: {
+                    organizationId: input.organizationId,
+                    ownerType: input.ownerType,
+                    ownerId: input.ownerId,
+                    filename: safeName,
+                    storageKey,
+                    contentType: input.contentType,
+                    size: input.buffer.length,
+                    checksum,
+                    uploadedBy: input.uploadedBy,
+                    classification: input.classification || 'INTERNAL',
+                    scanStatus,
+                },
+            });
+        } catch (error) {
+            await store.deleteObject(storageKey);
+            throw error;
+        }
 
         await recordAudit({
             organizationId: input.organizationId,
@@ -195,5 +201,32 @@ export const objectStorageService = {
             result: 'success',
         });
         return { deleted: true };
+    },
+
+    async reconcileOrphans(organizationId?: string) {
+        const store = provider();
+        const prefix = organizationId ? `${organizationId}/` : '';
+        const keys = store.listKeys ? await store.listKeys(prefix) : [];
+        const rows = await prisma.storedObject.findMany({
+            where: {
+                deletedAt: null,
+                ...(organizationId ? { organizationId } : {}),
+            },
+            select: { storageKey: true },
+        });
+        const known = new Set(rows.map((row) => row.storageKey));
+        const orphans = keys.filter((key) => !known.has(key));
+        for (const key of orphans) {
+            await store.deleteObject(key);
+            await recordAudit({
+                organizationId: organizationId || key.split('/')[0],
+                action: 'evidence.orphan_reconciled',
+                resourceType: 'StoredObject',
+                resourceId: key,
+                result: 'success',
+                metadata: { storageKey: key },
+            });
+        }
+        return { scanned: keys.length, orphansRemoved: orphans.length };
     },
 };

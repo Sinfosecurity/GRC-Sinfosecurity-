@@ -6,23 +6,24 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('🌱 Seeding database...');
 
-    // Create demo organization
+    const staging = process.env.APP_ENVIRONMENT === 'staging';
     const demoOrg = await prisma.organization.upsert({
         where: { id: 'demo-org-001' },
         update: {
-            isDemo: true,
-            slug: 'supreme-risk-demo',
+            isDemo: !staging,
+            slug: staging ? 'supreme-risk-staging' : 'supreme-risk-demo',
+            name: staging ? 'Supreme Risk Staging Workspace' : 'Supreme Risk Demo Workspace',
         },
         create: {
             id: 'demo-org-001',
-            name: 'Supreme Risk Demo Workspace',
+            name: staging ? 'Supreme Risk Staging Workspace' : 'Supreme Risk Demo Workspace',
             industry: 'Information Technology',
             country: 'USA',
             size: '50-200',
-            slug: 'supreme-risk-demo',
+            slug: staging ? 'supreme-risk-staging' : 'supreme-risk-demo',
             status: 'TRIAL',
             plan: 'PROFESSIONAL',
-            isDemo: true,
+            isDemo: !staging,
         },
     });
 
