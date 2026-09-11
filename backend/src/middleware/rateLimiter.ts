@@ -20,7 +20,10 @@ export const rateLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skip: (req: Request) =>
-        process.env.NODE_ENV === 'test' || req.path === '/health' || req.path === '/health/basic',
+        process.env.NODE_ENV === 'test' ||
+        process.env.DEV_MODE === 'true' ||
+        req.path === '/health' ||
+        req.path === '/health/basic',
 });
 
 // Authentication rate limiter - 5 attempts per 15 minutes

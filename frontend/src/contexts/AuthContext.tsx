@@ -60,7 +60,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(next);
           localStorage.setItem('user', JSON.stringify(next));
         })
-        .catch(() => {
+        .catch((err: { status?: number }) => {
+          if (err?.status && err.status !== 401) {
+            return;
+          }
           setToken(null);
           setUser(null);
           localStorage.removeItem('token');

@@ -32,7 +32,7 @@ import {
 } from '@mui/material';
 import { Add, Business, Assessment, CheckCircle, Warning, Error as ErrorIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { vendorAPI } from '../services/api';
+import { tprmAPI, vendorAPI } from '../services/api';
 
 interface Vendor {
     id: string | number;
@@ -89,6 +89,17 @@ export default function VendorManagement() {
     const [tabValue, setTabValue] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+    const [riskExplanation, setRiskExplanation] = useState<{
+        methodologyVersion?: string;
+        latest?: {
+            inherentRisk?: number;
+            controlEffectiveness?: number;
+            residualRisk?: number;
+            riskBand?: string;
+            factors?: Array<{ label: string; points: number; rationale?: string }>;
+        } | null;
+    } | null>(null);
+    const [riskExplanationError, setRiskExplanationError] = useState<string | null>(null);
     const [newVendor, setNewVendor] = useState({
         name: '',
         category: '',
@@ -194,6 +205,11 @@ export default function VendorManagement() {
 
     const handleViewVendor = (vendor: Vendor) => {
         setSelectedVendor(vendor);
+        setRiskExplanation(null);
+        setRiskExplanationError(null);
+        tprmAPI.riskExplanation(String(vendor.id))
+            .then((response) => setRiskExplanation(response.data.data))
+            .catch((err: any) => setRiskExplanationError(err.message || 'Unable to load risk explanation'));
     };
 
     const handleStartAssessment = () => {
@@ -675,6 +691,43 @@ export default function VendorManagement() {
                                     <Typography variant="body2" sx={{ color: 'white', mt: 0.5 }}>
                                         {selectedVendor.nextReview}
                                     </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
+                                        Explainable risk
+                                    </Typography>
+                                    {riskExplanationError && <Alert severity="error" sx={{ mb: 1 }}>{riskExplanationError}</Alert>}
+                                    {!riskExplanationError && !riskExplanation && (
+                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>Loading risk explanation…</Typography>
+                                    )}
+                                    {riskExplanation?.latest ? (
+                                        <Box>
+                                            <Typography variant="body2" sx={{ color: 'white' }}>
+                                                Inherent risk {riskExplanation.latest.inherentRisk}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: 'white' }}>
+                                                Control effectiveness {riskExplanation.latest.controlEffectiveness}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: 'white' }}>
+                                                Residual risk {riskExplanation.latest.residualRisk}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: 'white' }}>
+                                                Risk band {riskExplanation.latest.riskBand}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: 'white' }}>
+                                                Score methodology version {riskExplanation.methodologyVersion}
+                                            </Typography>
+                                            {(riskExplanation.latest.factors || []).map((factor) => (
+                                                <Typography key={factor.label} variant="caption" display="block" sx={{ color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>
+                                                    {factor.label}: {factor.points >= 0 ? '+' : ''}{factor.points}
+                                                </Typography>
+                                            ))}
+                                        </Box>
+                                    ) : riskExplanation ? (
+                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                                            No persisted score yet. Complete an assessment to calculate residual risk.
+                                        </Typography>
+                                    ) : null}
                                 </Grid>
                             </Grid>
                         </DialogContent>
