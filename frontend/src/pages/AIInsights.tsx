@@ -44,10 +44,14 @@ export default function AIInsights() {
             <Typography color="text.secondary" sx={{ mb: 3 }}>
                 Output must stay labeled FACTS / INFERENCES / RECOMMENDATIONS. Residual risk still comes from the deterministic engine.
             </Typography>
+            {!loading && (
+                <Alert severity={status === 'NOT_CONFIGURED' ? 'info' : status === 'ERROR' ? 'error' : 'success'} sx={{ mb: 2 }}>
+                    Provider status: {status}
+                </Alert>
+            )}
             <QueryState loading={loading} error={error} notConfigured={status === 'NOT_CONFIGURED'}>
                 <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)', border: '1px solid rgba(56,189,248,0.2)' }}>
                     <CardContent>
-                        <Alert severity="info" sx={{ mb: 2 }}>Provider status: {status}</Alert>
                         <Box component="form" onSubmit={analyze}>
                             <Stack spacing={2}>
                                 <TextField select label="Feature" value={feature} onChange={(e) => setFeature(e.target.value)}>

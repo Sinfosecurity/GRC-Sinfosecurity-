@@ -26,12 +26,12 @@ import {
     Tabs,
     Tab,
     LinearProgress,
-    CircularProgress,
     Alert,
     Snackbar,
 } from '@mui/material';
 import { Add, Business, Assessment, CheckCircle, Warning, Error as ErrorIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import QueryState from '../components/QueryState';
 import { tprmAPI, vendorAPI } from '../services/api';
 
 interface Vendor {
@@ -49,8 +49,53 @@ interface Vendor {
     assessmentStatus: 'Not Started' | 'In Progress' | 'Completed' | 'Overdue';
 }
 
-const categories = ['Cloud Services', 'Payment Processing', 'Analytics', 'Marketing', 'Human Resources', 'IT Services', 'Security', 'Other'];
-const tiers = ['Critical', 'High', 'Medium', 'Low'];
+const vendorTypes = [
+    { value: 'SAAS', label: 'SaaS' },
+    { value: 'CLOUD_SERVICE', label: 'Cloud service' },
+    { value: 'IT_SERVICE', label: 'IT service' },
+    { value: 'PROFESSIONAL_SERVICES', label: 'Professional services' },
+    { value: 'CONSULTING', label: 'Consulting' },
+    { value: 'OTHER', label: 'Other' },
+];
+const categories = [
+    { value: 'CLOUD_HOSTING', label: 'Cloud hosting' },
+    { value: 'TECHNOLOGY', label: 'Technology' },
+    { value: 'PAYMENT_PROCESSING', label: 'Payment processing' },
+    { value: 'ANALYTICS', label: 'Analytics' },
+    { value: 'MARKETING', label: 'Marketing' },
+    { value: 'HR_PAYROLL', label: 'HR / payroll' },
+    { value: 'CYBERSECURITY', label: 'Cybersecurity' },
+    { value: 'OTHER', label: 'Other' },
+];
+const tiers = [
+    { value: 'CRITICAL', label: 'Critical' },
+    { value: 'HIGH', label: 'High' },
+    { value: 'MEDIUM', label: 'Medium' },
+    { value: 'LOW', label: 'Low' },
+];
+
+function displayAssessmentStatus(status?: string) {
+    switch (status) {
+        case 'COMPLETED':
+        case 'Completed':
+            return 'Completed';
+        case 'IN_PROGRESS':
+        case 'PENDING_REVIEW':
+        case 'PENDING_APPROVAL':
+        case 'In Progress':
+            return 'In Progress';
+        case 'OVERDUE':
+        case 'Overdue':
+            return 'Overdue';
+        default:
+            return 'Not Started';
+    }
+}
+
+function displayTier(tier?: string) {
+    if (!tier) return 'Medium';
+    return tier.charAt(0) + tier.slice(1).toLowerCase();
+}
 
 const getTierColor = (tier: string) => {
     const colors: Record<string, string> = {
@@ -100,14 +145,17 @@ export default function VendorManagement() {
         } | null;
     } | null>(null);
     const [riskExplanationError, setRiskExplanationError] = useState<string | null>(null);
+    const [saving, setSaving] = useState(false);
     const [newVendor, setNewVendor] = useState({
         name: '',
+        vendorType: 'SAAS',
         category: '',
-        tier: 'Medium' as const,
+        tier: 'MEDIUM',
         contactEmail: '',
+        primaryContact: '',
+        servicesProvided: '',
         dataAccess: '',
         website: '',
-        primaryContact: '',
         businessOwner: ''
     });
 
@@ -121,22 +169,21 @@ export default function VendorManagement() {
         try {
             setLoading(true);
             setError(null);
-            const response = await vendorAPI.getAll();
+            const response = await vendorAPI.getAll({ pageSize: 100 });
             if (response.data.vendors) {
-                // Map backend data to frontend format
                 const mappedVendors = response.data.vendors.map((v: any) => ({
                     id: v.id,
                     name: v.name,
                     category: v.category,
-                    tier: v.tier,
+                    tier: displayTier(v.tier) as Vendor['tier'],
                     status: v.status,
                     riskScore: v.inherentRiskScore || 0,
                     complianceScore: 100 - (v.inherentRiskScore || 0),
                     lastAssessment: v.lastAssessmentDate ? new Date(v.lastAssessmentDate).toISOString().split('T')[0] : 'N/A',
                     nextReview: v.nextReviewDate ? new Date(v.nextReviewDate).toISOString().split('T')[0] : 'N/A',
-                    contactEmail: v.primaryContact || 'N/A',
-                    dataAccess: v.dataCategories?.join(', ') || 'N/A',
-                    assessmentStatus: v.assessmentStatus || 'Not Started'
+                    contactEmail: v.contactEmail || v.primaryContact || 'N/A',
+                    dataAccess: (v.dataTypesAccessed || v.dataCategories || []).join(', ') || 'N/A',
+                    assessmentStatus: displayAssessmentStatus(v.assessmentStatus)
                 }));
                 setVendors(mappedVendors);
             }
@@ -163,43 +210,61 @@ export default function VendorManagement() {
     const avgRiskScore = statistics?.averageRiskScore || (vendors.reduce((sum, v) => sum + v.riskScore, 0) / vendors.length).toFixed(0);
 
     const handleAddVendor = async () => {
+        const missing = [
+            !newVendor.name && 'Vendor name',
+            !newVendor.vendorType && 'Vendor type',
+            !newVendor.category && 'Category',
+            !newVendor.primaryContact && 'Primary contact',
+            !newVendor.contactEmail && 'Contact email',
+            !newVendor.servicesProvided && 'Services provided',
+        ].filter(Boolean);
+        if (missing.length) {
+            setSnackbar({ open: true, message: `Required: ${missing.join(', ')}`, severity: 'error' });
+            return;
+        }
         try {
-            setLoading(true);
+            setSaving(true);
+            const website = newVendor.website
+                ? (newVendor.website.startsWith('http') ? newVendor.website : `https://${newVendor.website}`)
+                : '';
             await vendorAPI.create({
-                name: newVendor.name,
+                name: newVendor.name.trim(),
+                vendorType: newVendor.vendorType,
                 category: newVendor.category,
                 tier: newVendor.tier,
-                primaryContact: newVendor.contactEmail,
-                website: newVendor.website,
-                businessOwner: newVendor.businessOwner,
-                dataCategories: newVendor.dataAccess ? [newVendor.dataAccess] : [],
-                services: []
+                primaryContact: newVendor.primaryContact.trim(),
+                contactEmail: newVendor.contactEmail.trim(),
+                servicesProvided: newVendor.servicesProvided.trim(),
+                website,
+                businessOwner: newVendor.businessOwner || undefined,
+                dataTypesAccessed: newVendor.dataAccess ? [newVendor.dataAccess] : [],
+                geographicFootprint: [],
+                regulatoryScope: [],
             });
-            
-            setSnackbar({ open: true, message: 'Vendor added successfully!', severity: 'success' });
+            setSnackbar({ open: true, message: 'Vendor added. The list has been refreshed.', severity: 'success' });
             setOpenDialog(false);
             setNewVendor({
                 name: '',
+                vendorType: 'SAAS',
                 category: '',
-                tier: 'Medium',
+                tier: 'MEDIUM',
                 contactEmail: '',
+                primaryContact: '',
+                servicesProvided: '',
                 dataAccess: '',
                 website: '',
-                primaryContact: '',
                 businessOwner: ''
             });
-            
-            // Reload vendors
             await loadVendors();
+            await loadStatistics();
         } catch (err: any) {
-            console.error('Failed to add vendor:', err);
-            setSnackbar({ 
-                open: true, 
-                message: err.response?.data?.message || 'Failed to add vendor', 
-                severity: 'error' 
+            setSnackbar({
+                open: true,
+                message: err.message || 'Failed to add vendor',
+                severity: 'error'
             });
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
@@ -212,9 +277,10 @@ export default function VendorManagement() {
             .catch((err: any) => setRiskExplanationError(err.message || 'Unable to load risk explanation'));
     };
 
-    const handleStartAssessment = () => {
-        if (selectedVendor?.id) {
-            navigate(`/assessments?vendorId=${selectedVendor.id}`);
+    const handleStartAssessment = (vendor?: Vendor | null) => {
+        const target = vendor || selectedVendor;
+        if (target?.id) {
+            navigate(`/assessments?vendorId=${target.id}`);
             return;
         }
         navigate('/assessments');
@@ -246,7 +312,7 @@ export default function VendorManagement() {
                     variant="contained"
                     startIcon={<Add />}
                     onClick={() => setOpenDialog(true)}
-                    disabled={loading}
+                    disabled={saving}
                     sx={{
                         background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                         color: '#000',
@@ -259,19 +325,17 @@ export default function VendorManagement() {
                 </Button>
             </Box>
 
-            {/* Error Alert */}
-            {error && (
-                <Alert severity="warning" sx={{ mb: 3 }} onClose={() => setError(null)}>
-                    {error}
-                </Alert>
-            )}
-
-            {/* Loading State */}
-            {loading && vendors.length === 0 && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
-                    <CircularProgress />
-                </Box>
-            )}
+            <Box sx={{ mb: 3 }}>
+                <QueryState
+                    loading={loading && vendors.length === 0}
+                    error={error}
+                    empty={!loading && vendors.length === 0}
+                    emptyTitle="No vendors yet"
+                    emptyBody="Add a vendor with type, category, contact, and services. The new record appears in this list immediately."
+                >
+                    <span />
+                </QueryState>
+            </Box>
 
             {/* Stats Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -333,22 +397,22 @@ export default function VendorManagement() {
                     </Typography>
                     <Grid container spacing={2}>
                         {tiers.map(tier => {
-                            const count = vendors.filter(v => v.tier === tier).length;
+                            const count = vendors.filter(v => v.tier === tier.label).length;
                             const percentage = ((count / vendors.length) * 100).toFixed(0);
                             return (
-                                <Grid item xs={12} sm={6} md={3} key={tier}>
+                                <Grid item xs={12} sm={6} md={3} key={tier.value}>
                                     <Box sx={{
                                         p: 2,
                                         border: '2px solid',
-                                        borderColor: getTierColor(tier),
+                                        borderColor: getTierColor(tier.label),
                                         borderRadius: 2,
-                                        bgcolor: `${getTierColor(tier)}10`
+                                        bgcolor: `${getTierColor(tier.label)}10`
                                     }}>
-                                        <Typography variant="h4" sx={{ color: getTierColor(tier), fontWeight: 700 }}>
+                                        <Typography variant="h4" sx={{ color: getTierColor(tier.label), fontWeight: 700 }}>
                                             {count}
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                            {tier} Tier ({percentage}%)
+                                            {tier.label} Tier ({percentage}%)
                                         </Typography>
                                     </Box>
                                 </Grid>
@@ -493,6 +557,10 @@ export default function VendorManagement() {
                                                     size="small"
                                                     startIcon={<Assessment />}
                                                     sx={{ color: '#667eea' }}
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        handleStartAssessment(vendor);
+                                                    }}
                                                 >
                                                     Assess
                                                 </Button>
@@ -532,14 +600,32 @@ export default function VendorManagement() {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <FormControl fullWidth required>
-                                <InputLabel>Category</InputLabel>
+                                <InputLabel id="vendor-type-label">Vendor type</InputLabel>
                                 <Select
+                                    labelId="vendor-type-label"
+                                    inputProps={{ 'aria-label': 'Vendor type' }}
+                                    value={newVendor.vendorType}
+                                    onChange={(e) => setNewVendor({ ...newVendor, vendorType: e.target.value })}
+                                    label="Vendor type"
+                                >
+                                    {vendorTypes.map((item) => (
+                                        <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth required>
+                                <InputLabel id="vendor-category-label">Category</InputLabel>
+                                <Select
+                                    labelId="vendor-category-label"
+                                    inputProps={{ 'aria-label': 'Category' }}
                                     value={newVendor.category}
                                     onChange={(e) => setNewVendor({ ...newVendor, category: e.target.value })}
                                     label="Category"
                                 >
-                                    {categories.map(cat => (
-                                        <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                                    {categories.map((cat) => (
+                                        <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -549,14 +635,23 @@ export default function VendorManagement() {
                                 <InputLabel>Risk Tier</InputLabel>
                                 <Select
                                     value={newVendor.tier}
-                                    onChange={(e) => setNewVendor({ ...newVendor, tier: e.target.value as any })}
+                                    onChange={(e) => setNewVendor({ ...newVendor, tier: e.target.value })}
                                     label="Risk Tier"
                                 >
-                                    {tiers.map(tier => (
-                                        <MenuItem key={tier} value={tier}>{tier}</MenuItem>
+                                    {tiers.map((tier) => (
+                                        <MenuItem key={tier.value} value={tier.value}>{tier.label}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Primary contact"
+                                value={newVendor.primaryContact}
+                                onChange={(e) => setNewVendor({ ...newVendor, primaryContact: e.target.value })}
+                                required
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
@@ -565,6 +660,33 @@ export default function VendorManagement() {
                                 type="email"
                                 value={newVendor.contactEmail}
                                 onChange={(e) => setNewVendor({ ...newVendor, contactEmail: e.target.value })}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Website"
+                                value={newVendor.website}
+                                onChange={(e) => setNewVendor({ ...newVendor, website: e.target.value })}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Business owner"
+                                value={newVendor.businessOwner}
+                                onChange={(e) => setNewVendor({ ...newVendor, businessOwner: e.target.value })}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                label="Services provided"
+                                value={newVendor.servicesProvided}
+                                onChange={(e) => setNewVendor({ ...newVendor, servicesProvided: e.target.value })}
                                 required
                             />
                         </Grid>
@@ -586,7 +708,7 @@ export default function VendorManagement() {
                     <Button
                         onClick={handleAddVendor}
                         variant="contained"
-                        disabled={!newVendor.name || !newVendor.category || !newVendor.contactEmail}
+                        disabled={saving || !newVendor.name || !newVendor.vendorType || !newVendor.category || !newVendor.primaryContact || !newVendor.contactEmail || !newVendor.servicesProvided}
                         sx={{
                             background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                             color: '#000'
@@ -736,7 +858,7 @@ export default function VendorManagement() {
                             <Button
                                 variant="contained"
                                 startIcon={<Assessment />}
-                                onClick={handleStartAssessment}
+                                onClick={() => handleStartAssessment()}
                                 sx={{
                                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 }}

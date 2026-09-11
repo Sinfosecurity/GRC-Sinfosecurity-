@@ -12,6 +12,7 @@ import { scoringMethodologyService } from '../services/scoringMethodologyService
 import { reportGenerationService } from '../reports/reportGenerationService';
 import type { ReportFilters } from '../reports/portfolioData';
 import { prisma } from '../config/database';
+import { reportLimiter, uploadLimiter } from '../middleware/rateLimiter';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
 const router = Router();
@@ -120,6 +121,7 @@ router.post('/vendors/:vendorId/assessments/:assessmentId/complete', requirePerm
 router.post(
     '/evidence/upload',
     requirePermission(PERMISSIONS['evidence.upload']),
+    uploadLimiter,
     upload.single('file'),
     async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
@@ -267,7 +269,7 @@ router.put('/scoring-methodology', requirePermission(PERMISSIONS['questionnaire.
     }
 });
 
-router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.decisionBriefPdf(actor(req), req.params.briefId, res);
     } catch (error) {
@@ -275,7 +277,7 @@ router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['repor
     }
 });
 
-router.get('/reports/executive.pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/executive.pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.executivePdf(actor(req), filters(req), res);
     } catch (error) {
@@ -283,7 +285,7 @@ router.get('/reports/executive.pdf', requirePermission(PERMISSIONS['report.expor
     }
 });
 
-router.get('/reports/vendors/:vendorId/scorecard.pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/vendors/:vendorId/scorecard.pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.vendorScorecardPdf(actor(req), req.params.vendorId, res);
     } catch (error) {
@@ -291,7 +293,7 @@ router.get('/reports/vendors/:vendorId/scorecard.pdf', requirePermission(PERMISS
     }
 });
 
-router.get('/reports/assessments/:assessmentId/pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/assessments/:assessmentId/pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.assessmentPdf(actor(req), req.params.assessmentId, res);
     } catch (error) {
@@ -299,7 +301,7 @@ router.get('/reports/assessments/:assessmentId/pdf', requirePermission(PERMISSIO
     }
 });
 
-router.get('/reports/findings.pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/findings.pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.findings(actor(req), 'pdf', filters(req), res);
     } catch (error) {
@@ -307,7 +309,7 @@ router.get('/reports/findings.pdf', requirePermission(PERMISSIONS['report.export
     }
 });
 
-router.get('/reports/findings.csv', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/findings.csv', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.findings(actor(req), 'csv', filters(req), res);
     } catch (error) {
@@ -315,7 +317,7 @@ router.get('/reports/findings.csv', requirePermission(PERMISSIONS['report.export
     }
 });
 
-router.get('/reports/findings.xlsx', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/findings.xlsx', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.findings(actor(req), 'xlsx', filters(req), res);
     } catch (error) {
@@ -323,7 +325,7 @@ router.get('/reports/findings.xlsx', requirePermission(PERMISSIONS['report.expor
     }
 });
 
-router.get('/reports/monitoring.pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/monitoring.pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.monitoring(actor(req), 'pdf', filters(req), res);
     } catch (error) {
@@ -331,7 +333,7 @@ router.get('/reports/monitoring.pdf', requirePermission(PERMISSIONS['report.expo
     }
 });
 
-router.get('/reports/monitoring.csv', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/monitoring.csv', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.monitoring(actor(req), 'csv', filters(req), res);
     } catch (error) {
@@ -339,7 +341,7 @@ router.get('/reports/monitoring.csv', requirePermission(PERMISSIONS['report.expo
     }
 });
 
-router.get('/reports/board.pdf', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/board.pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.board(actor(req), 'pdf', filters(req), res);
     } catch (error) {
@@ -347,7 +349,7 @@ router.get('/reports/board.pdf', requirePermission(PERMISSIONS['report.export'])
     }
 });
 
-router.get('/reports/board.pptx', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/board.pptx', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.board(actor(req), 'pptx', filters(req), res);
     } catch (error) {

@@ -1,15 +1,40 @@
 /**
- * Advanced Rate Limiting Configuration
- * Per-user and per-IP rate limiting for different endpoint types
+ * Differentiated rate limits.
+ * A legitimate authenticated TPRM journey (login through all report downloads)
+ * must complete without 429. Auth abuse stays strict.
+ *
+ * DEV_MODE no longer skips the general API limiter. Tests skip via NODE_ENV=test.
+ * RATE_LIMIT_RELAXED=true is the only explicit bypass for local soak tests.
  */
 
 import rateLimit from 'express-rate-limit';
 import { Request } from 'express';
 
-// General API rate limiter
+export function shouldSkipRateLimit(req: Pick<Request, 'path'>, env: NodeJS.ProcessEnv = process.env) {
+    return (
+        (env.NODE_ENV === 'test' && env.RATE_LIMIT_ENFORCE !== 'true') ||
+        env.RATE_LIMIT_RELAXED === 'true' ||
+        req.path === '/health' ||
+        req.path === '/health/basic'
+    );
+}
+
+function skipInfrastructure(req: Request) {
+    return shouldSkipRateLimit(req);
+}
+
+function ipKey(req: Request) {
+    return req.ip || req.socket.remoteAddress || 'unknown';
+}
+
+function userOrIp(req: Request) {
+    return (req as any).user?.id || ipKey(req);
+}
+
+/** General API: enough for a full TPRM session, still bounds suspicious bursts. */
 export const rateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
+    windowMs: 15 * 60 * 1000,
+    max: 800,
     message: {
         success: false,
         error: {
@@ -19,17 +44,17 @@ export const rateLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    skip: (req: Request) =>
-        process.env.NODE_ENV === 'test' ||
-        process.env.DEV_MODE === 'true' ||
-        req.path === '/health' ||
-        req.path === '/health/basic',
+    skip: skipInfrastructure,
+    keyGenerator: ipKey,
 });
 
-// Authentication rate limiter - 5 attempts per 15 minutes
+/** Login / signup failures — 5 per 15 minutes. Successful logins do not count. */
 export const authRateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
+    skipSuccessfulRequests: true,
+    skip: skipInfrastructure,
+    keyGenerator: ipKey,
     message: {
         success: false,
         error: {
@@ -37,13 +62,14 @@ export const authRateLimiter = rateLimit({
             code: 'AUTH_RATE_LIMIT_EXCEEDED',
         },
     },
-    skipSuccessfulRequests: true,
 });
 
-// MFA verification limiter - 5 attempts per 15 minutes
 export const mfaLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
+    skipSuccessfulRequests: true,
+    skip: skipInfrastructure,
+    keyGenerator: ipKey,
     message: {
         success: false,
         error: {
@@ -51,13 +77,13 @@ export const mfaLimiter = rateLimit({
             code: 'MFA_RATE_LIMIT_EXCEEDED',
         },
     },
-    skipSuccessfulRequests: true,
 });
 
-// Password reset limiter - 3 per hour
 export const passwordResetLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 3,
+    skip: skipInfrastructure,
+    keyGenerator: ipKey,
     message: {
         success: false,
         error: {
@@ -67,10 +93,11 @@ export const passwordResetLimiter = rateLimit({
     },
 });
 
-// File upload limiter - 20 per hour per user
 export const uploadLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
-    max: 20,
+    max: 40,
+    skip: skipInfrastructure,
+    keyGenerator: userOrIp,
     message: {
         success: false,
         error: {
@@ -78,13 +105,14 @@ export const uploadLimiter = rateLimit({
             code: 'UPLOAD_LIMIT_EXCEEDED',
         },
     },
-    keyGenerator: (req: Request) => (req as any).user?.id || req.ip,
 });
 
-// Report generation limiter - 10 per hour per user
+/** Full report pack is ~10 files; 40/hour allows a session plus retries. */
 export const reportLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
-    max: 10,
+    max: 40,
+    skip: skipInfrastructure,
+    keyGenerator: userOrIp,
     message: {
         success: false,
         error: {
@@ -92,13 +120,13 @@ export const reportLimiter = rateLimit({
             code: 'REPORT_LIMIT_EXCEEDED',
         },
     },
-    keyGenerator: (req: Request) => (req as any).user?.id || req.ip,
 });
 
-// Bulk operations limiter - 5 per hour per user
 export const bulkOperationLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 5,
+    skip: skipInfrastructure,
+    keyGenerator: userOrIp,
     message: {
         success: false,
         error: {
@@ -106,13 +134,13 @@ export const bulkOperationLimiter = rateLimit({
             code: 'BULK_OPERATION_LIMIT_EXCEEDED',
         },
     },
-    keyGenerator: (req: Request) => (req as any).user?.id || req.ip,
 });
 
-// SSO callback limiter - 10 per 15 minutes
 export const ssoLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
+    skip: skipInfrastructure,
+    keyGenerator: ipKey,
     message: {
         success: false,
         error: {
@@ -122,10 +150,11 @@ export const ssoLimiter = rateLimit({
     },
 });
 
-// Strict limiter for sensitive operations - 3 per 15 minutes
 export const strictLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 3,
+    skip: skipInfrastructure,
+    keyGenerator: userOrIp,
     message: {
         success: false,
         error: {
@@ -133,5 +162,4 @@ export const strictLimiter = rateLimit({
             code: 'STRICT_RATE_LIMIT_EXCEEDED',
         },
     },
-    keyGenerator: (req: Request) => (req as any).user?.id || req.ip,
 });

@@ -38,7 +38,14 @@ api.interceptors.response.use(
         const status = error.response?.status;
         const payload = error.response?.data;
         const nestedError = payload?.error;
+        const details = typeof nestedError === 'object' && nestedError
+            ? (nestedError as { details?: Array<{ field?: string; message?: string }> }).details
+            : undefined;
+        const detailMessage = Array.isArray(details)
+            ? details.map((item) => (item.field ? `${item.field}: ${item.message}` : item.message)).filter(Boolean).join('; ')
+            : '';
         const message =
+            detailMessage ||
             (typeof nestedError === 'string' ? nestedError : nestedError?.message) ||
             payload?.message ||
             (status === 403
@@ -47,9 +54,11 @@ api.interceptors.response.use(
                     ? 'The requested record was not found.'
                     : status === 429
                         ? 'Too many requests. Wait and try again.'
-                        : !error.response
-                            ? 'Network error. The server did not respond.'
-                            : 'The request failed.');
+                        : status === 503
+                            ? 'A required provider is unavailable.'
+                            : !error.response
+                                ? 'Network error. The server did not respond.'
+                                : 'The request failed.');
 
         if (status === 401) {
             localStorage.removeItem('token');
@@ -119,6 +128,14 @@ export const documentsAPI = {
 export const usersAPI = {
     getAll: () => api.get('/users'),
     invite: (data: { email: string; role: string }) => api.post('/users/invite', data),
+    invitations: () => api.get('/users/invitations'),
+    resendInvitation: (id: string) => api.post(`/users/invitations/${id}/resend`),
+    updateRole: (id: string, role: string) => api.patch(`/users/${id}/role`, { role }),
+    setStatus: (id: string, status: 'ACTIVE' | 'DISABLED') => api.patch(`/users/${id}/status`, { status }),
+};
+
+export const auditAPI = {
+    logs: (params?: Record<string, string | number | undefined>) => api.get('/audit/logs', { params }),
 };
 
 export const organizationAPI = {

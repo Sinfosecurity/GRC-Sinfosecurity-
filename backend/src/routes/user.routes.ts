@@ -26,6 +26,29 @@ router.get('/me', async (req: AuthRequest, res: Response, next: NextFunction) =>
     }
 });
 
+router.get('/invitations', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const invitations = await identityUserService.listInvitations(req.user!.organizationId);
+        res.json({ success: true, data: invitations });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/invitations/:id/resend', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const result = await identityUserService.resendInvitation(
+            req.user!.organizationId,
+            req.params.id,
+            req.user!.id,
+            req.user!.role as Role
+        );
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/:id', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const user = await identityUserService.getById(req.params.id, req.user!.organizationId);
@@ -41,7 +64,13 @@ router.patch('/:id/role', requirePermission(PERMISSIONS['user.manage']), async (
         if (!role || !Object.values(Role).includes(role)) {
             throw new ApiError(400, 'Valid role is required');
         }
-        const user = await identityUserService.updateRole(req.params.id, req.user!.organizationId, role, req.user!.id);
+        const user = await identityUserService.updateRole(
+            req.params.id,
+            req.user!.organizationId,
+            role,
+            req.user!.id,
+            req.user!.role as Role
+        );
         res.json({ success: true, data: user });
     } catch (error) {
         next(error);
@@ -51,7 +80,13 @@ router.patch('/:id/role', requirePermission(PERMISSIONS['user.manage']), async (
 router.patch('/:id/status', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const disabled = req.body?.status === 'DISABLED' || req.body?.disabled === true;
-        const user = await identityUserService.setDisabled(req.params.id, req.user!.organizationId, disabled, req.user!.id);
+        const user = await identityUserService.setDisabled(
+            req.params.id,
+            req.user!.organizationId,
+            disabled,
+            req.user!.id,
+            req.user!.role as Role
+        );
         res.json({ success: true, data: user });
     } catch (error) {
         next(error);
@@ -68,12 +103,14 @@ router.post('/invite', requirePermission(PERMISSIONS['user.manage']), async (req
             req.user!.organizationId,
             req.user!.id,
             email,
-            (role as Role) || Role.VIEWER
+            (role as Role) || Role.VIEWER,
+            req.user!.role as Role
         );
         res.status(201).json({
             success: true,
             data: {
                 invitation: result.invitation,
+                emailStatus: result.emailStatus,
                 ...(result.token ? { token: result.token } : {}),
             },
         });

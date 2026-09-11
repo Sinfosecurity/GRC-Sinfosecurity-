@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Card, CardContent, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import { tprmAPI, vendorAPI } from '../services/api';
@@ -46,11 +47,11 @@ type Assessment = {
 };
 
 export default function Assessments() {
-    const params = new URLSearchParams(window.location.search);
+    const [searchParams] = useSearchParams();
     const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
     const [templates, setTemplates] = useState<Template[]>([]);
     const [assessments, setAssessments] = useState<Assessment[]>([]);
-    const [vendorId, setVendorId] = useState(params.get('vendorId') || '');
+    const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [templateId, setTemplateId] = useState('');
     const [selected, setSelected] = useState<Assessment | null>(null);
     const [loading, setLoading] = useState(true);
@@ -63,12 +64,16 @@ export default function Assessments() {
         setError(null);
         try {
             const [vendorRes, templateRes, assessmentRes] = await Promise.all([
-                vendorAPI.getAll(),
+                vendorAPI.getAll({ pageSize: 100 }),
                 tprmAPI.questionnaires(),
                 tprmAPI.listAssessments(),
             ]);
             const vendorRows = vendorRes.data.vendors || vendorRes.data.data || vendorRes.data || [];
             setVendors(Array.isArray(vendorRows) ? vendorRows : []);
+            const requested = searchParams.get('vendorId');
+            if (requested && Array.isArray(vendorRows) && vendorRows.some((row: { id: string }) => row.id === requested)) {
+                setVendorId(requested);
+            }
             setTemplates(templateRes.data.data || []);
             setAssessments(assessmentRes.data.data || []);
         } catch (err: any) {
@@ -164,9 +169,21 @@ export default function Assessments() {
             </Typography>
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
-                <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 260 }}>
+                <TextField
+                    select
+                    label="Vendor"
+                    value={vendorId}
+                    onChange={(e) => setVendorId(e.target.value)}
+                    sx={{ minWidth: 260 }}
+                    SelectProps={{ native: true }}
+                    inputProps={{ 'aria-label': 'Vendor' }}
+                >
+                    <option value="">Select vendor</option>
+                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                        <option value={vendorId}>Selected vendor</option>
+                    )}
                     {vendors.map((vendor) => (
-                        <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>
+                        <option key={vendor.id} value={vendor.id}>{vendor.name}</option>
                     ))}
                 </TextField>
                 <TextField select label="Template" value={templateId} onChange={(e) => setTemplateId(e.target.value)} sx={{ minWidth: 280 }}>

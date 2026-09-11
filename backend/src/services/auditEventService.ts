@@ -70,15 +70,56 @@ export async function recordAudit(input: AuditInput): Promise<void> {
 
 export const auditEventService = {
     record: recordAudit,
-    async list(organizationId: string, filters?: { action?: string; resourceType?: string; limit?: number }) {
-        return prisma.auditEvent.findMany({
-            where: {
-                organizationId,
-                ...(filters?.action ? { action: filters.action } : {}),
-                ...(filters?.resourceType ? { resourceType: filters.resourceType } : {}),
-            },
-            orderBy: { timestamp: 'desc' },
-            take: Math.min(filters?.limit || 100, 500),
-        });
+    async list(
+        organizationId: string,
+        filters?: {
+            action?: string;
+            resourceType?: string;
+            result?: string;
+            q?: string;
+            limit?: number;
+            page?: number;
+            pageSize?: number;
+        }
+    ) {
+        const page = Math.max(1, filters?.page || 1);
+        const pageSize = Math.min(Math.max(1, filters?.pageSize || filters?.limit || 25), 100);
+        const q = filters?.q?.trim();
+        const where = {
+            organizationId,
+            ...(filters?.action ? { action: { contains: filters.action, mode: 'insensitive' as const } } : {}),
+            ...(filters?.resourceType ? { resourceType: { contains: filters.resourceType, mode: 'insensitive' as const } } : {}),
+            ...(filters?.result ? { result: filters.result } : {}),
+            ...(q
+                ? {
+                      OR: [
+                          { action: { contains: q, mode: 'insensitive' as const } },
+                          { resourceType: { contains: q, mode: 'insensitive' as const } },
+                          { resourceId: { contains: q, mode: 'insensitive' as const } },
+                          { result: { contains: q, mode: 'insensitive' as const } },
+                          { actor: { email: { contains: q, mode: 'insensitive' as const } } },
+                          { actor: { firstName: { contains: q, mode: 'insensitive' as const } } },
+                          { actor: { lastName: { contains: q, mode: 'insensitive' as const } } },
+                      ],
+                  }
+                : {}),
+        };
+
+        const [items, total] = await Promise.all([
+            prisma.auditEvent.findMany({
+                where,
+                include: {
+                    actor: {
+                        select: { id: true, email: true, firstName: true, lastName: true, role: true },
+                    },
+                },
+                orderBy: { timestamp: 'desc' },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.auditEvent.count({ where }),
+        ]);
+
+        return { items, page, pageSize, total };
     },
 };

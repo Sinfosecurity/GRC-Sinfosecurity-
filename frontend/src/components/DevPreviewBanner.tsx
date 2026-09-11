@@ -1,7 +1,13 @@
 import { Box, Typography } from '@mui/material';
 
+export function environmentLabel(): 'STAGING' | 'DEVELOPMENT' | null {
+    if (import.meta.env.VITE_ENVIRONMENT === 'staging') return 'STAGING';
+    if (import.meta.env.DEV || import.meta.env.VITE_PREVIEW_LABEL === 'true') return 'DEVELOPMENT';
+    return null;
+}
+
 export function shouldShowDevPreviewBanner(): boolean {
-    return import.meta.env.DEV || import.meta.env.VITE_PREVIEW_LABEL === 'true';
+    return environmentLabel() !== null;
 }
 
 export default function DevPreviewBanner() {
@@ -25,10 +31,12 @@ export default function DevPreviewBanner() {
             }}
         >
             <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.8rem' }}>
-                SUPREME RISK — DEVELOPMENT PREVIEW
+                {environmentLabel() === 'STAGING' ? 'SUPREME RISK — STAGING' : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
             </Typography>
             <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, fontSize: '0.7rem' }}>
-                Local demo data only. Not production. Authentication and tenant isolation remain enabled.
+                {environmentLabel() === 'STAGING'
+                    ? 'Isolated staging environment. Not production. Do not use production tenant data.'
+                    : 'Local demo data only. Not production. Authentication and tenant isolation remain enabled.'}
             </Typography>
         </Box>
     );

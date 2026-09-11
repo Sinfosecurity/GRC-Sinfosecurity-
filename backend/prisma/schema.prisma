@@ -84,6 +84,10 @@ model Organization {
   billingCustomerId  String?
   isDemo             Boolean             @default(false)
   timezone           String              @default("UTC")
+  legalName          String?
+  contactName        String?
+  contactEmail       String?
+  contactPhone       String?
 
   users                       User[]
   invitations                 AccountInvitation[]

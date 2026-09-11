@@ -5,6 +5,7 @@ import { getEnv } from '../config/env';
 import { canonicalizeRole, permissionsForRole } from '../security/rbac';
 import { hashPassword, hashToken, randomToken, validatePasswordPolicy, verifyPassword } from './passwordService';
 import { recordAudit } from './auditEventService';
+import { notify } from './notificationDeliveryService';
 import { ApiError } from '../middleware/errorHandler';
 
 const GENERIC_AUTH_ERROR = 'Invalid credentials';
@@ -289,6 +290,16 @@ export const authService = {
             resourceId: user.id,
             result: 'success',
         });
+        await notify({
+            organizationId: user.organizationId,
+            userId: user.id,
+            eventType: 'auth.password_reset',
+            title: 'Password reset requested',
+            body: 'A password reset was requested for this Supreme Risk account.',
+            resourceType: 'User',
+            resourceId: user.id,
+            emailTo: user.email,
+        });
         return { requested: true, resetToken: process.env.NODE_ENV === 'test' ? token : undefined, userId: user.id };
     },
 
@@ -430,6 +441,20 @@ export const authService = {
             metadata: { email: input.email, role: input.role },
         });
         return { invitation, token: process.env.NODE_ENV === 'test' ? token : undefined };
+    },
+
+    async rotateInvitationToken(invitationId: string) {
+        const token = randomToken();
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await prisma.accountInvitation.update({
+            where: { id: invitationId },
+            data: {
+                tokenHash: hashToken(token),
+                expiresAt,
+                status: 'PENDING',
+            },
+        });
+        return { token: process.env.NODE_ENV === 'test' ? token : undefined, expiresAt };
     },
 
     async acceptInvitation(token: string, input: { password: string; firstName: string; lastName: string }) {

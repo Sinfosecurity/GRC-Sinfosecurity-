@@ -5,6 +5,7 @@
 
 import { CriticalityLevel, Prisma, Vendor, VendorCategory, VendorTier, VendorStatus, VendorType } from '@prisma/client';
 import { prisma } from '../config/database';
+import { deriveAssessmentStatus } from './vendorAssessmentStatus';
 import { handlePrismaError, NotFoundError, ValidationError, BusinessLogicError } from '../utils/errors';
 import logger from '../config/logger';
 import { calculateVendorRiskAt } from './deterministicRiskEngine';
@@ -233,6 +234,11 @@ class VendorManagementService {
                     { name: 'asc' },
                 ],
                 include: {
+                    assessments: {
+                        orderBy: { createdAt: 'desc' },
+                        take: 1,
+                        select: { status: true, dueDate: true, completedAt: true },
+                    },
                     _count: {
                         select: {
                             assessments: true,
@@ -246,7 +252,10 @@ class VendorManagementService {
         ]);
 
         return {
-            vendors,
+            vendors: vendors.map((vendor) => ({
+                ...vendor,
+                assessmentStatus: deriveAssessmentStatus(vendor.assessments[0]),
+            })),
             pagination: {
                 page,
                 pageSize,

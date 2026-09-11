@@ -32,6 +32,9 @@ const OnboardingWizard = lazy(() => import('./pages/OnboardingWizard'));
 const ISO27001 = lazy(() => import('./pages/ISO27001'));
 const TISAX = lazy(() => import('./pages/TISAX'));
 const Settings = lazy(() => import('./pages/Settings'));
+const LegacyQuarantine = lazy(() => import('./pages/LegacyQuarantine'));
+
+const LEGACY_ENABLED = import.meta.env.VITE_ENABLE_LEGACY_GRC === 'true';
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
@@ -64,21 +67,21 @@ export default function App() {
                     <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="risk-management" element={<RiskManagement />} />
-                    <Route path="compliance" element={<ComplianceManagement />} />
-                    <Route path="controls" element={<ControlsManagement />} />
-                    <Route path="incidents" element={<IncidentManagement />} />
-                    <Route path="policies" element={<PolicyManagement />} />
+                    <Route path="risk-management" element={LEGACY_ENABLED ? <RiskManagement /> : <LegacyQuarantine />} />
+                    <Route path="compliance" element={LEGACY_ENABLED ? <ComplianceManagement /> : <LegacyQuarantine />} />
+                    <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
+                    <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
+                    <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />
                     <Route path="documents" element={<DocumentManagement />} />
                     <Route path="activity-log" element={<ActivityLog />} />
                     <Route path="user-management" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><UserManagement /></ProtectedRoute>} />
                     <Route path="organization-settings" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><OrganizationSettings /></ProtectedRoute>} />
-                    <Route path="analytics" element={<Analytics />} />
-                    <Route path="tasks" element={<Tasks />} />
-                    <Route path="workflows" element={<WorkflowBuilder />} />
-                    <Route path="business-continuity" element={<BusinessContinuity />} />
+                    <Route path="analytics" element={LEGACY_ENABLED ? <Analytics /> : <LegacyQuarantine />} />
+                    <Route path="tasks" element={LEGACY_ENABLED ? <Tasks /> : <LegacyQuarantine />} />
+                    <Route path="workflows" element={LEGACY_ENABLED ? <WorkflowBuilder /> : <LegacyQuarantine />} />
+                    <Route path="business-continuity" element={LEGACY_ENABLED ? <BusinessContinuity /> : <LegacyQuarantine />} />
                     <Route path="ai-insights" element={<AIInsights />} />
-                    <Route path="predictive-analytics" element={<PredictiveAnalytics />} />
+                    <Route path="predictive-analytics" element={LEGACY_ENABLED ? <PredictiveAnalytics /> : <LegacyQuarantine />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="vendor-management" element={<VendorManagement />} />
                     <Route path="assessments" element={<Assessments />} />
@@ -88,10 +91,10 @@ export default function App() {
                     <Route path="questionnaires" element={<Questionnaires />} />
                     <Route path="billing" element={<Billing />} />
                     <Route path="integrations" element={<Integrations />} />
-                    <Route path="soc-reports" element={<SOCReports />} />
-                    <Route path="onboarding" element={<OnboardingWizard />} />
-                    <Route path="iso27001" element={<ISO27001 />} />
-                    <Route path="tisax" element={<TISAX />} />
+                    <Route path="soc-reports" element={LEGACY_ENABLED ? <SOCReports /> : <LegacyQuarantine />} />
+                    <Route path="onboarding" element={LEGACY_ENABLED ? <OnboardingWizard /> : <LegacyQuarantine />} />
+                    <Route path="iso27001" element={LEGACY_ENABLED ? <ISO27001 /> : <LegacyQuarantine />} />
+                    <Route path="tisax" element={LEGACY_ENABLED ? <TISAX /> : <LegacyQuarantine />} />
                     <Route path="settings" element={<Settings />} />
                 </Route>
             </Routes>

@@ -9,12 +9,16 @@ router.use(requirePermission(PERMISSIONS['audit.read']));
 
 router.get('/logs', async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const logs = await auditEventService.list(req.user!.organizationId, {
+        const result = await auditEventService.list(req.user!.organizationId, {
             action: req.query.action as string | undefined,
             resourceType: req.query.resourceType as string | undefined,
-            limit: req.query.limit ? Number(req.query.limit) : 100,
+            result: req.query.result as string | undefined,
+            q: req.query.q as string | undefined,
+            limit: req.query.limit ? Number(req.query.limit) : undefined,
+            page: req.query.page ? Number(req.query.page) : undefined,
+            pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
         });
-        res.json({ success: true, count: logs.length, data: logs });
+        res.json({ success: true, count: result.items.length, ...result, data: result.items });
     } catch (error) {
         next(error);
     }
@@ -22,8 +26,8 @@ router.get('/logs', async (req: AuthRequest, res: Response, next: NextFunction) 
 
 router.get('/recent', async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const logs = await auditEventService.list(req.user!.organizationId, { limit: 25 });
-        res.json({ success: true, data: logs });
+        const result = await auditEventService.list(req.user!.organizationId, { pageSize: 25 });
+        res.json({ success: true, data: result.items });
     } catch (error) {
         next(error);
     }

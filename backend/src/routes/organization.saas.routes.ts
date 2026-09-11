@@ -35,10 +35,14 @@ router.patch('/current', requirePermission(PERMISSIONS['organization.manage']), 
             where: { id: req.user!.organizationId },
             data: {
                 name: req.body.name,
+                legalName: req.body.legalName,
                 industry: req.body.industry,
                 country: req.body.country,
                 size: req.body.size,
                 timezone: req.body.timezone,
+                contactName: req.body.contactName,
+                contactEmail: req.body.contactEmail,
+                contactPhone: req.body.contactPhone,
             },
         });
         await recordAudit({

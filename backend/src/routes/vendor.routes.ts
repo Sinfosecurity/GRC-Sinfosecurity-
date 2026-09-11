@@ -184,7 +184,7 @@ router.get('/:id', validateUUID('id'), async (req: any, res) => {
  * POST /api/vendors
  * Create new vendor
  */
-router.post('/', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateBody(CreateVendorSchema), async (req: any, res) => {
+router.post('/', authorize('ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER', 'BUSINESS_OWNER', 'ASSESSOR'), validateBody(CreateVendorSchema), async (req: any, res) => {
     try {
         const vendor = await vendorManagementService.createVendor({
             ...req.body,

@@ -7,7 +7,38 @@ import { z } from 'zod';
 
 // Enums
 export const VendorTierSchema = z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']);
-export const VendorTypeSchema = z.enum(['SOFTWARE', 'INFRASTRUCTURE', 'PROFESSIONAL_SERVICES', 'MANAGED_SERVICES', 'CONSULTING', 'HARDWARE', 'OTHER']);
+export const VendorTypeSchema = z.enum([
+    'IT_SERVICE',
+    'CLOUD_SERVICE',
+    'SAAS',
+    'PAAS',
+    'IAAS',
+    'PROFESSIONAL_SERVICES',
+    'CONSULTING',
+    'OUTSOURCING',
+    'STAFFING',
+    'SUPPLY_CHAIN',
+    'MANUFACTURING',
+    'LOGISTICS',
+    'CRITICAL_INFRASTRUCTURE',
+    'OTHER',
+]);
+export const VendorCategorySchema = z.enum([
+    'TECHNOLOGY',
+    'CYBERSECURITY',
+    'CLOUD_HOSTING',
+    'DATA_PROCESSING',
+    'PAYMENT_PROCESSING',
+    'HR_PAYROLL',
+    'MARKETING',
+    'ANALYTICS',
+    'COMMUNICATION',
+    'LEGAL',
+    'FINANCIAL',
+    'INSURANCE',
+    'FACILITIES',
+    'OTHER',
+]);
 export const VendorStatusSchema = z.enum(['ACTIVE', 'PENDING_ONBOARDING', 'UNDER_REVIEW', 'SUSPENDED', 'TERMINATED', 'OFFBOARDED']);
 export const AssessmentTypeSchema = z.enum(['DUE_DILIGENCE', 'ANNUAL_REVIEW', 'CONTINUOUS', 'INCIDENT_DRIVEN', 'CONTRACT_RENEWAL', 'SIG', 'CAIQ', 'CUSTOM']);
 export const AssessmentStatusSchema = z.enum(['DRAFT', 'IN_PROGRESS', 'PENDING_REVIEW', 'COMPLETED', 'APPROVED']);
@@ -21,22 +52,21 @@ export const CreateVendorSchema = z.object({
     name: z.string().min(1, 'Name is required').max(255, 'Name too long'),
     legalName: z.string().max(255).optional(),
     vendorType: VendorTypeSchema,
-    category: z.string().min(1, 'Category is required').max(100),
+    category: VendorCategorySchema,
     tier: VendorTierSchema,
-    description: z.string().max(2000).optional(),
     website: z.string().url('Invalid URL').max(255).optional().or(z.literal('')),
-    primaryContact: z.string().email('Invalid email').max(255).optional(),
-    primaryContactPhone: z.string().max(50).optional(),
+    primaryContact: z.string().min(1, 'Primary contact is required').max(255),
+    contactEmail: z.string().email('Valid contact email is required').max(255),
+    contactPhone: z.string().max(50).optional(),
     businessOwner: z.string().max(255).optional(),
-    technicalOwner: z.string().max(255).optional(),
-    headquarters: z.string().max(255).optional(),
-    dataProcessingLocations: z.array(z.string().max(100)).optional(),
-    servicesProvided: z.array(z.string().max(255)).optional(),
-    criticalityJustification: z.string().max(1000).optional(),
-    annualSpend: z.number().min(0).optional(),
+    relationshipOwner: z.string().max(255).optional(),
+    servicesProvided: z.string().min(1, 'Services provided is required').max(2000),
+    dataTypesAccessed: z.array(z.string().max(100)).default([]),
+    geographicFootprint: z.array(z.string().max(100)).default([]),
+    regulatoryScope: z.array(z.string().max(100)).default([]),
+    hasSubcontractors: z.boolean().optional(),
     contractValue: z.number().min(0).optional(),
-    onboardingDate: z.string().datetime().optional(),
-    nextReviewDate: z.string().datetime().optional()
+    currency: z.string().max(8).optional(),
 });
 
 // Update Vendor Schema
