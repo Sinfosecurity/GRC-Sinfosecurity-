@@ -1,39 +1,34 @@
-# Supreme Risk enterprise roadmap
+# Supreme Risk — short roadmap
 
-Product promise: make Supreme Risk the easiest enterprise-grade TPRM platform to adopt, with explainable risk decisions, evidence-driven assessments, and intelligent continuous monitoring.
+Canonical plan: [`docs/SUPREME-GOVERNANCE-PLATFORM-ROADMAP.md`](./SUPREME-GOVERNANCE-PLATFORM-ROADMAP.md)
 
 TPRM remains the commercial spearhead. Broader GRC grows around shared objects. This is not a OneTrust clone.
 
 ## CURRENT
 
-Phase A foundation on `supreme-risk-transformation`:
+On `supreme-risk-transformation`:
 
-- Explainable risk engine with named factors, methodology version `supreme-risk-1.1.0`, persisted `ScoreCalculation.factors`
-- Risk Decision Brief (generate, human decision, immutable decided snapshots, AI summary status honesty)
-- What Needs Attention Today dashboard from live tenant records
-- AI Evidence Analyst UI wired to `/ai` with `NOT_CONFIGURED` when no key
-- Evidence vault list from `StoredObject` with real scan status
-- Monitoring page shows recorded `VendorMonitoring` signals only
-- Grouped navigation: Home, Third Party, Intelligence, Administration
+- Explainable vendor scoring (`supreme-risk-1.1.0`); risk acceptance is not a scoring control
+- Risk Decision Briefs with immutable decided snapshots
+- Assessments, evidence linkage, findings/CAP, attention queue
+- Monitoring from recorded `VendorMonitoring` only
+- Professional Board / Executive / Findings / Monitoring / Brief / Scorecard / Assessment exports
+- Grouped nav: Home, Third Party, Intelligence, Administration
+- Honest `NOT_CONFIGURED` for AI, Stripe, integrations, and malware scan
 
 ## NEXT
 
-- Assessment wizard wired to questionnaire templates and evidence-required questions
-- Dedicated findings/remediation UI and CAP path alignment
-- Vendor-linked evidence upload (StoredObject + VendorDocument atomically)
-- Org-configurable scoring weights with versioned methodologies
-- PDF export of Risk Decision Brief
-- External monitoring provider adapters (CONNECTED only after a live test)
+Phase 1 production readiness (do this before new modules):
+
+- Browser E2E certification of the TPRM journey
+- Wire Organization, Users, and Audit Log UIs to existing APIs
+- Hide or quarantine legacy mock GRC silo pages
+- CI green, migration rehearsal, tracked TypeScript waivers
 
 ## LATER
 
-Phase B: automation engine, vendor portal, fourth-party graph, SSO/SCIM, public API keys, webhooks.
+Phase 2: vendor portal, monitoring adapters, SSO/SCIM, public API/webhooks.  
+Phase 3: Supreme Risk + Supreme Compliance (real UI on existing Prisma models).  
+Phases 4–8: Privacy, AI Governance, Intelligence, Automation, command center.
 
-Phase C: enterprise risk, controls, framework content system, policy attestations, incidents as risk inputs.
-
-Phase D: privacy, AI governance, data governance. Not started.
-
-## Honesty rules
-
-Never fake AI output, monitoring events, malware scan CLEAN, integrations, or risk scores.
-If a provider is missing, the product shows `NOT_CONFIGURED`, `DEGRADED`, or `FAILED`.
+See the master roadmap for gates, differentiators, and what is explicitly out of scope this sprint.
