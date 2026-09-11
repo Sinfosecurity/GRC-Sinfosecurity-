@@ -108,6 +108,77 @@ export async function loadPortfolioSnapshot(organizationId: string, filters: Rep
         lastError: connection?.lastError,
     });
 
+    const periodStart = filters.from || new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const closedThisPeriod = issues.filter((issue) =>
+        issue.status === VendorIssueStatus.CLOSED && issue.closedAt && issue.closedAt >= periodStart && issue.closedAt <= now
+    );
+    const ages = openIssues.map((issue) => Math.max(0, Math.floor((now.getTime() - issue.identifiedDate.getTime()) / 86400000)));
+    const averageFindingAge = ages.length ? Math.round(ages.reduce((sum, age) => sum + age, 0) / ages.length) : 0;
+    const agingBuckets = [
+        { label: '0–30 days', value: ages.filter((age) => age <= 30).length },
+        { label: '31–60 days', value: ages.filter((age) => age > 30 && age <= 60).length },
+        { label: '61–90 days', value: ages.filter((age) => age > 60 && age <= 90).length },
+        { label: '90+ days', value: ages.filter((age) => age > 90).length },
+    ];
+    const severityCounts = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((label) => ({
+        label,
+        value: issues.filter((issue) => issue.severity === label).length,
+    }));
+    const statusCounts = ['OPEN', 'IN_PROGRESS', 'PENDING_VALIDATION', 'CLOSED', 'RISK_ACCEPTED'].map((label) => ({
+        label,
+        value: issues.filter((issue) => issue.status === label).length,
+    }));
+    const residualBands = [
+        { label: 'Critical 80–100', value: vendors.filter((vendor) => vendor.residualRiskScore >= 80).length, color: '#B42318' },
+        { label: 'High 60–79', value: vendors.filter((vendor) => vendor.residualRiskScore >= 60 && vendor.residualRiskScore < 80).length, color: '#B54708' },
+        { label: 'Medium 40–59', value: vendors.filter((vendor) => vendor.residualRiskScore >= 40 && vendor.residualRiskScore < 60).length, color: '#CA8A04' },
+        { label: 'Low 0–39', value: vendors.filter((vendor) => vendor.residualRiskScore < 40).length, color: '#027A48' },
+    ];
+    const heatmap = emptyHeatmap();
+    vendors.forEach((vendor) => {
+        const impact = impactFromTier(vendor.tier);
+        const likelihood = likelihoodFromResidual(vendor.residualRiskScore);
+        heatmap[likelihood - 1][impact - 1] += 1;
+    });
+    const categoryConcentration = Object.entries(
+        vendors.reduce<Record<string, number>>((acc, vendor) => {
+            const key = String(vendor.category || 'Unspecified');
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+        }, {})
+    ).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const monitoredVendorIds = new Set(monitoring.map((row) => row.vendorId));
+    const latestByVendor = new Map<string, { residual: number; prior?: number }>();
+    [...scores].sort((a, b) => a.calculatedAt.getTime() - b.calculatedAt.getTime()).forEach((score) => {
+        const current = latestByVendor.get(score.vendorId);
+        if (!current) {
+            latestByVendor.set(score.vendorId, { residual: score.residualRisk });
+        } else {
+            latestByVendor.set(score.vendorId, { residual: score.residualRisk, prior: current.residual });
+        }
+    });
+    const scoreIncreases = [...latestByVendor.values()].filter((row) => row.prior != null && row.residual > row.prior).length;
+    const scoreDecreases = [...latestByVendor.values()].filter((row) => row.prior != null && row.residual < row.prior).length;
+    const upcomingReviews = vendors
+        .filter((vendor) => vendor.nextReviewDate)
+        .sort((a, b) => (a.nextReviewDate?.getTime() || 0) - (b.nextReviewDate?.getTime() || 0))
+        .slice(0, 8);
+    const controlScores = scores.slice(-vendors.length || -1).map((row) => row.controlEffectiveness).filter((value): value is number => typeof value === 'number');
+    const avgControlEffectiveness = controlScores.length
+        ? Math.round(controlScores.reduce((sum, value) => sum + value, 0) / controlScores.length)
+        : null;
+    const observations = [
+        highResidual.length
+            ? `${highResidual.length} vendor${highResidual.length === 1 ? '' : 's'} currently sit in high or critical residual risk.`
+            : 'No vendors currently sit in high or critical residual risk.',
+        criticalFindings.length
+            ? `${criticalFindings.length} critical or high finding${criticalFindings.length === 1 ? '' : 's'} remain open.`
+            : 'No critical or high findings are open.',
+        overdueRemediation.length
+            ? `${overdueRemediation.length} remediation item${overdueRemediation.length === 1 ? '' : 's'} are past the target date.`
+            : 'No remediation items are past their target date.',
+    ];
+    const trendDelta = dataTrendDelta(riskTrend);
     const recommendations: string[] = [];
     if (overdueAssessments.length) recommendations.push(`Complete ${overdueAssessments.length} overdue vendor assessment(s).`);
     if (criticalFindings.length) recommendations.push(`Remediate or formally accept ${criticalFindings.length} critical/high finding(s).`);
@@ -145,8 +216,59 @@ export async function loadPortfolioSnapshot(organizationId: string, filters: Rep
         expiringEvidence,
         topRiskVendors,
         riskTrend,
+        trendDelta,
         recommendations,
+        observations,
+        heatmap,
+        residualBands,
+        severityCounts,
+        statusCounts,
+        agingBuckets,
+        averageFindingAge,
+        closedThisPeriod: closedThisPeriod.length,
+        categoryConcentration,
+        monitoredVendors: monitoredVendorIds.size,
+        scoreIncreases,
+        scoreDecreases,
+        upcomingReviews,
+        avgControlEffectiveness,
         majorDecisions: briefs.filter((brief) => brief.status === 'DECIDED').slice(0, 12),
+        acceptedRisks: briefs.filter((brief) => brief.humanDecision === 'RISK_ACCEPTED').slice(0, 8),
+        conditionedApprovals: briefs.filter((brief) => brief.humanDecision === 'APPROVE_WITH_CONDITIONS').slice(0, 8),
+    };
+}
+
+function impactFromTier(tier: string): number {
+    if (tier === 'CRITICAL') return 5;
+    if (tier === 'HIGH') return 4;
+    if (tier === 'MEDIUM') return 3;
+    if (tier === 'LOW') return 2;
+    return 1;
+}
+
+function likelihoodFromResidual(score: number): number {
+    if (score >= 80) return 5;
+    if (score >= 60) return 4;
+    if (score >= 40) return 3;
+    if (score >= 20) return 2;
+    return 1;
+}
+
+function emptyHeatmap(): number[][] {
+    return Array.from({ length: 5 }, () => [0, 0, 0, 0, 0]);
+}
+
+function dataTrendDelta(trend: Array<{ month: string; avgResidual: number }>): { direction: string; delta: number; latest: number | null } {
+    if (trend.length < 2) {
+        return { direction: 'insufficient history', delta: 0, latest: trend[0]?.avgResidual ?? null };
+    }
+    const latest = trend[trend.length - 1].avgResidual;
+    const prior = trend[trend.length - 2].avgResidual;
+    const delta = latest - prior;
+    return {
+        latest,
+        delta,
+        direction: delta > 0 ? 'increasing' : delta < 0 ? 'decreasing' : 'stable',
     };
 }
 

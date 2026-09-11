@@ -1,6 +1,16 @@
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
-import { collectPdf, drawBrandHeader, drawDecisionStrip, drawFooter, drawSection } from './pdfBrand';
+import { createReportPdf } from './reportLayout';
+import {
+    drawBullets,
+    drawCallout,
+    drawComparisonBars,
+    drawDecisionBanner,
+    drawKeyValueGrid,
+    drawParagraph,
+    drawSectionTitle,
+} from './reportPrimitives';
+import { C, humanizeEnum, reportId, riskTone } from './reportTheme';
 import { isoDate } from './sendDownload';
 
 type Snapshot = Record<string, any>;
@@ -50,83 +60,101 @@ export async function renderDecisionBriefPdf(organizationId: string, briefId: st
         .sort((a, b) => Math.abs(Number(b.points || 0)) - Math.abs(Number(a.points || 0)))
         .slice(0, 8);
 
+    const keyFindings = Array.isArray(snapshot.keyFindings)
+        ? snapshot.keyFindings.map((item: unknown) => String(item))
+        : [];
+
     const humanDecision = decision.humanDecision || brief.humanDecision;
     const vendorName = vendor.name || 'Vendor';
     const reportDate = isoDate(brief.createdAt);
+    const residual = score.residualRisk ?? brief.residualRisk;
+    const inherent = score.inherentRisk ?? brief.inherentRisk;
+    const band = score.riskBand ?? brief.riskBand;
+    const methodology = text(score.version || score.scoreVersion);
 
-    const buffer = await collectPdf((doc) => {
-        drawBrandHeader(doc, {
-            organizationName: text(snapshot.organizationName || organization?.name),
-            title: 'Risk Decision Brief',
-            subtitle: `${vendorName}  ·  ${text(vendor.service || brief.engagementName)}`,
-            reportDate,
-        });
-        drawSection(doc, {
-            heading: 'Engagement',
-            rows: [
-                ['Vendor', text(vendorName)],
-                ['Service / engagement', text(vendor.service || brief.engagementName)],
-                ['Business owner', text(vendor.businessOwner)],
-                ['Relationship owner', text(vendor.relationshipOwner)],
-                ['Criticality', text(vendor.criticality)],
-                ['Report date', reportDate],
-            ],
-        });
-        drawSection(doc, {
-            heading: 'Authoritative risk score',
-            rows: [
-                ['Inherent risk', text(score.inherentRisk ?? brief.inherentRisk)],
-                ['Control effectiveness', text(controlEffectiveness)],
-                ['Residual risk', text(score.residualRisk ?? brief.residualRisk)],
-                ['Risk band', text(score.riskBand ?? brief.riskBand)],
-                ['Methodology version', text(score.version)],
-                ['Score calculated', text(score.calculatedAt)],
-            ],
-            paragraphs: [text(score.explanation)],
-        });
-        drawSection(doc, {
-            heading: 'Top risk factors',
-            bullets: topFactors.length
-                ? topFactors.map((factor) => `${factor.label || factor.code}: ${factor.points >= 0 ? '+' : ''}${factor.points} — ${factor.rationale || ''}`)
-                : ['No persisted factors in this snapshot.'],
-        });
-        drawSection(doc, {
-            heading: 'Evidence and monitoring',
-            rows: [
-                ['Assessment status', text(snapshot.assessmentStatus ?? brief.assessmentStatus)],
-                ['Evidence confidence', text(snapshot.evidenceConfidence ?? brief.evidenceConfidence)],
-                ['Open findings', text(snapshot.openFindings ?? brief.openFindingsCount)],
-                ['Monitoring alerts', text(snapshot.monitoringAlerts ?? brief.monitoringAlertCount)],
-            ],
-        });
-        drawSection(doc, {
-            heading: 'AI analyst summary',
-            paragraphs: [
-                brief.aiSummaryStatus === 'SUCCESS' && brief.aiSummary
-                    ? String(brief.aiSummary)
-                    : `AI status: ${brief.aiSummaryStatus}. No model output is treated as residual risk.`,
-            ],
-        });
-        drawSection(doc, {
-            heading: 'Human reviewer analysis',
-            paragraphs: [text(decision.reviewerAnalysis || brief.reviewerAnalysis)],
-        });
-        drawDecisionStrip(doc, humanDecision);
-        drawSection(doc, {
-            heading: 'Governance disposition',
-            rows: [
-                ['Final decision', text(humanDecision)],
-                ['Conditions', text(decision.conditions || brief.conditions)],
-                ['Decided by', text(decidedByName || decidedByUserId)],
-                ['Decided date', text(decision.decidedAt || brief.decidedAt)],
-                ['Next review', text(brief.nextReviewDate)],
-                ['Acceptance expiry', text(acceptance.acceptanceExpiry)],
-            ],
-            paragraphs: humanDecision === 'RISK_ACCEPTED'
-                ? [`Risk accepted is a governance disposition. Residual risk remains ${text(acceptance.residualRisk ?? score.residualRisk ?? brief.residualRisk)} ${text(acceptance.riskBand ?? score.riskBand ?? brief.riskBand)}.`]
-                : undefined,
-        });
-        drawFooter(doc, 'Historical values are taken from the immutable decision snapshot. Scores are not recalculated at export.');
+    const buffer = await createReportPdf({
+        title: 'Risk Decision Brief',
+        subtitle: `${vendorName}  ·  ${text(vendor.service || brief.engagementName)}`,
+        organizationName: text(snapshot.organizationName || organization?.name),
+        reportDate,
+        generatedAt: brief.createdAt,
+        reportId: reportId('RDB', brief.createdAt),
+        classification: 'Confidential — Decision record',
+        methodologyVersion: methodology !== '—' ? methodology : undefined,
+        footerNote: 'Immutable snapshot — scores are not recalculated at export',
+    }, (doc) => {
+        drawDecisionBanner(doc, humanDecision);
+        drawSectionTitle(doc, 'Engagement');
+        drawKeyValueGrid(doc, [
+            ['Vendor', text(vendorName)],
+            ['Service', text(vendor.service || brief.engagementName)],
+            ['Criticality', text(vendor.criticality || vendor.tier)],
+            ['Business owner', text(vendor.businessOwner)],
+            ['Relationship owner', text(vendor.relationshipOwner)],
+            ['Assessment state', humanizeEnum(snapshot.assessmentStatus ?? brief.assessmentStatus)],
+        ]);
+
+        drawSectionTitle(doc, 'Authoritative risk score');
+        drawParagraph(doc, 'Residual and inherent values are taken from the immutable decision snapshot. Historical scores are not recalculated when this PDF is generated.');
+        drawComparisonBars(doc, [
+            { label: 'Inherent', value: Number(inherent || 0), color: C.high },
+            { label: 'Residual', value: Number(residual || 0), color: C.navy },
+        ]);
+        drawKeyValueGrid(doc, [
+            ['Inherent risk', text(inherent)],
+            ['Residual risk', text(residual)],
+            ['Risk band', text(band)],
+            ['Control effectiveness', text(controlEffectiveness)],
+            ['Methodology version', methodology],
+            ['Score calculated', isoDate(score.calculatedAt)],
+            ['Evidence confidence', humanizeEnum(snapshot.evidenceConfidence ?? brief.evidenceConfidence)],
+            ['Monitoring status', humanizeEnum(snapshot.monitoringStatus) === '—' ? `${brief.monitoringAlertCount} recorded alert(s)` : humanizeEnum(snapshot.monitoringStatus)],
+        ]);
+        if (score.explanation) {
+            drawParagraph(doc, String(score.explanation));
+        }
+
+        drawSectionTitle(doc, 'Key findings');
+        if (keyFindings.length) {
+            drawBullets(doc, keyFindings.slice(0, 8));
+        } else {
+            drawCallout(doc, 'No key findings in snapshot', 'Open finding count at decision time was recorded as ' + text(snapshot.openFindings ?? brief.openFindingsCount) + '. Individual finding titles are shown only when stored on the snapshot.', 'info');
+        }
+
+        drawSectionTitle(doc, 'Top risk factors');
+        if (topFactors.length) {
+            drawBullets(doc, topFactors.map((factor) => `${factor.label || factor.code}: ${Number(factor.points) >= 0 ? '+' : ''}${factor.points} — ${factor.rationale || 'Persisted factor'}`));
+        } else {
+            drawCallout(doc, 'No persisted factors', 'This snapshot does not include explainable factor rows. The residual score above remains the authoritative figure.', 'info');
+        }
+
+        drawSectionTitle(doc, 'AI analyst summary');
+        drawParagraph(doc,
+            brief.aiSummaryStatus === 'SUCCESS' && brief.aiSummary
+                ? String(brief.aiSummary)
+                : `AI status: ${humanizeEnum(brief.aiSummaryStatus)}. Model output is narrative only and is never treated as residual risk.`
+        );
+
+        drawSectionTitle(doc, 'Reviewer analysis');
+        drawParagraph(doc, text(decision.reviewerAnalysis || brief.reviewerAnalysis));
+
+        drawSectionTitle(doc, 'Governance disposition');
+        drawKeyValueGrid(doc, [
+            ['Final decision', humanizeEnum(humanDecision)],
+            ['Conditions', text(decision.conditions || brief.conditions)],
+            ['Decision maker', text(decidedByName || decidedByUserId)],
+            ['Decision date', isoDate(decision.decidedAt || brief.decidedAt)],
+            ['Next review', text(brief.nextReviewDate)],
+            ['Acceptance expiry', text(acceptance.acceptanceExpiry)],
+        ]);
+        if (humanDecision === 'RISK_ACCEPTED') {
+            drawCallout(
+                doc,
+                'Accepted risk metadata',
+                `Risk accepted is a governance disposition. Residual risk remains ${text(acceptance.residualRisk ?? residual)} ${text(acceptance.riskBand ?? band)}. Acceptance does not reduce the scored residual.`,
+                riskTone('RISK_ACCEPTED')
+            );
+        }
     });
 
     return { buffer, filenameParts: ['Supreme-Risk-Decision-Brief', vendorName, reportDate] };
