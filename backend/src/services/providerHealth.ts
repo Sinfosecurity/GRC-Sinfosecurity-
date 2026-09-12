@@ -31,6 +31,19 @@ export async function providerHealth() {
         }
     }
 
+    let lastStripeWebhook: { type: string; at: Date; idempotentKey: string } | null = null;
+    try {
+        const last = await prisma.subscriptionEvent.findFirst({
+            orderBy: { processedAt: 'desc' },
+            select: { type: true, processedAt: true, stripeEventId: true },
+        });
+        if (last) {
+            lastStripeWebhook = { type: last.type, at: last.processedAt, idempotentKey: last.stripeEventId };
+        }
+    } catch {
+        lastStripeWebhook = null;
+    }
+
     return {
         environment: process.env.APP_ENVIRONMENT || process.env.VITE_ENVIRONMENT || process.env.NODE_ENV,
         database,
@@ -41,6 +54,8 @@ export async function providerHealth() {
         redis,
         email: emailStatus(),
         stripe: billingStatus(),
+        lastStripeWebhook,
         ai: isProviderConfigured('OPENAI_API_KEY') || isProviderConfigured('AI_API_KEY') ? 'CONNECTED' : 'NOT_CONFIGURED',
+        alerting: process.env.ALERT_WEBHOOK_URL || emailStatus() === 'CONNECTED' ? 'PATH_PRESENT' : 'NOT_CONFIGURED',
     };
 }

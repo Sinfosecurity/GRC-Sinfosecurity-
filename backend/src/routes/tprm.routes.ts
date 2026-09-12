@@ -10,9 +10,12 @@ import { prisma } from '../config/database';
 import { tenantWhere } from '../security/tenant';
 import { monitoringCredentialsConfigured, resolveMonitoringProviderStatus } from '../services/monitoringProviderStatus';
 import tprmOperationsRoutes from './tprm.operations.routes';
+import { notifyUser } from '../services/notificationDeliveryService';
+import { enforceSubscriptionWrites } from '../middleware/entitlement';
 
 const router = Router();
 router.use(authenticate);
+router.use(enforceSubscriptionWrites);
 
 router.get('/attention', requirePermission(PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -67,6 +70,15 @@ router.post('/vendors/:vendorId/decision-briefs', requirePermission(PERMISSIONS[
             req.params.vendorId,
             req.user!.id
         );
+        await notifyUser({
+            organizationId: req.user!.organizationId,
+            userId: req.user!.id,
+            eventType: 'approval.requested',
+            title: 'Approval requested',
+            body: 'A Decision Brief is ready for a human decision.',
+            resourceType: 'RiskDecisionBrief',
+            resourceId: data.id,
+        });
         res.status(201).json({ success: true, data });
     } catch (error) {
         next(error);
@@ -94,6 +106,18 @@ router.post('/decision-briefs/:briefId/decide', requirePermission(PERMISSIONS['a
             reviewerAnalysis,
             nextReviewDate,
             actorUserId: req.user!.id,
+        });
+        await notifyUser({
+            organizationId: req.user!.organizationId,
+            userId: req.user!.id,
+            eventType: 'approval.decision',
+            title: 'Decision recorded',
+            body:
+                decision === 'APPROVE_WITH_CONDITIONS'
+                    ? `Decision recorded with conditions requiring action: ${conditions || 'see brief'}.`
+                    : `Human decision recorded: ${decision}.`,
+            resourceType: 'RiskDecisionBrief',
+            resourceId: data.id,
         });
         res.json({ success: true, data });
     } catch (error) {

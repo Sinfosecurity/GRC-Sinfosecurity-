@@ -6,6 +6,7 @@
 import { IssuePriority, IssueSeverity, IssueSource, Prisma, VendorIssue, VendorIssueStatus, VendorIssueType } from '@prisma/client';
 import { prisma } from '../config/database';
 import logger from '../config/logger';
+import { notifyUser } from './notificationDeliveryService';
 
 export interface CreateVendorIssueInput {
     vendorId: string;
@@ -149,7 +150,7 @@ class VendorIssueService {
         correctiveActionPlan: string,
         targetRemediationDate: Date
     ) {
-        return await prisma.vendorIssue.updateMany({
+        const updated = await prisma.vendorIssue.updateMany({
             where: {
                 id: issueId,
                 organizationId,
@@ -161,6 +162,19 @@ class VendorIssueService {
                 updatedAt: new Date(),
             },
         });
+        const issue = await this.getIssueById(issueId, organizationId);
+        if (issue) {
+            await notifyUser({
+                organizationId,
+                userId: issue.assignedTo || issue.identifiedBy,
+                eventType: 'remediation.requested',
+                title: 'Corrective action requested',
+                body: `A corrective action plan was recorded for ${issue.title}.`,
+                resourceType: 'VendorIssue',
+                resourceId: issue.id,
+            });
+        }
+        return updated;
     }
 
     /**
@@ -221,6 +235,19 @@ class VendorIssueService {
             logger.info(`⚠️ Remediation rejected for issue: ${issueId}`);
         }
 
+        const record = await this.getIssueById(issueId, organizationId);
+        if (record) {
+            await notifyUser({
+                organizationId,
+                userId: record.assignedTo || record.identifiedBy,
+                eventType: 'remediation.validation_requested',
+                title: approved ? 'Remediation validated' : 'Remediation validation recorded',
+                body: `${record.title} validation ${approved ? 'approved' : 'returned for further work'}.`,
+                resourceType: 'VendorIssue',
+                resourceId: record.id,
+            });
+        }
+
         return issue;
     }
 
@@ -234,7 +261,7 @@ class VendorIssueService {
         closureNotes: string,
         closureEvidence?: string
     ) {
-        return await prisma.vendorIssue.updateMany({
+        const closed = await prisma.vendorIssue.updateMany({
             where: {
                 id: issueId,
                 organizationId,
@@ -248,6 +275,19 @@ class VendorIssueService {
                 updatedAt: new Date(),
             },
         });
+        const record = await this.getIssueById(issueId, organizationId);
+        if (record) {
+            await notifyUser({
+                organizationId,
+                userId: record.assignedTo || record.identifiedBy || closedBy,
+                eventType: 'finding.closed',
+                title: 'Finding closed',
+                body: `${record.title} was closed.`,
+                resourceType: 'VendorIssue',
+                resourceId: record.id,
+            });
+        }
+        return closed;
     }
 
     /**
@@ -439,8 +479,15 @@ class VendorIssueService {
      * Notify stakeholders about new issue
      */
     private async notifyIssueStakeholders(issue: VendorIssue) {
-        // In production, send emails/Slack notifications
-        logger.info(`Notifying stakeholders about issue: ${issue.title}`);
+        await notifyUser({
+            organizationId: issue.organizationId,
+            userId: issue.assignedTo || issue.identifiedBy,
+            eventType: 'finding.assigned',
+            title: 'Finding assigned',
+            body: `${issue.title} was recorded and assigned.`,
+            resourceType: 'VendorIssue',
+            resourceId: issue.id,
+        });
     }
 
     /**

@@ -4,6 +4,7 @@
 **Restore target:** isolated `supreme_risk_restore` on the same host
 **Production:** not contacted
 **Starting SHA:** `e03295f42a8d5c9fc7458b38b6da1701e5b2079f`
+**Hosted restage (2026-09-12):** **BLOCKED** — there is no hosted staging database to dump or restore. Counts below are local-only.
 
 ## Procedure
 

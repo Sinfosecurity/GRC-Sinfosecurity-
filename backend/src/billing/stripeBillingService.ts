@@ -5,13 +5,21 @@ import { recordAudit } from '../services/auditEventService';
 import { normalizePlan } from './plans';
 
 export function billingStatus() {
+    const secret = process.env.STRIPE_SECRET_KEY || '';
+    if (secret.startsWith('sk_live_') || secret.startsWith('rk_live_')) {
+        return 'ERROR';
+    }
     return isProviderConfigured('STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET')
         ? 'CONNECTED'
         : 'NOT_CONFIGURED';
 }
 
 async function stripeClient() {
-    if (!isProviderConfigured('STRIPE_SECRET_KEY')) {
+    const status = billingStatus();
+    if (status === 'ERROR') {
+        throw new ApiError(503, 'Live Stripe credentials are not permitted');
+    }
+    if (status === 'NOT_CONFIGURED' || !isProviderConfigured('STRIPE_SECRET_KEY')) {
         throw new ApiError(503, 'Billing is not configured');
     }
     const Stripe = (await import('stripe')).default;
@@ -22,6 +30,9 @@ export const stripeBillingService = {
     status: billingStatus,
 
     async createCheckout(organizationId: string, actorUserId: string, plan: string, successUrl: string, cancelUrl: string) {
+        if (billingStatus() === 'ERROR') {
+            throw new ApiError(503, 'Live Stripe credentials are not permitted');
+        }
         if (billingStatus() === 'NOT_CONFIGURED') {
             return { status: 'NOT_CONFIGURED' as const };
         }
@@ -71,6 +82,9 @@ export const stripeBillingService = {
     },
 
     async createPortal(organizationId: string, returnUrl: string) {
+        if (billingStatus() === 'ERROR') {
+            throw new ApiError(503, 'Live Stripe credentials are not permitted');
+        }
         if (billingStatus() === 'NOT_CONFIGURED') {
             return { status: 'NOT_CONFIGURED' as const };
         }
@@ -87,6 +101,9 @@ export const stripeBillingService = {
     },
 
     async handleWebhook(rawBody: Buffer, signature: string) {
+        if (billingStatus() === 'ERROR') {
+            throw new ApiError(503, 'Live Stripe credentials are not permitted');
+        }
         if (billingStatus() === 'NOT_CONFIGURED') {
             throw new ApiError(503, 'Billing is not configured');
         }

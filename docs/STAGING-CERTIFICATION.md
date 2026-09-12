@@ -1,12 +1,12 @@
 # Staging certification
 
 **Branch:** `supreme-risk-transformation`
-**Starting SHA:** `e03295f42a8d5c9fc7458b38b6da1701e5b2079f`
+**Starting SHA:** `ee25ffa04f87c5086ac731ecc4b20c13b3cc6c76`
 **Final SHA:** recorded by the certification commit on this branch
-**Staging URL:** `http://127.0.0.1:3200` (isolated local stack). Public hosted URL: BLOCKED.
+**Public staging URL:** none. Isolated local stack only: `http://127.0.0.1:3200`
 **Conclusion:** **DEVELOPMENT READY**
 
-This sprint does not merge `main` and does not deploy production. It does not add Privacy, AI Governance, Intelligence, or Governance Graph features.
+This sprint does not merge `main` and does not deploy production. It does not add Privacy, AI Governance, Intelligence, or Governance Graph features. Marketing was not redesigned.
 
 ## Environment
 
@@ -20,64 +20,87 @@ This sprint does not merge `main` and does not deploy production. It does not ad
 | Mailpit | SMTP `1025`, UI `8025` | yes |
 | Preview leftover | `localhost:3100` / `:4000` / `supreme_risk_preview` | unused by staging |
 
-UI banner: **SUPREME RISK — STAGING**. `VITE_ENVIRONMENT=staging`.
+UI banner: **SUPREME RISK — STAGING**. `VITE_ENVIRONMENT=staging`. `GET /api/v1/system/status` reports `environment: staging`.
+
+A Cloudflare quick tunnel attached to the preview stack on port 3100 is not staging and is not used as a public staging URL.
 
 ## Gates
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
 | Typecheck | PASS | backend `tsc --noEmit`, frontend `tsc --noEmit` |
-| Tests | PASS | backend Jest **140**, frontend Vitest **77** |
+| Tests | PASS | backend Jest **153**, frontend Vitest **87** |
 | Build | PASS | frontend `npm run build` |
-| Hosted CI | BLOCKED — EXTERNAL | GitHub run `34653719470`, 5s, no steps. Billing lock. Workflow not weakened. |
-| Staging migration | PASS | `docs/STAGING-MIGRATION-CERTIFICATION.md` |
-| Backup / restore | PASS | `docs/BACKUP-RESTORE-CERTIFICATION.md` |
-| Storage | PASS | MinIO upload, checksum, 403 on NOT_CONFIGURED, delete, orphan reconcile 1/1 |
-| Email | PARTIAL | Invite + password reset captured in Mailpit. Assessment/finding/approval events are not wired to `notify()` |
-| Stripe test mode | BLOCKED | No test keys. Webhook HTTP 503. UI NOT_CONFIGURED |
-| AI | PASS | Policy `NOT_CONFIGURED`. Residual score unchanged after APPROVE |
-| Malware | PASS | Fail-closed. Download HTTP 403. CLEAN not invented |
-| Observability | PASS | `/health` reflects postgres/redis/storage/email/stripe/ai/mongo truth |
-| Staging browser E2E | PASS | Isolated `3200`/`4100`. Core TPRM + all 10 report downloads. See notes |
-| Negative tests | PASS | Cross-tenant empty list, assessor 403, 401 expired, 400 malformed, webhook 503, unknown user 401 |
-| Tenant isolation | PASS | Jest tenant-isolation suites + staging other-tenant list empty |
-| RBAC | PASS | Assessor denied executive PDF. Invite revoke exists. Role change to VIEWER |
-| Admin | PASS | Org profile, users, roles, audit log, Environment status. Logo is post-launch |
-| Secret scan | PASS | `ci-security.sh` SECRET_SCAN=PASS. No direct critical npm vulns |
+| Hosted CI | BLOCKED — EXTERNAL | GitHub run `34674812047`, 4s. Annotation: account locked due to a billing issue. Workflow not weakened. |
+| Public hosted staging | BLOCKED | No Supreme Risk staging service exists. Render account has unrelated production apps only. Fly/Railway CLIs are absent. Localhost is not accepted. |
+| Staging migration (local) | PASS | `docs/STAGING-MIGRATION-CERTIFICATION.md` |
+| Hosted migration | BLOCKED | No hosted staging database |
+| Backup / restore (local) | PASS | `docs/BACKUP-RESTORE-CERTIFICATION.md` |
+| Hosted backup / restore | BLOCKED | No hosted staging database |
+| Storage | PARTIAL | Isolated MinIO is S3-compatible and previously certified. Not a hosted object store. Local filesystem is not used. |
+| Email / notifications | PASS | Invite, reset, assessment, finding, CAP, validation, close, approval, and alert messages captured in Mailpit |
+| Stripe test mode | BLOCKED | No `sk_test_` or `whsec_` credentials. Live keys are rejected. Required config is documented below. |
+| AI | PASS | Policy `NOT_CONFIGURED`. Residual score is not mutated by AI. |
+| Malware | PASS | Fail-closed. Scanner `NOT_CONFIGURED`. CLEAN is not invented. |
+| Observability | PASS | `/health`, `/health/ready`, `/health/live`, `x-request-id`, `/api/v1/system/status` |
+| Hosted alerting | BLOCKED | Real alert received on isolated Mailpit only. No hosted pager/webhook recipient. |
+| Public browser E2E | BLOCKED | No public URL. Local isolated E2E remains in `docs/STAGING-E2E-CERTIFICATION.md` |
+| Negative tests | PASS | Local isolated API suite. Public negative suite not run. |
+| Tenant isolation | PASS | Jest tenant-isolation suites |
+| RBAC | PASS | Assessor denied executive PDF. Invite revoke exists. |
+| Legal / trust routes | PASS | `/privacy` `/terms` `/security` `/subprocessors` `/status` `/trust` HTTP 200 on isolated UI |
+| Performance smoke | PASS | Local isolated timings only. Not a scale certification. |
+| Secret scan | PASS | Prior `ci-security.sh` SECRET_SCAN=PASS. No new secrets committed. |
 
-## Browser E2E notes
+## Stripe configuration required (not present)
 
-First clean staging run on `http://127.0.0.1:3200`:
+Do not fabricate billing success. To move Stripe from BLOCKED to PASS, supply **test mode only**:
 
-- Login showed **SUPREME RISK — STAGING**
-- Add vendor, assess, complete 14 questions, residual recalc
-- Evidence upload linked StoredObject + VendorDocument + EvidenceLink, scan `NOT_CONFIGURED`
-- Finding + CAP + validate + close → `CLOSED`
-- Explainable risk visible
-- Decision Brief APPROVE, snapshot unchanged
-- Decision Brief PDF downloaded (`%PDF-`, vendor in filename/bytes). FlateDecode hides some literal strings
-- Executive, scorecard, assessment, findings PDF/CSV/XLSX, monitoring PDF/CSV, board PDF/PPTX all downloaded
-- Legacy `/risk-management` quarantined
-- Org legal name saved
-- Invitation created and revoked
-- Environment page shows provider states
-- Billing shows NOT_CONFIGURED
+- `STRIPE_SECRET_KEY=sk_test_...` — live `sk_live_` / `rk_live_` keys are rejected (`billingStatus() === 'ERROR'`)
+- `STRIPE_WEBHOOK_SECRET=whsec_...`
+- `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PROFESSIONAL`, `STRIPE_PRICE_ENTERPRISE`
+- Stripe Customer Portal enabled in the test dashboard
+- Webhook endpoint pointing at the hosted API `/api/v1/billing/webhook` for `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
 
-A second run was polluted by leftover invitations and an assessor role change to AUDITOR. Assessor was reset to ASSESSOR. Negative API suite then passed again.
+Backend subscription state is authoritative. Entitlement middleware no-ops when billing is `NOT_CONFIGURED` and enforces standing + plan features when Stripe test mode is `CONNECTED`.
+
+## Notification evidence (isolated staging, 2026-09-12)
+
+Mailpit subjects after the workflow:
+
+- Assessment assigned
+- Assessment completed
+- Finding assigned
+- Corrective action requested
+- Remediation validated
+- Finding closed
+- Approval requested
+- Decision recorded
+- SUPREME RISK — STAGING alert test
+- prior invitation / password-reset messages
+
+`POST /api/v1/system/alert-test` returned `{ email: "DELIVERED", inApp: true, webhook: "NOT_CONFIGURED" }`.
+
+`GET /api/v1/notifications` included `assessment.assigned`, `finding.assigned`, `remediation.requested`, `remediation.validation_requested`, `finding.closed`, `approval.requested`, `approval.decision`, `ops.alert`.
+
+Unit tests cover `DELIVERED`, `NOT_CONFIGURED`, and `FAILED` without failing the business record.
 
 ## Why this is not STAGING CANDIDATE
 
-STAGING CANDIDATE requires Stripe test mode PASS. Stripe keys are absent, so that gate is BLOCKED. Hosted CI is also BLOCKED — EXTERNAL. There is no public hosted staging URL.
+STAGING CANDIDATE requires a public hosted staging URL, hosted migrations, hosted backup/restore, hosted object storage, hosted alerting, public browser E2E, and hosted CI. Those remain BLOCKED. Stripe test credentials were not supplied.
+
+Local isolated certification improved (notifications, entitlements, live-key rejection, alert-test path) but does not substitute for hosted gates.
 
 ## Known issues / release blockers
 
-1. GitHub Actions billing lock — hosted CI cannot start.
+1. GitHub Actions billing lock — hosted CI cannot start (`34674812047`).
 2. Stripe test keys, prices, and webhook secret are not configured.
-3. No hosted (non-localhost) staging URL.
-4. Assessment / finding / approval emails are not sent yet; only invite and reset were captured.
+3. No hosted (non-localhost) staging URL, database, Redis, or object store.
+4. Hosted alerting recipient is not configured. Isolated Mailpit received a real test alert.
 5. Organization logo/branding for customer reports is post-launch.
 6. Decision Brief PDF text is FlateDecode-compressed; string search is unreliable.
-7. Hosted alerting is not configured.
+7. No malware scanner host; fail-closed `NOT_CONFIGURED` remains in force.
+8. AI remains `NOT_CONFIGURED` by policy.
 
 ## Local commands
 

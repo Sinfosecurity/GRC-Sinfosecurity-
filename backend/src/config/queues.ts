@@ -243,8 +243,9 @@ async function processRiskScoreCalculation(data: any) {
 }
 
 async function processOverdueNotification(data: any) {
-  logger.info('Sending overdue notification', data);
-  // TODO: Implement overdue notification logic
+  const { scanDueNotifications } = await import('../services/notificationDeliveryService');
+  const sent = await scanDueNotifications();
+  logger.info('Due and overdue notifications processed', { requested: data, count: sent.length });
 }
 
 async function processReportGeneration(data: any) {

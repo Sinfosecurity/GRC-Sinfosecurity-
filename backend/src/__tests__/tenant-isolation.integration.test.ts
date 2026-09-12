@@ -185,6 +185,8 @@ describe('two-tenant isolation (PostgreSQL)', () => {
         await prisma.vendor.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
         await prisma.refreshToken.deleteMany({ where: { user: { organizationId: { in: [orgA, orgB].filter(Boolean) } } } });
         await prisma.auditEvent.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
+        await prisma.inAppNotification.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
+        await prisma.notificationPreference.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
         await prisma.user.deleteMany({ where: { organizationId: { in: [orgA, orgB].filter(Boolean) } } });
         await prisma.organization.deleteMany({ where: { id: { in: [orgA, orgB].filter(Boolean) } } });
         await prisma.$disconnect();

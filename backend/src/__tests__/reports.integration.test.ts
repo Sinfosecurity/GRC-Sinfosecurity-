@@ -91,6 +91,8 @@ describe('report generation and tenant isolation', () => {
         await prisma.vendor.deleteMany({ where: { organizationId: { in: [orgA, orgB] } } });
         await prisma.refreshToken.deleteMany({ where: { user: { organizationId: { in: [orgA, orgB] } } } });
         await prisma.auditEvent.deleteMany({ where: { organizationId: { in: [orgA, orgB] } } });
+        await prisma.inAppNotification.deleteMany({ where: { organizationId: { in: [orgA, orgB] } } });
+        await prisma.notificationPreference.deleteMany({ where: { organizationId: { in: [orgA, orgB] } } });
         await prisma.user.deleteMany({ where: { organizationId: { in: [orgA, orgB] } } });
         await prisma.organization.deleteMany({ where: { id: { in: [orgA, orgB] } } });
     });

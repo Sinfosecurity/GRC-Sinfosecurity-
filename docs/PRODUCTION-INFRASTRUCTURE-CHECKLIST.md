@@ -15,21 +15,24 @@ Status: **PASS** on isolated staging MinIO; production bucket still **BLOCKED**
 
 ## Email
 
-Status: **PASS** for invitation and password reset on staging SMTP; **PARTIAL** for TPRM event templates
+Status: **PASS** on isolated staging SMTP (invite, reset, TPRM workflow, alert-test); hosted email **BLOCKED**
 
 - Staging SMTP is Mailpit (`127.0.0.1:1025`, UI `8025`).
 - Invitation and forgot-password produced captured messages (`messages>=4`).
-- Assessment assignment, finding, and approval event types exist on `notify()` but those product paths do not yet call `notify()`.
+- Assessment, finding, CAP, validation, close, approval, and ops-alert events now call `notify()` / `notifyUser()`. Isolated Mailpit captured those subjects on 2026-09-12.
 - Secrets were not logged.
 
 ## Stripe
 
 Status: **BLOCKED**
 
-- Checkout, Customer Portal, webhook signature, and entitlement routes exist.
+- Checkout, Customer Portal, webhook signature, idempotent `subscriptionEvent.stripeEventId`, and entitlement middleware exist.
+- Live `sk_live_` / `rk_live_` keys are rejected (`billingStatus() === 'ERROR'`).
+- Entitlements no-op when billing is `NOT_CONFIGURED` and enforce standing/plan features when Stripe test mode is `CONNECTED`.
 - No Stripe test keys or webhook signing secret are present.
 - Webhook without configuration returns HTTP 503. UI shows NOT_CONFIGURED.
 - Frontend subscription state is not trusted.
+- Required test-mode variables: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PROFESSIONAL`, `STRIPE_PRICE_ENTERPRISE`.
 
 ## AI provider
 
@@ -61,10 +64,12 @@ Status: **PASS** for isolated staging; production managed DB still **BLOCKED**
 Status: **PASS** for local health truth; hosted alerting **BLOCKED**
 
 - Structured logs and `x-request-id` remain enabled.
-- `/health` reports postgres, redis, storage, email, stripe, ai, mongodb.
+- `/health`, `/health/ready`, `/health/live` report postgres, redis, storage, email, stripe, ai, malware, mongodb.
+- `/api/v1/system/status` adds last Stripe webhook id (when any) and alerting path presence.
+- `POST /api/v1/system/alert-test` delivered a real message to isolated Mailpit (`SUPREME RISK — STAGING alert test`). That is not a hosted alert path.
 - Optional Mongo / Stripe / AI are `degraded` + `NOT_CONFIGURED`, not fake `up`.
 - Administration → Environment shows the same provider states.
-- PagerDuty/CloudWatch are not configured.
+- PagerDuty/CloudWatch/`ALERT_WEBHOOK_URL` are not configured.
 
 ## Staging environment
 
@@ -79,7 +84,7 @@ Status: **PASS** for isolated local stack; public hosted URL **BLOCKED**
 
 Status: **BLOCKED — EXTERNAL**
 
-GitHub Actions run `34653719470` failed in 5s with no job steps. Account/org billing lock prevents hosted runner startup. Workflow gates were not weakened.
+Latest recheck: GitHub Actions run `34674812047` (2026-09-12T05:08:22Z) failed in 4s. Annotation: “The job was not started because your account is locked due to a billing issue.” Workflow gates were not weakened. Local tests are not hosted CI.
 
 ## Rate limits
 

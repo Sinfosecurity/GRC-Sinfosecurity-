@@ -4,6 +4,7 @@
 **Application database:** isolated `supreme_risk_staging` on the same host.
 **Ran at:** 2026-09-11T22:31:58Z
 **Starting SHA:** `e03295f42a8d5c9fc7458b38b6da1701e5b2079f`
+**Hosted restage (2026-09-12):** **BLOCKED** — no public/hosted staging database exists. The local chain below was not re-applied to a hosted instance.
 
 ## Procedure
 

@@ -228,9 +228,23 @@ export function registerDefaultHealthChecks() {
     healthChecker.registerCheck('stripe', async () => {
         const { billingStatus } = await import('../billing/stripeBillingService');
         const status = billingStatus();
-        return status === 'CONNECTED'
-            ? { status: 'up', message: 'Stripe connected' }
-            : { status: 'degraded', message: 'NOT_CONFIGURED' };
+        if (status === 'CONNECTED') {
+            return { status: 'up', message: 'Stripe test mode connected' };
+        }
+        if (status === 'ERROR') {
+            return { status: 'down', message: 'Live Stripe credentials are not permitted' };
+        }
+        return { status: 'degraded', message: 'NOT_CONFIGURED' };
+    });
+
+    healthChecker.registerCheck('malware', async () => {
+        const { objectStorageService } = await import('../services/objectStorageService');
+        const { ScanStatus } = await import('@prisma/client');
+        const status = objectStorageService.status();
+        if (status.malwareScanning === ScanStatus.NOT_CONFIGURED) {
+            return { status: 'degraded', message: 'NOT_CONFIGURED', details: { downloadPolicy: status.downloadPolicy } };
+        }
+        return { status: 'up', message: `Malware scanner ${status.malwareScanning}`, details: { downloadPolicy: status.downloadPolicy } };
     });
 
     healthChecker.registerCheck('ai', async () => {

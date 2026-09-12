@@ -6,9 +6,9 @@ Values below are readiness, not a cutover approval.
 
 ## Before a future production window
 
-1. Restore GitHub billing so hosted CI can run the full workflow to green.
-2. Provision a hosted staging URL that is not localhost, still isolated from production tenant data.
-3. Configure Stripe **test** mode first: secret key, webhook secret, prices, customer portal, entitlement enforcement.
+1. Restore GitHub billing so hosted CI can run the full workflow to green. Rechecked 2026-09-12: run `34674812047` still billing-locked.
+2. Provision a hosted staging URL that is not localhost, still isolated from production tenant data. Render currently has no Supreme Risk staging service.
+3. Configure Stripe **test** mode first: `sk_test_` secret, `whsec_` webhook secret, `STRIPE_PRICE_*`, customer portal, entitlement enforcement. Live keys are rejected by the application.
 4. Repeat the same Stripe flow in live mode only after test mode is green.
 5. Configure production Postgres with backups, point-in-time recovery, and a restore drill against a clone.
 6. Configure production S3 (or equivalent) with IAM, encryption, retention, and orphan reconcile on a schedule.
