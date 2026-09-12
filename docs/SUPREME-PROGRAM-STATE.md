@@ -8,8 +8,8 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-12 23:30 UTC
 
-**CURRENT VERIFIED SHA:** `9a195a27c67851566bef1cfa6bee461d2350d557`  
-(later than user-stated baseline `36a8cf8ab05b25aa5cef9c53615eb4bfe2410545`; last implementation SHA that closed hosted MFA-reset / audit / `ENCRYPTION_KEY` fail-fast gaps. Updated to this documentation commit after it lands.)
+**CURRENT VERIFIED SHA:** `641d2a950d9fdc1df4aba7990b355805226e4754`  
+(program-control documentation commit. Later than user-stated baseline `36a8cf8ab05b25aa5cef9c53615eb4bfe2410545`. Last implementation SHA remains `9a195a27c67851566bef1cfa6bee461d2350d557`.)
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -202,5 +202,5 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 
 **ITEM:** Program control documents  
 **STATUS CHANGE:** created — master punch list, program state, operating rules, Cursor project rule  
-**SHA:** (this documentation commit)  
+**SHA:** `641d2a950d9fdc1df4aba7990b355805226e4754`  
 **EVIDENCE:** `docs/SUPREME-MASTER-PUNCH-LIST.md`, `docs/SUPREME-PROGRAM-STATE.md`, `docs/SUPREME-PRODUCT-OPERATING-RULES.md`, `.cursor/rules/supreme-program-control.mdc`
