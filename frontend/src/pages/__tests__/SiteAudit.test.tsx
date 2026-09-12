@@ -51,6 +51,12 @@ describe('site audit remediation', () => {
         expect(marketingCss).toMatch(/\.supreme-marketing a\.mkt-btn-gold/);
         expect(marketingCss).toMatch(/--gold-ink:\s*#141a21/i);
         expect(marketingCss).toMatch(/--gold:\s*#c6a46b/i);
+        expect(contrastRatio('#735A2C', '#F4EFE6')).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio('#655E52', '#F4EFE6')).toBeGreaterThanOrEqual(4.5);
+        expect(marketingCss).toMatch(/--paper-kicker:\s*#735a2c/i);
+        expect(marketingCss).toMatch(/--paper-muted:\s*#655e52/i);
+        expect(marketingCss).not.toMatch(/#8a6d38/i);
+        expect(marketingCss).not.toMatch(/#7a7164/i);
     });
 
     it('defines per-route titles for public marketing pages', () => {

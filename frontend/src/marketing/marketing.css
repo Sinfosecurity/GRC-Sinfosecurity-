@@ -9,6 +9,8 @@
   --gold-strong: #d7b67a;
   --paper: #f4efe6;
   --paper-ink: #1a211c;
+  --paper-kicker: #735a2c;
+  --paper-muted: #655e52;
   --muted: #d5dbe1;
   --soft: #c5cdd4;
   --danger: #c45c4a;
@@ -457,16 +459,13 @@
   margin-top: 36px;
 }
 
-.mkt-product-grid .mkt-product-card:first-child {
-  grid-column: span 2;
-}
-
 .mkt-product-card {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   background: var(--panel);
   border: 1px solid rgba(244, 239, 230, 0.06);
-  padding: 22px;
-  min-height: 230px;
-  height: 100%;
+  padding: 20px 20px 18px;
   color: inherit;
 }
 
@@ -492,9 +491,14 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 14px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .mkt-chip {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
   border: 1px solid var(--line);
   color: var(--paper);
   padding: 6px 10px;
@@ -526,13 +530,13 @@
 
 .mkt-split {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   gap: 40px;
   align-items: center;
 }
 
 .mkt-split.reverse {
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
 }
 
 .mkt-split.reverse .mkt-copy {
@@ -540,10 +544,17 @@
 }
 
 .mkt-paper {
+  min-width: 0;
+  max-width: 100%;
   background: var(--paper);
   color: var(--paper-ink);
   padding: 22px;
   border: 1px solid #d8d0c2;
+}
+
+.mkt-paper .mkt-kicker,
+.mkt-report .mkt-kicker {
+  color: var(--paper-kicker);
 }
 
 .mkt-paper h3,
@@ -623,7 +634,7 @@
 .mkt-report small {
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #7a7164;
+  color: var(--paper-muted);
   font-weight: 700;
 }
 
@@ -803,10 +814,89 @@
   letter-spacing: 0.04em;
 }
 
-.mkt-product-grid.mkt-connected-grid .mkt-product-card:first-child {
-  grid-column: span 2;
-  grid-row: span 2;
-  min-height: 320px;
+.mkt-platform {
+  margin-top: 36px;
+  display: grid;
+  gap: 18px;
+}
+
+.mkt-platform-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.mkt-platform-preview,
+.mkt-platform-roadmap {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.mkt-platform-preview {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mkt-platform-roadmap {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mkt-product-flagship {
+  border-color: var(--line);
+  background:
+    linear-gradient(180deg, rgba(198, 164, 107, 0.08), transparent 42%),
+    var(--panel);
+}
+
+.mkt-platform-cta {
+  margin-top: 16px;
+}
+
+.mkt-platform-roadmap .mkt-product-card {
+  padding: 16px;
+}
+
+.mkt-platform-roadmap h3 {
+  font-size: 1.2rem;
+}
+
+.mkt-foundation {
+  margin-top: 8px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  background: #0e1722;
+}
+
+.mkt-foundation-line {
+  margin: 10px 0 16px;
+  color: var(--muted);
+}
+
+.mkt-foundation-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.mkt-foundation-rail li {
+  min-width: 0;
+  padding: 10px 14px 0 0;
+  margin: 10px 14px 0 0;
+  border-right: 1px solid var(--line);
+  color: var(--paper);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+}
+
+.mkt-foundation-rail li:last-child {
+  border-right: 0;
+  margin-right: 0;
+  padding-right: 0;
 }
 
 @media (max-width: 1180px) {
@@ -828,8 +918,6 @@
 
 @media (max-width: 1100px) {
   .mkt-hero-grid,
-  .mkt-split,
-  .mkt-split.reverse,
   .mkt-command-grid,
   .mkt-product-grid,
   .mkt-why-grid,
@@ -841,8 +929,18 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .mkt-product-grid .mkt-product-card:first-child {
-    grid-column: span 2;
+  .mkt-split,
+  .mkt-split.reverse {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mkt-platform-top {
+    grid-template-columns: 1fr;
+  }
+
+  .mkt-platform-preview,
+  .mkt-platform-roadmap {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
   .mkt-split.reverse .mkt-copy {
@@ -874,10 +972,6 @@
     grid-template-columns: 1fr;
   }
 
-  .mkt-product-grid .mkt-product-card:first-child {
-    grid-column: auto;
-  }
-
   .mkt-header-row {
     min-height: 64px;
   }
@@ -892,5 +986,24 @@
 
   .mkt-command-head {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .mkt-shell {
+    width: min(1280px, calc(100% - 32px));
+  }
+
+  .mkt-platform-top,
+  .mkt-platform-preview,
+  .mkt-platform-roadmap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mkt-product-card,
+  .mkt-chip-row {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
   }
 }

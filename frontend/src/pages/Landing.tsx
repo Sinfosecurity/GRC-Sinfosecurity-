@@ -3,9 +3,9 @@ import MarketingLayout from '../marketing/MarketingLayout';
 import {
     FRAMEWORKS,
     GRAPH_NODES,
+    PLATFORM_FOUNDATION,
     PRODUCTS,
     TRUST_CAPABILITIES,
-    availabilityLabel,
 } from '../marketing/catalog';
 import CommandCenter from '../marketing/visuals/CommandCenter';
 import DecisionBriefCard from '../marketing/visuals/DecisionBriefCard';
@@ -14,7 +14,8 @@ import GovernanceGraph from '../marketing/visuals/GovernanceGraph';
 import ReportPreviews from '../marketing/visuals/ReportPreviews';
 
 const FLAGSHIP = PRODUCTS[0];
-const CONNECTED = PRODUCTS.slice(1);
+const PREVIEW = PRODUCTS.filter((product) => product.status === 'preview');
+const ROADMAP = PRODUCTS.filter((product) => product.status === 'roadmap');
 
 export default function Landing() {
     return (
@@ -46,32 +47,62 @@ export default function Landing() {
                     <p className="mkt-kicker">Platform</p>
                     <h2 className="mkt-display">A flagship product, then a connected platform.</h2>
                     <p className="mkt-lede">
-                        Buyers start with third-party risk because that work is already live.
-                        Preview and roadmap products describe the architecture, not an equal
-                        set of finished modules.
+                        Start with third-party risk today. Expand into one connected governance
+                        platform as your program grows.
                     </p>
-                    <div className="mkt-product-grid mkt-connected-grid">
-                        <Link className="mkt-product-card" to={FLAGSHIP.href}>
-                            <span className="mkt-pill">Available</span>
-                            <h3>{FLAGSHIP.name}</h3>
-                            <p>{FLAGSHIP.subtitle}</p>
-                            <p className="mkt-note">{FLAGSHIP.summary}</p>
-                            <div className="mkt-chip-row">
-                                {FLAGSHIP.points.map((point) => (
-                                    <span key={point} className="mkt-chip">{point}</span>
+                    <p className="mkt-lede">
+                        Supreme connects third-party risk, enterprise risk, compliance,
+                        privacy, AI governance, intelligence and automation through a shared
+                        governance foundation.
+                    </p>
+                    <div className="mkt-platform">
+                        <div className="mkt-platform-top">
+                            <article className="mkt-product-card mkt-product-flagship">
+                                <span className="mkt-pill">Available</span>
+                                <h3>{FLAGSHIP.name}</h3>
+                                <p>{FLAGSHIP.subtitle}</p>
+                                <p className="mkt-note">{FLAGSHIP.purpose}</p>
+                                <div className="mkt-chip-row">
+                                    {FLAGSHIP.points.map((point) => (
+                                        <span key={point} className="mkt-chip">{point}</span>
+                                    ))}
+                                </div>
+                                <Link className="mkt-btn mkt-btn-ghost mkt-platform-cta" to={FLAGSHIP.href}>
+                                    Explore Supreme Third Party
+                                </Link>
+                            </article>
+                            <div className="mkt-platform-preview">
+                                {PREVIEW.map((product) => (
+                                    <Link key={product.slug} className="mkt-product-card" to={product.href}>
+                                        <span className="mkt-pill">Preview</span>
+                                        <h3>{product.name}</h3>
+                                        <p>{product.subtitle}</p>
+                                        <p className="mkt-note">{product.purpose}</p>
+                                    </Link>
                                 ))}
                             </div>
-                        </Link>
-                        {CONNECTED.map((product) => {
-                            const badge = availabilityLabel(product.status);
-                            return (
+                        </div>
+                        <div className="mkt-platform-roadmap" aria-label="Connected roadmap">
+                            {ROADMAP.map((product) => (
                                 <Link key={product.slug} className="mkt-product-card" to={product.href}>
-                                    <span className="mkt-pill">{badge}</span>
+                                    <span className="mkt-pill">Roadmap</span>
                                     <h3>{product.name}</h3>
-                                    <p>{product.subtitle}</p>
+                                    <p className="mkt-note">{product.purpose}</p>
                                 </Link>
-                            );
-                        })}
+                            ))}
+                        </div>
+                        <div className="mkt-foundation">
+                            <p className="mkt-kicker">One shared governance foundation</p>
+                            <p className="mkt-foundation-line">Seven products. One governance foundation.</p>
+                            <ul className="mkt-foundation-rail">
+                                {PLATFORM_FOUNDATION.map((item) => (
+                                    <li key={item}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="mkt-hero-actions">
+                            <Link className="mkt-btn mkt-btn-ghost" to="/demo">See the product tour</Link>
+                        </div>
                     </div>
                 </div>
             </section>

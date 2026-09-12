@@ -1,7 +1,7 @@
 export default function DecisionBriefCard() {
     return (
         <div className="mkt-paper" aria-label="Decision brief preview">
-            <p className="mkt-kicker" style={{ color: '#8a6d38' }}>Risk Decision Brief</p>
+            <p className="mkt-kicker">Risk Decision Brief</p>
             <h3>Northwind Cloud</h3>
             <div className="mkt-factor"><span>Residual risk</span><strong>49 — MEDIUM</strong></div>
             <div className="mkt-factor"><span>Evidence confidence</span><strong>Partial</strong></div>

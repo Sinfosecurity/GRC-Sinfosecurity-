@@ -5,6 +5,7 @@ export type ProductModule = {
     name: string;
     subtitle: string;
     summary: string;
+    purpose: string;
     status: Availability;
     href: string;
     points: string[];
@@ -16,6 +17,7 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme Third Party',
         subtitle: 'Third-Party Risk Management',
         summary: 'Vendors, assessments, evidence, findings, explainable residual risk, decision briefs, and reports.',
+        purpose: 'Run third-party risk on one graph: vendors, assessments, evidence, findings, residual scoring, and recorded decisions.',
         status: 'available',
         href: '/products/third-party',
         points: ['Vendor inventory', 'Assessments', 'Evidence', 'Findings', 'Explainable risk', 'Decision briefs', 'Monitoring'],
@@ -25,6 +27,7 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme Risk',
         subtitle: 'Enterprise Risk Management',
         summary: 'Enterprise risk register, heatmap, appetite, and treatments connected to the same evidence and decisions.',
+        purpose: 'Connect enterprise, operational, cyber and third-party risk into one risk view.',
         status: 'preview',
         href: '/products/risk',
         points: ['Risk register', 'Heatmap', 'Appetite', 'Treatments'],
@@ -34,6 +37,7 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme Compliance',
         subtitle: 'Controls & Frameworks',
         summary: 'Map controls once and reuse evidence across frameworks, audits, and vendor reviews.',
+        purpose: 'Map controls, frameworks, evidence and findings without duplicating assurance work.',
         status: 'preview',
         href: '/products/compliance',
         points: ['Controls', 'Framework mapping', 'Evidence reuse'],
@@ -43,6 +47,7 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme Privacy',
         subtitle: 'Privacy Management',
         summary: 'Connect processing activities, vendors, and privacy risk on the same governance graph.',
+        purpose: 'Privacy management connected to vendors, systems, evidence and risk.',
         status: 'roadmap',
         href: '/products/privacy',
         points: ['Processing inventory', 'Vendor linkage', 'Privacy risk'],
@@ -52,6 +57,7 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme AI Governance',
         subtitle: 'AI Governance',
         summary: 'Inventory AI systems, record use, and require a human decision before residual risk changes.',
+        purpose: 'Govern AI inventory, assessments, controls and approval decisions.',
         status: 'roadmap',
         href: '/products/ai-governance',
         points: ['AI inventory', 'Use cases', 'Human approval'],
@@ -61,6 +67,7 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme Intelligence',
         subtitle: 'External Risk Intelligence',
         summary: 'Bring external signals into residual risk only when a provider is connected and evidence is recorded.',
+        purpose: 'Bring external risk and regulatory signals into governance decisions.',
         status: 'roadmap',
         href: '/products/intelligence',
         points: ['External signals', 'Provider status', 'Evidence-backed intake'],
@@ -70,11 +77,24 @@ export const PRODUCTS: ProductModule[] = [
         name: 'Supreme Automation',
         subtitle: 'Workflows & Agents',
         summary: 'Automate repetitive governance work without removing human accountability for scores or decisions.',
+        purpose: 'Orchestrate assessments, remediation, approvals and governed agents.',
         status: 'roadmap',
         href: '/products/automation',
         points: ['Triggered workflows', 'Notifications', 'Human checkpoints'],
     },
 ];
+
+export const PLATFORM_FOUNDATION = [
+    'Governance Graph',
+    'Evidence',
+    'Controls',
+    'Risk',
+    'Decisions',
+    'Audit',
+    'Identity',
+    'Automation',
+    'Intelligence',
+] as const;
 
 export const GRAPH_NODES = [
     'Identity',

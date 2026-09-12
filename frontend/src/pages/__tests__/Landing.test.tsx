@@ -48,6 +48,9 @@ describe('Landing Page', () => {
         expect(screen.getAllByRole('link', { name: 'See the product tour' })[0]).toHaveAttribute('href', '/demo');
         expect(screen.getAllByRole('link', { name: 'Sign In' })[0]).toHaveAttribute('href', '/login');
         expect(screen.getAllByRole('link', { name: /Trust & Security/i })[0]).toHaveAttribute('href', '/trust');
+        expect(screen.getByRole('link', { name: 'Explore Supreme Third Party' })).toHaveAttribute('href', '/products/third-party');
+        expect(screen.getByText(/One shared governance foundation/i)).toBeInTheDocument();
+        expect(screen.getByText(/Seven products\. One governance foundation/i)).toBeInTheDocument();
     });
 
     it('labels unfinished products instead of selling them as live', async () => {

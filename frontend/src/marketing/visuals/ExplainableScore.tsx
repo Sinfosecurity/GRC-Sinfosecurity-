@@ -9,7 +9,7 @@ const FACTORS = [
 export default function ExplainableScore() {
     return (
         <div className="mkt-paper" aria-label="Explainable residual risk example">
-            <p className="mkt-kicker" style={{ color: '#8a6d38' }}>Why is this vendor high risk?</p>
+            <p className="mkt-kicker">Why is this vendor high risk?</p>
             <h3>Illustrative residual calculation</h3>
             {FACTORS.map((factor) => (
                 <div className="mkt-factor" key={factor.label}>
