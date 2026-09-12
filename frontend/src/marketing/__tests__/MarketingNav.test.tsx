@@ -56,14 +56,15 @@ describe('Marketing navigation', () => {
         expect(screen.getByText(/Draft — pending legal review/i)).toBeInTheDocument();
     });
 
-    it('prices with Contact Sales intent instead of invented numbers', () => {
+    it('publishes commercial list prices and keeps Enterprise sales-led', () => {
         renderAt('/pricing');
-        expect(screen.getByText(/Plans for growing teams and enterprise organizations/i)).toBeInTheDocument();
-        expect(screen.getAllByRole('link', { name: 'Contact Sales' })[0]).toHaveAttribute(
+        expect(screen.getByRole('heading', { name: /Straightforward pricing for serious governance/i })).toBeInTheDocument();
+        expect(screen.getByText('$5,990/year')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Contact Sales' })).toHaveAttribute(
             'href',
-            '/request-demo?intent=pricing&plan=Starter'
+            '/request-demo?source=pricing&selectedPlan=ENTERPRISE&intent=enterprise-sales'
         );
-        expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Commercial prices are not published here/i)).not.toBeInTheDocument();
     });
 
     it('returns a marketing 404 for unknown routes', () => {

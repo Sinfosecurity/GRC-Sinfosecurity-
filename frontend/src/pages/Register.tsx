@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import MarketingLayout from '../marketing/MarketingLayout';
 
 export default function Register() {
     const { signup } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const selectedPlan = searchParams.get('selectedPlan') || '';
+    const source = searchParams.get('source') || '';
+    const intent = searchParams.get('intent') || '';
     const [form, setForm] = useState({
         firstName: '',
         lastName: '',
@@ -38,7 +42,17 @@ export default function Register() {
                         <p className="mkt-kicker">Workspace access</p>
                         <h1 className="mkt-display">Create your organization</h1>
                         <p className="mkt-lede">Start a Supreme workspace. No demo data is invented.</p>
+                        {selectedPlan && (
+                            <p className="mkt-status" role="status">
+                                Selected plan: {selectedPlan}
+                                {source ? ` · Source: ${source}` : ''}
+                                {intent ? ` · Intent: ${intent}` : ''}
+                            </p>
+                        )}
                         <form className="mkt-form" onSubmit={handleSubmit}>
+                            {selectedPlan && <input type="hidden" name="selectedPlan" value={selectedPlan} />}
+                            {source && <input type="hidden" name="source" value={source} />}
+                            {intent && <input type="hidden" name="intent" value={intent} />}
                             <div className="mkt-field">
                                 <label htmlFor="first-name">First name</label>
                                 <input

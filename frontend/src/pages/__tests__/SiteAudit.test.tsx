@@ -59,6 +59,8 @@ describe('site audit remediation', () => {
         expect(marketingCss).toMatch(/--paper-muted:\s*#655e52/i);
         expect(marketingCss).not.toMatch(/#8a6d38/i);
         expect(marketingCss).not.toMatch(/#7a7164/i);
+        expect(marketingCss).toMatch(/@media \(max-width: 767px\)[\s\S]*\.mkt-price-grid[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+        expect(marketingCss).toMatch(/overflow-x:\s*hidden/);
     });
 
     it('defines per-route titles for public marketing pages', () => {
@@ -108,6 +110,12 @@ describe('site audit remediation', () => {
         expect(screen.getByLabelText('Business email')).toHaveAttribute('autocomplete', 'email');
         expect(screen.getByRole('textbox', { name: 'Company' })).toHaveAttribute('autocomplete', 'organization');
         expect(screen.getByText(/Selected plan: Professional/)).toBeInTheDocument();
+    });
+
+    it('carries pricing signup metadata onto registration', () => {
+        renderPath('/register?source=pricing&selectedPlan=STARTER&intent=get-started', <Register />);
+        expect(screen.getByText(/Selected plan: STARTER/)).toBeInTheDocument();
+        expect(screen.getByText(/Intent: get-started/)).toBeInTheDocument();
     });
 
     it('presents Third Party as an available product, not a stub', () => {

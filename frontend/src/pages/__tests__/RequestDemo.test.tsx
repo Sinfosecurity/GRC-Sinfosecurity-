@@ -52,4 +52,26 @@ describe('Request Demo', () => {
         });
         expect(await screen.findByRole('status')).toHaveTextContent(/NOT_CONFIGURED/i);
     });
+
+    it('preserves pricing source and selected plan on enterprise sales', async () => {
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/request-demo?source=pricing&selectedPlan=ENTERPRISE&intent=enterprise-sales']}>
+                <RequestDemo />
+            </MemoryRouter>
+        );
+        expect(screen.getByRole('heading', { name: /Contact sales about the ENTERPRISE plan/i })).toBeInTheDocument();
+        fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Jordan Hale' } });
+        fireEvent.change(screen.getByLabelText('Business email'), { target: { value: 'jordan.hale@example.com' } });
+        fireEvent.change(screen.getByRole('textbox', { name: 'Company' }), { target: { value: 'Harbor Analytics' } });
+        fireEvent.change(screen.getByLabelText('Role'), { target: { value: 'CISO' } });
+        fireEvent.change(screen.getByLabelText('Company size'), { target: { value: '251–1,000' } });
+        fireEvent.change(screen.getByLabelText('Primary need'), { target: { value: 'Enterprise rollout' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Contact sales' }));
+        expect(request).toHaveBeenCalledWith(expect.objectContaining({
+            intent: 'enterprise-sales',
+            plan: 'ENTERPRISE',
+            selectedPlan: 'ENTERPRISE',
+            source: 'pricing',
+        }));
+    });
 });

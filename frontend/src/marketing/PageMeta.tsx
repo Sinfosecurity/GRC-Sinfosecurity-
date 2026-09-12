@@ -44,8 +44,9 @@ export const ROUTE_META: Record<string, RouteMeta> = {
         description: 'Supreme Automation is a roadmap product for triggered work that keeps humans accountable for scores and decisions.',
     },
     '/pricing': {
-        title: 'Pricing — Supreme',
-        description: 'Supreme plan categories for growing teams and enterprises. Commercial prices are provided by sales, not published as invented numbers.',
+        title: 'Supreme Pricing | Third-Party Risk & Governance Platform',
+        description:
+            'Explore Supreme pricing for third-party risk management and governance, with plans for growing teams, established programs and enterprise organizations.',
     },
     '/trust': {
         title: 'Trust & Security — Supreme',

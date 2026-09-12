@@ -770,21 +770,194 @@
   border: 1px solid rgba(244, 239, 230, 0.08);
   padding: 22px;
   background: var(--panel);
-  min-height: 360px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
+.mkt-price-card.is-popular {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px rgba(198, 164, 107, 0.35);
+}
+
+.mkt-popular {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 4px 8px;
+  background: var(--gold);
+  color: var(--gold-ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mkt-price-name {
+  font-family: var(--display);
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  margin: 4px 0 10px;
+}
+
+.mkt-price-amount {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.mkt-price-period,
+.mkt-price-note {
+  color: var(--soft);
+  font-size: 0.92rem;
+  margin: 4px 0 0;
+}
+
+.mkt-price-audience {
+  margin: 14px 0 16px;
+  color: var(--muted);
+}
+
+.mkt-price-actions {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .mkt-price-card .mkt-btn {
   width: 100%;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
 }
 
 .mkt-price-card ul {
-  margin: 12px 0 20px;
+  margin: 12px 0 0;
   padding-left: 18px;
   color: var(--muted);
   flex: 1;
+}
+
+.mkt-billing-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.mkt-billing-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  background: #101924;
+}
+
+.mkt-billing-toggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.mkt-billing-toggle button.is-active {
+  background: var(--gold);
+  color: var(--gold-ink);
+}
+
+.mkt-billing-save {
+  color: var(--gold);
+  font-weight: 700;
+  margin: 0;
+}
+
+.mkt-compare,
+.mkt-faq {
+  margin-top: 56px;
+}
+
+.mkt-compare-wrap {
+  overflow: visible;
+  margin-top: 20px;
+}
+
+.mkt-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mkt-compare-table th,
+.mkt-compare-table td {
+  border-bottom: 1px solid rgba(244, 239, 230, 0.08);
+  padding: 12px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.mkt-compare-table th[scope='col'] {
+  color: var(--gold);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mkt-compare-stack {
+  display: none;
+}
+
+.mkt-compare-card {
+  border: 1px solid rgba(244, 239, 230, 0.08);
+  padding: 16px;
+  background: var(--panel);
+}
+
+.mkt-compare-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.mkt-compare-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.mkt-compare-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mkt-compare-card dt {
+  color: var(--soft);
+}
+
+.mkt-compare-card dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.mkt-faq article {
+  border-top: 1px solid rgba(244, 239, 230, 0.08);
+  padding: 16px 0;
+}
+
+.mkt-faq h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.mkt-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .mkt-tour {
@@ -814,10 +987,99 @@
   letter-spacing: 0.04em;
 }
 
+.mkt-platform-intro {
+  display: grid;
+  gap: 16px;
+}
+
 .mkt-platform {
   margin-top: 36px;
   display: grid;
   gap: 18px;
+}
+
+@media (min-width: 1101px) {
+  .mkt-section-platform {
+    scroll-margin-top: 73px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    min-height: calc(100dvh - 73px);
+    max-height: calc(100dvh - 73px);
+    padding: 28px 0 24px;
+    overflow: hidden;
+  }
+
+  .mkt-section-platform .mkt-shell {
+    width: min(1280px, calc(100% - 48px));
+  }
+
+  .mkt-section-platform .mkt-display {
+    font-size: clamp(1.7rem, 2.4vw, 2.35rem);
+    margin: 8px 0 10px;
+  }
+
+  .mkt-section-platform .mkt-lede {
+    font-size: 1rem;
+    line-height: 1.45;
+    max-width: 46rem;
+    margin: 0;
+  }
+
+  .mkt-platform-intro {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 28px;
+  }
+
+  .mkt-section-platform .mkt-platform {
+    margin-top: 18px;
+    gap: 10px;
+  }
+
+  .mkt-section-platform .mkt-product-card {
+    padding: 14px 16px 12px;
+  }
+
+  .mkt-section-platform .mkt-product-card h3 {
+    font-size: 1.22rem;
+    margin: 6px 0 4px;
+  }
+
+  .mkt-section-platform .mkt-note {
+    margin: 0 0 8px;
+  }
+
+  .mkt-section-platform .mkt-chip-row {
+    margin-top: 4px;
+  }
+
+  .mkt-section-platform .mkt-platform-cta {
+    margin-top: 10px;
+  }
+
+  .mkt-section-platform .mkt-platform-roadmap .mkt-product-card {
+    padding: 12px 14px;
+  }
+
+  .mkt-section-platform .mkt-platform-roadmap h3 {
+    font-size: 1.05rem;
+  }
+
+  .mkt-section-platform .mkt-foundation {
+    margin-top: 0;
+    padding: 12px 16px 10px;
+  }
+
+  .mkt-section-platform .mkt-foundation-line {
+    margin: 6px 0 8px;
+  }
+
+  .mkt-section-platform .mkt-foundation-rail li {
+    padding: 8px 12px 0 0;
+    margin: 8px 12px 0 0;
+    font-size: 0.8rem;
+  }
 }
 
 .mkt-platform-top {
@@ -986,6 +1248,28 @@
 
   .mkt-command-head {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 1199px) {
+  .mkt-price-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .mkt-price-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mkt-compare-wrap {
+    display: none;
+  }
+
+  .mkt-compare-stack {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
   }
 }
 

@@ -31,7 +31,8 @@ router.post('/', authRateLimiter, async (req: Request, res: Response, next: Next
         const companySize = String(req.body?.companySize || '').trim();
         const primaryNeed = String(req.body?.primaryNeed || '').trim();
         const intent = String(req.body?.intent || 'demo').trim();
-        const plan = String(req.body?.plan || '').trim();
+        const plan = String(req.body?.selectedPlan || req.body?.plan || '').trim();
+        const source = String(req.body?.source || '').trim();
 
         if (name.length < 2 || company.length < 2 || !role || !companySize || primaryNeed.length < 8) {
             throw new ApiError(400, 'Name, business email, company, role, company size, and primary need are required');
@@ -50,6 +51,8 @@ router.post('/', authRateLimiter, async (req: Request, res: Response, next: Next
             primaryNeed,
             intent,
             plan: plan || undefined,
+            selectedPlan: plan || undefined,
+            source: source || undefined,
         };
         persist(record);
 
@@ -73,6 +76,7 @@ router.post('/', authRateLimiter, async (req: Request, res: Response, next: Next
             `Primary need: ${primaryNeed}`,
             `Intent: ${intent}`,
             plan ? `Plan: ${plan}` : '',
+            source ? `Source: ${source}` : '',
         ].filter(Boolean).join('\n');
 
         if (isProviderConfigured('SENDGRID_API_KEY')) {

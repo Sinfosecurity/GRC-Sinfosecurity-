@@ -24,4 +24,24 @@ describe('Public demo request', () => {
         expect(response.body.accepted).toBe(true);
         expect(['SENT', 'NOT_CONFIGURED']).toContain(response.body.delivery);
     });
+
+    it('accepts pricing lead metadata without creating a checkout', async () => {
+        const response = await request(app)
+            .post('/api/v1/demo-requests')
+            .send({
+                name: 'Jordan Hale',
+                email: 'jordan.hale@example.com',
+                company: 'Harbor Analytics',
+                role: 'CISO',
+                companySize: '251–1,000',
+                primaryNeed: 'Enterprise pricing conversation',
+                intent: 'enterprise-sales',
+                selectedPlan: 'ENTERPRISE',
+                source: 'pricing',
+            });
+        expect(response.status).toBe(202);
+        expect(response.body.accepted).toBe(true);
+        expect(response.body.checkout).toBeUndefined();
+        expect(response.body.priceId).toBeUndefined();
+    });
 });

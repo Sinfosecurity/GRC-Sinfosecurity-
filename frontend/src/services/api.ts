@@ -277,6 +277,8 @@ export type DemoRequestPayload = {
     primaryNeed: string;
     intent?: string;
     plan?: string;
+    source?: string;
+    selectedPlan?: string;
 };
 
 export const demoAPI = {
