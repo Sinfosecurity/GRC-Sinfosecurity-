@@ -87,7 +87,15 @@ export default function DocumentManagement() {
                                     </Box>
                                     <Chip
                                         label={item.scanStatus}
-                                        color={item.scanStatus === 'CLEAN' ? 'success' : item.scanStatus === 'NOT_CONFIGURED' ? 'warning' : 'default'}
+                                        color={
+                                            item.scanStatus === 'CLEAN'
+                                                ? 'success'
+                                                : item.scanStatus === 'INFECTED'
+                                                  ? 'error'
+                                                  : item.scanStatus === 'NOT_CONFIGURED' || item.scanStatus === 'PENDING' || item.scanStatus === 'FAILED'
+                                                    ? 'warning'
+                                                    : 'default'
+                                        }
                                     />
                                 </Stack>
                             </CardContent>

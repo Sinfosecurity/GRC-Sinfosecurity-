@@ -17,19 +17,8 @@ export interface ObjectStorageProvider {
     listKeys?(prefix?: string): Promise<string[]>;
 }
 
-export const ALLOWED_CONTENT_TYPES = new Set([
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    'text/csv',
-    'text/plain',
-    'image/png',
-    'image/jpeg',
-]);
-
-export const MAX_UPLOAD_BYTES = parseInt(process.env.MAX_FILE_SIZE || '10485760', 10);
-
-export function sanitizeFilename(name: string): string {
-    return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 180) || 'file';
-}
+export {
+    ALLOWED_CONTENT_TYPES,
+    MAX_UPLOAD_BYTES,
+    sanitizeFilename,
+} from '../malware/filePolicy';

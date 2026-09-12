@@ -4,10 +4,12 @@ import { emailStatus } from './notificationDeliveryService';
 import { objectStorageService } from './objectStorageService';
 import { billingStatus } from '../billing/stripeBillingService';
 import { isProviderConfigured } from '../config/env';
+import { malwareScanService } from '../malware/malwareScanService';
 
 export type ProviderState = 'CONNECTED' | 'DEGRADED' | 'NOT_CONFIGURED' | 'ERROR' | 'POLICY';
 
 export async function providerHealth() {
+    await malwareScanService.probe();
     const storage = objectStorageService.status();
     let database: ProviderState = 'ERROR';
     try {
@@ -49,7 +51,8 @@ export async function providerHealth() {
         database,
         storage: storage.provider === 'NOT_CONFIGURED' ? 'NOT_CONFIGURED' : storage.provider === 's3' ? 'CONNECTED' : 'CONNECTED',
         storageProvider: storage.provider,
-        malware: storage.malwareScanning,
+        malware: storage.malwareProvider,
+        malwareScanning: storage.malwareScanning,
         malwarePolicy: storage.downloadPolicy,
         redis,
         email: emailStatus(),

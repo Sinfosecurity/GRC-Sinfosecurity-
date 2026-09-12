@@ -7,15 +7,15 @@ Values below are readiness, not a cutover approval.
 ## Before a future production window
 
 1. Restore GitHub billing so hosted CI can run the full workflow to green. Rechecked 2026-09-12: run `34674812047` still billing-locked.
-2. Provision a hosted staging URL that is not localhost, still isolated from production tenant data. Render currently has no Supreme Risk staging service.
-3. Configure Stripe **test** mode first: `sk_test_` secret, `whsec_` webhook secret, `STRIPE_PRICE_*`, customer portal, entitlement enforcement. Live keys are rejected by the application.
-4. Repeat the same Stripe flow in live mode only after test mode is green.
+2. Keep hosted staging isolated from production tenant data (`https://supreme-risk-staging.onrender.com`). Do not treat staging as a production cutover.
+3. Configure Stripe **test** mode first: `sk_test_` secret, `whsec_` webhook secret, `STRIPE_PRICE_*` in the host environment only, customer portal, entitlement enforcement. Live keys are rejected by the application.
+4. Repeat the same Stripe flow in live mode only after test mode is green. Hosted test-mode certification on 2026-09-12 is **PARTIAL / CONDITIONALLY CLEARED**. Remaining production-release checks: hosted `invoice.payment_failed`, hosted renewal/test-clock, browser Checkout completion (hCaptcha), and a final commercial price catalog. Do not treat staging catalog IDs as production prices.
 5. Configure production Postgres with backups, point-in-time recovery, and a restore drill against a clone.
 6. Configure production S3 (or equivalent) with IAM, encryption, retention, and orphan reconcile on a schedule.
 7. Configure production SMTP or SendGrid. Confirm invitation, reset, assignment, finding, and approval mail.
 8. Decide AI: real provider with audit, or keep `NOT_CONFIGURED`.
-9. Decide malware: real scanner, or keep fail-closed `NOT_CONFIGURED`. Never invent CLEAN.
-10. Configure hosted alerting for `/health` degraded/unhealthy, webhook failures, and restore job failure.
+9. Configure ClamAV (`CLAMAV_HOST`) or keep fail-closed `NOT_CONFIGURED`. Never invent CLEAN. CONNECTED only after a controlled EICAR + clean probe succeeds.
+10. Configure hosted alerting for `/health` degraded/unhealthy, webhook failures, infected evidence, and restore job failure.
 11. Freeze schema. Apply migrations with the baseline-then-additive path proven in `docs/STAGING-MIGRATION-CERTIFICATION.md`.
 12. Take a pre-cutover backup. Restore it into a scratch database. Compare counts.
 13. Re-run the staging browser E2E against the hosted staging URL.

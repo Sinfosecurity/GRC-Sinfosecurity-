@@ -245,13 +245,17 @@ export function registerDefaultHealthChecks() {
     });
 
     healthChecker.registerCheck('malware', async () => {
+        const { malwareScanService } = await import('../malware/malwareScanService');
+        const health = await malwareScanService.probe();
         const { objectStorageService } = await import('../services/objectStorageService');
-        const { ScanStatus } = await import('@prisma/client');
         const status = objectStorageService.status();
-        if (status.malwareScanning === ScanStatus.NOT_CONFIGURED) {
-            return { status: 'degraded', message: 'NOT_CONFIGURED', details: { downloadPolicy: status.downloadPolicy } };
+        if (health === 'CONNECTED') {
+            return { status: 'up', message: 'CONNECTED', details: { downloadPolicy: status.downloadPolicy } };
         }
-        return { status: 'up', message: `Malware scanner ${status.malwareScanning}`, details: { downloadPolicy: status.downloadPolicy } };
+        if (health === 'ERROR') {
+            return { status: 'down', message: 'ERROR', details: { downloadPolicy: status.downloadPolicy } };
+        }
+        return { status: 'degraded', message: health, details: { downloadPolicy: status.downloadPolicy } };
     });
 
     healthChecker.registerCheck('ai', async () => {
@@ -292,10 +296,13 @@ export async function readinessCheckHandler(req: Request, res: Response) {
     try {
         // Check critical dependencies
         await prisma.$queryRaw`SELECT 1`;
+        const { malwareScanService } = await import('../malware/malwareScanService');
+        const malware = await malwareScanService.probe();
 
         res.status(200).json({
             status: 'ready',
             timestamp: new Date().toISOString(),
+            malware,
         });
     } catch (error) {
         res.status(503).json({

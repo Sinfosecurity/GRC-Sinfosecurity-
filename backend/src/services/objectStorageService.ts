@@ -1,12 +1,13 @@
 import crypto from 'crypto';
 import { ScanStatus } from '@prisma/client';
 import { prisma } from '../config/database';
-import { isProviderConfigured } from '../config/env';
 import { ApiError } from '../middleware/errorHandler';
 import { recordAudit } from './auditEventService';
 import { LocalStorageProvider } from '../storage/localStorageProvider';
 import { S3StorageProvider } from '../storage/s3StorageProvider';
-import { ALLOWED_CONTENT_TYPES, MAX_UPLOAD_BYTES, ObjectStorageProvider, sanitizeFilename } from '../storage/types';
+import { ObjectStorageProvider, sanitizeFilename } from '../storage/types';
+import { assertSafeUpload } from '../malware/filePolicy';
+import { initialUploadScanStatus, malwareProviderHealth, malwareScanService } from '../malware/malwareScanService';
 
 export type ScanDownloadPolicy = {
     allowPendingDownloads: boolean;
@@ -46,6 +47,7 @@ export function evaluateScanDownloadPolicy(
             }
             return { allowed: false, statusCode: 403, reason: 'Download blocked: malware scan is pending' };
         case ScanStatus.FAILED:
+        case 'ERROR':
             return { allowed: false, statusCode: 403, reason: 'Download blocked: malware scan failed closed' };
         case ScanStatus.NOT_CONFIGURED:
             if (policy.allowUnscannedDownloads) {
@@ -69,10 +71,7 @@ export function assertDownloadable(scanStatus: ScanStatus | string, policy?: Sca
 }
 
 function malwareScanStatus(): ScanStatus {
-    if (isProviderConfigured('MALWARE_SCAN_PROVIDER') || isProviderConfigured('CLAMAV_HOST')) {
-        return ScanStatus.PENDING;
-    }
-    return ScanStatus.NOT_CONFIGURED;
+    return initialUploadScanStatus();
 }
 
 function provider(): ObjectStorageProvider {
@@ -92,6 +91,7 @@ export const objectStorageService = {
         return {
             provider: s3.isConfigured() ? 's3' : process.env.NODE_ENV === 'production' ? 'NOT_CONFIGURED' : 'local',
             malwareScanning: malwareScanStatus(),
+            malwareProvider: malwareProviderHealth(),
             downloadPolicy: scanDownloadPolicyFromEnv(),
         };
     },
@@ -107,12 +107,7 @@ export const objectStorageService = {
         classification?: string;
         requestId?: string;
     }) {
-        if (input.buffer.length > MAX_UPLOAD_BYTES) {
-            throw new ApiError(422, 'File exceeds maximum allowed size');
-        }
-        if (!ALLOWED_CONTENT_TYPES.has(input.contentType)) {
-            throw new ApiError(422, 'Content type is not allowed');
-        }
+        assertSafeUpload(input.contentType, input.filename, input.buffer);
 
         const safeName = sanitizeFilename(input.filename);
         const storageKey = `${input.organizationId}/${input.ownerType}/${input.ownerId}/${crypto.randomUUID()}-${safeName}`;
@@ -153,6 +148,17 @@ export const objectStorageService = {
             requestId: input.requestId,
             metadata: { filename: safeName, size: input.buffer.length, scanStatus },
         });
+
+        if (scanStatus === ScanStatus.PENDING) {
+            const nextStatus = await malwareScanService.scanStoredObject({
+                id: stored.id,
+                organizationId: input.organizationId,
+                uploadedBy: input.uploadedBy,
+                filename: safeName,
+                buffer: input.buffer,
+            });
+            return { ...stored, scanStatus: nextStatus };
+        }
 
         return stored;
     },

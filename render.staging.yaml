@@ -92,3 +92,14 @@ services:
     dockerfilePath: ./infra/staging/mailpit/Dockerfile
     dockerContext: ./infra/staging/mailpit
     healthCheckPath: /
+
+  - type: pserv
+    name: supreme-risk-staging-clamav
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./infra/staging/clamav/Dockerfile
+    dockerContext: ./infra/staging/clamav
+    envVars:
+      - key: CLAMD_STARTUP_TIMEOUT
+        value: "1800"
