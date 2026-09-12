@@ -1,0 +1,94 @@
+# Isolated Supreme Risk staging on Render.
+# Secrets are set in the Render dashboard / CLI. Never put credentials here.
+# Apply against branch supreme-risk-transformation only. Do not use for production.
+
+databases:
+  - name: supreme-risk-staging-pg
+    databaseName: supreme_risk_staging
+    user: supreme_staging
+    plan: free
+    region: oregon
+    postgresMajorVersion: 16
+
+services:
+  - type: redis
+    name: supreme-risk-staging-kv
+    plan: free
+    region: oregon
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
+
+  - type: web
+    name: supreme-risk-staging-api
+    runtime: node
+    region: oregon
+    plan: starter
+    rootDir: backend
+    buildCommand: npm install --include=dev --workspaces=false && npx prisma generate && npx tsc
+    preDeployCommand: npx prisma migrate deploy
+    startCommand: node dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENVIRONMENT
+        value: staging
+      - key: DEV_MODE
+        value: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: supreme-risk-staging-pg
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: supreme-risk-staging-kv
+          type: redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ALLOW_LOCAL_OBJECT_STORAGE
+        value: "false"
+      - key: ALLOW_PENDING_DOWNLOADS
+        value: "false"
+      - key: ALLOW_UNSCANNED_DOWNLOADS
+        value: "false"
+
+  - type: web
+    name: supreme-risk-staging
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install --include=dev --workspaces=false && npx tsc --noEmit && npx vite build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_ENVIRONMENT
+        value: staging
+      - key: VITE_PREVIEW_LABEL
+        value: "false"
+
+  - type: web
+    name: supreme-risk-staging-minio
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./infra/staging/minio/Dockerfile
+    dockerContext: ./infra/staging/minio
+    healthCheckPath: /minio/health/live
+    disk:
+      name: minio-data
+      mountPath: /data
+      sizeGB: 1
+
+  - type: web
+    name: supreme-risk-staging-mail
+    runtime: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./infra/staging/mailpit/Dockerfile
+    dockerContext: ./infra/staging/mailpit
+    healthCheckPath: /
