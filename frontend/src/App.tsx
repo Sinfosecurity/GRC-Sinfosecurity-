@@ -51,6 +51,12 @@ const RequestDemo = lazy(() => import('./pages/RequestDemo'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const TrustCenter = lazy(() => import('./pages/TrustCenter'));
 const MarketingPlaceholder = lazy(() => import('./pages/MarketingPlaceholder'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const ThirdPartyProduct = lazy(() => import('./pages/ThirdPartyProduct'));
+const Frameworks = lazy(() => import('./pages/Frameworks'));
+const LegalDraft = lazy(() => import('./pages/LegalDraft'));
+const SecurityOverview = lazy(() => import('./pages/SecurityOverview'));
+const PublicStatus = lazy(() => import('./pages/PublicStatus'));
 
 // Loading component
 const LoadingFallback = () => (
@@ -72,14 +78,15 @@ export default function App() {
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/trust" element={<TrustCenter />} />
                     <Route path="/solutions" element={<MarketingPlaceholder />} />
-                    <Route path="/frameworks" element={<MarketingPlaceholder />} />
+                    <Route path="/frameworks" element={<Frameworks />} />
                     <Route path="/resources" element={<MarketingPlaceholder />} />
                     <Route path="/company" element={<MarketingPlaceholder />} />
-                    <Route path="/privacy" element={<MarketingPlaceholder />} />
-                    <Route path="/terms" element={<MarketingPlaceholder />} />
-                    <Route path="/security" element={<MarketingPlaceholder />} />
-                    <Route path="/subprocessors" element={<MarketingPlaceholder />} />
-                    <Route path="/status" element={<MarketingPlaceholder />} />
+                    <Route path="/privacy" element={<LegalDraft />} />
+                    <Route path="/terms" element={<LegalDraft />} />
+                    <Route path="/security" element={<SecurityOverview />} />
+                    <Route path="/subprocessors" element={<LegalDraft />} />
+                    <Route path="/status" element={<PublicStatus />} />
+                    <Route path="/products/third-party" element={<ThirdPartyProduct />} />
                     <Route path="/products/:slug" element={<MarketingPlaceholder />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
@@ -118,6 +125,7 @@ export default function App() {
                     <Route path="settings" element={<Settings />} />
                     <Route path="environment" element={<EnvironmentStatus />} />
                 </Route>
+                    <Route path="*" element={<NotFound />} />
             </Routes>
         </Suspense>
         </>

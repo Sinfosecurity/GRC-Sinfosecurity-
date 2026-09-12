@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../marketing/routerFuture';
 import { AuthProvider } from '../../contexts/AuthContext';
 import ProtectedRoute from '../ProtectedRoute';
 
@@ -42,7 +43,7 @@ describe('ProtectedRoute', () => {
 
     it('renders children when authenticated', async () => {
         render(
-            <MemoryRouter>
+            <MemoryRouter future={routerFuture}>
                 <AuthProvider>
                     <ProtectedRoute>
                         <div>Protected Content</div>

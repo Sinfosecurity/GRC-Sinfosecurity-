@@ -5,11 +5,12 @@
   --panel: #162231;
   --line: rgba(198, 164, 107, 0.28);
   --gold: #c6a46b;
+  --gold-ink: #141a21;
   --gold-strong: #d7b67a;
   --paper: #f4efe6;
   --paper-ink: #1a211c;
-  --muted: #c5cdd4;
-  --soft: #9aa6b2;
+  --muted: #d5dbe1;
+  --soft: #c5cdd4;
   --danger: #c45c4a;
   --ok: #6f8f6a;
   --display: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', serif;
@@ -58,7 +59,7 @@
   top: -40px;
   z-index: 30;
   background: var(--gold);
-  color: var(--ink);
+  color: var(--gold-ink);
   padding: 8px 12px;
   font-weight: 700;
 }
@@ -119,13 +120,17 @@
   color: inherit;
 }
 
-.mkt-btn-gold {
+.mkt-btn-gold,
+.supreme-marketing a.mkt-btn-gold,
+.supreme-marketing a.mkt-skip {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--gold-ink);
 }
 
-.mkt-btn-gold:hover {
+.mkt-btn-gold:hover,
+.supreme-marketing a.mkt-btn-gold:hover {
   background: var(--gold-strong);
+  color: var(--gold-ink);
 }
 
 .mkt-btn-ghost {
@@ -227,9 +232,7 @@
   display: none;
 }
 
-.mkt-menu.open .mkt-dropdown,
-.mkt-menu:hover .mkt-dropdown,
-.mkt-menu:focus-within .mkt-dropdown {
+.mkt-menu.open .mkt-dropdown {
   display: grid;
   gap: 4px;
 }
@@ -279,9 +282,22 @@
   padding: 12px 0 20px;
 }
 
+.mkt-mobile-group {
+  padding-bottom: 8px;
+}
+
+.mkt-mobile-group h2 {
+  margin: 12px 0 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
 .mkt-mobile a {
   display: block;
   padding: 10px 0;
+  min-height: 44px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -371,6 +387,7 @@
   min-width: 0;
 }
 
+.mkt-tile-label,
 .mkt-tile h3,
 .mkt-tile h4 {
   margin: 0 0 8px;
@@ -618,7 +635,7 @@
 
 .mkt-footer-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -770,9 +787,26 @@
   gap: 8px;
 }
 
-.mkt-tour-nav button[aria-current='true'] {
+.mkt-tour-nav button[aria-selected='true'] {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--gold-ink);
+}
+
+.mkt-draft-banner {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  color: var(--gold-ink);
+  background: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mkt-product-grid.mkt-connected-grid .mkt-product-card:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+  min-height: 320px;
 }
 
 @media (max-width: 1180px) {

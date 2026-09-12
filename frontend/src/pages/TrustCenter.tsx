@@ -32,8 +32,8 @@ export default function TrustCenter() {
                         ))}
                     </div>
                     <div className="mkt-hero-actions">
-                        <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Request a security review</Link>
-                        <Link className="mkt-btn mkt-btn-ghost" to="/security">Security page</Link>
+                        <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Request a Demo</Link>
+                        <Link className="mkt-btn mkt-btn-ghost" to="/security">Security overview</Link>
                     </div>
                 </div>
             </section>

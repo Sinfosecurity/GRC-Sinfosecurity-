@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../marketing/routerFuture';
 import RequestDemo from '../RequestDemo';
 
 const request = vi.fn();
@@ -29,7 +30,7 @@ describe('Request Demo', () => {
 
     it('submits the inquiry fields instead of using a dead CTA', async () => {
         render(
-            <MemoryRouter>
+            <MemoryRouter future={routerFuture}>
                 <RequestDemo />
             </MemoryRouter>
         );
@@ -47,6 +48,7 @@ describe('Request Demo', () => {
             role: 'CISO',
             companySize: '251–1,000',
             primaryNeed: 'Third-party risk program',
+            intent: 'demo',
         });
         expect(await screen.findByRole('status')).toHaveTextContent(/NOT_CONFIGURED/i);
     });

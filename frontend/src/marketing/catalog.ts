@@ -163,25 +163,16 @@ export const PRICING_TIERS = [
 export const FOOTER_GROUPS: { title: string; links: { label: string; href: string }[] }[] = [
     {
         title: 'Products',
-        links: PRODUCTS.map((product) => ({ label: product.name, href: product.href })),
-    },
-    {
-        title: 'Solutions',
         links: [
-            { label: 'Third-party risk', href: '/solutions' },
-            { label: 'Enterprise risk', href: '/solutions' },
-            { label: 'Compliance programs', href: '/solutions' },
+            { label: 'Supreme Third Party', href: '/products/third-party' },
+            { label: 'Connected platform', href: '/#platform' },
         ],
-    },
-    {
-        title: 'Frameworks',
-        links: [{ label: 'Framework architecture', href: '/frameworks' }],
     },
     {
         title: 'Resources',
         links: [
-            { label: 'Product tour', href: '/demo' },
-            { label: 'Resources', href: '/resources' },
+            { label: 'See the product tour', href: '/demo' },
+            { label: 'Framework architecture', href: '/frameworks' },
         ],
     },
     {
@@ -189,15 +180,11 @@ export const FOOTER_GROUPS: { title: string; links: { label: string; href: strin
         links: [
             { label: 'Trust & Security', href: '/trust' },
             { label: 'Security', href: '/security' },
-            { label: 'Status', href: '/status' },
         ],
     },
     {
         title: 'Company',
-        links: [
-            { label: 'Company', href: '/company' },
-            { label: 'Request a demo', href: '/request-demo' },
-        ],
+        links: [{ label: 'Request a Demo', href: '/request-demo' }],
     },
     {
         title: 'Legal',

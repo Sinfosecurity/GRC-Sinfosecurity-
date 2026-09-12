@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { routerFuture } from './marketing/routerFuture'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { Provider } from 'react-redux'
 import App from './App'
@@ -15,7 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <ErrorBoundary>
             <Provider store={store}>
-                <BrowserRouter>
+                <BrowserRouter future={routerFuture}>
                     <NotificationProvider>
                         <AuthProvider>
                             <ThemeProvider theme={theme}>

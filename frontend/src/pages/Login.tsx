@@ -48,11 +48,27 @@ export default function Login() {
                         <form className="mkt-form" onSubmit={handleSubmit}>
                             <div className="mkt-field">
                                 <label htmlFor="work-email">Work email</label>
-                                <input id="work-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                <input
+                                    id="work-email"
+                                    name="username"
+                                    type="email"
+                                    autoComplete="username"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
                             </div>
                             <div className="mkt-field">
                                 <label htmlFor="password">Password</label>
-                                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
                             </div>
                             {error && <p role="alert">{error}</p>}
                             <button className="mkt-btn mkt-btn-gold" type="submit" disabled={loading}>

@@ -7,6 +7,7 @@ describe('environment banners', () => {
         expect(environmentLabelFrom({ DEV: true })).toBe('DEVELOPMENT');
         expect(environmentLabelFrom({ DEV: false, VITE_PREVIEW_LABEL: 'true' })).toBe('DEVELOPMENT');
         expect(environmentLabelFrom({ DEV: false, VITE_ENVIRONMENT: 'production' })).toBeNull();
+        expect(environmentLabelFrom({ DEV: false, PROD: true, VITE_PREVIEW_LABEL: 'true' })).toBeNull();
         expect(environmentLabelFrom({ DEV: false })).toBeNull();
     });
 });

@@ -1,4 +1,5 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MarketingLayout from '../marketing/MarketingLayout';
 import { demoAPI, DemoRequestPayload } from '../services/api';
 
@@ -12,10 +13,20 @@ const EMPTY: DemoRequestPayload = {
 };
 
 export default function RequestDemo() {
+    const [searchParams] = useSearchParams();
+    const intent = searchParams.get('intent') || 'demo';
+    const plan = searchParams.get('plan') || '';
+    const isSales = intent === 'pricing';
     const [form, setForm] = useState(EMPTY);
     const [submitting, setSubmitting] = useState(false);
     const [result, setResult] = useState<{ delivery: string; message: string } | null>(null);
     const [error, setError] = useState('');
+
+    const heading = useMemo(() => {
+        if (isSales && plan) return `Contact sales about the ${plan} plan.`;
+        if (isSales) return 'Contact sales about a Supreme plan.';
+        return 'See Supreme against the work you already do.';
+    }, [isSales, plan]);
 
     const onChange = (field: keyof DemoRequestPayload) => (
         event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -29,7 +40,11 @@ export default function RequestDemo() {
         setError('');
         setResult(null);
         try {
-            const response = await demoAPI.request(form);
+            const response = await demoAPI.request({
+                ...form,
+                intent,
+                plan: plan || undefined,
+            });
             const delivery = response.data.delivery;
             setResult({
                 delivery,
@@ -49,24 +64,28 @@ export default function RequestDemo() {
         <MarketingLayout>
             <section className="mkt-page">
                 <div className="mkt-shell">
-                    <p className="mkt-kicker">Request a demo</p>
-                    <h1 className="mkt-display">See Supreme against the work you already do.</h1>
+                    <p className="mkt-kicker">{isSales ? 'Contact sales' : 'Request a demo'}</p>
+                    <h1 className="mkt-display">{heading}</h1>
                     <p className="mkt-lede">
-                        Tell us who you are and what you need to govern. This is a real request path,
-                        not a decorative button.
+                        {isSales
+                            ? 'This is a sales conversation about plan fit. Commercial prices are not published on the site.'
+                            : 'Tell us who you are and what you need to govern. This is a real request path, not a decorative button.'}
                     </p>
+                    {plan && <p className="mkt-status" role="status">Selected plan: {plan}</p>}
                     <form className="mkt-form mkt-request-form" onSubmit={onSubmit}>
+                        <input type="hidden" name="intent" value={intent} />
+                        {plan && <input type="hidden" name="plan" value={plan} />}
                         <div className="mkt-field">
                             <label htmlFor="demo-name">Name</label>
-                            <input id="demo-name" name="name" value={form.name} onChange={onChange('name')} required />
+                            <input id="demo-name" name="name" autoComplete="name" value={form.name} onChange={onChange('name')} required />
                         </div>
                         <div className="mkt-field">
                             <label htmlFor="demo-email">Business email</label>
-                            <input id="demo-email" name="email" type="email" value={form.email} onChange={onChange('email')} required />
+                            <input id="demo-email" name="email" type="email" autoComplete="email" value={form.email} onChange={onChange('email')} required />
                         </div>
                         <div className="mkt-field">
                             <label htmlFor="demo-company">Company</label>
-                            <input id="demo-company" name="company" value={form.company} onChange={onChange('company')} required />
+                            <input id="demo-company" name="company" autoComplete="organization" value={form.company} onChange={onChange('company')} required />
                         </div>
                         <div className="mkt-field">
                             <label htmlFor="demo-role">Role</label>
@@ -103,7 +122,7 @@ export default function RequestDemo() {
                             </p>
                         )}
                         <button className="mkt-btn mkt-btn-gold mkt-span" type="submit" disabled={submitting}>
-                            {submitting ? 'Submitting…' : 'Submit request'}
+                            {submitting ? 'Submitting…' : isSales ? 'Contact sales' : 'Submit request'}
                         </button>
                     </form>
                 </div>

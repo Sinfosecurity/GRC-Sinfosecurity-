@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Alert, Box, Button, Container, Link, Stack, TextField, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import MarketingLayout from '../marketing/MarketingLayout';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -20,20 +20,37 @@ export default function ForgotPassword() {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ py: 12 }}>
-            <Typography variant="h4" sx={{ mb: 2, fontWeight: 800 }}>Reset password</Typography>
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            {sent ? (
-                <Alert severity="success">If an account exists, a reset email will be sent.</Alert>
-            ) : (
-                <Box component="form" onSubmit={handleSubmit}>
-                    <Stack spacing={2}>
-                        <TextField label="Work email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                        <Button type="submit" variant="contained">Send reset link</Button>
-                    </Stack>
-                </Box>
-            )}
-            <Link component={RouterLink} to="/login" sx={{ display: 'inline-block', mt: 3 }}>Back to sign in</Link>
-        </Container>
+        <MarketingLayout>
+            <section className="mkt-page">
+                <div className="mkt-shell">
+                    <div className="mkt-login">
+                        <p className="mkt-kicker">Workspace access</p>
+                        <h1 className="mkt-display">Reset password</h1>
+                        <p className="mkt-lede">If an account exists, a reset email will be sent.</p>
+                        {error && <p role="alert">{error}</p>}
+                        {sent ? (
+                            <p className="mkt-status" role="status">If an account exists, a reset email will be sent.</p>
+                        ) : (
+                            <form className="mkt-form" onSubmit={handleSubmit}>
+                                <div className="mkt-field">
+                                    <label htmlFor="work-email">Work email</label>
+                                    <input
+                                        id="work-email"
+                                        name="username"
+                                        type="email"
+                                        autoComplete="username"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <button className="mkt-btn mkt-btn-gold" type="submit">Send reset link</button>
+                            </form>
+                        )}
+                        <Link to="/login">Back to sign in</Link>
+                    </div>
+                </div>
+            </section>
+        </MarketingLayout>
     );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { KeyboardEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MarketingLayout from '../marketing/MarketingLayout';
 import CommandCenter from '../marketing/visuals/CommandCenter';
@@ -57,9 +57,39 @@ const SECTIONS = [
     },
 ];
 
+function tabId(title: string) {
+    return `tour-tab-${title.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
+function panelId(title: string) {
+    return `tour-panel-${title.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
 export default function ProductDemo() {
-    const [active, setActive] = useState(SECTIONS[0].title);
-    const section = SECTIONS.find((item) => item.title === active) || SECTIONS[0];
+    const [activeIndex, setActiveIndex] = useState(0);
+    const section = SECTIONS[activeIndex];
+
+    const select = (index: number) => {
+        const next = (index + SECTIONS.length) % SECTIONS.length;
+        setActiveIndex(next);
+        document.getElementById(tabId(SECTIONS[next].title))?.focus();
+    };
+
+    const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            select(activeIndex + 1);
+        } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            select(activeIndex - 1);
+        } else if (event.key === 'Home') {
+            event.preventDefault();
+            select(0);
+        } else if (event.key === 'End') {
+            event.preventDefault();
+            select(SECTIONS.length - 1);
+        }
+    };
 
     return (
         <MarketingLayout>
@@ -76,21 +106,28 @@ export default function ProductDemo() {
                         <span className="mkt-pill">NOT PRODUCTION DATA</span>
                     </div>
                     <div className="mkt-tour">
-                        <div className="mkt-tour-nav" role="tablist" aria-label="Product tour">
-                            {SECTIONS.map((item) => (
+                        <div className="mkt-tour-nav" role="tablist" aria-label="Product tour" onKeyDown={onKeyDown}>
+                            {SECTIONS.map((item, index) => (
                                 <button
                                     key={item.title}
+                                    id={tabId(item.title)}
                                     type="button"
                                     className="mkt-btn mkt-btn-ghost"
                                     role="tab"
-                                    aria-current={item.title === active}
-                                    onClick={() => setActive(item.title)}
+                                    aria-selected={index === activeIndex}
+                                    aria-controls={panelId(item.title)}
+                                    tabIndex={index === activeIndex ? 0 : -1}
+                                    onClick={() => setActiveIndex(index)}
                                 >
                                     {item.title}
                                 </button>
                             ))}
                         </div>
-                        <article>
+                        <article
+                            role="tabpanel"
+                            id={panelId(section.title)}
+                            aria-labelledby={tabId(section.title)}
+                        >
                             <h2 className="mkt-display">{section.title}</h2>
                             <p>{section.body}</p>
                             <p className="mkt-note">DEMO DATA: {section.sample}</p>
@@ -113,8 +150,8 @@ export default function ProductDemo() {
                         </article>
                     </div>
                     <div className="mkt-hero-actions">
-                        <Link className="mkt-btn mkt-btn-gold" to="/login">Sign in to a real workspace</Link>
-                        <Link className="mkt-btn mkt-btn-ghost" to="/">Back to landing</Link>
+                        <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Request a Demo</Link>
+                        <Link className="mkt-btn mkt-btn-ghost" to="/login">Sign in to a real workspace</Link>
                     </div>
                 </div>
             </section>

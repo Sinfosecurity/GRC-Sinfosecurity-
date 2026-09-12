@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../marketing/routerFuture';
 import { AuthProvider } from '../../contexts/AuthContext';
 import Layout from '../Layout';
 
 describe('Layout Component', () => {
     it('renders sidebar with navigation items', () => {
         render(
-            <MemoryRouter>
+            <MemoryRouter future={routerFuture}>
                 <AuthProvider>
                     <Layout />
                 </AuthProvider>
@@ -34,7 +35,7 @@ describe('Layout Component', () => {
         );
 
         render(
-            <MemoryRouter>
+            <MemoryRouter future={routerFuture}>
                 <AuthProvider>
                     <Layout />
                 </AuthProvider>

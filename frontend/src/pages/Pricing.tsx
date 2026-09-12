@@ -24,7 +24,12 @@ export default function Pricing() {
                                         <li key={item}>{item}</li>
                                     ))}
                                 </ul>
-                                <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Contact Sales</Link>
+                                <Link
+                                    className="mkt-btn mkt-btn-gold"
+                                    to={`/request-demo?intent=pricing&plan=${encodeURIComponent(tier.name)}`}
+                                >
+                                    Contact Sales
+                                </Link>
                             </article>
                         ))}
                     </div>

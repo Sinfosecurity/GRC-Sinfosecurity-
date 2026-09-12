@@ -83,8 +83,7 @@ export default function MarketingPlaceholder() {
                     )}
                     <div className="mkt-hero-actions">
                         <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Request a Demo</Link>
-                        <Link className="mkt-btn mkt-btn-ghost" to="/demo">View Demo</Link>
-                        <Link className="mkt-btn mkt-btn-text" to="/">Back to platform</Link>
+                        <Link className="mkt-btn mkt-btn-ghost" to="/demo">See the product tour</Link>
                     </div>
                 </div>
             </section>

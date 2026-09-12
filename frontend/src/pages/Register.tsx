@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Alert, Box, Button, Container, Link, Stack, TextField, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import MarketingLayout from '../marketing/MarketingLayout';
 
 export default function Register() {
     const { signup } = useAuth();
@@ -31,21 +31,81 @@ export default function Register() {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ py: 10 }}>
-            <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Create your Supreme Risk workspace</Typography>
-            <Typography color="text.secondary" sx={{ mb: 4 }}>Start a trial organization. No demo data is invented.</Typography>
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            <Box component="form" onSubmit={handleSubmit}>
-                <Stack spacing={2}>
-                    <TextField label="First name" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required />
-                    <TextField label="Last name" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required />
-                    <TextField label="Organization name" value={form.organizationName} onChange={(e) => setForm({ ...form, organizationName: e.target.value })} required />
-                    <TextField label="Work email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-                    <TextField label="Password" type="password" helperText="At least 10 characters with upper, lower, and a number" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-                    <Button type="submit" variant="contained" disabled={loading}>{loading ? 'Creating…' : 'Create organization'}</Button>
-                    <Link component={RouterLink} to="/login">Already have an account? Sign in</Link>
-                </Stack>
-            </Box>
-        </Container>
+        <MarketingLayout>
+            <section className="mkt-page">
+                <div className="mkt-shell">
+                    <div className="mkt-login">
+                        <p className="mkt-kicker">Workspace access</p>
+                        <h1 className="mkt-display">Create your organization</h1>
+                        <p className="mkt-lede">Start a Supreme workspace. No demo data is invented.</p>
+                        <form className="mkt-form" onSubmit={handleSubmit}>
+                            <div className="mkt-field">
+                                <label htmlFor="first-name">First name</label>
+                                <input
+                                    id="first-name"
+                                    name="firstName"
+                                    autoComplete="given-name"
+                                    value={form.firstName}
+                                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="mkt-field">
+                                <label htmlFor="last-name">Last name</label>
+                                <input
+                                    id="last-name"
+                                    name="lastName"
+                                    autoComplete="family-name"
+                                    value={form.lastName}
+                                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="mkt-field">
+                                <label htmlFor="organization">Organization</label>
+                                <input
+                                    id="organization"
+                                    name="organization"
+                                    autoComplete="organization"
+                                    value={form.organizationName}
+                                    onChange={(e) => setForm({ ...form, organizationName: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="mkt-field">
+                                <label htmlFor="work-email">Work email</label>
+                                <input
+                                    id="work-email"
+                                    name="username"
+                                    type="email"
+                                    autoComplete="username"
+                                    value={form.email}
+                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="mkt-field">
+                                <label htmlFor="password">Password</label>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    value={form.password}
+                                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                    required
+                                />
+                                <p className="mkt-note">At least 10 characters with upper, lower, and a number.</p>
+                            </div>
+                            {error && <p role="alert">{error}</p>}
+                            <button className="mkt-btn mkt-btn-gold" type="submit" disabled={loading}>
+                                {loading ? 'Creating…' : 'Create organization'}
+                            </button>
+                            <Link to="/login">Already have an account? Sign in</Link>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </MarketingLayout>
     );
 }

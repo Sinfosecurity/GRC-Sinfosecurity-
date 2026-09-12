@@ -275,6 +275,8 @@ export type DemoRequestPayload = {
     role: string;
     companySize: string;
     primaryNeed: string;
+    intent?: string;
+    plan?: string;
 };
 
 export const demoAPI = {

@@ -2,10 +2,27 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 
+function robotsPolicyPlugin() {
+  return {
+    name: 'supreme-robots-policy',
+    generateBundle() {
+      const production = process.env.VITE_ENVIRONMENT === 'production';
+      this.emitFile({
+        type: 'asset',
+        fileName: 'robots.txt',
+        source: production
+          ? 'User-agent: *\nAllow: /\n'
+          : 'User-agent: *\nDisallow: /\n',
+      });
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    robotsPolicyPlugin(),
     // Bundle analyzer (only in build)
     process.env.ANALYZE ? visualizer({
       open: true,
@@ -36,21 +53,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Vendor chunks
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'react-vendor';
-            }
-            if (id.includes('@mui')) {
-              return 'mui-vendor';
-            }
-            if (id.includes('recharts') || id.includes('d3')) {
-              return 'chart-vendor';
-            }
-            if (id.includes('axios') || id.includes('query')) {
-              return 'api-vendor';
-            }
-            return 'vendor'; // Other vendors
+          if (id.includes('node_modules/@mui')) {
+            return 'mui-vendor';
+          }
+          if (id.includes('node_modules/recharts')) {
+            return 'chart-vendor';
           }
         },
         // Optimize chunk names

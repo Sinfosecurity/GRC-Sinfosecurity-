@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../marketing/routerFuture';
 import Landing from '../Landing';
 
 const authState = {
@@ -21,7 +22,7 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 function renderLanding() {
     return render(
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
             <Landing />
         </MemoryRouter>
     );
@@ -34,9 +35,9 @@ describe('Landing Page', () => {
 
     it('sells the platform instead of embedding a login form', () => {
         renderLanding();
-        expect(screen.getByRole('heading', { name: /Govern everything that can put your business at risk/i })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Govern the third parties that can put the business at risk/i })).toBeInTheDocument();
         expect(screen.getAllByText(/Supreme Governance Platform/i).length).toBeGreaterThan(0);
-        expect(screen.getByText(/One platform. Seven governance products/i)).toBeInTheDocument();
+        expect(screen.getByText(/A flagship product, then a connected platform/i)).toBeInTheDocument();
         expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Log In' })).not.toBeInTheDocument();
     });
@@ -44,10 +45,9 @@ describe('Landing Page', () => {
     it('wires primary CTAs to demo, platform, sign-in, and product tour', () => {
         renderLanding();
         expect(screen.getAllByRole('link', { name: 'Request a Demo' })[0]).toHaveAttribute('href', '/request-demo');
-        expect(screen.getByRole('link', { name: 'Explore the Platform' })).toHaveAttribute('href', '#platform');
+        expect(screen.getAllByRole('link', { name: 'See the product tour' })[0]).toHaveAttribute('href', '/demo');
         expect(screen.getAllByRole('link', { name: 'Sign In' })[0]).toHaveAttribute('href', '/login');
-        expect(screen.getAllByRole('link', { name: 'View Demo' })[0]).toHaveAttribute('href', '/demo');
-        expect(screen.getAllByRole('link', { name: /View Trust/i })[0]).toHaveAttribute('href', '/trust');
+        expect(screen.getAllByRole('link', { name: /Trust & Security/i })[0]).toHaveAttribute('href', '/trust');
     });
 
     it('labels unfinished products instead of selling them as live', async () => {

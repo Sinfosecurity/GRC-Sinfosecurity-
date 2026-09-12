@@ -1,6 +1,7 @@
 import { render, RenderOptions } from '@testing-library/react';
 import { ReactElement } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { routerFuture } from '../marketing/routerFuture';
 import { ThemeProvider } from '@mui/material';
 import theme from '../theme';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -12,7 +13,7 @@ interface AllTheProvidersProps {
 
 const AllTheProviders = ({ children }: AllTheProvidersProps) => {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={routerFuture}>
       <NotificationProvider>
         <AuthProvider>
           <ThemeProvider theme={theme}>

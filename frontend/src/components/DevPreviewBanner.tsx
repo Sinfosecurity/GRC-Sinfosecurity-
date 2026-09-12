@@ -3,17 +3,24 @@ import { Box, Typography } from '@mui/material';
 type EnvironmentFlags = {
     VITE_ENVIRONMENT?: string;
     DEV?: boolean;
+    PROD?: boolean;
     VITE_PREVIEW_LABEL?: string;
 };
 
 export function environmentLabelFrom(env: EnvironmentFlags): 'STAGING' | 'DEVELOPMENT' | null {
     if (env.VITE_ENVIRONMENT === 'staging') return 'STAGING';
+    if (env.VITE_ENVIRONMENT === 'production' || env.PROD) return null;
     if (env.DEV || env.VITE_PREVIEW_LABEL === 'true') return 'DEVELOPMENT';
     return null;
 }
 
 export function environmentLabel(): 'STAGING' | 'DEVELOPMENT' | null {
-    return environmentLabelFrom(import.meta.env);
+    return environmentLabelFrom({
+        VITE_ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
+        DEV: import.meta.env.DEV,
+        PROD: import.meta.env.PROD,
+        VITE_PREVIEW_LABEL: import.meta.env.VITE_PREVIEW_LABEL,
+    });
 }
 
 export function shouldShowDevPreviewBanner(): boolean {

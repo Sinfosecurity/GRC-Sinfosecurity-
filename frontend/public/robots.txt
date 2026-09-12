@@ -1,0 +1,4 @@
+# Preview and staging must not be indexed.
+# Production builds with VITE_ENVIRONMENT=production emit an Allow policy.
+User-agent: *
+Disallow: /

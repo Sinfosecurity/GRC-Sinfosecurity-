@@ -5,7 +5,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import MarketingLayout from '../MarketingLayout';
 import Pricing from '../../pages/Pricing';
 import TrustCenter from '../../pages/TrustCenter';
-import MarketingPlaceholder from '../../pages/MarketingPlaceholder';
+import LegalDraft from '../../pages/LegalDraft';
+import NotFound from '../../pages/NotFound';
+import { routerFuture } from '../routerFuture';
 
 vi.mock('../../contexts/AuthContext', () => ({
     useAuth: () => ({
@@ -19,14 +21,14 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 function renderAt(path: string) {
     return render(
-        <MemoryRouter initialEntries={[path]}>
+        <MemoryRouter initialEntries={[path]} future={routerFuture}>
             <Routes>
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/trust" element={<TrustCenter />} />
-                <Route path="/privacy" element={<MarketingPlaceholder />} />
-                <Route path="/status" element={<MarketingPlaceholder />} />
-                <Route path="/products/:slug" element={<MarketingPlaceholder />} />
-                <Route path="*" element={<MarketingLayout><p>Shell</p></MarketingLayout>} />
+                <Route path="/privacy" element={<LegalDraft />} />
+                <Route path="/products/:slug" element={<MarketingLayout><p>Shell</p></MarketingLayout>} />
+                <Route path="/" element={<MarketingLayout><p>Shell</p></MarketingLayout>} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </MemoryRouter>
     );
@@ -36,7 +38,7 @@ describe('Marketing navigation', () => {
     it('exposes enterprise nav destinations and sign-in', () => {
         renderAt('/');
         expect(screen.getAllByRole('link', { name: 'Sign In' }).length).toBeGreaterThan(0);
-        expect(screen.getAllByRole('link', { name: 'Request Demo' }).length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('link', { name: 'Request a Demo' }).length).toBeGreaterThan(0);
         expect(screen.getAllByRole('link', { name: 'Trust' })[0]).toHaveAttribute('href', '/trust');
         expect(screen.getAllByRole('link', { name: 'Pricing' })[0]).toHaveAttribute('href', '/pricing');
     });
@@ -48,18 +50,37 @@ describe('Marketing navigation', () => {
         expect(screen.getByRole('menuitem', { name: /Supreme Privacy/i })).toHaveTextContent(/Roadmap/i);
     });
 
-    it('keeps legal and product routes from 404ing', () => {
+    it('keeps legal drafts from pretending counsel approved them', () => {
         renderAt('/privacy');
         expect(screen.getByRole('heading', { name: 'Privacy' })).toBeInTheDocument();
-        expect(screen.getByText(/Coming soon/i)).toBeInTheDocument();
-        renderAt('/products/privacy');
-        expect(screen.getByRole('heading', { name: 'Supreme Privacy' })).toBeInTheDocument();
+        expect(screen.getByText(/Draft — pending legal review/i)).toBeInTheDocument();
     });
 
-    it('prices with Contact Sales instead of invented numbers', () => {
+    it('prices with Contact Sales intent instead of invented numbers', () => {
         renderAt('/pricing');
         expect(screen.getByText(/Plans for growing teams and enterprise organizations/i)).toBeInTheDocument();
-        expect(screen.getAllByRole('link', { name: 'Contact Sales' })[0]).toHaveAttribute('href', '/request-demo');
+        expect(screen.getAllByRole('link', { name: 'Contact Sales' })[0]).toHaveAttribute(
+            'href',
+            '/request-demo?intent=pricing&plan=Starter'
+        );
         expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
+    });
+
+    it('returns a marketing 404 for unknown routes', () => {
+        renderAt('/this-route-does-not-exist');
+        expect(screen.getByRole('heading', { name: 'Page not found' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Back to homepage' })).toHaveAttribute('href', '/');
+        expect(screen.getAllByRole('link', { name: 'See the product tour' })[0]).toHaveAttribute('href', '/demo');
+    });
+
+    it('closes the products menu on Escape and restores trigger focus', async () => {
+        renderAt('/');
+        const trigger = screen.getByRole('button', { name: 'Products' });
+        expect(trigger).toHaveAttribute('aria-haspopup', 'true');
+        await userEvent.click(trigger);
+        expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        await userEvent.keyboard('{Escape}');
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        expect(trigger).toHaveFocus();
     });
 });
