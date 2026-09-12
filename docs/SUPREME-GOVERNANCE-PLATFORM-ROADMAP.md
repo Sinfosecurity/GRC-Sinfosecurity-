@@ -5,6 +5,8 @@
 **Product today:** Supreme Third Party (TPRM) on a shared Express + Prisma + React monolith.  
 **Destination:** One governance operating system with seven modules.
 
+**Controlling program documents:** numbered gates and live status live in `docs/SUPREME-MASTER-PUNCH-LIST.md`, `docs/SUPREME-PROGRAM-STATE.md`, and `docs/SUPREME-PRODUCT-OPERATING-RULES.md`. This roadmap is north-star architecture, not the numbered punch list.
+
 This document is the north-star plan. It is **not** permission to implement every section in one commit.
 
 ---

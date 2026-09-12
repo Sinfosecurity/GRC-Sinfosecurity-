@@ -1,0 +1,25 @@
+---
+description: Read Supreme program state before substantial work; do not skip numbered gates.
+alwaysApply: true
+---
+
+# Supreme program control
+
+Before substantial work (features, architecture, security, production, product modules, infrastructure, major GTM), read:
+
+- `docs/SUPREME-MASTER-PUNCH-LIST.md`
+- `docs/SUPREME-PROGRAM-STATE.md`
+- `docs/SUPREME-PRODUCT-OPERATING-RULES.md`
+- any ACCEPTED ADR that applies
+
+State the current punch-list item, status, verified SHA, dependencies, and next authorized item.
+
+If the request skips an unfinished numbered dependency, say so before implementing. Do not start #9 or later unless program state authorizes it.
+
+Do not merge `main`, deploy production, change production DNS, or declare production-ready without explicit program authorization.
+
+Trivial typo or comment-only edits do not need a full program recitation.
+
+Accepted ADRs control. If a request conflicts with an ACCEPTED ADR, stop and name the conflict.
+
+Do not change PASS / PARTIAL / FAIL / BLOCKED without evidence. Hosted gates require hosted proof. Marketing preview pages are not implementation.
