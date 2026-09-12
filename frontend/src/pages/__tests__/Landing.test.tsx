@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Landing from '../Landing';
 
-const navigate = vi.fn();
 const authState = {
     isAuthenticated: false,
     isLoading: false,
@@ -15,14 +14,6 @@ const authState = {
     logout: vi.fn(),
     updateUser: vi.fn(),
 };
-
-vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
-    return {
-        ...actual,
-        useNavigate: () => navigate,
-    };
-});
 
 vi.mock('../../contexts/AuthContext', () => ({
     useAuth: () => authState,
@@ -38,58 +29,39 @@ function renderLanding() {
 
 describe('Landing Page', () => {
     beforeEach(() => {
-        navigate.mockReset();
         authState.isAuthenticated = false;
-        Element.prototype.scrollIntoView = vi.fn();
     });
 
-    it('renders Supreme Risk and the development preview banner in Vite dev', () => {
+    it('sells the platform instead of embedding a login form', () => {
         renderLanding();
-        expect(screen.getAllByText(/Supreme Risk/i).length).toBeGreaterThan(0);
-        expect(screen.getAllByText(/DEVELOPMENT PREVIEW/i).length).toBeGreaterThan(0);
-        expect(screen.getByText(/SUPREME GOVERNANCE PLATFORM/i)).toBeInTheDocument();
-        expect(screen.getByText(/Govern Risk/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Govern everything that can put your business at risk/i })).toBeInTheDocument();
+        expect(screen.getAllByText(/Supreme Governance Platform/i).length).toBeGreaterThan(0);
+        expect(screen.getByText(/One platform. Seven governance products/i)).toBeInTheDocument();
+        expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Log In' })).not.toBeInTheDocument();
     });
 
-    it('renders the sign-in form', () => {
+    it('wires primary CTAs to demo, platform, sign-in, and product tour', () => {
         renderLanding();
-        expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Log In' })).toBeInTheDocument();
+        expect(screen.getAllByRole('link', { name: 'Request a Demo' })[0]).toHaveAttribute('href', '/request-demo');
+        expect(screen.getByRole('link', { name: 'Explore the Platform' })).toHaveAttribute('href', '#platform');
+        expect(screen.getAllByRole('link', { name: 'Sign In' })[0]).toHaveAttribute('href', '/login');
+        expect(screen.getAllByRole('link', { name: 'View Demo' })[0]).toHaveAttribute('href', '/demo');
+        expect(screen.getAllByRole('link', { name: /View Trust/i })[0]).toHaveAttribute('href', '/trust');
     });
 
-    it('sends an unauthenticated Launch Dashboard click to the on-page login form', async () => {
+    it('labels unfinished products instead of selling them as live', async () => {
         renderLanding();
-        const email = screen.getByLabelText(/email/i);
-        await userEvent.click(screen.getByRole('button', { name: /Sign In to Dashboard/i }));
-        expect(navigate).not.toHaveBeenCalledWith('/dashboard');
-        expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
-        expect(email).toHaveFocus();
+        await userEvent.click(screen.getByRole('button', { name: 'Products' }));
+        expect(screen.getAllByText('Supreme Third Party').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Roadmap').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Preview').length).toBeGreaterThan(0);
     });
 
-    it('sends an authenticated Launch Dashboard click to /dashboard', async () => {
+    it('sends an authenticated visitor to the dashboard from the header', () => {
         authState.isAuthenticated = true;
         renderLanding();
-        await userEvent.click(screen.getByRole('button', { name: 'Launch Dashboard' }));
-        expect(navigate).toHaveBeenCalledWith('/dashboard');
-    });
-
-    it('wires View Demo to the read-only demo tour', async () => {
-        renderLanding();
-        await userEvent.click(screen.getByRole('button', { name: /View Demo/i }));
-        expect(navigate).toHaveBeenCalledWith('/demo');
-    });
-
-    it('sends Sign In to the real login route', async () => {
-        renderLanding();
-        await userEvent.click(screen.getByRole('button', { name: 'Sign In' }));
-        expect(navigate).toHaveBeenCalledWith('/login');
-    });
-
-    it('sends Get Started to the signup route', async () => {
-        renderLanding();
-        await userEvent.click(screen.getByRole('button', { name: 'Get Started' }));
-        expect(navigate).toHaveBeenCalledWith('/register');
+        expect(screen.getAllByRole('link', { name: 'Launch Dashboard' })[0]).toHaveAttribute('href', '/dashboard');
     });
 
     it('does not render unverified commercial claims', () => {
@@ -102,21 +74,11 @@ describe('Landing Page', () => {
             /24\/7/,
             /Expert Support/i,
             /ISO 27001 Compliant/i,
-            /NEXT GEN GRC/i,
-            /Intelligent GRC/i,
+            /SOC 2 certified/i,
+            /AI-powered GRC/i,
         ];
         for (const pattern of banned) {
             expect(screen.queryByText(pattern)).not.toBeInTheDocument();
-        }
-        expect(screen.getAllByText(/EXPLAINABLE RISK/i).length).toBeGreaterThan(0);
-        expect(screen.getByText('DECISION READY')).toBeInTheDocument();
-        expect(screen.getByText('TENANT ISOLATED')).toBeInTheDocument();
-    });
-
-    it('has an onClick for every primary CTA', () => {
-        renderLanding();
-        for (const name of ['Sign In', 'Get Started', 'Sign In to Dashboard', 'View Demo', 'Log In']) {
-            expect(screen.getByRole('button', { name })).toBeEnabled();
         }
     });
 });

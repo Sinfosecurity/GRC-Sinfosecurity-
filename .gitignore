@@ -58,6 +58,7 @@ coverage/
 # Uploads
 uploads/
 temp/
+backend/data/
 
 # Logs
 logs/

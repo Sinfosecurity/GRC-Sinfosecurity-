@@ -47,6 +47,10 @@ const FindingsRemediation = lazy(() => import('./pages/FindingsRemediation'));
 const Questionnaires = lazy(() => import('./pages/Questionnaires'));
 const EnvironmentStatus = lazy(() => import('./pages/EnvironmentStatus'));
 const ProductDemo = lazy(() => import('./pages/ProductDemo'));
+const RequestDemo = lazy(() => import('./pages/RequestDemo'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const TrustCenter = lazy(() => import('./pages/TrustCenter'));
+const MarketingPlaceholder = lazy(() => import('./pages/MarketingPlaceholder'));
 
 // Loading component
 const LoadingFallback = () => (
@@ -64,6 +68,19 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<Landing />} />
                     <Route path="/demo" element={<ProductDemo />} />
+                    <Route path="/request-demo" element={<RequestDemo />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/trust" element={<TrustCenter />} />
+                    <Route path="/solutions" element={<MarketingPlaceholder />} />
+                    <Route path="/frameworks" element={<MarketingPlaceholder />} />
+                    <Route path="/resources" element={<MarketingPlaceholder />} />
+                    <Route path="/company" element={<MarketingPlaceholder />} />
+                    <Route path="/privacy" element={<MarketingPlaceholder />} />
+                    <Route path="/terms" element={<MarketingPlaceholder />} />
+                    <Route path="/security" element={<MarketingPlaceholder />} />
+                    <Route path="/subprocessors" element={<MarketingPlaceholder />} />
+                    <Route path="/status" element={<MarketingPlaceholder />} />
+                    <Route path="/products/:slug" element={<MarketingPlaceholder />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />

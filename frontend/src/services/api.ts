@@ -268,6 +268,19 @@ export const vendorAPI = {
     recordSignal: (vendorId: string, data: unknown) => api.post(`/vendors/${vendorId}/monitoring`, data),
 };
 
+export type DemoRequestPayload = {
+    name: string;
+    email: string;
+    company: string;
+    role: string;
+    companySize: string;
+    primaryNeed: string;
+};
+
+export const demoAPI = {
+    request: (data: DemoRequestPayload) => api.post('/demo-requests', data),
+};
+
 export const healthCheck = async () => {
     if (!API_BASE_URL && import.meta.env.PROD) {
         throw new ApiClientError('API URL is not configured', 503, 'NOT_CONFIGURED');

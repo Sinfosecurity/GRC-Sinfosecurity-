@@ -32,12 +32,13 @@ export default function DevPreviewBanner() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 2000,
-                bgcolor: '#b45309',
-                color: '#fff',
+                bgcolor: '#3a2a14',
+                color: '#f4efe6',
                 textAlign: 'center',
-                py: 0.75,
+                py: 0.45,
                 px: 2,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.08em',
+                borderBottom: '1px solid rgba(198,164,107,0.35)',
             }}
         >
             <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.8rem' }}>

@@ -3,6 +3,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Alert, Box, Button, Container, Link, Stack, TextField, Typography } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { environmentLabel } from '../components/DevPreviewBanner';
+import MarketingLayout from '../marketing/MarketingLayout';
 
 export default function Login() {
     const { login } = useAuth();
@@ -27,6 +28,7 @@ export default function Login() {
     };
 
     return (
+        <MarketingLayout>
         <Container maxWidth="sm" sx={{ py: 12 }}>
             <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Supreme Risk</Typography>
             {environmentLabel() && (
@@ -54,5 +56,6 @@ export default function Login() {
                 </Stack>
             </Box>
         </Container>
+        </MarketingLayout>
     );
 }
