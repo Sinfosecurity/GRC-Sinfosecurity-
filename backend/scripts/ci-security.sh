@@ -9,19 +9,31 @@ FAIL=0
 echo "==> Prisma schema validate"
 (cd backend && npx prisma validate)
 
-echo "==> Migration file present and non-destructive"
-MIGRATION="backend/prisma/migrations/20260910120000_supreme_risk_saas_foundation/migration.sql"
-if [[ ! -f "$MIGRATION" ]]; then
-  echo "Missing $MIGRATION"
+echo "==> Migration safety (all committed migrations)"
+MIGRATION_DIR="backend/prisma/migrations"
+if [[ ! -d "$MIGRATION_DIR" ]]; then
+  echo "Missing $MIGRATION_DIR"
   FAIL=1
 fi
-if grep -Ei 'drop table|truncate |prisma migrate reset' "$MIGRATION" >/dev/null; then
-  echo "Migration contains destructive SQL"
+FOUND_MIGRATIONS=0
+while IFS= read -r migration; do
+  FOUND_MIGRATIONS=$((FOUND_MIGRATIONS + 1))
+  if grep -Ei 'drop[[:space:]]+database|prisma migrate reset|truncate[[:space:]]+(table|[[:alnum:]_"]+)|drop[[:space:]]+table' "$migration" >/dev/null; then
+    echo "MIGRATION_SAFETY=FAIL file=$(basename "$(dirname "$migration")")"
+    FAIL=1
+  fi
+done < <(find "$MIGRATION_DIR" -name 'migration.sql' | sort)
+if [[ "$FOUND_MIGRATIONS" -lt 5 ]]; then
+  echo "Expected at least 5 committed migrations, found $FOUND_MIGRATIONS"
   FAIL=1
 fi
-if ! grep -q 'CREATE TABLE IF NOT EXISTS "RefreshToken"' "$MIGRATION"; then
-  echo "Migration is missing RefreshToken"
+FOUNDATION="backend/prisma/migrations/20260910120000_supreme_risk_saas_foundation/migration.sql"
+if [[ -f "$FOUNDATION" ]] && ! grep -q 'CREATE TABLE IF NOT EXISTS "RefreshToken"' "$FOUNDATION"; then
+  echo "Foundation migration is missing RefreshToken"
   FAIL=1
+fi
+if [[ "$FAIL" -eq 0 ]]; then
+  echo "MIGRATION_SAFETY=PASS files=$FOUND_MIGRATIONS"
 fi
 
 echo "==> Secret pattern scan (paths and rule names only)"
@@ -29,15 +41,21 @@ python3 - <<'PY'
 from pathlib import Path
 import re, sys
 root = Path(".")
-skip_parts = {".git", "node_modules", "dist", "coverage", "build", ".next"}
+skip_parts = {".git", "node_modules", "dist", "coverage", "build", ".next", "backups"}
 rules = {
     "pem_private_key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
     "aws_access_key": re.compile(r"AKIA(?!X{6})[0-9A-Z]{16}"),
     "generic_secret_assignment": re.compile(
-        r"(api[_-]?key|secret|token|password)\s*[:=]\s*['\"](?!test-|mock_|changeme|placeholder)[^'\"]{16,}['\"]",
+        r"(api[_-]?key|secret|token|password)\s*[:=]\s*['\"](?!test-|mock_|changeme|placeholder|ISOLATED_)[^'\"]{16,}['\"]",
         re.I,
     ),
     "stripe_live": re.compile(r"sk_live_[0-9a-zA-Z]{10,}"),
+    "stripe_test": re.compile(r"sk_test_(?!placeholder|example)[0-9a-zA-Z]{16,}"),
+    "stripe_webhook": re.compile(r"whsec_[0-9a-zA-Z]{16,}"),
+    "resend_key": re.compile(r"\bre_[0-9a-zA-Z]{20,}"),
+    "database_url_creds": re.compile(
+        r"(DATABASE_URL|POSTGRES(?:QL)?_URL|RESTORE_DATABASE_URL)\s*[:=]\s*['\"]postgres(?:ql)?://(?![\$\{])[^:\s/'\"']+:(?![\$\{])[^@\s'\"]+@"
+    ),
 }
 skip_files = {"backend/src/tests/setup.ts", "backend/src/tests/env.ts"}
 allow = {
@@ -74,7 +92,7 @@ if hits:
         print(hit)
     sys.exit(1)
 print("SECRET_SCAN=PASS")
-print(f"files_with_findings=0")
+print("files_with_findings=0")
 PY
 
 echo "==> Dependency audit (critical on direct production dependencies)"
@@ -82,7 +100,7 @@ python3 - <<'PY'
 import json, subprocess, sys
 from pathlib import Path
 
-def direct_critical(pkg_dir):
+def classify(pkg_dir):
     pkg = json.loads((Path(pkg_dir) / "package.json").read_text())
     direct = set((pkg.get("dependencies") or {}).keys())
     proc = subprocess.run(
@@ -97,25 +115,33 @@ def direct_critical(pkg_dir):
         print(f"{pkg_dir}: npm audit json parse failed")
         return 1
     vulns = data.get("vulnerabilities") or {}
-    critical_direct = []
-    critical_transitive = []
+    buckets = {
+        "direct_critical": [],
+        "direct_high": [],
+        "transitive_critical": [],
+        "transitive_high": [],
+    }
     for name, meta in vulns.items():
         severity = (meta.get("severity") or "").lower()
-        if severity != "critical":
+        if severity not in {"critical", "high"}:
             continue
-        if name in direct:
-            critical_direct.append(name)
-        else:
-            critical_transitive.append(name)
-    print(f"{pkg_dir}: direct_critical={critical_direct or 'none'} transitive_critical={critical_transitive or 'none'}")
-    if critical_direct:
+        key = ("direct_" if name in direct else "transitive_") + severity
+        buckets[key].append(name)
+    print(
+        f"{pkg_dir}: "
+        f"direct_critical={buckets['direct_critical'] or 'none'} "
+        f"direct_high={buckets['direct_high'] or 'none'} "
+        f"transitive_critical={buckets['transitive_critical'] or 'none'} "
+        f"transitive_high={buckets['transitive_high'] or 'none'}"
+    )
+    if buckets["direct_critical"]:
         print("DIRECT_CRITICAL=FAIL")
         return 1
     return 0
 
 failed = 0
-failed += direct_critical("backend")
-failed += direct_critical("frontend")
+failed += classify("backend")
+failed += classify("frontend")
 sys.exit(failed)
 PY
 

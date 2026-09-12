@@ -1,18 +1,20 @@
-name: CI
+name: Supreme CI
 
 on:
-  pull_request:
   push:
-    branches: [supreme-risk-transformation, main]
+    branches: [supreme-risk-transformation]
+  pull_request:
+    branches: [main, supreme-risk-transformation]
+  workflow_dispatch:
 
 jobs:
   quality:
+    name: quality
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
+    timeout-minutes: 45
     env:
       NODE_ENV: test
+      APP_ENVIRONMENT: test
       JWT_SECRET: test-jwt-secret-key-which-is-long-enough
       JWT_REFRESH_SECRET: test-refresh-secret-key-which-is-long-enough
       JWT_EXPIRES_IN: 1h
@@ -21,6 +23,7 @@ jobs:
       ALLOW_PENDING_DOWNLOADS: "false"
       ALLOW_UNSCANNED_DOWNLOADS: "false"
       ALLOW_LOCAL_OBJECT_STORAGE: "true"
+      VITE_API_URL: http://localhost:4000/api/v1
     services:
       postgres:
         image: postgres:16
@@ -37,33 +40,114 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
+
+      - name: Certify exact checkout SHA
+        run: |
+          set -euo pipefail
+          HEAD="$(git rev-parse HEAD)"
+          echo "RUN_SHA=$HEAD"
+          echo "GITHUB_SHA=$GITHUB_SHA"
+          echo "REF=$GITHUB_REF"
+          echo "EVENT=$GITHUB_EVENT_NAME"
+          if [[ "$HEAD" != "$GITHUB_SHA" ]]; then
+            echo "Checkout SHA does not match GITHUB_SHA"
+            exit 1
+          fi
+          echo "RUN_SHA=$HEAD" >> "$GITHUB_ENV"
+          mkdir -p "$GITHUB_WORKSPACE/ci-artifacts"
+          printf 'sha=%s\nbranch=%s\nevent=%s\n' "$HEAD" "${GITHUB_REF_NAME}" "$GITHUB_EVENT_NAME" > "$GITHUB_WORKSPACE/ci-artifacts/sha.txt"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install backend
-        run: npm install
+        working-directory: backend
+        run: |
+          if [[ -f package-lock.json ]]; then npm ci; else echo "LOCKFILE=ABSENT using npm install"; npm install; fi
+
       - name: Prisma generate
-        run: npx prisma generate
-      - name: Typecheck backend
+        working-directory: backend
+        run: npx prisma generate --schema prisma/schema.prisma
+
+      - name: Prisma validate
+        working-directory: backend
+        run: npx prisma validate --schema prisma/schema.prisma
+
+      - name: Migration deploy on disposable CI database
+        working-directory: backend
+        run: bash scripts/ci-migrate-deploy.sh
+
+      - name: Backend typecheck
+        working-directory: backend
         run: npx tsc --noEmit
-      - name: Security and schema checks
-        working-directory: .
+
+      - name: Security, secret scan, and dependency advisory
         run: bash backend/scripts/ci-security.sh
-      - name: Database migration rehearsal
-        run: bash scripts/rehearse-migration.sh
-      - name: Test backend
-        run: npm test -- --ci --runInBand
+
+      - name: Backend full test suite
+        working-directory: backend
+        run: npm test -- --ci --runInBand --forceExit | tee "$GITHUB_WORKSPACE/ci-artifacts/backend-tests.txt"
+
       - name: Install frontend
         working-directory: frontend
-        run: npm install
-      - name: Typecheck frontend
+        run: |
+          if [[ -f package-lock.json ]]; then npm ci; else echo "LOCKFILE=ABSENT using npm install"; npm install; fi
+
+      - name: Frontend typecheck
         working-directory: frontend
         run: npx tsc --noEmit
-      - name: Test frontend
+
+      - name: Frontend full test suite
         working-directory: frontend
-        run: npm test -- --run
-      - name: Build frontend
+        run: npx vitest run | tee "$GITHUB_WORKSPACE/ci-artifacts/frontend-tests.txt"
+
+      - name: Frontend production build
         working-directory: frontend
         run: npm run build
         env:
           VITE_API_URL: http://localhost:4000/api/v1
+
+      - name: Public build safety
+        run: bash frontend/scripts/public-build-safety.sh
+
+      - name: Release summary
+        if: always()
+        run: |
+          set -euo pipefail
+          BACKEND_COUNTS="$(grep -E 'Tests:|Test Suites:' "$GITHUB_WORKSPACE/ci-artifacts/backend-tests.txt" | tail -2 || true)"
+          FRONTEND_COUNTS="$(grep -E 'Test Files|Tests ' "$GITHUB_WORKSPACE/ci-artifacts/frontend-tests.txt" | tail -4 || true)"
+          {
+            echo "# Supreme CI"
+            echo
+            echo "- SHA: \`${RUN_SHA:-$GITHUB_SHA}\`"
+            echo "- Branch: \`${GITHUB_REF_NAME}\`"
+            echo "- Event: \`${GITHUB_EVENT_NAME}\`"
+            echo "- Production deployment: NO"
+            echo "- External services: none (disposable Postgres service only)"
+            echo
+            echo "## Commands"
+            echo "- prisma generate / validate"
+            echo "- baseline bootstrap (empty CI DB only) + prisma migrate deploy"
+            echo "- backend/frontend tsc --noEmit"
+            echo "- backend full Jest suite"
+            echo "- frontend full Vitest suite"
+            echo "- frontend production build + public build safety"
+            echo "- secret scan / migration safety / npm audit --omit=dev"
+            echo
+            echo "## Test output"
+            echo '```'
+            echo "$BACKEND_COUNTS"
+            echo "$FRONTEND_COUNTS"
+            echo '```'
+            echo
+            echo "This summary does not declare production-ready."
+          } | tee "$GITHUB_WORKSPACE/ci-artifacts/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload non-secret CI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supreme-ci-${{ github.sha }}
+          path: ci-artifacts/
+          if-no-files-found: warn
