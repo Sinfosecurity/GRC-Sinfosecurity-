@@ -220,9 +220,16 @@ export function registerDefaultHealthChecks() {
     healthChecker.registerCheck('email', async () => {
         const { emailStatus } = await import('../services/notificationDeliveryService');
         const status = emailStatus();
-        return status === 'CONNECTED'
-            ? { status: 'up', message: 'Email provider connected' }
-            : { status: 'degraded', message: 'NOT_CONFIGURED' };
+        if (status === 'CONNECTED') {
+            return { status: 'up', message: 'Email provider connected' };
+        }
+        if (status === 'ERROR') {
+            return { status: 'down', message: 'ERROR' };
+        }
+        if (status === 'DEGRADED') {
+            return { status: 'degraded', message: 'DEGRADED' };
+        }
+        return { status: 'degraded', message: 'NOT_CONFIGURED' };
     });
 
     healthChecker.registerCheck('stripe', async () => {

@@ -6,6 +6,7 @@ import { canonicalizeRole, permissionsForRole } from '../security/rbac';
 import { hashPassword, hashToken, randomToken, validatePasswordPolicy, verifyPassword } from './passwordService';
 import { recordAudit } from './auditEventService';
 import { notify } from './notificationDeliveryService';
+import { passwordResetEmailBody } from './publicFrontendUrl';
 import { ApiError } from '../middleware/errorHandler';
 
 const GENERIC_AUTH_ERROR = 'Invalid credentials';
@@ -296,6 +297,7 @@ export const authService = {
             eventType: 'auth.password_reset',
             title: 'Password reset requested',
             body: 'A password reset was requested for this Supreme Risk account.',
+            emailBody: passwordResetEmailBody(token),
             resourceType: 'User',
             resourceId: user.id,
             emailTo: user.email,
@@ -440,7 +442,7 @@ export const authService = {
             result: 'success',
             metadata: { email: input.email, role: input.role },
         });
-        return { invitation, token: process.env.NODE_ENV === 'test' ? token : undefined };
+        return { invitation, token };
     },
 
     async rotateInvitationToken(invitationId: string) {
@@ -454,7 +456,7 @@ export const authService = {
                 status: 'PENDING',
             },
         });
-        return { token: process.env.NODE_ENV === 'test' ? token : undefined, expiresAt };
+        return { token, expiresAt };
     },
 
     async acceptInvitation(token: string, input: { password: string; firstName: string; lastName: string }) {

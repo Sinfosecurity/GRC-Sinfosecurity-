@@ -21,6 +21,8 @@ ROUTES = [
     "/login",
     "/register",
     "/forgot-password",
+    "/activate",
+    "/reset-password",
     "/request-demo",
     "/frameworks",
     "/privacy",

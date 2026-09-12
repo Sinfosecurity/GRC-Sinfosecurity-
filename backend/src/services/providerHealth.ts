@@ -5,7 +5,7 @@ import { objectStorageService } from './objectStorageService';
 import { billingStatus } from '../billing/stripeBillingService';
 import { isProviderConfigured } from '../config/env';
 
-export type ProviderState = 'CONNECTED' | 'NOT_CONFIGURED' | 'ERROR' | 'POLICY';
+export type ProviderState = 'CONNECTED' | 'DEGRADED' | 'NOT_CONFIGURED' | 'ERROR' | 'POLICY';
 
 export async function providerHealth() {
     const storage = objectStorageService.status();

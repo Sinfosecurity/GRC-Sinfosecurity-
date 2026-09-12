@@ -79,6 +79,14 @@ export const ROUTE_META: Record<string, RouteMeta> = {
         title: 'Reset password — Supreme',
         description: 'Request a Supreme password reset email.',
     },
+    '/activate': {
+        title: 'Activate account — Supreme',
+        description: 'Activate a Supreme workspace invitation.',
+    },
+    '/reset-password': {
+        title: 'Choose a new password — Supreme',
+        description: 'Set a new password with a Supreme reset link.',
+    },
     '/privacy': {
         title: 'Privacy — Supreme',
         description: 'Draft factual privacy description for Supreme. Pending legal review.',

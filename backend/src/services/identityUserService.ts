@@ -5,6 +5,7 @@ import { recordAudit } from './auditEventService';
 import { ApiError } from '../middleware/errorHandler';
 import { permissionsForRole } from '../security/rbac';
 import { emailStatus, notify } from './notificationDeliveryService';
+import { invitationEmailBody } from './publicFrontendUrl';
 
 const PLATFORM_ROLES = new Set<Role>([Role.SUPERADMIN, Role.PLATFORM_ADMIN]);
 
@@ -45,6 +46,14 @@ function publicUser(user: {
         createdAt: user.createdAt,
         permissions: permissionsForRole(user.role),
     };
+}
+
+export function invitationApiPayload<T extends { token?: string }>(result: T): Omit<T, 'token'> & { token?: string } {
+    const { token, ...safe } = result;
+    if (process.env.NODE_ENV === 'test' && token) {
+        return { ...safe, token };
+    }
+    return safe;
 }
 
 export function assertRoleAssignment(input: {
@@ -162,15 +171,17 @@ export const identityUserService = {
             userId: invitedById,
             eventType: 'user.invitation',
             title: 'You are invited to Supreme Risk',
-            body: `An administrator invited ${email} with role ${role}.`,
+            body: `An administrator invited you with role ${role}.`,
+            emailBody: invitationEmailBody(role, result.token),
             resourceType: 'AccountInvitation',
             resourceId: result.invitation.id,
             emailTo: email,
         });
-        return {
-            ...result,
+        return invitationApiPayload({
+            invitation: result.invitation,
             emailStatus: typeof delivery === 'object' && delivery && 'email' in delivery ? delivery.email : emailStatus(),
-        };
+            token: result.token,
+        });
     },
 
     async listInvitations(organizationId: string) {
@@ -214,6 +225,7 @@ export const identityUserService = {
             eventType: 'user.invitation',
             title: 'Supreme Risk invitation (resent)',
             body: `Your invitation to join the organization as ${invitation.role} was resent.`,
+            emailBody: invitationEmailBody(invitation.role, result.token),
             resourceType: 'AccountInvitation',
             resourceId: invitation.id,
             emailTo: invitation.email,
@@ -226,11 +238,11 @@ export const identityUserService = {
             resourceId: invitation.id,
             result: 'success',
         });
-        return {
+        return invitationApiPayload({
             invitation: { ...invitation, expiresAt: result.expiresAt },
             emailStatus: typeof delivery === 'object' && delivery && 'email' in delivery ? delivery.email : emailStatus(),
             token: result.token,
-        };
+        });
     },
 
     async revokeInvitation(organizationId: string, invitationId: string, actorUserId: string, actorRole: Role) {

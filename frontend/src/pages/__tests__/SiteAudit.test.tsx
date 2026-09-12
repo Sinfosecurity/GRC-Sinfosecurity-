@@ -7,6 +7,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Login from '../Login';
 import Register from '../Register';
 import ForgotPassword from '../ForgotPassword';
+import Activate from '../Activate';
+import ResetPassword from '../ResetPassword';
 import RequestDemo from '../RequestDemo';
 import ThirdPartyProduct from '../ThirdPartyProduct';
 import PublicStatus from '../PublicStatus';
@@ -29,7 +31,7 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 vi.mock('../../services/api', () => ({
     demoAPI: { request: vi.fn() },
-    authAPI: { forgotPassword: vi.fn() },
+    authAPI: { forgotPassword: vi.fn(), resetPassword: vi.fn(), activate: vi.fn() },
 }));
 
 function renderPath(path: string, element: ReactNode) {
@@ -87,6 +89,16 @@ describe('site audit remediation', () => {
         login.unmount();
         const reset = renderPath('/forgot-password', <ForgotPassword />);
         expect(reset.getByLabelText('Work email')).toHaveAttribute('autocomplete', 'username');
+        reset.unmount();
+        const activate = renderPath('/activate?token=test-token', <Activate />);
+        expect(activate.getByLabelText('First name')).toHaveAttribute('autocomplete', 'given-name');
+        expect(activate.getByLabelText('Last name')).toHaveAttribute('autocomplete', 'family-name');
+        expect(activate.getByLabelText('Password')).toHaveAttribute('autocomplete', 'new-password');
+        expect(ROUTE_META['/activate'].title).toBe('Activate account — Supreme');
+        activate.unmount();
+        const choose = renderPath('/reset-password?token=test-token', <ResetPassword />);
+        expect(choose.getByLabelText('New password')).toHaveAttribute('autocomplete', 'new-password');
+        expect(ROUTE_META['/reset-password'].title).toBe('Choose a new password — Supreme');
     });
 
     it('sets request-demo autocomplete and preserves pricing intent', () => {

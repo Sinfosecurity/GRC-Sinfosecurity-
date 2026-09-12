@@ -38,6 +38,8 @@ const LEGACY_ENABLED = import.meta.env.VITE_ENABLE_LEGACY_GRC === 'true';
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const Activate = lazy(() => import('./pages/Activate'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Billing = lazy(() => import('./pages/Billing'));
 const Integrations = lazy(() => import('./pages/Integrations'));
 const DecisionBriefs = lazy(() => import('./pages/DecisionBriefs'));
@@ -91,6 +93,8 @@ export default function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/activate" element={<Activate />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
