@@ -46,7 +46,7 @@ if "test" not in name and "ci" not in name:
 print(f"CI_MIGRATE_TARGET database={name} host={host}")
 PY
 
-BASELINE="$ROOT/prisma/baseline/pre-transformation.prisma"
+BASELINE_SQL="$ROOT/prisma/baseline/pre-transformation.sql"
 CURRENT="$ROOT/prisma/schema.prisma"
 MIGRATIONS="$ROOT/prisma/migrations"
 
@@ -60,8 +60,12 @@ SQL
 )"
 
 if ! echo "$HAS_MIGRATIONS" | grep -Eq '(^|[^0-9])[1-9][0-9]*'; then
-  echo "==> Empty migration history: bootstrap pre-transformation baseline"
-  npx prisma db push --schema "$BASELINE" --skip-generate --accept-data-loss
+  echo "==> Empty migration history: apply committed pre-transformation baseline SQL"
+  if [[ ! -f "$BASELINE_SQL" ]]; then
+    echo "Missing $BASELINE_SQL" >&2
+    exit 1
+  fi
+  npx prisma db execute --schema "$CURRENT" --file "$BASELINE_SQL"
   echo "==> Apply committed additive migration SQL, then record history"
   while IFS= read -r migration; do
     name="$(basename "$(dirname "$migration")")"

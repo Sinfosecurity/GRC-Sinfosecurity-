@@ -64,7 +64,7 @@ jobs:
       - name: Install backend
         working-directory: backend
         run: |
-          if [[ -f package-lock.json ]]; then npm ci; else echo "LOCKFILE=ABSENT using npm install"; npm install; fi
+          if [[ -f package-lock.json ]]; then npm ci --workspaces=false; else echo "LOCKFILE=ABSENT using npm install"; npm install --workspaces=false; fi
 
       - name: Prisma generate
         working-directory: backend
@@ -92,7 +92,7 @@ jobs:
       - name: Install frontend
         working-directory: frontend
         run: |
-          if [[ -f package-lock.json ]]; then npm ci; else echo "LOCKFILE=ABSENT using npm install"; npm install; fi
+          if [[ -f package-lock.json ]]; then npm ci --workspaces=false; else echo "LOCKFILE=ABSENT using npm install"; npm install --workspaces=false; fi
 
       - name: Frontend typecheck
         working-directory: frontend

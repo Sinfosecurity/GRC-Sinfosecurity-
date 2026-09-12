@@ -91,12 +91,16 @@ Uploads `ci-artifacts/` (SHA file, test transcripts, summary). Does not upload `
 
 None for this workflow. CI uses a disposable Postgres service and test doubles already in the suite.
 
+## Hosted run after billing payment
+
+Billing lock cleared. Rerun attempt 2 of `34719529548` assigned runner `GitHub Actions 1000000468` and completed **success** on SHA `1dba713b530ba2963993ce68dc25575c66303dd5`.
+
+Follow-up hygiene (lockfiles, unused `react-pdf` removal, baseline SQL instead of `db push`) is certified on the later SHA recorded in the #7 resume report.
+
 ## Known issues
 
-- Hosted GitHub Actions is **BLOCKED — EXTERNAL** by account billing lock
-- `package-lock.json` is gitignored; install is `npm install` until lockfiles are tracked
-- Frontend `npm audit --omit=dev` reports direct **high** `react-pdf` and transitive `tar` / `canvas` / `pdfjs-dist`. Not a direct-critical blocker under current policy
-- Additive migrations require the documented baseline bootstrap on empty databases; `migrate deploy` alone cannot initialize a blank database
+- Remaining `npm audit --omit=dev` findings are **moderate** only (`qs`/`express`, `uuid` via `bull`/`exceljs`, `react-router` open-redirect/SSR). No safe non-breaking patch in this sprint; not direct-critical
+- Additive migrations still require the committed empty-DB baseline SQL before `migrate deploy`
 - `scripts/staging-certify.sh` remains unsafe for recovery (drops local staging) and is not used by CI
 
 ## Prior certifications

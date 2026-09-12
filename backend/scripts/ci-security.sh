@@ -104,7 +104,7 @@ def classify(pkg_dir):
     pkg = json.loads((Path(pkg_dir) / "package.json").read_text())
     direct = set((pkg.get("dependencies") or {}).keys())
     proc = subprocess.run(
-        ["npm", "audit", "--json", "--omit=dev"],
+        ["npm", "audit", "--json", "--omit=dev", "--workspaces=false"],
         cwd=pkg_dir,
         capture_output=True,
         text=True,
