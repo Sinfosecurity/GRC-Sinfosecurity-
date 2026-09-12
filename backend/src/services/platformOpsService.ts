@@ -583,6 +583,7 @@ export const platformOpsService = {
                 OR: [
                     { action: { startsWith: 'platform.' } },
                     { action: { startsWith: 'support.' } },
+                    { action: { startsWith: 'mfa.' } },
                 ],
                 ...(filters?.action ? { action: { contains: filters.action, mode: 'insensitive' } } : {}),
                 ...(filters?.q

@@ -6,7 +6,7 @@ import { prisma } from '../config/database';
 import { getEnv } from '../config/env';
 import { Permission, hasAnyPermission, permissionsForRole, roleMatches } from '../security/rbac';
 import { LegacyPermission } from '../security/rbac';
-import { AuthPlane, CUSTOMER_PLANE, parsePlane } from '../security/sessionPlane';
+import { AuthPlane, CUSTOMER_PLANE, PLATFORM_PLANE, parsePlane } from '../security/sessionPlane';
 
 export interface AuthUser {
     id: string;
@@ -79,6 +79,7 @@ export async function authenticate(
             plane?: string;
             mfa?: boolean;
             enroll?: boolean;
+            iat?: number;
         };
 
         const userId = decoded.userId || decoded.id;
@@ -99,10 +100,24 @@ export async function authenticate(
             throw new ApiError(403, 'Organization is not active');
         }
 
+        const plane = parsePlane(decoded.plane);
+        const enrollOnly = decoded.enroll === true;
+        if (plane === PLATFORM_PLANE && !enrollOnly) {
+            if (!user.mfaEnabled) {
+                throw new ApiError(401, 'Invalid or expired token');
+            }
+            const enrolledAtSec = user.mfaEnrolledAt
+                ? Math.floor(user.mfaEnrolledAt.getTime() / 1000)
+                : 0;
+            if (enrolledAtSec && typeof decoded.iat === 'number' && decoded.iat < enrolledAtSec) {
+                throw new ApiError(401, 'Invalid or expired token');
+            }
+        }
+
         attachUser(req, user, {
-            plane: parsePlane(decoded.plane),
+            plane,
             mfaSatisfied: decoded.mfa === true,
-            enrollOnly: decoded.enroll === true,
+            enrollOnly,
         });
         next();
     } catch (error) {

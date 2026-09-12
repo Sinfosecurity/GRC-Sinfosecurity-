@@ -221,4 +221,4 @@ A random password is printed once to stdout and is never committed. Bootstrap re
 
 ## MFA for Platform Owner (production)
 
-MFA for privileged internal access is implemented in this architecture lock. #8 Final Security Review is still required before production and is **not** started here.
+MFA for privileged internal access is implemented in this architecture lock. Production-like hosts must set a high-entropy `ENCRYPTION_KEY` or the API refuses to start. After MFA reset, platform access tokens are rejected until re-enrollment. Platform audit includes `mfa.*` events. #9 Final Security Review is still required before production and is **not** started here.

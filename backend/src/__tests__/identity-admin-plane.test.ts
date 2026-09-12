@@ -326,6 +326,16 @@ describe('identity and admin plane', () => {
         const securityUser = await prisma.user.findUnique({ where: { id: security.userId } });
         expect(securityUser?.mfaEnabled).toBe(false);
         expect(securityUser?.mfaSecretEnc).toBeNull();
+        const stale = await request(app)
+            .get(`${API}/platform/overview`)
+            .set('Authorization', `Bearer ${securityAuth.token}`);
+        expect(stale.status).toBe(401);
+        const audit = await request(app)
+            .get(`${API}/platform/audit`)
+            .query({ action: 'mfa.reset' })
+            .set('Authorization', `Bearer ${ownerAuth.token}`);
+        expect(audit.status).toBe(200);
+        expect(audit.body.data.some((row: { action: string }) => row.action === 'mfa.reset')).toBe(true);
     });
 
     it('does not leak secrets in audit metadata and prepares portal-specific email links', () => {
@@ -348,5 +358,43 @@ describe('identity and admin plane', () => {
             CORS_ORIGIN: 'https://app.supremerisk.com,https://admin.supremerisk.com',
         } as NodeJS.ProcessEnv)).toBe(false);
         expect(configuredCorsOrigins({ CORS_ORIGIN: 'https://app.supremerisk.com' } as NodeJS.ProcessEnv)).not.toContain('*');
+    });
+
+    it('refuses to demote the last remaining active platform owner', async () => {
+        const ownerRoles = [Role.PLATFORM_OWNER, Role.PLATFORM_ADMIN, Role.SUPERADMIN];
+        const extras = await prisma.user.findMany({
+            where: { role: { in: ownerRoles }, status: UserAccountStatus.ACTIVE, id: { not: owner.userId } },
+            select: { id: true },
+        });
+        const disabledOwner = await signup(`${suffix}-last`, 'lastowner');
+        await prisma.user.update({
+            where: { id: disabledOwner.userId },
+            data: { role: Role.PLATFORM_OWNER, status: UserAccountStatus.DISABLED },
+        });
+        if (extras.length) {
+            await prisma.user.updateMany({
+                where: { id: { in: extras.map((row) => row.id) } },
+                data: { status: UserAccountStatus.DISABLED },
+            });
+        }
+        try {
+            await request(app)
+                .post(`${API}/auth/step-up`)
+                .set('Authorization', `Bearer ${ownerAuth.token}`)
+                .send({ code: ownerAuth.recoveryCodes[4] });
+            const response = await request(app)
+                .patch(`${API}/platform/internal-users/${disabledOwner.userId}/role`)
+                .set('Authorization', `Bearer ${ownerAuth.token}`)
+                .send({ role: 'SUPPORT_ADMIN' });
+            expect(response.status).toBe(403);
+            expect(response.body.error?.message || '').toMatch(/last platform owner/i);
+        } finally {
+            if (extras.length) {
+                await prisma.user.updateMany({
+                    where: { id: { in: extras.map((row) => row.id) } },
+                    data: { status: UserAccountStatus.ACTIVE },
+                });
+            }
+        }
     });
 });

@@ -1,8 +1,10 @@
 # Platform access operations runbook
 
 **Production-ready claim:** NO  
-**#8:** NOT STARTED  
+**#9 Final Security Review:** NOT STARTED  
 **DNS:** do not change production DNS in this sprint.
+
+Hosted production-like environments (`NODE_ENV=production`) must set a high-entropy `ENCRYPTION_KEY` before Platform Owner MFA enrollment. The API refuses to start without it. Do not commit the key.
 
 ## First Platform Owner bootstrap
 

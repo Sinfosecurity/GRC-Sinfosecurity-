@@ -68,9 +68,9 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): AppEnv {
         throw new Error('DATABASE_URL is required in production');
     }
 
-    if (isProduction && env.ENCRYPTION_KEY && isWeak(env.ENCRYPTION_KEY)) {
+    if (isProduction && (!env.ENCRYPTION_KEY || isWeak(env.ENCRYPTION_KEY))) {
         throw new Error(
-            'ENCRYPTION_KEY is a predictable placeholder (including dev-encryption-key). Production refused to start.'
+            'ENCRYPTION_KEY is required in production and must not be a predictable placeholder. Production refused to start.'
         );
     }
 

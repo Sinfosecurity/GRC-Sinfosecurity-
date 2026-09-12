@@ -2,7 +2,7 @@
 
 **Classification:** commercial operations
 **Production-ready claim:** NO
-**MFA for Platform Owner:** Implemented as persisted TOTP for all platform roles. #8 Final Security Review is still required and has not started. See `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`.
+**MFA for Platform Owner:** Implemented as persisted TOTP for all platform roles. Hosted staging certification evidence is in `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. #9 Final Security Review has not started. See `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`.
 
 This document describes the Supreme internal operations console. It is not a customer tenant page.
 
@@ -14,7 +14,7 @@ The console lives at `/platform` behind the internal admin portal (`/admin/login
 - Platform APIs authorize with **platform permissions**, not tenant admin roles.
 - `ORGANIZATION_ADMIN`, `ADMIN`, `ASSESSOR`, `VIEWER`, and other customer roles receive `403` on every `/api/v1/platform/*` route.
 - Platform staff still belong to an organization row (schema requires it). That membership is **not** used to scope other tenants.
-- Existing `AuditEvent` records both tenant and platform actions. Platform actions use `platform.*` and `support.*` names.
+- Existing `AuditEvent` records both tenant and platform actions. Platform audit lists `platform.*`, `support.*`, and privileged `mfa.*` events.
 
 ## Platform roles
 
