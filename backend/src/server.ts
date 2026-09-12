@@ -59,6 +59,9 @@ import { rateLimiter } from './middleware/rateLimiter';
 import { standardTimeout } from './middleware/timeout';
 import { requestId, requestLogger, performanceMonitor } from './middleware/logging';
 import { sanitizeInput } from './middleware/sanitization';
+import { corsOriginDelegate } from './security/corsOrigins';
+import { authenticate } from './middleware/auth';
+import { rejectPlatformTenantContent } from './security/tenant';
 
 // Import config
 import { connectDatabase, prisma, redisClient } from './config/database';
@@ -129,7 +132,7 @@ app.use(compression({
 }));
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: corsOriginDelegate,
     credentials: true,
     exposedHeaders: ['Content-Disposition', 'Content-Type'],
 }));
@@ -203,34 +206,35 @@ app.get('/health/live', livenessCheckHandler); // Kubernetes liveness probe
 // API Routes
 const API_PREFIX = `/api/${process.env.API_VERSION || 'v1'}`;
 
+const tenantContent = [authenticate, rejectPlatformTenantContent];
 app.use(`${API_PREFIX}/auth`, authRoutes);
-app.use(`${API_PREFIX}/risks`, riskRoutes);
-app.use(`${API_PREFIX}/compliance`, complianceRoutes);
-app.use(`${API_PREFIX}/controls`, controlsRoutes);
-app.use(`${API_PREFIX}/incidents`, incidentRoutes);
-app.use(`${API_PREFIX}/policies`, policyRoutes);
-app.use(`${API_PREFIX}/documents`, documentRoutes);
-app.use(`${API_PREFIX}/audit`, auditRoutes);
-app.use(`${API_PREFIX}/users`, userRoutes);
-app.use(`${API_PREFIX}/notifications`, notificationRoutes);
-app.use(`${API_PREFIX}/tasks`, taskRoutes);
-app.use(`${API_PREFIX}/workflows`, workflowRoutes);
-app.use(`${API_PREFIX}/reports`, reportRoutes);
-app.use(`${API_PREFIX}/mobile`, mobileRoutes);
-app.use(`${API_PREFIX}/vendors/approvals`, approvalRoutes);
-app.use(`${API_PREFIX}/vendors/concentration-risk`, concentrationRoutes);
-app.use(`${API_PREFIX}/vendors/risk-history`, riskHistoryRoutes);
-app.use(`${API_PREFIX}/vendors`, vendorRoutes);
-app.use(`${API_PREFIX}/risk-appetite`, riskAppetiteRoutes);
-app.use(`${API_PREFIX}/monitoring`, monitoringRoutes);
+app.use(`${API_PREFIX}/risks`, ...tenantContent, riskRoutes);
+app.use(`${API_PREFIX}/compliance`, ...tenantContent, complianceRoutes);
+app.use(`${API_PREFIX}/controls`, ...tenantContent, controlsRoutes);
+app.use(`${API_PREFIX}/incidents`, ...tenantContent, incidentRoutes);
+app.use(`${API_PREFIX}/policies`, ...tenantContent, policyRoutes);
+app.use(`${API_PREFIX}/documents`, ...tenantContent, documentRoutes);
+app.use(`${API_PREFIX}/audit`, ...tenantContent, auditRoutes);
+app.use(`${API_PREFIX}/users`, ...tenantContent, userRoutes);
+app.use(`${API_PREFIX}/notifications`, ...tenantContent, notificationRoutes);
+app.use(`${API_PREFIX}/tasks`, ...tenantContent, taskRoutes);
+app.use(`${API_PREFIX}/workflows`, ...tenantContent, workflowRoutes);
+app.use(`${API_PREFIX}/reports`, ...tenantContent, reportRoutes);
+app.use(`${API_PREFIX}/mobile`, ...tenantContent, mobileRoutes);
+app.use(`${API_PREFIX}/vendors/approvals`, ...tenantContent, approvalRoutes);
+app.use(`${API_PREFIX}/vendors/concentration-risk`, ...tenantContent, concentrationRoutes);
+app.use(`${API_PREFIX}/vendors/risk-history`, ...tenantContent, riskHistoryRoutes);
+app.use(`${API_PREFIX}/vendors`, ...tenantContent, vendorRoutes);
+app.use(`${API_PREFIX}/risk-appetite`, ...tenantContent, riskAppetiteRoutes);
+app.use(`${API_PREFIX}/monitoring`, ...tenantContent, monitoringRoutes);
 app.use(`${API_PREFIX}/billing`, billingRoutes);
-app.use(`${API_PREFIX}/ai`, aiRoutes);
-app.use(`${API_PREFIX}/exports`, exportRoutes);
-app.use(`${API_PREFIX}/organization`, organizationSaasRoutes);
+app.use(`${API_PREFIX}/ai`, ...tenantContent, aiRoutes);
+app.use(`${API_PREFIX}/exports`, ...tenantContent, exportRoutes);
+app.use(`${API_PREFIX}/organization`, ...tenantContent, organizationSaasRoutes);
 app.use(`${API_PREFIX}/system`, systemRoutes);
-app.use(`${API_PREFIX}/integrations`, integrationRoutes);
-app.use(`${API_PREFIX}/questionnaires`, questionnaireRoutes);
-app.use(`${API_PREFIX}/tprm`, tprmRoutes);
+app.use(`${API_PREFIX}/integrations`, ...tenantContent, integrationRoutes);
+app.use(`${API_PREFIX}/questionnaires`, ...tenantContent, questionnaireRoutes);
+app.use(`${API_PREFIX}/tprm`, ...tenantContent, tprmRoutes);
 app.use(`${API_PREFIX}/demo-requests`, demoRoutes);
 app.use(`${API_PREFIX}/platform`, platformRoutes);
 app.use(`${API_PREFIX}/support`, supportRoutes);

@@ -6,10 +6,15 @@ import {
     activationRateLimiter,
     authRateLimiter,
     loginIpLimiter,
+    mfaLimiter,
     passwordResetIpLimiter,
     passwordResetLimiter,
     signupRateLimiter,
 } from '../middleware/rateLimiter';
+import { requestedPlane } from '../security/sessionPlane';
+import { totpMfaService } from '../services/totpMfaService';
+import { privilegeElevationService } from '../services/privilegeElevationService';
+import { requirePlatformStaff } from '../security/platform';
 
 const router = Router();
 
@@ -69,8 +74,10 @@ router.post('/login', loginIpLimiter, authRateLimiter, async (req: Request, res:
         if (!email || !password) {
             throw new ApiError(400, 'Email and password are required');
         }
-        const result = await authService.login(email, password, meta(req));
-        res.cookie('token', result.token, authService.cookieOptions());
+        const result = await authService.login(email, password, { ...meta(req), plane: requestedPlane(req.body) });
+        if ('token' in result && result.token) {
+            res.cookie('token', result.token, authService.cookieOptions());
+        }
         res.json({ success: true, data: result });
     } catch (error) {
         next(error);
@@ -103,7 +110,11 @@ router.post('/logout', authenticate, async (req: AuthRequest, res: Response, nex
 
 router.get('/me', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const user = await authService.me(req.user!.id);
+        const user = await authService.me(req.user!.id, {
+            plane: req.user!.plane,
+            mfaSatisfied: req.user!.mfaSatisfied,
+            enrollOnly: req.user!.enrollOnly,
+        });
         res.json({ success: true, data: { user } });
     } catch (error) {
         next(error);
@@ -164,6 +175,58 @@ router.post('/activate', activationRateLimiter, async (req: Request, res: Respon
         const result = await authService.acceptInvitation(token, { password, firstName, lastName });
         res.cookie('token', result.token, authService.cookieOptions());
         res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/mfa/enroll/start', authenticate, mfaLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user?.enrollOnly) {
+            throw new ApiError(403, 'MFA enrollment is required');
+        }
+        const data = await totpMfaService.startEnrollment(req.user!.id, req.user!.email, { requestId: meta(req).requestId });
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/mfa/enroll/confirm', authenticate, mfaLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user?.enrollOnly) {
+            throw new ApiError(403, 'MFA enrollment is required');
+        }
+        const result = await authService.completePlatformEnrollment(req.user!.id, String(req.body?.code || ''), {
+            requestId: meta(req).requestId,
+        });
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/mfa/verify', mfaLimiter, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await authService.completePlatformMfa(
+            String(req.body?.challengeToken || ''),
+            String(req.body?.code || ''),
+            meta(req)
+        );
+        res.cookie('token', result.token, authService.cookieOptions());
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/step-up', authenticate, requirePlatformStaff, mfaLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const data = await privilegeElevationService.stepUp(req.user!.id, String(req.body?.code || ''), {
+            requestId: meta(req).requestId,
+        });
+        res.json({ success: true, data });
     } catch (error) {
         next(error);
     }

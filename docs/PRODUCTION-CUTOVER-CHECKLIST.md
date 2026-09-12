@@ -7,7 +7,7 @@ Values below are readiness, not a cutover approval.
 ## Before a future production window
 
 1. Hosted Supreme CI is PASS as of SHA `93e71319e69f74bd90797583d66073a7232fc183` (#7). Later Owner Console SHAs must also be hosted-green.
-1a. Platform Owner MFA is required before/as part of #8 final security review. Do not fake MFA.
+1a. Privileged TOTP MFA is implemented for platform roles (see ADR-IDENTITY-ADMIN-SUPPORT). #8 final security review is still required and has not started. Production DNS for app.supremerisk.com / admin.supremerisk.com is not changed in this sprint.
 2. Keep hosted staging isolated from production tenant data (`https://supreme-risk-staging.onrender.com`). Do not treat staging as a production cutover.
 3. Configure Stripe **test** mode first: `sk_test_` secret, `whsec_` webhook secret, `STRIPE_PRICE_*` in the host environment only, customer portal, entitlement enforcement. Live keys are rejected by the application.
 4. Repeat the same Stripe flow in live mode only after test mode is green. Hosted test-mode certification on 2026-09-12 is **PARTIAL / CONDITIONALLY CLEARED**. Remaining production-release checks: hosted `invoice.payment_failed`, hosted renewal/test-clock, browser Checkout completion (hCaptcha), and a final commercial price catalog. Do not treat staging catalog IDs as production prices.

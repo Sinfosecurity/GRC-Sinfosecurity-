@@ -36,6 +36,9 @@ const LegacyQuarantine = lazy(() => import('./pages/LegacyQuarantine'));
 
 const LEGACY_ENABLED = import.meta.env.VITE_ENABLE_LEGACY_GRC === 'true';
 const Login = lazy(() => import('./pages/Login'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const AdminMfaChallenge = lazy(() => import('./pages/AdminMfa').then((mod) => ({ default: mod.AdminMfaChallenge })));
+const AdminMfaEnroll = lazy(() => import('./pages/AdminMfa').then((mod) => ({ default: mod.AdminMfaEnroll })));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Activate = lazy(() => import('./pages/Activate'));
@@ -105,6 +108,12 @@ export default function App() {
                     <Route path="/products/third-party" element={<ThirdPartyProduct />} />
                     <Route path="/products/:slug" element={<MarketingPlaceholder />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin/mfa" element={<AdminMfaChallenge />} />
+                    <Route path="/admin/mfa/enroll" element={<AdminMfaEnroll />} />
+                    <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/admin/reset-password" element={<ResetPassword />} />
+                    <Route path="/admin/activate" element={<Activate />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/activate" element={<Activate />} />

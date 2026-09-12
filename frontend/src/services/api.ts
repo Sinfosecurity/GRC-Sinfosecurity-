@@ -71,10 +71,12 @@ api.interceptors.response.use(
                             : 'The request failed.');
 
         if (status === 401) {
+            const path = window.location.pathname;
+            const authFlow = path.startsWith('/login') || path.startsWith('/admin/') || path === '/';
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            if (!window.location.pathname.startsWith('/login') && window.location.pathname !== '/') {
-                window.location.href = '/login';
+            if (!authFlow) {
+                window.location.href = path.startsWith('/platform') ? '/admin/login' : '/login';
             }
         }
 
@@ -83,8 +85,12 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-    login: (credentials: { email: string; password: string }) =>
+    login: (credentials: { email: string; password: string; plane?: 'CUSTOMER' | 'PLATFORM' }) =>
         api.post('/auth/login', credentials),
+    verifyMfa: (data: { challengeToken: string; code: string }) => api.post('/auth/mfa/verify', data),
+    startMfaEnrollment: () => api.post('/auth/mfa/enroll/start'),
+    confirmMfaEnrollment: (code: string) => api.post('/auth/mfa/enroll/confirm', { code }),
+    stepUp: (code: string) => api.post('/auth/step-up', { code }),
     signup: (data: {
         email: string;
         password: string;

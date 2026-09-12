@@ -16,7 +16,8 @@
         "db:generate": "prisma generate",
         "db:push": "prisma db push",
         "db:migrate": "prisma migrate deploy",
-        "db:migrate:dev": "prisma migrate dev"
+        "db:migrate:dev": "prisma migrate dev",
+        "platform:bootstrap-owner": "ts-node --transpile-only src/scripts/bootstrapPlatformOwner.ts"
     },
     "keywords": [
         "grc",

@@ -17,8 +17,12 @@ export default function Login() {
         setError('');
         setLoading(true);
         try {
-            await login(email, password);
-            navigate('/dashboard');
+            const result = await login(email, password, 'CUSTOMER');
+            if (result.mfaEnrollmentRequired) {
+                navigate('/admin/mfa/enroll');
+                return;
+            }
+            navigate(typeof result.nextPath === 'string' ? result.nextPath : '/dashboard');
         } catch (err: any) {
             setError(err.status === 429
                 ? 'Too many requests. Please try again later.'

@@ -11,6 +11,6 @@ Legacy Prisma roles remain valid and are aliased:
 - COMPLIANCE_OFFICER → ASSESSOR
 - USER → VIEWER
 
-`platform.*` permissions are never granted to customer tenant roles. See `docs/PLATFORM-OWNER-SUPPORT-CONSOLE.md`.
+`platform.*` permissions are never granted to customer tenant roles. Platform APIs also require a `plane=PLATFORM` session with completed MFA. Knowing the admin URL is not authorization. See `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`.
 
 Permission catalog is in `backend/src/security/rbac.ts`. Middleware: `requirePermission(...)` and `requirePlatformPermission(...)`.

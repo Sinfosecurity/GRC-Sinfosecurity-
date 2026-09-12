@@ -2,11 +2,13 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { Role, UserAccountStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 import { getEnv } from '../config/env';
-import { canonicalizeRole, permissionsForRole } from '../security/rbac';
+import { canonicalizeRole, isPlatformStaffRole, permissionsForRole } from '../security/rbac';
+import { AuthPlane, CUSTOMER_PLANE, MFA_REQUIRED_ROLES, PLATFORM_PLANE } from '../security/sessionPlane';
 import { hashPassword, hashToken, randomToken, validatePasswordPolicy, verifyPassword } from './passwordService';
 import { recordAudit } from './auditEventService';
 import { notify } from './notificationDeliveryService';
 import { passwordResetEmailBody } from './publicFrontendUrl';
+import { totpMfaService } from './totpMfaService';
 import { ApiError } from '../middleware/errorHandler';
 
 const GENERIC_AUTH_ERROR = 'Invalid credentials';
@@ -21,6 +23,11 @@ export type PublicUser = {
     permissions: string[];
     organizationStatus?: string;
     plan?: string;
+    plane?: AuthPlane;
+    mfaEnabled?: boolean;
+    mfaSatisfied?: boolean;
+    enrollOnly?: boolean;
+    nextPath?: string;
 };
 
 function toPublicUser(user: {
@@ -30,8 +37,10 @@ function toPublicUser(user: {
     lastName: string;
     role: string;
     organizationId: string;
+    mfaEnabled?: boolean;
     organization?: { status: string; plan: string } | null;
-}): PublicUser {
+}, session?: { plane: AuthPlane; mfaSatisfied?: boolean; enrollOnly?: boolean }): PublicUser {
+    const plane = session?.plane || CUSTOMER_PLANE;
     return {
         id: user.id,
         email: user.email,
@@ -42,12 +51,27 @@ function toPublicUser(user: {
         permissions: permissionsForRole(user.role),
         organizationStatus: user.organization?.status,
         plan: user.organization?.plan,
+        plane,
+        mfaEnabled: user.mfaEnabled === true,
+        mfaSatisfied: session?.mfaSatisfied === true,
+        enrollOnly: session?.enrollOnly === true,
+        nextPath: plane === PLATFORM_PLANE ? '/platform' : '/dashboard',
     };
 }
 
-function signAccessToken(user: { id: string; email: string; role: string; organizationId: string }): string {
+function signAccessToken(user: {
+    id: string;
+    email: string;
+    role: string;
+    organizationId: string;
+}, options: { plane: AuthPlane; mfaSatisfied?: boolean; enrollOnly?: boolean }): string {
     const env = getEnv();
-    const options: SignOptions = { expiresIn: env.jwtExpiresIn as SignOptions['expiresIn'] };
+    const expiresIn = options.enrollOnly
+        ? '15m'
+        : options.plane === PLATFORM_PLANE
+            ? env.platformJwtExpiresIn
+            : env.jwtExpiresIn;
+    const signOptions: SignOptions = { expiresIn: expiresIn as SignOptions['expiresIn'] };
     return jwt.sign(
         {
             userId: user.id,
@@ -55,26 +79,61 @@ function signAccessToken(user: { id: string; email: string; role: string; organi
             email: user.email,
             role: user.role,
             organizationId: user.organizationId,
+            plane: options.plane,
+            mfa: options.mfaSatisfied === true,
+            enroll: options.enrollOnly === true,
         },
         env.jwtSecret,
-        options
+        signOptions
     );
 }
 
-async function issueRefreshToken(userId: string): Promise<string> {
+function refreshTtlMs(plane: AuthPlane): number {
     const env = getEnv();
+    if (plane === PLATFORM_PLANE) {
+        const raw = env.platformJwtRefreshExpiresIn;
+        if (raw.endsWith('h')) return parseInt(raw, 10) * 60 * 60 * 1000;
+        if (raw.endsWith('d')) return parseInt(raw, 10) * 24 * 60 * 60 * 1000;
+        return 8 * 60 * 60 * 1000;
+    }
+    const raw = env.jwtRefreshExpiresIn;
+    const days = raw.endsWith('d') ? parseInt(raw, 10) : 7;
+    return days * 24 * 60 * 60 * 1000;
+}
+
+async function issueRefreshToken(userId: string, plane: AuthPlane, mfaSatisfied: boolean): Promise<string> {
     const token = randomToken();
-    const days = env.jwtRefreshExpiresIn.endsWith('d')
-        ? parseInt(env.jwtRefreshExpiresIn, 10)
-        : 7;
     await prisma.refreshToken.create({
         data: {
             tokenHash: hashToken(token),
             userId,
-            expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+            plane,
+            mfaSatisfied,
+            expiresAt: new Date(Date.now() + refreshTtlMs(plane)),
         },
     });
     return token;
+}
+
+async function issueSession(user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    organizationId: string;
+    mfaEnabled?: boolean;
+    organization?: { status: string; plan: string } | null;
+}, plane: AuthPlane, mfaSatisfied: boolean) {
+    const token = signAccessToken(user, { plane, mfaSatisfied });
+    const refreshToken = await issueRefreshToken(user.id, plane, mfaSatisfied);
+    return {
+        kind: 'session' as const,
+        token,
+        refreshToken,
+        user: toPublicUser(user, { plane, mfaSatisfied }),
+        plane,
+    };
 }
 
 function cookieOptions() {
@@ -89,7 +148,7 @@ function cookieOptions() {
 export const authService = {
     cookieOptions,
 
-    async login(email: string, password: string, meta?: { ip?: string; userAgent?: string; requestId?: string }) {
+    async login(email: string, password: string, meta?: { ip?: string; userAgent?: string; requestId?: string; plane?: AuthPlane }) {
         const user = await prisma.user.findUnique({
             where: { email: email.toLowerCase().trim() },
             include: { organization: true },
@@ -149,13 +208,87 @@ export const authService = {
             throw new ApiError(401, GENERIC_AUTH_ERROR);
         }
 
+        const plane = meta?.plane || CUSTOMER_PLANE;
+        const staff = isPlatformStaffRole(user.role) || MFA_REQUIRED_ROLES.has(user.role);
+
+        if (plane === PLATFORM_PLANE && !staff) {
+            await recordAudit({
+                organizationId: user.organizationId,
+                actorUserId: user.id,
+                action: 'auth.login',
+                resourceType: 'User',
+                resourceId: user.id,
+                result: 'failure',
+                ipAddress: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+                metadata: { reason: 'plane_denied' },
+            });
+            throw new ApiError(401, GENERIC_AUTH_ERROR);
+        }
+
+        if (plane === CUSTOMER_PLANE && staff) {
+            await recordAudit({
+                organizationId: user.organizationId,
+                actorUserId: user.id,
+                action: 'auth.login',
+                resourceType: 'User',
+                resourceId: user.id,
+                result: 'failure',
+                ipAddress: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+                metadata: { reason: 'plane_denied' },
+            });
+            throw new ApiError(401, GENERIC_AUTH_ERROR);
+        }
+
+        if (plane === PLATFORM_PLANE && !user.mfaEnabled) {
+            await recordAudit({
+                organizationId: user.organizationId,
+                actorUserId: user.id,
+                action: 'auth.login',
+                resourceType: 'User',
+                resourceId: user.id,
+                result: 'success',
+                ipAddress: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+                metadata: { reason: 'mfa_enrollment_required' },
+            });
+            return {
+                kind: 'mfa_enroll' as const,
+                mfaEnrollmentRequired: true,
+                enrollmentToken: signAccessToken(user, { plane: PLATFORM_PLANE, enrollOnly: true }),
+                user: toPublicUser(user, { plane: PLATFORM_PLANE, enrollOnly: true }),
+            };
+        }
+
+        if (plane === PLATFORM_PLANE && user.mfaEnabled) {
+            const challengeToken = await totpMfaService.createChallenge(user.id, 'MFA_LOGIN');
+            await recordAudit({
+                organizationId: user.organizationId,
+                actorUserId: user.id,
+                action: 'auth.login',
+                resourceType: 'User',
+                resourceId: user.id,
+                result: 'success',
+                ipAddress: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+                metadata: { reason: 'mfa_required' },
+            });
+            return {
+                kind: 'mfa_required' as const,
+                mfaRequired: true,
+                challengeToken,
+            };
+        }
+
         await prisma.user.update({
             where: { id: user.id },
             data: { lastLogin: new Date() },
         });
-
-        const accessToken = signAccessToken(user);
-        const refreshToken = await issueRefreshToken(user.id);
 
         await recordAudit({
             organizationId: user.organizationId,
@@ -167,13 +300,48 @@ export const authService = {
             ipAddress: meta?.ip,
             userAgent: meta?.userAgent,
             requestId: meta?.requestId,
+            metadata: { plane },
         });
 
-        return {
-            token: accessToken,
-            refreshToken,
-            user: toPublicUser(user),
-        };
+        return issueSession(user, plane, false);
+    },
+
+    async completePlatformMfa(challengeToken: string, code: string, meta?: { ip?: string; userAgent?: string; requestId?: string }) {
+        const userId = await totpMfaService.consumeChallenge(challengeToken, 'MFA_LOGIN');
+        await totpMfaService.verifyCode(userId, code, { requestId: meta?.requestId });
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { organization: true },
+        });
+        if (!user || user.status !== UserAccountStatus.ACTIVE) {
+            throw new ApiError(401, GENERIC_AUTH_ERROR);
+        }
+        await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
+        await recordAudit({
+            organizationId: user.organizationId,
+            actorUserId: user.id,
+            action: 'auth.login',
+            resourceType: 'User',
+            resourceId: user.id,
+            result: 'success',
+            ipAddress: meta?.ip,
+            userAgent: meta?.userAgent,
+            requestId: meta?.requestId,
+            metadata: { plane: PLATFORM_PLANE, mfa: true },
+        });
+        return issueSession(user, PLATFORM_PLANE, true);
+    },
+
+    async completePlatformEnrollment(userId: string, code: string, meta?: { requestId?: string | null }) {
+        const recovery = await totpMfaService.confirmEnrollment(userId, code, meta);
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { organization: true },
+        });
+        if (!user) throw new ApiError(401, 'Authentication required');
+        await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
+        const session = await issueSession(user, PLATFORM_PLANE, true);
+        return { ...session, recoveryCodes: recovery.recoveryCodes };
     },
 
     async logout(refreshToken?: string, userId?: string) {
@@ -214,16 +382,21 @@ export const authService = {
             data: { revokedAt: new Date() },
         });
 
-        const accessToken = signAccessToken(stored.user);
-        const nextRefresh = await issueRefreshToken(stored.user.id);
+        const plane = stored.plane === PLATFORM_PLANE ? PLATFORM_PLANE : CUSTOMER_PLANE;
+        if (plane === PLATFORM_PLANE && !stored.mfaSatisfied) {
+            throw new ApiError(401, 'Invalid or expired token');
+        }
+        const accessToken = signAccessToken(stored.user, { plane, mfaSatisfied: stored.mfaSatisfied });
+        const nextRefresh = await issueRefreshToken(stored.user.id, plane, stored.mfaSatisfied);
         return {
             token: accessToken,
             refreshToken: nextRefresh,
-            user: toPublicUser(stored.user),
+            user: toPublicUser(stored.user, { plane, mfaSatisfied: stored.mfaSatisfied }),
+            plane,
         };
     },
 
-    async me(userId: string) {
+    async me(userId: string, session?: { plane?: AuthPlane; mfaSatisfied?: boolean; enrollOnly?: boolean }) {
         const user = await prisma.user.findUnique({
             where: { id: userId },
             include: { organization: true },
@@ -231,7 +404,11 @@ export const authService = {
         if (!user || user.status !== UserAccountStatus.ACTIVE) {
             throw new ApiError(401, 'Authentication required');
         }
-        return toPublicUser(user);
+        return toPublicUser(user, {
+            plane: session?.plane || CUSTOMER_PLANE,
+            mfaSatisfied: session?.mfaSatisfied,
+            enrollOnly: session?.enrollOnly,
+        });
     },
 
     async changePassword(userId: string, currentPassword: string, nextPassword: string) {
@@ -297,7 +474,7 @@ export const authService = {
             eventType: 'auth.password_reset',
             title: 'Password reset requested',
             body: 'A password reset was requested for this Supreme Risk account.',
-            emailBody: passwordResetEmailBody(token),
+            emailBody: passwordResetEmailBody(token, process.env, isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE),
             resourceType: 'User',
             resourceId: user.id,
             emailTo: user.email,
@@ -407,13 +584,7 @@ export const authService = {
             result: 'success',
         });
 
-        const accessToken = signAccessToken(user);
-        const refreshToken = await issueRefreshToken(user.id);
-        return {
-            token: accessToken,
-            refreshToken,
-            user: toPublicUser(user),
-        };
+        return issueSession(user, CUSTOMER_PLANE, false);
     },
 
     async invite(input: {
@@ -500,9 +671,17 @@ export const authService = {
             resourceId: user.id,
             result: 'success',
         });
-        const accessToken = signAccessToken(user);
-        const refreshToken = await issueRefreshToken(user.id);
-        return { token: accessToken, refreshToken, user: toPublicUser(user) };
+        if (isPlatformStaffRole(user.role)) {
+            return {
+                kind: 'mfa_enroll' as const,
+                mfaEnrollmentRequired: true,
+                enrollmentToken: signAccessToken(user, { plane: PLATFORM_PLANE, enrollOnly: true }),
+                user: toPublicUser(user, { plane: PLATFORM_PLANE, enrollOnly: true }),
+                token: signAccessToken(user, { plane: PLATFORM_PLANE, enrollOnly: true }),
+                refreshToken: undefined,
+            };
+        }
+        return issueSession(user, CUSTOMER_PLANE, false);
     },
 
     canonicalizeRole,

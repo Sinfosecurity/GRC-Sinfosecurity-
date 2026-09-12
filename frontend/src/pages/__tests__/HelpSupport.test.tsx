@@ -13,6 +13,10 @@ vi.mock('../../platform/api', () => ({
         list: () => list(),
         get: vi.fn(),
         reply: vi.fn(),
+        accessRequests: vi.fn().mockResolvedValue({ data: { data: [] } }),
+        approveAccess: vi.fn(),
+        denyAccess: vi.fn(),
+        revokeAccess: vi.fn(),
     },
 }));
 

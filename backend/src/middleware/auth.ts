@@ -6,6 +6,7 @@ import { prisma } from '../config/database';
 import { getEnv } from '../config/env';
 import { Permission, hasAnyPermission, permissionsForRole, roleMatches } from '../security/rbac';
 import { LegacyPermission } from '../security/rbac';
+import { AuthPlane, CUSTOMER_PLANE, parsePlane } from '../security/sessionPlane';
 
 export interface AuthUser {
     id: string;
@@ -17,6 +18,9 @@ export interface AuthUser {
     role: string;
     organizationId: string;
     permissions: string[];
+    plane: AuthPlane;
+    mfaSatisfied: boolean;
+    enrollOnly: boolean;
 }
 
 export interface AuthRequest extends Request {
@@ -31,7 +35,7 @@ function attachUser(req: AuthRequest, user: {
     role: string;
     organizationId: string;
     status: UserAccountStatus;
-}) {
+}, claims: { plane: AuthPlane; mfaSatisfied: boolean; enrollOnly: boolean }) {
     if (user.status !== UserAccountStatus.ACTIVE) {
         throw new ApiError(401, 'Invalid or expired token');
     }
@@ -45,6 +49,9 @@ function attachUser(req: AuthRequest, user: {
         role: user.role,
         organizationId: user.organizationId,
         permissions: permissionsForRole(user.role),
+        plane: claims.plane,
+        mfaSatisfied: claims.mfaSatisfied,
+        enrollOnly: claims.enrollOnly,
     };
 }
 
@@ -69,6 +76,9 @@ export async function authenticate(
             email: string;
             role: string;
             organizationId?: string;
+            plane?: string;
+            mfa?: boolean;
+            enroll?: boolean;
         };
 
         const userId = decoded.userId || decoded.id;
@@ -89,7 +99,11 @@ export async function authenticate(
             throw new ApiError(403, 'Organization is not active');
         }
 
-        attachUser(req, user);
+        attachUser(req, user, {
+            plane: parsePlane(decoded.plane),
+            mfaSatisfied: decoded.mfa === true,
+            enrollOnly: decoded.enroll === true,
+        });
         next();
     } catch (error) {
         if (error instanceof ApiError) {

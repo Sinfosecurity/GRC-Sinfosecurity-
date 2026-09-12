@@ -3,6 +3,7 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import { requireTenant } from '../security/tenant';
 import { actorMeta } from '../security/platform';
 import { supportTicketService } from '../services/supportTicketService';
+import { supportAccessService } from '../services/supportAccessService';
 import { ApiError } from '../middleware/errorHandler';
 
 const router = Router();
@@ -67,6 +68,65 @@ router.post('/tickets/:id/messages', async (req: AuthRequest, res: Response, nex
                 req.user!.id,
                 String(req.body?.body || '')
             ),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/access-requests', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await supportAccessService.listForOrganization(requireTenant(req.user)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/access-requests/:id/approve', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await supportAccessService.customerApprove({
+                id: req.params.id,
+                actorUserId: req.user!.id,
+                role: req.user!.role,
+                organizationId: requireTenant(req.user),
+                ...actorMeta(req),
+            }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/access-requests/:id/deny', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await supportAccessService.customerDeny({
+                id: req.params.id,
+                actorUserId: req.user!.id,
+                role: req.user!.role,
+                organizationId: requireTenant(req.user),
+                ...actorMeta(req),
+            }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/access-requests/:id/revoke', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await supportAccessService.customerRevoke({
+                id: req.params.id,
+                actorUserId: req.user!.id,
+                role: req.user!.role,
+                organizationId: requireTenant(req.user),
+                ...actorMeta(req),
+            }),
         });
     } catch (error) {
         next(error);

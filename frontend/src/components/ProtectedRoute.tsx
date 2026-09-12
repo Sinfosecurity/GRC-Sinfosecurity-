@@ -2,6 +2,8 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Box, CircularProgress } from '@mui/material';
+import { isPlatformStaff } from '../platform/roles';
+import { portalLoginPath } from '../platform/portal';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
@@ -21,9 +23,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
-  console.log('ProtectedRoute check:', { isAuthenticated, isLoading, user, path: location.pathname });
-
-  // Show loading spinner while checking authentication
   if (isLoading) {
     return (
       <Box
@@ -39,11 +38,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    console.log('Not authenticated, redirecting to login');
-    return <Navigate to="/" state={{ from: location }} replace />;
+    const adminSurface = location.pathname.startsWith('/platform') || location.pathname.startsWith('/admin');
+    return <Navigate to={adminSurface ? '/admin/login' : portalLoginPath()} state={{ from: location }} replace />;
   }
 
-  // Check role-based access. ORGANIZATION_ADMIN is the SaaS org-admin role.
+  if (user?.enrollOnly && !location.pathname.startsWith('/admin/mfa')) {
+    return <Navigate to="/admin/mfa/enroll" replace />;
+  }
+
+  if (isPlatformStaff(user?.role) && location.pathname === '/dashboard') {
+    return <Navigate to="/platform" replace />;
+  }
+
   if (allowedRoles && user && !roleIsAllowed(user.role, allowedRoles)) {
     return <Navigate to="/unauthorized" replace />;
   }

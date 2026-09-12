@@ -2,7 +2,8 @@ import { Router, Response, NextFunction } from 'express';
 import { Role } from '@prisma/client';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { PERMISSIONS } from '../security/rbac';
-import { actorMeta, requirePlatformOwner, requirePlatformPermission, requirePlatformStaff } from '../security/platform';
+import { actorMeta, requirePlatformOwner, requirePlatformPermission, requirePlatformStaff, requireStepUp } from '../security/platform';
+import { totpMfaService } from '../services/totpMfaService';
 import { platformOpsService } from '../services/platformOpsService';
 import { supportTicketService } from '../services/supportTicketService';
 import { supportAccessService } from '../services/supportAccessService';
@@ -253,7 +254,7 @@ router.get('/internal-users', requirePlatformPermission(PERMISSIONS['platform.us
     }
 });
 
-router.patch('/internal-users/:id/role', requirePlatformOwner, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.patch('/internal-users/:id/role', requirePlatformOwner, requireStepUp, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -265,6 +266,15 @@ router.patch('/internal-users/:id/role', requirePlatformOwner, async (req: AuthR
                 ...actorMeta(req),
             }),
         });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/internal-users/:id/mfa-reset', requirePlatformOwner, requireStepUp, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        await totpMfaService.reset(req.params.id, req.user!.id, { requestId: actorMeta(req).requestId });
+        res.json({ success: true, data: { reset: true } });
     } catch (error) {
         next(error);
     }
@@ -289,6 +299,7 @@ router.post('/support-sessions', requirePlatformPermission(PERMISSIONS['platform
                 ticketId: req.body?.ticketId,
                 incident: req.body?.incident,
                 reason: String(req.body?.reason || ''),
+                scope: req.body?.scope ? String(req.body.scope) : undefined,
                 accessLevel: req.body?.accessLevel,
                 durationMinutes: req.body?.durationMinutes,
                 ...actorMeta(req),
@@ -304,6 +315,43 @@ router.post('/support-sessions/:id/approve', requirePlatformPermission(PERMISSIO
         res.json({
             success: true,
             data: await supportAccessService.approve({
+                id: req.params.id,
+                actorUserId: req.user!.id,
+                role: req.user!.role,
+                ...actorMeta(req),
+            }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/support-sessions/break-glass', requirePlatformPermission(PERMISSIONS['platform.sessions.request']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({
+            success: true,
+            data: await supportAccessService.requestBreakGlass({
+                actorUserId: req.user!.id,
+                role: req.user!.role,
+                organizationId: String(req.body?.organizationId || ''),
+                incidentId: String(req.body?.incidentId || req.body?.incident || ''),
+                reason: String(req.body?.reason || ''),
+                scope: req.body?.scope ? String(req.body.scope) : undefined,
+                accessLevel: req.body?.accessLevel,
+                durationMinutes: req.body?.durationMinutes,
+                ...actorMeta(req),
+            }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/support-sessions/:id/break-glass-approve', requireStepUp, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await supportAccessService.approveBreakGlass({
                 id: req.params.id,
                 actorUserId: req.user!.id,
                 role: req.user!.role,

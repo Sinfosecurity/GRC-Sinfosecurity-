@@ -5,12 +5,20 @@ function isLocalHost(hostname: string) {
 }
 
 export function publicFrontendUrl(env: NodeJS.ProcessEnv = process.env): string {
+    return portalFrontendUrl('CUSTOMER', env);
+}
+
+export function portalFrontendUrl(plane: 'CUSTOMER' | 'PLATFORM', env: NodeJS.ProcessEnv = process.env): string {
     const hosted = env.NODE_ENV === 'production' || env.APP_ENVIRONMENT === 'staging';
-    const candidates = [env.FRONTEND_BASE_URL, env.FRONTEND_URL, env.CORS_ORIGIN];
+    const candidates = plane === 'PLATFORM'
+        ? [env.ADMIN_FRONTEND_URL, env.FRONTEND_BASE_URL, env.FRONTEND_URL, env.CORS_ORIGIN]
+        : [env.CUSTOMER_FRONTEND_URL, env.FRONTEND_BASE_URL, env.FRONTEND_URL, env.CORS_ORIGIN];
     for (const raw of candidates) {
         if (!raw) continue;
+        const first = raw.split(',')[0]?.trim();
+        if (!first) continue;
         try {
-            const url = new URL(raw);
+            const url = new URL(first);
             if (hosted && isLocalHost(url.hostname)) {
                 continue;
             }
@@ -31,7 +39,9 @@ export function maskEmail(email: string) {
 }
 
 export function invitationEmailBody(role: string, token: string, env: NodeJS.ProcessEnv = process.env) {
-    const activateUrl = `${publicFrontendUrl(env)}/activate?token=${token}`;
+    const platform = /PLATFORM_|SUPPORT_|SECURITY_ADMIN|BILLING_SUPPORT|SUPERADMIN/.test(role);
+    const origin = portalFrontendUrl(platform ? 'PLATFORM' : 'CUSTOMER', env);
+    const activateUrl = `${origin}${platform ? '/admin/activate' : '/activate'}?token=${token}`;
     return [
         `You were invited to Supreme Risk as ${role}.`,
         'Activate your account with this single-use link. It expires in 7 days.',
@@ -40,8 +50,9 @@ export function invitationEmailBody(role: string, token: string, env: NodeJS.Pro
     ].join('\n');
 }
 
-export function passwordResetEmailBody(token: string, env: NodeJS.ProcessEnv = process.env) {
-    const resetUrl = `${publicFrontendUrl(env)}/reset-password?token=${token}`;
+export function passwordResetEmailBody(token: string, env: NodeJS.ProcessEnv = process.env, plane: 'CUSTOMER' | 'PLATFORM' = 'CUSTOMER') {
+    const origin = portalFrontendUrl(plane, env);
+    const resetUrl = `${origin}${plane === 'PLATFORM' ? '/admin/reset-password' : '/reset-password'}?token=${token}`;
     return [
         'A password reset was requested for this Supreme Risk account.',
         'Reset your password with this single-use link. It expires in 1 hour.',

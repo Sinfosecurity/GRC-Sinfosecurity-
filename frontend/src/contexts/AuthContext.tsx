@@ -9,6 +9,11 @@ export interface User {
   role: string;
   organizationId: string;
   permissions?: string[];
+  plane?: 'CUSTOMER' | 'PLATFORM';
+  mfaEnabled?: boolean;
+  mfaSatisfied?: boolean;
+  enrollOnly?: boolean;
+  nextPath?: string;
 }
 
 interface AuthContextType {
@@ -16,7 +21,9 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, plane?: 'CUSTOMER' | 'PLATFORM') => Promise<Record<string, unknown>>;
+  completeMfa: (challengeToken: string, code: string) => Promise<Record<string, unknown>>;
+  confirmMfaEnrollment: (code: string) => Promise<Record<string, unknown>>;
   signup: (input: {
     email: string;
     password: string;
@@ -75,12 +82,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const response = await authAPI.login({ email, password });
+  const login = async (email: string, password: string, plane?: 'CUSTOMER' | 'PLATFORM') => {
+    const response = await authAPI.login({ email, password, plane });
+    const data = response.data.data as Record<string, unknown> & { token?: string; enrollmentToken?: string; user?: User };
+    if (data.enrollmentToken && data.user) {
+      setToken(data.enrollmentToken);
+      setUser(data.user);
+      persist(data.enrollmentToken, data.user);
+      return data;
+    }
+    if (data.token && data.user) {
+      setToken(data.token);
+      setUser(data.user);
+      persist(data.token, data.user);
+    }
+    return data;
+  };
+
+  const completeMfa = async (challengeToken: string, code: string) => {
+    const response = await authAPI.verifyMfa({ challengeToken, code });
     const { token: newToken, user: newUser } = response.data.data;
     setToken(newToken);
     setUser(newUser);
     persist(newToken, newUser);
+    return response.data.data;
+  };
+
+  const confirmMfaEnrollment = async (code: string) => {
+    const response = await authAPI.confirmMfaEnrollment(code);
+    const { token: newToken, user: newUser } = response.data.data;
+    setToken(newToken);
+    setUser(newUser);
+    persist(newToken, newUser);
+    return response.data.data;
   };
 
   const signup = async (input: {
@@ -123,6 +157,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoading,
         login,
         signup,
+        completeMfa,
+        confirmMfaEnrollment,
         logout,
         updateUser,
       }}

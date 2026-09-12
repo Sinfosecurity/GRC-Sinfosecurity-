@@ -2,13 +2,13 @@
 
 **Classification:** commercial operations
 **Production-ready claim:** NO
-**MFA for Platform Owner:** REQUIRED BEFORE / AS PART OF FINAL PRODUCTION SECURITY REVIEW (#8). Supreme does not currently implement MFA and this console does not fake it.
+**MFA for Platform Owner:** Implemented as persisted TOTP for all platform roles. #8 Final Security Review is still required and has not started. See `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`.
 
 This document describes the Supreme internal operations console. It is not a customer tenant page.
 
 ## Architecture
 
-The console lives at `/platform` in the existing authenticated app and `/api/v1/platform/*` on the API.
+The console lives at `/platform` behind the internal admin portal (`/admin/login` on staging; production target `https://admin.supremerisk.com/platform`). Customer workspace login remains `/login` (production target `https://app.supremerisk.com`). One identity service authenticates both. DNS is not changed in this sprint.
 
 - Tenant identity for customer APIs is still derived from authenticated membership (`requireTenant`). Browser `organizationId` is rejected.
 - Platform APIs authorize with **platform permissions**, not tenant admin roles.
@@ -67,14 +67,15 @@ Statuses: `INVESTIGATING`, `IDENTIFIED`, `MONITORING`, `RESOLVED`.
 
 There is no permanent god mode and no password impersonation.
 
-1. Authorized staff request a session (organization, ticket/incident reference, reason, `READ_ONLY` default or `LIMITED_SUPPORT_WRITE`, 15/30/60 minutes).
-2. A **platform owner** approves. Support analysts/admins cannot approve their own access.
-3. Session is started, expires automatically, and can be revoked.
-4. Active session is tenant-bound. Org B identifiers return `404`.
-5. `READ_ONLY` rejects writes. `evidence.mark_clean` is denied at every access level.
-6. Every request, approval, start, read, action, expiry, and revoke is audited to the actual Supreme operator.
+1. Authorized staff request a session (organization, ticket/incident reference, reason, scope, `READ_ONLY` default or `LIMITED_SUPPORT_WRITE`, 15/30/60 minutes).
+2. A customer `ORGANIZATION_ADMIN` approves or denies from Help & Support. Ordinary access is never owner-approved as a silent bypass.
+3. Break-glass (incident + reason + step-up + owner/security admin, no self-approval) is the only internal emergency path.
+4. Session is started, expires automatically, and can be revoked by the customer or a platform owner.
+5. Active session is tenant-bound. Org B identifiers return `404`.
+6. `READ_ONLY` rejects writes. `evidence.mark_clean` is denied at every access level.
+7. Every request, customer decision, start, read, action, expiry, revoke, and break-glass event is audited to the actual Supreme operator.
 
-Future customer transparency (“Supreme support accessed your organization”) can be derived from these audit events. It is not customer-visible in this release.
+Customer Help & Support shows pending access requests. Historical rows remain after expiry for future transparency.
 
 ## Health model
 
@@ -101,4 +102,4 @@ Use “Submit a support request” and “We’ll review your request and follow
 - No cross-tenant support session.
 - No marking infected evidence `CLEAN` from the console.
 - No password, reset token, or payment-instrument exposure.
-- MFA for platform owners is a #8 production security-review requirement.
+- Privileged MFA is required for platform-plane sessions. #8 is still required before production.

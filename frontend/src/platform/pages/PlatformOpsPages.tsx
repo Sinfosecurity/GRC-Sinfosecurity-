@@ -139,32 +139,33 @@ export function PlatformSessions() {
     const { rows, error, loading, reload } = useList(platformAPI.sessions);
     const [organizationId, setOrganizationId] = useState('');
     const [reason, setReason] = useState('');
+    const [ticketId, setTicketId] = useState('');
+    const [durationMinutes, setDurationMinutes] = useState(30);
     return (
         <QueryState loading={loading} error={error}>
-            <Panel title="Active and requested sessions">
+            <Panel title="Tenant access requests">
                 {rows.length === 0 ? <EmptyState>No support access sessions.</EmptyState> : (rows as Array<Record<string, string>>).map((row) => (
-                    <BoxRow key={row.id} row={row} onApprove={() => platformAPI.approveSession(row.id).then(reload)} onStart={() => platformAPI.startSession(row.id).then(reload)} onRevoke={() => platformAPI.revokeSession(row.id).then(reload)} />
+                    <Typography key={row.id} sx={{ mb: 1 }}>
+                        {row.status} · {row.customerDecision || 'PENDING'} · {row.accessLevel} · {row.durationMinutes}m · {(row.organization as { name?: string } | undefined)?.name || row.organizationId} · {row.reason}
+                        {' '}
+                        {(row.status === 'APPROVED') && <Button size="small" onClick={() => platformAPI.startSession(row.id).then(reload)}>Start</Button>}
+                        {(row.status === 'ACTIVE' || row.status === 'APPROVED' || row.status === 'REQUESTED') && <Button size="small" onClick={() => platformAPI.revokeSession(row.id).then(reload)}>Revoke</Button>}
+                    </Typography>
                 ))}
             </Panel>
-            <Panel title="Request support access">
+            <Panel title="Request tenant access">
                 <TextField fullWidth label="Organization ID" value={organizationId} onChange={(event) => setOrganizationId(event.target.value)} sx={{ mb: 2 }} />
+                <TextField fullWidth label="Ticket ID" value={ticketId} onChange={(event) => setTicketId(event.target.value)} sx={{ mb: 2 }} />
                 <TextField fullWidth label="Reason" value={reason} onChange={(event) => setReason(event.target.value)} sx={{ mb: 2 }} />
-                <Button variant="contained" onClick={() => platformAPI.requestSession({ organizationId, reason, accessLevel: 'READ_ONLY', durationMinutes: 30 }).then(() => { setReason(''); reload(); })}>
-                    Request read-only session
+                <TextField select fullWidth label="Duration" value={String(durationMinutes)} onChange={(event) => setDurationMinutes(Number(event.target.value))} sx={{ mb: 2 }}>
+                    <MenuItem value={15}>15 minutes</MenuItem>
+                    <MenuItem value={30}>30 minutes</MenuItem>
+                    <MenuItem value={60}>60 minutes</MenuItem>
+                </TextField>
+                <Button variant="contained" onClick={() => platformAPI.requestSession({ organizationId, ticketId: ticketId || undefined, reason, scope: 'metadata-and-diagnostics', accessLevel: 'READ_ONLY', durationMinutes }).then(() => { setReason(''); reload(); })}>
+                    Request tenant access
                 </Button>
             </Panel>
         </QueryState>
-    );
-}
-
-function BoxRow({ row, onApprove, onStart, onRevoke }: { row: Record<string, string>; onApprove: () => void; onStart: () => void; onRevoke: () => void }) {
-    return (
-        <Typography sx={{ mb: 1 }}>
-            {row.status} · {row.accessLevel} · {(row.organization as { name?: string } | undefined)?.name || row.organizationId} · {row.reason}
-            {' '}
-            <Button size="small" onClick={onApprove}>Approve</Button>
-            <Button size="small" onClick={onStart}>Start</Button>
-            <Button size="small" onClick={onRevoke}>Revoke</Button>
-        </Typography>
     );
 }

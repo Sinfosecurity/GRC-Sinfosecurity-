@@ -30,6 +30,9 @@ model User {
   passwordChangedAt DateTime?
   mfaEnabled        Boolean           @default(false)
   mfaSecretEnc      String?
+  mfaEnrolledAt     DateTime?
+  lastMfaVerifiedAt DateTime?
+  mfaLastCounter    Int?
 
   risks               Risk[]
   incidents           Incident[]
@@ -44,7 +47,11 @@ model User {
   supportMessages         SupportTicketMessage[]
   sessionsRequested       SupportAccessSession[] @relation("SessionRequested")
   sessionsApproved        SupportAccessSession[] @relation("SessionApproved")
+  sessionsCustomerApproved SupportAccessSession[] @relation("SessionCustomerApproved")
   incidentsOwned          PlatformIncident[] @relation("IncidentOwner")
+  mfaRecoveryCodes        MfaRecoveryCode[]
+  privilegeElevations     PrivilegeElevation[]
+  authChallenges          AuthChallenge[]
 
   @@index([email])
   @@index([organizationId])
@@ -2049,6 +2056,8 @@ model RefreshToken {
   tokenHash String    @unique
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+  plane     String    @default("CUSTOMER")
+  mfaSatisfied Boolean @default(false)
   expiresAt DateTime
   revokedAt DateTime?
   createdAt DateTime  @default(now())
@@ -2529,12 +2538,22 @@ model SupportAccessSession {
   requestedByUserId String
   approvedBy       User?                @relation("SessionApproved", fields: [approvedByUserId], references: [id])
   approvedByUserId String?
+  customerApprover User?                @relation("SessionCustomerApproved", fields: [customerApproverUserId], references: [id])
+  customerApproverUserId String?
   reason           String
+  scope            String?
   accessLevel      SupportAccessLevel   @default(READ_ONLY)
   status           SupportSessionStatus @default(REQUESTED)
+  approvalKind     SupportApprovalKind  @default(CUSTOMER)
+  customerDecision SupportCustomerDecision @default(PENDING)
+  breakGlass       Boolean              @default(false)
+  postEventReviewRequired Boolean       @default(false)
   durationMinutes  Int                  @default(30)
   requestedAt      DateTime             @default(now())
   approvedAt       DateTime?
+  customerApprovedAt DateTime?
+  customerDeniedAt DateTime?
+  deniedByUserId   String?
   startedAt        DateTime?
   expiresAt        DateTime?
   endedAt          DateTime?
@@ -2604,4 +2623,52 @@ model OperationalEvent {
   @@index([organizationId])
   @@index([kind])
   @@index([createdAt])
+}
+
+enum SupportApprovalKind {
+  CUSTOMER
+  BREAK_GLASS
+}
+
+enum SupportCustomerDecision {
+  PENDING
+  APPROVED
+  DENIED
+  REVOKED
+}
+
+model MfaRecoveryCode {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model AuthChallenge {
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  purpose    String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, purpose])
+}
+
+model PrivilegeElevation {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+  requestId String?
+
+  @@index([userId, expiresAt])
 }

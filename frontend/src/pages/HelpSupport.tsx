@@ -26,13 +26,17 @@ export default function HelpSupport() {
     const [category, setCategory] = useState('OTHER');
     const [priority, setPriority] = useState('P3');
     const [tickets, setTickets] = useState<Array<Record<string, unknown>>>([]);
+    const [accessRequests, setAccessRequests] = useState<Array<Record<string, unknown>>>([]);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const load = () => {
-        tenantSupportAPI.list()
-            .then((response) => setTickets(response.data.data))
+        Promise.all([tenantSupportAPI.list(), tenantSupportAPI.accessRequests()])
+            .then(([ticketRes, accessRes]) => {
+                setTickets(ticketRes.data.data);
+                setAccessRequests(accessRes.data.data);
+            })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     };
@@ -76,6 +80,29 @@ export default function HelpSupport() {
                 Submit a support request
             </Button>
             {message && <Typography sx={{ mt: 2 }}>{message}</Typography>}
+            <Typography variant="h5" sx={{ mt: 5, mb: 2 }}>Support access requests</Typography>
+            {accessRequests.length === 0 ? (
+                <Typography color="text.secondary">No pending or recent Supreme support access requests.</Typography>
+            ) : accessRequests.map((row) => (
+                <Box key={String(row.id)} sx={{ mb: 2, p: 2, bgcolor: 'rgba(15,23,42,0.7)', borderRadius: 1 }}>
+                    <Typography fontWeight={700}>Supreme Support requests temporary access</Typography>
+                    <Typography variant="body2">
+                        Ticket: {(row.ticket as { ticketNumber?: number } | undefined)?.ticketNumber ? `SUP-${(row.ticket as { ticketNumber: number }).ticketNumber}` : '—'}
+                    </Typography>
+                    <Typography variant="body2">Reason: {String(row.reason)}</Typography>
+                    <Typography variant="body2">Access: {String(row.accessLevel)} · Duration: {String(row.durationMinutes)} minutes</Typography>
+                    <Typography variant="body2">Status: {String(row.customerDecision || row.status)}</Typography>
+                    {row.status === 'REQUESTED' && (
+                        <>
+                            <Button sx={{ mr: 1, mt: 1 }} onClick={() => tenantSupportAPI.approveAccess(String(row.id)).then(load)}>Approve</Button>
+                            <Button sx={{ mt: 1 }} onClick={() => tenantSupportAPI.denyAccess(String(row.id)).then(load)}>Deny</Button>
+                        </>
+                    )}
+                    {(row.status === 'ACTIVE' || row.status === 'APPROVED') && (
+                        <Button sx={{ mt: 1 }} onClick={() => tenantSupportAPI.revokeAccess(String(row.id)).then(load)}>Revoke access</Button>
+                    )}
+                </Box>
+            ))}
             <Typography variant="h5" sx={{ mt: 5, mb: 2 }}>My requests</Typography>
             <QueryState loading={loading} error={error}>
                 {tickets.length === 0 ? (

@@ -24,9 +24,10 @@ export const platformAPI = {
     updateUserRole: (id: string, role: string) => api.patch(`/platform/internal-users/${id}/role`, { role }),
     sessions: () => api.get('/platform/support-sessions'),
     requestSession: (data: unknown) => api.post('/platform/support-sessions', data),
-    approveSession: (id: string) => api.post(`/platform/support-sessions/${id}/approve`),
     startSession: (id: string) => api.post(`/platform/support-sessions/${id}/start`),
     revokeSession: (id: string) => api.post(`/platform/support-sessions/${id}/revoke`),
+    requestBreakGlass: (data: unknown) => api.post('/platform/support-sessions/break-glass', data),
+    approveBreakGlass: (id: string) => api.post(`/platform/support-sessions/${id}/break-glass-approve`),
 };
 
 export const tenantSupportAPI = {
@@ -34,4 +35,8 @@ export const tenantSupportAPI = {
     list: () => api.get('/support/tickets'),
     get: (id: string) => api.get(`/support/tickets/${id}`),
     reply: (id: string, body: string) => api.post(`/support/tickets/${id}/messages`, { body }),
+    accessRequests: () => api.get('/support/access-requests'),
+    approveAccess: (id: string) => api.post(`/support/access-requests/${id}/approve`),
+    denyAccess: (id: string) => api.post(`/support/access-requests/${id}/deny`),
+    revokeAccess: (id: string) => api.post(`/support/access-requests/${id}/revoke`),
 };

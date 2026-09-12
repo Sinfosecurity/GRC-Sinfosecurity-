@@ -6,6 +6,7 @@ import { hasPermission, PERMISSIONS, isPlatformStaffRole } from '../security/rba
 import { rollupHealth } from '../services/customerHealth';
 import { assertRoleAssignment } from '../services/identityUserService';
 import { ApiError } from '../middleware/errorHandler';
+import { totpAt } from '../security/totp';
 
 jest.setTimeout(60000);
 
@@ -33,6 +34,29 @@ async function setRole(userId: string, role: Role) {
     await prisma.user.update({ where: { id: userId }, data: { role } });
 }
 
+async function platformAuth(email: string) {
+    const login = await request(app).post(`${API}/auth/login`).send({
+        email,
+        password: PASSWORD,
+        plane: 'PLATFORM',
+    });
+    expect(login.status).toBe(200);
+    expect(login.body.data.mfaEnrollmentRequired).toBe(true);
+    const enrollToken = login.body.data.enrollmentToken as string;
+    const start = await request(app)
+        .post(`${API}/auth/mfa/enroll/start`)
+        .set('Authorization', `Bearer ${enrollToken}`);
+    expect(start.status).toBe(200);
+    const confirm = await request(app)
+        .post(`${API}/auth/mfa/enroll/confirm`)
+        .set('Authorization', `Bearer ${enrollToken}`)
+        .send({ code: totpAt(start.body.data.secret) });
+    expect(confirm.status).toBe(200);
+    expect(confirm.body.data.token).toBeTruthy();
+    expect(JSON.stringify(confirm.body)).not.toMatch(/mfaSecretEnc|hashedPassword/);
+    return confirm.body.data.token as string;
+}
+
 describe('platform owner console', () => {
     const suffix = `${Date.now()}`;
     let owner: Awaited<ReturnType<typeof signup>>;
@@ -51,6 +75,9 @@ describe('platform owner console', () => {
         await setRole(owner.userId, Role.PLATFORM_OWNER);
         await setRole(support.userId, Role.SUPPORT_ADMIN);
         await setRole(analyst.userId, Role.SUPPORT_ANALYST);
+        owner.token = await platformAuth(`owner-${suffix}@console.test`);
+        support.token = await platformAuth(`support-${suffix}@console.test`);
+        analyst.token = await platformAuth(`analyst-${suffix}@console.test`);
     });
 
     it('keeps tenant roles off platform permissions', () => {
@@ -254,9 +281,14 @@ describe('platform owner console', () => {
         expect(requested.status).toBe(201);
         expect(requested.body.data.accessLevel).toBe('READ_ONLY');
 
-        const approved = await request(app)
+        const ownerApprove = await request(app)
             .post(`${API}/platform/support-sessions/${requested.body.data.id}/approve`)
             .set('Authorization', `Bearer ${owner.token}`);
+        expect(ownerApprove.status).toBe(400);
+
+        const approved = await request(app)
+            .post(`${API}/support/access-requests/${requested.body.data.id}/approve`)
+            .set('Authorization', `Bearer ${customer.token}`);
         expect(approved.status).toBe(200);
 
         const started = await request(app)
@@ -300,7 +332,7 @@ describe('platform owner console', () => {
         const actions = audit.body.data.map((row: { action: string; actorUserId: string }) => row.action);
         expect(actions).toEqual(expect.arrayContaining([
             'support.session_requested',
-            'support.session_approved',
+            'support.session_customer_approved',
             'support.session_started',
             'support.session_revoked',
         ]));

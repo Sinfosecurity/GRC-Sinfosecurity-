@@ -28,6 +28,11 @@ export type AppEnv = {
     redisUrl?: string;
     appBaseUrl: string;
     frontendUrl: string;
+    customerFrontendUrl: string;
+    adminFrontendUrl: string;
+    platformJwtExpiresIn: string;
+    platformJwtRefreshExpiresIn: string;
+    elevationMinutes: number;
 };
 
 function isWeak(value: string | undefined): boolean {
@@ -84,6 +89,11 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): AppEnv {
         redisUrl: env.REDIS_URL,
         appBaseUrl: env.APP_BASE_URL || `http://localhost:${env.PORT || '4000'}`,
         frontendUrl: env.FRONTEND_URL || env.CORS_ORIGIN || 'http://localhost:3000',
+        customerFrontendUrl: env.CUSTOMER_FRONTEND_URL || env.FRONTEND_URL || env.CORS_ORIGIN || 'http://localhost:3000',
+        adminFrontendUrl: env.ADMIN_FRONTEND_URL || env.FRONTEND_URL || env.CORS_ORIGIN || 'http://localhost:3000',
+        platformJwtExpiresIn: env.PLATFORM_JWT_EXPIRES_IN || '10m',
+        platformJwtRefreshExpiresIn: env.PLATFORM_JWT_REFRESH_EXPIRES_IN || '8h',
+        elevationMinutes: Math.min(Math.max(parseInt(env.PLATFORM_ELEVATION_MINUTES || '15', 10) || 15, 5), 15),
     };
 }
 
