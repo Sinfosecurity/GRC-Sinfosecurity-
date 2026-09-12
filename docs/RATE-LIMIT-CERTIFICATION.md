@@ -94,12 +94,33 @@ Immediate duplicate submit (same email + company within 2 minutes) is suppressed
 
 ## Hosted staging result
 
-Recorded after the controlled hosted checks against:
+Checked 2026-09-12 against SHA `0ced3cd3762c148998c29f97f3b3020ad191d23d`.
 
-- Frontend: https://supreme-risk-staging.onrender.com
-- API: https://supreme-risk-staging-api.onrender.com
+Hosted staging **auto-deployed** this branch:
 
-See the consolidated sprint report for the hosted outcome. This is not a production-ready declaration.
+- Frontend: https://supreme-risk-staging.onrender.com — live
+- API: https://supreme-risk-staging-api.onrender.com — live
+- API instances: 1
+- Redis: healthy
+- Malware: CONNECTED (no #4 regression)
+- Stripe: test mode connected (no #3 reopening)
+- Email provider: DEGRADED (configured; not customer-visible)
+
+| Check | Hosted result |
+|---|---|
+| Valid login | 200 |
+| General API header | `limit=800` |
+| Auth abuse (unknown account) | 429 `RATE_LIMITED` + `Retry-After` |
+| Spoofed `X-Forwarded-For` after lock | still 429 |
+| Demo acceptance | 202, requestId, customer message only |
+| Demo public body | no `delivery`, `NOT_CONFIGURED`, `FAILED`, provider names |
+| Demo JS | “Request received” / no provider leak |
+| Demo form abuse | 429 `RATE_LIMITED` |
+| Stripe webhook burst | 400 (signature), never 429 |
+| Report/upload 429 | not flooded on hosted; same store/keying certified in automated tests |
+| Window recovery | certified with injected clock in automated tests (15-minute hosted wait not used) |
+
+Dual-stack clients may occupy two IP buckets (`email+IP`). Abuse still reached 429 without header bypass. This is not a production-ready declaration.
 
 ## Operational signals
 
