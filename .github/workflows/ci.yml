@@ -80,7 +80,7 @@ jobs:
 
       - name: Backend typecheck
         working-directory: backend
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Security, secret scan, and dependency advisory
         run: bash backend/scripts/ci-security.sh
@@ -96,11 +96,11 @@ jobs:
 
       - name: Frontend typecheck
         working-directory: frontend
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Frontend full test suite
         working-directory: frontend
-        run: npx vitest run | tee "$GITHUB_WORKSPACE/ci-artifacts/frontend-tests.txt"
+        run: npm test -- --run | tee "$GITHUB_WORKSPACE/ci-artifacts/frontend-tests.txt"
 
       - name: Frontend production build
         working-directory: frontend
@@ -129,7 +129,7 @@ jobs:
             echo "## Commands"
             echo "- prisma generate / validate"
             echo "- baseline bootstrap (empty CI DB only) + prisma migrate deploy"
-            echo "- backend/frontend tsc --noEmit"
+            echo "- backend/frontend npm run typecheck"
             echo "- backend full Jest suite"
             echo "- frontend full Vitest suite"
             echo "- frontend production build + public build safety"
