@@ -97,9 +97,13 @@ services:
     name: supreme-risk-staging-clamav
     runtime: docker
     region: oregon
-    plan: starter
+    plan: standard
     dockerfilePath: ./infra/staging/clamav/Dockerfile
     dockerContext: ./infra/staging/clamav
+    disk:
+      name: clamav-signatures
+      mountPath: /var/lib/clamav
+      sizeGB: 2
     envVars:
       - key: CLAMD_STARTUP_TIMEOUT
         value: "1800"
