@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import zipfile
 from datetime import date
@@ -145,7 +146,7 @@ def run() -> None:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(viewport={"width": 1440, "height": 900}, accept_downloads=True)
         page = context.new_page()
-        page.set_default_timeout(20000)
+        page.set_default_timeout(40000 if BASE.startswith("https://") else 20000)
 
         # A. LOGIN
         try:
@@ -154,10 +155,28 @@ def run() -> None:
             banner = page.get_by_text(BANNER)
             banner.first.wait_for()
             screenshot(page, "01-landing")
+            if page.get_by_label("Email").count() == 0:
+                home_ok = page.locator("main#main h1").count() > 0
+                record(
+                    "A0. MARKETING HOME",
+                    "PASS" if home_ok else "FAIL",
+                    "Public marketing homepage rendered with staging banner.",
+                )
+                page.goto(f"{BASE}/request-demo", wait_until="domcontentloaded")
+                page.wait_for_load_state("networkidle")
+                demo_ok = page.get_by_label("Email").count() > 0 or page.get_by_text("See Supreme against the work you already do").count() > 0
+                record(
+                    "A0. REQUEST DEMO",
+                    "PASS" if demo_ok else "FAIL",
+                    "Request-demo page is reachable on the public staging URL.",
+                )
+                page.goto(f"{BASE}/login", wait_until="domcontentloaded")
+                page.wait_for_load_state("networkidle")
+                banner.first.wait_for()
             page.get_by_label("Email").fill("admin@sinfosecurity.com")
             page.get_by_label("Password").fill("Admin@123")
-            page.get_by_role("button", name="Log In").click()
-            page.wait_for_url("**/dashboard", timeout=20000)
+            page.get_by_role("button", name=re.compile(r"(Log In|Sign in)", re.I)).click()
+            page.wait_for_url("**/dashboard", timeout=45000)
             page.wait_for_load_state("networkidle")
             screenshot(page, "02-dashboard")
             dash_ok = page.get_by_text("What needs attention today").count() > 0

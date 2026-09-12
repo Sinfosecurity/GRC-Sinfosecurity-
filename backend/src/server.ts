@@ -75,6 +75,7 @@ import { alertManager } from './utils/alerting';
 import { businessMetricsCollector } from './utils/businessMetrics';
 
 const app: Application = express();
+app.set('trust proxy', 1);
 const httpServer = createServer(app);
 
 // DEV_MODE may skip optional Redis/Mongo only. It is never an authentication path.
