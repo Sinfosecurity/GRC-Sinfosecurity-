@@ -1,0 +1,495 @@
+{
+  "certificationId": "BR-6-20260912T183207Z",
+  "timestamp": "2026-09-12T18:32:14Z",
+  "sourceEnvironment": "isolated-recovery-source on 127.0.0.1:55434",
+  "sourceSha": "f0d696e5d276d6be650d1176549cf7430f513c0b",
+  "backupTimestamp": "2026-09-12T18:32:14Z",
+  "lastIncludedTransaction": "15b71446-ea2c-4183-b64c-2ef716c1ca9e",
+  "recoveryTarget": "supreme_risk_recovery_target + isolated object namespace",
+  "operator": "recovery-certify.sh",
+  "liveStagingModified": "NO",
+  "databaseRestoreSeconds": 2,
+  "objectRestoreSeconds": 1,
+  "reconcileSeconds": 2,
+  "totalMeasuredRtoSeconds": 5,
+  "constraints": 266,
+  "indexes": 263,
+  "hostedDump": "PASS",
+  "hostedRestoreIsolated": "PASS",
+  "populate": {
+    "orgA": {
+      "id": "dff7a017-48ad-4789-a42a-1ff9346f6db9",
+      "name": "RECOVERY ORG A",
+      "vendors": 3
+    },
+    "orgB": {
+      "id": "282566a1-5634-4369-9f24-c6afdb6b4cbd",
+      "name": "RECOVERY ORG B",
+      "vendors": 2
+    }
+  },
+  "counts": {
+    "Organization": 2,
+    "User": 6,
+    "Vendor": 5,
+    "VendorAssessment": 5,
+    "AssessmentResponse": 5,
+    "VendorIssue": 5,
+    "VendorContract": 5,
+    "VendorMonitoring": 5,
+    "FourthParty": 2,
+    "ScoreCalculation": 5,
+    "RiskDecisionBrief": 5,
+    "ScoringMethodology": 2,
+    "StoredObject": 10,
+    "EvidenceLink": 5,
+    "AuditEvent": 5,
+    "SubscriptionEvent": 2,
+    "InAppNotification": 2
+  },
+  "tenants": {
+    "RECOVERY ORG A": {
+      "id": "dff7a017-48ad-4789-a42a-1ff9346f6db9",
+      "plan": "PROFESSIONAL",
+      "users": 3,
+      "vendors": 3,
+      "assessments": 3,
+      "findings": 3,
+      "briefs": 3
+    },
+    "RECOVERY ORG B": {
+      "id": "282566a1-5634-4369-9f24-c6afdb6b4cbd",
+      "plan": "STARTER",
+      "users": 3,
+      "vendors": 2,
+      "assessments": 2,
+      "findings": 2,
+      "briefs": 2
+    }
+  },
+  "reconcile": [
+    {
+      "category": "count.Organization",
+      "result": "PASS",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "category": "count.User",
+      "result": "PASS",
+      "expected": 6,
+      "actual": 6
+    },
+    {
+      "category": "count.Vendor",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.VendorAssessment",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.AssessmentResponse",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.VendorIssue",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.VendorContract",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.VendorMonitoring",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.FourthParty",
+      "result": "PASS",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "category": "count.ScoreCalculation",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.RiskDecisionBrief",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.ScoringMethodology",
+      "result": "PASS",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "category": "count.StoredObject",
+      "result": "PASS",
+      "expected": 10,
+      "actual": 10
+    },
+    {
+      "category": "count.EvidenceLink",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.AuditEvent",
+      "result": "PASS",
+      "expected": 5,
+      "actual": 5
+    },
+    {
+      "category": "count.SubscriptionEvent",
+      "result": "PASS",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "category": "count.InAppNotification",
+      "result": "PASS",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "category": "tenant.ids",
+      "result": "PASS",
+      "expected": [
+        "282566a1-5634-4369-9f24-c6afdb6b4cbd",
+        "dff7a017-48ad-4789-a42a-1ff9346f6db9"
+      ],
+      "actual": [
+        "282566a1-5634-4369-9f24-c6afdb6b4cbd",
+        "dff7a017-48ad-4789-a42a-1ff9346f6db9"
+      ]
+    },
+    {
+      "category": "evidence.checksums",
+      "result": "PASS",
+      "expected": [
+        [
+          "0909a37d-3236-4e73-a356-e1c03e90ca4f",
+          "f1c8a7e33c874e2072e67b328828d8816ee75909fc8c6b2018c6a34c9c4c2ac2",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "1738ad81-0a58-4bfa-9162-8db01ada1f46",
+          "e66a53d7fb86538d181575bada34b76563ec04f53a065ced1c87a289768f517f",
+          "CLEAN"
+        ],
+        [
+          "555e8758-a4be-4ce8-8260-e44abcd4da0f",
+          "1bc30ac93345b06b99bbbe9f602ad4f670d7eb69fb3f6eab072d7efbad451926",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "5d4246f7-13bb-4d05-b277-6580568354ab",
+          "30af51119f01826f576d32d747a88001a4d6fb51d2b7d536dcf045b793b3b138",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "88f3a334-42a5-467f-a1e6-463f0b34147c",
+          "a35a58752a073747123980aaf5373a0e96db92b792f44cf5cd77c5e40b1fcbf4",
+          "CLEAN"
+        ],
+        [
+          "8a8d75eb-a646-402d-a33e-f7e8cee10f20",
+          "a9b4e5bcd74c9b11c149f192f198c7c8ab82f2a373d90638625fc1ad8f1cbf63",
+          "CLEAN"
+        ],
+        [
+          "91097b78-cf0c-4d22-8637-6ac05f085702",
+          "9f13ea769f749b3bb9be67d7a05a3bbd347039b3c20453d1ef6e1717d177ae36",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "b5de4a41-14fa-43fd-adde-d20475ba8128",
+          "00a58fd82210d73bbe5fbf274febf4f604965c0b12770addf9b931b750942b0d",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "d0fa4403-8904-4137-9236-aad696409b22",
+          "4b101dd3aebd3af56dad606f2634b3dd3b306223a96fb2dbceefeeebee0f9a25",
+          "CLEAN"
+        ],
+        [
+          "fca4083e-ed35-4e6f-957b-351b75998ced",
+          "83dbd7f05aa3747d3221844b2c503fd9be65a8bc50787f8cb45311c3a0a93dbf",
+          "CLEAN"
+        ]
+      ],
+      "actual": [
+        [
+          "0909a37d-3236-4e73-a356-e1c03e90ca4f",
+          "f1c8a7e33c874e2072e67b328828d8816ee75909fc8c6b2018c6a34c9c4c2ac2",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "1738ad81-0a58-4bfa-9162-8db01ada1f46",
+          "e66a53d7fb86538d181575bada34b76563ec04f53a065ced1c87a289768f517f",
+          "CLEAN"
+        ],
+        [
+          "555e8758-a4be-4ce8-8260-e44abcd4da0f",
+          "1bc30ac93345b06b99bbbe9f602ad4f670d7eb69fb3f6eab072d7efbad451926",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "5d4246f7-13bb-4d05-b277-6580568354ab",
+          "30af51119f01826f576d32d747a88001a4d6fb51d2b7d536dcf045b793b3b138",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "88f3a334-42a5-467f-a1e6-463f0b34147c",
+          "a35a58752a073747123980aaf5373a0e96db92b792f44cf5cd77c5e40b1fcbf4",
+          "CLEAN"
+        ],
+        [
+          "8a8d75eb-a646-402d-a33e-f7e8cee10f20",
+          "a9b4e5bcd74c9b11c149f192f198c7c8ab82f2a373d90638625fc1ad8f1cbf63",
+          "CLEAN"
+        ],
+        [
+          "91097b78-cf0c-4d22-8637-6ac05f085702",
+          "9f13ea769f749b3bb9be67d7a05a3bbd347039b3c20453d1ef6e1717d177ae36",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "b5de4a41-14fa-43fd-adde-d20475ba8128",
+          "00a58fd82210d73bbe5fbf274febf4f604965c0b12770addf9b931b750942b0d",
+          "NOT_CONFIGURED"
+        ],
+        [
+          "d0fa4403-8904-4137-9236-aad696409b22",
+          "4b101dd3aebd3af56dad606f2634b3dd3b306223a96fb2dbceefeeebee0f9a25",
+          "CLEAN"
+        ],
+        [
+          "fca4083e-ed35-4e6f-957b-351b75998ced",
+          "83dbd7f05aa3747d3221844b2c503fd9be65a8bc50787f8cb45311c3a0a93dbf",
+          "CLEAN"
+        ]
+      ]
+    },
+    {
+      "category": "risk.scores",
+      "result": "PASS",
+      "expected": [
+        [
+          "14600bce-eb70-480f-bbc4-4fd0b356ad97",
+          100,
+          70,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "387bc2e1-5cec-4193-9ff9-4a7b800bf2c4",
+          67,
+          44,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "e0bac32a-de2a-430a-a375-77a259c1566a",
+          100,
+          70,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "f0b4a861-3673-4925-b2af-536182e54322",
+          67,
+          44,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "f4d715e4-bedb-4ac4-b043-cb1212d58401",
+          47,
+          31,
+          "RISK_ACCEPTED"
+        ]
+      ],
+      "actual": [
+        [
+          "14600bce-eb70-480f-bbc4-4fd0b356ad97",
+          100,
+          70,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "387bc2e1-5cec-4193-9ff9-4a7b800bf2c4",
+          67,
+          44,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "e0bac32a-de2a-430a-a375-77a259c1566a",
+          100,
+          70,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "f0b4a861-3673-4925-b2af-536182e54322",
+          67,
+          44,
+          "RISK_ACCEPTED"
+        ],
+        [
+          "f4d715e4-bedb-4ac4-b043-cb1212d58401",
+          47,
+          31,
+          "RISK_ACCEPTED"
+        ]
+      ]
+    },
+    {
+      "category": "invariants",
+      "result": "PASS",
+      "expected": [
+        "assessment:217496d6-8f6d-48f5-92cb-b4f462b90b48",
+        "assessment:2f7752fa-6ff6-4a7a-822b-33ecc60256e9",
+        "assessment:3b836361-b22d-411f-b46b-df6691ba1dc6",
+        "assessment:a7001a51-76d1-403d-a540-e9e38eca5ef4",
+        "assessment:b393d8d4-58f4-43db-a7ec-c3991a3d1d23",
+        "evidence-link:721084dc-9460-477b-b493-a205cdcd33fa",
+        "evidence-link:73cbb093-0669-4263-8091-477514efa7c1",
+        "evidence-link:83d0a511-e3b6-445c-a3d1-f6b7d18cc1d9",
+        "evidence-link:912eaa71-3ea2-49bf-8d4a-29c0a0856f36",
+        "evidence-link:e34908e7-ed41-41a7-a2a7-a60bd10c5ef0",
+        "finding:0087a8d7-fee4-4895-ba61-57277cd2ec7a",
+        "finding:9f4ab7bb-739d-472d-b82a-d462e36bb691",
+        "finding:a36e272f-1d05-4b00-9544-c3a4672a6a07",
+        "finding:cb91ccb9-c460-4cbd-ae92-379e1d445fba",
+        "finding:e9c6ae1d-70ad-4707-b7cb-eebb2b8ef9cd",
+        "risk-acceptance:14600bce-eb70-480f-bbc4-4fd0b356ad97",
+        "risk-acceptance:387bc2e1-5cec-4193-9ff9-4a7b800bf2c4",
+        "risk-acceptance:e0bac32a-de2a-430a-a375-77a259c1566a",
+        "risk-acceptance:f0b4a861-3673-4925-b2af-536182e54322",
+        "risk-acceptance:f4d715e4-bedb-4ac4-b043-cb1212d58401",
+        "two-tenants"
+      ],
+      "actual": [
+        "assessment:217496d6-8f6d-48f5-92cb-b4f462b90b48",
+        "assessment:2f7752fa-6ff6-4a7a-822b-33ecc60256e9",
+        "assessment:3b836361-b22d-411f-b46b-df6691ba1dc6",
+        "assessment:a7001a51-76d1-403d-a540-e9e38eca5ef4",
+        "assessment:b393d8d4-58f4-43db-a7ec-c3991a3d1d23",
+        "evidence-link:721084dc-9460-477b-b493-a205cdcd33fa",
+        "evidence-link:73cbb093-0669-4263-8091-477514efa7c1",
+        "evidence-link:83d0a511-e3b6-445c-a3d1-f6b7d18cc1d9",
+        "evidence-link:912eaa71-3ea2-49bf-8d4a-29c0a0856f36",
+        "evidence-link:e34908e7-ed41-41a7-a2a7-a60bd10c5ef0",
+        "finding:0087a8d7-fee4-4895-ba61-57277cd2ec7a",
+        "finding:9f4ab7bb-739d-472d-b82a-d462e36bb691",
+        "finding:a36e272f-1d05-4b00-9544-c3a4672a6a07",
+        "finding:cb91ccb9-c460-4cbd-ae92-379e1d445fba",
+        "finding:e9c6ae1d-70ad-4707-b7cb-eebb2b8ef9cd",
+        "risk-acceptance:14600bce-eb70-480f-bbc4-4fd0b356ad97",
+        "risk-acceptance:387bc2e1-5cec-4193-9ff9-4a7b800bf2c4",
+        "risk-acceptance:e0bac32a-de2a-430a-a375-77a259c1566a",
+        "risk-acceptance:f0b4a861-3673-4925-b2af-536182e54322",
+        "risk-acceptance:f4d715e4-bedb-4ac4-b043-cb1212d58401",
+        "two-tenants"
+      ]
+    }
+  ],
+  "postRestore": {
+    "passed": 45,
+    "failed": 0,
+    "allPassed": true
+  },
+  "reports": [
+    {
+      "name": "decision-brief",
+      "bytes": 5975,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "executive",
+      "bytes": 7264,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "vendor-scorecard",
+      "bytes": 7360,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "assessment",
+      "bytes": 6495,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "findings-pdf",
+      "bytes": 6444,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "findings-csv",
+      "bytes": 463,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "board-pdf",
+      "bytes": 16423,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "board-pptx",
+      "bytes": 33273,
+      "result": "PASS",
+      "detail": "generated"
+    },
+    {
+      "name": "cross-tenant-brief",
+      "result": "PASS",
+      "detail": "denied status=404"
+    }
+  ],
+  "invariants": [
+    "assessment:2f7752fa-6ff6-4a7a-822b-33ecc60256e9",
+    "assessment:3b836361-b22d-411f-b46b-df6691ba1dc6",
+    "assessment:b393d8d4-58f4-43db-a7ec-c3991a3d1d23",
+    "assessment:217496d6-8f6d-48f5-92cb-b4f462b90b48",
+    "assessment:a7001a51-76d1-403d-a540-e9e38eca5ef4",
+    "finding:e9c6ae1d-70ad-4707-b7cb-eebb2b8ef9cd",
+    "finding:9f4ab7bb-739d-472d-b82a-d462e36bb691",
+    "finding:a36e272f-1d05-4b00-9544-c3a4672a6a07",
+    "finding:cb91ccb9-c460-4cbd-ae92-379e1d445fba",
+    "finding:0087a8d7-fee4-4895-ba61-57277cd2ec7a",
+    "evidence-link:721084dc-9460-477b-b493-a205cdcd33fa",
+    "evidence-link:e34908e7-ed41-41a7-a2a7-a60bd10c5ef0",
+    "evidence-link:912eaa71-3ea2-49bf-8d4a-29c0a0856f36",
+    "evidence-link:73cbb093-0669-4263-8091-477514efa7c1",
+    "evidence-link:83d0a511-e3b6-445c-a3d1-f6b7d18cc1d9",
+    "risk-acceptance:14600bce-eb70-480f-bbc4-4fd0b356ad97",
+    "risk-acceptance:387bc2e1-5cec-4193-9ff9-4a7b800bf2c4",
+    "risk-acceptance:f4d715e4-bedb-4ac4-b043-cb1212d58401",
+    "risk-acceptance:e0bac32a-de2a-430a-a375-77a259c1566a",
+    "risk-acceptance:f0b4a861-3673-4925-b2af-536182e54322",
+    "two-tenants"
+  ]
+}
