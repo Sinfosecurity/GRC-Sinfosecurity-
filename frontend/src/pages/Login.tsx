@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Alert, Box, Button, Container, Link, Stack, TextField, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { environmentLabel } from '../components/DevPreviewBanner';
 import MarketingLayout from '../marketing/MarketingLayout';
@@ -29,33 +28,44 @@ export default function Login() {
 
     return (
         <MarketingLayout>
-        <Container maxWidth="sm" sx={{ py: 12 }}>
-            <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Supreme Risk</Typography>
-            {environmentLabel() && (
-                <Typography color="warning.main" sx={{ mb: 1, fontWeight: 700 }}>
-                    {environmentLabel() === 'STAGING' ? 'SUPREME RISK — STAGING' : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
-                </Typography>
-            )}
-            <Typography color="text.secondary" sx={{ mb: 4 }}>
-                {environmentLabel() === 'STAGING'
-                    ? 'Sign in to the isolated staging organization'
-                    : environmentLabel() === 'DEVELOPMENT'
-                        ? 'Sign in to the local demo organization'
-                        : 'Sign in to your organization'}
-            </Typography>
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            <Box component="form" onSubmit={handleSubmit}>
-                <Stack spacing={2}>
-                    <TextField label="Work email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth />
-                    <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required fullWidth />
-                    <Button type="submit" variant="contained" disabled={loading}>{loading ? 'Signing in…' : 'Sign in'}</Button>
-                    <Stack direction="row" justifyContent="space-between">
-                        <Link component={RouterLink} to="/forgot-password">Forgot password</Link>
-                        <Link component={RouterLink} to="/register">Create organization</Link>
-                    </Stack>
-                </Stack>
-            </Box>
-        </Container>
+            <section className="mkt-page">
+                <div className="mkt-shell">
+                    <div className="mkt-login">
+                        <p className="mkt-kicker">Workspace access</p>
+                        <h1 className="mkt-display">Sign in</h1>
+                        {environmentLabel() && (
+                            <p className="mkt-kicker">
+                                {environmentLabel() === 'STAGING' ? 'SUPREME RISK — STAGING' : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
+                            </p>
+                        )}
+                        <p className="mkt-lede">
+                            {environmentLabel() === 'STAGING'
+                                ? 'Sign in to the isolated staging organization'
+                                : environmentLabel() === 'DEVELOPMENT'
+                                    ? 'Sign in to the local demo organization'
+                                    : 'Sign in to your organization'}
+                        </p>
+                        <form className="mkt-form" onSubmit={handleSubmit}>
+                            <div className="mkt-field">
+                                <label htmlFor="work-email">Work email</label>
+                                <input id="work-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                            </div>
+                            <div className="mkt-field">
+                                <label htmlFor="password">Password</label>
+                                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            </div>
+                            {error && <p role="alert">{error}</p>}
+                            <button className="mkt-btn mkt-btn-gold" type="submit" disabled={loading}>
+                                {loading ? 'Signing in…' : 'Sign in'}
+                            </button>
+                            <div className="mkt-legal" style={{ marginTop: 8, paddingTop: 8, border: 0 }}>
+                                <Link to="/forgot-password">Forgot password</Link>
+                                <Link to="/register">Create organization</Link>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
         </MarketingLayout>
     );
 }

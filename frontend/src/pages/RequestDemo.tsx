@@ -55,7 +55,7 @@ export default function RequestDemo() {
                         Tell us who you are and what you need to govern. This is a real request path,
                         not a decorative button.
                     </p>
-                    <form className="mkt-form" onSubmit={onSubmit}>
+                    <form className="mkt-form mkt-request-form" onSubmit={onSubmit}>
                         <div className="mkt-field">
                             <label htmlFor="demo-name">Name</label>
                             <input id="demo-name" name="name" value={form.name} onChange={onChange('name')} required />
@@ -92,17 +92,17 @@ export default function RequestDemo() {
                                 <option>5,000+</option>
                             </select>
                         </div>
-                        <div className="mkt-field">
+                        <div className="mkt-field mkt-span">
                             <label htmlFor="demo-need">Primary need</label>
                             <textarea id="demo-need" name="primaryNeed" value={form.primaryNeed} onChange={onChange('primaryNeed')} required />
                         </div>
-                        {error && <p role="alert">{error}</p>}
+                        {error && <p className="mkt-span" role="alert">{error}</p>}
                         {result && (
-                            <p className="mkt-status" role="status">
+                            <p className="mkt-status mkt-span" role="status">
                                 {result.message} Delivery: {result.delivery}.
                             </p>
                         )}
-                        <button className="mkt-btn mkt-btn-gold" type="submit" disabled={submitting}>
+                        <button className="mkt-btn mkt-btn-gold mkt-span" type="submit" disabled={submitting}>
                             {submitting ? 'Submitting…' : 'Submit request'}
                         </button>
                     </form>
