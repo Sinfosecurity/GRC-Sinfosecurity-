@@ -1,4 +1,5 @@
 import { billingStatus } from '../billing/stripeBillingService';
+import { stripePriceEnvName } from '../billing/plans';
 
 describe('Stripe test-mode policy', () => {
     const originalSecret = process.env.STRIPE_SECRET_KEY;
@@ -29,5 +30,11 @@ describe('Stripe test-mode policy', () => {
         expect(billingStatus()).toBe('NOT_CONFIGURED');
         process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
         expect(billingStatus()).toBe('CONNECTED');
+    });
+
+    it('maps monthly and annual test price env names', () => {
+        expect(stripePriceEnvName('starter')).toBe('STRIPE_PRICE_STARTER');
+        expect(stripePriceEnvName('PROFESSIONAL', 'annual')).toBe('STRIPE_PRICE_PROFESSIONAL_ANNUAL');
+        expect(stripePriceEnvName('enterprise', 'yearly')).toBe('STRIPE_PRICE_ENTERPRISE_ANNUAL');
     });
 });

@@ -56,6 +56,48 @@ export function normalizePlan(plan?: string | null): PlanId {
     return 'STARTER';
 }
 
+export function stripePriceEnvName(plan?: string | null, interval?: string | null): string {
+    const base = `STRIPE_PRICE_${normalizePlan(plan)}`;
+    const cycle = (interval || '').toLowerCase();
+    if (cycle === 'annual' || cycle === 'year' || cycle === 'yearly') {
+        return `${base}_ANNUAL`;
+    }
+    return base;
+}
+
+export function normalizeBillingInterval(interval?: string | null): 'month' | 'year' {
+    const cycle = (interval || '').toLowerCase();
+    if (cycle === 'annual' || cycle === 'year' || cycle === 'yearly') {
+        return 'year';
+    }
+    return 'month';
+}
+
+const PRICE_ENV_BY_PLAN: Array<{ env: string; plan: PlanId; interval: 'month' | 'year' }> = [
+    { env: 'STRIPE_PRICE_STARTER', plan: 'STARTER', interval: 'month' },
+    { env: 'STRIPE_PRICE_STARTER_ANNUAL', plan: 'STARTER', interval: 'year' },
+    { env: 'STRIPE_PRICE_PROFESSIONAL', plan: 'PROFESSIONAL', interval: 'month' },
+    { env: 'STRIPE_PRICE_PROFESSIONAL_ANNUAL', plan: 'PROFESSIONAL', interval: 'year' },
+    { env: 'STRIPE_PRICE_ENTERPRISE', plan: 'ENTERPRISE', interval: 'month' },
+    { env: 'STRIPE_PRICE_ENTERPRISE_ANNUAL', plan: 'ENTERPRISE', interval: 'year' },
+];
+
+export function planFromStripePriceId(priceId?: string | null): PlanId | null {
+    if (!priceId) {
+        return null;
+    }
+    const match = PRICE_ENV_BY_PLAN.find((row) => process.env[row.env] === priceId);
+    return match?.plan || null;
+}
+
+export function intervalFromStripePriceId(priceId?: string | null): 'month' | 'year' | null {
+    if (!priceId) {
+        return null;
+    }
+    const match = PRICE_ENV_BY_PLAN.find((row) => process.env[row.env] === priceId);
+    return match?.interval || null;
+}
+
 export function entitlementsFor(plan?: string | null): Entitlements {
     return PLAN_ENTITLEMENTS[normalizePlan(plan)];
 }

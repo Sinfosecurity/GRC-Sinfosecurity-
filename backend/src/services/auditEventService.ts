@@ -14,6 +14,9 @@ const SENSITIVE_KEYS = [
     'authorization',
     'cookie',
     'jwt',
+    'stripe',
+    'card',
+    'payment',
 ];
 
 export type AuditInput = {

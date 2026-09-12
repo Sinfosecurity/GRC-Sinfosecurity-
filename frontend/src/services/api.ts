@@ -150,7 +150,7 @@ export const systemAPI = {
 
 export const billingAPI = {
     status: () => api.get('/billing/status'),
-    checkout: (plan: string) => api.post('/billing/checkout', { plan }),
+    checkout: (plan: string, interval?: string) => api.post('/billing/checkout', { plan, interval }),
     portal: () => api.post('/billing/portal'),
 };
 

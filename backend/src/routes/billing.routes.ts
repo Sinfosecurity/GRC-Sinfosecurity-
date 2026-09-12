@@ -6,6 +6,7 @@ import { stripeBillingService } from '../billing/stripeBillingService';
 import { entitlementsFor } from '../billing/plans';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import { rejectClientTenantOverride } from '../security/tenant';
 
 const router = Router();
 
@@ -36,8 +37,12 @@ router.get('/status', authenticate, requirePermission(PERMISSIONS['billing.manag
             data: {
                 provider: stripeBillingService.status(),
                 plan: org?.plan,
+                billingInterval: org?.billingInterval,
                 subscriptionStatus: org?.subscriptionStatus,
                 organizationStatus: org?.status,
+                billingCustomerId: org?.billingCustomerId,
+                billingSubscriptionId: org?.billingSubscriptionId,
+                cancelAtPeriodEnd: org?.cancelAtPeriodEnd === true,
                 entitlements: entitlementsFor(org?.plan),
             },
         });
@@ -48,12 +53,14 @@ router.get('/status', authenticate, requirePermission(PERMISSIONS['billing.manag
 
 router.post('/checkout', authenticate, requirePermission(PERMISSIONS['billing.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        const organizationId = rejectClientTenantOverride(req.user!.organizationId, req.body?.organizationId);
         const result = await stripeBillingService.createCheckout(
-            req.user!.organizationId,
+            organizationId,
             req.user!.id,
             req.body?.plan || 'PROFESSIONAL',
-            req.body?.successUrl || `${process.env.FRONTEND_URL}/settings?billing=success`,
-            req.body?.cancelUrl || `${process.env.FRONTEND_URL}/settings?billing=cancelled`
+            req.body?.successUrl || `${process.env.FRONTEND_URL}/billing?status=success`,
+            req.body?.cancelUrl || `${process.env.FRONTEND_URL}/billing?status=cancelled`,
+            req.body?.interval
         );
         res.json({ success: true, data: result });
     } catch (error) {
@@ -63,9 +70,10 @@ router.post('/checkout', authenticate, requirePermission(PERMISSIONS['billing.ma
 
 router.post('/portal', authenticate, requirePermission(PERMISSIONS['billing.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        const organizationId = rejectClientTenantOverride(req.user!.organizationId, req.body?.organizationId);
         const result = await stripeBillingService.createPortal(
-            req.user!.organizationId,
-            req.body?.returnUrl || `${process.env.FRONTEND_URL}/settings`
+            organizationId,
+            req.body?.returnUrl || `${process.env.FRONTEND_URL}/billing`
         );
         res.json({ success: true, data: result });
     } catch (error) {

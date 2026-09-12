@@ -80,8 +80,11 @@ model Organization {
   plan               String              @default("STARTER")
   trialStart         DateTime?
   trialEnd           DateTime?
-  subscriptionStatus String?
-  billingCustomerId  String?
+  subscriptionStatus    String?
+  billingCustomerId     String?
+  billingSubscriptionId String?
+  billingInterval       String?
+  cancelAtPeriodEnd     Boolean @default(false)
   isDemo             Boolean             @default(false)
   timezone           String              @default("UTC")
   legalName          String?
@@ -138,6 +141,7 @@ model Organization {
   @@index([slug])
   @@index([status])
   @@index([billingCustomerId])
+  @@index([billingSubscriptionId])
 }
 
 enum OrganizationStatus {
