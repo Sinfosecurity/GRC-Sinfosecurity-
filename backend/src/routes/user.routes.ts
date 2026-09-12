@@ -4,6 +4,7 @@ import { authenticate, AuthRequest, requirePermission } from '../middleware/auth
 import { PERMISSIONS } from '../security/rbac';
 import { identityUserService } from '../services/identityUserService';
 import { ApiError } from '../middleware/errorHandler';
+import { adminLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 router.use(authenticate);
@@ -49,7 +50,7 @@ router.post('/invitations/:id/revoke', requirePermission(PERMISSIONS['user.manag
     }
 });
 
-router.post('/invitations/:id/resend', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/invitations/:id/resend', requirePermission(PERMISSIONS['user.manage']), adminLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const result = await identityUserService.resendInvitation(
             req.user!.organizationId,
@@ -107,7 +108,7 @@ router.patch('/:id/status', requirePermission(PERMISSIONS['user.manage']), async
     }
 });
 
-router.post('/invite', requirePermission(PERMISSIONS['user.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/invite', requirePermission(PERMISSIONS['user.manage']), adminLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { email, role } = req.body || {};
         if (!email) {

@@ -20,7 +20,9 @@ export default function Login() {
             await login(email, password);
             navigate('/dashboard');
         } catch (err: any) {
-            setError(err.message || 'Unable to sign in');
+            setError(err.status === 429
+                ? 'Too many requests. Please try again later.'
+                : err.message || 'Unable to sign in');
         } finally {
             setLoading(false);
         }

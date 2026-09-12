@@ -29,6 +29,7 @@ export function downloadErrorMessage(error: unknown): string {
         if (error.status === 401) return 'Sign in is required to download this report.';
         if (error.status === 403) return 'You do not have permission to export this report.';
         if (error.status === 404) return 'This report cannot be generated because the record was not found.';
+        if (error.status === 429) return 'Too many requests. Please try again later.';
         if (error.status === 503) return 'A required provider is unavailable.';
         if (error.status === 500) return 'Report generation failed.';
         return error.message;

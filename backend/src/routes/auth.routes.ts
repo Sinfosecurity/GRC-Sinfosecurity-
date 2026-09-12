@@ -2,7 +2,14 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { authService } from '../services/authService';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { ApiError } from '../middleware/errorHandler';
-import { authRateLimiter, passwordResetLimiter } from '../middleware/rateLimiter';
+import {
+    activationRateLimiter,
+    authRateLimiter,
+    loginIpLimiter,
+    passwordResetIpLimiter,
+    passwordResetLimiter,
+    signupRateLimiter,
+} from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -14,7 +21,7 @@ function meta(req: Request) {
     };
 }
 
-router.post('/register', authRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/register', signupRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password, firstName, lastName, organizationName, country } = req.body || {};
         if (!email || !password || !firstName || !lastName || !organizationName) {
@@ -35,7 +42,7 @@ router.post('/register', authRateLimiter, async (req: Request, res: Response, ne
     }
 });
 
-router.post('/signup', authRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/signup', signupRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password, firstName, lastName, organizationName, country } = req.body || {};
         if (!email || !password || !firstName || !lastName || !organizationName) {
@@ -56,7 +63,7 @@ router.post('/signup', authRateLimiter, async (req: Request, res: Response, next
     }
 });
 
-router.post('/login', authRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/login', loginIpLimiter, authRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body || {};
         if (!email || !password) {
@@ -116,7 +123,7 @@ router.post('/change-password', authenticate, async (req: AuthRequest, res: Resp
     }
 });
 
-router.post('/forgot-password', passwordResetLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/forgot-password', passwordResetIpLimiter, passwordResetLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email } = req.body || {};
         if (!email) {
@@ -135,7 +142,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req: Request, res: 
     }
 });
 
-router.post('/reset-password', passwordResetLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/reset-password', passwordResetIpLimiter, passwordResetLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { token, password } = req.body || {};
         if (!token || !password) {
@@ -148,7 +155,7 @@ router.post('/reset-password', passwordResetLimiter, async (req: Request, res: R
     }
 });
 
-router.post('/activate', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/activate', activationRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { token, password, firstName, lastName } = req.body || {};
         if (!token || !password || !firstName || !lastName) {

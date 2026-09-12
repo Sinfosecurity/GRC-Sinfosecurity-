@@ -33,7 +33,7 @@ export function classifyApiError(err: { status?: number; message?: string } | nu
     if (!err) return 'API_FAILURE';
     if (err.status === 403) return 'PERMISSION_DENIED';
     if (err.status === 400 || err.status === 422) return 'VALIDATION';
-    if (err.status === 429) return 'RATE_LIMITED';
+    if (err.status === 429 || /too many requests/i.test(err.message || '')) return 'RATE_LIMITED';
     if (err.status === 503 || /provider/i.test(err.message || '')) return 'PROVIDER_ERROR';
     if (/not[_ -]?configured/i.test(err.message || '')) return 'NOT_CONFIGURED';
     return 'API_FAILURE';

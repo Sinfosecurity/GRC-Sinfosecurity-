@@ -7,15 +7,22 @@ export default function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        if (loading) return;
         setError('');
+        setLoading(true);
         try {
             await authAPI.forgotPassword(email);
             setSent(true);
         } catch (err: any) {
-            setError(err.message || 'Unable to request a reset');
+            setError(err.status === 429
+                ? 'Too many requests. Please try again later.'
+                : err.message || 'Unable to request a reset');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -44,7 +51,9 @@ export default function ForgotPassword() {
                                         required
                                     />
                                 </div>
-                                <button className="mkt-btn mkt-btn-gold" type="submit">Send reset link</button>
+                                <button className="mkt-btn mkt-btn-gold" type="submit" disabled={loading}>
+                                    {loading ? 'Sending…' : 'Send reset link'}
+                                </button>
                             </form>
                         )}
                         <Link to="/login">Back to sign in</Link>

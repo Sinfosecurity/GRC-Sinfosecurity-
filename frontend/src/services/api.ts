@@ -17,10 +17,12 @@ const api = axios.create({
 export class ApiClientError extends Error {
     status?: number;
     code?: string;
-    constructor(message: string, status?: number, code?: string) {
+    fields?: Array<{ field?: string; message?: string }>;
+    constructor(message: string, status?: number, code?: string, fields?: Array<{ field?: string; message?: string }>) {
         super(message);
         this.status = status;
         this.code = code;
+        this.fields = fields;
     }
 }
 
@@ -38,27 +40,35 @@ api.interceptors.response.use(
         const status = error.response?.status;
         const payload = error.response?.data;
         const nestedError = payload?.error;
-        const details = typeof nestedError === 'object' && nestedError
-            ? (nestedError as { details?: Array<{ field?: string; message?: string }> }).details
+        const rawDetails = typeof nestedError === 'object' && nestedError
+            ? (nestedError as { details?: Array<{ field?: string; message?: string }> | unknown }).details
             : undefined;
+        const details = Array.isArray(rawDetails)
+            ? rawDetails
+            : Array.isArray(nestedError)
+                ? nestedError
+                : undefined;
         const detailMessage = Array.isArray(details)
             ? details.map((item) => (item.field ? `${item.field}: ${item.message}` : item.message)).filter(Boolean).join('; ')
             : '';
+        const apiCode = typeof nestedError === 'object' && nestedError
+            ? (nestedError as { code?: string }).code
+            : undefined;
         const message =
-            detailMessage ||
-            (typeof nestedError === 'string' ? nestedError : nestedError?.message) ||
-            payload?.message ||
+            (status === 429
+                ? (typeof nestedError === 'object' && nestedError?.message) || 'Too many requests. Please try again later.'
+                : detailMessage ||
+                    (typeof nestedError === 'string' ? nestedError : nestedError?.message) ||
+                    payload?.message) ||
             (status === 403
                 ? 'You do not have permission to perform this action.'
                 : status === 404
                     ? 'The requested record was not found.'
-                    : status === 429
-                        ? 'Too many requests. Wait and try again.'
-                        : status === 503
-                            ? 'A required provider is unavailable.'
-                            : !error.response
-                                ? 'Network error. The server did not respond.'
-                                : 'The request failed.');
+                    : status === 503
+                        ? 'A required provider is unavailable.'
+                        : !error.response
+                            ? 'Network error. The server did not respond.'
+                            : 'The request failed.');
 
         if (status === 401) {
             localStorage.removeItem('token');
@@ -68,7 +78,7 @@ api.interceptors.response.use(
             }
         }
 
-        return Promise.reject(new ApiClientError(message, status, error.code));
+        return Promise.reject(new ApiClientError(message, status, apiCode || error.code, details));
     }
 );
 

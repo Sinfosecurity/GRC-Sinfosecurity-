@@ -53,6 +53,83 @@ export function emailStatus(): EmailProviderStatus {
     return 'DEGRADED';
 }
 
+export function salesNotificationRecipient(env: NodeJS.ProcessEnv = process.env) {
+    return String(env.DEMO_INQUIRY_EMAIL || env.ALERT_EMAIL_TO || '').trim();
+}
+
+/**
+ * Shared transactional mail path (SendGrid, otherwise SMTP/Resend).
+ * Callers must keep internal delivery state off public responses.
+ */
+export async function deliverEmail(input: {
+    to: string;
+    subject: string;
+    body: string;
+    eventType?: string;
+    organizationId?: string;
+}): Promise<{ status: EmailDeliveryStatus; messageId?: string }> {
+    if (!isEmailConfigured()) {
+        logger.info('Email notification skipped: email provider not configured', {
+            eventType: input.eventType,
+            organizationId: input.organizationId,
+        });
+        return { status: 'NOT_CONFIGURED' };
+    }
+    try {
+        let messageId: string | undefined;
+        if (isProviderConfigured('SENDGRID_API_KEY')) {
+            const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    personalizations: [{ to: [{ email: input.to }] }],
+                    from: {
+                        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@supremerisk.com',
+                        name: process.env.SENDGRID_FROM_NAME || 'Supreme Risk',
+                    },
+                    subject: input.subject,
+                    content: [{ type: 'text/plain', value: input.body }],
+                }),
+            });
+            if (!response.ok) {
+                throw new Error(`SendGrid responded ${response.status}`);
+            }
+            messageId = response.headers.get('x-message-id') || undefined;
+        } else if (isProviderConfigured('SMTP_HOST')) {
+            const sent = await sendSmtpMail({
+                to: input.to,
+                subject: input.subject,
+                body: input.body,
+            });
+            messageId = sent.messageId;
+        } else {
+            return { status: 'NOT_CONFIGURED' };
+        }
+        recordEmailDelivery(true);
+        logger.info('Email notification result', {
+            eventType: input.eventType,
+            organizationId: input.organizationId,
+            recipient: maskEmail(input.to),
+            deliveryStatus: 'DELIVERED',
+            messageId,
+        });
+        return { status: 'DELIVERED', messageId };
+    } catch (error) {
+        recordEmailDelivery(false);
+        logger.error('Email notification failed; business record unchanged', {
+            eventType: input.eventType,
+            organizationId: input.organizationId,
+            recipient: maskEmail(input.to),
+            deliveryStatus: 'FAILED',
+            error: error instanceof Error ? error.message : String(error),
+        });
+        return { status: 'FAILED' };
+    }
+}
+
 export async function notify(input: {
     organizationId: string;
     userId: string;
@@ -91,65 +168,14 @@ export async function notify(input: {
     }
 
     if (email && input.emailTo) {
-        if (!isEmailConfigured()) {
-            logger.info('Email notification skipped: email provider not configured', {
-                eventType: input.eventType,
-                organizationId: input.organizationId,
-            });
-            return { inApp, email: 'NOT_CONFIGURED' as const };
-        }
-        const mailBody = input.emailBody || input.body;
-        try {
-            let messageId: string | undefined;
-            if (isProviderConfigured('SENDGRID_API_KEY')) {
-                const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        personalizations: [{ to: [{ email: input.emailTo }] }],
-                        from: {
-                            email: process.env.SENDGRID_FROM_EMAIL || 'noreply@supremerisk.com',
-                            name: process.env.SENDGRID_FROM_NAME || 'Supreme Risk',
-                        },
-                        subject: input.title,
-                        content: [{ type: 'text/plain', value: mailBody }],
-                    }),
-                });
-                if (!response.ok) {
-                    throw new Error(`SendGrid responded ${response.status}`);
-                }
-                messageId = response.headers.get('x-message-id') || undefined;
-            } else if (isProviderConfigured('SMTP_HOST')) {
-                const sent = await sendSmtpMail({
-                    to: input.emailTo,
-                    subject: input.title,
-                    body: mailBody,
-                });
-                messageId = sent.messageId;
-            }
-            recordEmailDelivery(true);
-            logger.info('Email notification result', {
-                eventType: input.eventType,
-                organizationId: input.organizationId,
-                recipient: maskEmail(input.emailTo),
-                deliveryStatus: 'DELIVERED',
-                messageId,
-            });
-            return { inApp, email: 'DELIVERED' as const, messageId };
-        } catch (error) {
-            recordEmailDelivery(false);
-            logger.error('Email notification failed; business record unchanged', {
-                eventType: input.eventType,
-                organizationId: input.organizationId,
-                recipient: maskEmail(input.emailTo),
-                deliveryStatus: 'FAILED',
-                error: error instanceof Error ? error.message : String(error),
-            });
-            return { inApp, email: 'FAILED' as const };
-        }
+        const delivered = await deliverEmail({
+            to: input.emailTo,
+            subject: input.title,
+            body: input.emailBody || input.body,
+            eventType: input.eventType,
+            organizationId: input.organizationId,
+        });
+        return { inApp, email: delivered.status, messageId: delivered.messageId };
     }
 
     return { inApp, email: email ? (isEmailConfigured() ? emailStatus() : 'NOT_CONFIGURED') : 'DISABLED' };

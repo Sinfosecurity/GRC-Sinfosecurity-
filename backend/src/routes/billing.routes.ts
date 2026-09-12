@@ -7,6 +7,7 @@ import { entitlementsFor } from '../billing/plans';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { rejectClientTenantOverride } from '../security/tenant';
+import { billingLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -51,7 +52,7 @@ router.get('/status', authenticate, requirePermission(PERMISSIONS['billing.manag
     }
 });
 
-router.post('/checkout', authenticate, requirePermission(PERMISSIONS['billing.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/checkout', authenticate, requirePermission(PERMISSIONS['billing.manage']), billingLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = rejectClientTenantOverride(req.user!.organizationId, req.body?.organizationId);
         const result = await stripeBillingService.createCheckout(
@@ -68,7 +69,7 @@ router.post('/checkout', authenticate, requirePermission(PERMISSIONS['billing.ma
     }
 });
 
-router.post('/portal', authenticate, requirePermission(PERMISSIONS['billing.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/portal', authenticate, requirePermission(PERMISSIONS['billing.manage']), billingLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = rejectClientTenantOverride(req.user!.organizationId, req.body?.organizationId);
         const result = await stripeBillingService.createPortal(

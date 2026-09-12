@@ -1,165 +1,104 @@
 /**
- * Differentiated rate limits.
- * A legitimate authenticated TPRM journey (login through all report downloads)
- * must complete without 429. Auth abuse stays strict.
+ * Differentiated, proxy-safe rate limits.
+ * A legitimate authenticated TPRM journey must complete without 429.
+ * Auth and public-form abuse stay strict. Stripe webhooks are exempt.
  *
- * DEV_MODE no longer skips the general API limiter. Tests skip via NODE_ENV=test.
- * RATE_LIMIT_RELAXED=true is the only explicit bypass for local soak tests.
+ * DEV_MODE does not skip the general API limiter. Tests skip via NODE_ENV=test
+ * unless RATE_LIMIT_ENFORCE=true. RATE_LIMIT_RELAXED=true is local soak only.
  */
 
-import rateLimit from 'express-rate-limit';
-import { Request } from 'express';
+import rateLimit, { type Options, type RateLimitRequestHandler } from 'express-rate-limit';
+import { Request, Response } from 'express';
+import {
+    customerRateLimitBody,
+    getRateLimitSpec,
+    limiterKey,
+    shouldSkipRateLimit,
+    type RateLimitCategory,
+} from './rateLimitPolicy';
+import { createRateLimitStore } from './rateLimitStore';
+import { recordRateLimitThrottle } from '../services/rateLimitTelemetry';
 
-export function shouldSkipRateLimit(req: Pick<Request, 'path'>, env: NodeJS.ProcessEnv = process.env) {
-    return (
-        (env.NODE_ENV === 'test' && env.RATE_LIMIT_ENFORCE !== 'true') ||
-        env.RATE_LIMIT_RELAXED === 'true' ||
-        req.path === '/health' ||
-        req.path === '/health/basic'
-    );
-}
+export { shouldSkipRateLimit, limiterKey, getRateLimitSpec } from './rateLimitPolicy';
+export { rateLimitStoreMode, resetMemoryRateLimitStore, rateLimitClock } from './rateLimitStore';
 
 function skipInfrastructure(req: Request) {
     return shouldSkipRateLimit(req);
 }
 
-function ipKey(req: Request) {
-    return req.ip || req.socket.remoteAddress || 'unknown';
+function retryAfterSeconds(req: Request, windowMs: number) {
+    const reset = (req as Request & { rateLimit?: { resetTime?: Date } }).rateLimit?.resetTime;
+    if (reset) {
+        return Math.max(1, Math.ceil((reset.getTime() - Date.now()) / 1000));
+    }
+    return Math.max(1, Math.ceil(windowMs / 1000));
 }
 
-function userOrIp(req: Request) {
-    return (req as any).user?.id || ipKey(req);
+export function createCategoryLimiter(category: RateLimitCategory): RateLimitRequestHandler {
+    const spec = getRateLimitSpec(category);
+    return rateLimit({
+        windowMs: spec.windowMs,
+        max: () => getRateLimitSpec(category).max,
+        skipSuccessfulRequests: spec.skipSuccessfulRequests,
+        standardHeaders: 'draft-7',
+        legacyHeaders: false,
+        skip: skipInfrastructure,
+        keyGenerator: (req) => limiterKey(category, req),
+        store: createRateLimitStore(category),
+        validate: {
+            xForwardedForHeader: false,
+            ip: false,
+            creationStack: false,
+        },
+        handler: (req: Request, res: Response, _next, options: Options) => {
+            const user = (req as Request & { user?: { organizationId?: string } }).user;
+            recordRateLimitThrottle({
+                category,
+                requestId: (req as Request & { id?: string }).id || String(req.headers['x-request-id'] || ''),
+                organizationId: user?.organizationId,
+                key: limiterKey(category, req),
+                route: req.originalUrl || req.path,
+            });
+            const retryAfter = retryAfterSeconds(req, options.windowMs);
+            res.setHeader('Retry-After', String(retryAfter));
+            res.status(429).json(customerRateLimitBody());
+        },
+    });
 }
 
 /** General API: enough for a full TPRM session, still bounds suspicious bursts. */
-export const rateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 800,
-    message: {
-        success: false,
-        error: {
-            message: 'Too many requests from this IP, please try again later',
-            code: 'RATE_LIMIT_EXCEEDED',
-        },
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: skipInfrastructure,
-    keyGenerator: ipKey,
-});
+export const rateLimiter = createCategoryLimiter('general');
 
-/** Login / signup failures — 5 per 15 minutes. Successful logins do not count. */
-export const authRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
-    skipSuccessfulRequests: true,
-    skip: skipInfrastructure,
-    keyGenerator: ipKey,
-    message: {
-        success: false,
-        error: {
-            message: 'Too many login attempts, please try again after 15 minutes',
-            code: 'AUTH_RATE_LIMIT_EXCEEDED',
-        },
-    },
-});
+/** Login failures — email + IP. Successful logins do not count. */
+export const authRateLimiter = createCategoryLimiter('login');
+export const loginIpLimiter = createCategoryLimiter('login_ip');
 
-export const mfaLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
-    skipSuccessfulRequests: true,
-    skip: skipInfrastructure,
-    keyGenerator: ipKey,
-    message: {
-        success: false,
-        error: {
-            message: 'Too many MFA verification attempts, please try again later',
-            code: 'MFA_RATE_LIMIT_EXCEEDED',
-        },
-    },
-});
+/** Public signup / organization creation. */
+export const signupRateLimiter = createCategoryLimiter('signup');
 
-export const passwordResetLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 3,
-    skip: skipInfrastructure,
-    keyGenerator: ipKey,
-    message: {
-        success: false,
-        error: {
-            message: 'Too many password reset attempts, please try again after an hour',
-            code: 'PASSWORD_RESET_LIMIT_EXCEEDED',
-        },
-    },
-});
+export const mfaLimiter = createCategoryLimiter('mfa');
 
-export const uploadLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 40,
-    skip: skipInfrastructure,
-    keyGenerator: userOrIp,
-    message: {
-        success: false,
-        error: {
-            message: 'Upload limit exceeded, please try again later',
-            code: 'UPLOAD_LIMIT_EXCEEDED',
-        },
-    },
-});
+export const passwordResetLimiter = createCategoryLimiter('password_reset');
+export const passwordResetIpLimiter = createCategoryLimiter('password_reset_ip');
+
+export const activationRateLimiter = createCategoryLimiter('activation');
+
+export const demoRequestLimiter = createCategoryLimiter('demo');
+export const demoRequestIpLimiter = createCategoryLimiter('demo_ip');
+
+export const uploadLimiter = createCategoryLimiter('upload');
 
 /** Full report pack is ~10 files; 40/hour allows a session plus retries. */
-export const reportLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 40,
-    skip: skipInfrastructure,
-    keyGenerator: userOrIp,
-    message: {
-        success: false,
-        error: {
-            message: 'Report generation limit exceeded, please try again later',
-            code: 'REPORT_LIMIT_EXCEEDED',
-        },
-    },
-});
+export const reportLimiter = createCategoryLimiter('report');
 
-export const bulkOperationLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 5,
-    skip: skipInfrastructure,
-    keyGenerator: userOrIp,
-    message: {
-        success: false,
-        error: {
-            message: 'Bulk operation limit exceeded, please try again later',
-            code: 'BULK_OPERATION_LIMIT_EXCEEDED',
-        },
-    },
-});
+export const billingLimiter = createCategoryLimiter('billing');
 
-export const ssoLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    skip: skipInfrastructure,
-    keyGenerator: ipKey,
-    message: {
-        success: false,
-        error: {
-            message: 'Too many SSO attempts, please try again later',
-            code: 'SSO_RATE_LIMIT_EXCEEDED',
-        },
-    },
-});
+export const adminLimiter = createCategoryLimiter('admin');
 
-export const strictLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 3,
-    skip: skipInfrastructure,
-    keyGenerator: userOrIp,
-    message: {
-        success: false,
-        error: {
-            message: 'Rate limit exceeded for sensitive operation',
-            code: 'STRICT_RATE_LIMIT_EXCEEDED',
-        },
-    },
-});
+export const aiLimiter = createCategoryLimiter('ai');
+
+export const bulkOperationLimiter = createCategoryLimiter('bulk');
+
+export const ssoLimiter = createCategoryLimiter('sso');
+
+export const strictLimiter = createCategoryLimiter('strict');

@@ -24,7 +24,9 @@ export default function Activate() {
             });
             navigate('/login');
         } catch (err: any) {
-            setError(err.message || 'Unable to activate this invitation');
+            setError(err.status === 429
+                ? 'Too many requests. Please try again later.'
+                : err.message || 'Unable to activate this invitation');
         } finally {
             setLoading(false);
         }

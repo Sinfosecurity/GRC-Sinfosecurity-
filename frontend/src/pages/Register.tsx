@@ -28,7 +28,9 @@ export default function Register() {
             await signup(form);
             navigate('/dashboard');
         } catch (err: any) {
-            setError(err.message || 'Unable to create account');
+            setError(err.status === 429
+                ? 'Too many requests. Please try again later.'
+                : err.message || 'Unable to create account');
         } finally {
             setLoading(false);
         }
