@@ -12,16 +12,22 @@ Hosted runners **do not start**. GitHub returns:
 
 > The job was not started because your account is locked due to a billing issue.
 
-Observed on `supreme-risk-transformation` at SHA `38e6c35c356050cca923ad7a7165f09c0a218521`:
+Latest observed hosted attempt after the Supreme CI workflow commit:
+
+- Workflow: `Supreme CI`
+- Run ID: `34719068078`
+- URL: https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34719068078
+- SHA: `958981b8cf40215ab02d794964a0f96d7b2cdbd7`
+- Job: `quality`
+- Runner name: empty
+- Steps: none
+- Annotation: account locked due to a billing issue
+
+Prior identical lock at baseline SHA `38e6c35c356050cca923ad7a7165f09c0a218521`:
 
 - Workflow: `CI` (pre-change name)
 - Run ID: `34711650763`
 - URL: https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34711650763
-- Job: `quality`
-- Runner name: empty
-- Steps: none
-- Duration: ~2 seconds
-- Annotation path: `.github`
 
 This is an **external account/billing lock**. Local test execution is not a hosted PASS.
 
