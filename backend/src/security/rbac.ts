@@ -38,12 +38,32 @@ export const PERMISSIONS = {
     'monitoring.read': 'monitoring.read',
     'monitoring.manage': 'monitoring.manage',
     'questionnaire.manage': 'questionnaire.manage',
+    'platform.overview': 'platform.overview',
+    'platform.organizations.read': 'platform.organizations.read',
+    'platform.support.read': 'platform.support.read',
+    'platform.support.manage': 'platform.support.manage',
+    'platform.incidents.read': 'platform.incidents.read',
+    'platform.incidents.manage': 'platform.incidents.manage',
+    'platform.leads.read': 'platform.leads.read',
+    'platform.leads.manage': 'platform.leads.manage',
+    'platform.billing.read': 'platform.billing.read',
+    'platform.providers.read': 'platform.providers.read',
+    'platform.audit.read': 'platform.audit.read',
+    'platform.users.read': 'platform.users.read',
+    'platform.users.manage': 'platform.users.manage',
+    'platform.sessions.request': 'platform.sessions.request',
+    'platform.sessions.approve': 'platform.sessions.approve',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 export type CanonicalRole =
+    | 'PLATFORM_OWNER'
     | 'PLATFORM_ADMIN'
+    | 'SUPPORT_ADMIN'
+    | 'SUPPORT_ANALYST'
+    | 'BILLING_SUPPORT'
+    | 'SECURITY_ADMIN'
     | 'ORGANIZATION_ADMIN'
     | 'RISK_MANAGER'
     | 'ASSESSOR'
@@ -52,7 +72,41 @@ export type CanonicalRole =
     | 'AUDITOR'
     | 'VIEWER';
 
+const TENANT_PERMISSIONS = Object.values(PERMISSIONS).filter((p) => !p.startsWith('platform.'));
 const ALL_PERMISSIONS = Object.values(PERMISSIONS);
+const PLATFORM_OWNER_PERMS = ALL_PERMISSIONS;
+const SUPPORT_ADMIN_PERMS: Permission[] = [
+    PERMISSIONS['platform.overview'],
+    PERMISSIONS['platform.organizations.read'],
+    PERMISSIONS['platform.support.read'],
+    PERMISSIONS['platform.support.manage'],
+    PERMISSIONS['platform.incidents.read'],
+    PERMISSIONS['platform.leads.read'],
+    PERMISSIONS['platform.leads.manage'],
+    PERMISSIONS['platform.providers.read'],
+    PERMISSIONS['platform.sessions.request'],
+    PERMISSIONS['notification.read'],
+];
+const SUPPORT_ANALYST_PERMS: Permission[] = [
+    PERMISSIONS['platform.overview'],
+    PERMISSIONS['platform.support.read'],
+    PERMISSIONS['platform.sessions.request'],
+];
+const BILLING_SUPPORT_PERMS: Permission[] = [
+    PERMISSIONS['platform.overview'],
+    PERMISSIONS['platform.organizations.read'],
+    PERMISSIONS['platform.billing.read'],
+];
+const SECURITY_ADMIN_PERMS: Permission[] = [
+    PERMISSIONS['platform.overview'],
+    PERMISSIONS['platform.organizations.read'],
+    PERMISSIONS['platform.incidents.read'],
+    PERMISSIONS['platform.incidents.manage'],
+    PERMISSIONS['platform.providers.read'],
+    PERMISSIONS['platform.audit.read'],
+    PERMISSIONS['platform.sessions.request'],
+    PERMISSIONS['platform.sessions.approve'],
+];
 
 const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['vendor.read'],
@@ -67,8 +121,13 @@ const READ_PORTFOLIO: Permission[] = [
 ];
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
-    PLATFORM_ADMIN: ALL_PERMISSIONS,
-    ORGANIZATION_ADMIN: ALL_PERMISSIONS.filter((p) => p !== PERMISSIONS['approval.override'] || true),
+    PLATFORM_OWNER: PLATFORM_OWNER_PERMS,
+    PLATFORM_ADMIN: PLATFORM_OWNER_PERMS,
+    SUPPORT_ADMIN: SUPPORT_ADMIN_PERMS,
+    SUPPORT_ANALYST: SUPPORT_ANALYST_PERMS,
+    BILLING_SUPPORT: BILLING_SUPPORT_PERMS,
+    SECURITY_ADMIN: SECURITY_ADMIN_PERMS,
+    ORGANIZATION_ADMIN: TENANT_PERMISSIONS,
     RISK_MANAGER: [
         ...READ_PORTFOLIO,
         PERMISSIONS['vendor.create'],
@@ -125,7 +184,12 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
 
 const ROLE_ALIASES: Record<string, CanonicalRole> = {
     SUPERADMIN: 'PLATFORM_ADMIN',
+    PLATFORM_OWNER: 'PLATFORM_OWNER',
     PLATFORM_ADMIN: 'PLATFORM_ADMIN',
+    SUPPORT_ADMIN: 'SUPPORT_ADMIN',
+    SUPPORT_ANALYST: 'SUPPORT_ANALYST',
+    BILLING_SUPPORT: 'BILLING_SUPPORT',
+    SECURITY_ADMIN: 'SECURITY_ADMIN',
     ADMIN: 'ORGANIZATION_ADMIN',
     ORGANIZATION_ADMIN: 'ORGANIZATION_ADMIN',
     ORG_ADMIN: 'ORGANIZATION_ADMIN',
@@ -168,6 +232,35 @@ export function roleMatches(userRole: string | undefined | null, allowed: string
         const allowedCanonical = canonicalizeRole(role);
         return role === userRole || allowedCanonical === canonical || role === canonical;
     });
+}
+
+export const PLATFORM_OWNER_ROLES = ['PLATFORM_OWNER', 'PLATFORM_ADMIN', 'SUPERADMIN'] as const;
+export const PLATFORM_STAFF_ROLES = [
+    ...PLATFORM_OWNER_ROLES,
+    'SUPPORT_ADMIN',
+    'SUPPORT_ANALYST',
+    'BILLING_SUPPORT',
+    'SECURITY_ADMIN',
+] as const;
+
+export function isPlatformOwnerRole(role: string | undefined | null): boolean {
+    const canonical = canonicalizeRole(role);
+    return canonical === 'PLATFORM_OWNER' || canonical === 'PLATFORM_ADMIN';
+}
+
+export function isPlatformStaffRole(role: string | undefined | null): boolean {
+    const canonical = canonicalizeRole(role);
+    return (
+        isPlatformOwnerRole(role) ||
+        canonical === 'SUPPORT_ADMIN' ||
+        canonical === 'SUPPORT_ANALYST' ||
+        canonical === 'BILLING_SUPPORT' ||
+        canonical === 'SECURITY_ADMIN'
+    );
+}
+
+export function isTenantCustomerRole(role: string | undefined | null): boolean {
+    return !isPlatformStaffRole(role);
 }
 
 /** Legacy enum exported so existing imports of Permission from userService can migrate. */

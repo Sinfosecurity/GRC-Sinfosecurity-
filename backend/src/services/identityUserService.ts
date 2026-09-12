@@ -7,7 +7,17 @@ import { permissionsForRole } from '../security/rbac';
 import { emailStatus, notify } from './notificationDeliveryService';
 import { invitationEmailBody } from './publicFrontendUrl';
 
-const PLATFORM_ROLES = new Set<Role>([Role.SUPERADMIN, Role.PLATFORM_ADMIN]);
+const PLATFORM_ROLES = new Set<Role>([
+    Role.SUPERADMIN,
+    Role.PLATFORM_ADMIN,
+    Role.PLATFORM_OWNER,
+    Role.SUPPORT_ADMIN,
+    Role.SUPPORT_ANALYST,
+    Role.BILLING_SUPPORT,
+    Role.SECURITY_ADMIN,
+]);
+
+const PLATFORM_OWNER_ROLES = new Set<Role>([Role.SUPERADMIN, Role.PLATFORM_ADMIN, Role.PLATFORM_OWNER]);
 
 export const ORG_ASSIGNABLE_ROLES: Role[] = [
     Role.ORGANIZATION_ADMIN,
@@ -70,11 +80,11 @@ export function assertRoleAssignment(input: {
     if (input.action === 'disable' && input.actorId === input.targetId) {
         throw new ApiError(403, 'You cannot deactivate your own account');
     }
-    const actorIsPlatform = PLATFORM_ROLES.has(input.actorRole as Role);
-    if (input.targetCurrentRole && PLATFORM_ROLES.has(input.targetCurrentRole as Role) && !actorIsPlatform) {
-        throw new ApiError(403, 'Only a platform administrator can change a platform role');
+    const actorIsOwner = PLATFORM_OWNER_ROLES.has(input.actorRole as Role);
+    if (input.targetCurrentRole && PLATFORM_ROLES.has(input.targetCurrentRole as Role) && !actorIsOwner) {
+        throw new ApiError(403, 'Only a platform owner can change a platform role');
     }
-    if (input.nextRole && PLATFORM_ROLES.has(input.nextRole as Role) && !actorIsPlatform) {
+    if (input.nextRole && PLATFORM_ROLES.has(input.nextRole as Role) && !actorIsOwner) {
         throw new ApiError(403, 'Cannot assign a platform role');
     }
 }

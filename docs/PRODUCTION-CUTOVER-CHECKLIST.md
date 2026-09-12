@@ -6,7 +6,8 @@ Values below are readiness, not a cutover approval.
 
 ## Before a future production window
 
-1. Restore GitHub billing so hosted CI can run the full workflow to green. Rechecked 2026-09-12: run `34674812047` still billing-locked.
+1. Hosted Supreme CI is PASS as of SHA `93e71319e69f74bd90797583d66073a7232fc183` (#7). Later Owner Console SHAs must also be hosted-green.
+1a. Platform Owner MFA is required before/as part of #8 final security review. Do not fake MFA.
 2. Keep hosted staging isolated from production tenant data (`https://supreme-risk-staging.onrender.com`). Do not treat staging as a production cutover.
 3. Configure Stripe **test** mode first: `sk_test_` secret, `whsec_` webhook secret, `STRIPE_PRICE_*` in the host environment only, customer portal, entitlement enforcement. Live keys are rejected by the application.
 4. Repeat the same Stripe flow in live mode only after test mode is green. Hosted test-mode certification on 2026-09-12 is **PARTIAL / CONDITIONALLY CLEARED**. Remaining production-release checks: hosted `invoice.payment_failed`, hosted renewal/test-clock, browser Checkout completion (hCaptcha), and a final commercial price catalog. Do not treat staging catalog IDs as production prices.

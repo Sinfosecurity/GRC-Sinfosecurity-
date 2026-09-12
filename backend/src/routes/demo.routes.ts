@@ -8,6 +8,7 @@ import { deliverEmail, isEmailConfigured, salesNotificationRecipient } from '../
 import { maskEmail } from '../services/publicFrontendUrl';
 import { normalizeEmail } from '../middleware/rateLimitPolicy';
 import logger from '../config/logger';
+import { persistDemoLead } from '../services/demoLeadService';
 
 const router = Router();
 
@@ -43,6 +44,7 @@ function persist(record: DemoRecord) {
     const file = storePath();
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.appendFileSync(file, `${JSON.stringify(record)}\n`, 'utf8');
+    void persistDemoLead(record);
 }
 
 function recentDuplicate(email: string, company: string): DemoRecord | null {

@@ -50,6 +50,8 @@ import integrationRoutes from './routes/integration.routes';
 import questionnaireRoutes from './routes/questionnaire.routes';
 import tprmRoutes from './routes/tprm.routes';
 import demoRoutes from './routes/demo.routes';
+import platformRoutes from './routes/platform.routes';
+import supportRoutes from './routes/support.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -230,6 +232,8 @@ app.use(`${API_PREFIX}/integrations`, integrationRoutes);
 app.use(`${API_PREFIX}/questionnaires`, questionnaireRoutes);
 app.use(`${API_PREFIX}/tprm`, tprmRoutes);
 app.use(`${API_PREFIX}/demo-requests`, demoRoutes);
+app.use(`${API_PREFIX}/platform`, platformRoutes);
+app.use(`${API_PREFIX}/support`, supportRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

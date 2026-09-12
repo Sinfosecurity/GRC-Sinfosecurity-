@@ -32,6 +32,17 @@ describe('identity privilege controls', () => {
         })).toThrow(ApiError);
     });
 
+    it('blocks support staff from granting platform owner', () => {
+        expect(() => assertRoleAssignment({
+            actorId: 'support-1',
+            actorRole: Role.SUPPORT_ADMIN,
+            targetId: 'user-2',
+            targetCurrentRole: Role.SUPPORT_ANALYST,
+            nextRole: Role.PLATFORM_OWNER,
+            action: 'role_change',
+        })).toThrow(ApiError);
+    });
+
     it('allows org admins to assign viewer', () => {
         expect(() => assertRoleAssignment({
             actorId: 'admin-1',

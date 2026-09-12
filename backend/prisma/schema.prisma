@@ -39,6 +39,12 @@ model User {
   passwordResetTokens PasswordResetToken[]
   sentInvitations     AccountInvitation[]  @relation("InvitedBy")
   auditEvents         AuditEvent[]
+  supportTicketsRequested SupportTicket[] @relation("TicketRequester")
+  supportTicketsAssigned  SupportTicket[] @relation("TicketAssignee")
+  supportMessages         SupportTicketMessage[]
+  sessionsRequested       SupportAccessSession[] @relation("SessionRequested")
+  sessionsApproved        SupportAccessSession[] @relation("SessionApproved")
+  incidentsOwned          PlatformIncident[] @relation("IncidentOwner")
 
   @@index([email])
   @@index([organizationId])
@@ -64,6 +70,11 @@ enum Role {
   APPROVER
   BUSINESS_OWNER
   VIEWER
+  PLATFORM_OWNER
+  SUPPORT_ADMIN
+  SUPPORT_ANALYST
+  BILLING_SUPPORT
+  SECURITY_ADMIN
 }
 
 model Organization {
@@ -106,6 +117,11 @@ model Organization {
   evidenceLinks               EvidenceLink[]
   scoringMethodologies        ScoringMethodology[]
   subscriptionEvents          SubscriptionEvent[]
+  supportTickets              SupportTicket[]
+  incidentLinks               PlatformIncidentOrg[]
+  supportSessions             SupportAccessSession[]
+  notificationDeliveries      NotificationDeliveryLog[]
+  operationalEvents           OperationalEvent[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -2342,4 +2358,250 @@ model ScoringMethodology {
 
   @@unique([organizationId, version])
   @@index([organizationId, isActive])
+}
+
+enum SupportTicketPriority {
+  P1
+  P2
+  P3
+  P4
+}
+
+enum SupportTicketStatus {
+  NEW
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CUSTOMER
+  WAITING_INTERNAL
+  RESOLVED
+  CLOSED
+}
+
+enum SupportTicketCategory {
+  ACCESS
+  ASSESSMENT
+  EVIDENCE
+  MALWARE
+  FINDINGS
+  REPORTS
+  BILLING
+  NOTIFICATIONS
+  INTEGRATION
+  PERFORMANCE
+  SECURITY
+  HOW_TO
+  FEATURE_REQUEST
+  OTHER
+}
+
+enum SupportMessageVisibility {
+  CUSTOMER
+  INTERNAL
+}
+
+enum SupportAccessLevel {
+  READ_ONLY
+  LIMITED_SUPPORT_WRITE
+}
+
+enum SupportSessionStatus {
+  REQUESTED
+  APPROVED
+  ACTIVE
+  EXPIRED
+  REVOKED
+  DENIED
+}
+
+enum PlatformIncidentSeverity {
+  P1
+  P2
+  P3
+}
+
+enum PlatformIncidentStatus {
+  INVESTIGATING
+  IDENTIFIED
+  MONITORING
+  RESOLVED
+}
+
+enum DemoLeadStatus {
+  NEW
+  CONTACTED
+  DEMO_SCHEDULED
+  QUALIFIED
+  CONVERTED
+  NOT_A_FIT
+  CLOSED
+}
+
+model SupportTicket {
+  id                    String                 @id @default(uuid())
+  ticketNumber          Int                    @unique @default(autoincrement())
+  organization          Organization           @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  createdBy             User?                  @relation("TicketRequester", fields: [createdByUserId], references: [id])
+  createdByUserId       String?
+  requesterName         String
+  requesterEmail        String
+  subject               String
+  description           String
+  category              SupportTicketCategory  @default(OTHER)
+  priority              SupportTicketPriority  @default(P3)
+  requestedPriority     SupportTicketPriority  @default(P3)
+  status                SupportTicketStatus    @default(NEW)
+  assignedTo            User?                  @relation("TicketAssignee", fields: [assignedToUserId], references: [id])
+  assignedToUserId      String?
+  securityIncident      Boolean                @default(false)
+  diagnosticContext     Json?
+  resolutionSummary     String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  resolvedAt            DateTime?
+  messages              SupportTicketMessage[]
+  sessions              SupportAccessSession[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedToUserId])
+  @@index([createdAt])
+}
+
+model SupportTicketMessage {
+  id             String                   @id @default(uuid())
+  ticket         SupportTicket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId       String
+  author         User?                    @relation(fields: [authorUserId], references: [id])
+  authorUserId   String?
+  visibility     SupportMessageVisibility
+  body           String
+  createdAt      DateTime                 @default(now())
+
+  @@index([ticketId])
+}
+
+model PlatformIncident {
+  id                       String                   @id @default(uuid())
+  incidentNumber           Int                      @unique @default(autoincrement())
+  title                    String
+  severity                 PlatformIncidentSeverity
+  status                   PlatformIncidentStatus   @default(INVESTIGATING)
+  startedAt                DateTime                 @default(now())
+  detectedAt               DateTime                 @default(now())
+  resolvedAt               DateTime?
+  affectedServices         String[]
+  owner                    User?                    @relation("IncidentOwner", fields: [ownerUserId], references: [id])
+  ownerUserId              String?
+  summary                  String
+  rootCause                String?
+  resolution               String?
+  customerCommunication    String                   @default("INTERNAL_ONLY")
+  securityIncident         Boolean                  @default(false)
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
+  organizations            PlatformIncidentOrg[]
+
+  @@index([status])
+  @@index([severity])
+}
+
+model PlatformIncidentOrg {
+  id             String           @id @default(uuid())
+  incident       PlatformIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  incidentId     String
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  @@unique([incidentId, organizationId])
+  @@index([organizationId])
+}
+
+model SupportAccessSession {
+  id               String               @id @default(uuid())
+  organization     Organization         @relation(fields: [organizationId], references: [id])
+  organizationId   String
+  ticket           SupportTicket?       @relation(fields: [ticketId], references: [id])
+  ticketId         String?
+  incident         String?
+  requestedBy      User                 @relation("SessionRequested", fields: [requestedByUserId], references: [id])
+  requestedByUserId String
+  approvedBy       User?                @relation("SessionApproved", fields: [approvedByUserId], references: [id])
+  approvedByUserId String?
+  reason           String
+  accessLevel      SupportAccessLevel   @default(READ_ONLY)
+  status           SupportSessionStatus @default(REQUESTED)
+  durationMinutes  Int                  @default(30)
+  requestedAt      DateTime             @default(now())
+  approvedAt       DateTime?
+  startedAt        DateTime?
+  expiresAt        DateTime?
+  endedAt          DateTime?
+  createdAt        DateTime             @default(now())
+
+  @@index([organizationId])
+  @@index([requestedByUserId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model DemoLead {
+  id                       String          @id @default(uuid())
+  name                     String
+  email                    String
+  company                  String
+  role                     String
+  companySize              String
+  primaryNeed              String
+  intent                   String          @default("demo")
+  selectedPlan             String?
+  source                   String?
+  salesNotification        String
+  prospectAcknowledgement  String
+  duplicateOf              String?
+  leadStatus               DemoLeadStatus  @default(NEW)
+  assignedToUserId         String?
+  internalNotes            String?
+  lastContactedAt          DateTime?
+  nextAction               String?
+  submittedAt              DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+
+  @@index([email])
+  @@index([leadStatus])
+  @@index([submittedAt])
+}
+
+model NotificationDeliveryLog {
+  id             String        @id @default(uuid())
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  eventType      String
+  status         String
+  recipientMask  String?
+  resourceType   String?
+  resourceId     String?
+  createdAt      DateTime      @default(now())
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model OperationalEvent {
+  id             String        @id @default(uuid())
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  kind           String
+  failureClass   String?
+  requestId      String?
+  actorUserId    String?
+  metadata       Json?
+  createdAt      DateTime      @default(now())
+
+  @@index([organizationId])
+  @@index([kind])
+  @@index([createdAt])
 }

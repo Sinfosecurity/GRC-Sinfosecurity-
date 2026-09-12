@@ -4,7 +4,7 @@
 
 import { Router, Request, Response } from 'express';
 import reportGenerator from '../services/reportGenerator';
-import { authenticate, requirePermission } from '../middleware/auth';
+import { authenticate, requirePermission, AuthRequest } from '../middleware/auth';
 import { LegacyPermission as Permission } from '../security/rbac';
 
 const router = Router();
@@ -55,6 +55,14 @@ router.post('/generate', authenticate, requirePermission(Permission.CREATE_REPOR
             message: 'Report generated successfully',
         });
     } catch (error) {
+        const { recordOperationalEvent } = await import('../services/opsEventService');
+        await recordOperationalEvent({
+            organizationId: (req as AuthRequest).user?.organizationId,
+            kind: 'report_failure',
+            failureClass: 'generation',
+            actorUserId: (req as AuthRequest).user?.id,
+            metadata: { templateId: req.body?.templateId, format: req.body?.format },
+        });
         console.error('Error generating report:', error);
         res.status(500).json({
             success: false,

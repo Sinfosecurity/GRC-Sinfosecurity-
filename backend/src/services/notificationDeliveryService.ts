@@ -3,6 +3,7 @@ import { isProviderConfigured } from '../config/env';
 import logger from '../config/logger';
 import { maskEmail } from './publicFrontendUrl';
 import { sendSmtpMail } from './smtpClient';
+import { recordNotificationDelivery } from './opsEventService';
 
 export type NotificationEvent =
     | 'assessment.assigned'
@@ -109,6 +110,12 @@ export async function deliverEmail(input: {
             return { status: 'NOT_CONFIGURED' };
         }
         recordEmailDelivery(true);
+        await recordNotificationDelivery({
+            organizationId: input.organizationId,
+            eventType: input.eventType || 'email',
+            status: 'DELIVERED',
+            recipient: input.to,
+        });
         logger.info('Email notification result', {
             eventType: input.eventType,
             organizationId: input.organizationId,
@@ -119,6 +126,12 @@ export async function deliverEmail(input: {
         return { status: 'DELIVERED', messageId };
     } catch (error) {
         recordEmailDelivery(false);
+        await recordNotificationDelivery({
+            organizationId: input.organizationId,
+            eventType: input.eventType || 'email',
+            status: 'FAILED',
+            recipient: input.to,
+        });
         logger.error('Email notification failed; business record unchanged', {
             eventType: input.eventType,
             organizationId: input.organizationId,

@@ -59,6 +59,20 @@ const Frameworks = lazy(() => import('./pages/Frameworks'));
 const LegalDraft = lazy(() => import('./pages/LegalDraft'));
 const SecurityOverview = lazy(() => import('./pages/SecurityOverview'));
 const PublicStatus = lazy(() => import('./pages/PublicStatus'));
+const HelpSupport = lazy(() => import('./pages/HelpSupport'));
+const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
+const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
+const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
+const PlatformOrganizationDetail = lazy(() => import('./platform/pages/PlatformOrganizationDetail'));
+const PlatformSupport = lazy(() => import('./platform/pages/PlatformSupport').then((mod) => ({ default: mod.PlatformSupportQueue })));
+const PlatformTicketDetail = lazy(() => import('./platform/pages/PlatformSupport').then((mod) => ({ default: mod.PlatformTicketDetail })));
+const PlatformIncidents = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformIncidents })));
+const PlatformLeads = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformLeads })));
+const PlatformBilling = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformBilling })));
+const PlatformProviders = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformProviders })));
+const PlatformAudit = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformAudit })));
+const PlatformUsers = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformUsers })));
+const PlatformSessions = lazy(() => import('./platform/pages/PlatformOpsPages').then((mod) => ({ default: mod.PlatformSessions })));
 
 // Loading component
 const LoadingFallback = () => (
@@ -128,6 +142,21 @@ export default function App() {
                     <Route path="tisax" element={LEGACY_ENABLED ? <TISAX /> : <LegacyQuarantine />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="environment" element={<EnvironmentStatus />} />
+                    <Route path="help" element={<HelpSupport />} />
+                </Route>
+                <Route element={<ProtectedRoute allowedRoles={['PLATFORM_OWNER', 'PLATFORM_ADMIN', 'SUPERADMIN', 'SUPPORT_ADMIN', 'SUPPORT_ANALYST', 'BILLING_SUPPORT', 'SECURITY_ADMIN']}><PlatformLayout /></ProtectedRoute>}>
+                    <Route path="/platform" element={<PlatformOverview />} />
+                    <Route path="/platform/organizations" element={<PlatformOrganizations />} />
+                    <Route path="/platform/organizations/:id" element={<PlatformOrganizationDetail />} />
+                    <Route path="/platform/support" element={<PlatformSupport />} />
+                    <Route path="/platform/support/:id" element={<PlatformTicketDetail />} />
+                    <Route path="/platform/incidents" element={<PlatformIncidents />} />
+                    <Route path="/platform/leads" element={<PlatformLeads />} />
+                    <Route path="/platform/billing" element={<PlatformBilling />} />
+                    <Route path="/platform/providers" element={<PlatformProviders />} />
+                    <Route path="/platform/audit" element={<PlatformAudit />} />
+                    <Route path="/platform/users" element={<PlatformUsers />} />
+                    <Route path="/platform/sessions" element={<PlatformSessions />} />
                 </Route>
                     <Route path="*" element={<NotFound />} />
             </Routes>

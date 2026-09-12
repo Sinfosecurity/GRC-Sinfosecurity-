@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
-const ADMIN_ROLES = new Set(['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']);
+const ADMIN_ROLES = new Set(['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN', 'PLATFORM_OWNER']);
 
 function roleIsAllowed(userRole: string, allowedRoles: string[]): boolean {
   if (allowedRoles.includes(userRole)) {

@@ -14,6 +14,8 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['user.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['billing.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['vendor.read'])).toBe(true);
+        expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['platform.overview'])).toBe(false);
+        expect(hasPermission('PLATFORM_OWNER', PERMISSIONS['platform.overview'])).toBe(true);
     });
 
     it('allows approvers to decide and accept risk', () => {

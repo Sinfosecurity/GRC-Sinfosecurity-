@@ -1,5 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { isPlatformStaff } from '../platform/roles';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Typography, Avatar, Stack } from '@mui/material';
 import {
     Dashboard as DashboardIcon,
@@ -41,6 +42,7 @@ const menuSections = [
         items: [
             { text: 'AI Analyst', path: '/ai-insights', icon: <AnalyticsIcon />, color: '#38bdf8' },
             { text: 'Reports', path: '/reports', icon: <ReportIcon />, color: '#94a3b8' },
+            { text: 'Help & Support', path: '/help', icon: <IncidentIcon />, color: '#e8c9a0' },
         ],
     },
 ];
@@ -54,6 +56,7 @@ const adminItems = [
     { text: 'Audit Log', path: '/activity-log', icon: <ActivityIcon />, color: '#64748b' },
     { text: 'Environment', path: '/environment', icon: <SettingsIcon />, color: '#22d3ee' },
     { text: 'Security', path: '/settings', icon: <SettingsIcon />, color: '#8b5cf6' },
+    { text: 'Platform console', path: '/platform', icon: <AnalyticsIcon />, color: '#c4955c', platformOnly: true },
 ];
 
 export default function Layout() {
@@ -149,7 +152,7 @@ export default function Layout() {
                         Administration
                     </Typography>
                     <List disablePadding>
-                        {adminItems.map((item) => (
+                        {adminItems.filter((item) => !('platformOnly' in item && item.platformOnly) || isPlatformStaff(user?.role)).map((item) => (
                             <ListItem
                                 key={item.text}
                                 onClick={() => navigate(item.path)}
