@@ -150,7 +150,7 @@ def main():
         record("history-ui", "PASS" if "Show other assessments" in body else "FAIL", "history is available without dominating")
         record("no-flat-dropdown", "PASS" if page.locator('[aria-label="Assessment"]').count() == 0 else "FAIL", "no Assessment combobox")
         record("caption", "PASS" if "Assessment report will use" in body else "FAIL", "intended assessment caption")
-        page.get_by_role("button", name=/Show other assessments/).click()
+        page.get_by_role("button", name="Show other assessments").click()
         unique_history = page.locator('[data-testid="history-assessment"]').count()
         record("history-count", "PASS" if unique_history >= 1 else "FAIL", f"{unique_history} historical cards")
         shot(page, "selector-history-expanded-1440")

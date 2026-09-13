@@ -7,7 +7,7 @@ import {
     drawProfessionalTable,
     drawSectionTitle,
 } from './reportPrimitives';
-import { reportId } from './reportTheme';
+import { humanizeEnum, reportId } from './reportTheme';
 import { loadPortfolioSnapshot, type ReportFilters } from './portfolioData';
 import { isoDate } from './sendDownload';
 
@@ -73,8 +73,8 @@ export async function renderExecutivePdf(organizationId: string, filters: Report
             ],
             data.overdueAssessments.slice(0, 10).map((row) => ({
                 vendor: row.vendor.name,
-                type: row.assessmentType,
-                status: row.status,
+                type: humanizeEnum(row.assessmentType),
+                status: humanizeEnum(row.status),
                 due: isoDate(row.dueDate),
             })),
             'No overdue assessments',
