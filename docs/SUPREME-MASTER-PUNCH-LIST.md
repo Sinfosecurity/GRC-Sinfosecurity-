@@ -273,9 +273,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Implementation `2d78c5774118dd4fa3ac5025da552dc6bd1d0763`. Not PASS. Product Leadership hosted review required.
+**CERTIFICATION SHA:** Implementation `8ed9be7b5a0597d4c385147b1beb13409e5c3b85`. Hosted walkthrough captured on frontend `14ec99b4225f176c54efbc9acd2a7701f612aa3b` / API descendant `8ed9be7`. Not PASS. Product Leadership hosted review required.
 
-**EVIDENCE:** `docs/ADR-SUPREME-RISK.md`, `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`. Leftover `/risk-management` remains quarantined. Cursor does not declare PASS.
+**EVIDENCE:** `docs/ADR-SUPREME-RISK.md`, `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/private-beta/hosted-ux-qa/supreme-risk/`. Leftover `/risk-management` remains quarantined. Cursor does not declare PASS.
 
 **NEXT ACTION:** Product Leadership hosted review. Do not start #16. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 

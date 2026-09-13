@@ -1,0 +1,25 @@
+{
+  "item": 15,
+  "status": "PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED",
+  "hostedFrontendSha": "14ec99b4225f176c54efbc9acd2a7701f612aa3b",
+  "hostedApiSha": "14ec99b4225f176c54efbc9acd2a7701f612aa3b",
+  "tenant": "Elite Claims",
+  "checks": [
+    {"name": "hosted sha", "result": "PASS", "detail": "api=14ec99b frontend=14ec99b"},
+    {"name": "create risks", "result": "PASS", "detail": "RISK-00001 through RISK-00004"},
+    {"name": "set appetite", "result": "PASS"},
+    {"name": "treatment", "result": "PASS"},
+    {"name": "kri", "result": "PASS"},
+    {"name": "acceptance residual unchanged", "result": "PASS", "detail": "before=25 after=25"},
+    {"name": "vendor relationship", "result": "PASS"},
+    {"name": "control link", "result": "PASS"},
+    {"name": "control failure impact", "result": "PASS", "detail": "4 rule-based actions"},
+    {"name": "cross-tenant risk get", "result": "PASS", "detail": "404"},
+    {"name": "cross-tenant risk list", "result": "PASS", "detail": "no leakage"},
+    {"name": "dashboard honesty", "result": "PASS"},
+    {"name": "reports", "result": "PASS"},
+    {"name": "export csv", "result": "PASS"},
+    {"name": "import neutralize", "result": "PASS"},
+    {"name": "overflow 375-1920", "result": "PASS"}
+  ]
+}

@@ -1,0 +1,5 @@
+publicId,title,category,status,likelihood,impact,inherentScore,residualScore,residualRating,appetiteStatus,ownerUserId
+RISK-00001,Privileged access failure,CYBERSECURITY,ACCEPTED,5,5,25,25,CRITICAL,OUTSIDE_APPETITE,
+RISK-00002,Vendor concentration,THIRD_PARTY,IDENTIFIED,4,4,16,16,HIGH,OUTSIDE_APPETITE,
+RISK-00003,Model output error,AI,IDENTIFIED,3,4,12,12,MEDIUM,NEAR_TOLERANCE,
+RISK-00004,Records retention gap,COMPLIANCE,IDENTIFIED,2,3,6,6,LOW,WITHIN_APPETITE,
