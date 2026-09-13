@@ -5,7 +5,7 @@ import { routerFuture } from '../../marketing/routerFuture';
 import RiskDashboard from '../RiskDashboard';
 
 vi.mock('../../services/api', () => ({
-    ermAPI: { dashboard: vi.fn(), downloadReport: vi.fn(), setAppetite: vi.fn() },
+    ermAPI: { dashboard: vi.fn(), downloadReport: vi.fn(), downloadBoardPptx: vi.fn(), setAppetite: vi.fn() },
 }));
 
 describe('Supreme Risk dashboard', () => {

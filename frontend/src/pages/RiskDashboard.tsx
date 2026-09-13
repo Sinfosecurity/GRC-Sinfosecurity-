@@ -42,7 +42,7 @@ type Dashboard = {
     byBusinessUnit: Array<{ name: string; count: number; critical: number }>;
     appetite: AppetiteRow[];
     topRisks: Array<{ publicId: string; title: string; residualRating: string; appetiteStatus: string }>;
-    attention: Array<{ publicId: string; title: string; residualRating: string; appetiteStatus: string }>;
+    attention: Array<{ publicId: string; title: string; residualRating: string; appetiteStatus: string; reasons?: string[] }>;
 };
 
 function ratingTone(rating: string): 'critical' | 'high' | 'medium' | 'success' | 'neutral' {
@@ -119,7 +119,7 @@ export default function RiskDashboard() {
                 <MetricCard label="Overdue treatments" value={data.totals.overdueTreatments} />
                 <MetricCard label="Worsening" value={data.totals.worsening} />
                 <MetricCard label="Improving" value={data.totals.improving} />
-                <MetricCard label="Without owners" value={data.totals.withoutOwners} />
+                <MetricCard label="Without owners" value={data.totals.withoutOwners} onClick={() => navigate('/risks/register?unowned=1')} />
                 <MetricCard label="No tested controls" value={data.totals.withoutTestedControls} />
             </Box>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1.3fr 1fr' }, gap: 2, mb: 3 }}>
@@ -169,7 +169,12 @@ export default function RiskDashboard() {
                         <Typography variant="body2">Nothing is overdue, unowned, or outside appetite.</Typography>
                     ) : data.attention.map((row) => (
                         <Box key={row.publicId} sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, py: 0.75, cursor: 'pointer' }} onClick={() => navigate(`/risks/${row.publicId}`)}>
-                            <Typography variant="body2">{row.publicId} · {row.title}</Typography>
+                            <Box>
+                                <Typography variant="body2">{row.publicId} · {row.title}</Typography>
+                                {row.reasons?.includes('Unassigned') && (
+                                    <Typography variant="caption" color="text.secondary">Unassigned{row.residualRating === 'CRITICAL' || row.residualRating === 'HIGH' ? ' Critical/High' : ''}</Typography>
+                                )}
+                            </Box>
                             <StatusBadge kind="plain" tone={ratingTone(row.residualRating)} label={humanizeLabel(row.residualRating)} />
                         </Box>
                     ))}
@@ -234,6 +239,7 @@ export default function RiskDashboard() {
                         <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('appetite'), 'Supreme-Risk-Appetite.pdf')}>Appetite PDF</Button>
                         <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('treatment'), 'Supreme-Risk-Treatment.pdf')}>Treatment PDF</Button>
                         <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('board'), 'Supreme-Risk-Board.pdf')}>Board PDF</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadBoardPptx(), 'Supreme-Risk-Board.pptx')}>Board PPTX</Button>
                     </Stack>
                 </Stack>
                 {data.topRisks.length === 0 ? (

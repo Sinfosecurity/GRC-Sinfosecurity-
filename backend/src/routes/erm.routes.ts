@@ -11,7 +11,7 @@ import { PERMISSIONS } from '../security/rbac';
 import { requireTenant, rejectClientTenantOverride } from '../security/tenant';
 import { ApiError } from '../middleware/errorHandler';
 import { enterpriseRiskService } from '../services/enterpriseRiskService';
-import { renderEnterpriseRiskPdf, renderEnterpriseRiskRegister } from '../reports/enterpriseRiskReports';
+import { renderEnterpriseRiskBoardPptx, renderEnterpriseRiskPdf, renderEnterpriseRiskRegister } from '../reports/enterpriseRiskReports';
 import { downloadFilename, sendBinaryFile } from '../reports/sendDownload';
 import { reportLimiter } from '../middleware/rateLimiter';
 import { canExportReport, reportDenialReason } from '../security/reportAuthorization';
@@ -50,6 +50,7 @@ router.get('/risks', requirePermission(PERMISSIONS['risk.read']), async (req: Au
                 q: typeof req.query.q === 'string' ? req.query.q : undefined,
                 likelihood: req.query.likelihood ? Number(req.query.likelihood) : undefined,
                 impact: req.query.impact ? Number(req.query.impact) : undefined,
+                unowned: req.query.unowned === '1' || req.query.unowned === 'true',
             }),
         });
     } catch (error) {
@@ -274,11 +275,32 @@ router.get('/export/:format', requirePermission(PERMISSIONS['report.export']), r
 
 router.get('/reports/:kind.pdf', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        if (!canExportReport(req.user?.role, 'operational')) {
-            throw new ApiError(403, reportDenialReason(req.user?.role, 'operational'));
+        const kind = req.params.kind === 'board' ? 'board' : 'operational';
+        if (!canExportReport(req.user?.role, kind)) {
+            throw new ApiError(403, reportDenialReason(req.user?.role, kind));
         }
         const buffer = await renderEnterpriseRiskPdf(orgId(req, req.query.organizationId), req.params.kind);
         sendBinaryFile(res, buffer, 'application/pdf', downloadFilename(['Supreme-Risk', req.params.kind], 'pdf'));
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/reports/board.pptx', requirePermission(PERMISSIONS['report.export']), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        if (!canExportReport(req.user?.role, 'board')) {
+            throw new ApiError(403, reportDenialReason(req.user?.role, 'board'));
+        }
+        const file = await renderEnterpriseRiskBoardPptx(orgId(req, req.query.organizationId));
+        sendBinaryFile(res, file.buffer, 'application/vnd.openxmlformats-officedocument.presentationml.presentation', downloadFilename(file.filenameParts, 'pptx'));
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/owners', requirePermission(PERMISSIONS['risk.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterpriseRiskService.listAssignableOwners(orgId(req, req.query.organizationId)) });
     } catch (error) {
         next(error);
     }

@@ -13,6 +13,7 @@ describe('enterprise risk tenant isolation and scoring', () => {
     let tokenA = '';
     let tokenB = '';
     let publicIdB = '';
+    let userIdA = '';
 
     beforeAll(async () => {
         await prisma.$queryRaw`SELECT 1`;
@@ -36,6 +37,7 @@ describe('enterprise risk tenant isolation and scoring', () => {
         expect(signupB.status).toBe(201);
         tokenA = signupA.body.data.token;
         tokenB = signupB.body.data.token;
+        userIdA = signupA.body.data.user.id;
         const created = await request(app).post(`${API}/erm/risks`).set('Authorization', `Bearer ${tokenB}`).send({
             title: 'Cross-tenant bait',
             category: 'CYBERSECURITY',
@@ -88,6 +90,53 @@ describe('enterprise risk tenant isolation and scoring', () => {
         expect(scores).toHaveLength(1000);
         expect(scores[0].inherentScore).toBeGreaterThan(0);
         expect(elapsed).toBeLessThan(2000);
+    });
+
+    it('serves a board PPTX and keeps history summaries short', async () => {
+        const created = await request(app).post(`${API}/erm/risks`).set('Authorization', `Bearer ${tokenA}`).send({
+            title: 'History and board pack',
+            category: 'CYBERSECURITY',
+            likelihood: 4,
+            impact: 4,
+        });
+        expect(created.status).toBe(201);
+        const scored = await request(app).patch(`${API}/erm/risks/${created.body.data.publicId}`).set('Authorization', `Bearer ${tokenA}`).send({
+            likelihood: 5,
+            impact: 5,
+        });
+        expect(scored.status).toBe(200);
+        const detail = await request(app).get(`${API}/erm/risks/${created.body.data.publicId}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(detail.status).toBe(200);
+        const timeline = detail.body.data.timeline || [];
+        expect(timeline.some((row: { title: string }) => row.title === 'Risk reassessed')).toBe(true);
+        expect(JSON.stringify(timeline.map((row: { change: string }) => row.change))).not.toMatch(/Methodology supreme-erm/);
+        expect(timeline.some((row: { detail?: string }) => row.detail && row.detail.includes('Methodology'))).toBe(true);
+        const pptx = await request(app).get(`${API}/erm/reports/board.pptx`).set('Authorization', `Bearer ${tokenA}`);
+        expect(pptx.status).toBe(200);
+        expect(pptx.headers['content-type']).toMatch(/presentationml/);
+        expect(Buffer.from(pptx.body).subarray(0, 2).toString()).toBe('PK');
+        const pdf = await request(app).get(`${API}/erm/reports/board.pdf`).set('Authorization', `Bearer ${tokenA}`);
+        expect(pdf.status).toBe(200);
+        expect(Buffer.from(pdf.body).subarray(0, 4).toString()).toBe('%PDF');
+    });
+
+    it('assigns an owner without inventing one', async () => {
+        const created = await request(app).post(`${API}/erm/risks`).set('Authorization', `Bearer ${tokenA}`).send({
+            title: 'Needs an owner',
+            category: 'OPERATIONAL',
+            likelihood: 5,
+            impact: 5,
+        });
+        expect(created.status).toBe(201);
+        expect(created.body.data.ownerUserId).toBeFalsy();
+        const assigned = await request(app).patch(`${API}/erm/risks/${created.body.data.publicId}`).set('Authorization', `Bearer ${tokenA}`).send({
+            ownerUserId: userIdA,
+        });
+        expect(assigned.status).toBe(200);
+        expect(assigned.body.data.ownerUserId).toBe(userIdA);
+        const dashboard = await request(app).get(`${API}/erm/dashboard`).set('Authorization', `Bearer ${tokenA}`);
+        expect(dashboard.status).toBe(200);
+        expect(dashboard.body.data.attention.some((row: { publicId: string; reasons?: string[] }) => row.publicId === created.body.data.publicId && row.reasons?.includes('Unassigned'))).toBe(false);
     });
 
     it('blocks formula-bearing import cells from committing blindly', async () => {

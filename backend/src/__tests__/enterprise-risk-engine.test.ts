@@ -7,6 +7,7 @@ import {
     ratingFromScore,
     resolveAppetite,
 } from '../services/enterpriseRiskEngine';
+import { presentHistoryEntry, scoreChangeSummary } from '../services/enterpriseRiskHistory';
 
 describe('enterprise risk engine', () => {
     it('scores a 5x5 matrix deterministically', () => {
@@ -66,6 +67,27 @@ describe('enterprise risk engine', () => {
         expect(kriStatus({ value: 5, warningThreshold: 5, criticalThreshold: 10, direction: 'HIGHER_IS_WORSE' })).toBe('WARNING');
         expect(kriStatus({ value: 12, warningThreshold: 5, criticalThreshold: 10, direction: 'HIGHER_IS_WORSE' })).toBe('CRITICAL');
         expect(kriStatus({ value: 2, warningThreshold: 5, criticalThreshold: 3, direction: 'LOWER_IS_WORSE' })).toBe('CRITICAL');
+    });
+
+    it('keeps history summaries short and preserves calculation detail', () => {
+        expect(scoreChangeSummary({
+            fromRating: 'HIGH',
+            toRating: 'CRITICAL',
+            fromScore: 16,
+            toScore: 25,
+            fromLikelihood: 4,
+            toLikelihood: 5,
+        })).toBe('Residual risk changed High → Critical');
+        const presented = presentHistoryEntry({
+            eventType: 'Risk reassessed',
+            summary: 'Inherent 25 (CRITICAL) from likelihood 5 × impact 5. Methodology supreme-erm-1.0.0.',
+            createdAt: new Date().toISOString(),
+            payload: { explanation: 'Full calculation', fromRating: 'HIGH', toRating: 'CRITICAL' },
+        });
+        expect(presented.title).toBe('Risk reassessed');
+        expect(presented.change).toContain('High → Critical');
+        expect(presented.detail).toBe('Full calculation');
+        expect(presented.change && presented.change.length < 80).toBe(true);
     });
 
     it('neutralizes spreadsheet formula injection and formats public IDs', () => {

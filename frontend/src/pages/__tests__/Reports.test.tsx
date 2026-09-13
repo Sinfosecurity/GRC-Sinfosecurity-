@@ -53,7 +53,7 @@ vi.mock('../../services/api', () => ({
         }),
     },
     sccAPI: { downloadReport: vi.fn() },
-    ermAPI: { downloadReport: vi.fn(), exportRegister: vi.fn() },
+    ermAPI: { downloadReport: vi.fn(), downloadBoardPptx: vi.fn(), exportRegister: vi.fn() },
 }));
 
 vi.mock('../../services/download', () => ({

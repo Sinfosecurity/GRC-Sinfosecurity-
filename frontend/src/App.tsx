@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -129,7 +129,7 @@ export default function App() {
                     <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="risk-management" element={LEGACY_ENABLED ? <RiskManagement /> : <LegacyQuarantine />} />
+                    <Route path="risk-management" element={LEGACY_ENABLED ? <RiskManagement /> : <Navigate to="/risks" replace />} />
                     <Route path="compliance" element={LEGACY_ENABLED ? <ComplianceManagement /> : <LegacyQuarantine />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />

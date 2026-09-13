@@ -24,6 +24,7 @@ type RiskRow = {
     residualScore: number;
     appetiteStatus: string;
     ownerUserId?: string | null;
+    ownerName?: string | null;
     reviewDate?: string | null;
 };
 
@@ -51,6 +52,7 @@ export default function RiskRegister() {
             appetite: params.get('appetite') || undefined,
             likelihood: params.get('likelihood') || undefined,
             impact: params.get('impact') || undefined,
+            unowned: params.get('unowned') === '1' ? '1' : undefined,
         })
             .then((res) => setRows(res.data.data || []))
             .catch((err) => setError(err.message || 'Unable to load the risk register'))
@@ -97,12 +99,13 @@ export default function RiskRegister() {
                     </Stack>
                 )}
             />
-            {(params.get('likelihood') || params.get('rating') || params.get('appetite')) && (
+            {(params.get('likelihood') || params.get('rating') || params.get('appetite') || params.get('unowned')) && (
                 <Alert severity="info" sx={{ mb: 2 }}>
                     Showing a filtered slice
                     {params.get('likelihood') ? ` · likelihood ${params.get('likelihood')} / impact ${params.get('impact')}` : ''}
                     {params.get('rating') ? ` · residual ${humanizeLabel(params.get('rating') || '')}` : ''}
                     {params.get('appetite') ? ` · ${humanizeLabel(params.get('appetite') || '')}` : ''}
+                    {params.get('unowned') ? ' · Unassigned' : ''}
                     .
                 </Alert>
             )}
@@ -150,6 +153,7 @@ export default function RiskRegister() {
                         { id: 'category', label: 'Category', hideOnMobile: true, render: (row) => humanizeLabel(row.category) },
                         { id: 'rating', label: 'Residual', render: (row) => <StatusBadge kind="plain" tone={row.residualRating === 'CRITICAL' ? 'critical' : row.residualRating === 'HIGH' ? 'high' : 'medium'} label={humanizeLabel(row.residualRating)} /> },
                         { id: 'appetite', label: 'Appetite', hideOnMobile: true, render: (row) => humanizeLabel(row.appetiteStatus) },
+                        { id: 'owner', label: 'Owner', hideOnMobile: true, render: (row) => row.ownerName && row.ownerName !== 'Unassigned' ? row.ownerName : <StatusBadge kind="plain" tone="high" label="Unassigned" /> },
                         { id: 'status', label: 'Status', hideOnMobile: true, render: (row) => humanizeLabel(row.status) },
                     ]}
                 />

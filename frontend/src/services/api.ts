@@ -282,6 +282,8 @@ export const ermAPI = {
     commitImport: (rows: unknown[]) => api.post('/erm/import/commit', { rows }),
     exportRegister: (format: 'csv' | 'xlsx') => api.get(`/erm/export/${format}`, { responseType: 'blob' }),
     downloadReport: (kind: string) => api.get(`/erm/reports/${kind}.pdf`, { responseType: 'blob' }),
+    downloadBoardPptx: () => api.get('/erm/reports/board.pptx', { responseType: 'blob' }),
+    owners: () => api.get('/erm/owners'),
     controlImpact: (controlId: string) => api.get(`/erm/impact/controls/${controlId}`),
 };
 

@@ -7,7 +7,7 @@ import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import EntityRelationships from '../components/EntityRelationships';
 import { ermAPI, sccAPI, tprmAPI, vendorAPI } from '../services/api';
-import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
+import { formatDateTime, formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
 const SECTIONS = ['Overview', 'Scoring', 'Impact', 'Controls', 'Evidence', 'Findings', 'Treatment', 'KRIs', 'Decisions', 'Relationships', 'History'] as const;
 
@@ -32,6 +32,9 @@ export default function RiskDetail() {
     const [measure, setMeasure] = useState('');
     const [decisionRationale, setDecisionRationale] = useState('');
     const [controlImpact, setControlImpact] = useState<any>(null);
+    const [owners, setOwners] = useState<Array<{ id: string; firstName: string; lastName: string }>>([]);
+    const [ownerUserId, setOwnerUserId] = useState('');
+    const [openDetail, setOpenDetail] = useState<string | null>(null);
 
     const load = () => {
         setLoading(true);
@@ -41,6 +44,7 @@ export default function RiskDetail() {
                 sccAPI.controls().then((res) => setControls(res.data.data || [])).catch(() => setControls([]));
                 tprmAPI.listFindings().then((res) => setFindings(res.data.data || res.data.findings || [])).catch(() => setFindings([]));
                 vendorAPI.getAll().then((res) => setVendors(res.data.vendors || res.data.data || [])).catch(() => setVendors([]));
+                ermAPI.owners().then((res) => setOwners(res.data.data || [])).catch(() => setOwners([]));
             })
             .catch((err) => setError(err.message || 'Unable to load this risk'))
             .finally(() => setLoading(false));
@@ -85,7 +89,18 @@ export default function RiskDetail() {
                 <Surface>
                     <Typography variant="body2" sx={{ mb: 1 }}>{risk.statement || 'No structured statement recorded.'}</Typography>
                     <Typography variant="body2">{risk.description || 'No additional description.'}</Typography>
-                    <Typography variant="caption" display="block" sx={{ mt: 2 }}>Category {humanizeLabel(risk.category)} · Review {formatShortDate(risk.reviewDate)} · Owner {detail.owners?.[0] ? `${detail.owners[0].firstName} ${detail.owners[0].lastName}` : 'Unassigned'}</Typography>
+                    <Typography variant="caption" display="block" sx={{ mt: 2 }}>Category {humanizeLabel(risk.category)} · Review {formatShortDate(risk.reviewDate)}</Typography>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} sx={{ mt: 1.5 }}>
+                        <StatusBadge kind="plain" tone={risk.ownerUserId ? 'neutral' : 'high'} label={detail.owners?.[0] ? `${detail.owners[0].firstName} ${detail.owners[0].lastName}` : 'Unassigned'} />
+                        <Box component="form" onSubmit={(event) => submit(event, () => ermAPI.update(risk.publicId, { ownerUserId }))}>
+                            <Stack direction="row" spacing={1}>
+                                <TextField select size="small" label="Assign owner" value={ownerUserId} onChange={(e) => setOwnerUserId(e.target.value)} sx={{ minWidth: 220 }}>
+                                    {owners.map((person) => <MenuItem key={person.id} value={person.id}>{person.firstName} {person.lastName}</MenuItem>)}
+                                </TextField>
+                                <Button type="submit" variant="contained" disabled={!ownerUserId}>Assign</Button>
+                            </Stack>
+                        </Box>
+                    </Stack>
                 </Surface>
             )}
             {section === 'Scoring' && (
@@ -237,15 +252,22 @@ export default function RiskDetail() {
             )}
             {section === 'History' && (
                 <Surface>
-                    {(risk.events || []).map((item: any) => (
-                        <Typography key={item.id} variant="body2">{item.title} · {formatShortDate(item.occurredAt)}</Typography>
+                    {(detail.timeline || []).length === 0 && <Typography variant="body2">No recorded changes yet.</Typography>}
+                    {(detail.timeline || []).map((item: any, index: number) => (
+                        <Box key={`${item.title}-${item.createdAt}-${index}`} sx={{ py: 1, borderBottom: '1px solid rgba(20,32,46,0.08)' }}>
+                            <Typography variant="subtitle2">{item.title}</Typography>
+                            {item.change && <Typography variant="body2">{item.change}</Typography>}
+                            <Typography variant="caption" display="block">{item.actor} · {formatDateTime(item.createdAt)}</Typography>
+                            {item.detail && (
+                                <>
+                                    <Button size="small" sx={{ mt: 0.5 }} onClick={() => setOpenDetail(openDetail === item.createdAt ? null : item.createdAt)}>
+                                        {openDetail === item.createdAt ? 'Hide calculation details' : 'View calculation details'}
+                                    </Button>
+                                    {openDetail === item.createdAt && <Typography variant="body2" sx={{ mt: 0.5 }}>{item.detail}</Typography>}
+                                </>
+                            )}
+                        </Box>
                     ))}
-                    {(risk.history || []).map((item: any) => (
-                        <Typography key={item.id} variant="body2">{item.eventType} · {item.summary} · {formatShortDate(item.createdAt)}</Typography>
-                    ))}
-                    {(risk.events || []).length === 0 && (risk.history || []).length === 0 && (
-                        <Typography variant="body2">No recorded changes yet.</Typography>
-                    )}
                 </Surface>
             )}
         </Box>

@@ -20,7 +20,7 @@ EMAIL = os.environ.get("E2E_EMAIL", "report-proof-20260913@staging.supremerisk.t
 PASSWORD = os.environ.get("E2E_PASSWORD", "ReportProof1x")
 OTHER_EMAIL = os.environ.get("E2E_OTHER_EMAIL", "admin@sinfosecurity.com")
 OTHER_PASSWORD = os.environ.get("E2E_OTHER_PASSWORD", "Admin@123")
-EXPECTED_SHA = os.environ.get("E2E_EXPECTED_SHA", "14ec99b4225f176c54efbc9acd2a7701f612aa3b")
+EXPECTED_SHA = os.environ.get("E2E_EXPECTED_SHA", "")
 VENDOR_ID = "2afc74ad-a4e0-4a34-a2c4-40e88af5d376"
 RESULTS: dict = {"checks": [], "shots": [], "sha": {}}
 
@@ -90,9 +90,13 @@ def wait_hosted_sha():
             fe_sha = version.get("gitSha") or ""
             RESULTS["sha"] = {"api": api_sha, "frontend": fe_sha, "healthStatus": health_status}
             print(f"hosted sha api={api_sha} fe={fe_sha}")
-            if EXPECTED_SHA.startswith(str(api_sha)) or str(api_sha).startswith(EXPECTED_SHA[:7]):
-                if EXPECTED_SHA.startswith(str(fe_sha)) or str(fe_sha).startswith(EXPECTED_SHA[:7]):
+            if not EXPECTED_SHA:
+                if api_sha and fe_sha and str(api_sha)[:7] == str(fe_sha)[:7]:
                     return api_sha, fe_sha
+            elif (EXPECTED_SHA.startswith(str(api_sha)) or str(api_sha).startswith(EXPECTED_SHA[:7])) and (
+                EXPECTED_SHA.startswith(str(fe_sha)) or str(fe_sha).startswith(EXPECTED_SHA[:7])
+            ):
+                return api_sha, fe_sha
         except Exception as exc:
             print(f"waiting for hosted sha: {exc}")
         time.sleep(20)
@@ -170,6 +174,17 @@ def main():
     for kind in ("profile", "top-risks", "appetite", "treatment", "board"):
         status, payload = api("GET", f"/api/v1/erm/reports/{kind}.pdf", token)
         record(f"report {kind}", "PASS" if status == 200 and payload.get("binary") else "FAIL", str(status))
+    status, payload = api("GET", "/api/v1/erm/reports/board.pptx", token)
+    record("report board pptx", "PASS" if status == 200 and payload.get("binary") else "FAIL", str(status))
+    if created:
+        user_id = user.get("id") or user.get("userId")
+        status, payload = api("PATCH", f"/api/v1/erm/risks/{created[0]['publicId']}", token, {"ownerUserId": user_id})
+        record("owner assign", "PASS" if status == 200 and payload.get("data", {}).get("ownerUserId") == user_id else "FAIL", str(status))
+        status, detail = api("GET", f"/api/v1/erm/risks/{created[0]['publicId']}", token)
+        timeline = (detail.get("data") or {}).get("timeline") or []
+        dumped = any((row.get("change") or "").find("Methodology") >= 0 for row in timeline)
+        preserved = any((row.get("detail") or "").find("Methodology") >= 0 for row in timeline)
+        record("history concise", "PASS" if not dumped else "FAIL", f"dumped={dumped} preserved={preserved}")
     status, payload = api("GET", "/api/v1/erm/export/csv", token)
     record("export csv", "PASS" if status == 200 else "FAIL", str(status))
     status, payload = api("POST", "/api/v1/erm/import/preview", token, {"rows": [{"title": "=CMD()", "category": "CYBERSECURITY", "likelihood": "3", "impact": "3"}]})
@@ -188,6 +203,7 @@ def main():
             ("/control-center", "controls-regression"),
             ("/governance-graph", "graph-regression"),
             ("/reports", "reports-regression"),
+            ("/risk-management", "legacy-redirect"),
         ):
             page.goto(f"{BASE}{path}", wait_until="networkidle")
             time.sleep(0.8)

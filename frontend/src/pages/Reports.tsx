@@ -35,7 +35,7 @@ const catalog: CatalogItem[] = [
     { id: 'erm-top-risks', name: 'Top risks', category: 'Enterprise Risk', description: 'Highest residual enterprise risks from live tenant records.', formats: ['PDF'], kind: 'operational' },
     { id: 'erm-appetite', name: 'Risk appetite / exceptions', category: 'Enterprise Risk', description: 'Configured appetite and risks outside or near tolerance. Not configured is shown as not configured.', formats: ['PDF'], kind: 'operational' },
     { id: 'erm-treatment', name: 'Risk treatment status', category: 'Enterprise Risk', description: 'Treatment attention from live plans. A plan does not lower residual risk by itself.', formats: ['PDF'], kind: 'operational' },
-    { id: 'erm-board', name: 'Board risk summary', category: 'Enterprise Risk', description: 'Board-facing enterprise risk counts and top residual items. Ordinal scores are not summed.', formats: ['PDF'], kind: 'board' },
+    { id: 'erm-board', name: 'Board risk summary', category: 'Enterprise Risk', description: 'Board-facing enterprise risk counts, heatmap, appetite exceptions, and attention. Ordinal scores are not summed.', formats: ['PDF', 'PPTX'], kind: 'board' },
     { id: 'erm-register', name: 'Enterprise risk register', category: 'Enterprise Risk', description: 'CSV/XLSX of live enterprise risks with formula-injection protection.', formats: ['CSV', 'XLSX'], kind: 'operational' },
 ];
 
@@ -165,7 +165,7 @@ export default function Reports() {
             else if (item.id === 'erm-top-risks') response = await ermAPI.downloadReport('top-risks');
             else if (item.id === 'erm-appetite') response = await ermAPI.downloadReport('appetite');
             else if (item.id === 'erm-treatment') response = await ermAPI.downloadReport('treatment');
-            else if (item.id === 'erm-board') response = await ermAPI.downloadReport('board');
+            else if (item.id === 'erm-board') response = fmt === 'pptx' ? await ermAPI.downloadBoardPptx() : await ermAPI.downloadReport('board');
             else if (item.id === 'erm-register') response = await ermAPI.exportRegister(fmt as 'csv' | 'xlsx');
             else response = await tprmAPI.downloadBoard(fmt as 'pdf' | 'pptx');
             const filename = await downloadBinaryResponse(response, `Supreme-Risk-${item.id}.${fmt}`);

@@ -29,6 +29,7 @@ import {
     type ControlEffectiveness,
     type EnterpriseRating,
 } from './enterpriseRiskEngine';
+import { presentHistoryEntry, scoreChangeSummary } from './enterpriseRiskHistory';
 
 const CANONICAL_CATEGORIES = Object.values(EnterpriseRiskCategory);
 
@@ -154,7 +155,30 @@ async function scoreRisk(organizationId: string, riskId: string, reason: string,
             reason,
         },
     });
-    await history(organizationId, risk.id, 'Risk reassessed', scored.explanation, actorUserId, { residualScore: scored.residualScore });
+    if (reason !== 'Risk created') {
+        const summary = scoreChangeSummary({
+            fromRating: risk.residualRating,
+            toRating: scored.residualRating,
+            fromScore: risk.residualScore,
+            toScore: scored.residualScore,
+            fromLikelihood: risk.likelihood,
+            toLikelihood: scored.likelihood,
+            fromAppetite: risk.appetiteStatus,
+            toAppetite: appetite,
+        });
+        await history(organizationId, risk.id, 'Risk reassessed', summary, actorUserId, {
+            explanation: scored.explanation,
+            change: summary,
+            fromRating: risk.residualRating,
+            toRating: scored.residualRating,
+            fromScore: risk.residualScore,
+            toScore: scored.residualScore,
+            fromLikelihood: risk.likelihood,
+            toLikelihood: scored.likelihood,
+            fromAppetite: risk.appetiteStatus,
+            toAppetite: appetite,
+        });
+    }
     await audit({
         organizationId,
         actorUserId,
@@ -216,17 +240,32 @@ export const enterpriseRiskService = {
             byBusinessUnit,
             appetite,
             topRisks: [...risks].sort((a, b) => b.residualScore - a.residualScore).slice(0, 8),
-            attention: risks.filter((row) => (
-                row.appetiteStatus === 'OUTSIDE_APPETITE'
-                || (row.reviewDate && row.reviewDate.getTime() < now)
-                || row.decisions.some((item) => item.status === 'APPROVED' && item.expiresAt && item.expiresAt.getTime() < now)
-                || !row.ownerUserId
-            )).slice(0, 12),
+            attention: risks
+                .map((row) => {
+                    const reasons: string[] = [];
+                    const unownedHigh = !row.ownerUserId && (row.residualRating === 'CRITICAL' || row.residualRating === 'HIGH');
+                    if (unownedHigh) reasons.push('Unassigned');
+                    if (row.appetiteStatus === 'OUTSIDE_APPETITE') reasons.push('Outside appetite');
+                    if (row.reviewDate && row.reviewDate.getTime() < now) reasons.push('Overdue review');
+                    if (row.decisions.some((item) => item.status === 'APPROVED' && item.expiresAt && item.expiresAt.getTime() < now)) reasons.push('Acceptance expired');
+                    if (!row.ownerUserId && !unownedHigh) reasons.push('Unassigned');
+                    return { ...row, reasons };
+                })
+                .filter((row) => row.reasons.length)
+                .sort((left, right) => {
+                    const rank = (row: { ownerUserId: string | null; residualRating: string }) => {
+                        if (!row.ownerUserId && row.residualRating === 'CRITICAL') return 0;
+                        if (!row.ownerUserId && row.residualRating === 'HIGH') return 1;
+                        return 2;
+                    };
+                    return rank(left) - rank(right) || right.residualScore - left.residualScore;
+                })
+                .slice(0, 12),
         };
     },
 
-    async list(organizationId: string, filters: { category?: string; rating?: string; appetite?: string; q?: string; likelihood?: number; impact?: number }) {
-        return prisma.enterpriseRisk.findMany({
+    async list(organizationId: string, filters: { category?: string; rating?: string; appetite?: string; q?: string; likelihood?: number; impact?: number; unowned?: boolean }) {
+        const rows = await prisma.enterpriseRisk.findMany({
             where: {
                 organizationId,
                 archivedAt: null,
@@ -235,12 +274,19 @@ export const enterpriseRiskService = {
                 ...(filters.appetite ? { appetiteStatus: filters.appetite as never } : {}),
                 ...(filters.likelihood ? { likelihood: filters.likelihood } : {}),
                 ...(filters.impact ? { impact: filters.impact } : {}),
+                ...(filters.unowned ? { ownerUserId: null } : {}),
                 ...(filters.q ? { OR: [{ title: { contains: filters.q, mode: 'insensitive' } }, { publicId: { contains: filters.q, mode: 'insensitive' } }] } : {}),
             },
             orderBy: [{ residualScore: 'desc' }, { publicId: 'asc' }],
             include: { businessUnit: true },
             take: 500,
         });
+        const owners = await prisma.user.findMany({
+            where: { organizationId, id: { in: [...new Set(rows.map((row) => row.ownerUserId).filter(Boolean) as string[])] } },
+            select: { id: true, firstName: true, lastName: true },
+        });
+        const ownerName = new Map(owners.map((row) => [row.id, `${row.firstName} ${row.lastName}`.trim()]));
+        return rows.map((row) => ({ ...row, ownerName: row.ownerUserId ? ownerName.get(row.ownerUserId) || 'Unassigned' : 'Unassigned' }));
     },
 
     async get(organizationId: string, publicId: string) {
@@ -285,6 +331,15 @@ export const enterpriseRiskService = {
             where: { organizationId, id: { in: [risk.ownerUserId, risk.executiveOwnerUserId].filter(Boolean) as string[] } },
             select: { id: true, firstName: true, lastName: true, email: true },
         });
+        const actorIds = [...new Set(risk.history.map((row) => row.actorUserId).filter(Boolean) as string[])];
+        const actors = actorIds.length
+            ? await prisma.user.findMany({ where: { organizationId, id: { in: actorIds } }, select: { id: true, firstName: true, lastName: true } })
+            : [];
+        const actorName = new Map(actors.map((row) => [row.id, `${row.firstName} ${row.lastName}`.trim()]));
+        const timeline = risk.history.map((row) => ({
+            ...presentHistoryEntry({ ...row, payload: row.payload as never }),
+            actor: row.actorUserId ? actorName.get(row.actorUserId) || 'A teammate' : 'System',
+        }));
         return {
             honesty: 'This risk is scored by the enterprise 5×5 methodology. Vendor residual scores are separate. Acceptance does not lower residual risk.',
             risk,
@@ -300,6 +355,7 @@ export const enterpriseRiskService = {
             })),
             findings,
             owners,
+            timeline,
         };
     },
 
@@ -379,7 +435,18 @@ export const enterpriseRiskService = {
             await scoreRisk(organizationId, current.id, 'Inputs changed', actorUserId);
         }
         if (input.ownerUserId !== undefined && input.ownerUserId !== current.ownerUserId) {
-            await history(organizationId, current.id, 'Owner changed', 'Risk owner updated.', actorUserId);
+            const ids = [current.ownerUserId, typeof input.ownerUserId === 'string' ? input.ownerUserId : null].filter(Boolean) as string[];
+            const people = ids.length
+                ? await prisma.user.findMany({ where: { organizationId, id: { in: ids } }, select: { id: true, firstName: true, lastName: true } })
+                : [];
+            const nameOf = (id: string | null) => {
+                if (!id) return 'Unassigned';
+                const person = people.find((row) => row.id === id);
+                return person ? `${person.firstName} ${person.lastName}`.trim() : 'Unassigned';
+            };
+            const fromOwner = nameOf(current.ownerUserId);
+            const toOwner = nameOf(typeof input.ownerUserId === 'string' ? input.ownerUserId : null);
+            await history(organizationId, current.id, 'Owner changed', `Owner changed ${fromOwner} → ${toOwner}`, actorUserId, { fromOwner, toOwner });
         }
         await audit({ organizationId, actorUserId, action: 'risk.updated', resourceType: 'EnterpriseRisk', resourceId: current.id, metadata: { publicId } });
         return updated;
@@ -544,7 +611,7 @@ export const enterpriseRiskService = {
             relationshipType: GovernanceRelationshipType.ADDRESSES,
             createdBy: actorUserId,
         });
-        await history(organizationId, risk.id, 'Treatment approved', 'A treatment plan was recorded. Residual risk is unchanged until the risk is rescored from control evidence.', actorUserId);
+        await history(organizationId, risk.id, 'Treatment created', 'A treatment plan was recorded. Residual risk is unchanged until the risk is rescored from control evidence.', actorUserId);
         await audit({ organizationId, actorUserId, action: 'risk.treatment.changed', resourceType: 'EnterpriseRisk', resourceId: risk.id, metadata: { publicId, strategy: input.strategy } });
         return treatment;
     },
@@ -756,19 +823,58 @@ export const enterpriseRiskService = {
 
     async exportRows(organizationId: string) {
         const rows = await prisma.enterpriseRisk.findMany({ where: { organizationId, archivedAt: null }, orderBy: { publicId: 'asc' } });
+        const owners = await prisma.user.findMany({
+            where: { organizationId, id: { in: [...new Set(rows.map((row) => row.ownerUserId).filter(Boolean) as string[])] } },
+            select: { id: true, firstName: true, lastName: true },
+        });
+        const ownerName = new Map(owners.map((row) => [row.id, `${row.firstName} ${row.lastName}`.trim()]));
+        const readable = (value: string) => value.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
         return rows.map((row) => ({
             publicId: neutralizeSpreadsheetCell(row.publicId),
             title: neutralizeSpreadsheetCell(row.title),
-            category: neutralizeSpreadsheetCell(row.category),
-            status: neutralizeSpreadsheetCell(row.status),
+            category: neutralizeSpreadsheetCell(readable(row.category)),
+            status: neutralizeSpreadsheetCell(readable(row.status)),
             likelihood: row.likelihood,
             impact: row.impact,
             inherentScore: row.inherentScore,
             residualScore: row.residualScore,
-            residualRating: neutralizeSpreadsheetCell(row.residualRating),
-            appetiteStatus: neutralizeSpreadsheetCell(row.appetiteStatus),
-            ownerUserId: neutralizeSpreadsheetCell(row.ownerUserId || ''),
+            residualRating: neutralizeSpreadsheetCell(readable(row.residualRating)),
+            appetiteStatus: neutralizeSpreadsheetCell(readable(row.appetiteStatus)),
+            owner: neutralizeSpreadsheetCell(row.ownerUserId ? ownerName.get(row.ownerUserId) || 'Unassigned' : 'Unassigned'),
         }));
+    },
+
+    async listAssignableOwners(organizationId: string) {
+        return prisma.user.findMany({
+            where: { organizationId, status: 'ACTIVE' },
+            select: { id: true, firstName: true, lastName: true, email: true },
+            orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
+            take: 200,
+        });
+    },
+
+    async boardPack(organizationId: string) {
+        const dashboard = await this.dashboard(organizationId);
+        const [kris, decisions, treatments, name] = await Promise.all([
+            prisma.enterpriseRiskKri.findMany({
+                where: { organizationId, status: { in: ['WARNING', 'CRITICAL'] } },
+                include: { risk: { select: { publicId: true, title: true } } },
+                take: 20,
+            }),
+            prisma.enterpriseRiskDecision.findMany({
+                where: { organizationId },
+                include: { risk: { select: { publicId: true, title: true } } },
+                orderBy: { createdAt: 'desc' },
+                take: 20,
+            }),
+            prisma.enterpriseRiskTreatment.findMany({
+                where: { organizationId, status: { notIn: ['COMPLETED', 'CANCELLED'] } },
+                include: { risk: { select: { publicId: true, title: true } } },
+                take: 20,
+            }),
+            prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } }),
+        ]);
+        return { dashboard, kris, decisions, treatments, name: name?.name || 'This organization' };
     },
 
     async controlFailureImpact(organizationId: string, controlId: string) {
