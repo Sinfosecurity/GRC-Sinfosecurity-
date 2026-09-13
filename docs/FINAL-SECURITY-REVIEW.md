@@ -341,3 +341,57 @@ See `docs/SECURITY-ARCHITECTURE.md`. Trust boundaries: INTERNET, CUSTOMER PLANE,
 ## Tests added
 
 `backend/src/__tests__/final-security-review.test.ts` covers in-memory 404, metrics token, billing return URL, password-change JWT invalidation, disabled reset, last org admin, break-glass org binding, and CSV formula neutralization.
+
+## HOSTED FINAL-SHA CLOSURE
+
+**Date/time:** 2026-09-13 01:52 UTC
+**Environment:** Render staging only (not production)
+**Runtime SHA verified on staging frontend and API:** `227dc3215783df523a3b6dc8973928e66ef43df3`
+**Security implementation SHA present:** `309b76336a351ab43ce7627efa22272b94a34298` (ancestor of the hosted SHA)
+**#9 security implementation present:** YES
+**Production deployment:** NO
+**Main merged:** NO
+**#10 started:** NO
+
+Hosted staging was already serving the certified descendant. No additional staging deploy was required for this closure. No runtime source change was required.
+
+| Check | Result | Notes |
+|---|---|---|
+| Unauthenticated `GET /metrics` | PASS | 404; route not disclosed |
+| Wrong metrics bearer | PASS | 404 |
+| Correct metrics token | SKIP | `METRICS_TOKEN` is not configured; unauthenticated remains 404 |
+| Legacy `/api/v1/tasks` | PASS | 404 |
+| Legacy `/api/v1/workflows` | PASS | 404 |
+| Legacy `/api/v1/reports` | PASS | 404 |
+| Static `/uploads/test.pdf` | PASS | 404 |
+| Stripe hostile return URL `https://evil.example/steal` | PASS | 400; no session/redirect |
+| Password-change old JWT | PASS | subsequent `/auth/me` 401 |
+| Disabled-user reset with prior token | PASS | reset 400; account remained DISABLED |
+| Last organization administrator | PASS | self-demote/self-disable 403; one ACTIVE org admin remained |
+| Break-glass Org A incident against Org B | PASS | 400 |
+| Cross-tenant / IDOR (vendor, finding, decision brief, ticket, evidence download) | PASS | 403/404; no foreign data |
+| CSV formula `=1+1` | PASS | emitted as `'=1+1` |
+| XLSX formula `=2+2` | PASS | 200 after local PROFESSIONAL entitlement; no raw `=2+2` formula cell |
+| Error sanitization | PASS | 4xx without stack/SQL/paths/Redis/credentials |
+| CORS hostile `https://evil.example` | PASS | no `Access-Control-Allow-Origin` for that origin |
+| CORS staging origin | PASS | staging origin reflected |
+| Malware | PASS | provider CONNECTED; CLEAN download 200; PENDING download 403; support `evidence.mark_clean` 403 |
+| Rate-limit regression | PASS | failed login / forgot-password remain customer-safe 401/200; no limiter removed |
+| Platform MFA / `/admin/login` / `/platform` | PASS | pages 200; enroll-only cannot call `/platform`; enrolled owner overview 200; customer plane 401/403; platform token on `/vendors` 403 |
+| Support-access regression | PASS | pre-approval 403; approved READ_ONLY read 200; write 403; Org B 404; after revoke 403 |
+| Provider health | PASS | postgres/redis/storage/malware/stripe up; email up at closure; AI and MongoDB degraded (truthful) |
+| Frontend secret exposure | PASS | no `sk_`, `whsec_`, `ENCRYPTION_KEY`, `DATABASE_URL`, `SMTP_PASSWORD`, `JWT_SECRET`, Redis credentials, MinIO secret, or TOTP secrets in the hosted index bundle |
+
+**SECURITY CONTACT:** NOT YET CONFIGURED — no public mailbox designated; do not invent one. Cutover blocker for #10/#11, not a technical #9 reopen.
+
+**METRICS TOKEN:** NOT CONFIGURED — `/metrics` remains non-public.
+
+**New Critical findings:** 0
+**New High findings:** 0
+
+**GitHub-hosted CI for the verified runtime SHA:** PASS — run `34729299577` on `227dc3215783df523a3b6dc8973928e66ef43df3` (https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34729299577)
+
+**#9 FINAL SECURITY REVIEW:** PASS
+**HOSTED CLOSURE:** PASS
+
+Remaining launch requirements (not technical #9 reopeners): public security mailbox; `METRICS_TOKEN` if operators need authenticated metrics; #2 Stripe remains PARTIAL / CONDITIONALLY CLEARED; Product Leadership acceptance before #10.

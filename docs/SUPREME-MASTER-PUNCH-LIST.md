@@ -161,11 +161,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Product Leadership authorizes the review; findings are recorded; no silent production claim.
 
-**CURRENT STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance before #10
+**CURRENT STATUS:** EVIDENCE RESULT PASS; HOSTED CLOSURE PASS — awaiting Product Leadership acceptance before #10
 
 **CERTIFICATION SHA:** `309b76336a351ab43ce7627efa22272b94a34298`
 
-**EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md`, `docs/SECURITY-ARCHITECTURE.md`, `docs/PENETRATION-TEST-SCOPE.md`, `docs/SOC2-ISO-READINESS-MAPPING.md`
+**HOSTED CLOSURE SHA:** `227dc3215783df523a3b6dc8973928e66ef43df3`
+
+**EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md` (including HOSTED FINAL-SHA CLOSURE), `docs/SECURITY-ARCHITECTURE.md`, `docs/PENETRATION-TEST-SCOPE.md`, `docs/SOC2-ISO-READINESS-MAPPING.md`
 
 **NEXT ACTION:** Product Leadership review. Do not start #10 until accepted.
 
