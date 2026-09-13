@@ -231,17 +231,17 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **PURPOSE:** Shared graph of organizations, assets, vendors, controls, evidence, and decisions across modules.
 
-**DEPENDENCIES:** #1. Product Leadership authorized this item while #12 remains PARTIAL / open in parallel. Commercial production PASS on #12 is still not required to implement the graph. #14 is not authorized.
+**DEPENDENCIES:** #1. Product Leadership authorized this item while #12 remains PARTIAL / open in parallel. Commercial production PASS on #12 is still not required to implement the graph. Product Leadership later accepted #13 and authorized #14.
 
 **DEFINITION OF DONE:** Authoritative graph model with tenant isolation, provenance, temporal relationship state, idempotent TPRM backfill, explainable query APIs, and a professional explorer. No separate graph database. Marketing preview is not done.
 
-**CURRENT STATUS:** PARTIAL — hosted Graph Explorer was rejected for 429s; remediation is hosted and waiting for Product Leadership review. Not commercial production.
+**CURRENT STATUS:** Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel.
 
-**CERTIFICATION SHA:** limiter remediation `b9daaf57a309846dab025a8abd50520d3a4685ae` (hosted CI run `34751123207` PASS). Hosted frontend after mobile workspace fix `1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85`. First implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` remains the rejected explorer.
+**CERTIFICATION SHA:** limiter remediation `b9daaf57a309846dab025a8abd50520d3a4685ae` (hosted CI run `34751123207` PASS). Hosted frontend after mobile workspace fix `1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85`. First implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` remains the rejected explorer. Program-acceptance docs commit `c1c9948e3cf8c761345082b1467b348582b3b1af`.
 
-**EVIDENCE:** Hosted ordinary session on `/governance-graph` completed with zero unexpected 429s. Screenshots and request counts: `docs/private-beta/hosted-ux-qa/graph-explorer/`. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. #12 remains PARTIAL.
+**EVIDENCE:** Hosted ordinary session on `/governance-graph` completed with zero unexpected 429s. Screenshots and request counts: `docs/private-beta/hosted-ux-qa/graph-explorer/`. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. Product Leadership accepted the remediated explorer.
 
-**NEXT ACTION:** Product Leadership must review the new hosted explorer. Keep #12 PARTIAL. Do not start #14. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #13 accepted. Keep #12 PARTIAL. #14 is authorized. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -253,13 +253,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Control catalog and evidence objects are reusable across products without duplicate uploads as the source of truth.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** PARTIAL — implementation returned on `supreme-risk-transformation`. Product Leadership has not accepted the hosted Control Center / Evidence Library / coverage experience. Not commercial production.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** pending hosted deploy of the #14 implementation SHA. Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`.
 
-**EVIDENCE:** TPRM evidence exists for vendors only. That is not this layer.
+**EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification notes `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Do not mark PASS from code alone.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Product Leadership visual and operational review of the hosted experience. Keep #12 PARTIAL. Do not start #15. Do not merge `main` or deploy commercial production.
 
 ---
 

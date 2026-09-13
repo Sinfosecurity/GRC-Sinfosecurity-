@@ -242,6 +242,22 @@ export const tprmAPI = {
         api.get(`/tprm/reports/board.${format}`, { responseType: 'blob', params }),
 };
 
+export const sccAPI = {
+    summary: () => api.get('/scc/summary'),
+    controls: (params?: unknown) => api.get('/scc/controls', { params }),
+    control: (id: string) => api.get(`/scc/controls/${id}`),
+    updateControl: (id: string, data: unknown) => api.patch(`/scc/controls/${id}`, data),
+    recordTest: (id: string, data: unknown) => api.post(`/scc/controls/${id}/tests`, data),
+    frameworks: (params?: unknown) => api.get('/scc/frameworks', { params }),
+    evidence: (params?: unknown) => api.get('/scc/evidence', { params }),
+    linkEvidence: (data: unknown) => api.post('/scc/evidence/links', data),
+    reviewLink: (linkId: string, data: unknown) => api.post(`/scc/evidence/links/${linkId}/review`, data),
+    unlinkEvidence: (linkId: string, data?: unknown) => api.post(`/scc/evidence/links/${linkId}/unlink`, data || {}),
+    impact: (storedObjectId: string) => api.get(`/scc/evidence/${storedObjectId}/impact`),
+    downloadReport: (kind: string, format: 'json' | 'pdf' = 'pdf') =>
+        api.get(`/scc/reports/${kind}`, { params: { format }, responseType: format === 'pdf' ? 'blob' : 'json' }),
+};
+
 export const governanceAPI = {
     summary: (config?: { signal?: AbortSignal }) => api.get('/governance/summary', config),
     search: (params?: unknown, config?: { signal?: AbortSignal }) => api.get('/governance/search', { params, ...config }),

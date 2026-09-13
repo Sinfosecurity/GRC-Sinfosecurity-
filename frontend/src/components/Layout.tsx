@@ -27,7 +27,9 @@ import {
     GavelOutlined,
     HelpOutline,
     AccountTreeOutlined,
+    FactCheckOutlined,
     HistoryOutlined,
+    HubOutlined,
     Menu as MenuIcon,
     MonitorHeartOutlined,
     NotificationsNone,
@@ -61,6 +63,13 @@ const menuSections: NavSection[] = [
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
             { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
             { text: 'Decisions', path: '/decision-briefs', icon: <GavelOutlined fontSize="small" />, permission: 'approval.read' },
+        ],
+    },
+    {
+        title: 'Controls',
+        items: [
+            { text: 'Control Center', path: '/control-center', icon: <FactCheckOutlined fontSize="small" />, permission: 'control.read' },
+            { text: 'Framework coverage', path: '/framework-coverage', icon: <HubOutlined fontSize="small" />, permission: 'framework.read' },
         ],
     },
     {

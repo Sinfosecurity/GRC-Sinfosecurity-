@@ -21,6 +21,14 @@ export const AUTHORITATIVE_TABLES = [
     'InAppNotification',
     'GovernanceNode',
     'GovernanceEdge',
+    'ControlCatalogEntry',
+    'OrganizationControl',
+    'FrameworkDefinition',
+    'FrameworkVersion',
+    'FrameworkRequirement',
+    'RequirementControlMapping',
+    'EvidenceGovernanceLink',
+    'OrganizationControlTest',
 ] as const;
 
 export type RecoveryManifest = {
@@ -182,6 +190,18 @@ export async function buildRecoveryManifest(
         where: { organizationId: { in: orgs.map((org) => org.id) } },
         select: { id: true, organizationId: true, storedObjectId: true, vendorId: true },
     });
+    const orgControls = await prisma.organizationControl.findMany({
+        where: { organizationId: { in: orgs.map((org) => org.id) } },
+        select: { id: true, organizationId: true, controlKey: true },
+    });
+    const govLinks = await prisma.evidenceGovernanceLink.findMany({
+        where: { organizationId: { in: orgs.map((org) => org.id) } },
+        select: { id: true, organizationId: true, storedObjectId: true, targetType: true, targetId: true },
+    });
+    const controlTests = await prisma.organizationControlTest.findMany({
+        where: { organizationId: { in: orgs.map((org) => org.id) } },
+        select: { id: true, organizationId: true, controlId: true },
+    });
 
     const vendorOrg = new Map(vendors.map((item) => [item.id, item.organizationId]));
     const objectOrg = new Map(evidence.map((item) => [item.id, item.organizationId]));
@@ -207,6 +227,21 @@ export async function buildRecoveryManifest(
             id: `risk-acceptance:${item.vendorId}`,
             ok: item.residualUnchangedByAcceptance,
             detail: 'risk acceptance does not reduce residual score',
+        })),
+        ...orgControls.map((item) => ({
+            id: `control:${item.id}`,
+            ok: orgs.some((org) => org.id === item.organizationId),
+            detail: 'organization control belongs to a recovered tenant',
+        })),
+        ...govLinks.map((item) => ({
+            id: `evidence-governance-link:${item.id}`,
+            ok: objectOrg.get(item.storedObjectId) === item.organizationId,
+            detail: 'shared evidence link belongs to the same tenant as the stored object',
+        })),
+        ...controlTests.map((item) => ({
+            id: `control-test:${item.id}`,
+            ok: orgControls.some((control) => control.id === item.controlId && control.organizationId === item.organizationId),
+            detail: 'control test belongs to the same tenant as its control',
         })),
         {
             id: 'two-tenants',

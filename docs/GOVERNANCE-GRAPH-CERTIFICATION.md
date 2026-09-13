@@ -7,7 +7,7 @@
 **GITHUB CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34749488009 PASS on `8ec44343fea25a027bedd048ae7097fca17a06b7`  
 **BRANCH:** `supreme-risk-transformation`  
 **#12:** remains PARTIAL / OPEN IN PARALLEL  
-**#14 STARTED:** NO  
+**#14 STARTED:** YES — authorized after Product Leadership accepted #13; see `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`  
 **COMMERCIAL PRODUCTION:** NO-GO  
 **PRODUCTION READY:** NO
 
@@ -37,7 +37,7 @@
 
 ## Hosted explorer rejection (2026-09-13)
 
-Product Leadership tested live `/governance-graph` and received “Too many attempts. Too many requests. Please try again later.” during ordinary use. #13 remains PARTIAL.
+Product Leadership tested live `/governance-graph` and received “Too many attempts. Too many requests. Please try again later.” during ordinary use. That hosted explorer was rejected. The limiter/fetch remediation below was later accepted.
 
 | Fact | Finding |
 |---|---|
@@ -67,15 +67,14 @@ The explorer landing page shows guidance and recent stored relationship changes.
 | Selected entity | Northwind Cloud (vendor, real tenant record) |
 | Screenshots | `docs/private-beta/hosted-ux-qa/graph-explorer/` — selected entity, direct relationships, impact, lineage, landing, 1440, 375 |
 
-This is hosted engineering evidence. It is not Product Leadership acceptance and does not make #13 PASS.
+Product Leadership accepted the remediated hosted explorer on 2026-09-13. Commercial production remains NO-GO. #12 remains PARTIAL.
 
 ## Known non-closures
 
-- Hosted Supreme CI PASS on first implementation SHA `8ec4434` (run `34749488009`). Product Leadership later rejected that hosted explorer.
-- #13 remains PARTIAL until Product Leadership reviews the remediating hosted experience.
+- Hosted Supreme CI PASS on first implementation SHA `8ec4434` (run `34749488009`). Product Leadership later rejected that hosted explorer; the remediated explorer was accepted.
 - #12 invitation inbox confirmation, visual acceptance, UX-P2/P3, and commercial NO-GO remain #12 issues.
 - Private external testers are not authorized.
-- #14 is not authorized and was not started.
+- #14 is authorized and in progress. #15 is not authorized.
 
 ## Threat model (local)
 

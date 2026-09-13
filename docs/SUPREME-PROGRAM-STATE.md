@@ -8,17 +8,19 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #13 Governance Graph
+**CURRENT ITEM:** #14 Shared Control & Evidence Layer
 
-**CURRENT ITEM STATUS:** PARTIAL — hosted 429/UX remediation returned; Product Leadership review required
+**CURRENT ITEM STATUS:** PARTIAL — implementation in progress / returned; Product Leadership hosted acceptance required
 
 **#12:** PARTIAL / OPEN IN PARALLEL
+
+**#13:** Product Leadership accepted (2026-09-13)
 
 **COMMERCIAL PRODUCTION:** NO-GO
 
 **PRIVATE EXTERNAL TESTERS:** NOT AUTHORIZED unless Product Leadership separately approves
 
-**CURRENT VERIFIED SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2` (program-acceptance snapshot; engineering HEAD may be later)
+**CURRENT VERIFIED SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2` (program-acceptance snapshot; engineering HEAD is later — do not silently reconcile)
 
 **#13 STARTING SHA:** `70e4953e9d9eba13ac8604b721c81216a4e149ad`
 
@@ -44,18 +46,26 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
 **#12 STARTED:** YES — PARTIAL; invitation inbox / visual acceptance remain; open in parallel with #13
-**#13 AUTHORIZED:** YES — Product Leadership 2026-09-13
-**#14 AUTHORIZED:** NO
+**#13 AUTHORIZED:** YES — Product Leadership 2026-09-13; later accepted
+**#14 AUTHORIZED:** YES — Product Leadership 2026-09-13
+**#14 STARTING SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`
+**#15 AUTHORIZED:** NO
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #14 Shared Control & Evidence Layer
+
+**STATUS:** PARTIAL — common-control plane and evidence reuse implemented; hosted Product Leadership acceptance is still required
+
+See `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md` and `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. #15 is not authorized.
+
 ### #13 Governance Graph
 
-**STATUS:** PARTIAL — hosted 429/UX remediation is hosted; not Product Leadership acceptance
+**STATUS:** Product Leadership accepted (2026-09-13)
 
-PostgreSQL/Prisma relationship layer. No separate graph database. #14 is not authorized.
+PostgreSQL/Prisma relationship layer. No separate graph database.
 
 See `docs/ADR-GOVERNANCE-GRAPH.md` and `docs/GOVERNANCE-GRAPH-CERTIFICATION.md`.
 

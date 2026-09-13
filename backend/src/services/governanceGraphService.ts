@@ -1008,6 +1008,16 @@ export async function backfillOrganization(organizationId: string, actorUserId?:
         }
     }
 
+    try {
+        const { adoptCatalogForOrganization } = await import('./sharedControlEvidenceService');
+        await adoptCatalogForOrganization(organizationId, actorUserId || undefined);
+    } catch (error) {
+        counts.errors.push({
+            code: 'SHARED_CONTROL_ADOPT',
+            detail: error instanceof Error ? error.message : 'shared control adopt failed',
+        });
+    }
+
     await auditGraph({
         organizationId,
         actorUserId,

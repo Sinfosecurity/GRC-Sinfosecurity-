@@ -19,7 +19,7 @@ import MetricCard from '../components/design/MetricCard';
 import QueryState from '../components/QueryState';
 import { governanceAPI } from '../services/api';
 
-const NODE_TYPES = ['', 'ORGANIZATION', 'VENDOR', 'ASSESSMENT', 'EVIDENCE', 'FINDING', 'REMEDIATION', 'RISK', 'DECISION', 'CONTRACT', 'CONTROL'];
+const NODE_TYPES = ['', 'ORGANIZATION', 'VENDOR', 'ASSESSMENT', 'EVIDENCE', 'FINDING', 'REMEDIATION', 'RISK', 'DECISION', 'CONTRACT', 'CONTROL', 'FRAMEWORK', 'REQUIREMENT', 'CONTROL_TEST'];
 const RELATIONSHIP_TYPES = ['', 'OWNS', 'USES', 'HAS_RISK', 'ASSESSED_BY', 'HAS_FINDING', 'REMEDIATED_BY', 'SUPPORTED_BY', 'APPLIES_TO', 'CONTROLLED_BY', 'MITIGATES'];
 const STATUSES = ['', 'ACTIVE', 'ARCHIVED', 'TERMINATED', 'OFFBOARDING'];
 const PROVENANCES = ['', 'SYSTEM', 'USER', 'IMPORT', 'ASSESSMENT', 'RULE'];

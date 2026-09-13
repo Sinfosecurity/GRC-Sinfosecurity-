@@ -4,7 +4,7 @@ import { Alert, Box, Button, CircularProgress, MenuItem, Stack, TextField, Typog
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
-import { tprmAPI, vendorAPI } from '../services/api';
+import { sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 
 type CatalogItem = {
@@ -25,6 +25,10 @@ const catalog: CatalogItem[] = [
     { id: 'findings', name: 'Findings report', category: 'Findings', description: 'Vendor, severity, owner, age, remediation, evidence, and risk acceptance.', formats: ['PDF', 'CSV', 'XLSX'], kind: 'operational' },
     { id: 'monitoring', name: 'Monitoring report', category: 'Monitoring', description: 'Provider status plus recorded vendor signals only. External ratings are not invented.', formats: ['PDF', 'CSV'], kind: 'operational' },
     { id: 'board', name: 'Board report', category: 'Board', description: 'Executive summary, heatmap, trend, findings, decisions, and recommendations.', formats: ['PDF', 'PPTX'], kind: 'board' },
+    { id: 'control-coverage', name: 'Control coverage', category: 'Controls', description: 'Implemented, tested, ineffective, and findings-linked controls. Readiness only — not certification.', formats: ['PDF'], kind: 'operational' },
+    { id: 'evidence-coverage', name: 'Evidence coverage', category: 'Controls', description: 'CLEAN usable objects, reuse count, and honesty that a file does not prove every mapping.', formats: ['PDF'], kind: 'operational' },
+    { id: 'framework-readiness', name: 'Framework readiness', category: 'Controls', description: 'Mapped, implemented, tested, and gap counts for framework identifiers. Not compliant or certified.', formats: ['PDF'], kind: 'operational' },
+    { id: 'control-testing', name: 'Control testing', category: 'Controls', description: 'Recorded test results from this organization. Not applicable is not treated as pass.', formats: ['PDF'], kind: 'operational' },
 ];
 
 type Capabilities = {
@@ -89,6 +93,9 @@ export default function Reports() {
             else if (item.id === 'assessment') response = await tprmAPI.downloadAssessmentPdf(assessmentId);
             else if (item.id === 'findings') response = await tprmAPI.downloadFindings(fmt as 'pdf' | 'csv' | 'xlsx');
             else if (item.id === 'monitoring') response = await tprmAPI.downloadMonitoring(fmt as 'pdf' | 'csv');
+            else if (['control-coverage', 'evidence-coverage', 'framework-readiness', 'control-testing'].includes(item.id)) {
+                response = await sccAPI.downloadReport(item.id, 'pdf');
+            }
             else response = await tprmAPI.downloadBoard(fmt as 'pdf' | 'pptx');
             const filename = await downloadBinaryResponse(response, `Supreme-Risk-${item.id}.${fmt}`);
             setSuccess(`Downloaded ${filename}`);

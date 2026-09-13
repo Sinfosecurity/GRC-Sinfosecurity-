@@ -16,6 +16,17 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['vendor.read'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['governanceGraph.read'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['governanceGraph.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['control.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['control.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['control.test'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['evidence.link'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['framework.manage'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['control.test'])).toBe(true);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['control.manage'])).toBe(false);
+        expect(hasPermission('APPROVER', PERMISSIONS['control.approve'])).toBe(true);
+        expect(hasPermission('APPROVER', PERMISSIONS['evidence.review'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['control.manage'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['framework.manage'])).toBe(true);
         expect(hasPermission('SUPPORT_ADMIN', PERMISSIONS['governanceGraph.read'])).toBe(false);
         expect(hasPermission('SUPPORT_ANALYST', PERMISSIONS['governanceGraph.manage'])).toBe(false);
         expect(hasPermission('RISK_MANAGER', PERMISSIONS['governanceGraph.manage'])).toBe(true);

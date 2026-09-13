@@ -40,6 +40,14 @@ export const PERMISSIONS = {
     'questionnaire.manage': 'questionnaire.manage',
     'governanceGraph.read': 'governanceGraph.read',
     'governanceGraph.manage': 'governanceGraph.manage',
+    'control.read': 'control.read',
+    'control.manage': 'control.manage',
+    'control.test': 'control.test',
+    'control.approve': 'control.approve',
+    'evidence.link': 'evidence.link',
+    'evidence.review': 'evidence.review',
+    'framework.read': 'framework.read',
+    'framework.manage': 'framework.manage',
     'platform.overview': 'platform.overview',
     'platform.organizations.read': 'platform.organizations.read',
     'platform.support.read': 'platform.support.read',
@@ -123,6 +131,8 @@ const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['notification.read'],
     PERMISSIONS['monitoring.read'],
     PERMISSIONS['governanceGraph.read'],
+    PERMISSIONS['control.read'],
+    PERMISSIONS['framework.read'],
 ];
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
@@ -153,6 +163,12 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['monitoring.manage'],
         PERMISSIONS['questionnaire.manage'],
         PERMISSIONS['governanceGraph.manage'],
+        PERMISSIONS['control.manage'],
+        PERMISSIONS['control.test'],
+        PERMISSIONS['control.approve'],
+        PERMISSIONS['evidence.link'],
+        PERMISSIONS['evidence.review'],
+        PERMISSIONS['framework.manage'],
     ],
     ASSESSOR: [
         ...READ_PORTFOLIO,
@@ -165,6 +181,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['risk.create'],
         PERMISSIONS['risk.update'],
         PERMISSIONS['report.export'],
+        PERMISSIONS['control.test'],
+        PERMISSIONS['evidence.link'],
     ],
     APPROVER: [
         ...READ_PORTFOLIO,
@@ -172,6 +190,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['risk.accept'],
         PERMISSIONS['report.export'],
         PERMISSIONS['audit.read'],
+        PERMISSIONS['control.approve'],
+        PERMISSIONS['evidence.review'],
     ],
     BUSINESS_OWNER: [
         ...READ_PORTFOLIO,

@@ -331,6 +331,35 @@ export async function populateRecoveryDataset(prisma: PrismaClient, objectRoot: 
         { name: 'Payroll Hub B', tier: 'HIGH' },
     ]);
 
+    const { adoptCatalogForOrganization, linkEvidence, recordControlTest } = await import('../services/sharedControlEvidenceService');
+    await adoptCatalogForOrganization(orgA.org.id, orgA.admin.id);
+    await adoptCatalogForOrganization(orgB.org.id, orgB.admin.id);
+    const controlA = await prisma.organizationControl.findFirstOrThrow({
+        where: { organizationId: orgA.org.id, controlKey: 'AUTH-01' },
+    });
+    await prisma.organizationControl.update({
+        where: { id: controlA.id },
+        data: { implementationStatus: 'IMPLEMENTED', ownerUserId: orgA.admin.id },
+    });
+    await linkEvidence({
+        organizationId: orgA.org.id,
+        actorUserId: orgA.admin.id,
+        storedObjectId: seededA[0].stored.id,
+        targetType: 'CONTROL',
+        targetId: controlA.id,
+        relationship: 'SUPPORTS',
+        rationale: 'Recovery dataset: MFA policy for privileged access.',
+    });
+    await recordControlTest({
+        organizationId: orgA.org.id,
+        actorUserId: orgA.assessor.id,
+        controlId: controlA.id,
+        method: 'INSPECTION',
+        procedure: 'Inspect privileged-access MFA evidence.',
+        result: 'PASS',
+        notes: 'Recovery certification test. Not a live audit result.',
+    });
+
     const { backfillOrganization } = await import('../services/governanceGraphService');
     await backfillOrganization(orgA.org.id);
     await backfillOrganization(orgB.org.id);
