@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #17 Supreme Privacy
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -75,9 +75,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#17 IMPLEMENTATION SHA:** `134d12860c595603106180c35ad3a10a328917f7`
 **#17 CLOSURE SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
 **#17 FINAL VISUAL CLOSURE SHA:** `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`
-**#17 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34786063666 PASS on `6dab4ff`
+**#17 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34789986034 PASS on `c7382dd`
 **#17 HOSTED FRONTEND SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`
-**#17 HOSTED API SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`
+**#17 HOSTED API SHA:** `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`
+**#17 FINAL BOARD FIX SHA:** `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`
 **#18 AUTHORIZED:** NO
 
 ---
@@ -86,9 +87,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #17 Supreme Privacy
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED
 
-See `docs/ADR-SUPREME-PRIVACY.md` and `docs/private-beta/hosted-ux-qa/supreme-privacy/`. #18 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-PRIVACY.md` and `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Live Elite Claims Board PPTX is 14 native PowerPoint slides after the slide-11 clip fix. #18 is not authorized. #12 remains PARTIAL.
 
 ### #16 Supreme Compliance
 
@@ -350,3 +351,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED  
 **SHA:** Visual closure `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`; hosted product `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`  
 **EVIDENCE:** Hosted Supreme CI run `34786063666` PASS. Staging frontend and API both `1dd47b3`. Native PowerPoint renders of the hosted Board PPTX and 375/768 deletion/incident cards recorded in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. CI LibreOffice remains `native-attempted`. Not PASS. #12 remains PARTIAL. #18 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #17 Supreme Privacy  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED  
+**SHA:** Final board fix `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`; DrawingML repair `02fb0c803c150d02e51afbf6e5bbf31cd8a9e918`; wrap/paginate `ea3c153f1a718186fc8431a987873b6468a957a5`  
+**EVIDENCE:** Hosted Supreme CI run `34789986034` PASS on `c7382dd`. Live Elite Claims `/api/v1/privacy/reports/board.pptx` regenerated from hosted API `c7382dd`. Microsoft PowerPoint rendered 14 unique pages. Slide 11 decision copy is wrapped and complete; overflow uses continuation slides 12–14. Hosted frontend remains `1dd47b3` (UI unchanged; mismatch recorded). Not PASS. #12 remains PARTIAL. #18 is not authorized.

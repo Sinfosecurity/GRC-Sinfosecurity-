@@ -7,9 +7,10 @@
 **Operational closure SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`  
 **Final visual closure SHA:** `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`  
 **Product SHA on staging:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`  
+**Final board fix SHA:** `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`  
 **Hosted frontend SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`  
-**Hosted API SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`  
-**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34786063666 PASS on `6dab4ff`  
+**Hosted API SHA:** `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34789986034 PASS on `c7382dd`  
 **Backend tests:** 338  
 **Frontend tests:** 156  
 **Tenant:** Elite Claims (`report-proof-20260913@staging.supremerisk.test`)  
@@ -20,8 +21,8 @@
 
 ## Discrepancies (not silently reconciled)
 
-- Visual-closure product SHA `1dd47b3` is on hosted frontend and API. Branch head / CI SHA `6dab4ff` only changes the native-render script and CI LibreOffice tolerance. That hosted-vs-CI mismatch is recorded.
-- Documentation after this walkthrough will be ahead of hosted `1dd47b3`.
+- Visual-closure product SHA `1dd47b3` remains on hosted frontend. Board generator lives on the API; hosted API is `c7382dd`. That frontend/API mismatch is recorded and not silently reconciled.
+- Documentation after this walkthrough will be ahead of hosted frontend `1dd47b3`.
 - Hosted `/health` remains `degraded` for preexisting reasons: MongoDB `NOT_CONFIGURED`, email `DEGRADED`, AI `NOT_CONFIGURED`, high heap. Postgres, Redis, Stripe test mode, and malware CONNECTED / fail-closed downloads are unchanged.
 - CI LibreOffice exported 12 pages with 1 unique image hash (`native-attempted`). Distinct visual QA used Microsoft PowerPoint on the Mac runner.
 - The walkthrough cover-text regex missed `xml:space="preserve"` and recorded a false FAIL. Extracted slide XML contains `Board Risk Committee report`.
@@ -31,13 +32,13 @@
 `Supreme-Privacy-Board.pptx` was downloaded from hosted `/api/v1/privacy/reports/board.pptx` and rendered with Microsoft PowerPoint → PDF → PNG.
 
 - Engine: Microsoft PowerPoint
-- Pages: 12
-- Unique hashes: 12
+- Pages: 14
+- Unique hashes: 14
 - Reconstruction: native
 - Proof: `native-slides/native-render.json`
-- `board-slide-1.png` … `board-slide-12.png` are copies of those native images. HTML slide cards were removed.
+- `board-slide-1.png` … `board-slide-14.png` are copies of those native images. HTML slide cards were removed.
 
-Cover, posture, footprint, risk, transfers, rights, DPIA, vendor, retention, evidence, decisions, and 90-day actions are present. Copy says “No trend available.” It does not invent arrows or say “You must notify.”
+Cover, posture, footprint, risk, transfers, rights, DPIA, vendor, retention, evidence, decisions, decision continuation, 90-day actions, and action continuation are present. Copy says “No trend available.” It does not invent arrows or say “You must notify.” Continuation slides 12 and 14 are required by live Elite Claims attention copy, not padding.
 
 ## Slide defects
 
@@ -53,9 +54,19 @@ Fixed in `1dd47b3` before hosted re-render.
 
 Still open for Product Leadership:
 
-- Long decision lines clip at 140 characters (GAP-00001 on slide 11)
 - KPI tiles remain tightly rounded
 - CI LibreOffice is not a substitute for PowerPoint visual QA
+- Hosted frontend remains `1dd47b3` while the API board generator is `c7382dd`
+
+## Board clip closure (2026-09-13)
+
+Live Elite Claims Board PPTX was regenerated from hosted API `c7382dd` and rendered with Microsoft PowerPoint.
+
+- Decision/action text wraps inside the region. Height follows line count. Font size floors at 11pt only when a block exceeds five wrapped rows.
+- Items stay together across slides. GAP-00002 is complete on slide 12 instead of leaving a stranded “A” on slide 11.
+- Slide 11 shows four complete transfer decisions and two complete gap decisions, including “not a lawfulness finding” and “not a legal conclusion.”
+- Slides 12–14 are legitimate continuation pages. No 140-character cut remains in the OOXML or native render.
+- Native render used PowerPoint’s sandbox Documents folder so Grant File Access no longer blocked PDF export.
 
 ## 375 / 768 workspaces
 

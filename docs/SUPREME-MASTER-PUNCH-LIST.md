@@ -307,13 +307,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Privacy objects and workflows with truthful provider status.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Implementation `134d12860c595603106180c35ad3a10a328917f7`. Prior core closure `20811dafcbb5f55899e07d5abe19357024e5d43d`. Operational closure `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`. Final visual closure `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`. Hosted frontend and API `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`. Not PASS.
+**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Implementation `134d12860c595603106180c35ad3a10a328917f7`. Prior core closure `20811dafcbb5f55899e07d5abe19357024e5d43d`. Operational closure `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`. Final visual closure `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`. Product SHA before board-clip fix `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`. Final board fix `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`. Hosted frontend remains `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`. Hosted API `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`. Not PASS.
 
-**EVIDENCE:** `docs/ADR-SUPREME-PRIVACY.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Native PowerPoint slide renders in `docs/private-beta/hosted-ux-qa/supreme-privacy/native-slides/`. CI `34786063666` PASS on `6dab4ff`. Cursor does not declare #17 PASS.
+**EVIDENCE:** `docs/ADR-SUPREME-PRIVACY.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Native PowerPoint slide renders in `docs/private-beta/hosted-ux-qa/supreme-privacy/native-slides/` (14 unique pages). Live Elite Claims Board PPTX no longer cuts decision copy at 140 characters. CI `34789986034` PASS on `c7382dd`. Cursor does not declare #17 PASS.
 
-**NEXT ACTION:** Product Leadership final hosted review of native board slides and 375/768 deletion/incident cards. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership final hosted review of the 14-slide native board pack and 375/768 deletion/incident cards. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 

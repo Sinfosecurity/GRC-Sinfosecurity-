@@ -1,8 +1,8 @@
 {
   "engine": "Microsoft PowerPoint",
   "pptx": "/Users/tahirah-macmini/Documents/Supreme Risk /GRC-Sinfosecurity-/docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-Board.pptx",
-  "pages": 12,
-  "uniqueHashes": 12,
+  "pages": 14,
+  "uniqueHashes": 14,
   "hashes": [
     {
       "file": "native-slide-01.png",
@@ -11,58 +11,68 @@
     },
     {
       "file": "native-slide-02.png",
-      "sha256": "8274e45cac359e764d5d6f496a7c99861c9a2c38c4d0e597659c719588480a40",
-      "bytes": 64706
+      "sha256": "751cd7b4a81fb80fc7ea28f1e6496bec3b114e868e4b6a4dfb4b43057f6ee28a",
+      "bytes": 64790
     },
     {
       "file": "native-slide-03.png",
-      "sha256": "b1e7b67cbed00f5bfa2308846dba080e15230f40b4665a28012b066ffbb3e954",
-      "bytes": 69947
+      "sha256": "c4a68228731032d5d18c194ed426dba4b210e6c7eb1fe7991bf5fff3c123914a",
+      "bytes": 69877
     },
     {
       "file": "native-slide-04.png",
-      "sha256": "8ee979ef60eda452152d94b59f0c3d48a302c535eb4160a6bf895b2239ede783",
-      "bytes": 69350
+      "sha256": "f4e3f27aa00b6a7419dff660cfa2b9b2e3542f18a1eeb8ae9631d5a1242845e9",
+      "bytes": 69149
     },
     {
       "file": "native-slide-05.png",
-      "sha256": "1b86fba6ba973dec88e488e7ac6e7626d01b52f2971331947906e99b92696537",
-      "bytes": 70765
+      "sha256": "4cecef41ead482787ca7047d358c1c89d91b7aaae3b7c0b7f9969bf35dc96d9b",
+      "bytes": 70687
     },
     {
       "file": "native-slide-06.png",
-      "sha256": "99583ebba0be7641bdfd9ef04a692aa43e1011ea4ec40e4710dcf6e2a6d07b4e",
-      "bytes": 77181
+      "sha256": "3e10624198152ba70f887cfd4f87ebeef791d742339bc12eed80b6cee44124e1",
+      "bytes": 76941
     },
     {
       "file": "native-slide-07.png",
-      "sha256": "32eb14987ae651fff2768328ca3ad028cf37db2bb86e02980d91764e849d883f",
-      "bytes": 76112
+      "sha256": "100eed47969b2ca48d10b4ec8a7ebc8720f40e4c1b13199866267e6eaf65146b",
+      "bytes": 75826
     },
     {
       "file": "native-slide-08.png",
-      "sha256": "071869e9d24830873dd9d388aace72974061d0d33147456f3d49ecbafd27b9fe",
-      "bytes": 67990
+      "sha256": "72d2e72a353c8236958c653e4e2137d01f7a122dd45ece7a8dc9538b18c13920",
+      "bytes": 67874
     },
     {
       "file": "native-slide-09.png",
-      "sha256": "4728a5aeb5833dbbcc904b06c3edb65b22d548da12d93a14c16d0c43931f237d",
-      "bytes": 70747
+      "sha256": "4857ba5acf1f23cb29686234f84999de9e5a4d227732b3362abd29de62e3cf8b",
+      "bytes": 70670
     },
     {
       "file": "native-slide-10.png",
-      "sha256": "3cb29598b53a3e85dc7eb3e4c22ca4f33ce657be6e3accc3f7bebbc1bdf0a739",
-      "bytes": 96483
+      "sha256": "13aaf19eedd742e1895daa9eb39ea0a2a2f7d602b2bd2fde537f3f026c5c3c7b",
+      "bytes": 110861
     },
     {
       "file": "native-slide-11.png",
-      "sha256": "bcb388c0cc7a56199af6d26a55d754304ec5b48369c8cc85295b04d96075ff8e",
-      "bytes": 84701
+      "sha256": "82224773519cfcf42bf52ccf79f52ab5e3987fa883b8377286a09879e13293d6",
+      "bytes": 115429
     },
     {
       "file": "native-slide-12.png",
-      "sha256": "5d690c72d6a23375d29948dddb72d5b70f9a5526f00c8208535486317ac69c33",
-      "bytes": 71588
+      "sha256": "c63d05241ec0ce9218a670741ea2c6c1511ab4820bd0c078fa8e20dbb89f340d",
+      "bytes": 60172
+    },
+    {
+      "file": "native-slide-13.png",
+      "sha256": "eff767b9061204906ebdacea876f248df584200147946cde792aecd348c823db",
+      "bytes": 109281
+    },
+    {
+      "file": "native-slide-14.png",
+      "sha256": "7a6740bfc28e4f472e536cbd5e217db8626fe228d7e6256a2bbadf66997a397b",
+      "bytes": 89536
     }
   ],
   "reconstruction": "native",
