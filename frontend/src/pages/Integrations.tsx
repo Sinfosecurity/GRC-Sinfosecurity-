@@ -19,7 +19,10 @@ export default function Integrations() {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 800 }}>Integrations</Typography>
+            <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Integrations</Typography>
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
+                Status is reported by the server. NOT_CONFIGURED means the integration is available to connect later, not that it is working.
+            </Typography>
             <QueryState loading={loading} error={error}>
                 <Grid container spacing={2}>
                     {PROVIDERS.map((provider) => (

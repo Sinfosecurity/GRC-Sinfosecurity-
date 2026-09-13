@@ -25,7 +25,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — PASS as private-testing release candidate; commercial production remains NO-GO
+**#12 STARTED:** YES — REOPENED / PARTIAL after Product Leadership browser review
 **#13 AUTHORIZED:** NO
 
 ---
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #12 Supreme Third Party Production v1 / Private Testing Release
 
-**STATUS:** PASS as private-testing release candidate; commercial production NO-GO
+**STATUS:** REOPENED / PARTIAL — commercial production NO-GO; #13 not authorized
 
 See `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, and `docs/private-beta/`.
 
@@ -72,7 +72,7 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-#12 private-testing release candidate is certified. Invite selected humans with synthetic data only. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
+Remediate #12 private-beta product and UX after Product Leadership rejected the prior PASS. Do not invite external testers yet. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
@@ -175,7 +175,7 @@ Do not invent percentages.
 | 9 | Final Security Review | EVIDENCE RESULT PASS; HOSTED CLOSURE PASS |
 | 10 | Production Cutover Rehearsal | PASS |
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
-| 12 | Supreme Third Party Production v1 | PASS as private-testing RC; commercial production NO-GO |
+| 12 | Supreme Third Party Production v1 | REOPENED / PARTIAL; commercial production NO-GO |
 | 13–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -284,3 +284,10 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 **STATUS CHANGE:** NOT STARTED AS FINAL PRODUCTION RELEASE GATE -> PASS as private-testing release candidate (commercial production remains NO-GO; not #13 authorization)
 **SHA:** implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` (hosted CI run `34734519024` PASS)
 **EVIDENCE:** `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, `docs/private-beta/`
+
+### 2026-09-13
+
+**ITEM:** #12 Supreme Third Party Production v1
+**STATUS CHANGE:** PASS as private-testing RC -> REOPENED / PARTIAL after Product Leadership browser review
+**SHA:** prior `358eab7ece3e0dbb2f53d494328f7302f1f071d2` no longer accepted as customer-ready
+**EVIDENCE:** Staging Executive Report 403; questionnaire library judged inadequate. Remediation documents in `docs/PRIVATE-BETA-UX-PRODUCT-AUDIT.md` and `docs/PRIVATE-BETA-UX-DEFECTS.md`. #13 remains NOT AUTHORIZED.

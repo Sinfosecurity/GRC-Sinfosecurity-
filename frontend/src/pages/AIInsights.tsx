@@ -46,7 +46,9 @@ export default function AIInsights() {
             </Typography>
             {!loading && (
                 <Alert severity={status === 'NOT_CONFIGURED' ? 'info' : status === 'ERROR' ? 'error' : 'success'} sx={{ mb: 2 }}>
-                    Provider status: {status}
+                    {status === 'NOT_CONFIGURED'
+                        ? 'AI assistance is not configured for this environment. Supreme will not invent analysis.'
+                        : `Provider status: ${status}`}
                 </Alert>
             )}
             <QueryState loading={loading} error={error} notConfigured={status === 'NOT_CONFIGURED'}>

@@ -10,7 +10,8 @@ describe('report download helpers', () => {
 
     it('shows error state for failed generation', () => {
         expect(downloadErrorMessage(new ApiClientError('nope', 500))).toBe('Report generation failed.');
-        expect(downloadErrorMessage(new ApiClientError('denied', 403))).toContain('permission');
+        expect(downloadErrorMessage(new ApiClientError('denied', 403))).toContain('denied');
+        expect(downloadErrorMessage(new ApiClientError('Plan does not include advancedReporting', 403))).toMatch(/plan/i);
         expect(downloadErrorMessage(new ApiClientError('missing', 404))).toContain('not found');
         expect(downloadErrorMessage(new ApiClientError('auth', 401))).toContain('Sign in');
         expect(downloadErrorMessage(new ApiClientError('slow down', 429))).toBe('Too many requests. Please try again later.');

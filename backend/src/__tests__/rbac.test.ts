@@ -25,6 +25,8 @@ describe('RBAC', () => {
         expect(hasPermission('APPROVER', PERMISSIONS['approval.decide'])).toBe(true);
         expect(hasPermission('APPROVER', PERMISSIONS['risk.accept'])).toBe(true);
         expect(hasPermission('ASSESSOR', PERMISSIONS['approval.decide'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['report.export'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['report.export'])).toBe(false);
     });
 
     it('matches aliased roles in authorize()', () => {

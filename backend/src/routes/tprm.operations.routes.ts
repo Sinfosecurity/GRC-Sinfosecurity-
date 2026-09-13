@@ -14,13 +14,26 @@ import type { ReportFilters } from '../reports/portfolioData';
 import { prisma } from '../config/database';
 import { reportLimiter, uploadLimiter } from '../middleware/rateLimiter';
 import { notifyUser } from '../services/notificationDeliveryService';
-import { requireEntitlement } from '../middleware/entitlement';
+import { requireEntitlement, privateBetaUnlocks } from '../middleware/entitlement';
+import { canExportReport, reportDenialReason, type ReportKind } from '../security/reportAuthorization';
+import { assertEntitlement } from '../billing/plans';
+import { ensureSupremeLibrary, recommendAssessments } from '../services/questionnaireLibrary';
+import { cloneTemplate } from '../services/questionnaireService';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
 const router = Router();
 
 function actor(req: AuthRequest) {
     return { organizationId: req.user!.organizationId, userId: req.user!.id };
+}
+
+function requireReportKind(kind: ReportKind) {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
+        if (!canExportReport(req.user?.role, kind)) {
+            return next(new ApiError(403, reportDenialReason(req.user?.role, kind) || 'Download is not available for this role.'));
+        }
+        return next();
+    };
 }
 
 function filters(req: AuthRequest): ReportFilters {
@@ -33,8 +46,59 @@ function filters(req: AuthRequest): ReportFilters {
 
 router.get('/questionnaires', requirePermission(PERMISSIONS['assessment.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        await ensureSupremeLibrary();
         const templates = await listTemplates(req.user!.organizationId);
         res.json({ success: true, data: templates });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/questionnaires/:templateId/clone', requirePermission(PERMISSIONS['questionnaire.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const data = await cloneTemplate(req.user!.organizationId, req.params.templateId, req.body?.name);
+        res.status(201).json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/assessments/recommendations', requirePermission(PERMISSIONS['assessment.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const vendorId = String(req.query.vendorId || '');
+        if (!vendorId) throw new ApiError(400, 'Select a vendor to see recommended assessments.');
+        res.json({ success: true, data: await recommendAssessments(req.user!.organizationId, vendorId) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/reports/capabilities', requirePermission(PERMISSIONS['report.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const organization = await prisma.organization.findUnique({
+            where: { id: req.user!.organizationId },
+            select: { plan: true, isDemo: true },
+        });
+        const entitled = Boolean(organization?.isDemo && privateBetaUnlocks('advancedReporting'))
+            || assertEntitlement(organization?.plan, 'advancedReporting');
+        const operationalReason = !entitled
+            ? 'This download is not included in the current plan. Private-beta tester organizations can export reports.'
+            : reportDenialReason(req.user!.role, 'operational');
+        const boardReason = !entitled
+            ? 'This download is not included in the current plan. Private-beta tester organizations can export reports.'
+            : reportDenialReason(req.user!.role, 'board');
+        res.json({
+            success: true,
+            data: {
+                plan: organization?.plan || 'STARTER',
+                isDemo: Boolean(organization?.isDemo),
+                entitled,
+                canExportOperational: entitled && canExportReport(req.user!.role, 'operational'),
+                canExportBoard: entitled && canExportReport(req.user!.role, 'board'),
+                operationalReason,
+                boardReason,
+            },
+        });
     } catch (error) {
         next(error);
     }
@@ -289,7 +353,7 @@ router.put('/scoring-methodology', requirePermission(PERMISSIONS['questionnaire.
     }
 });
 
-router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.decisionBriefPdf(actor(req), req.params.briefId, res);
     } catch (error) {
@@ -297,7 +361,7 @@ router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['repor
     }
 });
 
-router.get('/reports/executive.pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/executive.pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.executivePdf(actor(req), filters(req), res);
     } catch (error) {
@@ -305,7 +369,7 @@ router.get('/reports/executive.pdf', requirePermission(PERMISSIONS['report.expor
     }
 });
 
-router.get('/reports/vendors/:vendorId/scorecard.pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/vendors/:vendorId/scorecard.pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.vendorScorecardPdf(actor(req), req.params.vendorId, res);
     } catch (error) {
@@ -313,7 +377,7 @@ router.get('/reports/vendors/:vendorId/scorecard.pdf', requirePermission(PERMISS
     }
 });
 
-router.get('/reports/assessments/:assessmentId/pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/assessments/:assessmentId/pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.assessmentPdf(actor(req), req.params.assessmentId, res);
     } catch (error) {
@@ -321,7 +385,7 @@ router.get('/reports/assessments/:assessmentId/pdf', requirePermission(PERMISSIO
     }
 });
 
-router.get('/reports/findings.pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/findings.pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.findings(actor(req), 'pdf', filters(req), res);
     } catch (error) {
@@ -329,7 +393,7 @@ router.get('/reports/findings.pdf', requirePermission(PERMISSIONS['report.export
     }
 });
 
-router.get('/reports/findings.csv', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/findings.csv', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.findings(actor(req), 'csv', filters(req), res);
     } catch (error) {
@@ -337,7 +401,7 @@ router.get('/reports/findings.csv', requirePermission(PERMISSIONS['report.export
     }
 });
 
-router.get('/reports/findings.xlsx', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/findings.xlsx', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.findings(actor(req), 'xlsx', filters(req), res);
     } catch (error) {
@@ -345,7 +409,7 @@ router.get('/reports/findings.xlsx', requirePermission(PERMISSIONS['report.expor
     }
 });
 
-router.get('/reports/monitoring.pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/monitoring.pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.monitoring(actor(req), 'pdf', filters(req), res);
     } catch (error) {
@@ -353,7 +417,7 @@ router.get('/reports/monitoring.pdf', requirePermission(PERMISSIONS['report.expo
     }
 });
 
-router.get('/reports/monitoring.csv', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/monitoring.csv', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.monitoring(actor(req), 'csv', filters(req), res);
     } catch (error) {
@@ -361,7 +425,7 @@ router.get('/reports/monitoring.csv', requirePermission(PERMISSIONS['report.expo
     }
 });
 
-router.get('/reports/board.pdf', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/board.pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('board'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.board(actor(req), 'pdf', filters(req), res);
     } catch (error) {
@@ -369,7 +433,7 @@ router.get('/reports/board.pdf', requirePermission(PERMISSIONS['report.export'])
     }
 });
 
-router.get('/reports/board.pptx', requirePermission(PERMISSIONS['report.export']), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/reports/board.pptx', requirePermission(PERMISSIONS['report.export']), requireReportKind('board'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.board(actor(req), 'pptx', filters(req), res);
     } catch (error) {

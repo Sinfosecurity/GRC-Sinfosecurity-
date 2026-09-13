@@ -23,6 +23,9 @@ vi.mock('../../services/api', () => ({
         downloadFindings: vi.fn(),
         downloadMonitoring: vi.fn(),
         downloadBoard: vi.fn(),
+        reportCapabilities: vi.fn().mockResolvedValue({
+            data: { data: { isDemo: true, entitled: true, canExportOperational: true, canExportBoard: true } },
+        }),
     },
 }));
 

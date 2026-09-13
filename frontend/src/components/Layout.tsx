@@ -100,7 +100,9 @@ export default function Layout() {
                                 Supreme Risk
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-                                {import.meta.env.VITE_ENVIRONMENT === 'staging' ? 'STAGING' : 'DEVELOPMENT PREVIEW'}
+                                {import.meta.env.VITE_ENVIRONMENT === 'private-beta' || import.meta.env.VITE_ENVIRONMENT === 'beta'
+                                    ? 'PRIVATE BETA / TEST'
+                                    : import.meta.env.VITE_ENVIRONMENT === 'staging' ? 'STAGING' : 'DEVELOPMENT PREVIEW'}
                             </Typography>
                         </Box>
                     </Stack>

@@ -1,6 +1,6 @@
 # #12 Supreme Third Party private-testing certification
 
-**Classification:** PRIVATE TESTING RELEASE CANDIDATE — not commercial production  
+**Classification:** PRIVATE TESTING REMEDIATION — Product Leadership reopened #12 as PARTIAL after browser review. Not commercial production.  
 **Production deployed:** NO  
 **Main merged:** NO  
 **Production DNS changed:** NO  

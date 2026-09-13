@@ -37,6 +37,10 @@ export async function enforceSubscriptionWrites(req: AuthRequest, res: Response,
     }
 }
 
+export function privateBetaUnlocks(feature: keyof Entitlements): boolean {
+    return feature === 'advancedReporting' || feature === 'assessments' || feature === 'continuousMonitoring';
+}
+
 export function requireEntitlement(feature: keyof Entitlements) {
     return async (req: AuthRequest, res: Response, next: NextFunction) => {
         if (billingStatus() !== 'CONNECTED') {
@@ -48,8 +52,11 @@ export function requireEntitlement(feature: keyof Entitlements) {
         try {
             const organization = await prisma.organization.findUnique({
                 where: { id: req.user.organizationId },
-                select: { plan: true },
+                select: { plan: true, isDemo: true },
             });
+            if (organization?.isDemo && privateBetaUnlocks(feature)) {
+                return next();
+            }
             if (!assertEntitlement(organization?.plan, feature)) {
                 return next(new ApiError(403, `Plan does not include ${feature}`));
             }

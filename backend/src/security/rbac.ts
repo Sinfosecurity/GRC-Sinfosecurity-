@@ -160,6 +160,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['finding.update'],
         PERMISSIONS['risk.create'],
         PERMISSIONS['risk.update'],
+        PERMISSIONS['report.export'],
     ],
     APPROVER: [
         ...READ_PORTFOLIO,

@@ -42,7 +42,10 @@ export default function Billing() {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 800 }}>Billing</Typography>
+            <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Billing</Typography>
+            <Alert severity="info" sx={{ mb: 3 }}>
+                Private testing uses Stripe test mode only, if billing is configured. Do not enter a real production card. A successful test checkout is not a commercial purchase.
+            </Alert>
             <QueryState loading={loading} error={error} notConfigured={status?.provider === 'NOT_CONFIGURED'}>
                 <Card>
                     <CardContent>

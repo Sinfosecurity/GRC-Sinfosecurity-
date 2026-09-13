@@ -464,33 +464,21 @@ class VendorAssessmentService {
     /**
      * Calculate response score based on answer
      */
-    private calculateResponseScore(response: string): number {
-        // Scoring logic based on response quality
-        // This is simplified - in production would use more sophisticated NLP
-
-        const positiveKeywords = [
-            'yes',
-            'implemented',
-            'compliant',
-            'certified',
-            'annually',
-            'quarterly',
-            'encrypted',
-            'monitored',
-        ];
-        const negativeKeywords = ['no', 'unknown', 'not implemented', 'none', 'never'];
-
-        const lowerResponse = response.toLowerCase();
-
-        if (negativeKeywords.some(keyword => lowerResponse.includes(keyword))) {
-            return 2; // Low score
+    private calculateResponseScore(response: string): number | null {
+        const lower = response.trim().toLowerCase();
+        if (lower === 'not applicable' || lower === 'n/a' || lower.startsWith('not applicable')) {
+            return null;
         }
-
-        if (positiveKeywords.some(keyword => lowerResponse.includes(keyword))) {
-            return 9; // High score
+        if (lower.startsWith('yes') || lower.includes('no exceptions') || lower.includes('type ii')) {
+            return 9;
         }
-
-        return 5; // Medium score for neutral responses
+        if (lower.startsWith('partial') || lower.startsWith('in progress') || lower.includes('outdated') || lower.includes('bridge')) {
+            return 5;
+        }
+        if (lower.startsWith('no') || lower === 'unknown' || lower.startsWith('qualified')) {
+            return 2;
+        }
+        return 5;
     }
 
     /**

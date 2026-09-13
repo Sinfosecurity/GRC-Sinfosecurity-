@@ -56,9 +56,17 @@ describe('entitlement enforcement', () => {
         expect(next).toHaveBeenCalledWith();
     });
 
+    it('allows private-beta tester orgs to export reports on Starter when Stripe is connected', async () => {
+        billingStatus.mockReturnValue('CONNECTED');
+        prisma.organization.findUnique.mockResolvedValue({ plan: 'STARTER', isDemo: true });
+        const next = jest.fn() as NextFunction;
+        await requireEntitlement('advancedReporting')(mockReq(), res, next);
+        expect(next).toHaveBeenCalledWith();
+    });
+
     it('denies a Starter org advanced reporting when Stripe is connected', async () => {
         billingStatus.mockReturnValue('CONNECTED');
-        prisma.organization.findUnique.mockResolvedValue({ plan: 'STARTER' });
+        prisma.organization.findUnique.mockResolvedValue({ plan: 'STARTER', isDemo: false });
         const next = jest.fn() as NextFunction;
         await requireEntitlement('advancedReporting')(mockReq(), res, next);
         const error = (next as jest.Mock).mock.calls[0][0];

@@ -61,13 +61,26 @@ export default function Questionnaires() {
                 Assessment questions are loaded from the database. Changing weights creates a new methodology version.
             </Typography>
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
-            <QueryState loading={loading} error={error} empty={templates.length === 0} emptyTitle="No templates" emptyBody="Default due-diligence templates are created per organization on first use.">
+            <QueryState loading={loading} error={error} empty={templates.length === 0} emptyTitle="No templates yet" emptyBody="Supreme assessment templates are created on first open. Clone a Supreme template before customizing.">
                 <Stack spacing={2}>
                     {templates.map((template) => (
                         <Card key={template.id} sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
                             <CardContent>
                                 <Typography fontWeight={800}>{template.name} v{template.version}</Typography>
-                                <Typography variant="caption" color="text.secondary">{template.framework} · {template.organizationId ? 'organization' : 'platform default'}</Typography>
+                                <Typography variant="caption" color="text.secondary">{template.framework} · {template.organizationId ? 'organization copy' : 'Supreme template (protected)'}</Typography>
+                                {!template.organizationId && (
+                                    <Button
+                                        size="small"
+                                        sx={{ mt: 1 }}
+                                        onClick={async () => {
+                                            await tprmAPI.cloneQuestionnaire(template.id);
+                                            setMessage('Created an organization copy. Supreme originals stay unchanged.');
+                                            await load();
+                                        }}
+                                    >
+                                        Clone for this organization
+                                    </Button>
+                                )}
                                 {template.sections.map((section) => (
                                     <Box key={section.title} sx={{ mt: 1 }}>
                                         <Typography fontWeight={700}>{section.title}</Typography>

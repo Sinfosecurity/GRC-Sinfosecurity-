@@ -11,16 +11,27 @@ type CatalogItem = {
     formats: string[];
     requiresVendor?: boolean;
     requiresAssessment?: boolean;
+    kind: 'operational' | 'board';
 };
 
 const catalog: CatalogItem[] = [
-    { id: 'executive', name: 'Executive report', description: 'Portfolio overview, attention, trend, top risk vendors, recommendations.', formats: ['PDF'] },
-    { id: 'scorecard', name: 'Vendor scorecard', description: 'Profile, score, trend, assessments, evidence, findings, monitoring, decision status.', formats: ['PDF'], requiresVendor: true },
-    { id: 'assessment', name: 'Assessment report', description: 'Persisted questionnaire, responses, scoring, evidence, gaps, outcome.', formats: ['PDF'], requiresAssessment: true },
-    { id: 'findings', name: 'Findings report', description: 'Vendor, severity, owner, age, remediation, evidence, risk acceptance.', formats: ['PDF', 'CSV', 'XLSX'] },
-    { id: 'monitoring', name: 'Monitoring report', description: 'Provider status plus recorded VendorMonitoring signals only.', formats: ['PDF', 'CSV'] },
-    { id: 'board', name: 'Board report', description: 'Executive summary, heatmap, trend, findings, decisions, recommendations.', formats: ['PDF', 'PPTX'] },
+    { id: 'executive', name: 'Executive report', description: 'Portfolio overview, attention, trend, top risk vendors, recommendations.', formats: ['PDF'], kind: 'operational' },
+    { id: 'scorecard', name: 'Vendor scorecard', description: 'Profile, score, trend, assessments, evidence, findings, monitoring, decision status.', formats: ['PDF'], requiresVendor: true, kind: 'operational' },
+    { id: 'assessment', name: 'Assessment report', description: 'Persisted questionnaire, responses, scoring, evidence, gaps, outcome.', formats: ['PDF'], requiresAssessment: true, kind: 'operational' },
+    { id: 'findings', name: 'Findings report', description: 'Vendor, severity, owner, age, remediation, evidence, risk acceptance.', formats: ['PDF', 'CSV', 'XLSX'], kind: 'operational' },
+    { id: 'monitoring', name: 'Monitoring report', description: 'Provider status plus recorded VendorMonitoring signals only.', formats: ['PDF', 'CSV'], kind: 'operational' },
+    { id: 'board', name: 'Board report', description: 'Executive summary, heatmap, trend, findings, decisions, recommendations.', formats: ['PDF', 'PPTX'], kind: 'board' },
 ];
+
+type Capabilities = {
+    plan?: string;
+    isDemo?: boolean;
+    entitled?: boolean;
+    canExportOperational?: boolean;
+    canExportBoard?: boolean;
+    operationalReason?: string | null;
+    boardReason?: string | null;
+};
 
 export default function Reports() {
     const [searchParams] = useSearchParams();
@@ -31,20 +42,28 @@ export default function Reports() {
     const [busyId, setBusyId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [capabilities, setCapabilities] = useState<Capabilities | null>(null);
 
     useEffect(() => {
-        Promise.all([vendorAPI.getAll(), tprmAPI.listAssessments()])
-            .then(([vendorRes, assessmentRes]) => {
+        Promise.all([vendorAPI.getAll(), tprmAPI.listAssessments(), tprmAPI.reportCapabilities()])
+            .then(([vendorRes, assessmentRes, capRes]) => {
                 const vendorRows = vendorRes.data.vendors || vendorRes.data.data || vendorRes.data || [];
                 setVendors(Array.isArray(vendorRows) ? vendorRows : []);
                 setAssessments(assessmentRes.data.data || []);
+                setCapabilities(capRes.data.data);
             })
             .catch((err) => setError(err.message));
     }, []);
 
     const unavailableReason = (item: CatalogItem) => {
+        if (item.kind === 'board' && capabilities && !capabilities.canExportBoard) {
+            return capabilities.boardReason || 'Board packs require an organization admin, risk manager, or approver.';
+        }
+        if (item.kind === 'operational' && capabilities && !capabilities.canExportOperational) {
+            return capabilities.operationalReason || 'Your role can view reports but cannot download them.';
+        }
         if (item.requiresVendor && !vendorId) return 'Select a vendor before generating a scorecard.';
-        if (item.requiresAssessment && !assessmentId) return 'Select a persisted assessment before generating this report.';
+        if (item.requiresAssessment && !assessmentId) return 'Select a completed or in-progress assessment first.';
         return null;
     };
 
@@ -80,8 +99,13 @@ export default function Reports() {
             <Typography variant="overline" sx={{ color: '#94a3b8', fontWeight: 800, letterSpacing: '0.14em' }}>Reports</Typography>
             <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Generate and download</Typography>
             <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Files are generated on the server from tenant-scoped records. Buttons that cannot produce a real file stay disabled.
+                Files are generated from this organization’s records. If a download is not available for your role or plan, the button stays off and the reason is shown.
             </Typography>
+            {capabilities?.isDemo && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    Private-beta tester organization. Report exports are included for evaluation. This is not a paid production subscription.
+                </Alert>
+            )}
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
@@ -109,7 +133,7 @@ export default function Reports() {
                                         <Typography color="text.secondary">{item.description}</Typography>
                                         {reason && <Chip size="small" sx={{ mt: 1 }} label={reason} />}
                                     </Box>
-                                    <Stack direction="row" spacing={1} alignItems="center">
+                                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
                                         {item.formats.map((format) => (
                                             <Button
                                                 key={format}

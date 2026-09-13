@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PASS as private-testing release candidate; commercial production remains NO-GO
+**CURRENT STATUS:** REOPENED / PARTIAL — Product Leadership rejected prior PASS after real-browser review
 
-**CERTIFICATION SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2`
+**CERTIFICATION SHA:** prior implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` is no longer accepted as customer-ready
 
-**EVIDENCE:** `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, `docs/private-beta/`. Hosted CI run `34734519024` PASS on the implementation SHA (252 backend, 114 frontend).
+**EVIDENCE:** Product Leadership staging review: authorized tester could not download Executive Report; questionnaire library and UX judged not commercially adequate. Remediation in progress.
 
-**NEXT ACTION:** Invite selected human testers with synthetic data only. Do not start #13. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Complete product/UX remediation. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
 
 ---
 
