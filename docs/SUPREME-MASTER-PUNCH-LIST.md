@@ -253,13 +253,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Control catalog and evidence objects are reusable across products without duplicate uploads as the source of truth.
 
-**CURRENT STATUS:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW. Architecture SHA `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. UX closure SHA `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9` is hosted. Not PASS. Not commercial production.
+**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel.
 
 **CERTIFICATION SHA:** UX closure `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`. CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`. Architecture `a743c8a00910fac77d9046a27c2f0eb36d13abd2`. Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`. Hosted CI run `34763715915` PASS.
 
 **EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Hosted UX-closure screenshots `docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/`. Do not mark PASS from code or this file alone.
 
-**NEXT ACTION:** Product Leadership final hosted review. Keep #12 PARTIAL. Do not start #15. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 PARTIAL. #15 is authorized. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -271,13 +271,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Enterprise risks, ownership, appetite, and explainable residual scores. Preview pages are not implementation.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Implementation `2d78c5774118dd4fa3ac5025da552dc6bd1d0763`. Not PASS. Product Leadership hosted review required.
 
-**EVIDENCE:** Marketing/placeholder routes only.
+**EVIDENCE:** `docs/ADR-SUPREME-RISK.md`, `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`. Leftover `/risk-management` remains quarantined. Cursor does not declare PASS.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Product Leadership hosted review. Do not start #16. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 

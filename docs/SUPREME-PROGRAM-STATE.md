@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #14 Shared Control & Evidence Layer
+**CURRENT ITEM:** #15 Supreme Risk
 
-**CURRENT ITEM STATUS:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW
+**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -54,17 +54,25 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#14 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34763715915 PASS on `915ac55`
 **#14 HOSTED FRONTEND SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`
 **#14 HOSTED API SHA:** `915ac55049bf68f335ea8ef4a08db87a513a5fce`
-**#15 AUTHORIZED:** NO
+**#15 AUTHORIZED:** YES — Product Leadership 2026-09-13
+**#15 STARTING SHA:** `6bba23a2c85eea877441c16190a12f9be8402d58`
+**#15 IMPLEMENTATION SHA:** `2d78c5774118dd4fa3ac5025da552dc6bd1d0763`
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #15 Supreme Risk
+
+**STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+
+See `docs/ADR-SUPREME-RISK.md`. #16 is not authorized. #12 remains PARTIAL.
+
 ### #14 Shared Control & Evidence Layer
 
-**STATUS:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW — UX closure hosted on `ce5d01c` / API descendant `915ac55`; Product Leadership has not accepted PASS
+**STATUS:** Product Leadership accepted PASS (2026-09-13)
 
-See `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md` and `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. #15 is not authorized.
+See `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md` and `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`.
 
 ### #13 Governance Graph
 
@@ -101,21 +109,21 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Hold #14 at PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW. Keep #12 PARTIAL. Do not start #15. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Implement and host #15 Supreme Risk for Product Leadership review. Keep #12 PARTIAL. Do not start #16. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#14 Shared Control & Evidence Layer** — hosted UX closure returned; Product Leadership final review required. Do not start #15.
+**#15 Supreme Risk** — hosted Product Leadership review required. Do not start #16.
 
-**Next item after #14:** #15 Supreme Risk — **NOT AUTHORIZED**.
+**#12** remains PARTIAL / open in parallel.
 
 ---
 
 ## DO NOT START
 
-- **#15** or later gates.
+- **#16** or later gates.
 - Production DNS, `main` merge, or production deploy.
 - Live Stripe or commercial sale.
 - External testers without a separate Product Leadership approval.
@@ -147,7 +155,7 @@ Hold #14 at PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW. Keep #12 PART
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership final hosted review of #14. #15 is not authorized. #12 remains PARTIAL until Product Leadership separately changes it.
+Product Leadership hosted review of #15 Supreme Risk. Do not declare #15 PASS from this file. #12 remains PARTIAL until Product Leadership separately changes it. #16 is not authorized.
 
 ---
 
