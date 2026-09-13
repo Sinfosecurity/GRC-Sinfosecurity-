@@ -3,7 +3,12 @@
     {
       "name": "hosted sha",
       "result": "PASS",
-      "detail": "api=42370e22303fa18b53c92c34d08f279d7f14f4e8 frontend=42370e22303fa18b53c92c34d08f279d7f14f4e8"
+      "detail": "api=3c580a147930ae4d89c7d812b3506405bb79eac3 frontend=3c580a147930ae4d89c7d812b3506405bb79eac3"
+    },
+    {
+      "name": "staging environment label",
+      "result": "PASS",
+      "detail": "runtimeMode=production deploymentEnvironment=staging environment=staging health=200"
     },
     {
       "name": "catalog",
@@ -26,9 +31,24 @@
       "detail": "200 ACT-00002"
     },
     {
+      "name": "framework crumb",
+      "result": "PASS",
+      "detail": "Compliance > ISO/IEC 27001 > 2022-ref"
+    },
+    {
+      "name": "cross-framework reuse",
+      "result": "PASS",
+      "detail": "13 common controls are already mapped. 0 CLEAN evidence items can be reused. 0 mapped controls already have a recorded test. 13 remaining implementation gaps. 13 remaining evidence gaps. 1 open exception. 1 related risk link."
+    },
+    {
+      "name": "testing coverage display",
+      "result": "PASS",
+      "detail": "No implemented mapped controls to test"
+    },
+    {
       "name": "remaining work",
       "result": "PASS",
-      "detail": "Applicability is not determined for enough requirements to calculate readiness. Not determined is not treated as not applicable, and not applicable is not treated as pass."
+      "detail": "100% of applicable requirements are mapped. 0% already have current evidence. 0 requirements remain unmapped. 2 gaps are open."
     },
     {
       "name": "activation honesty",
@@ -63,7 +83,7 @@
     {
       "name": "gap refresh",
       "result": "PASS",
-      "detail": "200 {'honesty': 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.', 'publicId': 'ACT-00002', 'name': 'ISO/IEC 27001', 'publisher': 'ISO', 'version': '2022-ref', 'versionStatus': 'ACTIVE', 'versionId': 'b0172155-60d4-4f72-bcff-2ee096439c86', 'scope': 'Version-change proof only', 'businessUnit': None, 'owner': 'Unassigned', 'ownerUserId': None, 'startDate': None, 'targetDate': None, 'status': 'Active', 'statusKey': 'ACTIVE', 'readiness': {'honesty': 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.', 'calculable': True, 'emptyReason': None, 'totals': {'totalRequirements': 9, 'applicable': 1, 'notApplicable': 0, 'notDetermined': 8, 'underReview': 0}, 'metrics': {'requirementCoverage': {'label': 'Requirement coverage', 'numerator': 1, 'denominator': 1, 'percent': 100, 'formula': 'Applicable requirements with at least one active mapping \u00f7 applicable requirements. Not applicable is excluded.'}, 'implementationCoverage': {'label': 'Control implementation coverage', 'numerator': 0, 'denominator': 1, 'percent': 0, 'formula': 'Mapped applicable requirements with at least one implemented control \u00f7 mapped applicable requirements.'}, 'testingCoverage': {'label': 'Testing coverage', 'numerator': 0, 'denominator': 0, 'percent': None, 'formula': 'Implemented mapped controls whose latest test is Pass, Fail, or Partial \u00f7 implemented mapped controls. Not tested and not applicable are not pass.'}, 'evidenceCoverage': {'label': 'Evidence coverage', 'numerator': 0, 'denominator': 1, 'percent': 0, 'formula': 'Mapped applicable requirements with at least one CLEAN current supporting evidence link \u00f7 mapped applicable requirements. A file is not compliance.'}}}, 'remainingWork': {'unmappedRequirements': 0, 'openGaps': 2, 'notDetermined': 8, 'message': '100% of applicable requirements are mapped. 0% already have current evidence. 0 requirements remain unmapped. 2 gaps are open.'}, 'requirements': [{'publicId': 'CRS-00006', 'requirementKey': 'A.15', 'summary': 'Supreme summary (2013-ref): supplier relationships are identified before data is shared.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Applicable', 'applicabilityKey': 'APPLICABLE', 'owner': 'Report Proof', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00007', 'requirementKey': 'A.5', 'summary': 'Supreme summary (2013-ref): information security policy ownership is recorded. This identifier belongs to a superseded pack.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00008', 'requirementKey': 'A.9', 'summary': 'Supreme summary (2013-ref): access control includes unique identity and removal when a role ends.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00009', 'requirementKey': 'A.8', 'summary': 'Supreme summary: technological controls protect systems, crypto, and logging.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 3, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00010', 'requirementKey': 'A.5', 'summary': 'Supreme summary: organizational controls assign ownership and keep policies usable.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00011', 'requirementKey': 'A.5.7', 'summary': 'Supreme summary: threat information that affects this organization is recorded and assigned.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00012', 'requirementKey': 'A.5.19', 'summary': 'Supreme summary: supplier relationships are identified and governed.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00013', 'requirementKey': 'A.8.3', 'summary': 'Supreme summary: information is protected according to its recorded classification before sharing.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00014', 'requirementKey': 'A.5.23', 'summary': 'Supreme summary: cloud services used for customer data have a recorded owner and isolation check.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}], 'gaps': [{'publicId': 'GAP-00004', 'title': 'A.15 has no current CLEAN evidence', 'source': 'Evidence missing', 'status': 'Open'}, {'publicId': 'GAP-00003', 'title': 'A.15 is mapped to controls that are not implemented', 'source': 'Not implemented', 'status': 'Open'}], 'exceptions': [], 'campaigns': [], 'periods': [{'publicId': 'AUD-00002', 'name': '2013 historical period', 'status': 'Preparing', 'startAt': '2013-01-01T00:00:00.000Z', 'endAt': None}], 'history': [{'title': 'Gaps refreshed', 'change': None, 'summary': '2 gaps opened from live control, evidence, and test records.', 'createdAt': '2026-09-13T19:49:00.964Z'}, {'title': 'Framework version updated', 'change': '2013-ref \u2192 2022-ref', 'summary': '2013-ref \u2192 2022-ref. Historical periods stay on the earlier version.', 'createdAt': '2026-09-13T19:46:52.877Z'}, {'title': 'Framework activated', 'change': None, 'summary': 'ISO/IEC 27001 2013-ref is now in this compliance program.', 'createdAt': '2026-09-13T19:46:52.008Z'}]}"
+      "detail": "200 {'honesty': 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.', 'publicId': 'ACT-00002', 'name': 'ISO/IEC 27001', 'publisher': 'ISO', 'version': '2022-ref', 'versionStatus': 'ACTIVE', 'versionId': 'b0172155-60d4-4f72-bcff-2ee096439c86', 'scope': 'Version-change proof only', 'businessUnit': None, 'owner': 'Unassigned', 'ownerUserId': None, 'startDate': None, 'targetDate': None, 'status': 'Active', 'statusKey': 'ACTIVE', 'readiness': {'honesty': 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.', 'calculable': True, 'emptyReason': None, 'totals': {'totalRequirements': 9, 'applicable': 1, 'notApplicable': 0, 'notDetermined': 8, 'underReview': 0}, 'metrics': {'requirementCoverage': {'label': 'Requirement coverage', 'numerator': 1, 'denominator': 1, 'percent': 100, 'display': '100%', 'emptyReason': None, 'formula': 'Applicable requirements with at least one active mapping \u00f7 applicable requirements. Not applicable is excluded.'}, 'implementationCoverage': {'label': 'Control implementation coverage', 'numerator': 0, 'denominator': 1, 'percent': 0, 'display': '0%', 'emptyReason': None, 'formula': 'Mapped applicable requirements with at least one implemented control \u00f7 mapped applicable requirements.'}, 'testingCoverage': {'label': 'Testing coverage', 'numerator': 0, 'denominator': 0, 'percent': None, 'display': 'No implemented mapped controls to test', 'emptyReason': 'No implemented mapped controls to test', 'formula': 'Implemented mapped controls whose latest test is Pass, Fail, or Partial \u00f7 implemented mapped controls. Not tested and not applicable are not pass.'}, 'evidenceCoverage': {'label': 'Evidence coverage', 'numerator': 0, 'denominator': 1, 'percent': 0, 'display': '0%', 'emptyReason': None, 'formula': 'Mapped applicable requirements with at least one CLEAN current supporting evidence link \u00f7 mapped applicable requirements. A file is not compliance.'}}}, 'remainingWork': {'unmappedRequirements': 0, 'openGaps': 2, 'notDetermined': 8, 'mappedDisplay': '100%', 'evidenceDisplay': '0%', 'testedDisplay': 'No implemented mapped controls to test', 'message': '100% of applicable requirements are mapped. 0% already have current evidence. 0 requirements remain unmapped. 2 gaps are open.'}, 'existingReuse': {'mappedControls': 13, 'cleanEvidence': 0, 'testedControls': 0, 'implementationGaps': 13, 'evidenceGaps': 13, 'exceptions': 1, 'relatedRisks': 1, 'message': '13 common controls are already mapped. 0 CLEAN evidence items can be reused. 0 mapped controls already have a recorded test. 13 remaining implementation gaps. 13 remaining evidence gaps. 1 open exception. 1 related risk link.'}, 'crumbs': [{'label': 'Compliance', 'href': '/compliance'}, {'label': 'ISO/IEC 27001', 'href': '/compliance/frameworks'}, {'label': '2022-ref'}], 'requirements': [{'publicId': 'CRS-00006', 'requirementKey': 'A.15', 'summary': 'Supreme summary (2013-ref): supplier relationships are identified before data is shared.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Applicable', 'applicabilityKey': 'APPLICABLE', 'owner': 'Report Proof', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00007', 'requirementKey': 'A.5', 'summary': 'Supreme summary (2013-ref): information security policy ownership is recorded. This identifier belongs to a superseded pack.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00008', 'requirementKey': 'A.9', 'summary': 'Supreme summary (2013-ref): access control includes unique identity and removal when a role ends.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00009', 'requirementKey': 'A.8', 'summary': 'Supreme summary: technological controls protect systems, crypto, and logging.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 3, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00010', 'requirementKey': 'A.5', 'summary': 'Supreme summary: organizational controls assign ownership and keep policies usable.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00011', 'requirementKey': 'A.5.7', 'summary': 'Supreme summary: threat information that affects this organization is recorded and assigned.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00012', 'requirementKey': 'A.5.19', 'summary': 'Supreme summary: supplier relationships are identified and governed.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00013', 'requirementKey': 'A.8.3', 'summary': 'Supreme summary: information is protected according to its recorded classification before sharing.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00014', 'requirementKey': 'A.5.23', 'summary': 'Supreme summary: cloud services used for customer data have a recorded owner and isolation check.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}], 'gaps': [{'publicId': 'GAP-00004', 'title': 'A.15 has no current CLEAN evidence', 'source': 'Evidence missing', 'status': 'Open'}, {'publicId': 'GAP-00003', 'title': 'A.15 is mapped to controls that are not implemented', 'source': 'Not implemented', 'status': 'Open'}], 'exceptions': [{'publicId': 'EXC-00002', 'scope': 'Temporary remote-admin path for hosted walkthrough', 'type': 'Policy exception', 'status': 'Approved', 'expiresAt': '2026-09-14T19:49:03.000Z'}], 'campaigns': [{'publicId': 'CAM-00002', 'name': 'Hosted Q4 control attestation', 'status': 'In progress', 'dueAt': None}], 'periods': [{'publicId': 'AUD-00002', 'name': '2013 historical period', 'status': 'Preparing', 'startAt': '2013-01-01T00:00:00.000Z', 'endAt': None}, {'publicId': 'AUD-00003', 'name': 'FY2026 hosted readiness', 'status': 'Preparing', 'startAt': '2026-09-13T19:49:05.000Z', 'endAt': None}], 'history': [{'title': 'Gaps refreshed', 'change': None, 'summary': '2 gaps opened from live control, evidence, and test records.', 'createdAt': '2026-09-13T19:49:00.964Z'}, {'title': 'Framework version updated', 'change': '2013-ref \u2192 2022-ref', 'summary': '2013-ref \u2192 2022-ref. Historical periods stay on the earlier version.', 'createdAt': '2026-09-13T19:46:52.877Z'}, {'title': 'Framework activated', 'change': None, 'summary': 'ISO/IEC 27001 2013-ref is now in this compliance program.', 'createdAt': '2026-09-13T19:46:52.008Z'}]}"
     },
     {
       "name": "gaps list",
@@ -88,7 +108,17 @@
     {
       "name": "campaign",
       "result": "PASS",
-      "detail": "201 CAM-00002"
+      "detail": "201 CAM-00003"
+    },
+    {
+      "name": "campaign review queue",
+      "result": "PASS",
+      "detail": "200 rows=1"
+    },
+    {
+      "name": "campaign review language",
+      "result": "PASS",
+      "detail": "An attestation is a governance statement. It is not a control test and does not prove effectiveness. Review uses Reviewed or Rejected, not Approved."
     },
     {
       "name": "attestation",
@@ -97,8 +127,18 @@
     },
     {
       "name": "attestation review",
-      "result": "FAIL",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "attestation review rejects Approved",
+      "result": "PASS",
       "detail": "400"
+    },
+    {
+      "name": "review does not change effectiveness",
+      "result": "PASS",
+      "detail": "NOT_TESTED->NOT_TESTED"
     },
     {
       "name": "audit period",
@@ -118,12 +158,22 @@
     {
       "name": "needs attention",
       "result": "PASS",
-      "detail": "items=0"
+      "detail": "items=2"
+    },
+    {
+      "name": "attention overdue campaign",
+      "result": "PASS",
+      "detail": "Overdue attestations"
     },
     {
       "name": "what changed",
       "result": "PASS",
       "detail": "events=20"
+    },
+    {
+      "name": "gap graph search",
+      "result": "PASS",
+      "detail": "200 GAP-00004 found=True"
     },
     {
       "name": "no false compliance",
@@ -136,9 +186,24 @@
       "detail": "200 controls=33"
     },
     {
+      "name": "evidence link control",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "evidence link requirement",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "evidence link mapped requirements",
+      "result": "PASS",
+      "detail": "extra=6"
+    },
+    {
       "name": "evidence reuse",
       "result": "PASS",
-      "detail": "200 {'filename': 'sr-clean-evidence.txt', 'scanStatus': 'CLEAN', 'usable': True, 'controls': 0, 'requirements': 0, 'programs': 0, 'programNames': [], 'offer': 'Use this existing CLEAN evidence before uploading a new file.', 'honesty': 'Reuse counts only explicit links. A file that supports one control does not automatically cover every mapped requirement.'}"
+      "detail": "200 file=sr-clean-evidence.txt controls=1 requirements=7 programs=2"
     },
     {
       "name": "risk link no auto-score",
@@ -149,6 +214,16 @@
       "name": "import neutralize",
       "result": "PASS",
       "detail": "'=1+1"
+    },
+    {
+      "name": "import commit",
+      "result": "PASS",
+      "detail": "200 updated=1"
+    },
+    {
+      "name": "import commit tenant scoped",
+      "result": "PASS",
+      "detail": "200 updated=0"
     },
     {
       "name": "report readiness pdf",
@@ -431,38 +506,44 @@
     "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-history-1440.png"
   ],
   "sha": {
-    "api": "42370e22303fa18b53c92c34d08f279d7f14f4e8",
-    "frontend": "42370e22303fa18b53c92c34d08f279d7f14f4e8",
-    "healthStatus": 200
+    "api": "3c580a147930ae4d89c7d812b3506405bb79eac3",
+    "frontend": "3c580a147930ae4d89c7d812b3506405bb79eac3",
+    "healthStatus": 200,
+    "runtimeMode": "production",
+    "deploymentEnvironment": "staging"
   },
   "workflow": {
     "activation": "ACT-00002",
     "framework": "ISO/IEC 27001 2022-ref",
-    "remainingWork": "Applicability is not determined for enough requirements to calculate readiness. Not determined is not treated as not applicable, and not applicable is not treated as pass.",
+    "remainingWork": "100% of applicable requirements are mapped. 0% already have current evidence. 0 requirements remain unmapped. 2 gaps are open.",
     "readiness": {
       "honesty": "Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.",
-      "calculable": false,
-      "emptyReason": "Applicability is not determined for enough requirements to calculate readiness. Not determined is not treated as not applicable, and not applicable is not treated as pass.",
+      "calculable": true,
+      "emptyReason": null,
       "totals": {
         "totalRequirements": 9,
-        "applicable": 0,
+        "applicable": 1,
         "notApplicable": 0,
-        "notDetermined": 9,
+        "notDetermined": 8,
         "underReview": 0
       },
       "metrics": {
         "requirementCoverage": {
           "label": "Requirement coverage",
-          "numerator": 0,
-          "denominator": 0,
-          "percent": null,
+          "numerator": 1,
+          "denominator": 1,
+          "percent": 100,
+          "display": "100%",
+          "emptyReason": null,
           "formula": "Applicable requirements with at least one active mapping \u00f7 applicable requirements. Not applicable is excluded."
         },
         "implementationCoverage": {
           "label": "Control implementation coverage",
           "numerator": 0,
-          "denominator": 0,
-          "percent": null,
+          "denominator": 1,
+          "percent": 0,
+          "display": "0%",
+          "emptyReason": null,
           "formula": "Mapped applicable requirements with at least one implemented control \u00f7 mapped applicable requirements."
         },
         "testingCoverage": {
@@ -470,16 +551,49 @@
           "numerator": 0,
           "denominator": 0,
           "percent": null,
+          "display": "No implemented mapped controls to test",
+          "emptyReason": "No implemented mapped controls to test",
           "formula": "Implemented mapped controls whose latest test is Pass, Fail, or Partial \u00f7 implemented mapped controls. Not tested and not applicable are not pass."
         },
         "evidenceCoverage": {
           "label": "Evidence coverage",
           "numerator": 0,
-          "denominator": 0,
-          "percent": null,
+          "denominator": 1,
+          "percent": 0,
+          "display": "0%",
+          "emptyReason": null,
           "formula": "Mapped applicable requirements with at least one CLEAN current supporting evidence link \u00f7 mapped applicable requirements. A file is not compliance."
         }
       }
+    },
+    "existingReuse": {
+      "mappedControls": 13,
+      "cleanEvidence": 0,
+      "testedControls": 0,
+      "implementationGaps": 13,
+      "evidenceGaps": 13,
+      "exceptions": 1,
+      "relatedRisks": 1,
+      "message": "13 common controls are already mapped. 0 CLEAN evidence items can be reused. 0 mapped controls already have a recorded test. 13 remaining implementation gaps. 13 remaining evidence gaps. 1 open exception. 1 related risk link."
+    },
+    "attention": [
+      {
+        "type": "Overdue attestations",
+        "why": "Hosted Q4 control attestation passed its due date without closing.",
+        "related": "CAM-00003"
+      },
+      {
+        "type": "Overdue attestations",
+        "why": "An assigned attestor has not closed this campaign before the due date.",
+        "related": "CAM-00003"
+      }
+    ],
+    "evidenceReuse": {
+      "filename": "sr-clean-evidence.txt",
+      "scanStatus": "CLEAN",
+      "controls": 1,
+      "requirements": 7,
+      "programs": 2
     }
   },
   "discrepancies": []

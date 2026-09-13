@@ -2,76 +2,128 @@
 
 **Date:** 2026-09-13  
 **Starting SHA:** `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`  
-**Implementation SHA:** `42370e22303fa18b53c92c34d08f279d7f14f4e8`  
-**Hosted frontend SHA:** `42370e22303fa18b53c92c34d08f279d7f14f4e8`  
-**Hosted API SHA:** `42370e22303fa18b53c92c34d08f279d7f14f4e8`  
-**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34778303631 PASS  
+**Base implementation SHA:** `42370e22303fa18b53c92c34d08f279d7f14f4e8`  
+**Closure SHA:** `3c580a147930ae4d89c7d812b3506405bb79eac3`  
+**Hosted frontend SHA:** `3c580a147930ae4d89c7d812b3506405bb79eac3`  
+**Hosted API SHA:** `3c580a147930ae4d89c7d812b3506405bb79eac3`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34779911121 PASS  
+**Backend tests:** 328  
+**Frontend tests:** 147  
 **Tenant:** Elite Claims (`report-proof-20260913@staging.supremerisk.test`)  
 **Environment:** https://supreme-risk-staging.onrender.com  
 **Production:** NO  
 **#16 PASS:** NOT DECLARED
 
+## Staging environment label
+
+`/health` on hosted staging now reports:
+
+- `runtimeMode`: `production` (`NODE_ENV` remains production for optimized runtime and fail-fast)
+- `deploymentEnvironment`: `staging` (`APP_ENVIRONMENT=staging` in `render.staging.yaml`)
+- `environment`: `staging` (deployment label, not `NODE_ENV`)
+- overall `status`: still `degraded` where providers are honestly degraded
+
+`NODE_ENV=production` was intentional. The defect was binding the customer-facing environment label to `NODE_ENV`. Production fail-fast was not weakened.
+
 ## Discrepancies (not silently reconciled)
 
-- Before this implementation, hosted frontend was `dbc4982` and hosted API was `6542e58` while local HEAD was `bde2d9e`. Those #15 hosted SHAs were left in place until this deploy.
-- After deploy, frontend and API both report `42370e2`.
-- Hosted `/health` still reports `environment: production` on the staging hostname, and `status: degraded`. Neither was changed to look healthier.
+- Before this closure, hosted frontend and API were `42370e2`. After deploy, both report `3c580a1`.
+- Import commit set `A.15` to Under review as a synthetic write. Applicability was restored to Applicable through the real API so the walkthrough program remains reviewable.
+- `CAM-00003` graph search returns 0 nodes. Campaigns are not projected as standalone graph nodes; attestation `ATT-00003` and gaps `GAP-00003` / `GAP-00004` resolve.
+- Residual-risk script comparison (`before=25 after=None`) is a list-vs-detail shape miss. Hosted `RISK-00001` detail residual remains **25 / Critical**.
 
-## Differentiating workflow (live Elite Claims numbers)
+## Attention queue (populated, live records only)
 
-NYDFS `500-ref` activated as `ACT-00001`. ISO/IEC 27001 `2013-ref` activated as `ACT-00002`, then changed to `2022-ref`. Historical period `AUD-00002` remains on `2013-ref`.
+Hosted dashboard attention after the overdue campaign and a real TPR-01 implement:
 
-After marking `A.15` applicable on `ACT-00002`:
+1. Overdue attestations — `Hosted Q4 control attestation` / `CAM-00003` — High
+2. Overdue attestations — assigned attestor not closed — High
+3. Implemented controls that are not tested — `TPR-01` — Medium
 
-- Requirement coverage **100%** (1/1 applicable mapped)
-- Evidence coverage **0%** (0/1 current CLEAN supporting links)
-- Implementation coverage **0%**
-- Testing coverage **not calculated** (no implemented mapped control in the denominator)
-- **0** applicable requirements remain unmapped
-- **2** open gaps: control not implemented; CLEAN evidence missing
-- **8** requirements still not determined
+No fake alerts were added. Open High/Critical findings tied to activated programs were not present on this tenant, so that type stayed empty. Expired evidence and expired exceptions were also absent.
 
-Exact remaining-work sentence from the hosted activation:
+## Testing coverage honesty
 
-> 100% of applicable requirements are mapped. 0% already have current evidence. 0 requirements remain unmapped. 2 gaps are open.
+| Program | Display | Meaning |
+|---|---|---|
+| ISO/IEC 27001 `2022-ref` (`ACT-00002`) | **0%** | denominator 1 implemented mapped control, 0 tested. `0%` is mathematically correct. |
+| NYDFS `500-ref` (`ACT-00001`) | **No implemented mapped controls to test** | denominator 0. Not shown as `0%` or `null%`. |
 
-These are live tenant counts. They are readiness/coverage, not certification.
+## Positive evidence reuse (actual hosted counts)
 
-## Verified
+CLEAN `StoredObject` `sr-clean-evidence.txt` (`scanStatus=CLEAN`, not fabricated):
 
-- Catalog has 10 reference packs (NIST CSF, 800-171, CMMC, ISO 2013-ref + 2022-ref, SOC 2, CIS, PCI DSS, HIPAA safeguards, NYDFS). Original Supreme summaries only. No official-endorsement claim.
-- Activation is opt-in. Nothing was auto-activated before this walkthrough.
-- Not applicable without rationale returns 400.
-- Attestation submit works. Review accepts `REVIEWED` (not `APPROVED`).
-- Approved exception does not change control effectiveness.
-- `AUD-00002` still reports version `2013-ref` after the activation moved to `2022-ref`.
-- Cross-tenant activation get is 404 with no public-id leak.
-- Reports: readiness/gaps/attestations/evidence/exceptions/executive/board PDFs and board PPTX are live binaries.
-- Import preview prefixes `=1+1` as `'=1+1`.
-- Viewports 375–1920 on dashboard, catalog, framework, requirement, gaps, exceptions, campaign, audit, plus #12/#13/#14/#15 regression routes. No page-level horizontal overflow in the script checks.
-- Residual risk on `RISK-00001` stayed **25 / Critical** after a gap link. The list endpoint exposes the score; detail is nested under `data.risk`.
+- **1** evidence item
+- **1** common control (`TPR-01`)
+- **7** mapped requirements
+- **2** activated programs: ISO/IEC 27001, NYDFS cybersecurity requirements
 
-## Attention queue
+Requirement `A.15` Evidence tab shows those reuse counts. Equivalence was not invented; only explicit #14 links count.
 
-Hosted dashboard attention was empty. That matched the live filters: no overdue campaign, no expired exception, no unmapped/failed-test/expired-evidence gap of those sources. Open “not implemented” / “evidence missing” gaps appear on the Gaps page and in What changed, not in the attention list.
+## Cross-framework reuse (actual hosted numbers)
 
-## Database-backed performance (isolated CI Postgres)
+Second program (ISO) after NYDFS already existed. Live `existingReuse` on `ACT-00002`:
 
-Not hosted staging. Not enterprise scale certification.
+- 13 common controls already mapped
+- 1 CLEAN evidence item already available
+- 0 mapped controls already tested
+- 12 remaining implementation gaps
+- 12 remaining evidence gaps
+- 2 open exceptions
+- 1 related risk link
 
-| Surface | ms |
-|---|---|
-| Dashboard | 57 |
-| Framework detail | 158 |
-| Requirements | 105 |
-| Cross-framework | 15 |
-| Board PDF | 86 |
-| Board PPTX | 65 |
+NYDFS `ACT-00001` after the same CLEAN file was linked:
 
-## Open after hosted walkthrough
+- 8 mapped controls
+- 1 CLEAN evidence item
+- 0 tested
+- 7 remaining implementation gaps
+- 7 remaining evidence gaps
+- 1 open exception
+- 1 related risk link
 
-- Campaign workspace is a submit form plus counts; it does not list each attestation for review.
-- Attention does not yet queue implemented-but-not-tested controls or open high-severity findings.
-- Framework detail prints a testing percent even when the metric is not calculated.
-- Graph summary shows attestation and compliance-period nodes; exception nodes are created only when an exception is tied to a control or requirement.
-- CLEAN file `sr-clean-evidence.txt` correctly reported 0 linked controls / requirements / programs because no explicit links exist.
+## Attestation review workspace
+
+`CAM-00003` is a review queue, not only a submit form.
+
+- Filters: All, Not Started, In Progress, Submitted, Reviewed, Rejected, Overdue
+- Row shows control, requirement, attestor, reviewer, attestation status, review status, submitted, due, evidence, notes
+- Actions: Review / Reject
+- Copy uses Reviewed / Rejected, not Approved
+- `APPROVED` review returns 400
+- Review left control effectiveness `NOT_TESTED`
+
+## Governance graph
+
+`GET /api/v1/governance/search?q=GAP-00003` and `GAP-00004` resolve live gap nodes. `ATT-00003` resolves. Exceptions remain scoped. No orphan nodes were added to inflate counts.
+
+## Framework breadcrumb
+
+Primary crumb is `Compliance > ISO/IEC 27001 > 2022-ref`. `ACT-00002` is secondary metadata (“Program ACT-00002”). No raw UUIDs.
+
+## Import commit
+
+Preview still prefixes `=1+1` as `'=1+1`. Hosted commit of a synthetic `A.15` / Under review row: `updated=1`. Cross-tenant commit of the same key: `updated=0`. Formula row did not write.
+
+## Reports
+
+All requested PDFs, board PPTX, and CSV/XLSX exported as live binaries from Elite Claims. Board PPTX is an 8-slide PK zip with KPI tiles on readiness, coverage, evidence, testing, and gaps. It is not a plain bullet deck.
+
+## Responsive
+
+Script overflow checks at 375 / 768 / 1024 / 1440 / 1920 were false on Compliance Dashboard, Framework Detail, Campaign, Requirement, Reports, Graph, Control Center, Risk, and methodology routes.
+
+## #12 / #13 / #14 / #15 regression
+
+Those routes rendered without page-level overflow. #12 remains PARTIAL as a program status. #13–#15 were not reopened.
+
+## Open after closure walkthrough
+
+- No hosted High/Critical finding attention item existed to populate. The queue does not invent one.
+- `CAM-*` public IDs are not standalone graph nodes.
+- The same CLEAN file can appear twice on a requirement Evidence tab when both a control link and a requirement link exist.
+- #12 remains PARTIAL / open in parallel.
+
+## #16
+
+PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
