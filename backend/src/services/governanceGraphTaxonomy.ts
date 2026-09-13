@@ -22,6 +22,9 @@ export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
     GovernanceNodeType.FRAMEWORK,
     GovernanceNodeType.REQUIREMENT,
     GovernanceNodeType.CONTROL_TEST,
+    GovernanceNodeType.KRI,
+    GovernanceNodeType.TREATMENT,
+    GovernanceNodeType.BUSINESS_UNIT,
 ];
 
 export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { vendorId?: string }) => string> = {
@@ -38,6 +41,10 @@ export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { ve
     FrameworkDefinition: () => '/framework-coverage',
     FrameworkRequirement: () => '/framework-coverage',
     OrganizationControlTest: (id) => `/control-center?testId=${id}`,
+    EnterpriseRisk: (id) => `/risks/${id}`,
+    EnterpriseRiskKri: () => '/risks',
+    EnterpriseRiskTreatment: () => '/risks',
+    EnterpriseRiskDecision: () => '/risks',
 };
 
 export function publicNode(node: {

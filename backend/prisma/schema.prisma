@@ -135,6 +135,12 @@ model Organization {
   organizationControlTests    OrganizationControlTest[]
   requirementControlMappings  RequirementControlMapping[]
   evidenceGovernanceLinks     EvidenceGovernanceLink[]
+  businessUnits               BusinessUnit[]
+  enterpriseRisks             EnterpriseRisk[]
+  enterpriseRiskAppetites     EnterpriseRiskAppetite[]
+  enterpriseRiskMethodologies EnterpriseRiskMethodology[]
+  enterpriseRiskKris          EnterpriseRiskKri[]
+  enterpriseRiskCategories    EnterpriseRiskCustomCategory[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -2748,6 +2754,8 @@ enum GovernanceNodeType {
   DECISION
   INCIDENT
   CONTROL_TEST
+  KRI
+  TREATMENT
 }
 
 enum GovernanceRelationshipType {
@@ -2782,6 +2790,10 @@ enum GovernanceRelationshipType {
   COVERED_BY
   SATISFIED_BY
   TESTED_BY
+  ASSOCIATED_WITH
+  INCREASES_EXPOSURE_TO
+  ADDRESSES
+  GOVERNS
 }
 
 enum GovernanceProvenance {
@@ -3141,4 +3153,428 @@ model OrganizationControlTest {
 
   @@index([organizationId, controlId])
   @@index([organizationId, result])
+}
+
+enum EnterpriseRiskCategory {
+  STRATEGIC
+  OPERATIONAL
+  FINANCIAL
+  CYBERSECURITY
+  TECHNOLOGY
+  THIRD_PARTY
+  PRIVACY
+  COMPLIANCE
+  AI
+  BUSINESS_CONTINUITY
+  REPUTATIONAL
+  LEGAL_REGULATORY
+  PEOPLE
+  PHYSICAL_ENVIRONMENTAL
+}
+
+enum EnterpriseRiskStatus {
+  DRAFT
+  IDENTIFIED
+  ASSESSED
+  TREATING
+  MONITORING
+  ACCEPTED
+  CLOSED
+  ARCHIVED
+}
+
+enum EnterpriseRiskTrend {
+  IMPROVING
+  STABLE
+  WORSENING
+  UNKNOWN
+}
+
+enum EnterpriseAppetiteState {
+  WITHIN_APPETITE
+  NEAR_TOLERANCE
+  OUTSIDE_APPETITE
+  NOT_CONFIGURED
+}
+
+enum EnterpriseTreatmentStrategy {
+  MITIGATE
+  ACCEPT
+  TRANSFER
+  AVOID
+  MONITOR
+}
+
+enum EnterpriseTreatmentStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  CANCELLED
+}
+
+enum EnterpriseDecisionType {
+  ACCEPT
+  REJECT
+  ESCALATE
+  APPROVE_TREATMENT
+}
+
+enum EnterpriseDecisionStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum EnterpriseImpactDimension {
+  FINANCIAL
+  OPERATIONAL
+  REGULATORY
+  CUSTOMER
+  REPUTATIONAL
+  SAFETY
+  PRIVACY
+  CYBERSECURITY
+}
+
+enum EnterpriseKriDirection {
+  HIGHER_IS_WORSE
+  LOWER_IS_WORSE
+}
+
+enum EnterpriseKriStatus {
+  WITHIN
+  WARNING
+  CRITICAL
+  NOT_MEASURED
+}
+
+enum EnterpriseAppetiteScope {
+  ORGANIZATION
+  CATEGORY
+  BUSINESS_UNIT
+}
+
+enum EnterpriseRiskRating {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model BusinessUnit {
+  id             String   @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  name           String
+  parentId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  risks          EnterpriseRisk[]
+  appetites      EnterpriseRiskAppetite[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model EnterpriseRiskCustomCategory {
+  id             String   @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  name           String
+  canonicalParent EnterpriseRiskCategory
+  createdAt      DateTime @default(now())
+  risks          EnterpriseRisk[]
+
+  @@unique([organizationId, name])
+}
+
+model EnterpriseRiskMethodology {
+  id             String   @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  version        String
+  isActive       Boolean  @default(true)
+  likelihoodLabels Json
+  impactLabels   Json
+  matrix         Json
+  dimensionRollup String  @default("HIGHEST_DIMENSION")
+  notes          String?
+  publishedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+  scores         EnterpriseRiskScoreSnapshot[]
+
+  @@unique([organizationId, version])
+  @@index([organizationId, isActive])
+}
+
+model EnterpriseRisk {
+  id                   String                   @id @default(uuid())
+  organization         Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  publicId             String
+  title                String
+  statement            String?
+  description          String?
+  category             EnterpriseRiskCategory
+  customCategory       EnterpriseRiskCustomCategory? @relation(fields: [customCategoryId], references: [id])
+  customCategoryId     String?
+  subcategory          String?
+  businessUnit         BusinessUnit?            @relation(fields: [businessUnitId], references: [id])
+  businessUnitId       String?
+  ownerUserId          String?
+  executiveOwnerUserId String?
+  source               String?
+  status               EnterpriseRiskStatus     @default(IDENTIFIED)
+  likelihood           Int
+  impact               Int
+  inherentScore        Int
+  inherentRating       EnterpriseRiskRating
+  residualScore        Int
+  residualRating       EnterpriseRiskRating
+  targetLikelihood     Int?
+  targetImpact         Int?
+  targetScore          Int?
+  targetRating         EnterpriseRiskRating?
+  velocity             String?
+  trend                EnterpriseRiskTrend      @default(UNKNOWN)
+  appetiteStatus       EnterpriseAppetiteState  @default(NOT_CONFIGURED)
+  treatmentStrategy    EnterpriseTreatmentStrategy?
+  reviewDate           DateTime?
+  methodologyVersion   String
+  lastCalculatedAt     DateTime?
+  archivedAt           DateTime?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  dimensions           EnterpriseRiskImpact[]
+  scores               EnterpriseRiskScoreSnapshot[]
+  treatments           EnterpriseRiskTreatment[]
+  decisions            EnterpriseRiskDecision[]
+  controlLinks         EnterpriseRiskControlLink[]
+  findingLinks         EnterpriseRiskFindingLink[]
+  kris                 EnterpriseRiskKri[]
+  events               EnterpriseRiskEvent[]
+  history              EnterpriseRiskHistory[]
+  relationshipLinks    EnterpriseRiskRelationship[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, residualRating])
+  @@index([organizationId, category])
+  @@index([organizationId, ownerUserId])
+  @@index([organizationId, appetiteStatus])
+  @@index([organizationId, archivedAt])
+  @@index([organizationId, reviewDate])
+}
+
+model EnterpriseRiskImpact {
+  id        String                   @id @default(uuid())
+  risk      EnterpriseRisk           @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId    String
+  dimension EnterpriseImpactDimension
+  rating    Int
+
+  @@unique([riskId, dimension])
+}
+
+model EnterpriseRiskScoreSnapshot {
+  id             String   @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  methodology    EnterpriseRiskMethodology? @relation(fields: [methodologyId], references: [id])
+  methodologyId  String?
+  methodologyVersion String
+  inherentScore  Int
+  inherentRating EnterpriseRiskRating
+  residualScore  Int
+  residualRating EnterpriseRiskRating
+  controlReduction Int
+  inputs         Json
+  explanation    String
+  reason         String
+  calculatedAt   DateTime @default(now())
+
+  @@index([riskId, calculatedAt])
+  @@index([organizationId])
+}
+
+model EnterpriseRiskAppetite {
+  id             String                 @id @default(uuid())
+  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  scope          EnterpriseAppetiteScope
+  category       EnterpriseRiskCategory?
+  businessUnit   BusinessUnit?          @relation(fields: [businessUnitId], references: [id])
+  businessUnitId String?
+  maxResidualRating EnterpriseRiskRating
+  statement      String?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([organizationId, scope])
+}
+
+model EnterpriseRiskTreatment {
+  id             String                     @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk             @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  strategy       EnterpriseTreatmentStrategy
+  ownerUserId    String?
+  status         EnterpriseTreatmentStatus  @default(PLANNED)
+  dueDate        DateTime?
+  priority       String?
+  expectedTargetScore Int?
+  notes          String?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  actions        EnterpriseRiskTreatmentAction[]
+
+  @@index([organizationId, status])
+  @@index([riskId])
+}
+
+model EnterpriseRiskTreatmentAction {
+  id          String @id @default(uuid())
+  treatment   EnterpriseRiskTreatment @relation(fields: [treatmentId], references: [id], onDelete: Cascade)
+  treatmentId String
+  title       String
+  ownerUserId String?
+  dueDate     DateTime?
+  status      EnterpriseTreatmentStatus @default(PLANNED)
+  createdAt   DateTime @default(now())
+}
+
+model EnterpriseRiskDecision {
+  id                 String                   @id @default(uuid())
+  organizationId     String
+  risk               EnterpriseRisk           @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId             String
+  decision           EnterpriseDecisionType
+  status             EnterpriseDecisionStatus @default(REQUESTED)
+  decisionMakerUserId String?
+  authority          String?
+  rationale          String
+  conditions         String?
+  approvedAt         DateTime?
+  expiresAt          DateTime?
+  evidenceObjectIds  Json?
+  createdAt          DateTime                 @default(now())
+
+  @@index([organizationId, status])
+  @@index([riskId])
+}
+
+model EnterpriseRiskControlLink {
+  id             String @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  controlId      String
+  rationale      String?
+  createdAt      DateTime @default(now())
+
+  @@unique([riskId, controlId])
+  @@index([organizationId])
+}
+
+model EnterpriseRiskFindingLink {
+  id             String @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  findingId      String
+  createdAt      DateTime @default(now())
+
+  @@unique([riskId, findingId])
+}
+
+model EnterpriseRiskRelationship {
+  id             String @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  targetType     String
+  targetId       String
+  relationship   String
+  createdAt      DateTime @default(now())
+
+  @@unique([riskId, targetType, targetId, relationship])
+  @@index([organizationId])
+}
+
+model EnterpriseRiskKri {
+  id             String @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  publicId       String
+  name           String
+  description    String?
+  ownerUserId    String?
+  unit           String?
+  direction      EnterpriseKriDirection
+  warningThreshold Float
+  criticalThreshold Float
+  currentValue   Float?
+  measuredAt     DateTime?
+  source         String   @default("MANUAL")
+  status         EnterpriseKriStatus @default(NOT_MEASURED)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  measurements   EnterpriseRiskKriMeasurement[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([riskId])
+}
+
+model EnterpriseRiskKriMeasurement {
+  id          String @id @default(uuid())
+  kri         EnterpriseRiskKri @relation(fields: [kriId], references: [id], onDelete: Cascade)
+  kriId       String
+  value       Float
+  measuredAt  DateTime @default(now())
+  source      String   @default("MANUAL")
+  recordedBy  String?
+}
+
+model EnterpriseRiskEvent {
+  id             String @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  eventType      String
+  title          String
+  description    String?
+  occurredAt     DateTime @default(now())
+  triggersReview Boolean @default(true)
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([riskId])
+}
+
+model EnterpriseRiskHistory {
+  id             String @id @default(uuid())
+  organizationId String
+  risk           EnterpriseRisk @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  riskId         String
+  eventType      String
+  summary        String
+  actorUserId    String?
+  payload        Json?
+  createdAt      DateTime @default(now())
+
+  @@index([riskId, createdAt])
+  @@index([organizationId])
+}
+
+model EnterpriseRiskCounter {
+  organizationId String @id
+  nextRisk       Int    @default(1)
+  nextKri        Int    @default(1)
 }

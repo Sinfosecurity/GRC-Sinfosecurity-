@@ -28,6 +28,7 @@ import {
     HelpOutline,
     AccountTreeOutlined,
     FactCheckOutlined,
+    WarningAmberOutlined,
     HistoryOutlined,
     HubOutlined,
     Menu as MenuIcon,
@@ -63,6 +64,13 @@ const menuSections: NavSection[] = [
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
             { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
             { text: 'Decisions', path: '/decision-briefs', icon: <GavelOutlined fontSize="small" />, permission: 'approval.read' },
+        ],
+    },
+    {
+        title: 'Enterprise Risk',
+        items: [
+            { text: 'Supreme Risk', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
+            { text: 'Risk register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
         ],
     },
     {

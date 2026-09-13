@@ -260,6 +260,31 @@ export const sccAPI = {
         api.get(`/scc/reports/${kind}`, { params: { format }, responseType: format === 'pdf' ? 'blob' : 'json' }),
 };
 
+export const ermAPI = {
+    dashboard: () => api.get('/erm/dashboard'),
+    list: (params?: unknown) => api.get('/erm/risks', { params }),
+    get: (publicId: string) => api.get(`/erm/risks/${publicId}`),
+    create: (data: unknown) => api.post('/erm/risks', data),
+    update: (publicId: string, data: unknown) => api.patch(`/erm/risks/${publicId}`, data),
+    archive: (publicId: string) => api.post(`/erm/risks/${publicId}/archive`),
+    linkControl: (publicId: string, data: unknown) => api.post(`/erm/risks/${publicId}/controls`, data),
+    linkFinding: (publicId: string, data: unknown) => api.post(`/erm/risks/${publicId}/findings`, data),
+    addRelationship: (publicId: string, data: unknown) => api.post(`/erm/risks/${publicId}/relationships`, data),
+    createTreatment: (publicId: string, data: unknown) => api.post(`/erm/risks/${publicId}/treatments`, data),
+    decide: (publicId: string, data: unknown) => api.post(`/erm/risks/${publicId}/decisions`, data),
+    createKri: (publicId: string, data: unknown) => api.post(`/erm/risks/${publicId}/kris`, data),
+    measureKri: (kriPublicId: string, data: unknown) => api.post(`/erm/kris/${kriPublicId}/measurements`, data),
+    appetite: () => api.get('/erm/appetite'),
+    setAppetite: (data: unknown) => api.post('/erm/appetite', data),
+    businessUnits: () => api.get('/erm/business-units'),
+    createBusinessUnit: (data: unknown) => api.post('/erm/business-units', data),
+    previewImport: (rows: unknown[]) => api.post('/erm/import/preview', { rows }),
+    commitImport: (rows: unknown[]) => api.post('/erm/import/commit', { rows }),
+    exportRegister: (format: 'csv' | 'xlsx') => api.get(`/erm/export/${format}`, { responseType: 'blob' }),
+    downloadReport: (kind: string) => api.get(`/erm/reports/${kind}.pdf`, { responseType: 'blob' }),
+    controlImpact: (controlId: string) => api.get(`/erm/impact/controls/${controlId}`),
+};
+
 export const governanceAPI = {
     summary: (config?: { signal?: AbortSignal }) => api.get('/governance/summary', config),
     search: (params?: unknown, config?: { signal?: AbortSignal }) => api.get('/governance/search', { params, ...config }),

@@ -64,6 +64,9 @@ const SecurityOverview = lazy(() => import('./pages/SecurityOverview'));
 const PublicStatus = lazy(() => import('./pages/PublicStatus'));
 const HelpSupport = lazy(() => import('./pages/HelpSupport'));
 const GovernanceGraphExplorer = lazy(() => import('./pages/GovernanceGraphExplorer'));
+const RiskDashboard = lazy(() => import('./pages/RiskDashboard'));
+const RiskRegister = lazy(() => import('./pages/RiskRegister'));
+const RiskDetail = lazy(() => import('./pages/RiskDetail'));
 const ControlCenter = lazy(() => import('./pages/ControlCenter'));
 const ControlDetail = lazy(() => import('./pages/ControlDetail'));
 const FrameworkCoverage = lazy(() => import('./pages/FrameworkCoverage'));
@@ -158,6 +161,9 @@ export default function App() {
                     <Route path="environment" element={<EnvironmentStatus />} />
                     <Route path="help" element={<HelpSupport />} />
                     <Route path="governance-graph" element={<GovernanceGraphExplorer />} />
+                    <Route path="risks" element={<RiskDashboard />} />
+                    <Route path="risks/register" element={<RiskRegister />} />
+                    <Route path="risks/:publicId" element={<RiskDetail />} />
                     <Route path="control-center" element={<ControlCenter />} />
                     <Route path="control-center/:controlId" element={<ControlDetail />} />
                     <Route path="framework-coverage" element={<FrameworkCoverage />} />

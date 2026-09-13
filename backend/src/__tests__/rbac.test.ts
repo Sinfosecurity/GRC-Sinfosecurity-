@@ -17,6 +17,13 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['governanceGraph.read'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['governanceGraph.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['control.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['risk.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['kri.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['risk.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['kri.manage'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['risk.treat'])).toBe(true);
+        expect(hasPermission('APPROVER', PERMISSIONS['risk.approve'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['risk.score'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['control.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['control.test'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['evidence.link'])).toBe(false);

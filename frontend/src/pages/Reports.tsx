@@ -5,7 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
-import { sccAPI, tprmAPI, vendorAPI } from '../services/api';
+import { ermAPI, sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
@@ -31,6 +31,12 @@ const catalog: CatalogItem[] = [
     { id: 'evidence-coverage', name: 'Evidence coverage', category: 'Controls', description: 'CLEAN usable objects, reuse count, and honesty that a file does not prove every mapping.', formats: ['PDF'], kind: 'operational' },
     { id: 'framework-readiness', name: 'Framework readiness', category: 'Controls', description: 'Mapped, implemented, tested, and gap counts for framework identifiers. Not compliant or certified.', formats: ['PDF'], kind: 'operational' },
     { id: 'control-testing', name: 'Control testing', category: 'Controls', description: 'Recorded test results from this organization. Not applicable is not treated as pass.', formats: ['PDF'], kind: 'operational' },
+    { id: 'erm-profile', name: 'Enterprise risk profile', category: 'Enterprise Risk', description: 'Active enterprise risks, appetite exceptions, and top residual ratings. Ordinal scores are not summed.', formats: ['PDF'], kind: 'operational' },
+    { id: 'erm-top-risks', name: 'Top risks', category: 'Enterprise Risk', description: 'Highest residual enterprise risks from live tenant records.', formats: ['PDF'], kind: 'operational' },
+    { id: 'erm-appetite', name: 'Risk appetite / exceptions', category: 'Enterprise Risk', description: 'Configured appetite and risks outside or near tolerance. Not configured is shown as not configured.', formats: ['PDF'], kind: 'operational' },
+    { id: 'erm-treatment', name: 'Risk treatment status', category: 'Enterprise Risk', description: 'Treatment attention from live plans. A plan does not lower residual risk by itself.', formats: ['PDF'], kind: 'operational' },
+    { id: 'erm-board', name: 'Board risk summary', category: 'Enterprise Risk', description: 'Board-facing enterprise risk counts and top residual items. Ordinal scores are not summed.', formats: ['PDF'], kind: 'board' },
+    { id: 'erm-register', name: 'Enterprise risk register', category: 'Enterprise Risk', description: 'CSV/XLSX of live enterprise risks with formula-injection protection.', formats: ['CSV', 'XLSX'], kind: 'operational' },
 ];
 
 type Capabilities = {
@@ -155,6 +161,12 @@ export default function Reports() {
             else if (['control-coverage', 'evidence-coverage', 'framework-readiness', 'control-testing'].includes(item.id)) {
                 response = await sccAPI.downloadReport(item.id, 'pdf');
             }
+            else if (item.id === 'erm-profile') response = await ermAPI.downloadReport('profile');
+            else if (item.id === 'erm-top-risks') response = await ermAPI.downloadReport('top-risks');
+            else if (item.id === 'erm-appetite') response = await ermAPI.downloadReport('appetite');
+            else if (item.id === 'erm-treatment') response = await ermAPI.downloadReport('treatment');
+            else if (item.id === 'erm-board') response = await ermAPI.downloadReport('board');
+            else if (item.id === 'erm-register') response = await ermAPI.exportRegister(fmt as 'csv' | 'xlsx');
             else response = await tprmAPI.downloadBoard(fmt as 'pdf' | 'pptx');
             const filename = await downloadBinaryResponse(response, `Supreme-Risk-${item.id}.${fmt}`);
             setSuccess(`Downloaded ${filename}`);

@@ -360,6 +360,25 @@ export async function populateRecoveryDataset(prisma: PrismaClient, objectRoot: 
         notes: 'Recovery certification test. Not a live audit result.',
     });
 
+    const { enterpriseRiskService } = await import('../services/enterpriseRiskService');
+    await enterpriseRiskService.create(orgA.org.id, orgA.admin.id, {
+        title: 'Privileged access failure',
+        statement: 'Because of a control test failure, there is a risk that privileged access is abused, resulting in unauthorized data exposure.',
+        category: 'CYBERSECURITY',
+        likelihood: 4,
+        impact: 5,
+        ownerUserId: orgA.admin.id,
+        source: 'RECOVERY',
+    });
+    await enterpriseRiskService.create(orgB.org.id, orgB.admin.id, {
+        title: 'Vendor concentration',
+        category: 'THIRD_PARTY',
+        likelihood: 3,
+        impact: 3,
+        ownerUserId: orgB.admin.id,
+        source: 'RECOVERY',
+    });
+
     const { backfillOrganization } = await import('../services/governanceGraphService');
     await backfillOrganization(orgA.org.id);
     await backfillOrganization(orgB.org.id);
