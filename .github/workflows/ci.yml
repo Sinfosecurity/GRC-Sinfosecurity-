@@ -87,9 +87,31 @@ jobs:
 
       - name: Backend full test suite
         working-directory: backend
+        env:
+          WRITE_BOARD_PPTX: ${{ github.workspace }}/ci-artifacts/Supreme-Privacy-Board.pptx
         run: |
           set -o pipefail
           npm test -- --ci --runInBand --forceExit | tee "$GITHUB_WORKSPACE/ci-artifacts/backend-tests.txt"
+
+      - name: Native board PPTX render
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libreoffice-impress poppler-utils
+          python3 scripts/render-pptx-native.py \
+            "$GITHUB_WORKSPACE/ci-artifacts/Supreme-Privacy-Board.pptx" \
+            "$GITHUB_WORKSPACE/ci-artifacts/native-slides"
+          test -f "$GITHUB_WORKSPACE/ci-artifacts/native-slides/native-slide-12.png"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path("ci-artifacts/native-slides/native-render.json").read_text())
+          assert payload["engine"] == "LibreOffice"
+          assert payload["pages"] == 12
+          assert payload["uniqueHashes"] >= 8
+          assert payload["reconstruction"] == "native"
+          print(payload["engine"], payload["pages"], payload["uniqueHashes"])
+          PY
 
       - name: Install frontend
         working-directory: frontend

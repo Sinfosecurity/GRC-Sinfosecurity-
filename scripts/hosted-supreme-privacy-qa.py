@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -349,19 +352,44 @@ def main():
         for path, label in [("/compliance", "compliance"), ("/risks", "risk"), ("/governance-graph", "graph"), ("/control-center", "controls"), ("/reports", "reports"), ("/questionnaires", "methodology")]:
             page.goto(f"{BASE}{path}", wait_until="networkidle")
             shot(page, f"regression-{label}-1440", 1440)
-        slides = RESULTS.get("boardSlides") or []
-        if slides:
-            html = "<html><body style='font-family:Georgia,serif;background:#0F172A;color:#fff;margin:0'>"
-            for index, text in enumerate(slides, start=1):
-                html += f"<section style='min-height:100vh;padding:48px;border-bottom:8px solid #C5A46E'><h2>Slide {index}</h2><p style='max-width:960px;line-height:1.5'>{text}</p></section>"
-            html += "</body></html>"
-            qa_path = OUT / "board-pptx-visual.html"
-            qa_path.write_text(html)
-            page.set_content(html, wait_until="domcontentloaded")
-            for index in range(len(slides)):
-                page.evaluate(f"window.scrollTo(0, {index} * window.innerHeight)")
-                shot(page, f"board-slide-{index + 1}", 1440)
-            record("board pptx visual qa", "PARTIAL" if slides else "FAIL", f"{len(slides)} rendered slide cards")
+        pptx_path = OUT / "Supreme-Privacy-Board.pptx"
+        native_dir = OUT / "native-slides"
+        if pptx_path.exists():
+            completed = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "render-pptx-native.py"), str(pptx_path), str(native_dir)],
+                capture_output=True,
+                text=True,
+            )
+            if completed.returncode != 0:
+                record("board pptx native render", "FAIL", (completed.stderr or completed.stdout)[:400])
+            else:
+                payload = json.loads((native_dir / "native-render.json").read_text())
+                for index in range(1, payload.get("pages", 0) + 1):
+                    src = native_dir / f"native-slide-{index:02d}.png"
+                    if src.exists():
+                        shutil.copyfile(src, OUT / f"board-slide-{index}.png")
+                        RESULTS["shots"].append(str((OUT / f"board-slide-{index}.png").relative_to(ROOT)))
+                html_card = OUT / "board-pptx-visual.html"
+                if html_card.exists():
+                    html_card.unlink()
+                record(
+                    "board pptx native render",
+                    "PASS" if payload.get("pages") == 12 and payload.get("uniqueHashes", 0) >= 8 else "FAIL",
+                    f"{payload.get('engine')} {payload.get('pages')} slides / {payload.get('uniqueHashes')} unique",
+                )
+        for name in ("deletions", "incidents"):
+            page.goto(f"{BASE}/privacy-ops/{name}", wait_until="networkidle")
+            for width in (375, 768):
+                page.set_viewport_size({"width": width, "height": 812})
+                time.sleep(0.4)
+                cards = page.locator("[data-testid='record-card']")
+                details = page.get_by_role("button", name="Details")
+                overflow = page.evaluate("() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2")
+                record(
+                    f"{name} {width} cards",
+                    "PASS" if cards.count() > 0 and details.count() > 0 and not overflow else "FAIL",
+                    f"cards={cards.count()} details={details.count()} overflow={overflow}",
+                )
         browser.close()
     RESULTS["hostedFrontendSha"] = fe_sha
     RESULTS["hostedApiSha"] = api_sha

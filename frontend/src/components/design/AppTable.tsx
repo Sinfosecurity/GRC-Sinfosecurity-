@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import {
     Box,
     Button,
+    Collapse,
     MenuItem,
     Stack,
     Table,
@@ -14,6 +15,8 @@ import {
     TableSortLabel,
     TextField,
     Typography,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import EmptyState from './EmptyState';
 
@@ -24,6 +27,7 @@ export type Column<T> = {
     render: (row: T) => ReactNode;
     width?: number | string;
     hideOnMobile?: boolean;
+    priority?: 'primary' | 'secondary';
 };
 
 type Props<T> = {
@@ -57,6 +61,9 @@ export default function AppTable<T>({
     const [sortId, setSortId] = useState<string | null>(null);
     const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
     const [page, setPage] = useState(0);
+    const [openCards, setOpenCards] = useState<Record<string, boolean>>({});
+    const theme = useTheme();
+    const compact = useMediaQuery(theme.breakpoints.down('md'), { noSsr: true });
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -82,6 +89,8 @@ export default function AppTable<T>({
     const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
     const safePage = Math.min(page, pageCount - 1);
     const visible = filtered.slice(safePage * pageSize, safePage * pageSize + pageSize);
+    const primaryColumns = columns.filter((column) => (column.priority || (column.hideOnMobile ? 'secondary' : 'primary')) === 'primary');
+    const secondaryColumns = columns.filter((column) => (column.priority || (column.hideOnMobile ? 'secondary' : 'primary')) === 'secondary');
 
     const toggleSort = (id: string) => {
         if (sortId !== id) {
@@ -113,6 +122,61 @@ export default function AppTable<T>({
                 <EmptyState title={emptyTitle} body={emptyBody} action={emptyAction} />
             ) : (
                 <>
+                    {compact ? (
+                <Stack spacing={1.5} sx={{ maxWidth: '100%', overflowX: 'hidden' }}>
+                    {visible.map((row) => {
+                        const key = rowKey(row);
+                        const open = Boolean(openCards[key]);
+                        return (
+                            <Box
+                                key={key}
+                                data-testid="record-card"
+                                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                                sx={{
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: '8px',
+                                    p: 1.5,
+                                    cursor: onRowClick ? 'pointer' : 'default',
+                                }}
+                            >
+                                <Stack spacing={1}>
+                                    {primaryColumns.map((column) => (
+                                        <Box key={column.id}>
+                                            {column.label ? <Typography variant="caption" color="text.secondary">{column.label}</Typography> : null}
+                                            <Typography component="div">{column.render(row)}</Typography>
+                                        </Box>
+                                    ))}
+                                </Stack>
+                                {secondaryColumns.length > 0 && (
+                                    <>
+                                        <Button
+                                            size="small"
+                                            sx={{ mt: 1 }}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setOpenCards((current) => ({ ...current, [key]: !current[key] }));
+                                            }}
+                                        >
+                                            {open ? 'Hide details' : 'Details'}
+                                        </Button>
+                                        <Collapse in={open}>
+                                            <Stack spacing={1} sx={{ mt: 1 }}>
+                                                {secondaryColumns.map((column) => (
+                                                    <Box key={column.id}>
+                                                        {column.label ? <Typography variant="caption" color="text.secondary">{column.label}</Typography> : null}
+                                                        <Typography component="div">{column.render(row)}</Typography>
+                                                    </Box>
+                                                ))}
+                                            </Stack>
+                                        </Collapse>
+                                    </>
+                                )}
+                            </Box>
+                        );
+                    })}
+                </Stack>
+                    ) : (
                     <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', border: '1px solid', borderColor: 'divider', borderRadius: '8px' }}>
                         <Table size="small" sx={{ minWidth: 640 }}>
                             <TableHead>
@@ -161,6 +225,7 @@ export default function AppTable<T>({
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    )}
                     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 1.5 }}>
                         <Typography variant="caption">
                             {filtered.length} record{filtered.length === 1 ? '' : 's'}

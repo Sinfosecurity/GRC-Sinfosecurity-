@@ -56,7 +56,7 @@ export default function PrivacyVendorDetail() {
                         </Surface>
                         <Surface>
                             <Typography fontWeight={700} sx={{ mb: 1 }}>Privacy assessments and DPIAs</Typography>
-                            <AppTable rows={[...(data.dpias || []).map((row: any) => ({ ...row, kind: 'DPIA' })), ...(data.assessments || []).map((row: any) => ({ publicId: row.id, title: 'Third Party assessment', status: row.status, kind: 'Assessment' }))]} rowKey={(row: any) => `${row.kind}-${row.publicId}`} emptyTitle="No assessments" emptyBody="DPIAs and Third Party assessments appear when they are linked to this vendor's processing." columns={[
+                            <AppTable rows={[...(data.dpias || []).map((row: any) => ({ ...row, kind: 'DPIA' })), ...(data.assessments || []).map((row: any, index: number) => ({ publicId: `Assessment ${index + 1}`, title: 'Third Party assessment', status: row.status, kind: 'Assessment' }))]} rowKey={(row: any) => `${row.kind}-${row.publicId}`} emptyTitle="No assessments" emptyBody="DPIAs and Third Party assessments appear when they are linked to this vendor's processing." columns={[
                                 { id: 'kind', label: 'Kind', render: (row: any) => row.kind },
                                 { id: 'publicId', label: 'Record', render: (row: any) => row.publicId },
                                 { id: 'title', label: 'Title', render: (row: any) => row.title || '—' },

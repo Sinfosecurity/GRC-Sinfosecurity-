@@ -64,20 +64,20 @@ export default function PrivacyDeletions() {
                             emptyTitle="No deletion tasks"
                             emptyBody="Record a task when deletion is requested. Do not claim systems were wiped."
                             columns={[
-                                { id: 'publicId', label: 'Task', render: (row) => row.publicId },
-                                { id: 'activity', label: 'Activity', render: (row) => row.activity || 'Not linked' },
-                                { id: 'system', label: 'System / vendor', render: (row) => row.system },
-                                { id: 'dataCategory', label: 'Data', render: (row) => row.dataCategory },
-                                { id: 'owner', label: 'Owner', render: (row) => row.owner },
-                                { id: 'dueAt', label: 'Due', render: (row) => row.dueAt ? new Date(row.dueAt).toLocaleDateString() : 'Not set' },
-                                { id: 'action', label: 'Action', render: (row) => row.action },
-                                { id: 'verification', label: 'Verification', render: (row) => row.verification },
-                                { id: 'evidence', label: 'Evidence', render: (row) => row.evidence },
-                                { id: 'exception', label: 'Exception', render: (row) => row.exception || 'None' },
-                                { id: 'completedAt', label: 'Completed', render: (row) => row.completedAt ? new Date(row.completedAt).toLocaleDateString() : 'Open' },
-                                { id: 'status', label: 'Status', render: (row) => row.status },
-                                { id: 'honesty', label: 'Honesty', render: (row) => row.honesty },
-                                { id: 'update', label: '', render: (row) => (
+                                { id: 'publicId', label: 'Deletion ID', priority: 'primary', render: (row) => row.publicId },
+                                { id: 'activity', label: 'Activity', priority: 'primary', render: (row) => row.activity || 'Not linked' },
+                                { id: 'status', label: 'Status', priority: 'primary', render: (row) => row.status },
+                                { id: 'owner', label: 'Owner', priority: 'primary', render: (row) => row.owner },
+                                { id: 'dueAt', label: 'Due date', priority: 'primary', render: (row) => row.dueAt ? new Date(row.dueAt).toLocaleDateString() : 'Not set' },
+                                { id: 'system', label: 'System / vendor', priority: 'primary', render: (row) => row.system },
+                                { id: 'verification', label: 'Verification', priority: 'primary', render: (row) => row.verification },
+                                { id: 'dataCategory', label: 'Data', priority: 'secondary', render: (row) => row.dataCategory },
+                                { id: 'action', label: 'Action', priority: 'secondary', render: (row) => row.action },
+                                { id: 'evidence', label: 'Evidence', priority: 'secondary', render: (row) => row.evidence },
+                                { id: 'exception', label: 'Exception', priority: 'secondary', render: (row) => row.exception || 'None' },
+                                { id: 'completedAt', label: 'Completed', priority: 'secondary', render: (row) => row.completedAt ? new Date(row.completedAt).toLocaleDateString() : 'Open' },
+                                { id: 'honesty', label: 'Honesty', priority: 'secondary', render: (row) => row.honesty },
+                                { id: 'update', label: 'Update status', priority: 'secondary', render: (row) => (
                                     <TextField select size="small" value={row.statusKey} onChange={(event) => privacyAPI.updateDeletion(row.publicId, { status: event.target.value, verification: 'Attestation recorded' }).then(load).catch((err) => setError(err.message))} sx={{ minWidth: 200 }}>
                                         {STATUSES.map((item) => <MenuItem key={item.key} value={item.key}>{item.label}</MenuItem>)}
                                     </TextField>
