@@ -18,7 +18,7 @@ fi
 FOUND_MIGRATIONS=0
 while IFS= read -r migration; do
   FOUND_MIGRATIONS=$((FOUND_MIGRATIONS + 1))
-  if grep -Ei 'drop[[:space:]]+database|prisma migrate reset|truncate[[:space:]]+(table|[[:alnum:]_"]+)|drop[[:space:]]+table' "$migration" >/dev/null; then
+  if grep -Ei 'drop[[:space:]]+database|prisma migrate reset|truncate[[:space:]]+(table|[[:alnum:]_"]+)|drop[[:space:]]+table' <(grep -Ev '^[[:space:]]*--' "$migration") >/dev/null; then
     echo "MIGRATION_SAFETY=FAIL file=$(basename "$(dirname "$migration")")"
     FAIL=1
   fi
