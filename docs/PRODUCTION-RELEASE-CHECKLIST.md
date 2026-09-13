@@ -10,7 +10,7 @@
 This gate decides whether Supreme is ready to enter production. It does **not** deploy Supreme.
 
 **Starting accepted program SHA:** `346450044d1418bc75c6ce4dd4291fc499adb823`  
-**Release candidate SHA:** pin the #11 commit recorded in `docs/SUPREME-PROGRAM-STATE.md` (`RELEASE_CANDIDATE_SHA`). Never deploy “latest.”
+**Release candidate SHA:** `597fa34301d16c4046f45ff8f1cb873c56976f47` — never deploy “latest.”
 
 ---
 
@@ -36,7 +36,7 @@ Cursor cannot convert this to Conditional GO. Product Leadership must accept any
 | Prior accepted SHA | `346450044d1418bc75c6ce4dd4291fc499adb823` |
 | Security implementation | `309b76336a351ab43ce7627efa22272b94a34298` |
 | Hosted security runtime | `227dc3215783df523a3b6dc8973928e66ef43df3` |
-| RELEASE_CANDIDATE_SHA | the #11 commit SHA in program state |
+| RELEASE_CANDIDATE_SHA | `597fa34301d16c4046f45ff8f1cb873c56976f47` |
 | #12 | NOT STARTED |
 
 Candidate includes accepted #1–#10 work plus #11 launch-critical fixes only:

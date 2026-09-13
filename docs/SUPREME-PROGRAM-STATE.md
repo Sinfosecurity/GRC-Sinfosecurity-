@@ -8,7 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT VERIFIED SHA:** `346450044d1418bc75c6ce4dd4291fc499adb823` (accepted #10). `RELEASE_CANDIDATE_SHA` is the #11 commit after hosted CI.
+**CURRENT VERIFIED SHA:** `597fa34301d16c4046f45ff8f1cb873c56976f47`
+
+**RELEASE_CANDIDATE_SHA:** `597fa34301d16c4046f45ff8f1cb873c56976f47`
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -264,5 +266,5 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 
 **ITEM:** #11 Production Release Checklist
 **STATUS CHANGE:** NOT STARTED -> EVIDENCE RESULT PASS (production ready NO; GO/NO-GO NO-GO; not #12 authorization)
-**SHA:** starting `346450044d1418bc75c6ce4dd4291fc499adb823`; RELEASE_CANDIDATE_SHA is the #11 commit
+**SHA:** `597fa34301d16c4046f45ff8f1cb873c56976f47`
 **EVIDENCE:** `docs/PRODUCTION-RELEASE-CHECKLIST.md`, `docs/PRODUCTION-USER-ACTIONS.md`

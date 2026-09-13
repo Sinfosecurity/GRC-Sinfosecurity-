@@ -201,7 +201,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** EVIDENCE RESULT PASS — production ready NO; GO/NO-GO is NO-GO pending Product Leadership
 
-**CERTIFICATION SHA:** pin the #11 commit in `docs/SUPREME-PROGRAM-STATE.md` (`RELEASE_CANDIDATE_SHA`)
+**CERTIFICATION SHA:** `597fa34301d16c4046f45ff8f1cb873c56976f47`
 
 **EVIDENCE:** `docs/PRODUCTION-RELEASE-CHECKLIST.md`, `docs/PRODUCTION-USER-ACTIONS.md`. BUSINESS entitlements implemented. Admin/app noindex implemented. Production not deployed. DNS unchanged. #12 not started.
 
