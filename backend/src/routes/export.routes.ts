@@ -4,17 +4,10 @@ import { authenticate, AuthRequest, requirePermission } from '../middleware/auth
 import { PERMISSIONS } from '../security/rbac';
 import { recordAudit } from '../services/auditEventService';
 import { tenantWhere } from '../security/tenant';
+import { csvEscape } from '../security/spreadsheetSafe';
 
 const router = Router();
 router.use(authenticate);
-
-function csvEscape(value: unknown): string {
-    const text = value == null ? '' : String(value);
-    if (/[",\n]/.test(text)) {
-        return `"${text.replace(/"/g, '""')}"`;
-    }
-    return text;
-}
 
 router.get('/vendors.csv', requirePermission(PERMISSIONS['report.export']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {

@@ -1,5 +1,6 @@
 import net from 'net';
 import tls from 'tls';
+import { sanitizeHeaderValue } from '../security/headerSanitize';
 
 export type SmtpDelivery = {
     messageId?: string;
@@ -171,9 +172,9 @@ export async function sendSmtpMail(
         await expect(socket, [250], `MAIL FROM:<${fromEmail}>`, 'MAIL');
         await expect(socket, [250], `RCPT TO:<${input.to}>`, 'RCPT');
         await expect(socket, [354], 'DATA');
-        write(socket, `From: ${fromName} <${fromEmail}>`);
-        write(socket, `To: ${input.to}`);
-        write(socket, `Subject: ${input.subject}`);
+        write(socket, `From: ${sanitizeHeaderValue(fromName)} <${sanitizeHeaderValue(fromEmail)}>`);
+        write(socket, `To: ${sanitizeHeaderValue(input.to)}`);
+        write(socket, `Subject: ${sanitizeHeaderValue(input.subject)}`);
         write(socket, 'MIME-Version: 1.0');
         write(socket, 'Content-Type: text/plain; charset=utf-8');
         write(socket, '');

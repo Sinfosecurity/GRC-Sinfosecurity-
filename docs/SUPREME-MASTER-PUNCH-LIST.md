@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**Do not start #9** until Product Leadership reviews #7 and #8.
+**Do not start #10** until Product Leadership accepts #9.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -125,13 +125,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Hosted Platform Owner can use `/platform`; Customer 360 shows operational metadata; customer-approved support read works; write denial, revoke, cross-tenant denial, and audit work. Product Leadership accepts the hosted evidence.
 
-**CURRENT STATUS:** PARTIAL
+**CURRENT STATUS:** PASS
 
 **CERTIFICATION SHA:** implementation `d957054de0ad5d0497251f36afe1a7bc6542d648`; identity lock `36a8cf8ab05b25aa5cef9c53615eb4bfe2410545`; hosted evidence commit `9a195a27c67851566bef1cfa6bee461d2350d557`
 
-**EVIDENCE:** `docs/PLATFORM-OWNER-SUPPORT-CONSOLE.md`, `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. Engineering hosted walkthrough was returned. **Program acceptance is not recorded as PASS** until Product Leadership reviews.
+**EVIDENCE:** `docs/PLATFORM-OWNER-SUPPORT-CONSOLE.md`, `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. Product Leadership authorized PASS in the #9 task.
 
-**NEXT ACTION:** Product Leadership review of hosted certification. Do not start #9 in the same sprint as that review unless authorized.
+**NEXT ACTION:** Keep console/support-access controls unchanged unless a later gate finds a regression.
 
 ---
 
@@ -143,13 +143,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** ADR preserved; hosted admin login + MFA + portal boundary + step-up + support approval + break-glass + role safety; hosted CI on the exact SHA. Product Leadership accepts the hosted evidence.
 
-**CURRENT STATUS:** PARTIAL
+**CURRENT STATUS:** PASS
 
 **CERTIFICATION SHA:** ADR/implementation `36a8cf8ab05b25aa5cef9c53615eb4bfe2410545`; hosted MFA-reset/audit fix `9a195a27c67851566bef1cfa6bee461d2350d557`
 
-**EVIDENCE:** `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`, `docs/PLATFORM-ACCESS-OPERATIONS-RUNBOOK.md`, `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. Engineering may report evidence supports PASS. **Program status stays PARTIAL** until Product Leadership review.
+**EVIDENCE:** `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`, `docs/PLATFORM-ACCESS-OPERATIONS-RUNBOOK.md`, `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. Product Leadership authorized PASS in the #9 task.
 
-**NEXT ACTION:** Product Leadership review. Do not begin #9 until that review authorizes it.
+**NEXT ACTION:** Do not weaken MFA, planes, or support approval. #9 is the next reviewed gate.
 
 ---
 
@@ -161,13 +161,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Product Leadership authorizes the review; findings are recorded; no silent production claim.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance before #10
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** (this #9 sprint commit)
 
-**EVIDENCE:** None. Not authorized.
+**EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md`, `docs/SECURITY-ARCHITECTURE.md`, `docs/PENETRATION-TEST-SCOPE.md`, `docs/SOC2-ISO-READINESS-MAPPING.md`
 
-**NEXT ACTION:** Start only after #7 and #8 are reviewed and closed.
+**NEXT ACTION:** Product Leadership review. Do not start #10 until accepted.
 
 ---
 

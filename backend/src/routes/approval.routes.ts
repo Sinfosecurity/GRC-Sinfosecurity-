@@ -8,6 +8,7 @@ import { authenticate, authorize } from '../middleware/auth';
 import { validateBody, validateUUID } from '../middleware/validation';
 import { CreateWorkflowSchema, SubmitDecisionSchema } from '../validators/approval.validators';
 import vendorApprovalWorkflow from '../services/vendorApprovalWorkflow';
+import { legacyErrorMessage } from '../middleware/errorHandler';
 
 const router = express.Router();
 
@@ -78,7 +79,7 @@ router.post('/workflows', validateBody(CreateWorkflowSchema), async (req: any, r
     } catch (error: any) {
         res.status(error.statusCode || 500).json({
             success: false,
-            error: error.message,
+            error: legacyErrorMessage(error),
         });
     }
 });
@@ -119,7 +120,7 @@ router.get('/workflows/:workflowId', validateUUID('workflowId'), async (req: any
     } catch (error: any) {
         res.status(error.statusCode || 500).json({
             success: false,
-            error: error.message,
+            error: legacyErrorMessage(error),
         });
     }
 });
@@ -198,7 +199,7 @@ router.post('/workflows/:workflowId/steps/:stepOrder/approve',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -239,7 +240,7 @@ router.get('/vendors/:vendorId/workflows', validateUUID('vendorId'), async (req:
     } catch (error: any) {
         res.status(error.statusCode || 500).json({
             success: false,
-            error: error.message,
+            error: legacyErrorMessage(error),
         });
     }
 });
@@ -272,7 +273,7 @@ router.get('/pending', async (req: any, res) => {
     } catch (error: any) {
         res.status(error.statusCode || 500).json({
             success: false,
-            error: error.message,
+            error: legacyErrorMessage(error),
         });
     }
 });
@@ -329,7 +330,7 @@ router.post('/workflows/:workflowId/cancel',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -379,7 +380,7 @@ router.get('/statistics',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }

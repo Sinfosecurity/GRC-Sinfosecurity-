@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticate, authorize } from '../middleware/auth';
 import vendorConcentrationRisk from '../services/vendorConcentrationRisk';
+import { legacyErrorMessage } from '../middleware/errorHandler';
 
 const router = express.Router();
 
@@ -63,7 +64,7 @@ router.get('/',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -98,7 +99,7 @@ router.get('/spend',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -133,7 +134,7 @@ router.get('/geographic',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -169,7 +170,7 @@ router.get('/single-points-of-failure',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -230,7 +231,7 @@ router.get('/board-report',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -265,7 +266,7 @@ router.post('/refresh',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }

@@ -2,6 +2,53 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 
+function securityHeadersPlugin() {
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: https:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://supreme-risk-staging-api.onrender.com https://supreme-risk-staging.onrender.com https://app.supremerisk.com https://admin.supremerisk.com https://api.stripe.com",
+    "frame-src https://js.stripe.com https://hooks.stripe.com",
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ');
+
+  return {
+    name: 'supreme-security-headers',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html: string) {
+        if (html.includes('Content-Security-Policy')) {
+          return html;
+        }
+        return html.replace(
+          '<meta name="viewport"',
+          `<meta http-equiv="Content-Security-Policy" content="${csp}" />\n    <meta name="viewport"`
+        );
+      },
+    },
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: '_headers',
+        source: [
+          '/*',
+          `  Content-Security-Policy: ${csp}`,
+          '  X-Content-Type-Options: nosniff',
+          '  Referrer-Policy: strict-origin-when-cross-origin',
+          '  Permissions-Policy: camera=(), microphone=(), geolocation=()',
+          '  X-Frame-Options: DENY',
+          '',
+        ].join('\n'),
+      });
+    },
+  };
+}
+
 function robotsPolicyPlugin() {
   return {
     name: 'supreme-robots-policy',
@@ -22,6 +69,7 @@ function robotsPolicyPlugin() {
 export default defineConfig({
   plugins: [
     react(),
+    securityHeadersPlugin(),
     robotsPolicyPlugin(),
     // Bundle analyzer (only in build)
     process.env.ANALYZE ? visualizer({

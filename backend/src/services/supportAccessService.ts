@@ -284,8 +284,18 @@ export const supportAccessService = {
         }
         if (!input.reason?.trim()) throw new ApiError(400, 'A documented reason is required');
         if (!input.incidentId?.trim()) throw new ApiError(400, 'An active incident is required');
-        const incident = await prisma.platformIncident.findUnique({ where: { id: input.incidentId } });
+        const incident = await prisma.platformIncident.findUnique({
+            where: { id: input.incidentId },
+            include: { organizations: true },
+        });
         if (!incident || incident.status === 'RESOLVED') {
+            throw new ApiError(400, 'An active incident is required');
+        }
+        const incidentOrgs = incident.organizations.map((row) => row.organizationId);
+        if (incidentOrgs.length > 0 && !incidentOrgs.includes(input.organizationId)) {
+            throw new ApiError(400, 'An active incident is required');
+        }
+        if (incidentOrgs.length === 0) {
             throw new ApiError(400, 'An active incident is required');
         }
         const org = await prisma.organization.findUnique({ where: { id: input.organizationId } });

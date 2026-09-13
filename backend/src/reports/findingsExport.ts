@@ -5,6 +5,7 @@ import { drawEmptyState, drawKpiRow, drawParagraph, drawProfessionalTable, drawS
 import { humanizeEnum, reportId } from './reportTheme';
 import { loadPortfolioSnapshot, type ReportFilters } from './portfolioData';
 import { isoDate } from './sendDownload';
+import { csvEscape, neutralizeSpreadsheetValue } from '../security/spreadsheetSafe';
 
 function findingAgeDays(identifiedDate: Date): number {
     return Math.max(0, Math.floor((Date.now() - identifiedDate.getTime()) / 86400000));
@@ -30,10 +31,9 @@ function rows(data: Awaited<ReturnType<typeof loadPortfolioSnapshot>>) {
 export async function renderFindingsCsv(organizationId: string, filters: ReportFilters = {}) {
     const data = await loadPortfolioSnapshot(organizationId, filters);
     const header = ['vendor', 'title', 'severity', 'status', 'owner', 'targetRemediationDate', 'ageDays', 'remediationStatus', 'evidence', 'riskAcceptance'];
-    const escape = (value: string) => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
     const body = [
         header.join(','),
-        ...rows(data).map((row) => header.map((key) => escape(String(row[key as keyof typeof row] || ''))).join(',')),
+        ...rows(data).map((row) => header.map((key) => csvEscape(row[key as keyof typeof row])).join(',')),
     ].join('\n');
     return { buffer: Buffer.from(body, 'utf8'), filenameParts: ['Supreme-Risk-Findings', isoDate(data.generatedAt)] };
 }
@@ -57,7 +57,16 @@ export async function renderFindingsXlsx(organizationId: string, filters: Report
     ];
     sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
     sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B1F33' } };
-    rows(data).forEach((row) => sheet.addRow(row));
+    rows(data).forEach((row) => sheet.addRow({
+        ...row,
+        vendor: neutralizeSpreadsheetValue(row.vendor),
+        title: neutralizeSpreadsheetValue(row.title),
+        owner: neutralizeSpreadsheetValue(row.owner),
+        evidence: neutralizeSpreadsheetValue(row.evidence),
+        riskAcceptance: neutralizeSpreadsheetValue(row.riskAcceptance),
+        cap: neutralizeSpreadsheetValue(row.cap),
+        description: neutralizeSpreadsheetValue(row.description),
+    }));
     const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
     return { buffer, filenameParts: ['Supreme-Risk-Findings', isoDate(data.generatedAt)] };
 }

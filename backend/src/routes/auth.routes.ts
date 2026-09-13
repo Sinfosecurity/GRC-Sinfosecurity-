@@ -84,7 +84,7 @@ router.post('/login', loginIpLimiter, authRateLimiter, async (req: Request, res:
     }
 });
 
-router.post('/refresh', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/refresh', authRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const refreshToken = req.body?.refreshToken || req.cookies?.refreshToken;
         if (!refreshToken) {

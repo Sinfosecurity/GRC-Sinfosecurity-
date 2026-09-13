@@ -19,6 +19,29 @@ const PLATFORM_ROLES = new Set<Role>([
 
 const PLATFORM_OWNER_ROLES = new Set<Role>([Role.SUPERADMIN, Role.PLATFORM_ADMIN, Role.PLATFORM_OWNER]);
 
+const ORG_ADMIN_ROLES = new Set<Role>([Role.ORGANIZATION_ADMIN, Role.ADMIN]);
+
+async function assertRemainingOrgAdmin(organizationId: string, targetId: string, nextRole?: Role) {
+    const target = await prisma.user.findFirst({ where: { id: targetId, organizationId } });
+    if (!target || !ORG_ADMIN_ROLES.has(target.role)) {
+        return;
+    }
+    if (nextRole && ORG_ADMIN_ROLES.has(nextRole)) {
+        return;
+    }
+    const remaining = await prisma.user.count({
+        where: {
+            organizationId,
+            status: UserAccountStatus.ACTIVE,
+            role: { in: [Role.ORGANIZATION_ADMIN, Role.ADMIN] },
+            id: { not: targetId },
+        },
+    });
+    if (remaining === 0) {
+        throw new ApiError(403, 'Cannot remove the last organization administrator');
+    }
+}
+
 export const ORG_ASSIGNABLE_ROLES: Role[] = [
     Role.ORGANIZATION_ADMIN,
     Role.ADMIN,
@@ -119,6 +142,7 @@ export const identityUserService = {
             nextRole: role,
             action: 'role_change',
         });
+        await assertRemainingOrgAdmin(organizationId, id, role);
         const updated = await prisma.user.update({
             where: { id },
             data: { role },
@@ -147,6 +171,15 @@ export const identityUserService = {
                 targetId: id,
                 targetCurrentRole: user.role,
                 action: 'disable',
+            });
+            await assertRemainingOrgAdmin(organizationId, id);
+            await prisma.refreshToken.updateMany({
+                where: { userId: id, revokedAt: null },
+                data: { revokedAt: new Date() },
+            });
+            await prisma.passwordResetToken.updateMany({
+                where: { userId: id, usedAt: null },
+                data: { usedAt: new Date() },
             });
         }
         const updated = await prisma.user.update({

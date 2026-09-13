@@ -7,6 +7,8 @@ import express from 'express';
 import { authenticate, authorize } from '../middleware/auth';
 import { validateUUID } from '../middleware/validation';
 import vendorRiskHistory from '../services/vendorRiskHistory';
+import { legacyErrorMessage } from '../middleware/errorHandler';
+import { csvEscape } from '../security/spreadsheetSafe';
 
 const router = express.Router();
 
@@ -96,7 +98,7 @@ router.get('/:vendorId', validateUUID('vendorId'), async (req: any, res) => {
     } catch (error: any) {
         res.status(error.statusCode || 500).json({
             success: false,
-            error: error.message,
+            error: legacyErrorMessage(error),
         });
     }
 });
@@ -152,7 +154,7 @@ router.post('/:vendorId/snapshot',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -242,7 +244,7 @@ router.get('/trends',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -281,7 +283,7 @@ router.get('/trends/increasing',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -320,7 +322,7 @@ router.get('/trends/volatile',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -365,9 +367,11 @@ router.get('/trends/export',
             } else if (format === 'csv') {
                 // Generate CSV
                 const csv = [
-                    'Vendor ID,Vendor Name,Current Score,Trend Direction,Change %,Volatility',
-                    ...result.trends.map((t: any) => 
-                        `${t.vendorId},${t.vendorName},${t.currentRiskScore},${t.trend.direction},${t.trend.changePercent},${t.trend.volatility}`
+                    ['Vendor ID', 'Vendor Name', 'Current Score', 'Trend Direction', 'Change %', 'Volatility'].join(','),
+                    ...result.trends.map((t: any) =>
+                        [t.vendorId, t.vendorName, t.currentRiskScore, t.trend.direction, t.trend.changePercent, t.trend.volatility]
+                            .map(csvEscape)
+                            .join(',')
                     )
                 ].join('\n');
 
@@ -383,7 +387,7 @@ router.get('/trends/export',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }

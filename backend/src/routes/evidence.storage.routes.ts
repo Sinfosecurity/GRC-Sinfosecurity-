@@ -6,8 +6,10 @@ import { objectStorageService } from '../services/objectStorageService';
 import { prisma } from '../config/database';
 import { tenantWhere } from '../security/tenant';
 import { ApiError } from '../middleware/errorHandler';
+import { uploadLimiter } from '../middleware/rateLimiter';
+import { MAX_UPLOAD_BYTES } from '../malware/filePolicy';
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES } });
 const router = Router();
 router.use(authenticate);
 
@@ -40,6 +42,7 @@ router.get('/', requirePermission(PERMISSIONS['evidence.read']), async (req: Aut
 router.post(
     '/',
     requirePermission(PERMISSIONS['evidence.upload']),
+    uploadLimiter,
     upload.single('file'),
     async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {

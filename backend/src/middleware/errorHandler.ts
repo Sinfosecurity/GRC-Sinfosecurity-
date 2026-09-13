@@ -162,6 +162,18 @@ function handlePrismaError(error: PrismaClientKnownRequestError): {
 /**
  * Enhanced API Error classes
  */
+export function publicServerErrorPayload(error: unknown): { error: string } {
+    return { error: legacyErrorMessage(error, 500) };
+}
+
+export function legacyErrorMessage(error: unknown, statusCode = 500): string {
+    const hosted = process.env.NODE_ENV === 'production' || process.env.APP_ENVIRONMENT === 'staging';
+    if (statusCode >= 500 && hosted) {
+        return 'An unexpected error occurred';
+    }
+    return error instanceof Error ? error.message : 'An unexpected error occurred';
+}
+
 export class ApiError extends Error implements AppError {
     statusCode: number;
     isOperational: boolean;

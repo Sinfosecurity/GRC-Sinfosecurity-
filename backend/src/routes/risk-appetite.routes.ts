@@ -8,6 +8,7 @@ import { authenticate, authorize } from '../middleware/auth';
 import { validateBody, validateUUID } from '../middleware/validation';
 import { CreateRiskAppetiteSchema, UpdateRiskAppetiteSchema, ResolveBreachSchema } from '../validators/risk-appetite.validators';
 import riskAppetiteService from '../services/riskAppetite';
+import { legacyErrorMessage } from '../middleware/errorHandler';
 
 const router = express.Router();
 
@@ -93,7 +94,7 @@ router.post('/',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -128,7 +129,7 @@ router.get('/',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -190,7 +191,7 @@ router.put('/:id',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -233,7 +234,7 @@ router.post('/:id/monitor',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -268,7 +269,7 @@ router.post('/monitor-all',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -310,7 +311,7 @@ router.get('/breaches',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -373,7 +374,7 @@ router.post('/breaches/:breachId/resolve',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -407,7 +408,7 @@ router.get('/dashboard',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }
@@ -442,7 +443,7 @@ router.get('/review-required',
         } catch (error: any) {
             res.status(error.statusCode || 500).json({
                 success: false,
-                error: error.message,
+                error: legacyErrorMessage(error),
             });
         }
     }

@@ -12,6 +12,7 @@
 
 import express from 'express';
 import { authenticate, authorize } from '../middleware/auth';
+import { publicServerErrorPayload } from '../middleware/errorHandler';
 import { validateBody, validateQuery, validateUUID } from '../middleware/validation';
 import {
     CreateVendorSchema,
@@ -127,7 +128,7 @@ router.get('/', validateQuery(VendorListQuerySchema), async (req: any, res) => {
 
         res.json(result);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -140,7 +141,7 @@ router.get('/statistics', async (req: any, res) => {
         const stats = await vendorManagementService.getVendorStatistics(req.user.organizationId);
         res.json(stats);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -155,7 +156,7 @@ router.get('/attention', async (req: any, res) => {
         );
         res.json(attention);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -291,7 +292,7 @@ router.get('/:id/assessments', async (req: any, res) => {
         );
         res.json(assessments);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -330,7 +331,7 @@ router.get('/assessments/:assessmentId', async (req: any, res) => {
 
         res.json(assessment);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -386,7 +387,7 @@ router.get('/:id/assessments/:assessmentId', validateUUID('id'), validateUUID('a
         }
         res.json(assessment);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -437,7 +438,7 @@ router.get('/assessments/overdue', async (req: any, res) => {
         );
         res.json(overdue);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -457,7 +458,7 @@ router.get('/:id/contracts', async (req: any, res) => {
         );
         res.json(contracts);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -496,7 +497,7 @@ router.get('/contracts/:contractId', async (req: any, res) => {
 
         res.json(contract);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -550,7 +551,7 @@ router.get('/contracts/expiring', async (req: any, res) => {
 
         res.json(contracts);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -580,7 +581,7 @@ router.get('/contracts/:contractId/risk-analysis', async (req: any, res) => {
         const analysis = await vendorContractService.analyzeContractRisk(req.params.contractId);
         res.json(analysis);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -598,7 +599,7 @@ router.get('/contracts/sla-report', async (req: any, res) => {
 
         res.json(report);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -620,7 +621,7 @@ router.get('/:id/issues', async (req: any, res) => {
         );
         res.json(issues);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -749,7 +750,7 @@ router.get('/issues/overdue', async (req: any, res) => {
         const issues = await vendorIssueService.getOverdueIssues(req.user.organizationId);
         res.json(issues);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -762,7 +763,7 @@ router.get('/issues/statistics', async (req: any, res) => {
         const stats = await vendorIssueService.getIssueStatistics(req.user.organizationId);
         res.json(stats);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -782,7 +783,7 @@ router.get('/:id/monitoring', async (req: any, res) => {
         );
         res.json(signals);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -852,7 +853,7 @@ router.get('/monitoring/statistics', async (req: any, res) => {
         );
         res.json(stats);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json(publicServerErrorPayload(error));
     }
 });
 

@@ -71,7 +71,7 @@ function signAccessToken(user: {
         : options.plane === PLATFORM_PLANE
             ? env.platformJwtExpiresIn
             : env.jwtExpiresIn;
-    const signOptions: SignOptions = { expiresIn: expiresIn as SignOptions['expiresIn'] };
+    const signOptions: SignOptions = { expiresIn: expiresIn as SignOptions['expiresIn'], algorithm: 'HS256' };
     return jwt.sign(
         {
             userId: user.id,
@@ -453,6 +453,10 @@ export const authService = {
             return { requested: true };
         }
         const token = randomToken();
+        await prisma.passwordResetToken.updateMany({
+            where: { userId: user.id, usedAt: null },
+            data: { usedAt: new Date() },
+        });
         await prisma.passwordResetToken.create({
             data: {
                 tokenHash: hashToken(token),
@@ -493,13 +497,19 @@ export const authService = {
         if (!stored || stored.usedAt || stored.expiresAt < new Date()) {
             throw new ApiError(400, 'Reset link is invalid or expired');
         }
+        const owner = await prisma.user.findUnique({ where: { id: stored.userId } });
+        if (!owner || owner.status === UserAccountStatus.DISABLED) {
+            throw new ApiError(400, 'Reset link is invalid or expired');
+        }
         await prisma.$transaction([
             prisma.user.update({
                 where: { id: stored.userId },
                 data: {
                     hashedPassword: await hashPassword(nextPassword),
                     passwordChangedAt: new Date(),
-                    status: UserAccountStatus.ACTIVE,
+                    status: owner.status === UserAccountStatus.PENDING_ACTIVATION
+                        ? UserAccountStatus.ACTIVE
+                        : owner.status,
                 },
             }),
             prisma.passwordResetToken.update({

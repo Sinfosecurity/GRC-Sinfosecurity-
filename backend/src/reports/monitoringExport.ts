@@ -4,6 +4,7 @@ import { drawCallout, drawEmptyState, drawKpiRow, drawParagraph, drawProfessiona
 import { humanizeEnum, humanizeProviderStatus, reportId, riskTone, shortProviderStatus } from './reportTheme';
 import { loadPortfolioSnapshot, type ReportFilters } from './portfolioData';
 import { isoDate } from './sendDownload';
+import { csvEscape } from '../security/spreadsheetSafe';
 
 function signalTrend(monitoring: Array<{ detectedAt: Date }>) {
     const months = new Map<string, number>();
@@ -17,7 +18,6 @@ function signalTrend(monitoring: Array<{ detectedAt: Date }>) {
 export async function renderMonitoringCsv(organizationId: string, filters: ReportFilters = {}) {
     const data = await loadPortfolioSnapshot(organizationId, filters);
     const header = ['providerStatus', 'signalCount', 'vendor', 'eventType', 'detectedDate', 'riskIndicator', 'requiresAction', 'status'];
-    const escape = (value: string) => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
     const lines = [
         header.join(','),
         ...data.monitoring.map((row) =>
@@ -30,7 +30,7 @@ export async function renderMonitoringCsv(organizationId: string, filters: Repor
                 row.riskIndicator,
                 String(row.requiresAction),
                 row.resolvedAt ? 'RESOLVED' : row.acknowledgedAt ? 'ACKNOWLEDGED' : 'OPEN',
-            ].map((value) => escape(String(value))).join(',')
+            ].map((value) => csvEscape(value)).join(',')
         ),
     ];
     return { buffer: Buffer.from(lines.join('\n'), 'utf8'), filenameParts: ['Supreme-Risk-Monitoring', isoDate(data.generatedAt)] };

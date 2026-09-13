@@ -70,7 +70,7 @@ export async function authenticate(
         }
 
         const env = getEnv();
-        const decoded = jwt.verify(token, env.jwtSecret) as {
+        const decoded = jwt.verify(token, env.jwtSecret, { algorithms: ['HS256'] }) as {
             id?: string;
             userId?: string;
             email: string;
@@ -98,6 +98,13 @@ export async function authenticate(
 
         if (user.organization.status === 'SUSPENDED' || user.organization.status === 'CANCELLED') {
             throw new ApiError(403, 'Organization is not active');
+        }
+
+        if (user.passwordChangedAt && typeof decoded.iat === 'number') {
+            const changedAtSec = Math.floor(user.passwordChangedAt.getTime() / 1000);
+            if (decoded.iat < changedAtSec) {
+                throw new ApiError(401, 'Invalid or expired token');
+            }
         }
 
         const plane = parsePlane(decoded.plane);

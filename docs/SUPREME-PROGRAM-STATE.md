@@ -6,10 +6,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-12 23:30 UTC
+**LAST UPDATED:** 2026-09-13 01:30 UTC
 
-**CURRENT VERIFIED SHA:** `641d2a950d9fdc1df4aba7990b355805226e4754`  
-(program-control documentation commit. Later than user-stated baseline `36a8cf8ab05b25aa5cef9c53615eb4bfe2410545`. Last implementation SHA remains `9a195a27c67851566bef1cfa6bee461d2350d557`.)
+**CURRENT VERIFIED SHA:** `806975fd8d8093dd11bc987db82518b75110e636`
+(updated to the #9 implementation SHA after that commit lands)
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -17,55 +17,59 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PRODUCTION DEPLOYED:** NO
 
-**#9 STARTED:** NO
+**#9 STARTED:** YES — evidence returned; not a production-ready declaration
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #9 Final Security Review
+
+**STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance
+
+See `docs/FINAL-SECURITY-REVIEW.md`. Do not start #10 until Product Leadership accepts #9.
+
 ### #7 Platform Owner & Support Console
 
-**STATUS:** PARTIAL
+**STATUS:** PASS
 
-Implementation exists. Hosted operator certification evidence was returned in `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. Program acceptance is not PASS. Product Leadership review is required.
+Product Leadership authorized PASS as a #9 dependency. Hosted evidence remains `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`.
 
 ### #8 Identity / Admin Architecture
 
-**STATUS:** PARTIAL
+**STATUS:** PASS
 
-Architecture accepted and implemented (`docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`). Hosted Platform Owner MFA / operator walkthrough evidence was returned. Program acceptance is not PASS. Product Leadership review is required.
+Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ---
 
 ## CURRENT OBJECTIVE
 
-Close hosted Platform Owner / MFA / support-access certification.
-
-Engineering hosted evidence is in the repository. **Do not treat that as program PASS.** Product Leadership must review #7 and #8 before any later gate starts.
+Complete #9 Final Security Review evidence and stop for Product Leadership acceptance.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#9 Final Security Review**
+**#10 Production Cutover Rehearsal**
 
-**ONLY AFTER #7 AND #8 ARE REVIEWED/CLOSED.**
+**ONLY AFTER PRODUCT LEADERSHIP ACCEPTS #9.**
 
 ---
 
 ## DO NOT START
 
-- **#9** until current gate evidence is returned **and reviewed** by Product Leadership.
 - **#10** or later gates without authorization.
-- Any new product module (#13 onward) as part of a #7/#8 closure or this program-control documentation task.
+- Production DNS, `main` merge, or production deploy.
+- Any new product module (#13 onward).
 
 ---
 
 ## CURRENT BLOCKERS
 
-- Product Leadership review of #7 and #8 hosted certification evidence.
-- Program status for #7 and #8 remains PARTIAL until that review.
-- #2 Stripe Billing remains PARTIAL / CONDITIONALLY CLEARED (hosted test-mode; remaining hosted billing checks). Not in scope for this documentation task.
+- Product Leadership acceptance of #9 evidence before #10.
+- #2 Stripe Billing remains PARTIAL / CONDITIONALLY CLEARED (hosted test-mode completeness).
+- Production legal mailbox / retention schedule still undesignated (not a #9 technical blocker).
 
 ---
 
@@ -100,20 +104,14 @@ This documentation-only change does not rerun backend/frontend suites.
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership review of #7 and #8 hosted certification.
+Product Leadership acceptance of #9.
 
-Possible outcomes:
-
-- Accept both gates as PASS and authorize #9.
-- Keep one or both PARTIAL and name remaining hosted proof.
-- FAIL and name the defect.
-
-Until that decision is recorded here, **#9 is not started**.
+Until that decision is recorded here, **#10 is not started**.
 
 Distinguish:
 
-- **IMPLEMENTATION RESULT** — Cursor may report “Evidence supports PASS.”
-- **PROGRAM ACCEPTANCE** — this file does not silently advance to #9 in the same sprint.
+- **IMPLEMENTATION RESULT** — #9 EVIDENCE RESULT: PASS
+- **PROGRAM ACCEPTANCE** — this file does not authorize #10 in the same sprint.
 
 ---
 
@@ -139,9 +137,9 @@ Do not invent percentages.
 | 4 | Rate Limiting / Abuse Protection | PASS |
 | 5 | Backup / Disaster Recovery | PASS |
 | 6 | Hosted CI | PASS |
-| 7 | Platform Owner & Support Console | PARTIAL |
-| 8 | Identity / Admin Architecture | PARTIAL |
-| 9 | Final Security Review | NOT STARTED |
+| 7 | Platform Owner & Support Console | PASS |
+| 8 | Identity / Admin Architecture | PASS |
+| 9 | Final Security Review | EVIDENCE RESULT PASS — pending Product Leadership acceptance |
 | 10 | Production Cutover Rehearsal | NOT STARTED |
 | 11 | Production Release Checklist | NOT STARTED |
 | 12 | Supreme Third Party Production v1 | NOT STARTED AS FINAL PRODUCTION RELEASE GATE |
@@ -204,3 +202,24 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 **STATUS CHANGE:** created — master punch list, program state, operating rules, Cursor project rule  
 **SHA:** `641d2a950d9fdc1df4aba7990b355805226e4754`  
 **EVIDENCE:** `docs/SUPREME-MASTER-PUNCH-LIST.md`, `docs/SUPREME-PROGRAM-STATE.md`, `docs/SUPREME-PRODUCT-OPERATING-RULES.md`, `.cursor/rules/supreme-program-control.mdc`
+
+### 2026-09-13
+
+**ITEM:** #7 Platform Owner & Support Console
+**STATUS CHANGE:** PARTIAL -> PASS
+**SHA:** `9a195a27c67851566bef1cfa6bee461d2350d557`
+**EVIDENCE:** Product Leadership authorized PASS as a #9 dependency; hosted walkthrough `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`
+
+### 2026-09-13
+
+**ITEM:** #8 Identity / Admin Architecture
+**STATUS CHANGE:** PARTIAL -> PASS
+**SHA:** `9a195a27c67851566bef1cfa6bee461d2350d557`
+**EVIDENCE:** Product Leadership authorized PASS as a #9 dependency; ADR `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`
+
+### 2026-09-13
+
+**ITEM:** #9 Final Security Review
+**STATUS CHANGE:** NOT STARTED -> EVIDENCE RESULT PASS (not #10 authorization)
+**SHA:** (this #9 sprint commit)
+**EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md`

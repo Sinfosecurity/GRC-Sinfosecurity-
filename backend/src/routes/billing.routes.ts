@@ -8,6 +8,7 @@ import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { rejectClientTenantOverride } from '../security/tenant';
 import { billingLimiter } from '../middleware/rateLimiter';
+import { assertSafeAppReturnUrl } from '../security/safeReturnUrl';
 
 const router = Router();
 
@@ -59,8 +60,8 @@ router.post('/checkout', authenticate, requirePermission(PERMISSIONS['billing.ma
             organizationId,
             req.user!.id,
             req.body?.plan || 'PROFESSIONAL',
-            req.body?.successUrl || `${process.env.FRONTEND_URL}/billing?status=success`,
-            req.body?.cancelUrl || `${process.env.FRONTEND_URL}/billing?status=cancelled`,
+            assertSafeAppReturnUrl(req.body?.successUrl, '/billing?status=success'),
+            assertSafeAppReturnUrl(req.body?.cancelUrl, '/billing?status=cancelled'),
             req.body?.interval
         );
         res.json({ success: true, data: result });
@@ -74,7 +75,7 @@ router.post('/portal', authenticate, requirePermission(PERMISSIONS['billing.mana
         const organizationId = rejectClientTenantOverride(req.user!.organizationId, req.body?.organizationId);
         const result = await stripeBillingService.createPortal(
             organizationId,
-            req.body?.returnUrl || `${process.env.FRONTEND_URL}/billing`
+            assertSafeAppReturnUrl(req.body?.returnUrl, '/billing')
         );
         res.json({ success: true, data: result });
     } catch (error) {

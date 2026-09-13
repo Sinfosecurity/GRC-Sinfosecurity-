@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import path from 'path';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { createServer } from 'http';
@@ -16,7 +15,7 @@ validateEnv();
 
 // Import Swagger and metrics
 import { swaggerSpec } from './config/swagger';
-import { metricsMiddleware, metricsEndpoint } from './config/metrics';
+import { metricsMiddleware } from './config/metrics';
 import { scheduleRecurringJobs, shutdownQueues } from './config/queues';
 import { CacheService } from './services/cacheService';
 
@@ -105,6 +104,9 @@ app.use(helmet({
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
             frameSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
         },
     },
     hsts: {
@@ -114,6 +116,9 @@ app.use(helmet({
     },
     frameguard: {
         action: 'deny'
+    },
+    referrerPolicy: {
+        policy: 'strict-origin-when-cross-origin',
     },
     noSniff: true,
     xssFilter: true
@@ -166,17 +171,25 @@ app.use(metricsMiddleware);
 // Rate limiting
 app.use('/api/', rateLimiter);
 
-// Static files (for uploads)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+function metricsAuthorized(req: Request): boolean {
+    const expected = process.env.METRICS_TOKEN;
+    if (!expected) return false;
+    const bearer = req.headers.authorization?.replace(/^Bearer\s+/i, '');
+    const query = typeof req.query.token === 'string' ? req.query.token : '';
+    return bearer === expected || query === expected;
+}
 
-// API Documentation (Swagger)
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'GRC Platform API Docs',
-}));
+if (process.env.NODE_ENV !== 'production') {
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: 'GRC Platform API Docs',
+    }));
+}
 
-// Metrics endpoint for Prometheus
 app.get('/metrics', async (req: Request, res: Response) => {
+    if (!metricsAuthorized(req)) {
+        return res.status(404).json({ error: 'Not Found', message: 'Route /metrics not found' });
+    }
     try {
         res.set('Content-Type', 'text/plain');
         const metrics = await monitoringService.getMetrics();
@@ -187,8 +200,10 @@ app.get('/metrics', async (req: Request, res: Response) => {
     }
 });
 
-// Metrics JSON endpoint
 app.get('/metrics/json', async (req: Request, res: Response) => {
+    if (!metricsAuthorized(req)) {
+        return res.status(404).json({ error: 'Not Found', message: 'Route /metrics/json not found' });
+    }
     try {
         const metrics = await monitoringService.getMetricsJSON();
         res.json(metrics);
@@ -217,9 +232,12 @@ app.use(`${API_PREFIX}/documents`, ...tenantContent, documentRoutes);
 app.use(`${API_PREFIX}/audit`, ...tenantContent, auditRoutes);
 app.use(`${API_PREFIX}/users`, ...tenantContent, userRoutes);
 app.use(`${API_PREFIX}/notifications`, ...tenantContent, notificationRoutes);
-app.use(`${API_PREFIX}/tasks`, ...tenantContent, taskRoutes);
-app.use(`${API_PREFIX}/workflows`, ...tenantContent, workflowRoutes);
-app.use(`${API_PREFIX}/reports`, ...tenantContent, reportRoutes);
+const allowLegacyInMemory = process.env.ENABLE_LEGACY_INMEMORY_APIS === 'true' && process.env.NODE_ENV !== 'production';
+if (allowLegacyInMemory) {
+    app.use(`${API_PREFIX}/tasks`, ...tenantContent, taskRoutes);
+    app.use(`${API_PREFIX}/workflows`, ...tenantContent, workflowRoutes);
+    app.use(`${API_PREFIX}/reports`, ...tenantContent, reportRoutes);
+}
 app.use(`${API_PREFIX}/mobile`, ...tenantContent, mobileRoutes);
 app.use(`${API_PREFIX}/vendors/approvals`, ...tenantContent, approvalRoutes);
 app.use(`${API_PREFIX}/vendors/concentration-risk`, ...tenantContent, concentrationRoutes);
