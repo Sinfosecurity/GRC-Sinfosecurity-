@@ -1,6 +1,6 @@
 # Production cutover checklist
 
-Do not execute this checklist in the current sprint. Production deploy and `main` merge are forbidden here.
+Superseded for execution status by `docs/PRODUCTION-CUTOVER-REHEARSAL.md` (#10). Production deploy and `main` merge remain forbidden until a later authorized GO.
 
 Values below are readiness, not a cutover approval.
 

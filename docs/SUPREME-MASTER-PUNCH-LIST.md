@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**Do not start #10** until Product Leadership accepts #9.
+**Do not start #11** until Product Leadership accepts #10.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -149,7 +149,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** `docs/ADR-IDENTITY-ADMIN-SUPPORT-ARCHITECTURE.md`, `docs/PLATFORM-ACCESS-OPERATIONS-RUNBOOK.md`, `docs/HOSTED-PLATFORM-OWNER-CERTIFICATION.md`. Product Leadership authorized PASS in the #9 task.
 
-**NEXT ACTION:** Do not weaken MFA, planes, or support approval. #9 is the next reviewed gate.
+**NEXT ACTION:** Do not weaken MFA, planes, or support approval.
 
 ---
 
@@ -169,7 +169,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md` (including HOSTED FINAL-SHA CLOSURE), `docs/SECURITY-ARCHITECTURE.md`, `docs/PENETRATION-TEST-SCOPE.md`, `docs/SOC2-ISO-READINESS-MAPPING.md`
 
-**NEXT ACTION:** Product Leadership review. Do not start #10 until accepted.
+**NEXT ACTION:** Closed as a #10 dependency. Do not weaken #9 controls.
 
 ---
 
@@ -181,13 +181,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Documented rehearsal of deploy, migrate, rollback, and secrets against a non-production target. Production DNS unchanged.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance before #11
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** rehearsal recorded against security baseline `227dc3215783df523a3b6dc8973928e66ef43df3`
 
-**EVIDENCE:** Checklist exists at `docs/PRODUCTION-CUTOVER-CHECKLIST.md` (planning only). Rehearsal not executed as this gate.
+**EVIDENCE:** `docs/PRODUCTION-CUTOVER-REHEARSAL.md`, `docs/PRODUCTION-CUTOVER-RUNBOOK.md`, `docs/PRODUCTION-CONFIGURATION-MATRIX.md`, `docs/PRODUCTION-GO-NO-GO.md`. Production DNS unchanged. Production not deployed.
 
-**NEXT ACTION:** Do not start without authorization after #9.
+**NEXT ACTION:** Product Leadership review. Do not start #11 until accepted.
 
 ---
 

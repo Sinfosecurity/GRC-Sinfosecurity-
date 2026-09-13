@@ -6,7 +6,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-13 01:52 UTC
+**LAST UPDATED:** 2026-09-13 02:05 UTC
 
 **CURRENT VERIFIED SHA:** `227dc3215783df523a3b6dc8973928e66ef43df3` (contains security implementation `309b76336a351ab43ce7627efa22272b94a34298`)
 
@@ -16,17 +16,25 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PRODUCTION DEPLOYED:** NO
 
-**#9 STARTED:** YES — evidence returned; not a production-ready declaration
+**#9 STARTED:** YES — hosted closure PASS
+**#10 STARTED:** YES — rehearsal evidence returned; not a production-ready declaration
+**#11 STARTED:** NO
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #10 Production Cutover Rehearsal
+
+**STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance
+
+See `docs/PRODUCTION-CUTOVER-REHEARSAL.md`. Do not start #11. Production was not deployed. DNS was not changed.
+
 ### #9 Final Security Review
 
-**STATUS:** EVIDENCE RESULT PASS; HOSTED CLOSURE PASS — awaiting Product Leadership acceptance
+**STATUS:** EVIDENCE RESULT PASS; HOSTED CLOSURE PASS
 
-See `docs/FINAL-SECURITY-REVIEW.md` (HOSTED FINAL-SHA CLOSURE). Do not start #10 until Product Leadership accepts #9.
+See `docs/FINAL-SECURITY-REVIEW.md` (HOSTED FINAL-SHA CLOSURE). Product Leadership accepted this SHA as the #10 security baseline.
 
 ### #7 Platform Owner & Support Console
 
@@ -44,21 +52,21 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-#9 hosted final-SHA closure is complete. Stop for Product Leadership acceptance. Do not start #10.
+#10 cutover rehearsal evidence is complete. Stop for Product Leadership acceptance. Do not start #11. Do not deploy production.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#10 Production Cutover Rehearsal**
+**#11 Production Release Checklist**
 
-**ONLY AFTER PRODUCT LEADERSHIP ACCEPTS #9.**
+**ONLY AFTER PRODUCT LEADERSHIP ACCEPTS #10.**
 
 ---
 
 ## DO NOT START
 
-- **#10** or later gates without authorization.
+- **#11** or later gates without authorization.
 - Production DNS, `main` merge, or production deploy.
 - Any new product module (#13 onward).
 
@@ -66,10 +74,13 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT BLOCKERS
 
-- Product Leadership acceptance of #9 (hosted closure PASS) before #10.
-- #2 Stripe Billing remains PARTIAL / CONDITIONALLY CLEARED (hosted test-mode completeness).
-- Public security mailbox and production legal mailbox / retention schedule still undesignated (not a #9 technical blocker; #10/#11 cutover items).
-- `METRICS_TOKEN` is not configured; unauthenticated `/metrics` is 404.
+- Product Leadership acceptance of #10 before #11.
+- #2 Stripe remains PARTIAL / CONDITIONALLY CLEARED; commercial catalog and BUSINESS entitlements are launch blockers.
+- Security / support / sales mailboxes undesignated.
+- Paid production Postgres/Redis/object store and off-site/immutable backups not created.
+- Legal Privacy/Terms/Subprocessors still Draft.
+- Production DNS not created and must not be switched until GO.
+- `METRICS_TOKEN` decision still open; unauthenticated `/metrics` is 404.
 
 ---
 
@@ -105,14 +116,14 @@ This documentation-only change does not rerun backend/frontend suites.
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership acceptance of #9.
+Product Leadership acceptance of #10.
 
-Until that decision is recorded here, **#10 is not started**.
+Until that decision is recorded here, **#11 is not started**.
 
 Distinguish:
 
-- **IMPLEMENTATION RESULT** — #9 EVIDENCE RESULT: PASS
-- **PROGRAM ACCEPTANCE** — this file does not authorize #10 in the same sprint.
+- **IMPLEMENTATION RESULT** — #10 EVIDENCE RESULT: PASS (procedure demonstrated)
+- **PROGRAM ACCEPTANCE** — this file does not authorize #11 or production GO.
 
 ---
 
@@ -140,8 +151,8 @@ Do not invent percentages.
 | 6 | Hosted CI | PASS |
 | 7 | Platform Owner & Support Console | PASS |
 | 8 | Identity / Admin Architecture | PASS |
-| 9 | Final Security Review | EVIDENCE RESULT PASS; HOSTED CLOSURE PASS — pending Product Leadership acceptance |
-| 10 | Production Cutover Rehearsal | NOT STARTED |
+| 9 | Final Security Review | EVIDENCE RESULT PASS; HOSTED CLOSURE PASS |
+| 10 | Production Cutover Rehearsal | EVIDENCE RESULT PASS — pending Product Leadership acceptance |
 | 11 | Production Release Checklist | NOT STARTED |
 | 12 | Supreme Third Party Production v1 | NOT STARTED AS FINAL PRODUCTION RELEASE GATE |
 | 13–38, 40 | Later modules / GTM / packs | NOT STARTED |
@@ -231,3 +242,10 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 **STATUS CHANGE:** hosted staging pre-#9 runtime PARTIAL -> HOSTED CLOSURE PASS (not #10 authorization)
 **SHA:** hosted runtime `227dc3215783df523a3b6dc8973928e66ef43df3`
 **EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md` HOSTED FINAL-SHA CLOSURE; GitHub Actions run `34729299577`
+
+### 2026-09-13
+
+**ITEM:** #10 Production Cutover Rehearsal
+**STATUS CHANGE:** NOT STARTED -> EVIDENCE RESULT PASS (not #11 authorization; not production GO)
+**SHA:** security baseline `227dc3215783df523a3b6dc8973928e66ef43df3`
+**EVIDENCE:** `docs/PRODUCTION-CUTOVER-REHEARSAL.md`, `docs/PRODUCTION-CUTOVER-RUNBOOK.md`, `docs/PRODUCTION-CONFIGURATION-MATRIX.md`, `docs/PRODUCTION-GO-NO-GO.md`
