@@ -22,7 +22,6 @@ describe('shared control synthetic scale', () => {
             },
         });
         await adoptCatalogForOrganization(org.id, user.id);
-        const control = await prisma.organizationControl.findFirstOrThrow({ where: { organizationId: org.id, controlKey: 'AUTH-01' } });
         const extras = Array.from({ length: 200 }, (_, index) => ({
             organizationId: org.id,
             controlKey: `PERF-${String(index + 1).padStart(4, '0')}`,
@@ -48,12 +47,16 @@ describe('shared control synthetic scale', () => {
         }));
         await prisma.storedObject.createMany({ data: objects });
         const stored = await prisma.storedObject.findMany({ where: { organizationId: org.id }, select: { id: true } });
+        const targets = await prisma.organizationControl.findMany({
+            where: { organizationId: org.id },
+            select: { id: true },
+        });
         const links = stored.flatMap((object, objectIndex) =>
-            Array.from({ length: 120 }, (_, index) => ({
+            targets.slice(0, 120).map((target, index) => ({
                 organizationId: org.id,
                 storedObjectId: object.id,
                 targetType: 'CONTROL' as const,
-                targetId: control.id,
+                targetId: target.id,
                 relationship: 'RELATED_TO' as const,
                 rationale: `Synthetic link ${objectIndex}-${index}`,
                 createdBy: user.id,
