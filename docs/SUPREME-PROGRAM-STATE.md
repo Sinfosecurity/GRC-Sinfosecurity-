@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #15 Supreme Risk
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**CURRENT ITEM STATUS:** PARTIAL — CORE PRODUCT PASSES, EXECUTIVE REPORTING + HISTORY UX CLOSURE REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -57,9 +57,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#15 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#15 STARTING SHA:** `6bba23a2c85eea877441c16190a12f9be8402d58`
 **#15 IMPLEMENTATION SHA:** `8ed9be7b5a0597d4c385147b1beb13409e5c3b85`
-**#15 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34770432853 PASS on `8ed9be7`
-**#15 HOSTED FRONTEND SHA:** `14ec99b4225f176c54efbc9acd2a7701f612aa3b` at Product Leadership walkthrough capture
-**#15 HOSTED API SHA:** `8ed9be7b5a0597d4c385147b1beb13409e5c3b85`
+**#15 CLOSURE SHA:** `6542e58484b84591b39863a254560841a639432d`
+**#15 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34774298187 PASS on `6542e58`
+**#15 HOSTED FRONTEND SHA:** `dbc4982c8bb9cff228ad661a01f69f7998a38566`
+**#15 HOSTED API SHA:** `6542e58484b84591b39863a254560841a639432d`
 
 ---
 
