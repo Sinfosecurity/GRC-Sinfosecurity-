@@ -14,10 +14,11 @@ jest.mock('../services/notificationDeliveryService', () => ({
 }));
 
 jest.mock('../config/database', () => ({
-    prisma: {
-        user: { findUnique: jest.fn() },
-        accountInvitation: { findFirst: jest.fn() },
-    },
+        prisma: {
+            user: { findUnique: jest.fn() },
+            organization: { findUnique: jest.fn() },
+            accountInvitation: { findFirst: jest.fn() },
+        },
 }));
 
 const { authService } = require('../services/authService');
@@ -39,8 +40,11 @@ describe('invitation email activation links', () => {
         prisma.user.findUnique
             .mockResolvedValueOnce({ email: 'admin@org-a.test' })
             .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce({ firstName: 'Amina', lastName: 'Cole', email: 'admin@org-a.test' })
             .mockResolvedValueOnce({ email: 'admin@org-a.test' })
-            .mockResolvedValueOnce(null);
+            .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce({ firstName: 'Amina', lastName: 'Cole', email: 'admin@org-a.test' });
+        prisma.organization.findUnique.mockResolvedValue({ name: 'Elite Claims' });
         prisma.accountInvitation.findFirst.mockResolvedValue(null);
     });
 
@@ -62,8 +66,9 @@ describe('invitation email activation links', () => {
                 eventType: 'user.invitation',
                 emailTo: 'invitee@org-a.test',
                 body: expect.not.stringContaining('opaque-invite-token'),
-                emailBody: expect.stringContaining(
-                    'https://supreme-risk-staging.onrender.com/activate?token=opaque-invite-token'
+                title: "You're invited to Supreme",
+                emailBody: expect.stringMatching(
+                    /https:\/\/supreme-risk-staging\.onrender\.com\/activate\?token=opaque-invite-token/
                 ),
             })
         );

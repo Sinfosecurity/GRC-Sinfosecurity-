@@ -25,7 +25,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — FAIL customer-facing product experience after Product Leadership hosted review
+**#12 STARTED:** YES — PARTIAL; Product Leadership acceptance pending; invitation inbox USER ACTION REQUIRED
 **#13 AUTHORIZED:** NO
 
 ---
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #12 Supreme Third Party Production v1 / Private Testing Release
 
-**STATUS:** FAIL — CUSTOMER-FACING PRODUCT EXPERIENCE; commercial production NO-GO; #13 not authorized
+**STATUS:** PARTIAL — commercial production NO-GO; #13 not authorized
 
 See `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, and `docs/private-beta/`.
 
@@ -72,7 +72,7 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-Close the four hosted #12 blockers together: API reliability, invitation inbox, duplicate assessment templates, and premium UX. #12 stays FAIL until Product Leadership visual and functional acceptance. Do not start #13. Do not invite external testers. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Close remaining #12 blockers: real invitation inbox receipt, complete hosted golden journey including invite activation, and Product Leadership visual/functional acceptance. #12 stays PARTIAL until Product Leadership accepts. Do not start #13. Do not invite external testers. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 

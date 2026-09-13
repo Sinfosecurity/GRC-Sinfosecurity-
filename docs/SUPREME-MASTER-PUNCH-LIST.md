@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** FAIL — CUSTOMER-FACING PRODUCT EXPERIENCE. Backend/security certifications are not invalidated. #13 is not authorized.
+**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox receipt is USER ACTION REQUIRED. #13 is not authorized.
 
-**CERTIFICATION SHA:** prior implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` is no longer accepted. Cursor cannot declare visual PASS.
+**CERTIFICATION SHA:** Cursor cannot declare visual PASS. Latest hosted evidence SHA is recorded in `docs/PRIVATE-BETA-CERTIFICATION.md`.
 
-**EVIDENCE:** Duplicate hosted templates were caused by platform `organizationId` NULL rows plus a non-idempotent `ensureSupremeLibrary()` race. Source/scope uniqueness, safe remapping, and seed idempotency are implemented. Dashboard no longer treats `/health` `degraded` as unreachable. Invitation provider accept is proven; inbox receipt is not. Hosted visual acceptance remains Product Leadership only. Cursor cannot declare #12 PASS.
+**EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. Cursor cannot declare #12 PASS.
 
-**NEXT ACTION:** Deploy the uniqueness migration to staging, prove one canonical Supreme template per version, and keep the four hosted blockers open until Product Leadership inspects staging. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership hosted review. Provide/approve a real controlled test inbox before invitation P1 can close. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
 
 ---
 

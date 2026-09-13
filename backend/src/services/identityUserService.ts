@@ -251,14 +251,24 @@ export const identityUserService = {
         if (pending) {
             return this.resendInvitation(organizationId, pending.id, invitedById, actorRole);
         }
+        const [organization, inviter] = await Promise.all([
+            prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } }),
+            prisma.user.findUnique({ where: { id: invitedById }, select: { firstName: true, lastName: true, email: true } }),
+        ]);
         const result = await authService.invite({ organizationId, invitedById, email: normalized, role });
+        const roleLabel = CUSTOMER_ROLE_LABELS[role]?.label || 'a team member';
+        const invitedByName = [inviter?.firstName, inviter?.lastName].filter(Boolean).join(' ') || 'A team administrator';
         const delivery = await notify({
             organizationId,
             userId: invitedById,
             eventType: 'user.invitation',
-            title: 'You are invited to Supreme',
-            body: `An administrator invited you as ${CUSTOMER_ROLE_LABELS[role]?.label || 'a team member'}.`,
-            emailBody: invitationEmailBody(role, result.token),
+            title: "You're invited to Supreme",
+            body: `${invitedByName} invited you as ${roleLabel}.`,
+            emailBody: invitationEmailBody(role, result.token, process.env, {
+                organizationName: organization?.name,
+                invitedByName,
+                roleLabel,
+            }),
             resourceType: 'AccountInvitation',
             resourceId: result.invitation.id,
             emailTo: normalized,
@@ -321,14 +331,24 @@ export const identityUserService = {
             nextRole: invitation.role,
             action: 'invite',
         });
+        const [organization, inviter] = await Promise.all([
+            prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } }),
+            prisma.user.findUnique({ where: { id: invitedById }, select: { firstName: true, lastName: true } }),
+        ]);
         const result = await authService.rotateInvitationToken(invitation.id);
+        const roleLabel = CUSTOMER_ROLE_LABELS[invitation.role]?.label || 'a team member';
+        const invitedByName = [inviter?.firstName, inviter?.lastName].filter(Boolean).join(' ') || 'A team administrator';
         const delivery = await notify({
             organizationId,
             userId: invitedById,
             eventType: 'user.invitation',
-            title: 'Supreme Risk invitation (resent)',
-            body: `Your invitation to join the organization as ${invitation.role} was resent.`,
-            emailBody: invitationEmailBody(invitation.role, result.token),
+            title: 'Your Supreme invitation was resent',
+            body: `${invitedByName} resent your invitation as ${roleLabel}.`,
+            emailBody: invitationEmailBody(invitation.role, result.token, process.env, {
+                organizationName: organization?.name,
+                invitedByName,
+                roleLabel,
+            }),
             resourceType: 'AccountInvitation',
             resourceId: invitation.id,
             emailTo: invitation.email,

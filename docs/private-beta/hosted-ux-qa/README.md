@@ -1,39 +1,48 @@
-# Hosted UX QA — SHA `ea0cd6751a916d3906eb1b795bb4b38ff1e6e079`
+# Hosted UX QA
 
-Captured from the live staging application after deploy. These are not mocks.
+Captured from live staging. These are not mocks.
 
 **Frontend:** `https://supreme-risk-staging.onrender.com`  
 **API:** `https://supreme-risk-staging-api.onrender.com`  
-**Baked API base:** `https://supreme-risk-staging-api.onrender.com/api/v1`
-
-Dashboard did **not** show “API unreachable” after login as an Organization Admin.
+**Frontend SHA at capture:** `9eb45dad8f6add6ab804ab37ba65bc44dd125049`  
+**API SHA at capture:** `a1936e8c17fa35b46f160804b4f0b8e5562c2fa0`
 
 Cursor cannot declare visual PASS. Product Leadership review is required.
 
-## Screenshots
+## Required 1440
 
-| File | Viewport |
+| File | Status |
 |---|---|
-| 01-dashboard-1440.png | 1440 |
-| 01-dashboard-375.png | 375 |
-| 02-third-parties-1440.png | 1440 |
-| 02-third-parties-375.png | 375 |
-| 04-assessment-center-1440.png | 1440 |
-| 04-assessment-center-375.png | 375 |
-| 05-new-assessment-wizard-1440.png | 1440 |
-| 07-evidence-1440.png | 1440 |
-| 08-findings-1440.png | 1440 |
-| 09-monitoring-1440.png | 1440 |
-| 10-decisions-1440.png | 1440 |
-| 11-reports-1440.png | 1440 |
-| 12-team-1440.png | 1440 |
-| 12-team-375.png | 375 |
-| 13-assessment-library-1440.png | 1440 |
-| 14-help-1440.png | 1440 |
+| 01-dashboard-1440.png | Captured |
+| 02-third-parties-1440.png | Captured |
+| 03-vendor-detail-1440.png | Captured — right-hand drawer |
+| 04-assessment-center-1440.png | Captured |
+| 05-assessment-wizard-1440.png | Captured |
+| 06-questionnaire-1440.png | Captured |
+| 07-evidence-1440.png | Captured |
+| 08-findings-1440.png | Captured |
+| 09-monitoring-1440.png | Captured |
+| 10-decisions-1440.png | Captured |
+| 11-reports-1440.png | Captured |
+| 12-team-1440.png | Captured |
+| 13-assessment-library-1440.png | Captured |
+| 14-help-1440.png | Captured |
+| 15-platform-console-1440.png | Captured as Access Denied for Organization Admin |
+| 15b-platform-login-1440.png | Operator login chrome |
 
-Vendor detail, questionnaire workspace, and Platform Console captures remain outstanding on this pass.
+## Critical 375
 
-## Known follow-ups visible in first capture
+| File | Status |
+|---|---|
+| 01-dashboard-375.png | Captured |
+| 02-third-parties-375.png | Captured |
+| 04-assessment-center-375.png | Captured |
+| 06-questionnaire-375.png | Captured |
+| 12-team-375.png | Captured |
 
-- Empty-state panel used a leftover dark fill; patched after this SHA and queued for the next staging deploy.
-- Elite Claims remains `PAST_DUE` in Stripe standing while `isDemo` / testing access is true. Assessment create still returned 201.
+## Notes
+
+- Dashboard did not show “API unreachable.”
+- Vendor Detail is a drawer with identity, tier, next review, tabs, and actions. UX-P2 remains open versus a full-page flagship layout.
+- Platform Console interior was not captured: Organization Admin is correctly denied. Platform Owner MFA was not used.
+- Questionnaire workspace shows vendor, assessment, progress, sections, current question, answer, evidence, Previous, Save & next.

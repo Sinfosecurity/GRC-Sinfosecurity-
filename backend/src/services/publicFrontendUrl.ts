@@ -38,15 +38,29 @@ export function maskEmail(email: string) {
     return `${local.slice(0, 1)}***@${domain}`;
 }
 
-export function invitationEmailBody(role: string, token: string, env: NodeJS.ProcessEnv = process.env) {
+export function invitationEmailBody(
+    role: string,
+    token: string,
+    env: NodeJS.ProcessEnv = process.env,
+    extras: { organizationName?: string; invitedByName?: string; roleLabel?: string } = {}
+) {
     const platform = /PLATFORM_|SUPPORT_|SECURITY_ADMIN|BILLING_SUPPORT|SUPERADMIN/.test(role);
     const origin = portalFrontendUrl(platform ? 'PLATFORM' : 'CUSTOMER', env);
     const activateUrl = `${origin}${platform ? '/admin/activate' : '/activate'}?token=${token}`;
+    const roleLabel = extras.roleLabel || role.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+    const organizationName = extras.organizationName || 'their organization';
+    const invitedByName = extras.invitedByName || 'A team administrator';
     return [
-        `You were invited to Supreme Risk as ${role}.`,
-        'Activate your account with this single-use link. It expires in 7 days.',
+        `${invitedByName} invited you to join ${organizationName} on Supreme.`,
+        '',
+        'Supreme is a third-party risk workspace for vendors, assessments, evidence, and decisions.',
+        `Your role: ${roleLabel}`,
+        '',
+        'Activate your account:',
         activateUrl,
-        'If you did not expect this invitation, ignore this email.',
+        '',
+        'This link expires in 7 days and can be used once.',
+        'If you were not expecting this invitation, ignore this email. Do not forward the link.',
     ].join('\n');
 }
 

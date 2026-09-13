@@ -165,7 +165,7 @@ export async function sendSmtpMail(
     if (!fromEmail) {
         throw new Error('SMTP_FROM_EMAIL is not configured');
     }
-    const fromName = env.SMTP_FROM_NAME || env.SENDGRID_FROM_NAME || 'Supreme Risk';
+    const fromName = env.SMTP_FROM_NAME || env.SENDGRID_FROM_NAME || 'Supreme';
     const socket = await openSession(env);
     try {
         await authenticate(socket, env);

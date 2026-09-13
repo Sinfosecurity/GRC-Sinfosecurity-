@@ -23,10 +23,17 @@ describe('public frontend URLs and invitation payload safety', () => {
     });
 
     it('puts an activation URL on the hosted frontend, not localhost', () => {
-        const body = invitationEmailBody('VIEWER', 'opaque-invite-token', staging as NodeJS.ProcessEnv);
+        const body = invitationEmailBody('VIEWER', 'opaque-invite-token', staging as NodeJS.ProcessEnv, {
+            organizationName: 'Elite Claims',
+            invitedByName: 'Amina Cole',
+            roleLabel: 'Viewer',
+        });
         expect(body).toContain(
             'https://supreme-risk-staging.onrender.com/activate?token=opaque-invite-token'
         );
+        expect(body).toContain('Amina Cole invited you to join Elite Claims on Supreme.');
+        expect(body).toContain('Your role: Viewer');
+        expect(body).not.toMatch(/\bVIEWER\b|ORGANIZATION_ADMIN|SMTP|SENDGRID/);
         expect(body).not.toMatch(/localhost|127\.0\.0\.1|5173/);
     });
 

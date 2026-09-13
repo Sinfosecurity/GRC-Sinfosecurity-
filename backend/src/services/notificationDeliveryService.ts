@@ -91,7 +91,7 @@ export async function deliverEmail(input: {
                     personalizations: [{ to: [{ email: input.to }] }],
                     from: {
                         email: process.env.SENDGRID_FROM_EMAIL || 'noreply@supremerisk.com',
-                        name: process.env.SENDGRID_FROM_NAME || 'Supreme Risk',
+                        name: process.env.SENDGRID_FROM_NAME || 'Supreme',
                     },
                     subject: input.subject,
                     content: [{ type: 'text/plain', value: input.body }],

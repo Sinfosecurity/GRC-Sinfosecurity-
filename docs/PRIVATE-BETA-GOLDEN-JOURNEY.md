@@ -2,6 +2,32 @@
 
 Synthetic company only. Do not use real customer data. Do not invite external testers until Product Leadership accepts this journey in a real browser.
 
+## Hosted Elite Claims run (2026-09-13)
+
+Organization: Elite Claims evaluation tenant. Vendor: Supreme Investigation.
+
+| Step | Hosted browser result |
+|---|---|
+| Login | PASS — no API unreachable, no billing block |
+| Dashboard | PASS |
+| Select third party | PASS |
+| Vendor detail | PASS as drawer — UX-P2 versus full-page standard |
+| Risk tier | PASS — recorded on vendor |
+| Recommended assessment plan | PASS |
+| Start assessment | PASS |
+| Questionnaire workspace | PASS after opening an existing assessment (Information Security) |
+| Save / resume | PASS — Saved, workspace reopened |
+| Conditional questions | PARTIAL — present in library; not isolated as a dedicated hosted toggle in this run |
+| Evidence / malware | PASS — scan status visible |
+| Finding / remediation | PASS — controlled finding created |
+| Residual risk | PASS — persistable explanation on vendor Risk tab |
+| Decision / monitoring | PASS — pages open; monitoring does not invent success |
+| Executive PDF | PASS — HTTP download, PDF opened, Elite Claims tenant |
+| Team | PASS |
+| Invite activation | FAIL — USER ACTION REQUIRED for a real controlled inbox |
+
+Hosted screenshots: `docs/private-beta/hosted-ux-qa/`.
+
 ## Company
 
 **Acme Financial Services** (tester organization)  

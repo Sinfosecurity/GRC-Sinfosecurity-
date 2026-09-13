@@ -16,18 +16,20 @@ Severity: UX-P1 unusable/confusing primary workflow · UX-P2 major professional-
 
 | ID | Sev | Issue |
 |---|---|---|
-| UX-019 | P1 | Hosted Reports were disabled because the tenant behind vendor “Supreme Investigation” is Elite Claims: STARTER, `isDemo=false`, PAST_DUE, Stripe test mode CONNECTED. Evaluation access is now an authorized Platform workflow. Hosted Executive PDF on SHA `783bccf` downloaded and opened (2 pages). #12 remains FAIL pending Product Leadership visual acceptance. |
-| UX-020 | P1 | Dashboard treated `/health` `degraded` as “API unreachable” while the API answered 200. Engineering chip removed; reachability is no longer a customer banner. |
-| UX-021 | P1 | Designated evaluation orgs could still see “billing is not in good standing” on assessment writes if status was PAST_DUE. Evaluation orgs now skip write-standing checks; designation restores TRIAL standing. |
-| UX-022 | P1 | Invitation PENDING was treated as email sent. Invitation lifecycle and email delivery are now separate. Customer copy is “Invitation created” / queued / not sent. |
-| UX-023 | P1 | Assessment Center was vendor dropdown + template dropdown + Start. Replaced with recommended-plan wizard and focused questionnaire workspace. |
+| UX-019 | P1 | Hosted Reports were disabled for Elite Claims billing standing. Closed: evaluation entitlement ≠ billing standing. Executive PDF re-downloaded on 2026-09-13 (8434 bytes, opens). |
+| UX-020 | P1 | Dashboard treated `/health` `degraded` as “API unreachable.” Closed unless regression evidence appears. |
+| UX-021 | P1 | Evaluation orgs blocked by PAST_DUE write-standing. Closed unless regression evidence appears. |
+| UX-022 | P1 | Invitation PENDING treated as email sent. Delivery states are now separate. **Inbox receipt remains OPEN / USER ACTION REQUIRED.** |
+| UX-023 | P1 | Assessment Center dropdown workflow. Closed as architecture; hosted wizard and library cards are live. |
+| UX-024 | P1 | Duplicate Supreme templates. Closed on hosted staging: 16 canonical Supreme rows, 0 duplicate groups, custom clone labeled. |
 | UX-010 | P2 | Hosted golden-journey click-through of every report file on staging still required from Product Leadership. |
 | UX-011 | P2 | Custom questionnaires are clone-only; no visual question builder. |
 | UX-012 | P2 | Critical-answer → automatic finding rules are documented, not auto-encoded for every example. |
 | UX-013 | P3 | Assessment save is per-answer, not background debounce. |
 | UX-015 | P2 | Product Leadership must accept this redesign on **hosted staging**. Local screenshots in `docs/private-beta/ux-qa/` are not hosted proof. |
 | UX-016 | P3 | On ~900px-tall viewports, Administration items below Organization may require a short sidebar scroll. |
-| UX-017 | P3 | Vendor detail related modules (assessments, evidence, findings) deep-link to workspaces rather than embedding full inline lists. |
+| UX-017 | P2 | Vendor Detail is a right-hand drawer, not a full-page flagship workspace. Hosted capture: `03-vendor-detail-1440.png`. |
+| UX-025 | P2 | Platform Console interior not captured in this customer-admin session. Org Admin correctly receives Access Denied. |
 | UX-018 | P3 | Primary actions use gold fills; further restraint is possible if Product Leadership wants gold only on a single page CTA. |
 
-Hosted Executive PDF download on SHA `783bccf` is proven (`docs/private-beta/ux-qa/hosted-reports/`). #12 remains PARTIAL. External testers must not be invited.
+Hosted Executive PDF was re-downloaded during the 2026-09-13 closure run. #12 remains PARTIAL. Invitation inbox is USER ACTION REQUIRED. External testers must not be invited.

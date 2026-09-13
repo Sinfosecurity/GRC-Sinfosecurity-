@@ -1,6 +1,6 @@
 # #12 Supreme Third Party private-testing certification
 
-**Classification:** PRIVATE TESTING REMEDIATION — Product Leadership reopened #12 as PARTIAL after browser review. Not commercial production.  
+**Classification:** PRIVATE TESTING REMEDIATION — #12 is PARTIAL. Product Leadership visual/functional acceptance is pending. Invitation inbox receipt is USER ACTION REQUIRED. Not commercial production.  
 **Production deployed:** NO  
 **Main merged:** NO  
 **Production DNS changed:** NO  
@@ -20,8 +20,10 @@ Product Leadership authorized #12 as a **controlled private-testing release**, n
 | Starting SHA | `0e52e203459b1d3a8130ad063a5284e33898144c` |
 | Accepted #11 RC SHA | `5912ccafee28b87898548da9721adf79c5bbacb6` (ancestor) |
 | Branch | `supreme-risk-transformation` |
-| Implementation SHA | `358eab7ece3e0dbb2f53d494328f7302f1f071d2` |
-| Hosted CI | Run `34734519024` PASS — https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34734519024 |
+| Implementation SHA | see latest commit on `supreme-risk-transformation` after invitation-email copy |
+| Hosted frontend SHA (verified 2026-09-13) | `9eb45dad8f6add6ab804ab37ba65bc44dd125049` |
+| Hosted API SHA (verified 2026-09-13) | `a1936e8c17fa35b46f160804b4f0b8e5562c2fa0` |
+| Hosted CI | Latest accepted CI on `a1936e8c17fa35b46f160804b4f0b8e5562c2fa0` run `34738677972` PASS. Follow-up SHA requires a new hosted CI PASS. |
 
 ## What #12 is
 
@@ -170,18 +172,18 @@ Landing no longer says “available now.”
 | Severity | Open |
 |---|---|
 | P0 | 0 known |
-| P1 | 0 known |
-| P2 | Invitation email/in-app notify may fail when the inviter is not a member of the new tester org; the one-time activation URL is still shown to Platform Owner |
+| P1 | Invitation inbox receipt — USER ACTION REQUIRED: no real controlled inbox is available inside this environment. Provider accept ≠ delivered. |
+| P2 | Vendor Detail remains a drawer, not a full-page flagship workspace. Platform Console interior not captured (Org Admin correctly denied; Platform Owner MFA not used). |
 | P3 | HelpSupport unit test `act(...)` warning; dedicated private-beta host is not the current Render staging label |
 
 ## Exit criteria
 
 | Criterion | Result |
 |---|---|
-| Principal TPRM lifecycle usable end-to-end | PASS |
+| Principal TPRM lifecycle usable end-to-end | PARTIAL — hosted browser path proven through report download; invite activation blocked on inbox |
 | Individual private tester control | PASS |
 | Tenant isolation | PASS (automated) |
-| No known P0/P1 | PASS |
+| No known P0/P1 | FAIL — invitation inbox P1 open / USER ACTION REQUIRED |
 | Evidence security | PASS |
 | Reports | PASS |
 | Previous security controls regress | PASS locally; hosted CI required |
@@ -196,7 +198,7 @@ Landing no longer says “available now.”
 
 | Question | Answer |
 |---|---|
-| Ready for controlled private testing with synthetic data | YES |
+| Ready for controlled private testing with synthetic data | NO — invitation inbox and Product Leadership acceptance remain |
 | Ready for paid commercial production | NO |
 
 ## Do not
