@@ -1,0 +1,472 @@
+{
+  "checks": [
+    {
+      "name": "UI.LOGIN",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/dashboard"
+    },
+    {
+      "name": "UI.CONTROL_CENTER",
+      "result": "PASS",
+      "detail": "AUTH-01 visible"
+    },
+    {
+      "name": "UI.PLAIN.OVERVIEW",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.375_CHIPS",
+      "result": "PASS",
+      "detail": "chips=8 stacked=0"
+    },
+    {
+      "name": "UI.PLAIN.REQUIREMENTS",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.PLAIN.EVIDENCE",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.PLAIN.TESTING",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.FINDINGS_TITLES",
+      "result": "PASS",
+      "detail": "uuids=0"
+    },
+    {
+      "name": "UI.PLAIN.FINDINGS",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.RELATIONSHIPS",
+      "result": "PASS",
+      "detail": "groups=5"
+    },
+    {
+      "name": "UI.PLAIN.RELATIONSHIPS",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.HISTORY_LANGUAGE",
+      "result": "PASS",
+      "detail": "customer labels"
+    },
+    {
+      "name": "UI.HISTORY_COMPLETENESS",
+      "result": "PASS",
+      "detail": "Controls\n/\nAUTH-01\nAUTH-01 Multi-factor authentication for privileged access\n\nStolen passwords alone cannot use privileged access.\n\nIMPLEMENTED\nEFFECTIVE\nMapped requirements are identifiers plus Supreme summaries. This is not a certificatio"
+    },
+    {
+      "name": "UI.PLAIN.HISTORY",
+      "result": "PASS",
+      "detail": "clean"
+    },
+    {
+      "name": "UI.DUPLICATE_STATE",
+      "result": "PASS",
+      "detail": "Controls\n/\nAUTH-01\nAUTH-01 Multi-factor authentication for privileged access\n\nStolen passwords alone cannot use privileged access.\n\nIMPLEMENTED\nEFFECTIVE\nMapped requirements are identifiers plus Supreme summaries. This i"
+    },
+    {
+      "name": "UI.375_RELATED_ONCE",
+      "result": "PASS",
+      "detail": "related=0"
+    },
+    {
+      "name": "UI.EVIDENCE_LIBRARY",
+      "result": "PASS",
+      "detail": "library rendered"
+    },
+    {
+      "name": "UI.COVERAGE_LANGUAGE",
+      "result": "PASS",
+      "detail": "Mapped and implemented"
+    },
+    {
+      "name": "UI.REGRESSION-DASHBOARD",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/dashboard"
+    },
+    {
+      "name": "UI.REGRESSION-VENDORS",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-management"
+    },
+    {
+      "name": "UI.REGRESSION-ASSESSMENTS",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/assessments"
+    },
+    {
+      "name": "UI.REGRESSION-QUESTIONNAIRE",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/questionnaires"
+    },
+    {
+      "name": "UI.REGRESSION-EVIDENCE",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/documents"
+    },
+    {
+      "name": "UI.REGRESSION-FINDINGS",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/findings"
+    },
+    {
+      "name": "UI.REGRESSION-MONITORING",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/monitoring"
+    },
+    {
+      "name": "UI.REGRESSION-DECISIONS",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/decision-briefs"
+    },
+    {
+      "name": "UI.REGRESSION-REPORTS",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/reports"
+    },
+    {
+      "name": "UI.REGRESSION-TEAM",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/user-management"
+    },
+    {
+      "name": "UI.375_OVERFLOW",
+      "result": "PASS",
+      "detail": "[]"
+    },
+    {
+      "name": "UI.WALKTHROUGH",
+      "result": "PASS",
+      "detail": "51 screenshots"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-center-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-overview-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-overview-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-overview-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-overview-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-requirements-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-requirements-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-requirements-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-requirements-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-evidence-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-evidence-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-evidence-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-testing-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-testing-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-testing-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-testing-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-findings-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-findings-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-findings-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-findings-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-relationships-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-relationships-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-relationships-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-relationships-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-history-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-history-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-history-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/control-detail-history-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/duplicate-link-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/duplicate-link-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/duplicate-link-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/duplicate-link-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/evidence-library-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/evidence-library-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/evidence-library-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/evidence-library-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/framework-coverage-375.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/framework-coverage-768.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/framework-coverage-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/framework-coverage-1920.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-dashboard-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-vendors-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-assessments-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-questionnaire-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-findings-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-monitoring-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-decisions-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-reports-1440.png",
+    "docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/regression-team-1440.png"
+  ],
+  "overflow": [
+    {
+      "name": "control-center",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-overview",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-overview",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-overview",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-overview",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-requirements",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-requirements",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-requirements",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-requirements",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-evidence",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-evidence",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-evidence",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-evidence",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-testing",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-testing",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-testing",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-testing",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-findings",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-findings",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-findings",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-findings",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-relationships",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-relationships",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-relationships",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-relationships",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-history",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-history",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-history",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "control-detail-history",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "duplicate-link",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "duplicate-link",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "duplicate-link",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "duplicate-link",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "evidence-library",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "evidence-library",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "evidence-library",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "evidence-library",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "framework-coverage",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "name": "framework-coverage",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "name": "framework-coverage",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "framework-coverage",
+      "width": 1920,
+      "overflow": 0
+    },
+    {
+      "name": "regression-dashboard",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-vendors",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-assessments",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-questionnaire",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-evidence",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-findings",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-monitoring",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-decisions",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-reports",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "name": "regression-team",
+      "width": 1440,
+      "overflow": 0
+    }
+  ],
+  "frontend": {
+    "gitSha": "ce5d01cbb01fe1e96becc03eb3baf308a280c8e9",
+    "builtAt": "2026-09-13T14:39:35.872Z"
+  },
+  "api": {
+    "gitSha": "915ac55049bf68f335ea8ef4a08db87a513a5fce",
+    "status": "degraded"
+  }
+}

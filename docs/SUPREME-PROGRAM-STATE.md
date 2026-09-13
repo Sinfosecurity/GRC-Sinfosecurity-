@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #14 Shared Control & Evidence Layer
 
-**CURRENT ITEM STATUS:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED
+**CURRENT ITEM STATUS:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -20,7 +20,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PRIVATE EXTERNAL TESTERS:** NOT AUTHORIZED unless Product Leadership separately approves
 
-**CURRENT VERIFIED SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2` (hosted #14 implementation under Product Leadership review; not a #14 PASS acceptance SHA. Prior program-acceptance snapshot `358eab7ece3e0dbb2f53d494328f7302f1f071d2` remains the last #12 customer-ready attempt and is still not accepted.)
+**CURRENT VERIFIED SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9` (hosted #14 UX closure; not a #14 PASS acceptance SHA). CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`. Architecture SHA `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. Prior program-acceptance snapshot `358eab7ece3e0dbb2f53d494328f7302f1f071d2` remains the last #12 customer-ready attempt and is still not accepted.
 
 **#13 STARTING SHA:** `70e4953e9d9eba13ac8604b721c81216a4e149ad`
 
@@ -50,9 +50,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#14 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#14 STARTING SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`
 **#14 IMPLEMENTATION SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`
-**#14 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34760658744 PASS
-**#14 HOSTED FRONTEND SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`
-**#14 HOSTED API SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`
+**#14 UX CLOSURE SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`
+**#14 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34763715915 PASS on `915ac55`
+**#14 HOSTED FRONTEND SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`
+**#14 HOSTED API SHA:** `915ac55049bf68f335ea8ef4a08db87a513a5fce`
 **#15 AUTHORIZED:** NO
 
 ---
@@ -61,7 +62,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #14 Shared Control & Evidence Layer
 
-**STATUS:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED — Product Leadership provisionally accepted the architecture on `a743c8a`; customer-facing UX closure is still required before PASS
+**STATUS:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW — UX closure hosted on `ce5d01c` / API descendant `915ac55`; Product Leadership has not accepted PASS
 
 See `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md` and `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. #15 is not authorized.
 
@@ -99,13 +100,13 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Hold #14 at PARTIAL until Product Leadership accepts the hosted UX closure. Architecture is provisionally accepted. Keep #12 PARTIAL. Do not start #15. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Hold #14 at PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW. Keep #12 PARTIAL. Do not start #15. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#14 Shared Control & Evidence Layer** — architecture provisionally accepted; UX remediations returned; hosted UX re-review required.
+**#14 Shared Control & Evidence Layer** — hosted UX closure returned; Product Leadership final review required. Do not start #15.
 
 **Next item after #14:** #15 Supreme Risk — **NOT AUTHORIZED**.
 
@@ -145,7 +146,7 @@ Hold #14 at PARTIAL until Product Leadership accepts the hosted UX closure. Arch
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership hosted re-review of #14 UX closure. #15 is not authorized. #12 remains PARTIAL until Product Leadership separately changes it.
+Product Leadership final hosted review of #14. #15 is not authorized. #12 remains PARTIAL until Product Leadership separately changes it.
 
 ---
 
@@ -178,7 +179,7 @@ Do not invent percentages.
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
 | 12 | Supreme Third Party Production v1 | PARTIAL / OPEN IN PARALLEL; commercial production NO-GO |
 | 13 | Governance Graph | Product Leadership accepted (2026-09-13) |
-| 14 | Shared Control & Evidence Layer | PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED |
+| 14 | Shared Control & Evidence Layer | PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW |
 | 15–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -233,3 +234,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW -> PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED  
 **SHA:** architecture `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. UX remediations are committed separately and are not a PASS SHA.  
 **EVIDENCE:** Product Leadership independently verified `a743c8a` and provisionally accepted the common-control / mapping / reuse / testing / graph / isolation architecture. Closure requires hosted re-proof of customer-language IDs, humanized history, a structured Relationships workspace, duplicate-link prevention, 375 Control Detail / Evidence Library density, and plain-language coverage labels. #15 remains unauthorized.
+
+### 2026-09-13
+
+**ITEM:** #14 Shared Control & Evidence Layer  
+**STATUS CHANGE:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED -> PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW  
+**SHA:** UX closure `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`; CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`  
+**EVIDENCE:** Hosted Supreme CI run `34763715915` PASS. Staging frontend `ce5d01c`, API `915ac55`. Migration `20260913193000_active_evidence_link_uniqueness` applied. Hosted Control Detail / History / Relationships / duplicate-link / 375 / coverage walkthrough recorded. Not PASS. #12 remains PARTIAL. #15 is not authorized.

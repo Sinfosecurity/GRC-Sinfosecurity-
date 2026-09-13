@@ -253,13 +253,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Control catalog and evidence objects are reusable across products without duplicate uploads as the source of truth.
 
-**CURRENT STATUS:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED. Product Leadership independently verified implementation SHA `a743c8a00910fac77d9046a27c2f0eb36d13abd2` and provisionally accepted the architecture. Customer-facing UX defects remain a closure gate. Not PASS. Not commercial production.
+**CURRENT STATUS:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW. Architecture SHA `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. UX closure SHA `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9` is hosted. Not PASS. Not commercial production.
 
-**CERTIFICATION SHA:** architecture `a743c8a00910fac77d9046a27c2f0eb36d13abd2`. Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`. Hosted CI run `34760658744` PASS on the architecture SHA. UX remediations are in this commit and still require hosted re-proof. Not PASS.
+**CERTIFICATION SHA:** UX closure `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`. CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`. Architecture `a743c8a00910fac77d9046a27c2f0eb36d13abd2`. Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`. Hosted CI run `34763715915` PASS.
 
-**EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Hosted screenshots `docs/private-beta/hosted-ux-qa/shared-control-evidence/`. Do not mark PASS from code or this file alone.
+**EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Hosted UX-closure screenshots `docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/`. Do not mark PASS from code or this file alone.
 
-**NEXT ACTION:** Product Leadership hosted re-review of the six UX closure items. Keep #12 PARTIAL. Do not start #15. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership final hosted review. Keep #12 PARTIAL. Do not start #15. Do not merge `main` or deploy commercial production.
 
 ---
 

@@ -4,16 +4,17 @@
 **Branch:** `supreme-risk-transformation`  
 **Starting SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`  
 **Implementation SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
-**Hosted frontend SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
-**Hosted API SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
-**Hosted CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34760658744 PASS  
-**Status:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED  
+**UX closure SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`  
+**Hosted frontend SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`  
+**Hosted API SHA:** `915ac55049bf68f335ea8ef4a08db87a513a5fce`  
+**Hosted CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34763715915 PASS  
+**Status:** PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW  
 **#12:** PARTIAL / OPEN IN PARALLEL  
 **#13:** Product Leadership accepted  
 **#15:** NOT AUTHORIZED  
 **Commercial production:** NO-GO
 
-This is not #14 PASS. Product Leadership provisionally accepted the architecture on `a743c8a` and required customer-facing UX closure before PASS.
+This is not #14 PASS. Product Leadership provisionally accepted the architecture on `a743c8a`. Hosted UX closure is returned for final review.
 
 ## Principle
 
@@ -43,7 +44,7 @@ Leftover `Control` / `ComplianceFramework` tables are not this layer. Additive m
 | Check | Result |
 |---|---|
 | Control Center counts, search, filters | PASS — 33 controls |
-| Control Detail sections | PARTIAL — Overview / Requirements / Evidence / Testing work on hosted `a743c8a`; UX remediations replace raw IDs / `control.update` in this commit and need hosted re-proof |
+| Control Detail sections | PASS for hosted UX closure — Overview / Requirements / Evidence / Testing / Findings / Relationships / History on `ce5d01c`; people names, finding titles, customer History labels. Not #14 program PASS |
 | Evidence reuse | PASS — same `ok.zip` StoredObject, CLEAN preserved, rationale + review + audit |
 | Malware policy | PASS — FAILED, INFECTED, NOT_CONFIGURED SUPPORTS links HTTP 403 |
 | Freshness | PASS — CURRENT; expiry not invented |
@@ -60,22 +61,25 @@ Leftover `Control` / `ComplianceFramework` tables are not this layer. Additive m
 
 ## Visual notes for Product Leadership
 
-Cursor does not declare premium UI PASS. Hosted screenshots below remain the `a743c8a` walkthrough. UX remediations below are in this commit and still require hosted re-review.
+Cursor does not declare premium UI PASS. Architecture walkthrough shots remain under `docs/private-beta/hosted-ux-qa/shared-control-evidence/`. UX-closure shots are under `docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/`.
 
 **Product Leadership closure items (2026-09-13)**
 
-| Item | Working-tree remediation | Hosted re-proof |
-|---|---|---|
-| Raw UUIDs on Findings / Evidence | Control detail now shows person names and finding titles; IDs stay in the API only | Required |
-| History codes such as `control.update` | API returns `label` / `actorName`; History shows “Control updated” and includes evidence / test events | Required |
-| Relationships as a raw graph dump | Grouped Requirements / Evidence / Tests / Findings / Risks workspace; graph codes hidden | Required |
-| Duplicate CLEAN evidence links | Application 409 for the same active file/target/relationship; additive partial unique index | Required |
-| Cramped 375 Control Detail / Evidence Library | Horizontal section chips; vendor graph hidden on xs; compact reuse fields | Required |
-| “Evidence path exists” | Replaced with “Mapped and implemented”; Gap retained | Required |
+| Item | Hosted result |
+|---|---|
+| Raw UUIDs on Findings / Evidence | Hosted — people display as Admin User; findings display titles |
+| History codes such as `control.update` | Hosted — Control updated / Evidence linked / Control test recorded with actor names |
+| Relationships as a raw graph dump | Hosted — grouped Requirements / Evidence / Tests / Findings / Risks; Open graph remains advanced |
+| Duplicate CLEAN evidence links | Hosted — 409 already-linked; different relationship allowed; unlink/relink 201; concurrent 201+409 |
+| Cramped 375 Control Detail / Evidence Library | Hosted — horizontal chips; vendor graph hidden on xs; no page overflow measured |
+| “Evidence path exists” | Hosted — Mapped and implemented; Gap retained |
 
-**P0:** none observed on hosted security or tenant isolation.
+**P0:** none observed on hosted security or tenant isolation.  
+**P1:** none observed on the six closure items.  
+**P2:** none opened by this walkthrough.  
+**P3:** Evidence cards still show SUPPORTS / RELATED TO as badge text; History and Relationships lists are long after repeated hosted QA.
 
-Screenshots: `docs/private-beta/hosted-ux-qa/shared-control-evidence/`
+Screenshots: `docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/`
 
 ## Local / hosted CI counts
 
@@ -85,8 +89,8 @@ Screenshots: `docs/private-beta/hosted-ux-qa/shared-control-evidence/`
 | Clean migration deploy | PASS (hosted CI disposable DB + staging preDeploy) |
 | Backend typecheck | PASS |
 | Frontend typecheck | PASS |
-| Backend tests | PASS — 296 |
-| Frontend tests | PASS — 128 |
+| Backend tests | PASS — 301 on `915ac55` (includes shared-control-evidence + concurrent duplicate + unique scale fixture) |
+| Frontend tests | PASS |
 | Secret scan / dependency policy | PASS |
 | Frontend production build / public-build safety | PASS |
 
