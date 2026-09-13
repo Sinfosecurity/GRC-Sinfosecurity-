@@ -289,13 +289,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Framework packs, control status, and evidence reuse. Legacy ISO/TISAX pages are not this product.
 
-**CURRENT STATUS:** PARTIAL — AUTHORIZED / IN PROGRESS
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`. Not PASS.
+**CERTIFICATION SHA:** Implementation `42370e22303fa18b53c92c34d08f279d7f14f4e8`. Starting SHA `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`. Not PASS.
 
-**EVIDENCE:** `docs/ADR-SUPREME-COMPLIANCE.md`. Legacy `/compliance` mock is not this product.
+**EVIDENCE:** `docs/ADR-SUPREME-COMPLIANCE.md`, `docs/private-beta/hosted-ux-qa/supreme-compliance/`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34778303631 PASS. Staging frontend and API both `42370e2`. Legacy `/compliance` mock is not this product; it remains at `/legacy/compliance`.
 
-**NEXT ACTION:** Implement and host Supreme Compliance for Product Leadership review. Do not start #17. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership hosted review. Do not start #17. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 

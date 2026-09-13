@@ -1,0 +1,486 @@
+{
+  "checks": [
+    {
+      "name": "hosted sha",
+      "result": "PASS",
+      "detail": "api=42370e22303fa18b53c92c34d08f279d7f14f4e8 frontend=42370e22303fa18b53c92c34d08f279d7f14f4e8"
+    },
+    {
+      "name": "catalog",
+      "result": "PASS",
+      "detail": "200 packs=10"
+    },
+    {
+      "name": "catalog packs",
+      "result": "PASS",
+      "detail": "CIS,CMMC,HIPAA_SAFEGUARDS,ISO_27001,NIST_800_171,NIST_CSF,NYDFS_500,PCI_DSS,SOC2"
+    },
+    {
+      "name": "catalog licensing",
+      "result": "PASS",
+      "detail": "endorsement_ok=True dumped=False"
+    },
+    {
+      "name": "reuse activation",
+      "result": "PASS",
+      "detail": "200 ACT-00002"
+    },
+    {
+      "name": "remaining work",
+      "result": "PASS",
+      "detail": "Applicability is not determined for enough requirements to calculate readiness. Not determined is not treated as not applicable, and not applicable is not treated as pass."
+    },
+    {
+      "name": "activation honesty",
+      "result": "PASS",
+      "detail": "Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not "
+    },
+    {
+      "name": "na without rationale",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "applicability",
+      "result": "PASS",
+      "detail": "200 Applicable"
+    },
+    {
+      "name": "requirement owner",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "requirement workspace",
+      "result": "PASS",
+      "detail": "200 CRS-00006"
+    },
+    {
+      "name": "common control mapping",
+      "result": "PASS",
+      "detail": "controls=1"
+    },
+    {
+      "name": "gap refresh",
+      "result": "PASS",
+      "detail": "200 {'honesty': 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.', 'publicId': 'ACT-00002', 'name': 'ISO/IEC 27001', 'publisher': 'ISO', 'version': '2022-ref', 'versionStatus': 'ACTIVE', 'versionId': 'b0172155-60d4-4f72-bcff-2ee096439c86', 'scope': 'Version-change proof only', 'businessUnit': None, 'owner': 'Unassigned', 'ownerUserId': None, 'startDate': None, 'targetDate': None, 'status': 'Active', 'statusKey': 'ACTIVE', 'readiness': {'honesty': 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.', 'calculable': True, 'emptyReason': None, 'totals': {'totalRequirements': 9, 'applicable': 1, 'notApplicable': 0, 'notDetermined': 8, 'underReview': 0}, 'metrics': {'requirementCoverage': {'label': 'Requirement coverage', 'numerator': 1, 'denominator': 1, 'percent': 100, 'formula': 'Applicable requirements with at least one active mapping \u00f7 applicable requirements. Not applicable is excluded.'}, 'implementationCoverage': {'label': 'Control implementation coverage', 'numerator': 0, 'denominator': 1, 'percent': 0, 'formula': 'Mapped applicable requirements with at least one implemented control \u00f7 mapped applicable requirements.'}, 'testingCoverage': {'label': 'Testing coverage', 'numerator': 0, 'denominator': 0, 'percent': None, 'formula': 'Implemented mapped controls whose latest test is Pass, Fail, or Partial \u00f7 implemented mapped controls. Not tested and not applicable are not pass.'}, 'evidenceCoverage': {'label': 'Evidence coverage', 'numerator': 0, 'denominator': 1, 'percent': 0, 'formula': 'Mapped applicable requirements with at least one CLEAN current supporting evidence link \u00f7 mapped applicable requirements. A file is not compliance.'}}}, 'remainingWork': {'unmappedRequirements': 0, 'openGaps': 2, 'notDetermined': 8, 'message': '100% of applicable requirements are mapped. 0% already have current evidence. 0 requirements remain unmapped. 2 gaps are open.'}, 'requirements': [{'publicId': 'CRS-00006', 'requirementKey': 'A.15', 'summary': 'Supreme summary (2013-ref): supplier relationships are identified before data is shared.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Applicable', 'applicabilityKey': 'APPLICABLE', 'owner': 'Report Proof', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00007', 'requirementKey': 'A.5', 'summary': 'Supreme summary (2013-ref): information security policy ownership is recorded. This identifier belongs to a superseded pack.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00008', 'requirementKey': 'A.9', 'summary': 'Supreme summary (2013-ref): access control includes unique identity and removal when a role ends.', 'framework': 'ISO/IEC 27001', 'version': '2013-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00009', 'requirementKey': 'A.8', 'summary': 'Supreme summary: technological controls protect systems, crypto, and logging.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 3, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00010', 'requirementKey': 'A.5', 'summary': 'Supreme summary: organizational controls assign ownership and keep policies usable.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00011', 'requirementKey': 'A.5.7', 'summary': 'Supreme summary: threat information that affects this organization is recorded and assigned.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00012', 'requirementKey': 'A.5.19', 'summary': 'Supreme summary: supplier relationships are identified and governed.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00013', 'requirementKey': 'A.8.3', 'summary': 'Supreme summary: information is protected according to its recorded classification before sharing.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 1, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}, {'publicId': 'CRS-00014', 'requirementKey': 'A.5.23', 'summary': 'Supreme summary: cloud services used for customer data have a recorded owner and isolation check.', 'framework': 'ISO/IEC 27001', 'version': '2022-ref', 'applicability': 'Not determined', 'applicabilityKey': 'NOT_DETERMINED', 'owner': 'Unassigned', 'mapped': True, 'mappedCount': 2, 'implementation': 'Not implemented', 'effectiveness': 'Not tested', 'latestTest': 'Not tested', 'sourceUrl': None}], 'gaps': [{'publicId': 'GAP-00004', 'title': 'A.15 has no current CLEAN evidence', 'source': 'Evidence missing', 'status': 'Open'}, {'publicId': 'GAP-00003', 'title': 'A.15 is mapped to controls that are not implemented', 'source': 'Not implemented', 'status': 'Open'}], 'exceptions': [], 'campaigns': [], 'periods': [{'publicId': 'AUD-00002', 'name': '2013 historical period', 'status': 'Preparing', 'startAt': '2013-01-01T00:00:00.000Z', 'endAt': None}], 'history': [{'title': 'Gaps refreshed', 'change': None, 'summary': '2 gaps opened from live control, evidence, and test records.', 'createdAt': '2026-09-13T19:49:00.964Z'}, {'title': 'Framework version updated', 'change': '2013-ref \u2192 2022-ref', 'summary': '2013-ref \u2192 2022-ref. Historical periods stay on the earlier version.', 'createdAt': '2026-09-13T19:46:52.877Z'}, {'title': 'Framework activated', 'change': None, 'summary': 'ISO/IEC 27001 2013-ref is now in this compliance program.', 'createdAt': '2026-09-13T19:46:52.008Z'}]}"
+    },
+    {
+      "name": "gaps list",
+      "result": "PASS",
+      "detail": "200 count=4"
+    },
+    {
+      "name": "exception create",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "exception approve",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "exception not effective",
+      "result": "PASS",
+      "detail": "approved exception is not control effectiveness"
+    },
+    {
+      "name": "campaign",
+      "result": "PASS",
+      "detail": "201 CAM-00002"
+    },
+    {
+      "name": "attestation",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "attestation review",
+      "result": "FAIL",
+      "detail": "400"
+    },
+    {
+      "name": "audit period",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "framework version change",
+      "result": "PARTIAL",
+      "detail": "2013-ref pack not available on this tenant catalog yet"
+    },
+    {
+      "name": "dashboard",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "needs attention",
+      "result": "PASS",
+      "detail": "items=0"
+    },
+    {
+      "name": "what changed",
+      "result": "PASS",
+      "detail": "events=20"
+    },
+    {
+      "name": "no false compliance",
+      "result": "PASS",
+      "detail": "dashboard language"
+    },
+    {
+      "name": "cross-framework",
+      "result": "PASS",
+      "detail": "200 controls=33"
+    },
+    {
+      "name": "evidence reuse",
+      "result": "PASS",
+      "detail": "200 {'filename': 'sr-clean-evidence.txt', 'scanStatus': 'CLEAN', 'usable': True, 'controls': 0, 'requirements': 0, 'programs': 0, 'programNames': [], 'offer': 'Use this existing CLEAN evidence before uploading a new file.', 'honesty': 'Reuse counts only explicit links. A file that supports one control does not automatically cover every mapped requirement.'}"
+    },
+    {
+      "name": "risk link no auto-score",
+      "result": "FAIL",
+      "detail": "before=25 after=None"
+    },
+    {
+      "name": "import neutralize",
+      "result": "PASS",
+      "detail": "'=1+1"
+    },
+    {
+      "name": "report readiness pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report gaps pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report attestations pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report evidence pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report exceptions pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report executive pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report board pdf",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report board pptx",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "export csv",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "export xlsx",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "cross-tenant activation",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "cross-tenant activation body",
+      "result": "PASS",
+      "detail": "leaked=False"
+    },
+    {
+      "name": "cross-tenant dashboard",
+      "result": "PASS",
+      "detail": "200 leaked=False"
+    },
+    {
+      "name": "cross-tenant report",
+      "result": "PASS",
+      "detail": "200 leaked=False"
+    },
+    {
+      "name": "rbac activate other tenant",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "overflow dashboard",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "copy dashboard",
+      "result": "PASS",
+      "detail": "customer copy"
+    },
+    {
+      "name": "overflow frameworks",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow framework-detail",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "copy framework-detail",
+      "result": "PASS",
+      "detail": "customer copy"
+    },
+    {
+      "name": "overflow requirement",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "copy requirement",
+      "result": "PASS",
+      "detail": "customer copy"
+    },
+    {
+      "name": "overflow gaps",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow exceptions",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow campaign",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow audit",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow reports-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow assessments-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow methodology-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow risk-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow risk-register-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow controls-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow coverage-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    },
+    {
+      "name": "overflow graph-regression",
+      "result": "PASS",
+      "detail": "scrollWidth overflow=False"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-readiness.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-gaps.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-attestations.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-evidence.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-exceptions.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-executive.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-board.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/Supreme-Compliance-Board.pptx",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/dashboard-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/dashboard-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/dashboard-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/dashboard-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/dashboard-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/frameworks-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/frameworks-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/frameworks-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/frameworks-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/frameworks-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-detail-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/gaps-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/gaps-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/gaps-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/gaps-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/gaps-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/exceptions-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/exceptions-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/exceptions-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/exceptions-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/exceptions-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/campaign-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/campaign-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/campaign-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/campaign-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/campaign-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/audit-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/audit-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/audit-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/audit-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/audit-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/reports-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/reports-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/reports-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/reports-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/reports-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/assessments-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/assessments-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/assessments-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/assessments-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/assessments-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/methodology-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/methodology-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/methodology-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/methodology-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/methodology-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-register-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-register-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-register-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-register-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/risk-register-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/controls-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/controls-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/controls-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/controls-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/controls-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/coverage-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/coverage-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/coverage-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/coverage-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/coverage-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/graph-regression-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/graph-regression-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/graph-regression-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/graph-regression-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/graph-regression-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-overview-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-requirements-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-controls-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-gaps-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-attestations-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-exceptions-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-audit-periods-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-relationships-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/framework-history-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-overview-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-controls-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-testing-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-gaps-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-exceptions-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-related-risks-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-relationships-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-compliance/requirement-history-1440.png"
+  ],
+  "sha": {
+    "api": "42370e22303fa18b53c92c34d08f279d7f14f4e8",
+    "frontend": "42370e22303fa18b53c92c34d08f279d7f14f4e8",
+    "healthStatus": 200
+  },
+  "workflow": {
+    "activation": "ACT-00002",
+    "framework": "ISO/IEC 27001 2022-ref",
+    "remainingWork": "Applicability is not determined for enough requirements to calculate readiness. Not determined is not treated as not applicable, and not applicable is not treated as pass.",
+    "readiness": {
+      "honesty": "Readiness and coverage are not certification, attestation, or a claim that this organization is compliant. Not applicable is not pass. Evidence presence is not pass. An attestation is not a control test. An exception does not make a control effective. Residual risk does not change unless Supreme Risk recalculates it.",
+      "calculable": false,
+      "emptyReason": "Applicability is not determined for enough requirements to calculate readiness. Not determined is not treated as not applicable, and not applicable is not treated as pass.",
+      "totals": {
+        "totalRequirements": 9,
+        "applicable": 0,
+        "notApplicable": 0,
+        "notDetermined": 9,
+        "underReview": 0
+      },
+      "metrics": {
+        "requirementCoverage": {
+          "label": "Requirement coverage",
+          "numerator": 0,
+          "denominator": 0,
+          "percent": null,
+          "formula": "Applicable requirements with at least one active mapping \u00f7 applicable requirements. Not applicable is excluded."
+        },
+        "implementationCoverage": {
+          "label": "Control implementation coverage",
+          "numerator": 0,
+          "denominator": 0,
+          "percent": null,
+          "formula": "Mapped applicable requirements with at least one implemented control \u00f7 mapped applicable requirements."
+        },
+        "testingCoverage": {
+          "label": "Testing coverage",
+          "numerator": 0,
+          "denominator": 0,
+          "percent": null,
+          "formula": "Implemented mapped controls whose latest test is Pass, Fail, or Partial \u00f7 implemented mapped controls. Not tested and not applicable are not pass."
+        },
+        "evidenceCoverage": {
+          "label": "Evidence coverage",
+          "numerator": 0,
+          "denominator": 0,
+          "percent": null,
+          "formula": "Mapped applicable requirements with at least one CLEAN current supporting evidence link \u00f7 mapped applicable requirements. A file is not compliance."
+        }
+      }
+    }
+  },
+  "discrepancies": []
+}
