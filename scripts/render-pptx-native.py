@@ -164,7 +164,7 @@ def render(pptx: Path, dest: Path) -> dict:
         hashes.append({"file": page.name, "sha256": digest, "bytes": page.stat().st_size})
     unique = {item["sha256"] for item in hashes}
     if len(pages) < 12:
-        die(f"Expected 12 native slides, rendered {len(pages)}")
+        die(f"Expected at least 12 native slides, rendered {len(pages)}")
     reconstruction = "native"
     warning = ""
     if len(unique) < 8:

@@ -107,7 +107,7 @@ jobs:
           from pathlib import Path
           payload = json.loads(Path("ci-artifacts/native-slides/native-render.json").read_text())
           assert payload["engine"] == "LibreOffice"
-          assert payload["pages"] == 12
+          assert payload["pages"] >= 12
           assert payload["reconstruction"] in {"native", "native-attempted"}
           print(payload["engine"], payload["pages"], payload["uniqueHashes"], payload["reconstruction"])
           if payload["uniqueHashes"] < 8:

@@ -37,9 +37,65 @@ function box(id: number, name: string, x: number, y: number, cx: number, cy: num
     </p:sp>`;
 }
 
+const BASE_SIZE = 1300;
+const MIN_SIZE = 1100;
+const BASE_CHARS = 88;
+
+export function wrapBoardLine(value: string, maxChars: number): string[] {
+    const words = value.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+    if (!words.length) return [];
+    const rows: string[] = [];
+    let line = '';
+    for (const word of words) {
+        if (word.length > maxChars) {
+            if (line) {
+                rows.push(line);
+                line = '';
+            }
+            for (let index = 0; index < word.length; index += maxChars) {
+                const chunk = word.slice(index, index + maxChars);
+                if (index + maxChars < word.length) rows.push(chunk);
+                else line = chunk;
+            }
+            continue;
+        }
+        const next = line ? `${line} ${word}` : word;
+        if (next.length > maxChars) {
+            rows.push(line);
+            line = word;
+        } else {
+            line = next;
+        }
+    }
+    if (line) rows.push(line);
+    return rows;
+}
+
+export function sizeBoardBlock(value: string): { size: number; rows: string[] } {
+    let size = BASE_SIZE;
+    let chars = BASE_CHARS;
+    let rows = wrapBoardLine(value, chars);
+    while (rows.length > 5 && size > MIN_SIZE) {
+        size -= 100;
+        chars = Math.round(BASE_CHARS * (BASE_SIZE / size));
+        rows = wrapBoardLine(value, chars);
+    }
+    return { size, rows: rows.length ? rows : [value.replace(/\s+/g, ' ').trim()] };
+}
+
+function lineEmu(size: number) {
+    if (size <= 1100) return 240000;
+    if (size <= 1200) return 260000;
+    return 280000;
+}
+
+function run(value: string, size: number, color: string, bold = false) {
+    return `<a:r><a:rPr lang="en-US" sz="${size}" b="${bold ? 1 : 0}" dirty="0">${solid(color)}<a:latin typeface="Calibri" pitchFamily="34" charset="0"/></a:rPr><a:t xml:space="preserve">${xml(value)}</a:t></a:r>`;
+}
+
 function text(id: number, value: string, x: number, y: number, cx: number, cy: number, size: number, color: string, bold = false, align = 'l') {
-    const clipped = value.replace(/\s+/g, ' ').trim().slice(0, 140);
-    if (!clipped) return '';
+    const cleaned = value.replace(/\s+/g, ' ').trim();
+    if (!cleaned) return '';
     return `<p:sp>
       <p:nvSpPr><p:cNvPr id="${id}" name="t${id}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
       <p:spPr>
@@ -52,10 +108,67 @@ function text(id: number, value: string, x: number, y: number, cx: number, cy: n
         <a:lstStyle/>
         <a:p>
           <a:pPr algn="${align}"/>
-          <a:r><a:rPr lang="en-US" sz="${size}" b="${bold ? 1 : 0}" dirty="0">${solid(color)}<a:latin typeface="Calibri" pitchFamily="34" charset="0"/></a:rPr><a:t xml:space="preserve">${xml(clipped)}</a:t></a:r>
+          ${run(cleaned, size, color, bold)}
         </a:p>
       </p:txBody>
     </p:sp>`;
+}
+
+function wrappedBox(id: number, rows: string[], size: number, x: number, y: number, cx: number, color = INK) {
+    const cy = rows.length * lineEmu(size) + 50000;
+    return {
+        height: cy,
+        xml: `<p:sp>
+      <p:nvSpPr><p:cNvPr id="${id}" name="n${id}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
+      <p:spPr>
+        <a:xfrm><a:off x="${x}" y="${y}"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm>
+        <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+        <a:noFill/>
+      </p:spPr>
+      <p:txBody>
+        <a:bodyPr wrap="square" anchor="t" lIns="45720" tIns="8000" rIns="45720" bIns="8000"/>
+        <a:lstStyle/>
+        ${rows.map((row) => `<a:p><a:pPr algn="l" spcAft="0" spcBef="0"/><a:defRPr sz="${size}"/>${run(row, size, color)}</a:p>`).join('')}
+      </p:txBody>
+    </p:sp>`,
+    };
+}
+
+export function paginateBoardNarrative(items: string[], options?: { reserveNote?: boolean }): { rows: string[]; size: number }[][] {
+    const top = 1680000;
+    const bottom = options?.reserveNote ? 5480000 : 6360000;
+    const pages: { rows: string[]; size: number }[][] = [[]];
+    let used = top;
+    const gap = 70000;
+
+    const newPage = () => {
+        pages.push([]);
+        used = top;
+    };
+
+    for (const item of items.map((value) => value.replace(/\s+/g, ' ').trim()).filter(Boolean)) {
+        const sized = sizeBoardBlock(item);
+        let offset = 0;
+        while (offset < sized.rows.length) {
+            const available = bottom - used - 50000;
+            const fit = Math.max(0, Math.floor(available / lineEmu(sized.size)));
+            if (fit < 1) {
+                if (pages[pages.length - 1].length === 0) {
+                    pages[pages.length - 1].push({ rows: sized.rows.slice(offset, offset + 1), size: sized.size });
+                    offset += 1;
+                    used = bottom;
+                }
+                newPage();
+                continue;
+            }
+            const take = sized.rows.slice(offset, offset + fit);
+            pages[pages.length - 1].push({ rows: take, size: sized.size });
+            used += take.length * lineEmu(sized.size) + 50000 + gap;
+            offset += take.length;
+        }
+    }
+    if (pages.length > 1 && pages[pages.length - 1].length === 0) pages.pop();
+    return pages;
 }
 
 function kpi(id: number, value: string, label: string, x: number) {
@@ -79,8 +192,13 @@ function header(title: string, subtitle: string) {
 }
 
 function lines(startId: number, items: string[], x: number, y: number) {
-    const rows = items.filter(Boolean).slice(0, 5);
-    return rows.map((item, index) => text(startId + index, item, x, y + index * 460000, 11300000, 420000, 1300, INK)).join('');
+    let cursor = y;
+    return items.filter(Boolean).slice(0, 5).map((item, index) => {
+        const sized = sizeBoardBlock(item);
+        const box = wrappedBox(startId + index, sized.rows, sized.size, x, cursor, 11300000);
+        cursor += box.height + 60000;
+        return box.xml;
+    }).join('');
 }
 
 function bar(id: number, label: string, value: number, max: number, x: number, y: number) {
@@ -113,7 +231,37 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
     const dpias = pack.dpias;
     const retention = pack.retention;
     const maxBar = Math.max(totals.activeActivities, totals.openRightsRequests, totals.transfersRequiringReview, totals.highRiskProcessing, 1);
+    const decisionItems = attention.length
+        ? attention.map((row) => `${row.publicId}  ${row.type} — ${row.why}`)
+        : ['No management decision is required from the current live queue.'];
+    const actionItems = attention.length
+        ? attention.map((row, index) => `${index + 1}. Review ${row.publicId} — ${row.type}. ${row.why}`)
+        : ['1. Maintain current records. No overdue privacy action is recorded.'];
+    const decisionPages = paginateBoardNarrative(decisionItems);
+    const actionPages = paginateBoardNarrative(actionItems, { reserveNote: true });
+    const total = 10 + decisionPages.length + actionPages.length;
     const slides: string[] = [];
+
+    const narrativeSlide = (
+        title: string,
+        subtitle: string,
+        blocks: { rows: string[]; size: number }[],
+        page: number,
+        note?: string,
+    ) => {
+        let cursor = 1680000;
+        const body = blocks.map((block, index) => {
+            const box = wrappedBox(20 + index, block.rows, block.size, 420000, cursor, 11300000);
+            cursor += box.height + 70000;
+            return box.xml;
+        }).join('');
+        return slide(`
+      ${header(title, subtitle)}
+      ${body}
+      ${note ? text(80, note, 420000, 5600000, 11000000, 360000, 1200, MUTED) : ''}
+      ${footer(page, total)}
+    `);
+    };
 
     slides.push(slide(`
       ${box(2, 'cover', 0, 0, W, H, NAVY)}
@@ -137,7 +285,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${bar(70, 'Open rights', totals.openRightsRequests, maxBar, 420000, 4080000)}
       ${bar(80, 'Transfers in review', totals.transfersRequiringReview, maxBar, 420000, 4560000)}
       ${bar(90, 'High-risk processing', totals.highRiskProcessing, maxBar, 420000, 5040000)}
-      ${footer(2, 12)}
+      ${footer(2, total)}
     `));
 
     slides.push(slide(`
@@ -147,7 +295,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(30, String(new Set(activities.flatMap((row) => row.dataCategories?.map((item: { label: string }) => item.label) || [])).size), 'Data categories', 5820000)}
       ${kpi(40, String(new Set(activities.flatMap((row) => row.vendors?.map((item: { name: string }) => item.name) || [])).size), 'Linked processors', 8520000)}
       ${lines(60, activities.slice(0, 6).map((row) => `${row.publicId}  ${row.name}  ·  ${row.status}  ·  ${(row.jurisdictions || []).join(', ') || 'No jurisdiction recorded'}`), 420000, 3200000)}
-      ${footer(3, 12)}
+      ${footer(3, total)}
     `));
 
     const highRisk = activities.filter((row) => /high|critical/i.test(String(row.riskLevel || '')));
@@ -159,7 +307,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(40, String(totals.evidenceRefresh || 0), 'Evidence refresh', 8520000)}
       ${lines(60, (highRisk.length ? highRisk : activities).slice(0, 5).map((row) => `${row.publicId}  ${row.name}  ·  ${row.riskLevel || 'Not scored'}`), 420000, 3200000)}
       ${text(90, highRisk.length ? 'Highest recorded privacy risk activities.' : 'No separately scored high-risk activities. Showing recorded activities instead.', 420000, 5600000, 11000000, 300000, 1200, MUTED)}
-      ${footer(4, 12)}
+      ${footer(4, total)}
     `));
 
     slides.push(slide(`
@@ -169,7 +317,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(30, String(transfers.filter((row) => /scc|adequacy|bcr/i.test(String(row.mechanism))).length), 'Mechanism recorded', 5820000)}
       ${kpi(40, 'None', 'Lawfulness claimed', 8520000)}
       ${lines(60, transfers.length ? transfers.slice(0, 5).map((row) => `${row.publicId}  ${row.source} to ${row.destination}  ·  ${row.mechanism}  ·  ${row.status}`) : ['No international transfer is recorded.'], 420000, 3200000)}
-      ${footer(5, 12)}
+      ${footer(5, total)}
     `));
 
     slides.push(slide(`
@@ -179,7 +327,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(30, String(rights.length), 'Recorded requests', 5820000)}
       ${kpi(40, 'Configured', 'Deadline model', 8520000)}
       ${lines(60, rights.length ? rights.slice(0, 5).map((row) => `${row.publicId}  ${row.requestType}  ·  ${row.status}  ·  configured due ${row.dueAt ? isoDate(new Date(row.dueAt)) : 'not set'}`) : ['No rights request is recorded.'], 420000, 3200000)}
-      ${footer(6, 12)}
+      ${footer(6, total)}
     `));
 
     slides.push(slide(`
@@ -189,7 +337,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(30, String(dpias.filter((row) => /complete/i.test(String(row.status))).length), 'Decisions recorded', 5820000)}
       ${kpi(40, 'Review', 'Not legal clearance', 8520000)}
       ${lines(60, dpias.length ? dpias.slice(0, 5).map((row) => `${row.publicId}  ${row.title}  ·  ${row.status}`) : ['No DPIA is recorded.'], 420000, 3200000)}
-      ${footer(7, 12)}
+      ${footer(7, total)}
     `));
 
     slides.push(slide(`
@@ -199,7 +347,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(30, String(transfers.length), 'Transfer paths', 5820000)}
       ${kpi(40, String(totals.evidenceRefresh || 0), 'Evidence refresh', 8520000)}
       ${lines(60, activities.slice(0, 5).map((row) => `${row.publicId}  ${(row.vendors || []).slice(0, 2).map((item: { name: string; role: string }) => `${item.name || 'Vendor'} · ${item.role}`).join(' · ') || 'No processor recorded'}`), 420000, 3200000)}
-      ${footer(8, 12)}
+      ${footer(8, total)}
     `));
 
     slides.push(slide(`
@@ -209,7 +357,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(30, String(totals.deletionPending || 0), 'Deletion pending', 5820000)}
       ${kpi(40, 'Manual', 'Auto-delete', 8520000)}
       ${lines(60, retention.length ? retention.slice(0, 5).map((row) => `${row.publicId}  ${row.period}  ·  ${row.due ? 'Due' : 'Scheduled'}`) : ['No retention rule is recorded.'], 420000, 3200000)}
-      ${footer(9, 12)}
+      ${footer(9, total)}
     `));
 
     slides.push(slide(`
@@ -220,21 +368,26 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
       ${kpi(40, 'Closed', 'Malware fail-closed', 8520000)}
       ${lines(60, attention.filter((row) => /evidence|control|gap/i.test(row.type)).slice(0, 6).map((row) => `${row.publicId}  ${row.type}: ${row.why}`), 420000, 3200000)}
       ${text(90, attention.some((row) => /evidence|control|gap/i.test(row.type)) ? '' : 'No evidence or control attention items from live records.', 420000, 5800000, 11000000, 300000, 1200, MUTED)}
-      ${footer(10, 12)}
+      ${footer(10, total)}
     `));
 
-    slides.push(slide(`
-      ${header('Key decisions required', 'Human-authoritative. Supreme does not issue legal conclusions.')}
-      ${lines(20, attention.length ? attention.slice(0, 5).map((row) => `${row.publicId}  ${row.type} — ${row.why}`) : ['No management decision is required from the current live queue.'], 420000, 1680000)}
-      ${footer(11, 12)}
-    `));
-
-    slides.push(slide(`
-      ${header('Priority actions / next 90 days', 'Taken from the live attention queue. No invented program.')}
-      ${lines(20, attention.length ? attention.slice(0, 5).map((row, index) => `${index + 1}. Review ${row.publicId} — ${row.type}`) : ['1. Maintain current records. No overdue privacy action is recorded.'], 420000, 1680000)}
-      ${text(90, 'Consent collector remains not configured / manual. No trend available.', 420000, 5600000, 11000000, 300000, 1200, MUTED)}
-      ${footer(12, 12)}
-    `));
+    decisionPages.forEach((blocks, index) => {
+        slides.push(narrativeSlide(
+            index === 0 ? 'Key decisions required' : 'Key decisions required  ·  continued',
+            'Human-authoritative. Supreme does not issue legal conclusions.',
+            blocks,
+            11 + index,
+        ));
+    });
+    actionPages.forEach((blocks, index) => {
+        slides.push(narrativeSlide(
+            index === 0 ? 'Priority actions / next 90 days' : 'Priority actions / next 90 days  ·  continued',
+            'Taken from the live attention queue. No invented program.',
+            blocks,
+            11 + decisionPages.length + index,
+            index === actionPages.length - 1 ? 'Consent collector remains not configured / manual. No trend available.' : undefined,
+        ));
+    });
 
     const zip = new JSZip();
     zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -254,11 +407,11 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
     zip.file('ppt/_rels/presentation.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   ${slides.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide${i + 1}.xml"/>`).join('')}
-  <Relationship Id="rId13" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
+  <Relationship Id="rId${slides.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster" Target="slideMasters/slideMaster1.xml"/>
 </Relationships>`);
     zip.file('ppt/presentation.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-  <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId13"/></p:sldMasterIdLst>
+  <p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId${slides.length + 1}"/></p:sldMasterIdLst>
   <p:sldIdLst>
     ${slides.map((_, i) => `<p:sldId id="${256 + i}" r:id="rId${i + 1}"/>`).join('')}
   </p:sldIdLst>

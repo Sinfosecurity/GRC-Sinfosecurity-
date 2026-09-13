@@ -374,7 +374,7 @@ def main():
                     html_card.unlink()
                 record(
                     "board pptx native render",
-                    "PASS" if payload.get("pages") == 12 and payload.get("uniqueHashes", 0) >= 8 else "FAIL",
+                    "PASS" if payload.get("pages", 0) >= 12 and payload.get("uniqueHashes", 0) >= 8 else "FAIL",
                     f"{payload.get('engine')} {payload.get('pages')} slides / {payload.get('uniqueHashes')} unique",
                 )
         for name in ("deletions", "incidents"):

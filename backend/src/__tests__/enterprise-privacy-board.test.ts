@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import JSZip from 'jszip';
-import { renderPrivacyBoardPptx } from '../reports/privacyBoardPptx';
+import { paginateBoardNarrative, renderPrivacyBoardPptx, wrapBoardLine } from '../reports/privacyBoardPptx';
 import { prisma } from '../config/database';
 
 jest.setTimeout(60000);
@@ -13,10 +13,10 @@ describe('supreme privacy board pptx', () => {
         });
         const result = await renderPrivacyBoardPptx(org.id);
         expect(result.buffer.subarray(0, 2).toString()).toBe('PK');
-        expect(result.slideCount).toBe(12);
+        expect(result.slideCount).toBeGreaterThanOrEqual(12);
         const zip = await JSZip.loadAsync(result.buffer);
-        const names = Object.keys(zip.files).filter((name) => name.startsWith('ppt/slides/slide'));
-        expect(names).toHaveLength(12);
+        const names = Object.keys(zip.files).filter((name) => name.startsWith('ppt/slides/slide') && name.endsWith('.xml'));
+        expect(names).toHaveLength(result.slideCount);
         const cover = await zip.file('ppt/slides/slide1.xml')?.async('text');
         const posture = await zip.file('ppt/slides/slide2.xml')?.async('text');
         expect(cover).toMatch(/Board Risk Committee/);
@@ -34,5 +34,29 @@ describe('supreme privacy board pptx', () => {
             fs.mkdirSync(path.dirname(dest), { recursive: true });
             fs.writeFileSync(dest, result.buffer);
         }
+    });
+
+    it('wraps long decision copy instead of cutting it at 140 characters', () => {
+        const line = 'GAP-00001  Open privacy-related gap — GAP-00001 500.07 is mapped to controls that are not implemented. A gap is remaining work, not a legal conclusion.';
+        const rows = wrapBoardLine(line, 88);
+        expect(rows.join(' ')).toBe(line.replace(/\s+/g, ' ').trim());
+        expect(rows.some((row) => row.includes('legal conclusion'))).toBe(true);
+        const pages = paginateBoardNarrative([
+            line,
+            'XFR-00004  Transfer requiring review — XFR-00004 US-NY → IE is recorded as review required. This is not a lawfulness finding.',
+        ]);
+        const text = pages.flatMap((page) => page.flatMap((block) => block.rows)).join(' ');
+        expect(text).toContain('not a legal conclusion');
+        expect(text).toContain('not a lawfulness finding');
+        expect(text).not.toMatch(/legal c$/);
+    });
+
+    it('opens a continuation page when decision copy exceeds one region', () => {
+        const items = Array.from({ length: 12 }, (_, index) => (
+            `${index + 1}. GAP-0000${index} Open privacy-related gap — control ${index} is mapped but not implemented. A gap is remaining work, not a legal conclusion.`
+        ));
+        const pages = paginateBoardNarrative(items);
+        expect(pages.length).toBeGreaterThan(1);
+        expect(pages.flatMap((page) => page.flatMap((block) => block.rows)).join(' ')).toContain('not a legal conclusion');
     });
 });
