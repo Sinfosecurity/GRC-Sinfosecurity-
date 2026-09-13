@@ -5,7 +5,7 @@ import { calculateEnterpriseRisk } from '../services/enterpriseRiskEngine';
 
 jest.setTimeout(60000);
 
-const PASSWORD = 'ErmPass1x';
+const PASSWORD = 'ErmPass1xx';
 const API = '/api/v1';
 
 describe('enterprise risk tenant isolation and scoring', () => {
