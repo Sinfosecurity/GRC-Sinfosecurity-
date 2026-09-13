@@ -19,6 +19,7 @@ describe('supreme privacy board pptx', () => {
         expect(names).toHaveLength(result.slideCount);
         const cover = await zip.file('ppt/slides/slide1.xml')?.async('text');
         const posture = await zip.file('ppt/slides/slide2.xml')?.async('text');
+        const allSlides = (await Promise.all(names.map((name) => zip.file(name)?.async('text')))).join('');
         expect(cover).toMatch(/Board Risk Committee/);
         expect(cover).toMatch(/Not legal advice|not a finding that processing is lawful/i);
         expect(cover).toMatch(/xml:space="preserve"/);
@@ -26,6 +27,7 @@ describe('supreme privacy board pptx', () => {
         expect(posture).not.toMatch(/>Notrendavailable</);
         expect(`${cover}${posture}`).not.toMatch(/you must notify/i);
         expect(`${cover}${posture}`).not.toMatch(/this processing is GDPR compliant/i);
+        expect(allSlides).not.toMatch(/spcAft=|spcBef=/);
         expect(zip.file('ppt/theme/theme1.xml')).toBeTruthy();
         expect(zip.file('ppt/slideMasters/slideMaster1.xml')).toBeTruthy();
         expect(zip.file('ppt/slideLayouts/slideLayout1.xml')).toBeTruthy();

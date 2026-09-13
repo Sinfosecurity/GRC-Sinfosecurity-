@@ -128,7 +128,7 @@ function wrappedBox(id: number, rows: string[], size: number, x: number, y: numb
       <p:txBody>
         <a:bodyPr wrap="square" anchor="t" lIns="45720" tIns="8000" rIns="45720" bIns="8000"/>
         <a:lstStyle/>
-        ${rows.map((row) => `<a:p><a:pPr algn="l" spcAft="0" spcBef="0"/><a:defRPr sz="${size}"/>${run(row, size, color)}</a:p>`).join('')}
+        ${rows.map((row) => `<a:p><a:pPr algn="l"/>${run(row, size, color)}</a:p>`).join('')}
       </p:txBody>
     </p:sp>`,
     };
@@ -191,14 +191,19 @@ function header(title: string, subtitle: string) {
     ${text(6, subtitle, 420000, 740000, 11000000, 320000, 1200, 'CBD5E1')}`;
 }
 
-function lines(startId: number, items: string[], x: number, y: number) {
+function lines(startId: number, items: string[], x: number, y: number, floor = 6360000) {
     let cursor = y;
-    return items.filter(Boolean).slice(0, 5).map((item, index) => {
+    const xml: string[] = [];
+    for (const [index, item] of items.filter(Boolean).entries()) {
+        if (xml.length >= 5) break;
         const sized = sizeBoardBlock(item);
+        const height = sized.rows.length * lineEmu(sized.size) + 50000;
+        if (cursor + height > floor) break;
         const box = wrappedBox(startId + index, sized.rows, sized.size, x, cursor, 11300000);
         cursor += box.height + 60000;
-        return box.xml;
-    }).join('');
+        xml.push(box.xml);
+    }
+    return xml.join('');
 }
 
 function bar(id: number, label: string, value: number, max: number, x: number, y: number) {

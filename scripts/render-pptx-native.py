@@ -30,46 +30,73 @@ def powerpoint_app() -> Path | None:
     return candidate if candidate.exists() else None
 
 
+def dismiss_powerpoint_dialogs() -> None:
+    script = '''
+tell application "System Events"
+    if not (exists process "Microsoft PowerPoint") then return
+    tell process "Microsoft PowerPoint"
+        set frontmost to true
+        delay 0.4
+        repeat 6 times
+            if exists button "Repair" of window 1 then
+                click button "Repair" of window 1
+                delay 2
+            else if exists button "OK" of window 1 then
+                click button "OK" of window 1
+                delay 1
+            else if exists button "Cancel" of window "Grant File Access" then
+                click button "Cancel" of window "Grant File Access"
+                delay 1
+            else
+                exit repeat
+            end if
+        end repeat
+    end tell
+end tell
+'''
+    subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
+
+
 def convert_with_powerpoint(pptx: Path, pdf: Path) -> None:
-    variants = [
-        f'''
-tell application "Microsoft PowerPoint"
-    activate
-    open POSIX file "{pptx}"
-    delay 1
-    set dest to POSIX file "{pdf}"
-    save active presentation in dest as save as PDF
-    close active presentation saving no
-end tell
-''',
-        f'''
-tell application "Microsoft PowerPoint"
-    activate
-    open POSIX file "{pptx}"
-    delay 1
-    save active presentation in (POSIX file "{pdf}" as string) as save as PDF
-    close active presentation saving no
-end tell
-''',
-        f'''
-tell application "Microsoft PowerPoint"
-    open POSIX file "{pptx}"
-    delay 2
-    set thePres to active presentation
-    save thePres in POSIX file "{pdf}" as save as PDF
-    close thePres saving no
-end tell
-''',
-    ]
-    errors: list[str] = []
-    for script in variants:
-        if pdf.exists():
-            pdf.unlink()
-        completed = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
-        if completed.returncode == 0 and pdf.exists() and pdf.stat().st_size > 1000:
-            return
-        errors.append(completed.stderr.strip() or completed.stdout.strip() or "no PDF written")
-    die("PowerPoint PDF export failed: " + " | ".join(errors))
+    sibling = pptx.with_suffix(".pdf")
+    if sibling.exists():
+        sibling.unlink()
+    script = f'''
+with timeout of 120 seconds
+    tell application "Microsoft PowerPoint"
+        activate
+        open POSIX file "{pptx}"
+        delay 3
+    end tell
+end timeout
+'''
+    opened = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
+    dismiss_powerpoint_dialogs()
+    export = f'''
+with timeout of 120 seconds
+    tell application "Microsoft PowerPoint"
+        activate
+        set dest to POSIX file "{sibling}"
+        save active presentation in dest as save as PDF
+        delay 1
+        close active presentation saving no
+    end tell
+end timeout
+'''
+    completed = subprocess.run(["osascript", "-e", export], capture_output=True, text=True)
+    dismiss_powerpoint_dialogs()
+    if completed.returncode == 0 and sibling.exists() and sibling.stat().st_size > 1000:
+        if sibling.resolve() != pdf.resolve():
+            shutil.copyfile(sibling, pdf)
+            sibling.unlink(missing_ok=True)
+        return
+    if sibling.exists() and sibling.stat().st_size > 1000:
+        shutil.copyfile(sibling, pdf)
+        return
+    die(
+        "PowerPoint PDF export failed: "
+        + (opened.stderr.strip() or completed.stderr.strip() or completed.stdout.strip() or "no PDF written")
+    )
 
 
 def convert_with_libreoffice(pptx: Path, pdf: Path) -> None:
