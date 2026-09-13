@@ -87,6 +87,12 @@ const menuSections: NavSection[] = [
         items: [
             { text: 'Supreme Privacy', path: '/privacy-ops', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
             { text: 'Processing activities', path: '/privacy-ops/activities', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Vendor privacy', path: '/privacy-ops/vendors', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Rights requests', path: '/privacy-ops/rights', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Deletion', path: '/privacy-ops/deletions', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Consent', path: '/privacy-ops/consent', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Incidents', path: '/privacy-ops/incidents', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Import', path: '/privacy-ops/import', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
         ],
     },
     {

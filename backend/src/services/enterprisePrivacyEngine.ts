@@ -25,7 +25,34 @@ export const DPIA_SCREENING = [
 
 export function humanPrivacyLabel(value: string | null | undefined) {
     if (!value) return 'Not set';
-    return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+    if (value === 'SPECIAL_CATEGORY' || /^special[_ ]category$/i.test(value)) return 'Special Category Data';
+    return value.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+export function deletionHonesty(status: string, exception?: string | null) {
+    if (/LEGAL_HOLD|EXCEPTION/i.test(status) || exception) {
+        return 'Legal hold or exception is recorded. This task is not complete as a deletion, and it is not proof that external-system data is deleted.';
+    }
+    if (/VERIFIED|CLOSED/i.test(status)) {
+        return 'Deletion task completed. Deletion verified by attestation or evidence. This is not proof that external-system data is deleted.';
+    }
+    return 'A deletion task is not automated deletion across systems. Closed is not proof the data is gone.';
+}
+
+export function consentProviderStatus(source?: string | null) {
+    if (source === 'IMPORTED') return 'Imported';
+    if (source === 'INTEGRATION') return 'Integration not configured';
+    return 'Not configured / manual';
+}
+
+export function notificationHonesty(status?: string | null) {
+    if (/DETERMINED_REQUIRED/i.test(status || '')) {
+        return 'Notification determined required is a recorded organizational decision. It is not legal advice.';
+    }
+    if (/DETERMINED_NOT_REQUIRED/i.test(status || '')) {
+        return 'Notification determined not required is a recorded organizational decision, not a legal clearance.';
+    }
+    return 'Notification assessment required. Supreme does not automatically calculate a breach-notification obligation.';
 }
 
 export function neutralizeSpreadsheetCell(value: unknown): string {

@@ -227,6 +227,34 @@ def seed(token: str):
             "risk": risk_rows[0].get("publicId") if risk_rows else None,
             "requirement": requirement_rows[0].get("publicId") if requirement_rows else None,
         }
+        if vendor_id:
+            status, vendor_view = api("GET", f"/api/v1/privacy/vendors/{vendor_id}", token)
+            RESULTS["vendorPrivacy"] = vendor_view.get("data") or {}
+            record("vendor privacy", "PASS" if status == 200 and RESULTS["vendorPrivacy"].get("vendor") else "FAIL", str(status))
+        status, deletion = api("POST", "/api/v1/privacy/deletions", token, {
+            "activityPublicId": activity,
+            "status": "REQUESTED",
+            "action": "Manual deletion request",
+            "systemName": "Claims platform",
+            "dataKind": "FINANCIAL",
+        })
+        record("deletion", "PASS" if status == 201 and "not proof" in json.dumps(deletion).lower() else "FAIL", str((deletion.get("data") or {}).get("publicId")))
+        status, hold = api("POST", "/api/v1/privacy/deletions", token, {
+            "activityPublicId": activity,
+            "status": "LEGAL_HOLD",
+            "exceptionReason": "Litigation hold",
+        })
+        closed, _closed_payload = api("PATCH", f"/api/v1/privacy/deletions/{(hold.get('data') or {}).get('publicId')}", token, {"status": "CLOSED"})
+        record("deletion legal hold", "PASS" if closed == 400 else "FAIL", str(closed))
+        status, consent = api("POST", "/api/v1/privacy/consent", token, {"purpose": "Service delivery", "subjectRef": "hosted-manual", "choice": "GIVEN"})
+        record("consent provider", "PASS" if status == 201 and "not configured" in json.dumps(consent).lower() else "FAIL", str((consent.get("data") or {}).get("providerStatus")))
+        status, incident = api("POST", "/api/v1/privacy/incidents", token, {
+            "title": "Hosted privacy notification assessment",
+            "activityPublicId": activity,
+            "enterpriseRiskId": risk_rows[0].get("publicId") if risk_rows else None,
+            "notificationStatus": "REVIEW_REQUIRED",
+        })
+        record("incident", "PASS" if status == 201 and "you must notify" not in json.dumps(incident).lower() else "FAIL", str((incident.get("data") or {}).get("publicId")))
         status, affected = api("GET", f"/api/v1/privacy/affected?kind=activity&id={activity}", token)
         RESULTS["chain"] = affected.get("data") or {}
         chain = RESULTS["chain"]
@@ -241,6 +269,28 @@ def seed(token: str):
     record("board pptx", "PASS" if status == 200 and pptx.get("binary") else "FAIL", str(status))
     if pptx.get("content"):
         save_binary("Supreme-Privacy-Board.pptx", pptx)
+        try:
+            import zipfile
+            import re
+            with zipfile.ZipFile(OUT / "Supreme-Privacy-Board.pptx") as zipped:
+                slides = [name for name in zipped.namelist() if name.startswith("ppt/slides/slide") and name.endswith(".xml")]
+                cover = zipped.read("ppt/slides/slide1.xml").decode("utf-8", "replace")
+                texts = " ".join(re.findall(r"<a:t>([^<]*)</a:t>", cover))
+                record("board pptx slides", "PASS" if len(slides) >= 8 else "FAIL", f"{len(slides)} slides")
+                record("board pptx cover", "PASS" if "Board Risk Committee" in texts else "FAIL", texts[:180])
+                RESULTS["boardSlides"] = []
+                for name in sorted(slides, key=lambda item: int("".join(ch for ch in item if ch.isdigit()) or "0")):
+                    body = zipped.read(name).decode("utf-8", "replace")
+                    slide_text = " · ".join(re.findall(r"<a:t>([^<]*)</a:t>", body))
+                    RESULTS["boardSlides"].append(slide_text[:400])
+                    defects = []
+                    if len(slide_text) < 20:
+                        defects.append("empty")
+                    if "undefined" in slide_text.lower():
+                        defects.append("undefined text")
+                    RESULTS.setdefault("boardVisualNotes", []).append({"slide": name, "defects": defects, "chars": len(slide_text)})
+        except Exception as exc:
+            record("board pptx slides", "FAIL", str(exc))
     for fmt in ["csv", "xlsx"]:
         status, payload = api("GET", f"/api/v1/privacy/export/{fmt}", token)
         record(f"export {fmt}", "PASS" if status == 200 and payload.get("binary") else "FAIL", str(status))
@@ -271,9 +321,16 @@ def main():
             ("dpias", "/privacy-ops/dpias"),
             ("rights", "/privacy-ops/rights"),
             ("retention", "/privacy-ops/retention"),
+            ("vendors", "/privacy-ops/vendors"),
+            ("deletions", "/privacy-ops/deletions"),
+            ("consent", "/privacy-ops/consent"),
+            ("incidents", "/privacy-ops/incidents"),
+            ("import", "/privacy-ops/import"),
         ]
         if activity:
             pages.append(("activity-detail", f"/privacy-ops/activities/{activity}"))
+        if RESULTS["workflow"].get("vendorId"):
+            pages.append(("vendor-detail", f"/privacy-ops/vendors/{RESULTS['workflow']['vendorId']}"))
         for name, path in pages:
             page.goto(f"{BASE}{path}", wait_until="networkidle")
             if name == "dashboard":
@@ -282,13 +339,29 @@ def main():
             if name == "rights":
                 copy = page.inner_text("body")
                 record("rights list mask", "PASS" if "hosted.requester@example.com" not in copy else "FAIL", copy[:200])
+            if name == "activity-detail":
+                copy = page.inner_text("body")
+                record("humanized labels", "PASS" if "CUSTOMERS" not in copy and "SERVICE_PROVIDER" not in copy else "FAIL", copy[:220])
             for width in (375, 768, 1024, 1440, 1920):
                 shot(page, f"{name}-{width}", width)
             overflow = page.evaluate("() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2")
             record(f"overflow {name}", "FAIL" if overflow else "PASS", path)
-        for path, label in [("/compliance", "compliance"), ("/risks", "risk"), ("/governance-graph", "graph"), ("/control-center", "controls")]:
+        for path, label in [("/compliance", "compliance"), ("/risks", "risk"), ("/governance-graph", "graph"), ("/control-center", "controls"), ("/reports", "reports"), ("/questionnaires", "methodology")]:
             page.goto(f"{BASE}{path}", wait_until="networkidle")
             shot(page, f"regression-{label}-1440", 1440)
+        slides = RESULTS.get("boardSlides") or []
+        if slides:
+            html = "<html><body style='font-family:Georgia,serif;background:#0F172A;color:#fff;margin:0'>"
+            for index, text in enumerate(slides, start=1):
+                html += f"<section style='min-height:100vh;padding:48px;border-bottom:8px solid #C5A46E'><h2>Slide {index}</h2><p style='max-width:960px;line-height:1.5'>{text}</p></section>"
+            html += "</body></html>"
+            qa_path = OUT / "board-pptx-visual.html"
+            qa_path.write_text(html)
+            page.set_content(html, wait_until="domcontentloaded")
+            for index in range(len(slides)):
+                page.evaluate(f"window.scrollTo(0, {index} * window.innerHeight)")
+                shot(page, f"board-slide-{index + 1}", 1440)
+            record("board pptx visual qa", "PARTIAL" if slides else "FAIL", f"{len(slides)} rendered slide cards")
         browser.close()
     RESULTS["hostedFrontendSha"] = fe_sha
     RESULTS["hostedApiSha"] = api_sha

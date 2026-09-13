@@ -62,6 +62,16 @@ describe('privacy database-backed performance smoke', () => {
         expect(pdf.subarray(0, 4).toString()).toBe('%PDF');
         const pptx = await renderPrivacyBoardPptx(organizationId);
         expect(pptx.buffer.subarray(0, 2).toString()).toBe('PK');
+        const vendors = await request(app).get(`${API}/privacy/vendors`).set('Authorization', `Bearer ${token}`);
+        expect(vendors.status).toBe(200);
+        const rights = await request(app).get(`${API}/privacy/rights`).set('Authorization', `Bearer ${token}`);
+        expect(rights.status).toBe(200);
+        const deletions = await request(app).get(`${API}/privacy/deletions`).set('Authorization', `Bearer ${token}`);
+        expect(deletions.status).toBe(200);
+        const incidents = await request(app).get(`${API}/privacy/incidents`).set('Authorization', `Bearer ${token}`);
+        expect(incidents.status).toBe(200);
+        const preview = await request(app).post(`${API}/privacy/import/preview`).set('Authorization', `Bearer ${token}`).send({ rows: [{ name: 'Preview activity' }] });
+        expect(preview.status).toBe(200);
         expect(Date.now() - started).toBeLessThan(120000);
     });
 });

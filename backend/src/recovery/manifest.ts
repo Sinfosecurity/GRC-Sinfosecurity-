@@ -76,6 +76,7 @@ export const AUTHORITATIVE_TABLES = [
     'PrivacyRetentionRule',
     'PrivacyDeletionTask',
     'PrivacyIncidentLink',
+    'PrivacyIncidentAssessment',
     'PrivacyHistory',
     'PrivacyCounter',
 ] as const;

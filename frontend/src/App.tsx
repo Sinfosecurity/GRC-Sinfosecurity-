@@ -86,6 +86,12 @@ const PrivacyTransfers = lazy(() => import('./pages/PrivacyTransfers'));
 const PrivacyDpias = lazy(() => import('./pages/PrivacyDpias'));
 const PrivacyRights = lazy(() => import('./pages/PrivacyRights'));
 const PrivacyRetention = lazy(() => import('./pages/PrivacyRetention'));
+const PrivacyVendors = lazy(() => import('./pages/PrivacyVendors'));
+const PrivacyVendorDetail = lazy(() => import('./pages/PrivacyVendorDetail'));
+const PrivacyDeletions = lazy(() => import('./pages/PrivacyDeletions'));
+const PrivacyConsent = lazy(() => import('./pages/PrivacyConsent'));
+const PrivacyIncidents = lazy(() => import('./pages/PrivacyIncidents'));
+const PrivacyImport = lazy(() => import('./pages/PrivacyImport'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -163,6 +169,12 @@ export default function App() {
                     <Route path="privacy-ops/dpias" element={<PrivacyDpias />} />
                     <Route path="privacy-ops/rights" element={<PrivacyRights />} />
                     <Route path="privacy-ops/retention" element={<PrivacyRetention />} />
+                    <Route path="privacy-ops/vendors" element={<PrivacyVendors />} />
+                    <Route path="privacy-ops/vendors/:vendorId" element={<PrivacyVendorDetail />} />
+                    <Route path="privacy-ops/deletions" element={<PrivacyDeletions />} />
+                    <Route path="privacy-ops/consent" element={<PrivacyConsent />} />
+                    <Route path="privacy-ops/incidents" element={<PrivacyIncidents />} />
+                    <Route path="privacy-ops/import" element={<PrivacyImport />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

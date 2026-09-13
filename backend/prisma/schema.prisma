@@ -4025,6 +4025,7 @@ enum PrivacyDataKind {
   DEMOGRAPHIC
   BEHAVIORAL
   PREFERENCE
+  SPECIAL_CATEGORY
   OTHER
 }
 
@@ -4096,9 +4097,21 @@ enum PrivacyRightsStatus {
 enum PrivacyDeletionStatus {
   REQUESTED
   PENDING
+  IN_PROGRESS
+  AWAITING_VERIFICATION
   VERIFIED
+  EXCEPTION
   LEGAL_HOLD
+  CLOSED
   NOT_APPLICABLE
+}
+
+enum PrivacyNotificationStatus {
+  REVIEW_REQUIRED
+  ASSESSMENT_IN_PROGRESS
+  NOTIFICATION_DETERMINED_REQUIRED
+  NOTIFICATION_DETERMINED_NOT_REQUIRED
+  CLOSED
 }
 
 enum PrivacyConsentStatus {
@@ -4332,6 +4345,12 @@ model PrivacyRightsRequest {
   status               PrivacyRightsStatus       @default(RECEIVED)
   decision             String?
   completedAt          DateTime?
+  verificationMethod   String?
+  verifiedByUserId     String?
+  verifiedAt           DateTime?
+  verificationNotes    String?
+  verificationException String?
+  verificationObjectId String?
   createdAt            DateTime                  @default(now())
   updatedAt            DateTime                  @updatedAt
   tasks                PrivacyRightsTask[]
@@ -4365,7 +4384,11 @@ model PrivacyConsentRecord {
   source         String               @default("MANUAL")
   noticeVersion  String?
   withdrawnAt    DateTime?
+  providerStatus String               @default("NOT_CONFIGURED")
+  storedObjectId String?
+  evidenceNote   String?
   createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 
   @@unique([organizationId, publicId])
   @@index([organizationId])
@@ -4418,10 +4441,40 @@ model PrivacyDeletionTask {
   storedObjectId String?
   ownerUserId    String?
   dueAt          DateTime?
+  dataKind       PrivacyDataKind?
+  systemName     String?
+  vendorId       String?
+  action         String?
+  verification   String?
+  exceptionReason String?
+  completedAt    DateTime?
   createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
 
   @@unique([organizationId, publicId])
   @@index([organizationId, status])
+}
+
+model PrivacyIncidentAssessment {
+  id                   String                     @id @default(uuid())
+  organizationId       String
+  publicId             String
+  title                String
+  incidentId           String?
+  findingId            String?
+  enterpriseRiskId     String?
+  notificationStatus   PrivacyNotificationStatus  @default(REVIEW_REQUIRED)
+  decision             String?
+  ownerUserId          String?
+  occurredAt           DateTime?
+  closedAt             DateTime?
+  note                 String?
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  links                PrivacyIncidentLink[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, notificationStatus])
 }
 
 model PrivacyIncidentLink {
@@ -4431,6 +4484,8 @@ model PrivacyIncidentLink {
   activityId     String?
   incidentId     String?
   findingId      String?
+  assessment     PrivacyIncidentAssessment? @relation(fields: [assessmentId], references: [id])
+  assessmentId   String?
   note           String?
   createdAt      DateTime                  @default(now())
 

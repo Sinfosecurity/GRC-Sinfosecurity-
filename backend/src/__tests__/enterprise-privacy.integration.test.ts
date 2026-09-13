@@ -158,4 +158,72 @@ describe('supreme privacy tenant isolation and honesty', () => {
         expect(dpia.body.data.advice).toMatch(/may be required \/ review recommended/i);
         expect(dpia.body.data.advice).not.toMatch(/this DPIA is legally required/i);
     });
+
+    it('keeps rights detail need-to-know, deletion honest, consent manual, and incidents non-automatic', async () => {
+        const admin = await prisma.user.findFirstOrThrow({ where: { organizationId: orgA, role: { not: 'VIEWER' } } });
+        const viewer = await prisma.user.create({
+            data: {
+                email: `priv-viewer-detail-${suffix}@tenant-a.test`,
+                hashedPassword: admin.hashedPassword,
+                firstName: 'View',
+                lastName: 'Detail',
+                role: 'VIEWER',
+                organizationId: orgA,
+                status: 'ACTIVE',
+            },
+        });
+        const viewerLogin = await request(app).post(`${API}/auth/login`).send({ email: viewer.email, password: PASSWORD, plane: 'CUSTOMER' });
+        expect(viewerLogin.status).toBe(200);
+        const detailViewer = await request(app).get(`${API}/privacy/rights/${rightsA}`).set('Authorization', `Bearer ${viewerLogin.body.data.token}`);
+        expect(detailViewer.status).toBe(200);
+        expect(JSON.stringify(detailViewer.body)).not.toContain('Jane Doe');
+        expect(JSON.stringify(detailViewer.body)).not.toContain('jane.doe@example.com');
+        const detailAdmin = await request(app).get(`${API}/privacy/rights/${rightsA}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(detailAdmin.status).toBe(200);
+        expect(detailAdmin.body.data.verification).toBeTruthy();
+        expect(JSON.stringify(detailAdmin.body)).toMatch(/Jane Doe|jane.doe@example.com/);
+        const denied = await request(app).patch(`${API}/privacy/rights/${rightsA}`).set('Authorization', `Bearer ${viewerLogin.body.data.token}`).send({ verificationStatus: 'VERIFIED' });
+        expect(denied.status).toBe(403);
+        const leaked = await request(app).get(`${API}/privacy/rights/${rightsA}`).set('Authorization', `Bearer ${tokenB}`);
+        expect([403, 404]).toContain(leaked.status);
+        const deletion = await request(app).post(`${API}/privacy/deletions`).set('Authorization', `Bearer ${tokenA}`).send({
+            activityPublicId: activityA,
+            status: 'REQUESTED',
+            action: 'Manual deletion request',
+        });
+        expect(deletion.status).toBe(201);
+        expect(deletion.body.data.honesty).toMatch(/not automated deletion/i);
+        const hold = await request(app).post(`${API}/privacy/deletions`).set('Authorization', `Bearer ${tokenA}`).send({
+            activityPublicId: activityA,
+            status: 'LEGAL_HOLD',
+            exceptionReason: 'Litigation hold',
+        });
+        expect(hold.status).toBe(201);
+        const closedHold = await request(app).patch(`${API}/privacy/deletions/${hold.body.data.publicId}`).set('Authorization', `Bearer ${tokenA}`).send({ status: 'CLOSED' });
+        expect(closedHold.status).toBe(400);
+        const consent = await request(app).post(`${API}/privacy/consent`).set('Authorization', `Bearer ${tokenA}`).send({
+            purpose: 'Service delivery',
+            subjectRef: 'manual-1',
+            choice: 'GIVEN',
+        });
+        expect(consent.status).toBe(201);
+        expect(consent.body.data.providerStatus).toMatch(/not configured/i);
+        const withdrawn = await request(app).post(`${API}/privacy/consent/${consent.body.data.publicId}/withdraw`).set('Authorization', `Bearer ${tokenA}`).send({});
+        expect(withdrawn.status).toBe(200);
+        expect(withdrawn.body.data.status).toMatch(/withdrawn/i);
+        expect(withdrawn.body.data.timestamp).toBeTruthy();
+        const incident = await request(app).post(`${API}/privacy/incidents`).set('Authorization', `Bearer ${tokenA}`).send({
+            title: 'Notification assessment',
+            activityPublicId: activityA,
+            notificationStatus: 'REVIEW_REQUIRED',
+        });
+        expect(incident.status).toBe(201);
+        expect(JSON.stringify(incident.body)).not.toMatch(/you must notify/i);
+        expect(incident.body.data.residualHonesty).toMatch(/does not automatically change/i);
+        const vendors = await request(app).get(`${API}/privacy/vendors`).set('Authorization', `Bearer ${tokenA}`);
+        expect(vendors.status).toBe(200);
+        const pptx = await request(app).get(`${API}/privacy/reports/board.pptx`).set('Authorization', `Bearer ${tokenA}`);
+        expect(pptx.status).toBe(200);
+        expect(fileBuffer(pptx).subarray(0, 2).toString()).toBe('PK');
+    });
 });

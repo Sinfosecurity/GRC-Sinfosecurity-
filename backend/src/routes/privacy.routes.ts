@@ -259,9 +259,33 @@ router.post('/retention', requirePermission(PERMISSIONS['retention.manage'], PER
     }
 });
 
+router.get('/deletions', requirePermission(PERMISSIONS['privacy.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.listDeletions(orgId(req, req.query.organizationId)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post('/deletions', requirePermission(PERMISSIONS['retention.manage'], PERMISSIONS['privacy.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await enterprisePrivacyService.createDeletion(orgId(req, req.body.organizationId), req.user?.userId || null, req.body) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.patch('/deletions/:publicId', requirePermission(PERMISSIONS['retention.manage'], PERMISSIONS['privacy.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.updateDeletion(orgId(req, req.body.organizationId), req.params.publicId, req.user?.userId || null, req.body) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/consent', requirePermission(PERMISSIONS['privacy.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.listConsent(orgId(req, req.query.organizationId)) });
     } catch (error) {
         next(error);
     }
@@ -275,6 +299,14 @@ router.post('/consent', requirePermission(PERMISSIONS['privacy.manage']), async 
     }
 });
 
+router.post('/consent/:publicId/withdraw', requirePermission(PERMISSIONS['privacy.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.withdrawConsent(orgId(req, req.body.organizationId), req.params.publicId, req.user?.userId || null) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post('/notices', requirePermission(PERMISSIONS['privacy.manage'], PERMISSIONS['processingActivity.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await enterprisePrivacyService.createNotice(orgId(req, req.body.organizationId), req.user?.userId || null, req.body) });
@@ -283,9 +315,33 @@ router.post('/notices', requirePermission(PERMISSIONS['privacy.manage'], PERMISS
     }
 });
 
+router.get('/incidents', requirePermission(PERMISSIONS['privacy.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.listIncidents(orgId(req, req.query.organizationId)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post('/incidents', requirePermission(PERMISSIONS['privacy.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await enterprisePrivacyService.linkIncident(orgId(req, req.body.organizationId), req.user?.userId || null, req.body) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/incidents/:publicId/decision', requirePermission(PERMISSIONS['privacy.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.decideIncident(orgId(req, req.body.organizationId), req.params.publicId, req.user?.userId || null, req.body) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/vendors', requirePermission(PERMISSIONS['privacy.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterprisePrivacyService.listVendorPrivacy(orgId(req, req.query.organizationId)) });
     } catch (error) {
         next(error);
     }
@@ -311,8 +367,16 @@ router.get('/affected', requirePermission(PERMISSIONS['privacy.read']), async (r
 
 router.post('/import/preview', requirePermission(PERMISSIONS['privacy.manage'], PERMISSIONS['processingActivity.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        orgId(req, req.body.organizationId);
-        res.json({ success: true, data: enterprisePrivacyService.previewImport(req.body.rows || []) });
+        res.json({ success: true, data: await enterprisePrivacyService.previewImportForOrg(orgId(req, req.body.organizationId), req.body.rows || []) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/import/template', requirePermission(PERMISSIONS['privacy.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        orgId(req, req.query.organizationId);
+        res.json({ success: true, data: enterprisePrivacyService.importTemplate() });
     } catch (error) {
         next(error);
     }

@@ -6,7 +6,7 @@ import { csvEscape } from '../security/spreadsheetSafe';
 import { neutralizeSpreadsheetCell, PRIVACY_HONESTY } from '../services/enterprisePrivacyEngine';
 import { enterprisePrivacyService } from '../services/enterprisePrivacyService';
 import { isoDate } from './sendDownload';
-import { buildPptx } from './pptxBuilder';
+import { renderPrivacyBoardPptx as renderPremiumPrivacyBoard } from './privacyBoardPptx';
 
 const TITLES: Record<string, string> = {
     ropa: 'ROPA / Processing Activities',
@@ -131,78 +131,7 @@ export async function renderPrivacyPdf(organizationId: string, kind: string) {
 }
 
 export async function renderPrivacyBoardPptx(organizationId: string) {
-    const pack = await enterprisePrivacyService.pack(organizationId);
-    const slides = [
-        {
-            title: 'Supreme Privacy — Board summary',
-            kpis: [
-                { label: 'Active processing', value: String(pack.dashboard.totals.activeActivities) },
-                { label: 'Open rights', value: String(pack.dashboard.totals.openRightsRequests) },
-                { label: 'Transfers in review', value: String(pack.dashboard.totals.transfersRequiringReview) },
-                { label: 'Retention due', value: String(pack.dashboard.totals.retentionActionsDue) },
-            ],
-            bullets: [
-                pack.name,
-                'Recorded legal basis is not a finding that processing is lawful.',
-                'Configured deadlines are not legal advice.',
-            ],
-        },
-        {
-            title: 'Privacy posture',
-            kpis: [
-                { label: 'High-risk processing', value: String(pack.dashboard.totals.highRiskProcessing) },
-                { label: 'DPIAs due', value: String(pack.dashboard.totals.dpiasDue) },
-                { label: 'Overdue rights', value: String(pack.dashboard.totals.overdueRightsRequests) },
-                { label: 'Open gaps', value: String(pack.dashboard.totals.openGaps) },
-            ],
-            bullets: [
-                'A DPIA decision is not a claim that GDPR is satisfied.',
-                'Closed deletion tasks are not proof data is gone.',
-            ],
-        },
-        {
-            title: 'Transfers and processors',
-            kpis: [
-                { label: 'Transfers in review', value: String(pack.dashboard.totals.transfersRequiringReview) },
-                { label: 'Processors linked', value: String(pack.dashboard.totals.processorsWithIssues) },
-                { label: 'Evidence refresh', value: String(pack.dashboard.totals.evidenceRefresh) },
-                { label: 'Deletion pending', value: String(pack.dashboard.totals.deletionPending) },
-            ],
-            bullets: pack.transfers.length
-                ? pack.transfers.slice(0, 6).map((row) => `${row.publicId} ${row.source} → ${row.destination} · ${row.status}`)
-                : ['No international transfer is recorded.'],
-        },
-        {
-            title: 'Rights and retention',
-            kpis: [
-                { label: 'Open rights', value: String(pack.dashboard.totals.openRightsRequests) },
-                { label: 'Overdue rights', value: String(pack.dashboard.totals.overdueRightsRequests) },
-                { label: 'Retention due', value: String(pack.dashboard.totals.retentionActionsDue) },
-                { label: 'Consent collector', value: 'Manual' },
-            ],
-            bullets: [
-                'Requester identity is withheld from this board view.',
-                'Consent collection remains not configured / manual.',
-            ],
-        },
-        {
-            title: 'Needs attention',
-            bullets: pack.dashboard.attention.length
-                ? pack.dashboard.attention.slice(0, 8).map((row) => `${row.type}: ${row.why}`)
-                : ['No attention items from live records.'],
-        },
-        {
-            title: 'Decisions required',
-            bullets: pack.dashboard.attention.length
-                ? pack.dashboard.attention.slice(0, 6).map((row) => `Review ${row.publicId} — ${row.type}`)
-                : ['No management action is required from the current live queue.'],
-            footnote: 'Supreme Privacy records organizational determinations. It does not provide legal advice.',
-        },
-    ];
-    return {
-        buffer: await buildPptx(slides),
-        filenameParts: ['Supreme-Privacy-Board'],
-    };
+    return renderPremiumPrivacyBoard(organizationId);
 }
 
 export async function renderPrivacyWorkbook(organizationId: string, format: 'csv' | 'xlsx') {

@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
@@ -12,6 +12,7 @@ const SECTIONS = ['Overview', 'Purpose & Basis', 'Data', 'Data Subjects', 'Syste
 
 export default function PrivacyActivityDetail() {
     const { publicId } = useParams();
+    const navigate = useNavigate();
     const [section, setSection] = useState<(typeof SECTIONS)[number]>('Overview');
     const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
@@ -119,7 +120,7 @@ export default function PrivacyActivityDetail() {
                                 ]} />
                                 <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addData(publicId!, { kind: dataKind, label: dataKind.replace(/_/g, ' '), sensitive: ['HEALTH', 'BIOMETRIC', 'CRIMINAL_LEGAL'].includes(dataKind) }))} direction="row" spacing={1.5} sx={{ mt: 2 }}>
                                     <TextField select label="Data category" value={dataKind} onChange={(event) => setDataKind(event.target.value)} sx={{ minWidth: 220 }}>
-                                        {['IDENTITY', 'CONTACT', 'FINANCIAL', 'EMPLOYMENT', 'HEALTH', 'LOCATION', 'ONLINE_IDENTIFIERS'].map((item) => <MenuItem key={item} value={item}>{item.replace(/_/g, ' ')}</MenuItem>)}
+                                        {[{ key: 'IDENTITY', label: 'Identity' }, { key: 'CONTACT', label: 'Contact' }, { key: 'FINANCIAL', label: 'Financial' }, { key: 'EMPLOYMENT', label: 'Employment' }, { key: 'HEALTH', label: 'Health' }, { key: 'LOCATION', label: 'Location' }, { key: 'ONLINE_IDENTIFIERS', label: 'Online Identifiers' }, { key: 'SPECIAL_CATEGORY', label: 'Special Category Data' }].map((item) => <MenuItem key={item.key} value={item.key}>{item.label}</MenuItem>)}
                                     </TextField>
                                     <Button type="submit">Add category</Button>
                                 </Stack>
@@ -133,7 +134,7 @@ export default function PrivacyActivityDetail() {
                                 ]} />
                                 <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addSubject(publicId!, { kind: subjectKind }))} direction="row" spacing={1.5} sx={{ mt: 2 }}>
                                     <TextField select label="Data subject" value={subjectKind} onChange={(event) => setSubjectKind(event.target.value)} sx={{ minWidth: 220 }}>
-                                        {['CUSTOMERS', 'EMPLOYEES', 'APPLICANTS', 'CONTRACTORS', 'PROSPECTS', 'WEBSITE_VISITORS', 'SUPPLIERS'].map((item) => <MenuItem key={item} value={item}>{item.replace(/_/g, ' ')}</MenuItem>)}
+                                        {[{ key: 'CUSTOMERS', label: 'Customers' }, { key: 'EMPLOYEES', label: 'Employees' }, { key: 'APPLICANTS', label: 'Applicants' }, { key: 'CONTRACTORS', label: 'Contractors' }, { key: 'PROSPECTS', label: 'Prospects' }, { key: 'WEBSITE_VISITORS', label: 'Website Visitors' }, { key: 'SUPPLIERS', label: 'Suppliers' }].map((item) => <MenuItem key={item.key} value={item.key}>{item.label}</MenuItem>)}
                                     </TextField>
                                     <Button type="submit">Add subject</Button>
                                 </Stack>
@@ -157,13 +158,14 @@ export default function PrivacyActivityDetail() {
                                     { id: 'name', label: 'Vendor', render: (row: any) => row.name || 'Linked vendor' },
                                     { id: 'role', label: 'Privacy role', render: (row: any) => row.role },
                                     { id: 'jurisdiction', label: 'Jurisdiction', render: (row: any) => row.jurisdiction || 'Not recorded' },
+                                    { id: 'open', label: '', render: (row: any) => row.vendorId ? <Button onClick={() => navigate(`/privacy-ops/vendors/${row.vendorId}`)}>Open vendor privacy</Button> : null },
                                 ]} />
                                 <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addParty(publicId!, { partyType: 'VENDOR', vendorId, privacyRole }))} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 2 }}>
                                     <TextField select label="Existing vendor" value={vendorId} onChange={(event) => setVendorId(event.target.value)} sx={{ minWidth: 260 }} required>
                                         {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                                     </TextField>
                                     <TextField select label="Privacy role" value={privacyRole} onChange={(event) => setPrivacyRole(event.target.value)} sx={{ minWidth: 200 }}>
-                                        {['PROCESSOR', 'SUBPROCESSOR', 'CONTROLLER', 'JOINT_CONTROLLER', 'RECIPIENT', 'SERVICE_PROVIDER'].map((item) => <MenuItem key={item} value={item}>{item.replace(/_/g, ' ')}</MenuItem>)}
+                                        {[{ key: 'PROCESSOR', label: 'Processor' }, { key: 'SUBPROCESSOR', label: 'Subprocessor' }, { key: 'CONTROLLER', label: 'Controller' }, { key: 'JOINT_CONTROLLER', label: 'Joint Controller' }, { key: 'RECIPIENT', label: 'Recipient' }, { key: 'SERVICE_PROVIDER', label: 'Service Provider' }].map((item) => <MenuItem key={item.key} value={item.key}>{item.label}</MenuItem>)}
                                     </TextField>
                                     <Button type="submit" disabled={!vendorId}>Link vendor</Button>
                                 </Stack>

@@ -1,10 +1,14 @@
 import {
     configuredDeadline,
+    consentProviderStatus,
     containsForbiddenClaim,
+    deletionHonesty,
     dpiaScreeningAdvice,
+    humanPrivacyLabel,
     maskRequester,
     neutralizeSpreadsheetCell,
     nextPrivacyId,
+    notificationHonesty,
     PRIVACY_HONESTY,
 } from '../services/enterprisePrivacyEngine';
 
@@ -36,5 +40,17 @@ describe('supreme privacy honesty', () => {
         expect(ccpa.days).toBe(45);
         expect(maskRequester('jane.doe@example.com')).toBe('j•••@example.com');
         expect(maskRequester('AB')).toBe('••••');
+    });
+
+    it('humanizes catalog keys and keeps deletion/consent/incident language honest', () => {
+        expect(humanPrivacyLabel('CUSTOMERS')).toBe('Customers');
+        expect(humanPrivacyLabel('SERVICE_PROVIDER')).toBe('Service Provider');
+        expect(humanPrivacyLabel('SPECIAL_CATEGORY')).toBe('Special Category Data');
+        expect(deletionHonesty('CLOSED')).toMatch(/not proof that external-system data is deleted/i);
+        expect(deletionHonesty('LEGAL_HOLD', 'Hold')).toMatch(/not complete as a deletion/i);
+        expect(consentProviderStatus('MANUAL')).toMatch(/not configured/i);
+        expect(consentProviderStatus('IMPORTED')).toBe('Imported');
+        expect(notificationHonesty('NOTIFICATION_DETERMINED_REQUIRED')).not.toMatch(/you must notify/i);
+        expect(notificationHonesty('REVIEW_REQUIRED')).toMatch(/notification assessment required/i);
     });
 });

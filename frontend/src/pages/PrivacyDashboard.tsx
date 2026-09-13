@@ -59,8 +59,12 @@ export default function PrivacyDashboard() {
                 actions={(
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                         <Button variant="contained" onClick={() => navigate('/privacy-ops/activities')}>Processing activities</Button>
-                        <Button onClick={() => navigate('/privacy-ops/data-map')}>Data map</Button>
+                        <Button onClick={() => navigate('/privacy-ops/vendors')}>Vendor privacy</Button>
                         <Button onClick={() => navigate('/privacy-ops/rights')}>Rights requests</Button>
+                        <Button onClick={() => navigate('/privacy-ops/deletions')}>Deletion</Button>
+                        <Button onClick={() => navigate('/privacy-ops/consent')}>Consent</Button>
+                        <Button onClick={() => navigate('/privacy-ops/incidents')}>Incidents</Button>
+                        <Button onClick={() => navigate('/privacy-ops/import')}>Import</Button>
                         <Button onClick={() => privacyAPI.downloadReport('executive').then((res) => downloadBinaryResponse(res, 'Supreme-Privacy-executive.pdf'))}>Executive PDF</Button>
                         <Button onClick={() => privacyAPI.downloadBoardPptx().then((res) => downloadBinaryResponse(res, 'Supreme-Privacy-Board.pptx'))}>Board PPTX</Button>
                     </Stack>

@@ -423,6 +423,7 @@ export default function VendorManagement() {
                                 </Surface>
                                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                                     <Button variant="contained" onClick={() => handleStartAssessment()}>Start assessment</Button>
+                                    <Button onClick={() => navigate(`/privacy-ops/vendors/${selectedVendor.id}`)}>Open privacy</Button>
                                     <Button onClick={() => navigate(`/documents?vendorId=${selectedVendor.id}`)}>Request evidence</Button>
                                     <Button onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Create finding</Button>
                                     <Button onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Make decision</Button>
