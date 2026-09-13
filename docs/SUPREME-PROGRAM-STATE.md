@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #17 Supreme Privacy
 
-**CURRENT ITEM STATUS:** AUTHORIZED / IN PROGRESS
+**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -72,6 +72,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#16 PROGRAM ACCEPTANCE:** PASS — Product Leadership accepted (2026-09-13)
 **#17 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#17 STARTING SHA:** `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`
+**#17 IMPLEMENTATION SHA:** `134d12860c595603106180c35ad3a10a328917f7`
+**#17 CLOSURE SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`
+**#17 HOSTED FRONTEND SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`
+**#17 HOSTED API SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`
 **#18 AUTHORIZED:** NO
 
 ---
@@ -80,9 +84,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #17 Supreme Privacy
 
-**STATUS:** AUTHORIZED / IN PROGRESS
+**STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
-See `docs/ADR-SUPREME-PRIVACY.md`. #18 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-PRIVACY.md` and `docs/private-beta/hosted-ux-qa/supreme-privacy/`. #18 is not authorized. #12 remains PARTIAL.
 
 ### #16 Supreme Compliance
 
@@ -137,13 +141,13 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Implement #17 Supreme Privacy. Keep #12 PARTIAL. Do not start #18. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Product Leadership hosted review of #17 Supreme Privacy. Keep #12 PARTIAL. Do not start #18. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#17 Supreme Privacy** — authorized. Do not start #18.
+**#17 Supreme Privacy** — Product Leadership review required. Do not start #18.
 
 **#12** remains PARTIAL / open in parallel.
 
@@ -183,7 +187,7 @@ Implement #17 Supreme Privacy. Keep #12 PARTIAL. Do not start #18. Do not invite
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership hosted review of #17 Supreme Privacy after implementation. Do not declare #17 PASS from this file. #16 is accepted. #12 remains PARTIAL. #18 is not authorized.
+Product Leadership hosted review of #17 Supreme Privacy. Hosted evidence is in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Do not declare #17 PASS from this file. #16 is accepted. #12 remains PARTIAL. #18 is not authorized.
 
 ---
 
@@ -322,3 +326,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** NOT STARTED -> AUTHORIZED / IN PROGRESS  
 **SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`  
 **EVIDENCE:** Explicit Product Leadership authorization. #16 is PASS. #12 remains PARTIAL. #18 is not authorized. Hosted staging remains `3c580a1` until this item deploys. That mismatch is not silently reconciled.
+
+### 2026-09-13
+
+**ITEM:** #17 Supreme Privacy  
+**STATUS CHANGE:** AUTHORIZED / IN PROGRESS -> PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED  
+**SHA:** Implementation `134d12860c595603106180c35ad3a10a328917f7`; closure `20811dafcbb5f55899e07d5abe19357024e5d43d`  
+**EVIDENCE:** Hosted Supreme CI run `34782536022` PASS. Staging frontend and API both `20811da`. Hosted Elite Claims walkthrough recorded in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Not PASS. #12 remains PARTIAL. #18 is not authorized.

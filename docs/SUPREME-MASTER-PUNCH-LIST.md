@@ -307,13 +307,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Privacy objects and workflows with truthful provider status.
 
-**CURRENT STATUS:** AUTHORIZED / IN PROGRESS
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Not PASS.
+**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Implementation `134d12860c595603106180c35ad3a10a328917f7`. Closure `20811dafcbb5f55899e07d5abe19357024e5d43d`. Hosted frontend and API both `20811da`. Not PASS.
 
-**EVIDENCE:** Product Leadership authorization 2026-09-13. See `docs/ADR-SUPREME-PRIVACY.md`.
+**EVIDENCE:** `docs/ADR-SUPREME-PRIVACY.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. CI `34782536022` PASS. Cursor does not declare #17 PASS.
 
-**NEXT ACTION:** Implement Supreme Privacy on #13–#16. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership hosted review. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 

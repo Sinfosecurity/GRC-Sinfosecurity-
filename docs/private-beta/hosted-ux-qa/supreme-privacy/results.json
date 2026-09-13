@@ -1,0 +1,377 @@
+{
+  "checks": [
+    {
+      "name": "dashboard",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "honesty",
+      "result": "PASS",
+      "detail": "A recorded legal basis is not a finding that processing is lawful. A DPIA is not a claim that GDPR is satisfied. A configured deadline is not legal advice. A closed deletion task i"
+    },
+    {
+      "name": "create activity",
+      "result": "PASS",
+      "detail": "201 PA-00002"
+    },
+    {
+      "name": "vendor link",
+      "result": "PASS",
+      "detail": "Supreme Investigation 2afc74ad-a4e0-4a34-a2c4-40e88af5d376"
+    },
+    {
+      "name": "transfer",
+      "result": "PASS",
+      "detail": "201 XFR-00002"
+    },
+    {
+      "name": "dpia screening",
+      "result": "PASS",
+      "detail": "DPIA may be required / review recommended. This is not a statement that a DPIA is legally required."
+    },
+    {
+      "name": "rights",
+      "result": "PASS",
+      "detail": "DSR-00002"
+    },
+    {
+      "name": "data map financial",
+      "result": "PASS",
+      "detail": "200 rows=2"
+    },
+    {
+      "name": "what is affected",
+      "result": "PASS",
+      "detail": "{\"systems\": [\"Claims platform\"], \"vendors\": [\"Supreme Investigation (vendor residual 13)\"], \"dataCategories\": [\"Financial\"], \"dataSubjects\": [\"CUSTOMERS\"], \"jurisdictions\": [\"US-NY\", \"IE\"], \"transfers\": [\"XFR-00002\"], \"privacyRisks\": [\"RISK-00001 Privileged access failure\"], \"controls\": [\"TPR-01\"], \"requirements\": [\"CRS-00001\"], \"evidence\": [\"sr-clean-evidence.txt (CLEAN)\"], \"gaps\": [\"GAP-00001 50"
+    },
+    {
+      "name": "report ropa",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report risk",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report dpia",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report transfers",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report rights",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report retention",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report processors",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report executive",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report board",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "board pptx",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "export csv",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "export xlsx",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "cross-tenant activity",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "dashboard copy spaces",
+      "result": "PASS",
+      "detail": "SUPREME RISK \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nSupreme\n\nThird Party \u00b7 Staging\n\nOVERVIEW\n\nOverview\n\nTHI"
+    },
+    {
+      "name": "overflow dashboard",
+      "result": "PASS",
+      "detail": "/privacy-ops"
+    },
+    {
+      "name": "overflow activities",
+      "result": "PASS",
+      "detail": "/privacy-ops/activities"
+    },
+    {
+      "name": "overflow data-map",
+      "result": "PASS",
+      "detail": "/privacy-ops/data-map"
+    },
+    {
+      "name": "overflow transfers",
+      "result": "PASS",
+      "detail": "/privacy-ops/transfers"
+    },
+    {
+      "name": "overflow dpias",
+      "result": "PASS",
+      "detail": "/privacy-ops/dpias"
+    },
+    {
+      "name": "rights list mask",
+      "result": "PASS",
+      "detail": "SUPREME RISK \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nSupreme\n\nThird Party \u00b7 Staging\n\nOVERVIEW\n\nOverview\n\nTHIRD PARTIES\n\nVendors\nAssessments\nEvidence"
+    },
+    {
+      "name": "overflow rights",
+      "result": "PASS",
+      "detail": "/privacy-ops/rights"
+    },
+    {
+      "name": "overflow retention",
+      "result": "PASS",
+      "detail": "/privacy-ops/retention"
+    },
+    {
+      "name": "overflow activity-detail",
+      "result": "PASS",
+      "detail": "/privacy-ops/activities/PA-00002"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-ropa.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-risk.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-dpia.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-transfers.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-rights.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-retention.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-processors.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-executive.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-board.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-Board.pptx",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-Register.csv",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-Register.xlsx",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dashboard-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dashboard-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dashboard-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dashboard-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dashboard-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activities-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activities-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activities-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activities-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activities-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/data-map-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/data-map-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/data-map-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/data-map-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/data-map-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/transfers-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/transfers-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/transfers-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/transfers-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/transfers-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dpias-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dpias-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dpias-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dpias-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/dpias-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/rights-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/rights-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/rights-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/rights-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/rights-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-compliance-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-risk-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-graph-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-controls-1440.png"
+  ],
+  "sha": {
+    "api": "20811dafcbb5f55899e07d5abe19357024e5d43d",
+    "frontend": "20811dafcbb5f55899e07d5abe19357024e5d43d",
+    "healthStatus": 200,
+    "health": {
+      "status": "degraded",
+      "timestamp": "2026-09-13T21:11:34.058Z",
+      "uptime": 522.27048308,
+      "version": "1.0.0",
+      "runtimeMode": "production",
+      "deploymentEnvironment": "staging",
+      "environment": "staging",
+      "gitSha": "20811dafcbb5f55899e07d5abe19357024e5d43d",
+      "checks": {
+        "mongodb": {
+          "status": "degraded",
+          "message": "NOT_CONFIGURED",
+          "responseTime": 0
+        },
+        "memory": {
+          "status": "degraded",
+          "message": "High memory usage",
+          "details": {
+            "heapUsedMB": 82,
+            "heapTotalMB": 85,
+            "usagePercent": "96.47"
+          },
+          "responseTime": 0
+        },
+        "circuitBreakers": {
+          "status": "up",
+          "message": "All circuit breakers operational",
+          "details": {
+            "totalBreakers": 0
+          },
+          "responseTime": 0
+        },
+        "storage": {
+          "status": "up",
+          "message": "Object storage s3",
+          "details": {
+            "provider": "s3",
+            "malwareScanning": "PENDING",
+            "malwareProvider": "CONNECTED",
+            "downloadPolicy": {
+              "allowPendingDownloads": false,
+              "allowUnscannedDownloads": false
+            }
+          },
+          "responseTime": 0
+        },
+        "email": {
+          "status": "degraded",
+          "message": "DEGRADED",
+          "responseTime": 0
+        },
+        "stripe": {
+          "status": "up",
+          "message": "Stripe test mode connected",
+          "responseTime": 0
+        },
+        "ai": {
+          "status": "degraded",
+          "message": "NOT_CONFIGURED",
+          "responseTime": 0
+        },
+        "malware": {
+          "status": "up",
+          "message": "CONNECTED",
+          "details": {
+            "downloadPolicy": {
+              "allowPendingDownloads": false,
+              "allowUnscannedDownloads": false
+            }
+          },
+          "responseTime": 0
+        },
+        "redis": {
+          "status": "up",
+          "message": "Redis connection healthy",
+          "responseTime": 1
+        },
+        "postgres": {
+          "status": "up",
+          "message": "PostgreSQL connection healthy",
+          "responseTime": 1
+        }
+      },
+      "memory": {
+        "rss": 197591040,
+        "heapUsed": 85970256,
+        "heapTotal": 89284608
+      }
+    }
+  },
+  "workflow": {
+    "activity": "PA-00002",
+    "transfer": "XFR-00002",
+    "dpia": "DPIA-00002",
+    "rights": "DSR-00002",
+    "vendorId": "2afc74ad-a4e0-4a34-a2c4-40e88af5d376",
+    "vendorName": "Supreme Investigation",
+    "control": "TPR-01",
+    "risk": "RISK-00001",
+    "requirement": "CRS-00001"
+  },
+  "chain": {
+    "systems": [
+      "Claims platform"
+    ],
+    "vendors": [
+      "Supreme Investigation (vendor residual 13)"
+    ],
+    "dataCategories": [
+      "Financial"
+    ],
+    "dataSubjects": [
+      "CUSTOMERS"
+    ],
+    "jurisdictions": [
+      "US-NY",
+      "IE"
+    ],
+    "transfers": [
+      "XFR-00002"
+    ],
+    "privacyRisks": [
+      "RISK-00001 Privileged access failure"
+    ],
+    "controls": [
+      "TPR-01"
+    ],
+    "requirements": [
+      "CRS-00001"
+    ],
+    "evidence": [
+      "sr-clean-evidence.txt (CLEAN)"
+    ],
+    "gaps": [
+      "GAP-00001 500.07 is mapped to controls that are not implemented \u00b7 OPEN",
+      "GAP-00002 500.07 has no current CLEAN evidence \u00b7 OPEN"
+    ],
+    "dpias": [
+      "DPIA-00002"
+    ],
+    "rightsRequests": [
+      "DSR-00002"
+    ],
+    "retentionRules": [
+      "RET-00002"
+    ]
+  },
+  "discrepancies": [],
+  "hostedFrontendSha": "20811dafcbb5f55899e07d5abe19357024e5d43d",
+  "hostedApiSha": "20811dafcbb5f55899e07d5abe19357024e5d43d"
+}

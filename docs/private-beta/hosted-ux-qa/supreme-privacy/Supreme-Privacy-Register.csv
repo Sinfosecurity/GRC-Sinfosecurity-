@@ -1,0 +1,9 @@
+Sheet,ID,Title,Status,Owner
+Processing,PA-00001,Claims servicing,ACTIVE,Report Proof
+Processing,PA-00002,Claims servicing,ACTIVE,Report Proof
+Transfers,XFR-00001,US-NY → IE,REVIEW REQUIRED,Report Proof
+Transfers,XFR-00002,US-NY → IE,REVIEW REQUIRED,Report Proof
+Rights,DSR-00001,ACCESS,RECEIVED,Report Proof
+Rights,DSR-00002,ACCESS,RECEIVED,Report Proof
+Retention,RET-00001,7 years after claim close,Scheduled,
+Retention,RET-00002,7 years after claim close,Scheduled,
