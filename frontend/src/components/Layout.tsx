@@ -65,7 +65,7 @@ export default function Layout() {
     const { user, logout } = useAuth();
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default', overflowX: 'hidden' }}>
             {/* Sidebar */}
             <Box
                 component="nav"

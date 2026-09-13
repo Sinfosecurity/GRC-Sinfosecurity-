@@ -25,7 +25,7 @@ export function PlatformSupportQueue() {
                 <Table size="small" aria-label="Support ticket queue">
                     <TableHead>
                         <TableRow>
-                            {['Ticket', 'Priority', 'Status', 'Organization', 'Age', 'Subject'].map((col) => (
+                            {['Ticket', 'Kind', 'Priority', 'Status', 'Organization', 'Age', 'Subject'].map((col) => (
                                 <TableCell key={col} sx={{ color: '#c4955c' }}>{col}</TableCell>
                             ))}
                         </TableRow>
@@ -34,6 +34,7 @@ export function PlatformSupportQueue() {
                         {rows.map((row) => (
                             <TableRow key={String(row.id)}>
                                 <TableCell><Link to={`/platform/support/${row.id}`} style={{ color: '#e8c9a0' }}>{String(row.displayId)}</Link></TableCell>
+                                <TableCell>{String((row.diagnosticContext as { kind?: string } | undefined)?.kind || '—')}</TableCell>
                                 <TableCell>{String(row.priority)}</TableCell>
                                 <TableCell>{String(row.status)}</TableCell>
                                 <TableCell>{String((row.organization as { name?: string } | undefined)?.name || '')}</TableCell>
@@ -70,6 +71,29 @@ export function PlatformTicketDetail() {
             <Panel title={String(ticket?.displayId || 'Ticket')}>
                 <Typography>{String(ticket?.subject)}</Typography>
                 <Typography sx={{ color: '#c4b09a' }}>{String(ticket?.priority)} · {String(ticket?.status)}</Typography>
+                <Typography sx={{ color: '#c4b09a' }}>
+                    Organization: {String((ticket?.organization as { name?: string } | undefined)?.name || '—')}
+                </Typography>
+            </Panel>
+            <Panel title="Private-beta feedback">
+                <Typography sx={{ color: '#c4b09a' }}>
+                    Kind: {String((ticket?.diagnosticContext as { kind?: string } | undefined)?.kind || '—')}
+                </Typography>
+                <Typography sx={{ color: '#c4b09a' }}>
+                    Workflow: {String((ticket?.diagnosticContext as { workflow?: string } | undefined)?.workflow || '—')}
+                </Typography>
+                <Typography sx={{ color: '#c4b09a' }}>
+                    Tester-perceived severity: {String((ticket?.diagnosticContext as { perceivedSeverity?: string } | undefined)?.perceivedSeverity || '—')}
+                </Typography>
+                <Typography sx={{ color: '#c4b09a' }}>
+                    Page: {String((ticket?.diagnosticContext as { route?: string } | undefined)?.route || '—')}
+                </Typography>
+                <Typography sx={{ color: '#c4b09a' }}>
+                    Reported at: {String((ticket?.diagnosticContext as { timestamp?: string } | undefined)?.timestamp || '—')}
+                </Typography>
+                <Typography sx={{ color: '#c4b09a', wordBreak: 'break-all' }}>
+                    CLEAN evidence reference: {String((ticket?.diagnosticContext as { evidenceObjectId?: string } | undefined)?.evidenceObjectId || 'none')}
+                </Typography>
             </Panel>
             <Panel title="Thread">
                 {messages.map((message) => (

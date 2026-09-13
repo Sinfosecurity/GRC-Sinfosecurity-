@@ -2,7 +2,7 @@ import { VendorStatus } from '@prisma/client';
 import { ApiError } from '../middleware/errorHandler';
 
 const TRANSITIONS: Record<VendorStatus, VendorStatus[]> = {
-    PROPOSED: [VendorStatus.APPROVED, VendorStatus.REJECTED, VendorStatus.ACTIVE],
+    PROPOSED: [VendorStatus.APPROVED, VendorStatus.REJECTED, VendorStatus.ACTIVE, VendorStatus.OFFBOARDING],
     APPROVED: [VendorStatus.ACTIVE, VendorStatus.REJECTED, VendorStatus.OFFBOARDING],
     ACTIVE: [VendorStatus.SUSPENDED, VendorStatus.INACTIVE, VendorStatus.OFFBOARDING],
     SUSPENDED: [VendorStatus.ACTIVE, VendorStatus.OFFBOARDING, VendorStatus.TERMINATED],

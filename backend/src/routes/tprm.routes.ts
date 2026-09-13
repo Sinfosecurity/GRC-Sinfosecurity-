@@ -12,6 +12,7 @@ import { monitoringCredentialsConfigured, resolveMonitoringProviderStatus } from
 import tprmOperationsRoutes from './tprm.operations.routes';
 import { notifyUser } from '../services/notificationDeliveryService';
 import { enforceSubscriptionWrites } from '../middleware/entitlement';
+import { vendorOffboardService } from '../services/vendorOffboardService';
 
 const router = Router();
 router.use(authenticate);
@@ -143,6 +144,34 @@ router.get('/evidence', requirePermission(PERMISSIONS['evidence.read']), async (
                 storage,
                 items,
             },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/vendors/:vendorId/offboard', requirePermission(PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await vendorOffboardService.preview(req.user!.organizationId, req.params.vendorId),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/vendors/:vendorId/offboard', requirePermission(PERMISSIONS['vendor.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await vendorOffboardService.offboard({
+                organizationId: req.user!.organizationId,
+                vendorId: req.params.vendorId,
+                actorUserId: req.user!.id,
+                exitNotes: req.body?.exitNotes ? String(req.body.exitNotes) : undefined,
+                acknowledgeOutstanding: Boolean(req.body?.acknowledgeOutstanding),
+            }),
         });
     } catch (error) {
         next(error);

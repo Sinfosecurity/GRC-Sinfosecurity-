@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Card, CardContent, CircularProgress, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import { tprmAPI, vendorAPI } from '../services/api';
@@ -26,8 +27,9 @@ type Brief = {
 const decisions = ['APPROVE', 'APPROVE_WITH_CONDITIONS', 'ESCALATE', 'REJECT', 'RISK_ACCEPTED'];
 
 export default function DecisionBriefs() {
+    const [searchParams] = useSearchParams();
     const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
-    const [vendorId, setVendorId] = useState('');
+    const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [briefs, setBriefs] = useState<Brief[]>([]);
     const [selected, setSelected] = useState<Brief | null>(null);
     const [loading, setLoading] = useState(true);
@@ -104,6 +106,10 @@ export default function DecisionBriefs() {
 
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
                 <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 280 }}>
+                    <MenuItem value="">Select vendor</MenuItem>
+                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                        <MenuItem value={vendorId}>Selected vendor</MenuItem>
+                    )}
                     {vendors.map((vendor) => (
                         <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>
                     ))}

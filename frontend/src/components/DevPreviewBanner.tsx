@@ -7,14 +7,16 @@ type EnvironmentFlags = {
     VITE_PREVIEW_LABEL?: string;
 };
 
-export function environmentLabelFrom(env: EnvironmentFlags): 'STAGING' | 'DEVELOPMENT' | null {
+export function environmentLabelFrom(env: EnvironmentFlags): 'PRIVATE_BETA' | 'STAGING' | 'DEVELOPMENT' | null {
+    const value = String(env.VITE_ENVIRONMENT || '').toLowerCase();
+    if (value === 'private-beta' || value === 'private_beta' || value === 'beta') return 'PRIVATE_BETA';
     if (env.VITE_ENVIRONMENT === 'staging') return 'STAGING';
     if (env.VITE_ENVIRONMENT === 'production' || env.PROD) return null;
     if (env.DEV || env.VITE_PREVIEW_LABEL === 'true') return 'DEVELOPMENT';
     return null;
 }
 
-export function environmentLabel(): 'STAGING' | 'DEVELOPMENT' | null {
+export function environmentLabel(): 'PRIVATE_BETA' | 'STAGING' | 'DEVELOPMENT' | null {
     return environmentLabelFrom({
         VITE_ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
         DEV: import.meta.env.DEV,
@@ -49,12 +51,18 @@ export default function DevPreviewBanner() {
             }}
         >
             <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.8rem' }}>
-                {environmentLabel() === 'STAGING' ? 'SUPREME RISK — STAGING' : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
+                {environmentLabel() === 'PRIVATE_BETA'
+                    ? 'SUPREME — PRIVATE BETA / TEST'
+                    : environmentLabel() === 'STAGING'
+                        ? 'SUPREME RISK — STAGING'
+                        : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
             </Typography>
             <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, fontSize: '0.7rem' }}>
-                {environmentLabel() === 'STAGING'
-                    ? 'Isolated staging environment. Not production. Do not use production tenant data.'
-                    : 'Local demo data only. Not production. Authentication and tenant isolation remain enabled.'}
+                {environmentLabel() === 'PRIVATE_BETA'
+                    ? 'Controlled private testing. Not production. Use synthetic data only. This is not an external pentest, SOC 2, or ISO assessment.'
+                    : environmentLabel() === 'STAGING'
+                        ? 'Isolated staging environment. Not production. Do not use production tenant data.'
+                        : 'Local demo data only. Not production. Authentication and tenant isolation remain enabled.'}
             </Typography>
         </Box>
     );

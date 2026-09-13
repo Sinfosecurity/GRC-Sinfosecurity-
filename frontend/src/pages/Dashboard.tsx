@@ -86,6 +86,30 @@ export default function Dashboard() {
                 />
             </Stack>
 
+            <Card sx={{ mb: 4, bgcolor: 'rgba(15,23,42,0.7)', border: '1px solid rgba(251,191,36,0.18)' }}>
+                <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Getting started</Typography>
+                    <Typography color="text.secondary" sx={{ mb: 2 }}>
+                        Complete one vendor lifecycle. You do not need database or internal architecture knowledge.
+                    </Typography>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap="wrap" useFlexGap>
+                        {[
+                            { label: '1. Add a vendor', href: '/vendor-management' },
+                            { label: '2. Start an assessment', href: '/assessments' },
+                            { label: '3. Upload evidence', href: '/documents' },
+                            { label: '4. Track findings', href: '/findings' },
+                            { label: '5. Make a decision', href: '/decision-briefs' },
+                            { label: '6. Review reports', href: '/reports' },
+                            { label: '7. Send feedback', href: '/help' },
+                        ].map((step) => (
+                            <Button key={step.href} variant="outlined" onClick={() => navigate(step.href)}>
+                                {step.label}
+                            </Button>
+                        ))}
+                    </Stack>
+                </CardContent>
+            </Card>
+
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
                 {[
                     { label: 'Vendors', value: stats?.totalVendors ?? '—' },

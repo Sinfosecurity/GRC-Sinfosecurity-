@@ -12,6 +12,8 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **RELEASE_CANDIDATE_SHA:** `5912ccafee28b87898548da9721adf79c5bbacb6`
 
+**#12 STARTING SHA:** `0e52e203459b1d3a8130ad063a5284e33898144c`
+
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
 **MAIN MERGED:** NO
@@ -21,17 +23,24 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** NO
+**#12 STARTED:** YES — private-testing implementation complete; commercial production remains NO-GO
+**#13 AUTHORIZED:** NO
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #12 Supreme Third Party Production v1 / Private Testing Release
+
+**STATUS:** IMPLEMENTATION COMPLETE — private-testing release candidate; commercial production NO-GO; hosted CI pending
+
+See `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, and `docs/private-beta/`.
+
 ### #11 Production Release Checklist
 
 **STATUS:** EVIDENCE RESULT PASS — production ready NO; CURRENT GO/NO-GO NO-GO
 
-See `docs/PRODUCTION-RELEASE-CHECKLIST.md` and `docs/PRODUCTION-USER-ACTIONS.md`. Cursor does not self-approve Conditional GO. Do not start #12.
+See `docs/PRODUCTION-RELEASE-CHECKLIST.md` and `docs/PRODUCTION-USER-ACTIONS.md`. Product Leadership authorized #12 as private testing only. That is not commercial GO.
 
 ### #10 Production Cutover Rehearsal
 
@@ -61,25 +70,21 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-#11 release checklist is complete. Stop for Product Leadership GO / NO-GO. Do not start #12. Do not deploy production. Do not change DNS. Do not merge `main`.
+Deliver and certify the #12 private-testing release candidate. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#12 Supreme Third Party Production v1**
-
-**ONLY AFTER PRODUCT LEADERSHIP RECORDS GO OR AN EXPLICIT CONDITIONAL GO.**
-
-Cursor may not self-approve Conditional GO.
+**None.** #13 Governance Graph is **not authorized**.
 
 ---
 
 ## DO NOT START
 
-- **#12** or later gates without authorization.
+- **#13** or later gates.
 - Production DNS, `main` merge, or production deploy.
-- Any new product module (#13 onward).
+- Live Stripe or commercial sale.
 
 ---
 
@@ -129,14 +134,12 @@ Cursor may not self-approve Conditional GO.
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership GO / Conditional GO / NO-GO on `docs/PRODUCTION-RELEASE-CHECKLIST.md`.
-
-Until GO is recorded here, **#12 is not started**.
+None for engineering start of #13. Product Leadership may later decide whether private testing on this SHA is sufficient to invite selected humans.
 
 Distinguish:
 
-- **IMPLEMENTATION RESULT** — #11 EVIDENCE RESULT: PASS (honest NO-GO package)
-- **PROGRAM ACCEPTANCE** — this file does not authorize production GO or #12.
+- **IMPLEMENTATION RESULT** — #12 private-testing implementation complete; hosted CI pending at draft
+- **PROGRAM ACCEPTANCE** — this file does not authorize commercial production GO or #13.
 
 ---
 
@@ -144,7 +147,7 @@ Distinguish:
 
 Do not invent percentages.
 
-**PRODUCTION READINESS:** NO — #11 NO-GO
+**PRODUCTION READINESS:** NO — #11 NO-GO; #12 is private testing only
 
 **PLATFORM COMPLETION:** TBD — weighted seven-product scoring model to be defined
 
@@ -167,7 +170,7 @@ Do not invent percentages.
 | 9 | Final Security Review | EVIDENCE RESULT PASS; HOSTED CLOSURE PASS |
 | 10 | Production Cutover Rehearsal | PASS |
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
-| 12 | Supreme Third Party Production v1 | NOT STARTED AS FINAL PRODUCTION RELEASE GATE |
+| 12 | Supreme Third Party Production v1 | IMPLEMENTATION COMPLETE — private-testing RC; commercial production NO-GO |
 | 13–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -269,3 +272,10 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 **STATUS CHANGE:** NOT STARTED -> EVIDENCE RESULT PASS (production ready NO; GO/NO-GO NO-GO; not #12 authorization)
 **SHA:** `5912ccafee28b87898548da9721adf79c5bbacb6` (hosted CI run `34733153974` PASS)
 **EVIDENCE:** `docs/PRODUCTION-RELEASE-CHECKLIST.md`, `docs/PRODUCTION-USER-ACTIONS.md`
+
+### 2026-09-13
+
+**ITEM:** #12 Supreme Third Party Production v1
+**STATUS CHANGE:** NOT STARTED AS FINAL PRODUCTION RELEASE GATE -> IMPLEMENTATION COMPLETE (private-testing release candidate; commercial production remains NO-GO; not #13 authorization)
+**SHA:** starting `0e52e203459b1d3a8130ad063a5284e33898144c`; implementation SHA recorded after commit
+**EVIDENCE:** `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, `docs/private-beta/`

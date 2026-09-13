@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**Do not start #12** until Product Leadership records GO or an explicit Conditional GO on #11.
+**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO and does not authorize #13.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -203,27 +203,27 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CERTIFICATION SHA:** `5912ccafee28b87898548da9721adf79c5bbacb6`
 
-**EVIDENCE:** `docs/PRODUCTION-RELEASE-CHECKLIST.md`, `docs/PRODUCTION-USER-ACTIONS.md`. BUSINESS entitlements implemented. Admin/app noindex implemented. Production not deployed. DNS unchanged. #12 not started.
+**EVIDENCE:** `docs/PRODUCTION-RELEASE-CHECKLIST.md`, `docs/PRODUCTION-USER-ACTIONS.md`. BUSINESS entitlements implemented. Admin/app noindex implemented. Production not deployed. DNS unchanged.
 
-**NEXT ACTION:** Product Leadership review. Do not start #12. Do not merge `main` or change production DNS.
+**NEXT ACTION:** Commercial GO remains NO-GO. Product Leadership authorized #12 as private testing only. Do not merge `main` or change production DNS.
 
 ---
 
 ## 12. Supreme Third Party Production v1
 
-**PURPOSE:** First production release of Supreme Third Party as a commercial product.
+**PURPOSE:** Product Leadership narrowed this item from commercial production launch to a complete, coherent Supreme Third Party **private-testing** release candidate. Commercial sale, live Stripe, production DNS, and paid assurance services are out of scope.
 
-**DEPENDENCIES:** #9, #10, #11
+**DEPENDENCIES:** #9, #10, #11 (NO-GO for commercial production remains in force)
 
-**DEFINITION OF DONE:** Production hosts, DNS, live billing, and customer onboarding are authorized and verified. Not a staging candidate.
+**DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** NOT STARTED AS FINAL PRODUCTION RELEASE GATE
+**CURRENT STATUS:** IMPLEMENTATION COMPLETE — private-testing release candidate; commercial production remains NO-GO; hosted CI pending at documentation draft
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** starting `0e52e203459b1d3a8130ad063a5284e33898144c`; final SHA recorded after commit in `docs/SUPREME-PROGRAM-STATE.md`
 
-**EVIDENCE:** Staging exists. That is not production v1.
+**EVIDENCE:** `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, `docs/private-beta/`
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Record hosted CI on the implementation SHA. Do not start #13. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -231,7 +231,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **PURPOSE:** Shared graph of organizations, assets, vendors, controls, evidence, and decisions across modules.
 
-**DEPENDENCIES:** #12 (production TPRM v1 as the first live product), #1
+**DEPENDENCIES:** #12 as a commercial production product (private-testing PASS is not sufficient), #1
 
 **DEFINITION OF DONE:** Authoritative graph model with tenant isolation, versioning, and no mock nodes. Marketing preview is not done.
 

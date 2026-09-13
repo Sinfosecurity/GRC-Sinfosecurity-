@@ -53,6 +53,7 @@ export const PERMISSIONS = {
     'platform.users.manage': 'platform.users.manage',
     'platform.sessions.request': 'platform.sessions.request',
     'platform.sessions.approve': 'platform.sessions.approve',
+    'platform.testers.manage': 'platform.testers.manage',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -85,6 +86,7 @@ const SUPPORT_ADMIN_PERMS: Permission[] = [
     PERMISSIONS['platform.leads.manage'],
     PERMISSIONS['platform.providers.read'],
     PERMISSIONS['platform.sessions.request'],
+    PERMISSIONS['platform.testers.manage'],
     PERMISSIONS['notification.read'],
 ];
 const SUPPORT_ANALYST_PERMS: Permission[] = [

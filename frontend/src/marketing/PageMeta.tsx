@@ -190,6 +190,9 @@ export function robotsPolicyForPath(
     if (env.VITE_ENVIRONMENT !== 'production' || env.DEV) {
         return 'noindex,nofollow';
     }
+    if (String(env.VITE_ENVIRONMENT).toLowerCase() === 'private-beta') {
+        return 'noindex,nofollow';
+    }
     const host = (hostname || (typeof window !== 'undefined' ? window.location.hostname : '')).toLowerCase();
     if (host === 'admin.supremerisk.com') {
         return 'noindex,nofollow';

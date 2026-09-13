@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Card, CardContent, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import { tprmAPI, vendorAPI } from '../services/api';
@@ -17,12 +18,13 @@ type Finding = {
 };
 
 export default function FindingsRemediation() {
+    const [searchParams] = useSearchParams();
     const [findings, setFindings] = useState<Finding[]>([]);
     const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
     const [selected, setSelected] = useState<Finding | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [vendorId, setVendorId] = useState('');
+    const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [severity, setSeverity] = useState('HIGH');
@@ -91,6 +93,10 @@ export default function FindingsRemediation() {
                 <CardContent>
                     <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
                         <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                            <MenuItem value="">Select vendor</MenuItem>
+                            {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                                <MenuItem value={vendorId}>Selected vendor</MenuItem>
+                            )}
                             {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                         </TextField>
                         <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />

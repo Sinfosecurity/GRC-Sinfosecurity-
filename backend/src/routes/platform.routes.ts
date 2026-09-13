@@ -12,6 +12,8 @@ import { demoLeadService } from '../services/demoLeadService';
 import { providerHealth } from '../services/providerHealth';
 import { recordAudit } from '../services/auditEventService';
 import { prisma } from '../config/database';
+import { privateTesterService } from '../services/privateTesterService';
+import { environmentClass, publicEnvironmentBanner } from '../services/privateBetaEnvironment';
 
 const router = Router();
 router.use(authenticate, requirePlatformStaff);
@@ -51,6 +53,58 @@ router.get('/organizations', requirePlatformPermission(PERMISSIONS['platform.ove
                 role: req.user!.role,
                 userId: req.user!.id,
             }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/environment', requirePlatformPermission(PERMISSIONS['platform.overview']), async (_req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const envClass = environmentClass();
+        res.json({
+            success: true,
+            data: {
+                environmentClass: envClass,
+                banner: publicEnvironmentBanner(envClass),
+                production: envClass === 'production',
+                commercialLaunch: false,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/testers', requirePlatformPermission(PERMISSIONS['platform.testers.manage']), async (_req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await privateTesterService.list() });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/testers', requirePlatformPermission(PERMISSIONS['platform.testers.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const data = await privateTesterService.provision({
+            organizationName: String(req.body?.organizationName || ''),
+            testerEmail: String(req.body?.testerEmail || ''),
+            testerRole: req.body?.testerRole,
+            country: req.body?.country,
+            invitedById: req.user!.id,
+            actorRole: req.user!.role as Role,
+        });
+        res.status(201).json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/testers/:organizationId/disable', requirePlatformPermission(PERMISSIONS['platform.testers.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await privateTesterService.disableOrganization(req.params.organizationId, req.user!.id),
         });
     } catch (error) {
         next(error);

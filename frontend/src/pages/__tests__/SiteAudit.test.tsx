@@ -69,6 +69,7 @@ describe('site audit remediation', () => {
         expect(metaForPath('/demo').title).toBe('Product Tour — Supreme');
         expect(ROUTE_META['/request-demo'].title).toBe('Request a Demo — Supreme');
         expect(robotsPolicy({ VITE_ENVIRONMENT: 'staging' })).toBe('noindex,nofollow');
+        expect(robotsPolicy({ VITE_ENVIRONMENT: 'private-beta' })).toBe('noindex,nofollow');
         expect(robotsPolicy({ VITE_ENVIRONMENT: 'production', DEV: false })).toBe('index,follow');
         const production = { VITE_ENVIRONMENT: 'production', DEV: false };
         expect(robotsPolicyForPath('/', production)).toBe('index,follow');

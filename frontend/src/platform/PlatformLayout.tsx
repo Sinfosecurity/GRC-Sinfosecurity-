@@ -8,6 +8,7 @@ import { platformAPI } from './api';
 const NAV = [
     { to: '/platform', label: 'Overview', end: true },
     { to: '/platform/organizations', label: 'Organizations' },
+    { to: '/platform/testers', label: 'Private testers' },
     { to: '/platform/support', label: 'Support' },
     { to: '/platform/incidents', label: 'Incidents' },
     { to: '/platform/leads', label: 'Sales / Demo' },

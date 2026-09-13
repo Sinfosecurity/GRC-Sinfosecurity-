@@ -66,6 +66,7 @@ const HelpSupport = lazy(() => import('./pages/HelpSupport'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
+const PlatformTesters = lazy(() => import('./platform/pages/PlatformTesters'));
 const PlatformOrganizationDetail = lazy(() => import('./platform/pages/PlatformOrganizationDetail'));
 const PlatformSupport = lazy(() => import('./platform/pages/PlatformSupport').then((mod) => ({ default: mod.PlatformSupportQueue })));
 const PlatformTicketDetail = lazy(() => import('./platform/pages/PlatformSupport').then((mod) => ({ default: mod.PlatformTicketDetail })));
@@ -156,6 +157,7 @@ export default function App() {
                 <Route element={<ProtectedRoute allowedRoles={['PLATFORM_OWNER', 'PLATFORM_ADMIN', 'SUPERADMIN', 'SUPPORT_ADMIN', 'SUPPORT_ANALYST', 'BILLING_SUPPORT', 'SECURITY_ADMIN']}><PlatformLayout /></ProtectedRoute>}>
                     <Route path="/platform" element={<PlatformOverview />} />
                     <Route path="/platform/organizations" element={<PlatformOrganizations />} />
+                    <Route path="/platform/testers" element={<PlatformTesters />} />
                     <Route path="/platform/organizations/:id" element={<PlatformOrganizationDetail />} />
                     <Route path="/platform/support" element={<PlatformSupport />} />
                     <Route path="/platform/support/:id" element={<PlatformTicketDetail />} />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Card, CardContent, Chip, CircularProgress, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
@@ -22,9 +23,10 @@ const catalog: CatalogItem[] = [
 ];
 
 export default function Reports() {
+    const [searchParams] = useSearchParams();
     const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
     const [assessments, setAssessments] = useState<Array<{ id: string; vendor?: { name: string }; assessmentType: string }>>([]);
-    const [vendorId, setVendorId] = useState('');
+    const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [assessmentId, setAssessmentId] = useState('');
     const [busyId, setBusyId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -85,6 +87,9 @@ export default function Reports() {
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
                 <TextField select label="Vendor scope" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 260 }}>
                     <MenuItem value="">All vendors</MenuItem>
+                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                        <MenuItem value={vendorId}>Selected vendor</MenuItem>
+                    )}
                     {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                 </TextField>
                 <TextField select label="Assessment" value={assessmentId} onChange={(e) => setAssessmentId(e.target.value)} sx={{ minWidth: 280 }}>

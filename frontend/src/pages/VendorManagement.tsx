@@ -134,6 +134,10 @@ export default function VendorManagement() {
     const [tabValue, setTabValue] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+    const [offboardVendor, setOffboardVendor] = useState<Vendor | null>(null);
+    const [offboardNotes, setOffboardNotes] = useState('');
+    const [offboardAck, setOffboardAck] = useState(false);
+    const [offboardPreview, setOffboardPreview] = useState<any>(null);
     const [riskExplanation, setRiskExplanation] = useState<{
         methodologyVersion?: string;
         latest?: {
@@ -853,21 +857,83 @@ export default function VendorManagement() {
                                 </Grid>
                             </Grid>
                         </DialogContent>
-                        <DialogActions>
+                        <DialogActions sx={{ flexWrap: 'wrap', gap: 1, justifyContent: 'flex-start', px: 3, pb: 2 }}>
                             <Button onClick={() => setSelectedVendor(null)}>Close</Button>
+                            <Button variant="contained" startIcon={<Assessment />} onClick={() => handleStartAssessment()}>
+                                Start Assessment
+                            </Button>
+                            <Button onClick={() => navigate(`/documents?vendorId=${selectedVendor.id}`)}>Evidence</Button>
+                            <Button onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Findings</Button>
+                            <Button onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Decision brief</Button>
+                            <Button onClick={() => navigate('/monitoring')}>Monitoring</Button>
+                            <Button onClick={() => navigate(`/reports?vendorId=${selectedVendor.id}`)}>Reports</Button>
                             <Button
-                                variant="contained"
-                                startIcon={<Assessment />}
-                                onClick={() => handleStartAssessment()}
-                                sx={{
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                color="warning"
+                                onClick={() => {
+                                    setOffboardVendor(selectedVendor);
+                                    setOffboardNotes('');
+                                    setOffboardAck(false);
+                                    setOffboardPreview(null);
+                                    tprmAPI.offboardPreview(String(selectedVendor.id))
+                                        .then((res) => setOffboardPreview(res.data.data))
+                                        .catch((err) => setError(err.message));
                                 }}
                             >
-                                Start Assessment
+                                Offboard
                             </Button>
                         </DialogActions>
                     </>
                 )}
+            </Dialog>
+
+            <Dialog open={Boolean(offboardVendor)} onClose={() => setOffboardVendor(null)} fullWidth maxWidth="sm">
+                <DialogTitle>Offboard vendor</DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ mb: 2 }}>
+                        Termination keeps assessments, evidence, findings, and audit history. Records are not destroyed.
+                    </Typography>
+                    {offboardPreview?.outstanding && (
+                        <Alert severity="info" sx={{ mb: 2 }}>
+                            Open findings: {offboardPreview.outstanding.openFindings}. Open assessments: {offboardPreview.outstanding.openAssessments}. Evidence objects: {offboardPreview.outstanding.evidenceCount}.
+                        </Alert>
+                    )}
+                    <TextField
+                        fullWidth
+                        multiline
+                        minRows={3}
+                        label="Exit notes"
+                        value={offboardNotes}
+                        onChange={(event) => setOffboardNotes(event.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    <Button variant="text" onClick={() => setOffboardAck((value) => !value)}>
+                        {offboardAck ? 'Outstanding risks acknowledged' : 'Acknowledge outstanding risks'}
+                    </Button>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOffboardVendor(null)}>Cancel</Button>
+                    <Button
+                        color="warning"
+                        variant="contained"
+                        onClick={async () => {
+                            if (!offboardVendor) return;
+                            try {
+                                await tprmAPI.offboard(String(offboardVendor.id), {
+                                    exitNotes: offboardNotes,
+                                    acknowledgeOutstanding: offboardAck,
+                                });
+                                setSnackbar({ open: true, message: 'Vendor offboarding recorded. Governance records were kept.', severity: 'success' });
+                                setOffboardVendor(null);
+                                setSelectedVendor(null);
+                                await loadVendors();
+                            } catch (err: any) {
+                                setSnackbar({ open: true, message: err.message || 'Offboard failed', severity: 'error' });
+                            }
+                        }}
+                    >
+                        Confirm offboard
+                    </Button>
+                </DialogActions>
             </Dialog>
 
         </Box>

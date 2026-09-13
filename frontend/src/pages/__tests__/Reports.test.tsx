@@ -1,7 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../marketing/routerFuture';
 import Reports from '../Reports';
+
+function renderReports() {
+    return render(
+        <MemoryRouter future={routerFuture} initialEntries={['/reports']}>
+            <Reports />
+        </MemoryRouter>
+    );
+}
 
 vi.mock('../../services/api', () => ({
     vendorAPI: { getAll: vi.fn().mockResolvedValue({ data: { vendors: [{ id: 'v1', name: 'Acme' }] } }) },
@@ -29,7 +39,7 @@ describe('Reports page', () => {
     it('downloads executive PDF and shows success', async () => {
         const { tprmAPI } = await import('../../services/api');
         (tprmAPI.downloadExecutivePdf as any).mockResolvedValue({ data: new Blob(['%PDF']), headers: { 'content-type': 'application/pdf' } });
-        render(<Reports />);
+        renderReports();
         const buttons = await screen.findAllByRole('button', { name: /Download PDF/i });
         await userEvent.click(buttons[0]);
         expect(await screen.findByText(/Downloaded Supreme-Risk-Executive-Report.pdf/)).toBeInTheDocument();
@@ -40,14 +50,14 @@ describe('Reports page', () => {
         const { downloadErrorMessage } = await import('../../services/download');
         (tprmAPI.downloadExecutivePdf as any).mockRejectedValue(new Error('generation failed'));
         (downloadErrorMessage as any).mockReturnValue('Report generation failed.');
-        render(<Reports />);
+        renderReports();
         const buttons = await screen.findAllByRole('button', { name: /Download PDF/i });
         await userEvent.click(buttons[0]);
         expect(await screen.findByText(/Report generation failed/)).toBeInTheDocument();
     });
 
     it('disables vendor scorecard until a vendor is selected', async () => {
-        render(<Reports />);
+        renderReports();
         expect(await screen.findByText(/Select a vendor before generating a scorecard/)).toBeInTheDocument();
     });
 });

@@ -46,7 +46,7 @@ export default function ThirdPartyProduct() {
             <section className="mkt-hero">
                 <div className="mkt-shell mkt-hero-grid">
                     <div>
-                        <p className="mkt-kicker">Supreme Third Party · Available</p>
+                        <p className="mkt-kicker">Supreme Third Party · Private beta</p>
                         <h1 className="mkt-display">Third-party risk you can explain, evidence, and decide.</h1>
                         <p className="mkt-lede">
                             Most programs collect vendor files and still cannot show why residual risk

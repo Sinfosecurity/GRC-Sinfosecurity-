@@ -29,7 +29,7 @@ export default function Landing() {
                         </h1>
                         <p className="mkt-lede">
                             Supreme is one connected governance platform. Supreme Third Party is
-                            available now. The remaining products share the same graph and are
+                            the active private-beta product. The remaining products share the same graph and are
                             labelled Preview or Roadmap until they are operational.
                         </p>
                         <div className="mkt-hero-actions">
@@ -47,7 +47,7 @@ export default function Landing() {
                     <p className="mkt-kicker">Platform</p>
                     <h2 className="mkt-display">A flagship product, then a connected platform.</h2>
                     <p className="mkt-lede">
-                        Start with third-party risk today. Expand into one connected governance
+                        Start with third-party risk in private testing. Expand into one connected governance
                         platform as your program grows.
                     </p>
                     <p className="mkt-lede">
@@ -58,7 +58,7 @@ export default function Landing() {
                     <div className="mkt-platform">
                         <div className="mkt-platform-top">
                             <article className="mkt-product-card mkt-product-flagship">
-                                <span className="mkt-pill">Available</span>
+                                <span className="mkt-pill">Private beta</span>
                                 <h3>{FLAGSHIP.name}</h3>
                                 <p>{FLAGSHIP.subtitle}</p>
                                 <p className="mkt-note">{FLAGSHIP.purpose}</p>

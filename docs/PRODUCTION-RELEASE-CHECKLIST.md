@@ -4,7 +4,7 @@
 **Production deployed:** NO  
 **Main merged:** NO  
 **Production DNS changed:** NO  
-**#12 started:** NO  
+**#12 started:** YES later as private testing only — this does not convert #11 to GO  
 **Cursor self-approved Conditional GO:** NO  
 
 This gate decides whether Supreme is ready to enter production. It does **not** deploy Supreme.
@@ -37,7 +37,7 @@ Cursor cannot convert this to Conditional GO. Product Leadership must accept any
 | Security implementation | `309b76336a351ab43ce7627efa22272b94a34298` |
 | Hosted security runtime | `227dc3215783df523a3b6dc8973928e66ef43df3` |
 | RELEASE_CANDIDATE_SHA | `5912ccafee28b87898548da9721adf79c5bbacb6` |
-| #12 | NOT STARTED |
+| #12 | Later authorized as private testing only; not commercial GO |
 
 Candidate includes accepted #1–#10 work plus #11 launch-critical fixes only:
 

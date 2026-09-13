@@ -59,7 +59,7 @@ export default function MarketingPlaceholder() {
         ? {
             title: product.name,
             lede: product.summary,
-            status: availabilityLabel(product.status) || 'Available',
+            status: availabilityLabel(product.status) || 'Private beta',
         }
         : PAGES[location.pathname] || {
             title: 'Supreme',

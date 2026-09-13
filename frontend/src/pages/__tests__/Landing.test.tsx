@@ -59,6 +59,8 @@ describe('Landing Page', () => {
         expect(screen.getAllByText('Supreme Third Party').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Roadmap').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Preview').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Private beta').length).toBeGreaterThan(0);
+        expect(screen.getByText(/active private-beta product/i)).toBeInTheDocument();
     });
 
     it('sends an authenticated visitor to the dashboard from the header', () => {

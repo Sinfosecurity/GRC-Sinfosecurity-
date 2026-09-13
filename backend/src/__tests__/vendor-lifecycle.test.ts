@@ -9,6 +9,10 @@ describe('vendor lifecycle', () => {
         expect(() => assertVendorTransition(VendorStatus.PROPOSED, VendorStatus.APPROVED)).not.toThrow();
     });
 
+    it('allows proposed vendors to enter offboarding', () => {
+        expect(() => assertVendorTransition(VendorStatus.PROPOSED, VendorStatus.OFFBOARDING)).not.toThrow();
+    });
+
     it('blocks terminated to active', () => {
         expect(() => assertVendorTransition(VendorStatus.TERMINATED, VendorStatus.ACTIVE)).toThrow();
     });

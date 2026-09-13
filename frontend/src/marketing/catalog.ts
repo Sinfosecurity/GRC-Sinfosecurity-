@@ -217,7 +217,7 @@ export const FOOTER_GROUPS: { title: string; links: { label: string; href: strin
 ];
 
 export function availabilityLabel(status: Availability): string | null {
-    if (status === 'available') return null;
+    if (status === 'available') return 'Private beta';
     if (status === 'preview') return 'Preview';
     if (status === 'roadmap') return 'Roadmap';
     return 'Coming soon';

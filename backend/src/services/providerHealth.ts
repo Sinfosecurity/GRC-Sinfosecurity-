@@ -5,6 +5,7 @@ import { objectStorageService } from './objectStorageService';
 import { billingStatus } from '../billing/stripeBillingService';
 import { isProviderConfigured } from '../config/env';
 import { malwareScanService } from '../malware/malwareScanService';
+import { environmentClass, publicEnvironmentBanner } from './privateBetaEnvironment';
 
 export type ProviderState = 'CONNECTED' | 'DEGRADED' | 'NOT_CONFIGURED' | 'ERROR' | 'POLICY';
 
@@ -48,6 +49,9 @@ export async function providerHealth() {
 
     return {
         environment: process.env.APP_ENVIRONMENT || process.env.VITE_ENVIRONMENT || process.env.NODE_ENV,
+        environmentClass: environmentClass(),
+        environmentBanner: publicEnvironmentBanner(),
+        commercialLaunch: false,
         database,
         storage: storage.provider === 'NOT_CONFIGURED' ? 'NOT_CONFIGURED' : storage.provider === 's3' ? 'CONNECTED' : 'CONNECTED',
         storageProvider: storage.provider,

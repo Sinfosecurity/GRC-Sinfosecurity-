@@ -20,11 +20,23 @@ const CATEGORIES = [
     ['OTHER', 'Other'],
 ];
 
+const FEEDBACK_KINDS = [
+    ['BUG', 'Bug'],
+    ['UX', 'UX / confusion'],
+    ['FEATURE', 'Feature request'],
+    ['SECURITY', 'Security concern'],
+    ['PERFORMANCE', 'Performance problem'],
+    ['DOCUMENTATION', 'Documentation issue'],
+];
+
 export default function HelpSupport() {
     const [subject, setSubject] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('OTHER');
+    const [kind, setKind] = useState('BUG');
+    const [workflow, setWorkflow] = useState('');
     const [priority, setPriority] = useState('P3');
+    const [evidenceObjectId, setEvidenceObjectId] = useState('');
     const [tickets, setTickets] = useState<Array<Record<string, unknown>>>([]);
     const [accessRequests, setAccessRequests] = useState<Array<Record<string, unknown>>>([]);
     const [message, setMessage] = useState<string | null>(null);
@@ -48,17 +60,31 @@ export default function HelpSupport() {
             <Typography variant="overline" sx={{ letterSpacing: '0.12em' }}>Help & Support</Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Get help</Typography>
             <Typography sx={{ color: 'text.secondary', mb: 3 }}>
-                Submit a support request. We will review it and follow up. No contractual response time is promised.
+                Submit a support request or private-beta feedback. We will review it and follow up. No contractual response time is promised.
+                Optional screenshots must already be CLEAN evidence in this tenant — uploads cannot bypass malware scanning.
             </Typography>
             <TextField fullWidth label="Subject" value={subject} onChange={(event) => setSubject(event.target.value)} sx={{ mb: 2 }} />
+            <TextField select fullWidth label="Feedback type" value={kind} onChange={(event) => setKind(event.target.value)} sx={{ mb: 2 }}>
+                {FEEDBACK_KINDS.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
+            </TextField>
+            <TextField fullWidth label="Page or workflow" value={workflow} onChange={(event) => setWorkflow(event.target.value)} sx={{ mb: 2 }} helperText="Example: Vendor offboarding, Assessment scoring" />
             <TextField select fullWidth label="Category" value={category} onChange={(event) => setCategory(event.target.value)} sx={{ mb: 2 }}>
                 {CATEGORIES.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}
             </TextField>
-            <TextField select fullWidth label="Suggested urgency" value={priority} onChange={(event) => setPriority(event.target.value)} sx={{ mb: 2 }} helperText="Supreme may reclassify urgency after review.">
+            <TextField select fullWidth label="Suggested urgency" value={priority} onChange={(event) => setPriority(event.target.value)} sx={{ mb: 2 }} helperText="Supreme may reclassify urgency after review. P1 is treated as a security or workflow-blocking report.">
+                <MenuItem value="P1">Critical / High — security, data loss, or product unusable</MenuItem>
                 <MenuItem value="P2">High — I cannot complete a material workflow</MenuItem>
                 <MenuItem value="P3">Normal</MenuItem>
                 <MenuItem value="P4">Request / how-to</MenuItem>
             </TextField>
+            <TextField
+                fullWidth
+                label="CLEAN evidence object ID (optional)"
+                value={evidenceObjectId}
+                onChange={(event) => setEvidenceObjectId(event.target.value)}
+                sx={{ mb: 2 }}
+                helperText="Reference an already-scanned CLEAN file in this organization. New uploads cannot bypass malware scanning."
+            />
             <TextField fullWidth multiline minRows={4} label="Description" value={description} onChange={(event) => setDescription(event.target.value)} sx={{ mb: 2 }} />
             <Button
                 variant="contained"
@@ -67,11 +93,16 @@ export default function HelpSupport() {
                         subject,
                         description,
                         category,
+                        kind,
+                        workflow,
+                        perceivedSeverity: priority,
                         priority,
+                        evidenceObjectId: evidenceObjectId.trim() || undefined,
                         route: window.location.pathname,
                     }).then(() => {
                         setSubject('');
                         setDescription('');
+                        setEvidenceObjectId('');
                         setMessage("Thank you. Your request was submitted. We'll review it and follow up.");
                         load();
                     }).catch((err) => setError(err.message));
