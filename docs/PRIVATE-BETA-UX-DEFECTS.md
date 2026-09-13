@@ -31,5 +31,6 @@ Severity: UX-P1 unusable/confusing primary workflow · UX-P2 major professional-
 | UX-017 | P2 | Vendor Detail is a right-hand drawer, not a full-page flagship workspace. Hosted capture: `03-vendor-detail-1440.png`. |
 | UX-025 | P2 | Platform Console interior not captured in this customer-admin session. Org Admin correctly receives Access Denied. |
 | UX-018 | P3 | Primary actions use gold fills; further restraint is possible if Product Leadership wants gold only on a single page CTA. |
+| UX-031 | P1 | Hosted Reports assessment selector showed many identical `Supreme Investigation · INITIAL_DUE_DILIGENCE` rows. No prior selector remediation was committed. Fix returned in this #12 remediation: humanized types, current vs history, template labels, open-assessment 409. Hosted re-proof required. |
 
 Hosted Executive PDF was re-downloaded during the 2026-09-13 closure run. #12 remains PARTIAL. Invitation inbox is USER ACTION REQUIRED. External testers must not be invited.

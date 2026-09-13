@@ -65,6 +65,22 @@ class VendorAssessmentService {
         if (!template) {
             throw new ApiError(404, 'Questionnaire template not found');
         }
+        const open = await prisma.vendorAssessment.findFirst({
+            where: {
+                organizationId: data.organizationId,
+                vendorId: data.vendorId,
+                assessmentType: data.assessmentType,
+                templateId: template.id,
+                status: { notIn: [AssessmentStatus.COMPLETED, AssessmentStatus.CANCELLED] },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (open) {
+            throw new ApiError(
+                409,
+                'This vendor already has an open assessment for that questionnaire. Continue the existing one or complete it before starting another.',
+            );
+        }
         const assessment = await prisma.vendorAssessment.create({
             data: {
                 ...rest,
@@ -114,7 +130,7 @@ class VendorAssessmentService {
      * List assessments for a vendor
      */
     async listVendorAssessments(vendorId: string, organizationId: string) {
-        return await prisma.vendorAssessment.findMany({
+        const rows = await prisma.vendorAssessment.findMany({
             where: {
                 vendorId,
                 organizationId,
@@ -129,10 +145,11 @@ class VendorAssessmentService {
                 },
             },
         });
+        return this.withTemplateLabels(rows);
     }
 
     async listOrganizationAssessments(organizationId: string) {
-        return prisma.vendorAssessment.findMany({
+        const rows = await prisma.vendorAssessment.findMany({
             where: { organizationId },
             orderBy: { createdAt: 'desc' },
             include: {
@@ -140,6 +157,26 @@ class VendorAssessmentService {
                 _count: { select: { responses: true, evidence: true } },
             },
             take: 200,
+        });
+        return this.withTemplateLabels(rows);
+    }
+
+    private async withTemplateLabels<T extends { templateId?: string | null; templateVersion?: string | null }>(rows: T[]) {
+        const ids = [...new Set(rows.map((row) => row.templateId).filter((id): id is string => Boolean(id)))];
+        const templates = ids.length
+            ? await prisma.questionnaireTemplate.findMany({
+                where: { id: { in: ids } },
+                select: { id: true, name: true, version: true },
+            })
+            : [];
+        const byId = new Map(templates.map((row) => [row.id, row]));
+        return rows.map((row) => {
+            const template = row.templateId ? byId.get(row.templateId) : undefined;
+            return {
+                ...row,
+                templateName: template?.name || null,
+                templateVersion: row.templateVersion || template?.version || null,
+            };
         });
     }
 

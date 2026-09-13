@@ -217,7 +217,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox placement / deliverability remains USER ACTION REQUIRED. Raw JSON scoring editor is removed; Risk Scoring Methodology workspace is implemented and pending hosted Product Leadership acceptance. Not PASS.
+**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox placement / deliverability remains USER ACTION REQUIRED. Raw JSON scoring editor is removed; Risk Scoring Methodology workspace is implemented and pending hosted Product Leadership acceptance. Reports assessment selector (UX-031) remediation is returned and still requires hosted Product Leadership review. Not PASS.
 
 **CERTIFICATION SHA:** Cursor cannot declare visual PASS. Latest hosted evidence SHA is recorded in `docs/PRIVATE-BETA-CERTIFICATION.md`. Methodology workspace evidence: `docs/RISK-METHODOLOGY-WORKSPACE.md`.
 

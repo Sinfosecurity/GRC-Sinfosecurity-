@@ -85,6 +85,7 @@ Known open #12 issues:
 - remaining UX-P2/P3 items
 - commercial production NO-GO
 - hosted Product Leadership acceptance of the Risk Scoring Methodology workspace
+- hosted Reports assessment selector (UX-031): raw `INITIAL_DUE_DILIGENCE` and indistinguishable repeats — remediation returned; Product Leadership re-review required
 
 RAW JSON SCORING EDITOR: REMOVED  
 RISK METHODOLOGY WORKSPACE: IMPLEMENTED  

@@ -14,9 +14,34 @@ function renderReports() {
 }
 
 vi.mock('../../services/api', () => ({
-    vendorAPI: { getAll: vi.fn().mockResolvedValue({ data: { vendors: [{ id: 'v1', name: 'Acme' }] } }) },
+    vendorAPI: { getAll: vi.fn().mockResolvedValue({ data: { vendors: [{ id: 'v1', name: 'Supreme Investigation' }] } }) },
     tprmAPI: {
-        listAssessments: vi.fn().mockResolvedValue({ data: { data: [] } }),
+        listAssessments: vi.fn().mockResolvedValue({
+            data: {
+                data: [
+                    {
+                        id: 'a-completed',
+                        vendorId: 'v1',
+                        vendor: { id: 'v1', name: 'Supreme Investigation' },
+                        assessmentType: 'INITIAL_DUE_DILIGENCE',
+                        status: 'COMPLETED',
+                        templateName: 'Supreme Risk Standard Due Diligence',
+                        templateVersion: '1.0.0',
+                        createdAt: '2026-09-13T03:15:46.000Z',
+                        completedAt: '2026-09-13T03:18:26.000Z',
+                    },
+                    {
+                        id: 'a-open',
+                        vendorId: 'v1',
+                        vendor: { id: 'v1', name: 'Supreme Investigation' },
+                        assessmentType: 'INITIAL_DUE_DILIGENCE',
+                        status: 'IN_PROGRESS',
+                        templateName: 'Information Security Assessment',
+                        createdAt: '2026-09-13T05:00:58.000Z',
+                    },
+                ],
+            },
+        }),
         downloadExecutivePdf: vi.fn(),
         downloadScorecardPdf: vi.fn(),
         downloadAssessmentPdf: vi.fn(),
@@ -27,6 +52,7 @@ vi.mock('../../services/api', () => ({
             data: { data: { testingAccess: true, isDemo: true, entitled: true, canExportOperational: true, canExportBoard: true } },
         }),
     },
+    sccAPI: { downloadReport: vi.fn() },
 }));
 
 vi.mock('../../services/download', () => ({
@@ -62,5 +88,19 @@ describe('Reports page', () => {
     it('disables vendor scorecard until a vendor is selected', async () => {
         renderReports();
         expect(await screen.findByText(/Select a vendor before generating a scorecard/)).toBeInTheDocument();
+    });
+
+    it('humanizes assessment types and does not use a flat enum dropdown', async () => {
+        const user = userEvent.setup();
+        renderReports();
+        expect(await screen.findByText(/Select a vendor before generating a scorecard/)).toBeInTheDocument();
+        await user.click(screen.getByLabelText('Vendor scope'));
+        await user.click(await screen.findByRole('option', { name: 'Supreme Investigation' }));
+        expect(await screen.findByTestId('current-assessment')).toHaveTextContent('Initial Due Diligence');
+        expect(screen.getByTestId('current-assessment')).toHaveTextContent('Completed');
+        expect(screen.getByTestId('assessment-history')).toHaveTextContent('Information Security Assessment');
+        expect(screen.queryByText('INITIAL_DUE_DILIGENCE')).not.toBeInTheDocument();
+        expect(screen.queryByRole('combobox', { name: 'Assessment' })).not.toBeInTheDocument();
+        expect(screen.getByText(/Assessment report will use Initial Due Diligence/)).toBeInTheDocument();
     });
 });

@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, CircularProgress, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
+import Surface from '../components/design/Surface';
 import { sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
+import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
 type CatalogItem = {
     id: string;
@@ -42,10 +44,44 @@ type Capabilities = {
     boardReason?: string | null;
 };
 
+type AssessmentRow = {
+    id: string;
+    vendorId?: string;
+    vendor?: { id?: string; name?: string };
+    assessmentType: string;
+    status: string;
+    templateName?: string | null;
+    templateVersion?: string | null;
+    createdAt?: string;
+    completedAt?: string | null;
+    updatedAt?: string;
+};
+
+const ACTIVE_STATUSES = new Set(['COMPLETED', 'IN_PROGRESS', 'PENDING_REVIEW', 'PENDING_APPROVAL']);
+
+function assessmentDate(row: AssessmentRow) {
+    return row.completedAt || row.updatedAt || row.createdAt || null;
+}
+
+function statusRank(status: string) {
+    if (status === 'COMPLETED') return 3;
+    if (status === 'IN_PROGRESS' || status === 'PENDING_REVIEW' || status === 'PENDING_APPROVAL') return 2;
+    if (status === 'NOT_STARTED') return 1;
+    return 0;
+}
+
+export function pickLatestAssessment(rows: AssessmentRow[]) {
+    return [...rows].sort((left, right) => {
+        const rank = statusRank(right.status) - statusRank(left.status);
+        if (rank !== 0) return rank;
+        return new Date(assessmentDate(right) || 0).getTime() - new Date(assessmentDate(left) || 0).getTime();
+    })[0] || null;
+}
+
 export default function Reports() {
     const [searchParams] = useSearchParams();
     const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
-    const [assessments, setAssessments] = useState<Array<{ id: string; vendor?: { name: string }; assessmentType: string }>>([]);
+    const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
     const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [assessmentId, setAssessmentId] = useState('');
     const [busyId, setBusyId] = useState<string | null>(null);
@@ -63,6 +99,27 @@ export default function Reports() {
             })
             .catch((err) => setError(err.message));
     }, []);
+
+    const vendorAssessments = useMemo(
+        () => assessments.filter((row) => (row.vendorId || row.vendor?.id) === vendorId && row.status !== 'CANCELLED'),
+        [assessments, vendorId],
+    );
+    const latest = useMemo(() => pickLatestAssessment(vendorAssessments), [vendorAssessments]);
+    const history = useMemo(
+        () => vendorAssessments.filter((row) => row.id !== latest?.id),
+        [vendorAssessments, latest],
+    );
+
+    useEffect(() => {
+        if (!vendorId) {
+            setAssessmentId('');
+            return;
+        }
+        const preferred = pickLatestAssessment(vendorAssessments.filter((row) => ACTIVE_STATUSES.has(row.status)));
+        setAssessmentId(preferred?.id || '');
+    }, [vendorId, vendorAssessments]);
+
+    const selected = vendorAssessments.find((row) => row.id === assessmentId) || latest;
 
     const unavailableReason = (item: CatalogItem) => {
         if (item.kind === 'board' && capabilities && !capabilities.canExportBoard) {
@@ -106,6 +163,38 @@ export default function Reports() {
         }
     };
 
+    const renderAssessmentCard = (row: AssessmentRow, current: boolean) => (
+        <Box
+            key={row.id}
+            component="button"
+            type="button"
+            onClick={() => setAssessmentId(row.id)}
+            data-testid={current ? 'current-assessment' : 'history-assessment'}
+            sx={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                p: 1.5,
+                border: `1px solid ${assessmentId === row.id ? 'currentColor' : 'inherit'}`,
+                borderRadius: '6px',
+                bgcolor: 'transparent',
+                cursor: 'pointer',
+                font: 'inherit',
+                color: 'inherit',
+            }}
+        >
+            <Typography variant="subtitle2">{humanizeLabel(row.assessmentType)}</Typography>
+            <Typography variant="body2">
+                {humanizeLabel(row.status)} · {formatShortDate(assessmentDate(row))}
+            </Typography>
+            {row.templateName && (
+                <Typography variant="caption" display="block">
+                    {row.templateName}{row.templateVersion ? ` ${row.templateVersion}` : ''}
+                </Typography>
+            )}
+        </Box>
+    );
+
     return (
         <Box sx={{ maxWidth: 1200 }}>
             <PageHeader
@@ -119,18 +208,37 @@ export default function Reports() {
             )}
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 3 }}>
-                <TextField select label="Vendor scope" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 260 }}>
+            <Stack spacing={1.5} sx={{ mb: 3 }}>
+                <TextField select label="Vendor scope" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 260, maxWidth: 420 }}>
                     <MenuItem value="">All vendors</MenuItem>
                     {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
                         <MenuItem value={vendorId}>Selected vendor</MenuItem>
                     )}
                     {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                 </TextField>
-                <TextField select label="Assessment" value={assessmentId} onChange={(e) => setAssessmentId(e.target.value)} sx={{ minWidth: 280 }}>
-                    <MenuItem value="">Select assessment</MenuItem>
-                    {assessments.map((row) => <MenuItem key={row.id} value={row.id}>{row.vendor?.name || 'Vendor'} · {row.assessmentType}</MenuItem>)}
-                </TextField>
+                {vendorId && (
+                    <Surface>
+                        <Typography variant="subtitle2" sx={{ mb: 1 }}>Current assessment</Typography>
+                        {latest
+                            ? renderAssessmentCard(latest, true)
+                            : <Typography variant="body2">No assessments are recorded for this vendor.</Typography>}
+                        {selected && (
+                            <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                                Assessment report will use {humanizeLabel(selected.assessmentType)}
+                                {selected.templateName ? ` · ${selected.templateName}` : ''} · {humanizeLabel(selected.status)}.
+                            </Typography>
+                        )}
+                        {history.length > 0 && (
+                            <Box sx={{ mt: 2 }} data-testid="assessment-history">
+                                <Typography variant="subtitle2" sx={{ mb: 1 }}>Other assessments</Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>Historical questionnaires stay available when you need a specific report. They do not replace the current assessment.</Typography>
+                                <Stack spacing={1}>
+                                    {history.map((row) => renderAssessmentCard(row, false))}
+                                </Stack>
+                            </Box>
+                        )}
+                    </Surface>
+                )}
             </Stack>
             <AppTable
                 rows={catalog}
