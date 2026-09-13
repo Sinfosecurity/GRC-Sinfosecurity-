@@ -60,5 +60,19 @@ describe('supreme privacy board pptx', () => {
         const pages = paginateBoardNarrative(items);
         expect(pages.length).toBeGreaterThan(1);
         expect(pages.flatMap((page) => page.flatMap((block) => block.rows)).join(' ')).toContain('not a legal conclusion');
+        expect(pages.every((page) => page.every((block) => !block.rows.join(' ').match(/\sA$/)))).toBe(true);
+    });
+
+    it('keeps a decision item together instead of leaving a one-word widow on the prior slide', () => {
+        const first = 'XFR-00001  Transfer requiring review — XFR-00001 US-NY → IE is recorded as review required. This is not a lawfulness finding.';
+        const second = 'GAP-00002  Open privacy-related gap — GAP-00002 500.07 has no current CLEAN evidence. A gap is remaining work, not a legal conclusion.';
+        const filler = Array.from({ length: 6 }, (_, index) => (
+            `${index + 1}. Review XFR-0000${index} — Transfer requiring review. US-NY → IE is recorded as review required. This is not a lawfulness finding.`
+        ));
+        const pages = paginateBoardNarrative([...filler, first, second]);
+        const flattened = pages.map((page) => page.map((block) => block.rows.join(' ')));
+        expect(flattened.flat().some((row) => row.includes('not a legal conclusion'))).toBe(true);
+        expect(flattened.flat().some((row) => row.trim() === 'A')).toBe(false);
+        expect(flattened.some((page) => page.some((row) => row.includes('GAP-00002') && row.includes('legal conclusion')))).toBe(true);
     });
 });

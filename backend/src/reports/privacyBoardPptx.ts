@@ -140,31 +140,39 @@ export function paginateBoardNarrative(items: string[], options?: { reserveNote?
     const pages: { rows: string[]; size: number }[][] = [[]];
     let used = top;
     const gap = 70000;
+    const pageBudget = bottom - top;
 
     const newPage = () => {
         pages.push([]);
         used = top;
     };
 
+    const heightOf = (rows: string[], size: number) => rows.length * lineEmu(size) + 50000;
+
     for (const item of items.map((value) => value.replace(/\s+/g, ' ').trim()).filter(Boolean)) {
         const sized = sizeBoardBlock(item);
+        const height = heightOf(sized.rows, sized.size);
+        const available = bottom - used - 50000;
+        if (height <= available) {
+            pages[pages.length - 1].push(sized);
+            used += height + gap;
+            continue;
+        }
+        if (pages[pages.length - 1].length > 0) newPage();
+        if (height <= pageBudget) {
+            pages[pages.length - 1].push(sized);
+            used += height + gap;
+            continue;
+        }
         let offset = 0;
         while (offset < sized.rows.length) {
-            const available = bottom - used - 50000;
-            const fit = Math.max(0, Math.floor(available / lineEmu(sized.size)));
-            if (fit < 1) {
-                if (pages[pages.length - 1].length === 0) {
-                    pages[pages.length - 1].push({ rows: sized.rows.slice(offset, offset + 1), size: sized.size });
-                    offset += 1;
-                    used = bottom;
-                }
-                newPage();
-                continue;
-            }
-            const take = sized.rows.slice(offset, offset + fit);
+            const remaining = sized.rows.slice(offset);
+            const fit = Math.max(1, Math.floor((bottom - used - 50000) / lineEmu(sized.size)));
+            const take = remaining.slice(0, fit);
             pages[pages.length - 1].push({ rows: take, size: sized.size });
-            used += take.length * lineEmu(sized.size) + 50000 + gap;
             offset += take.length;
+            if (offset < sized.rows.length) newPage();
+            else used += heightOf(take, sized.size) + gap;
         }
     }
     if (pages.length > 1 && pages[pages.length - 1].length === 0) pages.pop();

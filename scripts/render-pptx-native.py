@@ -30,6 +30,10 @@ def powerpoint_app() -> Path | None:
     return candidate if candidate.exists() else None
 
 
+def powerpoint_sandbox() -> Path:
+    return Path.home() / "Library" / "Containers" / "com.microsoft.Powerpoint" / "Data" / "Documents"
+
+
 def dismiss_powerpoint_dialogs() -> None:
     script = '''
 tell application "System Events"
@@ -37,15 +41,12 @@ tell application "System Events"
     tell process "Microsoft PowerPoint"
         set frontmost to true
         delay 0.4
-        repeat 6 times
+        repeat 8 times
             if exists button "Repair" of window 1 then
                 click button "Repair" of window 1
                 delay 2
             else if exists button "OK" of window 1 then
                 click button "OK" of window 1
-                delay 1
-            else if exists button "Cancel" of window "Grant File Access" then
-                click button "Cancel" of window "Grant File Access"
                 delay 1
             else
                 exit repeat
@@ -58,14 +59,18 @@ end tell
 
 
 def convert_with_powerpoint(pptx: Path, pdf: Path) -> None:
-    sibling = pptx.with_suffix(".pdf")
-    if sibling.exists():
-        sibling.unlink()
+    sandbox = powerpoint_sandbox()
+    sandbox.mkdir(parents=True, exist_ok=True)
+    sandboxed = sandbox / pptx.name
+    sandboxed_pdf = sandbox / f"{pptx.stem}.pdf"
+    shutil.copyfile(pptx, sandboxed)
+    if sandboxed_pdf.exists():
+        sandboxed_pdf.unlink()
     script = f'''
 with timeout of 120 seconds
     tell application "Microsoft PowerPoint"
         activate
-        open POSIX file "{pptx}"
+        open POSIX file "{sandboxed}"
         delay 3
     end tell
 end timeout
@@ -76,7 +81,7 @@ end timeout
 with timeout of 120 seconds
     tell application "Microsoft PowerPoint"
         activate
-        set dest to POSIX file "{sibling}"
+        set dest to POSIX file "{sandboxed_pdf}"
         save active presentation in dest as save as PDF
         delay 1
         close active presentation saving no
@@ -85,13 +90,8 @@ end timeout
 '''
     completed = subprocess.run(["osascript", "-e", export], capture_output=True, text=True)
     dismiss_powerpoint_dialogs()
-    if completed.returncode == 0 and sibling.exists() and sibling.stat().st_size > 1000:
-        if sibling.resolve() != pdf.resolve():
-            shutil.copyfile(sibling, pdf)
-            sibling.unlink(missing_ok=True)
-        return
-    if sibling.exists() and sibling.stat().st_size > 1000:
-        shutil.copyfile(sibling, pdf)
+    if sandboxed_pdf.exists() and sandboxed_pdf.stat().st_size > 1000:
+        shutil.copyfile(sandboxed_pdf, pdf)
         return
     die(
         "PowerPoint PDF export failed: "
