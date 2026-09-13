@@ -53,6 +53,22 @@ Product Leadership tested live `/governance-graph` and received “Too many atte
 
 The explorer landing page shows guidance and recent stored relationship changes. A selected node opens a relationship workspace (entity, summary, direct relationships, impact, lineage, related-record links). No force-directed graph.
 
+## Hosted ordinary-use proof (2026-09-13)
+
+| Evidence | Value |
+|---|---|
+| Frontend SHA | `1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85` (`/version.json`) |
+| API SHA | `b9daaf57a309846dab025a8abd50520d3a4685ae` (`/health.gitSha`) |
+| Limiter CI | https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34751123207 PASS on `b9daaf5` |
+| Endpoints previously 429 | `/governance/summary`, `/governance/search`, `/governance/nodes/:id/relationships`, `/governance/nodes/:id/impact`, `/governance/nodes/:id/lineage`, `/governance/backfill` on the **report** limiter |
+| Request count before | ~6 per load/select (backfill + summary + search + relationships + impact + lineage) |
+| Request count after (ordinary session) | summary 1, search 12 (several searches + filters), relationships 1, impact 1, lineage 1, backfill 0 |
+| Unexpected 429s | **0** |
+| Selected entity | Northwind Cloud (vendor, real tenant record) |
+| Screenshots | `docs/private-beta/hosted-ux-qa/graph-explorer/` — selected entity, direct relationships, impact, lineage, landing, 1440, 375 |
+
+This is hosted engineering evidence. It is not Product Leadership acceptance and does not make #13 PASS.
+
 ## Known non-closures
 
 - Hosted Supreme CI PASS on first implementation SHA `8ec4434` (run `34749488009`). Product Leadership later rejected that hosted explorer.

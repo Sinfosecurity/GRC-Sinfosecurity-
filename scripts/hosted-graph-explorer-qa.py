@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import time
+import urllib.request
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -61,12 +62,24 @@ def main() -> int:
         page.set_default_timeout(45000)
         page.on("response", record_request)
 
+        req = urllib.request.Request(
+            f"{API}/api/v1/auth/login",
+            data=json.dumps({"email": EMAIL, "password": PASSWORD, "plane": "CUSTOMER"}).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            payload = json.loads(resp.read().decode())
+        token = payload["data"]["token"]
+        user = payload["data"]["user"]
         page.goto(f"{BASE}/login", wait_until="domcontentloaded")
-        page.wait_for_load_state("networkidle")
-        page.get_by_label("Email").fill(EMAIL)
-        page.get_by_label("Password").fill(PASSWORD)
-        page.get_by_role("button", name=re.compile(r"(Log In|Sign in)", re.I)).click()
-        page.wait_for_url("**/dashboard", timeout=45000)
+        page.evaluate(
+            """([token, user]) => {
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+            }""",
+            [token, user],
+        )
 
         page.goto(f"{BASE}/governance-graph", wait_until="domcontentloaded")
         page.get_by_role("heading", name="Governance Graph").wait_for()

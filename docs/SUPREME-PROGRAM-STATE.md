@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #13 Governance Graph
 
-**CURRENT ITEM STATUS:** PARTIAL — hosted Graph Explorer rejected (429 on ordinary use); remediation in progress
+**CURRENT ITEM STATUS:** PARTIAL — hosted 429/UX remediation returned; Product Leadership review required
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -22,9 +22,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#13 STARTING SHA:** `70e4953e9d9eba13ac8604b721c81216a4e149ad`
 
-**#13 IMPLEMENTATION SHA:** `8ec44343fea25a027bedd048ae7097fca17a06b7`
+**#13 IMPLEMENTATION SHA:** `8ec44343fea25a027bedd048ae7097fca17a06b7` (rejected hosted explorer)
 
-**#13 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34749488009 PASS
+**#13 REMEDIATION SHA:** `b9daaf57a309846dab025a8abd50520d3a4685ae` (limiter / fetch policy); frontend follow-up `1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85`
+
+**#13 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34751123207 PASS on `b9daaf5`
 
 **RELEASE_CANDIDATE_SHA:** `5912ccafee28b87898548da9721adf79c5bbacb6`
 
@@ -51,7 +53,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #13 Governance Graph
 
-**STATUS:** PARTIAL — hosted explorer rejected; 429/UX remediation is not Product Leadership acceptance
+**STATUS:** PARTIAL — hosted 429/UX remediation is hosted; not Product Leadership acceptance
 
 PostgreSQL/Prisma relationship layer. No separate graph database. #14 is not authorized.
 

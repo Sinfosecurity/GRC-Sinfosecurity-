@@ -235,13 +235,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Authoritative graph model with tenant isolation, provenance, temporal relationship state, idempotent TPRM backfill, explainable query APIs, and a professional explorer. No separate graph database. Marketing preview is not done.
 
-**CURRENT STATUS:** PARTIAL — Product Leadership rejected hosted Graph Explorer after ordinary use returned 429. Rate-limit/UX remediation is in this branch. Not commercial production.
+**CURRENT STATUS:** PARTIAL — hosted Graph Explorer was rejected for 429s; remediation is hosted and waiting for Product Leadership review. Not commercial production.
 
-**CERTIFICATION SHA:** first implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` (hosted CI run `34749488009` PASS). Hosted explorer rejection followed that SHA. Remediation SHA is recorded in `docs/GOVERNANCE-GRAPH-CERTIFICATION.md` after deploy.
+**CERTIFICATION SHA:** limiter remediation `b9daaf57a309846dab025a8abd50520d3a4685ae` (hosted CI run `34751123207` PASS). Hosted frontend after mobile workspace fix `1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85`. First implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` remains the rejected explorer.
 
-**EVIDENCE:** Product Leadership authorization 2026-09-13. Hosted rejection: `/governance/*` shared the report limiter (40/hour) and the explorer issued ~6 requests per load/select. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. #12 remains PARTIAL.
+**EVIDENCE:** Hosted ordinary session on `/governance-graph` completed with zero unexpected 429s. Screenshots and request counts: `docs/private-beta/hosted-ux-qa/graph-explorer/`. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. #12 remains PARTIAL.
 
-**NEXT ACTION:** Product Leadership must re-review the hosted explorer after the 429/UX fix. Keep #12 PARTIAL. Do not start #14. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership must review the new hosted explorer. Keep #12 PARTIAL. Do not start #14. Do not merge `main` or deploy commercial production.
 
 ---
 

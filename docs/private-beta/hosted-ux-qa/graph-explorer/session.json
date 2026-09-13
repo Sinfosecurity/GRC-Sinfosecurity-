@@ -1,0 +1,21 @@
+{
+  "base": "https://supreme-risk-staging.onrender.com",
+  "api": "https://supreme-risk-staging-api.onrender.com",
+  "frontendSha": "1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85",
+  "apiSha": "b9daaf57a309846dab025a8abd50520d3a4685ae",
+  "selectedNodeId": "deeae34d-3ba6-4882-9802-5275fdc9d010",
+  "selectedEntity": "Northwind Cloud",
+  "governanceApiRequestCount": 16,
+  "pageNavigationCount": 1,
+  "governance429": 0,
+  "other429": 0,
+  "byPath": {
+    "GET /governance/summary": 1,
+    "GET /governance/search": 12,
+    "GET /governance/nodes/:id/relationships": 1,
+    "GET /governance/nodes/:id/impact": 1,
+    "GET /governance/nodes/:id/lineage": 1
+  },
+  "unexpected429": [],
+  "passed": true
+}
