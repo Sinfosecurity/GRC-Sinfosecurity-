@@ -1,6 +1,6 @@
 # Supreme Competitive Capability Matrix
 
-**Item:** #15 Supreme Risk  
+**Item:** #16 Supreme Compliance (extends #15 matrix)  
 **Date:** 2026-09-13  
 **Honesty rule:** Competitor names identify market categories only. This document does not copy proprietary UI, help text, control content, or code. Status is Supreme’s current implementation, not a claim that Supreme is better.
 
@@ -24,3 +24,22 @@
 | ServiceNow IRM / Archer / AuditBoard / LogicGate / MetricStream workflow depth | Core ERM operating path | Simpler UX; not a CMDB or GRC suite clone | Partial | Do not claim parity |
 
 Supreme can differentiate where evidence exists: Governance Graph impact, shared CLEAN evidence, explainable methodology versions, and a refusal to pretend acceptance lowers risk. It does not yet claim suite-wide IRM parity.
+
+## Compliance program capabilities (#16)
+
+| Capability category | Supreme equivalent | OneTrust / ServiceNow / Archer / AuditBoard / LogicGate / MetricStream | Vanta / Drata | Current status | Evidence |
+|---|---|---|---|---|---|
+| Framework catalog | #14 packs + identifiers + original Supreme summaries | Broad licensed content libraries | Automated starter catalogs | Implemented as reference packs, not licensed reproductions | `controlLibrary.ts`, ADR-SUPREME-COMPLIANCE |
+| Framework activation / scope | `ComplianceActivation` opt-in per version | Mature program objects | Often auto-scoped from questionnaire | Implemented. Nothing auto-activated | `/compliance/frameworks` |
+| Applicability | Applicable / Not applicable / Under review / Not determined | Common | Common | Implemented. NA requires rationale and is not pass | `ComplianceRequirementState` |
+| Common control mapping | Reuses `RequirementControlMapping` strengths | Crosswalk modules vary | Usually questionnaire-to-control | Implemented on #14 mappings only | Cross-framework view |
+| Evidence reuse | CLEAN `EvidenceGovernanceLink` before upload | Strong in GRC suites | Strong in automated evidence | Implemented; malware fail-closed unchanged | Requirement Evidence section |
+| Attestation campaigns | Period, attestors, review, overdue | Strong | Lighter | Implemented. Not a control test | `/compliance/campaigns` |
+| Control testing | Reuses #14 tests | Strong | Often inferred | Implemented. Not tested is not pass | Requirement Testing section |
+| Gaps / exceptions | Explicit gap + governed exception | Strong | Lighter exceptions | Implemented. Exception ≠ effective | `/compliance/gaps`, `/compliance/exceptions` |
+| Readiness | Four explainable coverage metrics | Scorecards often branded “compliance” | Automated % scores | Implemented without Certified/Compliant claims | Dashboard + reports |
+| Audit / assessment workspace | Internal period, requested evidence | Strong audit modules | Exam-prep checklists | Implemented as readiness, not external attestation | `/compliance/audits` |
+| Integrated risk | Optional `EnterpriseRisk` link as potential impact | Native IRM | Limited | Implemented. Score not auto-changed | Requirement Related risks |
+| UX | Workspace + tables, no UUID labels | Dense enterprise UX | Consumer-simple | Implemented for #16 review | `/compliance` |
+
+Supreme can differentiate on honest readiness language, shared CLEAN evidence, and common-control reuse across programs. It does not claim content-library parity with OneTrust/Archer or automation parity with Vanta/Drata.

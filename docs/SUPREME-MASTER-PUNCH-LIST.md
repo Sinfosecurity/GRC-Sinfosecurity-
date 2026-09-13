@@ -259,7 +259,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Hosted UX-closure screenshots `docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/`. Do not mark PASS from code or this file alone.
 
-**NEXT ACTION:** Keep #12 PARTIAL. #15 is authorized. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 PARTIAL. #16 is authorized. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -271,13 +271,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Enterprise risks, ownership, appetite, and explainable residual scores. Preview pages are not implementation.
 
-**CURRENT STATUS:** PARTIAL — CORE PRODUCT PASSES, EXECUTIVE REPORTING + HISTORY UX CLOSURE IN REVIEW
+**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel.
 
-**CERTIFICATION SHA:** Closure `6542e58484b84591b39863a254560841a639432d`. Hosted frontend `dbc4982c8bb9cff228ad661a01f69f7998a38566` / API `6542e58`. Not PASS. Product Leadership final review required.
+**CERTIFICATION SHA:** Closure `6542e58484b84591b39863a254560841a639432d`. Hosted frontend `dbc4982c8bb9cff228ad661a01f69f7998a38566` / API `6542e58`. Documentation `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`.
 
-**EVIDENCE:** `docs/ADR-SUPREME-RISK.md`, `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/private-beta/hosted-ux-qa/supreme-risk/`, `docs/private-beta/hosted-ux-qa/supreme-risk-closure/`. `/risk-management` redirects to Supreme Risk. Cursor does not declare PASS.
+**EVIDENCE:** `docs/ADR-SUPREME-RISK.md`, `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/private-beta/hosted-ux-qa/supreme-risk/`, `docs/private-beta/hosted-ux-qa/supreme-risk-closure/`. Product Leadership accepted the hosted closure.
 
-**NEXT ACTION:** Product Leadership final hosted review of #15 closure. Do not start #16. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 PARTIAL. #16 is authorized. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -289,13 +289,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Framework packs, control status, and evidence reuse. Legacy ISO/TISAX pages are not this product.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** PARTIAL — AUTHORIZED / IN PROGRESS
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Starting SHA `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`. Not PASS.
 
-**EVIDENCE:** Marketing/placeholder and legacy quarantine surfaces only.
+**EVIDENCE:** `docs/ADR-SUPREME-COMPLIANCE.md`. Legacy `/compliance` mock is not this product.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Implement and host Supreme Compliance for Product Leadership review. Do not start #17. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 

@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #15 Supreme Risk
+**CURRENT ITEM:** #16 Supreme Compliance
 
-**CURRENT ITEM STATUS:** PARTIAL — CORE PRODUCT PASSES, EXECUTIVE REPORTING + HISTORY UX CLOSURE REQUIRED
+**CURRENT ITEM STATUS:** PARTIAL — AUTHORIZED / IN PROGRESS
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -61,16 +61,26 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#15 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34774298187 PASS on `6542e58`
 **#15 HOSTED FRONTEND SHA:** `dbc4982c8bb9cff228ad661a01f69f7998a38566`
 **#15 HOSTED API SHA:** `6542e58484b84591b39863a254560841a639432d`
+**#15 PROGRAM ACCEPTANCE:** PASS — Product Leadership accepted (2026-09-13)
+**#16 AUTHORIZED:** YES — Product Leadership 2026-09-13
+**#16 STARTING SHA:** `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`
+**#17 AUTHORIZED:** NO
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #16 Supreme Compliance
+
+**STATUS:** PARTIAL — AUTHORIZED / IN PROGRESS
+
+See `docs/ADR-SUPREME-COMPLIANCE.md`. #17 is not authorized. #12 remains PARTIAL.
+
 ### #15 Supreme Risk
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**STATUS:** PASS — Product Leadership accepted (2026-09-13)
 
-See `docs/ADR-SUPREME-RISK.md`. #16 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-RISK.md`. #16 is authorized. #12 remains PARTIAL.
 
 ### #14 Shared Control & Evidence Layer
 
@@ -113,13 +123,13 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Implement and host #15 Supreme Risk for Product Leadership review. Keep #12 PARTIAL. Do not start #16. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Implement and host #16 Supreme Compliance for Product Leadership review. Keep #12 PARTIAL. Do not start #17. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#15 Supreme Risk** — hosted Product Leadership review required. Do not start #16.
+**#16 Supreme Compliance** — hosted Product Leadership review required. Do not start #17.
 
 **#12** remains PARTIAL / open in parallel.
 
@@ -127,7 +137,7 @@ Implement and host #15 Supreme Risk for Product Leadership review. Keep #12 PART
 
 ## DO NOT START
 
-- **#16** or later gates.
+- **#17** or later gates.
 - Production DNS, `main` merge, or production deploy.
 - Live Stripe or commercial sale.
 - External testers without a separate Product Leadership approval.
@@ -159,7 +169,7 @@ Implement and host #15 Supreme Risk for Product Leadership review. Keep #12 PART
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership hosted review of #15 Supreme Risk. Do not declare #15 PASS from this file. #12 remains PARTIAL until Product Leadership separately changes it. #16 is not authorized.
+Product Leadership hosted review of #16 Supreme Compliance. Do not declare #16 PASS from this file. #15 is accepted. #12 remains PARTIAL until Product Leadership separately changes it. #17 is not authorized.
 
 ---
 
@@ -192,8 +202,10 @@ Do not invent percentages.
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
 | 12 | Supreme Third Party Production v1 | PARTIAL / OPEN IN PARALLEL; commercial production NO-GO |
 | 13 | Governance Graph | Product Leadership accepted (2026-09-13) |
-| 14 | Shared Control & Evidence Layer | PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW |
-| 15–38, 40 | Later modules / GTM / packs | NOT STARTED |
+| 14 | Shared Control & Evidence Layer | Product Leadership accepted PASS (2026-09-13) |
+| 15 | Supreme Risk | PASS — Product Leadership accepted (2026-09-13) |
+| 16 | Supreme Compliance | PARTIAL — AUTHORIZED / IN PROGRESS |
+| 17–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
 Marketing preview pages are not implementation.
@@ -254,3 +266,17 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED -> PARTIAL — READY FOR PRODUCT LEADERSHIP FINAL REVIEW  
 **SHA:** UX closure `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`; CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`  
 **EVIDENCE:** Hosted Supreme CI run `34763715915` PASS. Staging frontend `ce5d01c`, API `915ac55`. Migration `20260913193000_active_evidence_link_uniqueness` applied. Hosted Control Detail / History / Relationships / duplicate-link / 375 / coverage walkthrough recorded. Not PASS. #12 remains PARTIAL. #15 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #15 Supreme Risk  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED -> PASS — Product Leadership accepted  
+**SHA:** Closure `6542e58484b84591b39863a254560841a639432d`; documentation `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`  
+**EVIDENCE:** Explicit Product Leadership acceptance. Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel. #16 authorized separately.
+
+### 2026-09-13
+
+**ITEM:** #16 Supreme Compliance  
+**STATUS CHANGE:** NOT STARTED -> PARTIAL — AUTHORIZED / IN PROGRESS  
+**SHA:** Starting SHA `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`  
+**EVIDENCE:** Explicit Product Leadership authorization. #15 is PASS. #12 remains PARTIAL. #17 is not authorized.

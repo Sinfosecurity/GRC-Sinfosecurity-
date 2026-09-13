@@ -25,6 +25,10 @@ export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
     GovernanceNodeType.KRI,
     GovernanceNodeType.TREATMENT,
     GovernanceNodeType.BUSINESS_UNIT,
+    GovernanceNodeType.EXCEPTION,
+    GovernanceNodeType.COMPLIANCE_GAP,
+    GovernanceNodeType.ATTESTATION,
+    GovernanceNodeType.COMPLIANCE_PERIOD,
 ];
 
 export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { vendorId?: string }) => string> = {
@@ -45,6 +49,13 @@ export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { ve
     EnterpriseRiskKri: () => '/risks',
     EnterpriseRiskTreatment: () => '/risks',
     EnterpriseRiskDecision: () => '/risks',
+    ComplianceActivation: (id) => `/compliance/frameworks/${id}`,
+    ComplianceRequirementState: (id) => `/compliance/requirements/${id}`,
+    ComplianceAttestationCampaign: (id) => `/compliance/campaigns/${id}`,
+    ComplianceAttestation: () => '/compliance',
+    ComplianceGap: () => '/compliance/gaps',
+    ComplianceException: () => '/compliance/exceptions',
+    CompliancePeriod: (id) => `/compliance/audits/${id}`,
 };
 
 export function publicNode(node: {

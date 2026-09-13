@@ -28,6 +28,7 @@ import {
     HelpOutline,
     AccountTreeOutlined,
     FactCheckOutlined,
+    VerifiedUserOutlined,
     WarningAmberOutlined,
     HistoryOutlined,
     HubOutlined,
@@ -71,6 +72,13 @@ const menuSections: NavSection[] = [
         items: [
             { text: 'Supreme Risk', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
             { text: 'Risk register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
+        ],
+    },
+    {
+        title: 'Compliance',
+        items: [
+            { text: 'Supreme Compliance', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },
+            { text: 'Frameworks', path: '/compliance/frameworks', icon: <HubOutlined fontSize="small" />, permission: 'compliance.read' },
         ],
     },
     {

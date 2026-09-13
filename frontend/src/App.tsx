@@ -70,6 +70,14 @@ const RiskDetail = lazy(() => import('./pages/RiskDetail'));
 const ControlCenter = lazy(() => import('./pages/ControlCenter'));
 const ControlDetail = lazy(() => import('./pages/ControlDetail'));
 const FrameworkCoverage = lazy(() => import('./pages/FrameworkCoverage'));
+const ComplianceDashboard = lazy(() => import('./pages/ComplianceDashboard'));
+const ComplianceFrameworks = lazy(() => import('./pages/ComplianceFrameworks'));
+const ComplianceFrameworkDetail = lazy(() => import('./pages/ComplianceFrameworkDetail'));
+const ComplianceRequirementDetail = lazy(() => import('./pages/ComplianceRequirementDetail'));
+const ComplianceGaps = lazy(() => import('./pages/ComplianceGaps'));
+const ComplianceExceptions = lazy(() => import('./pages/ComplianceExceptions'));
+const ComplianceCampaignDetail = lazy(() => import('./pages/ComplianceCampaignDetail'));
+const ComplianceAuditDetail = lazy(() => import('./pages/ComplianceAuditDetail'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -130,7 +138,15 @@ export default function App() {
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="risk-management" element={LEGACY_ENABLED ? <RiskManagement /> : <Navigate to="/risks" replace />} />
-                    <Route path="compliance" element={LEGACY_ENABLED ? <ComplianceManagement /> : <LegacyQuarantine />} />
+                    <Route path="legacy/compliance" element={LEGACY_ENABLED ? <ComplianceManagement /> : <LegacyQuarantine />} />
+                    <Route path="compliance" element={<ComplianceDashboard />} />
+                    <Route path="compliance/frameworks" element={<ComplianceFrameworks />} />
+                    <Route path="compliance/frameworks/:publicId" element={<ComplianceFrameworkDetail />} />
+                    <Route path="compliance/requirements/:publicId" element={<ComplianceRequirementDetail />} />
+                    <Route path="compliance/gaps" element={<ComplianceGaps />} />
+                    <Route path="compliance/exceptions" element={<ComplianceExceptions />} />
+                    <Route path="compliance/campaigns/:publicId" element={<ComplianceCampaignDetail />} />
+                    <Route path="compliance/audits/:publicId" element={<ComplianceAuditDetail />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

@@ -25,6 +25,7 @@ export type NotificationEvent =
     | 'remediation.validation_requested'
     | 'approval.requested'
     | 'approval.decision'
+    | 'attestation.assigned'
     | 'monitoring.critical'
     | 'vendor.review_due'
     | 'user.invitation'

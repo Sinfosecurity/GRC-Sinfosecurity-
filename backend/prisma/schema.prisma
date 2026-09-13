@@ -141,6 +141,14 @@ model Organization {
   enterpriseRiskMethodologies EnterpriseRiskMethodology[]
   enterpriseRiskKris          EnterpriseRiskKri[]
   enterpriseRiskCategories    EnterpriseRiskCustomCategory[]
+  complianceActivations       ComplianceActivation[]
+  complianceRequirementStates ComplianceRequirementState[]
+  complianceCampaigns         ComplianceAttestationCampaign[]
+  complianceAttestations      ComplianceAttestation[]
+  complianceGaps              ComplianceGap[]
+  complianceExceptions        ComplianceException[]
+  compliancePeriods           CompliancePeriod[]
+  complianceHistory           ComplianceHistory[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -2756,6 +2764,10 @@ enum GovernanceNodeType {
   CONTROL_TEST
   KRI
   TREATMENT
+  EXCEPTION
+  COMPLIANCE_GAP
+  ATTESTATION
+  COMPLIANCE_PERIOD
 }
 
 enum GovernanceRelationshipType {
@@ -2790,6 +2802,7 @@ enum GovernanceRelationshipType {
   COVERED_BY
   SATISFIED_BY
   TESTED_BY
+  COVERS
   ASSOCIATED_WITH
   INCREASES_EXPOSURE_TO
   ADDRESSES
@@ -3030,6 +3043,9 @@ model OrganizationControl {
   archivedAt            DateTime?
   tests                 OrganizationControlTest[]
   mappings              RequirementControlMapping[]
+  complianceAttestations ComplianceAttestation[]
+  complianceGaps         ComplianceGap[]
+  complianceExceptions   ComplianceException[]
 
   @@unique([organizationId, controlKey])
   @@index([organizationId, domain])
@@ -3059,6 +3075,8 @@ model FrameworkVersion {
   sourceUrl    String?
   createdAt    DateTime             @default(now())
   requirements FrameworkRequirement[]
+  activations  ComplianceActivation[]
+  periods      CompliancePeriod[]
 
   @@unique([frameworkId, version])
 }
@@ -3067,10 +3085,13 @@ model FrameworkRequirement {
   id                 String            @id @default(uuid())
   frameworkVersion   FrameworkVersion  @relation(fields: [frameworkVersionId], references: [id], onDelete: Cascade)
   frameworkVersionId String
-  requirementKey     String
-  supremeSummary     String
-  sourceUrl          String?
-  mappings           RequirementControlMapping[]
+  requirementKey             String
+  supremeSummary             String
+  sourceUrl                  String?
+  lifecycle                  String   @default("ACTIVE")
+  supersededRequirementKey   String?
+  mappings                   RequirementControlMapping[]
+  requirementStates          ComplianceRequirementState[]
 
   @@unique([frameworkVersionId, requirementKey])
 }
@@ -3273,6 +3294,7 @@ model BusinessUnit {
   updatedAt      DateTime @updatedAt
   risks          EnterpriseRisk[]
   appetites      EnterpriseRiskAppetite[]
+  complianceActivations ComplianceActivation[]
 
   @@unique([organizationId, name])
   @@index([organizationId])
@@ -3357,6 +3379,8 @@ model EnterpriseRisk {
   events               EnterpriseRiskEvent[]
   history              EnterpriseRiskHistory[]
   relationshipLinks    EnterpriseRiskRelationship[]
+  complianceGaps       ComplianceGap[]
+  complianceExceptions ComplianceException[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, status])
@@ -3577,4 +3601,355 @@ model EnterpriseRiskCounter {
   organizationId String @id
   nextRisk       Int    @default(1)
   nextKri        Int    @default(1)
+}
+
+enum ComplianceActivationStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+enum ComplianceApplicability {
+  APPLICABLE
+  NOT_APPLICABLE
+  UNDER_REVIEW
+  NOT_DETERMINED
+}
+
+enum ComplianceAttestationStatus {
+  IMPLEMENTED
+  PARTIALLY_IMPLEMENTED
+  NOT_IMPLEMENTED
+  NOT_APPLICABLE
+}
+
+enum ComplianceCampaignStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  REVIEWED
+  OVERDUE
+  CLOSED
+}
+
+enum ComplianceAttestationReviewStatus {
+  PENDING
+  REVIEWED
+  REJECTED
+}
+
+enum ComplianceGapSource {
+  UNMAPPED
+  NOT_IMPLEMENTED
+  INEFFECTIVE
+  EVIDENCE_MISSING
+  EVIDENCE_EXPIRED
+  FAILED_TEST
+  OPEN_FINDING
+  UNRESOLVED_EXCEPTION
+}
+
+enum ComplianceGapStatus {
+  OPEN
+  IN_PROGRESS
+  LINKED_FINDING
+  CLOSED
+}
+
+enum ComplianceExceptionType {
+  POLICY
+  CONTROL
+  EVIDENCE
+  INTERPRETATION
+}
+
+enum ComplianceExceptionStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  EXPIRED
+  CLOSED
+}
+
+enum CompliancePeriodStatus {
+  PREPARING
+  IN_PROGRESS
+  COMPLETED
+  CLOSED
+}
+
+enum CompliancePeriodItemType {
+  REQUIREMENT
+  CONTROL
+  EVIDENCE_REQUEST
+}
+
+enum CompliancePeriodItemStatus {
+  REQUESTED
+  RECEIVED
+  REVIEWED
+}
+
+model ComplianceActivation {
+  id                 String                     @id @default(uuid())
+  organization       Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  publicId           String
+  frameworkVersion   FrameworkVersion           @relation(fields: [frameworkVersionId], references: [id])
+  frameworkVersionId String
+  businessUnit       BusinessUnit?              @relation(fields: [businessUnitId], references: [id])
+  businessUnitId     String?
+  ownerUserId        String?
+  scope              String?
+  startDate          DateTime?
+  targetDate         DateTime?
+  status             ComplianceActivationStatus @default(DRAFT)
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  closedAt           DateTime?
+  requirementStates  ComplianceRequirementState[]
+  campaigns          ComplianceAttestationCampaign[]
+  gaps               ComplianceGap[]
+  exceptions         ComplianceException[]
+  periods            CompliancePeriod[]
+  versionChanges     ComplianceVersionChange[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, frameworkVersionId])
+}
+
+model ComplianceRequirementState {
+  id               String                   @id @default(uuid())
+  organization     Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId   String
+  publicId         String
+  activation       ComplianceActivation     @relation(fields: [activationId], references: [id], onDelete: Cascade)
+  activationId     String
+  requirement      FrameworkRequirement     @relation(fields: [requirementId], references: [id])
+  requirementId    String
+  applicability    ComplianceApplicability  @default(NOT_DETERMINED)
+  naRationale      String?
+  naActorUserId    String?
+  naAt             DateTime?
+  ownerUserId      String?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  attestations     ComplianceAttestation[]
+  gaps             ComplianceGap[]
+  exceptions       ComplianceException[]
+  periodItems      CompliancePeriodItem[]
+
+  @@unique([organizationId, publicId])
+  @@unique([activationId, requirementId])
+  @@index([organizationId, applicability])
+  @@index([organizationId, ownerUserId])
+}
+
+model ComplianceAttestationCampaign {
+  id             String                    @id @default(uuid())
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  publicId       String
+  activation     ComplianceActivation?     @relation(fields: [activationId], references: [id])
+  activationId   String?
+  name           String
+  periodStart    DateTime?
+  periodEnd      DateTime?
+  dueAt          DateTime?
+  status         ComplianceCampaignStatus  @default(NOT_STARTED)
+  ownerUserId    String?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  assignments    ComplianceCampaignAssignment[]
+  attestations   ComplianceAttestation[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model ComplianceCampaignAssignment {
+  id             String                       @id @default(uuid())
+  organizationId String
+  campaign       ComplianceAttestationCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId     String
+  organizationControlId String?
+  attestorUserId String
+  reviewerUserId String?
+  createdAt      DateTime                     @default(now())
+
+  @@index([campaignId])
+  @@index([organizationId])
+}
+
+model ComplianceAttestation {
+  id                    String                             @id @default(uuid())
+  organization          Organization                       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  publicId              String
+  campaign              ComplianceAttestationCampaign?     @relation(fields: [campaignId], references: [id])
+  campaignId            String?
+  control               OrganizationControl                @relation(fields: [organizationControlId], references: [id])
+  organizationControlId String
+  requirementState      ComplianceRequirementState?        @relation(fields: [requirementStateId], references: [id])
+  requirementStateId    String?
+  status                ComplianceAttestationStatus
+  statement             String
+  periodStart           DateTime?
+  periodEnd             DateTime?
+  attestorUserId        String
+  attestedAt            DateTime                           @default(now())
+  reviewerUserId        String?
+  reviewedAt            DateTime?
+  reviewStatus          ComplianceAttestationReviewStatus  @default(PENDING)
+  reviewNotes           String?
+  createdAt             DateTime                           @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, organizationControlId])
+  @@index([organizationId, campaignId])
+}
+
+model ComplianceGap {
+  id                    String               @id @default(uuid())
+  organization          Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  publicId              String
+  activation            ComplianceActivation? @relation(fields: [activationId], references: [id])
+  activationId          String?
+  requirementState      ComplianceRequirementState? @relation(fields: [requirementStateId], references: [id])
+  requirementStateId    String?
+  control               OrganizationControl? @relation(fields: [organizationControlId], references: [id])
+  organizationControlId String?
+  findingId             String?
+  enterpriseRisk        EnterpriseRisk?      @relation(fields: [enterpriseRiskId], references: [id])
+  enterpriseRiskId      String?
+  source                ComplianceGapSource
+  title                 String
+  explanation           String
+  ownerUserId           String?
+  dueDate               DateTime?
+  status                ComplianceGapStatus  @default(OPEN)
+  remediation           String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, source])
+}
+
+model ComplianceException {
+  id                    String                     @id @default(uuid())
+  organization          Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  publicId              String
+  activation            ComplianceActivation?      @relation(fields: [activationId], references: [id])
+  activationId          String?
+  type                  ComplianceExceptionType
+  scope                 String
+  rationale             String
+  conditions            String?
+  ownerUserId           String
+  approverUserId        String?
+  approvedAt            DateTime?
+  startAt               DateTime
+  expiresAt             DateTime?
+  reviewAt              DateTime?
+  status                ComplianceExceptionStatus  @default(REQUESTED)
+  requirementState      ComplianceRequirementState? @relation(fields: [requirementStateId], references: [id])
+  requirementStateId    String?
+  control               OrganizationControl?       @relation(fields: [organizationControlId], references: [id])
+  organizationControlId String?
+  enterpriseRisk        EnterpriseRisk?            @relation(fields: [enterpriseRiskId], references: [id])
+  enterpriseRiskId      String?
+  createdAt             DateTime                   @default(now())
+  updatedAt             DateTime                   @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, expiresAt])
+}
+
+model CompliancePeriod {
+  id                 String                  @id @default(uuid())
+  organization       Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  publicId           String
+  activation         ComplianceActivation    @relation(fields: [activationId], references: [id])
+  activationId       String
+  frameworkVersion   FrameworkVersion        @relation(fields: [frameworkVersionId], references: [id])
+  frameworkVersionId String
+  name               String
+  startAt            DateTime
+  endAt              DateTime?
+  status             CompliancePeriodStatus  @default(PREPARING)
+  ownerUserId        String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  items              CompliancePeriodItem[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model CompliancePeriodItem {
+  id                    String                      @id @default(uuid())
+  organizationId        String
+  period                CompliancePeriod            @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  periodId              String
+  itemType              CompliancePeriodItemType
+  requirementState      ComplianceRequirementState? @relation(fields: [requirementStateId], references: [id])
+  requirementStateId    String?
+  organizationControlId String?
+  storedObjectId        String?
+  status                CompliancePeriodItemStatus  @default(REQUESTED)
+  notes                 String?
+  dueAt                 DateTime?
+  ownerUserId           String?
+  createdAt             DateTime                    @default(now())
+
+  @@index([periodId])
+  @@index([organizationId])
+}
+
+model ComplianceVersionChange {
+  id             String               @id @default(uuid())
+  organizationId String
+  activation     ComplianceActivation @relation(fields: [activationId], references: [id], onDelete: Cascade)
+  activationId   String
+  fromVersionId  String
+  toVersionId    String
+  actorUserId    String?
+  notes          String?
+  createdAt      DateTime             @default(now())
+
+  @@index([activationId])
+  @@index([organizationId])
+}
+
+model ComplianceHistory {
+  id             String   @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  entityType     String
+  entityId       String
+  eventType      String
+  summary        String
+  change         String?
+  actorUserId    String?
+  payload        Json?
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, entityType, entityId, createdAt])
+  @@index([organizationId, createdAt])
+}
+
+model ComplianceCounter {
+  organizationId String
+  kind           String
+  next           Int    @default(1)
+
+  @@id([organizationId, kind])
 }

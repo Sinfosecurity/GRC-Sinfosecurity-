@@ -27,6 +27,7 @@ export type CatalogFramework = {
     publisher: string;
     sourceUrl?: string;
     version: string;
+    versionStatus?: 'ACTIVE' | 'SUPERSEDED';
     requirements: CatalogRequirement[];
 };
 
@@ -75,8 +76,13 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         version: '2.0-ref',
         requirements: [
             { requirementKey: 'GV.RR', supremeSummary: 'Supreme summary: roles for cyber risk and third-party decisions are assigned and kept current.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }, { controlKey: 'TPR-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'GV.OC', supremeSummary: 'Supreme summary: the organization records what it must protect and why those outcomes matter.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'GOV-01', strength: 'CONTRIBUTING' }, { controlKey: 'DAT-01', strength: 'RELATED' }] },
+            { requirementKey: 'ID.AM', supremeSummary: 'Supreme summary: systems and vendors that handle customer data are inventoried.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'AST-01', strength: 'PRIMARY' }, { controlKey: 'TPR-01', strength: 'CONTRIBUTING' }] },
             { requirementKey: 'PR.AA', supremeSummary: 'Supreme summary: identity, authentication, and privileged access are controlled.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }, { controlKey: 'IAM-01', strength: 'CONTRIBUTING' }, { controlKey: 'PAM-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'PR.DS', supremeSummary: 'Supreme summary: customer data is protected in transit and at rest when stored.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'ENC-01', strength: 'PRIMARY' }, { controlKey: 'ENC-02', strength: 'PRIMARY' }] },
             { requirementKey: 'DE.CM', supremeSummary: 'Supreme summary: security-relevant activity can be reviewed after the fact.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'LOG-01', strength: 'PRIMARY' }] },
+            { requirementKey: 'RS.MA', supremeSummary: 'Supreme summary: security incidents have an owner and a recorded next action.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'INC-01', strength: 'PRIMARY' }] },
+            { requirementKey: 'RC.RP', supremeSummary: 'Supreme summary: restore of authoritative data has been exercised in isolation.', sourceUrl: 'https://www.nist.gov/cyberframework', maps: [{ controlKey: 'DR-01', strength: 'PRIMARY' }, { controlKey: 'BKP-01', strength: 'CONTRIBUTING' }] },
         ],
     },
     {
@@ -88,6 +94,8 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         requirements: [
             { requirementKey: '3.5', supremeSummary: 'Supreme summary: identification and authentication protect access to controlled information.', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }, { controlKey: 'AUTH-02', strength: 'CONTRIBUTING' }] },
             { requirementKey: '3.1', supremeSummary: 'Supreme summary: access is limited to people and services that need it.', maps: [{ controlKey: 'IAM-02', strength: 'PRIMARY' }, { controlKey: 'PAM-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: '3.13', supremeSummary: 'Supreme summary: communications and system information remain protected in transit.', maps: [{ controlKey: 'ENC-01', strength: 'PRIMARY' }, { controlKey: 'NET-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: '3.6', supremeSummary: 'Supreme summary: incident handling includes a recorded owner and next action.', maps: [{ controlKey: 'INC-01', strength: 'PRIMARY' }] },
         ],
     },
     {
@@ -99,6 +107,8 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         requirements: [
             { requirementKey: 'IA', supremeSummary: 'Supreme summary: identification and authentication practices are in place for systems that handle controlled information.', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }] },
             { requirementKey: 'AC', supremeSummary: 'Supreme summary: access control limits who can reach controlled information.', maps: [{ controlKey: 'IAM-01', strength: 'PRIMARY' }, { controlKey: 'IAM-02', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'AU', supremeSummary: 'Supreme summary: security-relevant events can be reviewed after the fact.', maps: [{ controlKey: 'LOG-01', strength: 'PRIMARY' }] },
+            { requirementKey: 'IR', supremeSummary: 'Supreme summary: incidents affecting controlled information have an owner.', maps: [{ controlKey: 'INC-01', strength: 'PRIMARY' }] },
         ],
     },
     {
@@ -109,8 +119,11 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         version: '2022-ref',
         requirements: [
             { requirementKey: 'A.5', supremeSummary: 'Supreme summary: organizational controls assign ownership and keep policies usable.', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }, { controlKey: 'GOV-02', strength: 'CONTRIBUTING' }] },
-            { requirementKey: 'A.8', supremeSummary: 'Supreme summary: technological controls protect systems, crypto, and logging.', maps: [{ controlKey: 'ENC-01', strength: 'CONTRIBUTING' }, { controlKey: 'ENC-02', strength: 'CONTRIBUTING' }, { controlKey: 'LOG-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'A.5.7', supremeSummary: 'Supreme summary: threat information that affects this organization is recorded and assigned.', maps: [{ controlKey: 'VUL-01', strength: 'CONTRIBUTING' }, { controlKey: 'INC-01', strength: 'RELATED' }] },
             { requirementKey: 'A.5.19', supremeSummary: 'Supreme summary: supplier relationships are identified and governed.', maps: [{ controlKey: 'TPR-01', strength: 'PRIMARY' }, { controlKey: 'TPR-03', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'A.5.23', supremeSummary: 'Supreme summary: cloud services used for customer data have a recorded owner and isolation check.', maps: [{ controlKey: 'CLD-01', strength: 'PRIMARY' }, { controlKey: 'TPR-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'A.8', supremeSummary: 'Supreme summary: technological controls protect systems, crypto, and logging.', maps: [{ controlKey: 'ENC-01', strength: 'CONTRIBUTING' }, { controlKey: 'ENC-02', strength: 'CONTRIBUTING' }, { controlKey: 'LOG-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'A.8.3', supremeSummary: 'Supreme summary: information is protected according to its recorded classification before sharing.', maps: [{ controlKey: 'DAT-01', strength: 'PRIMARY' }] },
         ],
     },
     {
@@ -120,6 +133,8 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         sourceUrl: 'https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2',
         version: '2017-ref',
         requirements: [
+            { requirementKey: 'CC1', supremeSummary: 'Supreme summary: control environment includes assigned security and risk ownership.', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }] },
+            { requirementKey: 'CC3', supremeSummary: 'Supreme summary: risk assessment records inherent risk before residual risk.', maps: [{ controlKey: 'RSK-01', strength: 'PRIMARY' }, { controlKey: 'RSK-02', strength: 'CONTRIBUTING' }] },
             { requirementKey: 'CC6', supremeSummary: 'Supreme summary: logical and physical access is restricted to authorized people and services.', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }, { controlKey: 'IAM-02', strength: 'CONTRIBUTING' }, { controlKey: 'PHY-01', strength: 'PARTIAL' }] },
             { requirementKey: 'CC7', supremeSummary: 'Supreme summary: system operation includes monitoring and response to anomalies.', maps: [{ controlKey: 'LOG-01', strength: 'PRIMARY' }, { controlKey: 'INC-01', strength: 'CONTRIBUTING' }] },
             { requirementKey: 'CC9', supremeSummary: 'Supreme summary: risk mitigation includes vendor and recovery considerations.', maps: [{ controlKey: 'TPR-02', strength: 'CONTRIBUTING' }, { controlKey: 'DR-01', strength: 'RELATED' }] },
@@ -133,7 +148,9 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         version: 'v8-ref',
         requirements: [
             { requirementKey: 'CIS-06', supremeSummary: 'Supreme summary: access control includes MFA for administrative access.', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }, { controlKey: 'PAM-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'CIS-05', supremeSummary: 'Supreme summary: account management removes access when a role ends.', maps: [{ controlKey: 'IAM-02', strength: 'PRIMARY' }] },
             { requirementKey: 'CIS-03', supremeSummary: 'Supreme summary: data protection includes knowing where customer data lives.', maps: [{ controlKey: 'DAT-01', strength: 'PRIMARY' }, { controlKey: 'AST-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'CIS-08', supremeSummary: 'Supreme summary: audit logs are retained long enough to investigate an incident.', maps: [{ controlKey: 'LOG-01', strength: 'PRIMARY' }] },
         ],
     },
     {
@@ -145,6 +162,8 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         requirements: [
             { requirementKey: 'REQ-8', supremeSummary: 'Supreme summary: identify users and authenticate access to system components.', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }, { controlKey: 'IAM-01', strength: 'CONTRIBUTING' }] },
             { requirementKey: 'REQ-3', supremeSummary: 'Supreme summary: protect stored account data, including encryption where applicable.', maps: [{ controlKey: 'ENC-02', strength: 'PRIMARY' }, { controlKey: 'KEY-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'REQ-10', supremeSummary: 'Supreme summary: log and review access to system components that handle account data.', maps: [{ controlKey: 'LOG-01', strength: 'PRIMARY' }] },
+            { requirementKey: 'REQ-12', supremeSummary: 'Supreme summary: maintain an information-security policy with a named owner.', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }, { controlKey: 'GOV-02', strength: 'CONTRIBUTING' }] },
         ],
     },
     {
@@ -156,6 +175,7 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         requirements: [
             { requirementKey: 'A.164.312', supremeSummary: 'Supreme summary: technical safeguards include access control and transmission security for electronic protected health information when that data is in scope.', maps: [{ controlKey: 'AUTH-01', strength: 'CONTRIBUTING' }, { controlKey: 'ENC-01', strength: 'CONTRIBUTING' }] },
             { requirementKey: 'A.164.308', supremeSummary: 'Supreme summary: administrative safeguards include assigned security responsibility and vendor oversight when PHI is involved.', maps: [{ controlKey: 'GOV-01', strength: 'CONTRIBUTING' }, { controlKey: 'TPR-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'A.164.310', supremeSummary: 'Supreme summary: physical safeguards restrict workspaces that can reach electronic protected health information systems when those systems are in scope.', maps: [{ controlKey: 'PHY-01', strength: 'CONTRIBUTING' }] },
         ],
     },
     {
@@ -165,9 +185,24 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
         sourceUrl: 'https://www.dfs.ny.gov/industry_guidance/cybersecurity',
         version: '500-ref',
         requirements: [
+            { requirementKey: '500.02', supremeSummary: 'Supreme summary: a cybersecurity program has a named owner and recorded scope.', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }] },
             { requirementKey: '500.07', supremeSummary: 'Supreme summary: access privileges are limited and periodically reviewed.', maps: [{ controlKey: 'IAM-02', strength: 'PRIMARY' }, { controlKey: 'PAM-01', strength: 'CONTRIBUTING' }] },
             { requirementKey: '500.12', supremeSummary: 'Supreme summary: multi-factor authentication is used for privileged and remote access where required.', maps: [{ controlKey: 'AUTH-01', strength: 'PRIMARY' }, { controlKey: 'AUTH-02', strength: 'CONTRIBUTING' }] },
             { requirementKey: '500.11', supremeSummary: 'Supreme summary: third-party service providers are inventoried and overseen.', maps: [{ controlKey: 'TPR-01', strength: 'PRIMARY' }, { controlKey: 'TPR-04', strength: 'CONTRIBUTING' }] },
+            { requirementKey: '500.14', supremeSummary: 'Supreme summary: training is provided to people who operate cybersecurity or vendor-risk processes.', maps: [{ controlKey: 'AWR-01', strength: 'PRIMARY' }] },
+        ],
+    },
+    {
+        frameworkKey: 'ISO_27001',
+        name: 'ISO/IEC 27001',
+        publisher: 'ISO',
+        sourceUrl: 'https://www.iso.org/standard/27001',
+        version: '2013-ref',
+        versionStatus: 'SUPERSEDED',
+        requirements: [
+            { requirementKey: 'A.5', supremeSummary: 'Supreme summary (2013-ref): information security policy ownership is recorded. This identifier belongs to a superseded pack.', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }] },
+            { requirementKey: 'A.9', supremeSummary: 'Supreme summary (2013-ref): access control includes unique identity and removal when a role ends.', maps: [{ controlKey: 'IAM-01', strength: 'PRIMARY' }, { controlKey: 'IAM-02', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'A.15', supremeSummary: 'Supreme summary (2013-ref): supplier relationships are identified before data is shared.', maps: [{ controlKey: 'TPR-01', strength: 'PRIMARY' }] },
         ],
     },
 ];

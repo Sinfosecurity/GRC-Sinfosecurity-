@@ -47,6 +47,18 @@ export const AUTHORITATIVE_TABLES = [
     'EnterpriseRiskEvent',
     'EnterpriseRiskHistory',
     'EnterpriseRiskCounter',
+    'ComplianceActivation',
+    'ComplianceRequirementState',
+    'ComplianceAttestationCampaign',
+    'ComplianceCampaignAssignment',
+    'ComplianceAttestation',
+    'ComplianceGap',
+    'ComplianceException',
+    'CompliancePeriod',
+    'CompliancePeriodItem',
+    'ComplianceVersionChange',
+    'ComplianceHistory',
+    'ComplianceCounter',
 ] as const;
 
 export type RecoveryManifest = {

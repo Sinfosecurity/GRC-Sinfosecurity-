@@ -219,7 +219,7 @@ describe('API Service', () => {
 
     it('gets all compliance frameworks', async () => {
       await complianceAPI.getFrameworks();
-      expect(api.get).toHaveBeenCalledWith('/compliance');
+      expect(api.get).toHaveBeenCalledWith('/compliance/catalog');
     });
 
     it('runs gap analysis', async () => {

@@ -5,7 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
-import { ermAPI, sccAPI, tprmAPI, vendorAPI } from '../services/api';
+import { complianceAPI, ermAPI, sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
@@ -37,6 +37,14 @@ const catalog: CatalogItem[] = [
     { id: 'erm-treatment', name: 'Risk treatment status', category: 'Enterprise Risk', description: 'Treatment attention from live plans. A plan does not lower residual risk by itself.', formats: ['PDF'], kind: 'operational' },
     { id: 'erm-board', name: 'Board risk summary', category: 'Enterprise Risk', description: 'Board-facing enterprise risk counts, heatmap, appetite exceptions, and attention. Ordinal scores are not summed.', formats: ['PDF', 'PPTX'], kind: 'board' },
     { id: 'erm-register', name: 'Enterprise risk register', category: 'Enterprise Risk', description: 'CSV/XLSX of live enterprise risks with formula-injection protection.', formats: ['CSV', 'XLSX'], kind: 'operational' },
+    { id: 'cmp-readiness', name: 'Framework readiness', category: 'Compliance', description: 'Mapped, implemented, tested, and evidence coverage. Not certified or compliant.', formats: ['PDF'], kind: 'operational' },
+    { id: 'cmp-gaps', name: 'Framework gap report', category: 'Compliance', description: 'Open gaps from live mappings, tests, evidence, and exceptions.', formats: ['PDF'], kind: 'operational' },
+    { id: 'cmp-attestations', name: 'Control attestation report', category: 'Compliance', description: 'Attestation campaigns. An attestation is not a control test.', formats: ['PDF'], kind: 'operational' },
+    { id: 'cmp-evidence', name: 'Evidence coverage report', category: 'Compliance', description: 'CLEAN current evidence coverage. A file is not compliance.', formats: ['PDF'], kind: 'operational' },
+    { id: 'cmp-exceptions', name: 'Exceptions report', category: 'Compliance', description: 'Governed exceptions. An exception does not make a control effective.', formats: ['PDF'], kind: 'operational' },
+    { id: 'cmp-executive', name: 'Compliance executive summary', category: 'Compliance', description: 'Program posture, readiness, gaps, and attention from live records.', formats: ['PDF'], kind: 'board' },
+    { id: 'cmp-board', name: 'Compliance board summary', category: 'Compliance', description: 'Board-facing readiness, gaps, exceptions, and attention. Not certification.', formats: ['PDF', 'PPTX'], kind: 'board' },
+    { id: 'cmp-register', name: 'Requirements / controls / gaps', category: 'Compliance', description: 'CSV/XLSX of activated requirement states with formula-injection protection.', formats: ['CSV', 'XLSX'], kind: 'operational' },
 ];
 
 type Capabilities = {
@@ -167,6 +175,14 @@ export default function Reports() {
             else if (item.id === 'erm-treatment') response = await ermAPI.downloadReport('treatment');
             else if (item.id === 'erm-board') response = fmt === 'pptx' ? await ermAPI.downloadBoardPptx() : await ermAPI.downloadReport('board');
             else if (item.id === 'erm-register') response = await ermAPI.exportRegister(fmt as 'csv' | 'xlsx');
+            else if (item.id === 'cmp-readiness') response = await complianceAPI.downloadReport('readiness');
+            else if (item.id === 'cmp-gaps') response = await complianceAPI.downloadReport('gaps');
+            else if (item.id === 'cmp-attestations') response = await complianceAPI.downloadReport('attestations');
+            else if (item.id === 'cmp-evidence') response = await complianceAPI.downloadReport('evidence');
+            else if (item.id === 'cmp-exceptions') response = await complianceAPI.downloadReport('exceptions');
+            else if (item.id === 'cmp-executive') response = await complianceAPI.downloadReport('executive');
+            else if (item.id === 'cmp-board') response = fmt === 'pptx' ? await complianceAPI.downloadBoardPptx() : await complianceAPI.downloadReport('board');
+            else if (item.id === 'cmp-register') response = await complianceAPI.exportRegister(fmt as 'csv' | 'xlsx');
             else response = await tprmAPI.downloadBoard(fmt as 'pdf' | 'pptx');
             const filename = await downloadBinaryResponse(response, `Supreme-Risk-${item.id}.${fmt}`);
             setSuccess(`Downloaded ${filename}`);

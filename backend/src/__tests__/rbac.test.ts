@@ -28,6 +28,15 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['control.test'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['evidence.link'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['framework.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['compliance.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['framework.activate'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['requirement.attest'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['requirement.attest'])).toBe(true);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['framework.activate'])).toBe(false);
+        expect(hasPermission('APPROVER', PERMISSIONS['exception.approve'])).toBe(true);
+        expect(hasPermission('APPROVER', PERMISSIONS['attestation.review'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['compliance.manage'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['framework.activate'])).toBe(true);
         expect(hasPermission('ASSESSOR', PERMISSIONS['control.test'])).toBe(true);
         expect(hasPermission('ASSESSOR', PERMISSIONS['control.manage'])).toBe(false);
         expect(hasPermission('ASSESSOR', PERMISSIONS['questionnaire.manage'])).toBe(false);

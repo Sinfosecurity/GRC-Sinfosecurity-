@@ -88,8 +88,8 @@ export async function seedPlatformCatalog() {
         });
         const version = await prisma.frameworkVersion.upsert({
             where: { frameworkId_version: { frameworkId: framework.id, version: pack.version } },
-            update: { sourceUrl: pack.sourceUrl, status: 'ACTIVE' },
-            create: { frameworkId: framework.id, version: pack.version, sourceUrl: pack.sourceUrl, status: 'ACTIVE' },
+            update: { sourceUrl: pack.sourceUrl, status: pack.versionStatus || 'ACTIVE' },
+            create: { frameworkId: framework.id, version: pack.version, sourceUrl: pack.sourceUrl, status: pack.versionStatus || 'ACTIVE' },
         });
         for (const req of pack.requirements) {
             const requirement = await prisma.frameworkRequirement.upsert({
