@@ -6,6 +6,8 @@ import { ApiError } from '../middleware/errorHandler';
 import { permissionsForRole } from '../security/rbac';
 import { emailStatus, notify } from './notificationDeliveryService';
 import { invitationEmailBody, invitationEmailHtml, portalFrontendUrl } from './publicFrontendUrl';
+import { getResendEmail, mapResendEventType } from './resendClient';
+import { applyProviderDeliveryEvent } from './emailDeliveryLifecycle';
 
 export const CUSTOMER_ROLE_LABELS: Record<string, { label: string; description: string }> = {
     ORGANIZATION_ADMIN: { label: 'Organization Admin', description: 'Manages the organization, people, and Third Party settings.' },
@@ -312,11 +314,30 @@ export const identityUserService = {
                 acceptedAt: true,
                 invitedBy: { select: { firstName: true, lastName: true, email: true } },
                 emailDeliveryStatus: true,
+                emailProvider: true,
+                providerMessageId: true,
                 emailSentAt: true,
                 emailDeliveredAt: true,
                 emailFailedAt: true,
             },
         });
+        for (const row of rows.filter((item) => item.providerMessageId && item.emailProvider === 'RESEND' && ['ACCEPTED', 'SENT'].includes(item.emailDeliveryStatus || '')).slice(0, 10)) {
+            const inspected = await getResendEmail(row.providerMessageId as string);
+            const mapped = inspected?.lastEvent ? mapResendEventType(`email.${inspected.lastEvent}`) : null;
+            if (mapped && mapped !== row.emailDeliveryStatus) {
+                await applyProviderDeliveryEvent({
+                    provider: 'RESEND',
+                    providerEventId: `poll:${row.providerMessageId}:${inspected?.lastEvent}`,
+                    providerMessageId: row.providerMessageId,
+                    eventType: `email.${inspected?.lastEvent}`,
+                    recipient: row.email,
+                });
+                row.emailDeliveryStatus = mapped;
+                if (mapped === 'DELIVERED') {
+                    row.emailDeliveredAt = new Date();
+                }
+            }
+        }
         const deliveries = await prisma.notificationDeliveryLog.findMany({
             where: { organizationId, resourceId: { in: rows.map((row) => row.id) } },
             orderBy: { createdAt: 'desc' },
