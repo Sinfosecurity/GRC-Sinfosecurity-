@@ -560,7 +560,7 @@ Operations runbooks exist: cutover, DR, platform access, support console, config
 
 ## 63–66. Candidate CI, smoke, rollback
 
-Candidate must pass hosted Supreme CI on the exact SHA.
+Candidate must pass hosted Supreme CI on the exact SHA. `#11` also enabled `pipefail` on the backend/frontend test steps so a failed suite can no longer be hidden by `tee`.
 
 Post-cutover smoke (shorter than full CI):
 

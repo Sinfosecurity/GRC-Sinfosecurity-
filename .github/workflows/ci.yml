@@ -87,7 +87,9 @@ jobs:
 
       - name: Backend full test suite
         working-directory: backend
-        run: npm test -- --ci --runInBand --forceExit | tee "$GITHUB_WORKSPACE/ci-artifacts/backend-tests.txt"
+        run: |
+          set -o pipefail
+          npm test -- --ci --runInBand --forceExit | tee "$GITHUB_WORKSPACE/ci-artifacts/backend-tests.txt"
 
       - name: Install frontend
         working-directory: frontend
@@ -100,7 +102,9 @@ jobs:
 
       - name: Frontend full test suite
         working-directory: frontend
-        run: npm test -- --run | tee "$GITHUB_WORKSPACE/ci-artifacts/frontend-tests.txt"
+        run: |
+          set -o pipefail
+          npm test -- --run | tee "$GITHUB_WORKSPACE/ci-artifacts/frontend-tests.txt"
 
       - name: Frontend production build
         working-directory: frontend

@@ -29,7 +29,8 @@ describe('Billing', () => {
         expect(await screen.findByText(/Plan: STARTER/)).toBeInTheDocument();
         expect(screen.getByText(/Subscription ID: sub_test/)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Open customer portal' })).toBeInTheDocument();
-        expect(screen.getAllByRole('button', { name: 'Monthly' })).toHaveLength(3);
+        expect(screen.getByText('BUSINESS')).toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: 'Monthly' })).toHaveLength(4);
         expect(screen.queryByText(/price_/)).not.toBeInTheDocument();
         expect(screen.queryByText(/sk_test/)).not.toBeInTheDocument();
     });
