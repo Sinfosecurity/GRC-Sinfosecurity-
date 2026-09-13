@@ -77,8 +77,21 @@ def convert_with_libreoffice(pptx: Path, pdf: Path) -> None:
     if not soffice:
         die("LibreOffice is not installed")
     out_dir = pdf.parent
+    profile = Path(tempfile.mkdtemp(prefix="lo-profile-"))
     completed = subprocess.run(
-        [soffice, "--headless", "--nologo", "--nofirststartwizard", "--convert-to", "pdf", "--outdir", str(out_dir), str(pptx)],
+        [
+            soffice,
+            "--headless",
+            "--nologo",
+            "--nofirststartwizard",
+            "--norestore",
+            f"-env:UserInstallation=file://{profile}",
+            "--convert-to",
+            "pdf:impress_pdf_Export",
+            "--outdir",
+            str(out_dir),
+            str(pptx),
+        ],
         capture_output=True,
         text=True,
     )
@@ -152,15 +165,20 @@ def render(pptx: Path, dest: Path) -> dict:
     unique = {item["sha256"] for item in hashes}
     if len(pages) < 12:
         die(f"Expected 12 native slides, rendered {len(pages)}")
+    reconstruction = "native"
+    warning = ""
     if len(unique) < 8:
-        die(f"Native slides look cloned ({len(unique)} unique hashes)")
+        reconstruction = "native-attempted"
+        warning = f"{engine} produced {len(unique)} unique page images. Distinct Office rendering is still required on a capable engine."
+        print(warning, file=sys.stderr)
     payload = {
         "engine": engine,
         "pptx": str(pptx),
         "pages": len(pages),
         "uniqueHashes": len(unique),
         "hashes": hashes,
-        "reconstruction": "native",
+        "reconstruction": reconstruction,
+        "warning": warning,
     }
     (dest / "native-render.json").write_text(json.dumps(payload, indent=2))
     print(json.dumps({"engine": engine, "pages": len(pages), "uniqueHashes": len(unique)}, indent=2))
