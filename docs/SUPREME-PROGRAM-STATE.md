@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #14 Shared Control & Evidence Layer
 
-**CURRENT ITEM STATUS:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW
+**CURRENT ITEM STATUS:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -61,7 +61,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #14 Shared Control & Evidence Layer
 
-**STATUS:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW — hosted CI PASS; staging frontend and API are `a743c8a`; Product Leadership has not accepted the visual experience
+**STATUS:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED — Product Leadership provisionally accepted the architecture on `a743c8a`; customer-facing UX closure is still required before PASS
 
 See `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md` and `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. #15 is not authorized.
 
@@ -99,13 +99,13 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Hold #14 for Product Leadership hosted review. Keep #12 PARTIAL. Do not start #15. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Hold #14 at PARTIAL until Product Leadership accepts the hosted UX closure. Architecture is provisionally accepted. Keep #12 PARTIAL. Do not start #15. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#14 Shared Control & Evidence Layer** — hosted implementation returned; Product Leadership review required.
+**#14 Shared Control & Evidence Layer** — architecture provisionally accepted; UX remediations returned; hosted UX re-review required.
 
 **Next item after #14:** #15 Supreme Risk — **NOT AUTHORIZED**.
 
@@ -145,7 +145,7 @@ Hold #14 for Product Leadership hosted review. Keep #12 PARTIAL. Do not start #1
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership hosted review of #14. #15 is not authorized. #12 remains PARTIAL until Product Leadership separately changes it.
+Product Leadership hosted re-review of #14 UX closure. #15 is not authorized. #12 remains PARTIAL until Product Leadership separately changes it.
 
 ---
 
@@ -178,7 +178,7 @@ Do not invent percentages.
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
 | 12 | Supreme Third Party Production v1 | PARTIAL / OPEN IN PARALLEL; commercial production NO-GO |
 | 13 | Governance Graph | Product Leadership accepted (2026-09-13) |
-| 14 | Shared Control & Evidence Layer | PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW |
+| 14 | Shared Control & Evidence Layer | PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED |
 | 15–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -224,5 +224,12 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 **ITEM:** #12 Supreme Third Party Production v1  
 **STATUS CHANGE:** PARTIAL remains PARTIAL — raw JSON scoring editor removed; Risk Scoring Methodology workspace implemented; hosted acceptance pending  
-**SHA:** recorded in `docs/RISK-METHODOLOGY-WORKSPACE.md` after commit  
+**SHA:** `692694b73d9b17c95bedf25ea03d193f1fa1791a`  
 **EVIDENCE:** Customer-facing JSON textarea removed. Structured thresholds and factors, draft/publish/history, and immutable published versions returned. Deterministic engine unchanged. #12 is not PASS. #14 is not PASS. #15 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #14 Shared Control & Evidence Layer  
+**STATUS CHANGE:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW -> PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED  
+**SHA:** architecture `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. UX remediations are committed separately and are not a PASS SHA.  
+**EVIDENCE:** Product Leadership independently verified `a743c8a` and provisionally accepted the common-control / mapping / reuse / testing / graph / isolation architecture. Closure requires hosted re-proof of customer-language IDs, humanized history, a structured Relationships workspace, duplicate-link prevention, 375 Control Detail / Evidence Library density, and plain-language coverage labels. #15 remains unauthorized.

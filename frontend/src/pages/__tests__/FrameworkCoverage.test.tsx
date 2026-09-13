@@ -36,6 +36,14 @@ describe('Framework coverage', () => {
                             implementedControls: 0,
                             testedControls: 0,
                             gap: true,
+                        }, {
+                            id: 'r2',
+                            requirementKey: 'CC7',
+                            supremeSummary: 'Supreme summary: system operations are monitored.',
+                            mappedControls: 1,
+                            implementedControls: 1,
+                            testedControls: 0,
+                            gap: false,
                         }],
                     }],
                 },
@@ -53,6 +61,8 @@ describe('Framework coverage', () => {
         expect(screen.getAllByText(/not certified, compliant, or attested/i).length).toBeGreaterThan(0);
         expect(screen.getByText('CC6')).toBeInTheDocument();
         expect(screen.getByText('Gap')).toBeInTheDocument();
+        expect(screen.getByText('Mapped and implemented')).toBeInTheDocument();
+        expect(screen.queryByText(/Evidence path exists/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/you are soc 2 compliant/i)).not.toBeInTheDocument();
     });
 });

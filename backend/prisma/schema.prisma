@@ -3116,6 +3116,8 @@ model EvidenceGovernanceLink {
   expiresAt      DateTime?
   reviewDueAt    DateTime?
 
+  // Active reuse is unique per (org, file, target, relationship) via
+  // EvidenceGovernanceLink_active_unique (partial, validTo IS NULL).
   @@index([organizationId, storedObjectId])
   @@index([organizationId, targetType, targetId])
   @@index([organizationId, freshness])

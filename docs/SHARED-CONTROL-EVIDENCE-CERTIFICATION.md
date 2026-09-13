@@ -7,13 +7,13 @@
 **Hosted frontend SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
 **Hosted API SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
 **Hosted CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34760658744 PASS  
-**Status:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW  
+**Status:** PARTIAL — TECHNICALLY STRONG, UX CLOSURE REQUIRED  
 **#12:** PARTIAL / OPEN IN PARALLEL  
 **#13:** Product Leadership accepted  
 **#15:** NOT AUTHORIZED  
 **Commercial production:** NO-GO
 
-This is not #14 PASS. Product Leadership must accept the hosted experience.
+This is not #14 PASS. Product Leadership provisionally accepted the architecture on `a743c8a` and required customer-facing UX closure before PASS.
 
 ## Principle
 
@@ -43,7 +43,7 @@ Leftover `Control` / `ComplianceFramework` tables are not this layer. Additive m
 | Check | Result |
 |---|---|
 | Control Center counts, search, filters | PASS — 33 controls |
-| Control Detail sections | PARTIAL — Overview / Requirements / Evidence / Testing work; Findings and History show raw IDs / `control.update` |
+| Control Detail sections | PARTIAL — Overview / Requirements / Evidence / Testing work on hosted `a743c8a`; UX remediations replace raw IDs / `control.update` in this commit and need hosted re-proof |
 | Evidence reuse | PASS — same `ok.zip` StoredObject, CLEAN preserved, rationale + review + audit |
 | Malware policy | PASS — FAILED, INFECTED, NOT_CONFIGURED SUPPORTS links HTTP 403 |
 | Freshness | PASS — CURRENT; expiry not invented |
@@ -60,26 +60,20 @@ Leftover `Control` / `ComplianceFramework` tables are not this layer. Additive m
 
 ## Visual notes for Product Leadership
 
-Cursor does not declare premium UI PASS.
+Cursor does not declare premium UI PASS. Hosted screenshots below remain the `a743c8a` walkthrough. UX remediations below are in this commit and still require hosted re-review.
+
+**Product Leadership closure items (2026-09-13)**
+
+| Item | Working-tree remediation | Hosted re-proof |
+|---|---|---|
+| Raw UUIDs on Findings / Evidence | Control detail now shows person names and finding titles; IDs stay in the API only | Required |
+| History codes such as `control.update` | API returns `label` / `actorName`; History shows “Control updated” and includes evidence / test events | Required |
+| Relationships as a raw graph dump | Grouped Requirements / Evidence / Tests / Findings / Risks workspace; graph codes hidden | Required |
+| Duplicate CLEAN evidence links | Application 409 for the same active file/target/relationship; additive partial unique index | Required |
+| Cramped 375 Control Detail / Evidence Library | Horizontal section chips; vendor graph hidden on xs; compact reuse fields | Required |
+| “Evidence path exists” | Replaced with “Mapped and implemented”; Gap retained | Required |
 
 **P0:** none observed on hosted security or tenant isolation.
-
-**P1**
-
-- Control Detail Findings lists raw finding UUIDs
-- Control Detail Evidence lists raw user UUIDs for linked / reviewed by
-- Control Detail History shows `control.update` and does not list evidence.link / control.test
-
-**P2**
-
-- Relationships tab is a long raw graph dump after repeated tests
-- Same CLEAN file can be linked more than once
-- 375 Control Detail section list consumes the first screen
-- 375 Evidence Library is dense once impact and relationships render
-
-**P3**
-
-- “Evidence path exists” is accurate but jargon-heavy
 
 Screenshots: `docs/private-beta/hosted-ux-qa/shared-control-evidence/`
 

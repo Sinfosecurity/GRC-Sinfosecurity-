@@ -186,6 +186,111 @@ describe('shared control and evidence layer', () => {
             });
         expect(ok.status).toBe(201);
         expect(ok.body.data.usable).toBe(true);
+
+        const duplicate = await request(app)
+            .post(`${API}/scc/evidence/links`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({
+                storedObjectId: cleanA,
+                targetType: 'CONTROL',
+                targetId: controlA,
+                relationship: 'SUPPORTS',
+                rationale: 'Same file and relationship must not create a second active link.',
+            });
+        expect(duplicate.status).toBe(409);
+
+        const related = await request(app)
+            .post(`${API}/scc/evidence/links`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({
+                storedObjectId: cleanA,
+                targetType: 'CONTROL',
+                targetId: controlA,
+                relationship: 'RELATED_TO',
+                rationale: 'A different relationship is a legitimate second link.',
+            });
+        expect(related.status).toBe(201);
+    });
+
+    it('keeps one active SUPPORTS link when two identical requests race', async () => {
+        const list = await request(app).get(`${API}/scc/controls`).set('Authorization', `Bearer ${tokenA}`);
+        const other = list.body.data.find((row: { controlKey: string }) => row.controlKey === 'LOG-01')
+            || list.body.data.find((row: { id: string }) => row.id !== controlA);
+        expect(other?.id).toBeTruthy();
+        const payload = {
+            storedObjectId: cleanA,
+            targetType: 'CONTROL',
+            targetId: other.id,
+            relationship: 'SUPPORTS',
+            rationale: 'Concurrent identical SUPPORTS must not create two active links.',
+        };
+        const [first, second] = await Promise.all([
+            request(app).post(`${API}/scc/evidence/links`).set('Authorization', `Bearer ${tokenA}`).send(payload),
+            request(app).post(`${API}/scc/evidence/links`).set('Authorization', `Bearer ${tokenA}`).send(payload),
+        ]);
+        const created = [first, second].filter((row) => row.status === 201);
+        const rejected = [first, second].filter((row) => row.status === 409);
+        expect(created).toHaveLength(1);
+        expect(rejected).toHaveLength(1);
+        expect(rejected[0].body.error?.message || JSON.stringify(rejected[0].body)).toMatch(/already linked/i);
+        const active = await prisma.evidenceGovernanceLink.count({
+            where: {
+                organizationId: orgA,
+                storedObjectId: cleanA,
+                targetId: other.id,
+                relationship: 'SUPPORTS',
+                validTo: null,
+            },
+        });
+        expect(active).toBe(1);
+    });
+
+    it('allows the same SUPPORTS relationship again only after the prior active link is closed', async () => {
+        const existing = await prisma.evidenceGovernanceLink.findFirstOrThrow({
+            where: {
+                organizationId: orgA,
+                storedObjectId: cleanA,
+                targetId: controlA,
+                relationship: 'SUPPORTS',
+                validTo: null,
+            },
+        });
+        const unlink = await request(app)
+            .post(`${API}/scc/evidence/links/${existing.id}/unlink`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({ reason: 'Replace with a later review of the same file.' });
+        expect(unlink.status).toBe(200);
+        const again = await request(app)
+            .post(`${API}/scc/evidence/links`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({
+                storedObjectId: cleanA,
+                targetType: 'CONTROL',
+                targetId: controlA,
+                relationship: 'SUPPORTS',
+                rationale: 'Later version of the same MFA policy after the prior link was closed.',
+            });
+        expect(again.status).toBe(201);
+        expect(again.body.data.id).not.toBe(existing.id);
+        const closed = await prisma.evidenceGovernanceLink.findUniqueOrThrow({ where: { id: existing.id } });
+        expect(closed.validTo).not.toBeNull();
+    });
+
+    it('returns customer labels instead of raw identifiers on control detail', async () => {
+        const saved = await request(app)
+            .patch(`${API}/scc/controls/${controlA}`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({ implementationStatus: 'IMPLEMENTED' });
+        expect(saved.status).toBe(200);
+
+        const detail = await request(app)
+            .get(`${API}/scc/controls/${controlA}`)
+            .set('Authorization', `Bearer ${tokenA}`);
+        expect(detail.status).toBe(200);
+        expect(detail.body.data.evidence[0].linkedBy).toBe('Scc A');
+        expect(detail.body.data.evidence[0].linkedBy).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i);
+        expect(detail.body.data.history.some((row: { action: string; label: string }) => row.action === 'control.update' && row.label === 'Control updated')).toBe(true);
+        expect(detail.body.data.history.some((row: { label: string }) => row.label === 'Evidence linked')).toBe(true);
     });
 
     it('does not invent findings and does not treat not-applicable as pass', async () => {

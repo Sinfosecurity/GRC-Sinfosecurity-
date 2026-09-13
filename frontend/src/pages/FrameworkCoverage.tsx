@@ -64,7 +64,7 @@ export default function FrameworkCoverage() {
             />
             {honesty && <Alert severity="info" sx={{ mb: 2 }}>{honesty}</Alert>}
             <QueryState loading={loading} error={error} empty={frameworks.length === 0} emptyTitle="No framework packs" emptyBody="Open Control Center once so the organization can adopt the Supreme library.">
-                <TextField select label="Framework" value={selectedKey} onChange={(event) => setSelectedKey(event.target.value)} sx={{ minWidth: 320, mb: 2 }}>
+                <TextField select label="Framework" value={selectedKey} onChange={(event) => setSelectedKey(event.target.value)} sx={{ width: '100%', maxWidth: 420, mb: 2 }}>
                     {frameworks.map((row) => <MenuItem key={row.frameworkKey} value={row.frameworkKey}>{row.name}</MenuItem>)}
                 </TextField>
                 {selected && (
@@ -89,7 +89,7 @@ export default function FrameworkCoverage() {
                                             <StatusBadge kind="plain" label={`${row.mappedControls} mapped`} />
                                             <StatusBadge kind="plain" label={`${row.implementedControls} implemented`} />
                                             <StatusBadge kind="plain" label={`${row.testedControls} tested`} />
-                                            <StatusBadge kind="plain" tone={row.gap ? 'high' : 'success'} label={row.gap ? 'Gap' : 'Evidence path exists'} />
+                                            <StatusBadge kind="plain" tone={row.gap ? 'high' : 'success'} label={row.gap ? 'Gap' : 'Mapped and implemented'} />
                                         </Stack>
                                     </Stack>
                                     <Typography

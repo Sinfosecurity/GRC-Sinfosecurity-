@@ -121,11 +121,14 @@ export default function DocumentManagement() {
                 description="Upload once. Reuse with an explicit rationale. Only files with a CLEAN malware scan can be treated as usable evidence."
                 meta={<StatusBadge kind="plain" tone={storageStatus === 'NOT_CONFIGURED' ? 'high' : 'info'} label={storageStatus === 'NOT_CONFIGURED' ? 'Storage not ready' : 'Storage ready'} />}
             />
-            <Alert severity="info" sx={{ mb: 2 }}>
+            <Alert severity="info" sx={{ mb: 2, display: { xs: 'none', md: 'flex' } }}>
                 Linking a file to one control does not prove every mapped requirement. Expired or revoked evidence shows potential governance impact and does not change residual scores.
             </Alert>
+            <Typography variant="caption" display="block" sx={{ display: { xs: 'block', md: 'none' }, mb: 2 }}>
+                Reuse a CLEAN file. Linking one control does not prove every mapped requirement.
+            </Typography>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
-                <TextField select label="Link upload to vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 280 }}>
+                <TextField select label="Link upload to vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: { md: 280 }, width: { xs: '100%', md: 'auto' } }}>
                     <MenuItem value="">Select vendor</MenuItem>
                     {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
                         <MenuItem value={vendorId}>Selected vendor</MenuItem>
@@ -153,7 +156,11 @@ export default function DocumentManagement() {
                     }} />
                 </Button>
             </Stack>
-            {!vendorId && <Alert severity="info" sx={{ mb: 2 }}>Select a vendor so a new file is stored and linked atomically. Prefer “Use existing evidence” when the file is already here.</Alert>}
+            {!vendorId && (
+                <Alert severity="info" sx={{ mb: 2, display: { xs: 'none', sm: 'flex' } }}>
+                    Select a vendor so a new file is stored and linked atomically. Prefer “Use existing evidence” when the file is already here.
+                </Alert>
+            )}
 
             <Surface>
                 <Typography variant="h5" sx={{ mb: 1 }}>Use existing evidence</Typography>
@@ -161,7 +168,7 @@ export default function DocumentManagement() {
                 <Box component="form" onSubmit={linkExisting}>
                     <Stack spacing={1.5} sx={{ mb: 2 }}>
                         <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField select label="Existing file" value={selectedId} onChange={(e) => showImpact(e.target.value)} sx={{ minWidth: 280 }}>
+                            <TextField select label="Existing file" value={selectedId} onChange={(e) => showImpact(e.target.value)} sx={{ minWidth: { md: 280 }, width: { xs: '100%', md: 'auto' } }}>
                                 <MenuItem value="">Select file</MenuItem>
                                 {library.map((row) => (
                                     <MenuItem key={row.id} value={row.id} disabled={!row.usable}>
@@ -169,18 +176,18 @@ export default function DocumentManagement() {
                                     </MenuItem>
                                 ))}
                             </TextField>
-                            <TextField select label="Control" value={controlId} onChange={(e) => setControlId(e.target.value)} sx={{ minWidth: 280 }}>
+                            <TextField select label="Control" value={controlId} onChange={(e) => setControlId(e.target.value)} sx={{ minWidth: { md: 280 }, width: { xs: '100%', md: 'auto' } }}>
                                 <MenuItem value="">Select control</MenuItem>
                                 {controls.map((row) => <MenuItem key={row.id} value={row.id}>{row.controlKey} {row.title}</MenuItem>)}
                             </TextField>
                         </Stack>
-                        <TextField select label="Relationship" value={relationship} onChange={(e) => setRelationship(e.target.value)} sx={{ minWidth: 220 }}>
+                        <TextField select label="Relationship" value={relationship} onChange={(e) => setRelationship(e.target.value)} sx={{ minWidth: { md: 220 }, width: { xs: '100%', md: 'auto' } }}>
                             <MenuItem value="SUPPORTS">Supports</MenuItem>
                             <MenuItem value="PARTIALLY_SUPPORTS">Partially supports</MenuItem>
                             <MenuItem value="RELATED_TO">Related to</MenuItem>
                             <MenuItem value="CONTRADICTS">Contradicts</MenuItem>
                         </TextField>
-                        <TextField label="Why this file supports this control" value={rationale} onChange={(e) => setRationale(e.target.value)} required multiline minRows={2} />
+                        <TextField label="Why this file supports this control" value={rationale} onChange={(e) => setRationale(e.target.value)} required multiline minRows={2} sx={{ '& textarea': { minHeight: { xs: 56, sm: 72 } } }} />
                         <Button type="submit" variant="contained" disabled={!selectedId || !controlId}>Link existing evidence</Button>
                     </Stack>
                 </Box>
@@ -191,12 +198,12 @@ export default function DocumentManagement() {
                 )}
             </Surface>
 
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ my: 2 }}>
-                <TextField select label="Malware status" value={scanFilter} onChange={(e) => setScanFilter(e.target.value)} sx={{ minWidth: 200 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ my: 2 }}>
+                <TextField select label="Malware status" value={scanFilter} onChange={(e) => setScanFilter(e.target.value)} sx={{ minWidth: { sm: 200 }, width: { xs: '100%', sm: 'auto' } }}>
                     <MenuItem value="">Any scan status</MenuItem>
                     {['CLEAN', 'PENDING', 'FAILED', 'INFECTED', 'ERROR', 'NOT_CONFIGURED'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
                 </TextField>
-                <TextField select label="Freshness" value={freshnessFilter} onChange={(e) => setFreshnessFilter(e.target.value)} sx={{ minWidth: 200 }}>
+                <TextField select label="Freshness" value={freshnessFilter} onChange={(e) => setFreshnessFilter(e.target.value)} sx={{ minWidth: { sm: 200 }, width: { xs: '100%', sm: 'auto' } }}>
                     <MenuItem value="">Any freshness</MenuItem>
                     {['CURRENT', 'EXPIRING', 'EXPIRED', 'SUPERSEDED', 'REVOKED', 'UNDER_REVIEW'].map((value) => <MenuItem key={value} value={value}>{value.replace(/_/g, ' ')}</MenuItem>)}
                 </TextField>
@@ -232,8 +239,16 @@ export default function DocumentManagement() {
                     ]}
                 />
             </QueryState>
-            {vendorId && <Box sx={{ mt: 2 }}><EntityRelationships sourceModel="Vendor" sourceId={vendorId} /></Box>}
-            {selectedId && <Box sx={{ mt: 2 }}><EntityRelationships sourceModel="StoredObject" sourceId={selectedId} /></Box>}
+            {vendorId && (
+                <Box sx={{ display: { xs: 'none', md: 'block' }, mt: 2 }}>
+                    <EntityRelationships sourceModel="Vendor" sourceId={vendorId} compact />
+                </Box>
+            )}
+            {selectedId && (
+                <Box sx={{ mt: 2 }}>
+                    <EntityRelationships sourceModel="StoredObject" sourceId={selectedId} compact />
+                </Box>
+            )}
         </Box>
     );
 }

@@ -30,6 +30,24 @@ export function resetCatalogSeedForTests() {
     catalogSeeded = false;
 }
 
+const HISTORY_LABELS: Record<string, string> = {
+    'control.update': 'Control updated',
+    'control.test': 'Control test recorded',
+    'evidence.link': 'Evidence linked',
+    'evidence.review': 'Evidence reviewed',
+    'evidence.unlink': 'Evidence unlinked',
+};
+
+function actorLabel(user?: { firstName: string; lastName: string; email: string } | null, fallback?: string | null) {
+    if (!user) {
+        if (!fallback) return 'Supreme';
+        if (fallback === 'system') return 'Supreme';
+        return 'A workspace member';
+    }
+    const name = `${user.firstName} ${user.lastName}`.trim();
+    return name || user.email.split('@')[0];
+}
+
 export function displayedFreshness(input: {
     freshness: EvidenceFreshness;
     expiresAt?: Date | null;
@@ -279,7 +297,7 @@ export async function getControl(organizationId: string, controlId: string) {
     await adoptCatalogForOrganization(organizationId);
     const control = await prisma.organizationControl.findFirst({ where: { id: controlId, organizationId } });
     if (!control) throw new ApiError(404, 'Control not found');
-    const [tests, mappings, evidence, history] = await Promise.all([
+    const [tests, mappings, evidence] = await Promise.all([
         prisma.organizationControlTest.findMany({ where: { organizationId, controlId }, orderBy: { testedAt: 'desc' } }),
         prisma.requirementControlMapping.findMany({
             where: {
@@ -296,16 +314,60 @@ export async function getControl(organizationId: string, controlId: string) {
             include: { storedObject: { select: { id: true, filename: true, scanStatus: true, uploadedAt: true, ownerType: true, ownerId: true } } },
             orderBy: { createdAt: 'desc' },
         }),
+    ]);
+    const findingIds = tests.map((row) => row.findingId).filter((id): id is string => Boolean(id));
+    const [history, people, findings, linkableFindings] = await Promise.all([
         prisma.auditEvent.findMany({
-            where: { organizationId, resourceType: 'OrganizationControl', resourceId: control.id },
+            where: {
+                organizationId,
+                OR: [
+                    { resourceType: 'OrganizationControl', resourceId: control.id },
+                    { resourceType: 'OrganizationControlTest', resourceId: { in: tests.map((row) => row.id) } },
+                    { resourceType: 'EvidenceGovernanceLink', resourceId: { in: evidence.map((row) => row.id) } },
+                ],
+            },
             orderBy: { timestamp: 'desc' },
-            take: 25,
+            take: 40,
             select: { id: true, action: true, actorUserId: true, timestamp: true, result: true },
         }),
+        prisma.user.findMany({
+            where: {
+                organizationId,
+                id: {
+                    in: [
+                        ...tests.map((row) => row.testerUserId),
+                        ...evidence.map((row) => row.createdBy),
+                        ...evidence.map((row) => row.reviewedBy || ''),
+                    ].filter(Boolean),
+                },
+            },
+            select: { id: true, firstName: true, lastName: true, email: true },
+        }),
+        prisma.vendorIssue.findMany({
+            where: { organizationId, id: { in: findingIds } },
+            select: { id: true, title: true, status: true, severity: true },
+        }),
+        prisma.vendorIssue.findMany({
+            where: { organizationId, status: { notIn: ['CLOSED', 'RESOLVED'] } },
+            select: { id: true, title: true, status: true, severity: true },
+            orderBy: { identifiedDate: 'desc' },
+            take: 50,
+        }),
     ]);
+    const byId = new Map(people.map((user) => [user.id, user]));
+    const findingById = new Map(findings.map((row) => [row.id, row]));
+    const historyActors = await prisma.user.findMany({
+        where: { organizationId, id: { in: history.map((row) => row.actorUserId || '').filter(Boolean) } },
+        select: { id: true, firstName: true, lastName: true, email: true },
+    });
+    const historyById = new Map(historyActors.map((user) => [user.id, user]));
     return {
         control,
-        tests,
+        tests: tests.map((row) => ({
+            ...row,
+            testerName: actorLabel(byId.get(row.testerUserId), row.testerUserId),
+            finding: row.findingId ? findingById.get(row.findingId) || null : null,
+        })),
         mappings: mappings.map((row) => ({
             id: row.id,
             strength: row.mappingStrength,
@@ -319,13 +381,25 @@ export async function getControl(organizationId: string, controlId: string) {
         })),
         evidence: evidence.map((row) => ({
             ...row,
+            linkedBy: actorLabel(byId.get(row.createdBy), row.createdBy),
+            reviewedByName: row.reviewedBy ? actorLabel(byId.get(row.reviewedBy), row.reviewedBy) : null,
             freshness: displayedFreshness(row),
             usable: row.storedObject.scanStatus === ScanStatus.CLEAN && USABLE_RELATIONS.includes(row.relationship),
         })),
+        findings: tests
+            .filter((row) => row.findingId && findingById.has(row.findingId))
+            .map((row) => ({
+                testId: row.id,
+                testedAt: row.testedAt,
+                result: row.result,
+                ...findingById.get(row.findingId!)!,
+            })),
+        linkableFindings,
         history: history.map((row) => ({
             id: row.id,
             action: row.action,
-            actorUserId: row.actorUserId,
+            label: HISTORY_LABELS[row.action] || row.action.replace(/[._]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()),
+            actorName: actorLabel(historyById.get(row.actorUserId || ''), row.actorUserId),
             createdAt: row.timestamp,
             result: row.result,
         })),
@@ -475,26 +549,47 @@ export async function linkEvidence(input: {
         throw new ApiError(403, 'Only files with a CLEAN malware scan can be used as supporting evidence');
     }
     await assertTarget(input.organizationId, input.targetType, input.targetId);
-    const freshness = input.freshness || (input.expiresAt ? displayedFreshness({ freshness: 'CURRENT', expiresAt: input.expiresAt }) : 'CURRENT');
-    const link = await prisma.evidenceGovernanceLink.create({
-        data: {
+    const duplicate = await prisma.evidenceGovernanceLink.findFirst({
+        where: {
             organizationId: input.organizationId,
             storedObjectId: stored.id,
             targetType: input.targetType,
             targetId: input.targetId,
             relationship: input.relationship,
-            rationale: input.rationale.trim(),
-            createdBy: input.actorUserId,
-            expiresAt: input.expiresAt,
-            issuedAt: input.issuedAt,
-            effectiveFrom: input.effectiveFrom,
-            reviewDueAt: input.reviewDueAt,
-            freshness,
-            provenance: GovernanceProvenance.USER,
-            authority: GovernanceAuthority.AUTHORITATIVE,
-            reviewStatus: EvidenceReviewStatus.SUBMITTED,
+            validTo: null,
         },
     });
+    if (duplicate) {
+        throw new ApiError(409, 'This file is already linked to that record with the same relationship. Choose a different relationship or unlink the current one first.');
+    }
+    const freshness = input.freshness || (input.expiresAt ? displayedFreshness({ freshness: 'CURRENT', expiresAt: input.expiresAt }) : 'CURRENT');
+    let link;
+    try {
+        link = await prisma.evidenceGovernanceLink.create({
+            data: {
+                organizationId: input.organizationId,
+                storedObjectId: stored.id,
+                targetType: input.targetType,
+                targetId: input.targetId,
+                relationship: input.relationship,
+                rationale: input.rationale.trim(),
+                createdBy: input.actorUserId,
+                expiresAt: input.expiresAt,
+                issuedAt: input.issuedAt,
+                effectiveFrom: input.effectiveFrom,
+                reviewDueAt: input.reviewDueAt,
+                freshness,
+                provenance: GovernanceProvenance.USER,
+                authority: GovernanceAuthority.AUTHORITATIVE,
+                reviewStatus: EvidenceReviewStatus.SUBMITTED,
+            },
+        });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            throw new ApiError(409, 'This file is already linked to that record with the same relationship. Choose a different relationship or unlink the current one first.');
+        }
+        throw error;
+    }
     await recordAudit({
         organizationId: input.organizationId,
         actorUserId: input.actorUserId,
