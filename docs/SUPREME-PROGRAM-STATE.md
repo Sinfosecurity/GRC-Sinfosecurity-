@@ -74,9 +74,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#17 STARTING SHA:** `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`
 **#17 IMPLEMENTATION SHA:** `134d12860c595603106180c35ad3a10a328917f7`
 **#17 CLOSURE SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
-**#17 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34784381903 PASS on `9976e81`
-**#17 HOSTED FRONTEND SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
-**#17 HOSTED API SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
+**#17 FINAL VISUAL CLOSURE SHA:** `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`
+**#17 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34786063666 PASS on `6dab4ff`
+**#17 HOSTED FRONTEND SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`
+**#17 HOSTED API SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`
 **#18 AUTHORIZED:** NO
 
 ---
@@ -342,3 +343,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED  
 **SHA:** Closure `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`  
 **EVIDENCE:** Hosted Supreme CI run `34784381903` PASS. Staging frontend and API both `9976e81`. Operational workspaces and 12-slide board PPTX recorded in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Board PPTX visual QA is PARTIAL (HTML slide cards, not native Office renders). Not PASS. #12 remains PARTIAL. #18 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #17 Supreme Privacy  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED  
+**SHA:** Visual closure `6dab4ff4b116046ed46ae397cdc7a612ffdce9ef`; hosted product `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`  
+**EVIDENCE:** Hosted Supreme CI run `34786063666` PASS. Staging frontend and API both `1dd47b3`. Native PowerPoint renders of the hosted Board PPTX and 375/768 deletion/incident cards recorded in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. CI LibreOffice remains `native-attempted`. Not PASS. #12 remains PARTIAL. #18 is not authorized.

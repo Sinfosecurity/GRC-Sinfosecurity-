@@ -278,13 +278,13 @@ def seed(token: str):
             with zipfile.ZipFile(OUT / "Supreme-Privacy-Board.pptx") as zipped:
                 slides = [name for name in zipped.namelist() if name.startswith("ppt/slides/slide") and name.endswith(".xml")]
                 cover = zipped.read("ppt/slides/slide1.xml").decode("utf-8", "replace")
-                texts = " ".join(re.findall(r"<a:t>([^<]*)</a:t>", cover))
+                texts = " ".join(re.findall(r"<a:t[^>]*>([^<]*)</a:t>", cover))
                 record("board pptx slides", "PASS" if len(slides) >= 8 else "FAIL", f"{len(slides)} slides")
                 record("board pptx cover", "PASS" if "Board Risk Committee" in texts else "FAIL", texts[:180])
                 RESULTS["boardSlides"] = []
                 for name in sorted(slides, key=lambda item: int("".join(ch for ch in item if ch.isdigit()) or "0")):
                     body = zipped.read(name).decode("utf-8", "replace")
-                    slide_text = " · ".join(re.findall(r"<a:t>([^<]*)</a:t>", body))
+                    slide_text = " · ".join(re.findall(r"<a:t[^>]*>([^<]*)</a:t>", body))
                     RESULTS["boardSlides"].append(slide_text[:400])
                     defects = []
                     if len(slide_text) < 20:

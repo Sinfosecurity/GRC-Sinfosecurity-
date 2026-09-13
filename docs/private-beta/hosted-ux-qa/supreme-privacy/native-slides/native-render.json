@@ -1,0 +1,70 @@
+{
+  "engine": "Microsoft PowerPoint",
+  "pptx": "/Users/tahirah-macmini/Documents/Supreme Risk /GRC-Sinfosecurity-/docs/private-beta/hosted-ux-qa/supreme-privacy/Supreme-Privacy-Board.pptx",
+  "pages": 12,
+  "uniqueHashes": 12,
+  "hashes": [
+    {
+      "file": "native-slide-01.png",
+      "sha256": "be3b2e056aafb9ae664c9705e75bbf155bb9dac5c2fcdb640f6c92f9bb756f25",
+      "bytes": 52422
+    },
+    {
+      "file": "native-slide-02.png",
+      "sha256": "8274e45cac359e764d5d6f496a7c99861c9a2c38c4d0e597659c719588480a40",
+      "bytes": 64706
+    },
+    {
+      "file": "native-slide-03.png",
+      "sha256": "b1e7b67cbed00f5bfa2308846dba080e15230f40b4665a28012b066ffbb3e954",
+      "bytes": 69947
+    },
+    {
+      "file": "native-slide-04.png",
+      "sha256": "8ee979ef60eda452152d94b59f0c3d48a302c535eb4160a6bf895b2239ede783",
+      "bytes": 69350
+    },
+    {
+      "file": "native-slide-05.png",
+      "sha256": "1b86fba6ba973dec88e488e7ac6e7626d01b52f2971331947906e99b92696537",
+      "bytes": 70765
+    },
+    {
+      "file": "native-slide-06.png",
+      "sha256": "99583ebba0be7641bdfd9ef04a692aa43e1011ea4ec40e4710dcf6e2a6d07b4e",
+      "bytes": 77181
+    },
+    {
+      "file": "native-slide-07.png",
+      "sha256": "32eb14987ae651fff2768328ca3ad028cf37db2bb86e02980d91764e849d883f",
+      "bytes": 76112
+    },
+    {
+      "file": "native-slide-08.png",
+      "sha256": "071869e9d24830873dd9d388aace72974061d0d33147456f3d49ecbafd27b9fe",
+      "bytes": 67990
+    },
+    {
+      "file": "native-slide-09.png",
+      "sha256": "4728a5aeb5833dbbcc904b06c3edb65b22d548da12d93a14c16d0c43931f237d",
+      "bytes": 70747
+    },
+    {
+      "file": "native-slide-10.png",
+      "sha256": "3cb29598b53a3e85dc7eb3e4c22ca4f33ce657be6e3accc3f7bebbc1bdf0a739",
+      "bytes": 96483
+    },
+    {
+      "file": "native-slide-11.png",
+      "sha256": "bcb388c0cc7a56199af6d26a55d754304ec5b48369c8cc85295b04d96075ff8e",
+      "bytes": 84701
+    },
+    {
+      "file": "native-slide-12.png",
+      "sha256": "5d690c72d6a23375d29948dddb72d5b70f9a5526f00c8208535486317ac69c33",
+      "bytes": 71588
+    }
+  ],
+  "reconstruction": "native",
+  "warning": ""
+}
