@@ -134,6 +134,10 @@ describe('supreme privacy tenant isolation and honesty', () => {
         expect(JSON.stringify(list.body)).not.toContain('Jane Doe');
         expect(JSON.stringify(list.body)).not.toContain('jane.doe@example.com');
         expect(JSON.stringify(list.body)).toMatch(/j•••@example.com|Requester/);
+        const adminList = await request(app).get(`${API}/privacy/rights`).set('Authorization', `Bearer ${tokenA}`);
+        expect(adminList.status).toBe(200);
+        expect(JSON.stringify(adminList.body)).not.toContain('jane.doe@example.com');
+        expect(JSON.stringify(adminList.body)).not.toContain('Jane Doe');
         const preview = await request(app).post(`${API}/privacy/import/preview`).set('Authorization', `Bearer ${tokenA}`).send({
             rows: [{ name: '=HYPERLINK("http://evil")', description: '+cmd' }],
         });

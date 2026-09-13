@@ -1212,7 +1212,9 @@ export const enterprisePrivacyService = {
             actorUserId,
         });
         if (input.targetType === 'CONTROL') {
-            const control = await prisma.organizationControl.findFirst({ where: { organizationId, id: input.targetId } });
+            const control = await prisma.organizationControl.findFirst({
+                where: { organizationId, OR: [{ id: input.targetId }, { controlKey: input.targetId }] },
+            });
             if (!control) throw new ApiError(404, 'Control not found');
             const node = await ensureNode({
                 organizationId,
@@ -1230,7 +1232,9 @@ export const enterprisePrivacyService = {
                 createdBy: actorUserId,
             });
         } else if (input.targetType === 'RISK') {
-            const risk = await prisma.enterpriseRisk.findFirst({ where: { organizationId, id: input.targetId } });
+            const risk = await prisma.enterpriseRisk.findFirst({
+                where: { organizationId, OR: [{ id: input.targetId }, { publicId: input.targetId }] },
+            });
             if (!risk) throw new ApiError(404, 'Risk not found');
             const node = await ensureNode({
                 organizationId,
@@ -1248,7 +1252,9 @@ export const enterprisePrivacyService = {
                 createdBy: actorUserId,
             });
         } else {
-            const requirement = await prisma.complianceRequirementState.findFirst({ where: { organizationId, id: input.targetId } });
+            const requirement = await prisma.complianceRequirementState.findFirst({
+                where: { organizationId, OR: [{ id: input.targetId }, { publicId: input.targetId }] },
+            });
             if (!requirement) throw new ApiError(404, 'Requirement not found');
             const node = await ensureNode({
                 organizationId,
@@ -1347,6 +1353,20 @@ export const enterprisePrivacyService = {
             },
         });
         const related = [...(controlEdges?.outgoingEdges || []).map((edge) => edge.toNode), ...(controlEdges?.incomingEdges || []).map((edge) => edge.fromNode)];
+        const controlIds = related.filter((node) => node.nodeType === 'CONTROL').map((node) => node.sourceId);
+        const requirementIds = related.filter((node) => node.nodeType === 'REQUIREMENT').map((node) => node.sourceId);
+        const evidenceLinks = controlIds.length
+            ? await prisma.evidenceGovernanceLink.findMany({
+                where: { organizationId, targetType: 'CONTROL', targetId: { in: controlIds }, validTo: null },
+                include: { storedObject: { select: { filename: true, scanStatus: true } } },
+            })
+            : [];
+        const gaps = requirementIds.length
+            ? await prisma.complianceGap.findMany({
+                where: { organizationId, requirementStateId: { in: requirementIds } },
+                select: { publicId: true, title: true, status: true },
+            })
+            : [];
         return {
             systems: activity.parties.filter((item) => item.systemName).map((item) => item.systemName),
             vendors: vendors.map((item) => `${item.name} (vendor residual ${item.residualRiskScore})`),
@@ -1357,6 +1377,8 @@ export const enterprisePrivacyService = {
             privacyRisks: related.filter((node) => node.nodeType === 'RISK').map((node) => node.displayLabel),
             controls: related.filter((node) => node.nodeType === 'CONTROL').map((node) => node.displayLabel),
             requirements: related.filter((node) => node.nodeType === 'REQUIREMENT').map((node) => node.displayLabel),
+            evidence: evidenceLinks.map((link) => `${link.storedObject.filename} (${link.storedObject.scanStatus})`),
+            gaps: gaps.map((item) => `${item.publicId} ${item.title} · ${item.status}`),
             dpias: activity.dpias.map((item) => item.publicId),
             rightsRequests: activity.rightsRequests.map((item) => item.publicId),
             retentionRules: activity.retentionRules.map((item) => item.publicId),

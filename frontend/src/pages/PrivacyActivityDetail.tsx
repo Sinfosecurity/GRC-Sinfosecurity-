@@ -6,7 +6,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
-import { privacyAPI } from '../services/api';
+import { privacyAPI, vendorAPI } from '../services/api';
 
 const SECTIONS = ['Overview', 'Purpose & Basis', 'Data', 'Data Subjects', 'Systems', 'Vendors', 'Transfers', 'Risks', 'Controls', 'Evidence', 'DPIA', 'Retention', 'Rights', 'Relationships', 'History'] as const;
 
@@ -22,6 +22,9 @@ export default function PrivacyActivityDetail() {
     const [dataKind, setDataKind] = useState('IDENTITY');
     const [subjectKind, setSubjectKind] = useState('CUSTOMERS');
     const [systemName, setSystemName] = useState('');
+    const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
+    const [vendorId, setVendorId] = useState('');
+    const [privacyRole, setPrivacyRole] = useState('PROCESSOR');
 
     const load = () => {
         if (!publicId) return;
@@ -33,6 +36,15 @@ export default function PrivacyActivityDetail() {
     };
 
     useEffect(load, [publicId]);
+
+    useEffect(() => {
+        vendorAPI.getAll()
+            .then((res) => {
+                const rows = res.data?.vendors || res.data?.data?.vendors || [];
+                setVendors(rows.map((row: { id: string; name: string }) => ({ id: row.id, name: row.name })));
+            })
+            .catch(() => setVendors([]));
+    }, []);
 
     const run = (event: FormEvent, action: () => Promise<unknown>) => {
         event.preventDefault();
@@ -146,6 +158,15 @@ export default function PrivacyActivityDetail() {
                                     { id: 'role', label: 'Privacy role', render: (row: any) => row.role },
                                     { id: 'jurisdiction', label: 'Jurisdiction', render: (row: any) => row.jurisdiction || 'Not recorded' },
                                 ]} />
+                                <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addParty(publicId!, { partyType: 'VENDOR', vendorId, privacyRole }))} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 2 }}>
+                                    <TextField select label="Existing vendor" value={vendorId} onChange={(event) => setVendorId(event.target.value)} sx={{ minWidth: 260 }} required>
+                                        {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                                    </TextField>
+                                    <TextField select label="Privacy role" value={privacyRole} onChange={(event) => setPrivacyRole(event.target.value)} sx={{ minWidth: 200 }}>
+                                        {['PROCESSOR', 'SUBPROCESSOR', 'CONTROLLER', 'JOINT_CONTROLLER', 'RECIPIENT', 'SERVICE_PROVIDER'].map((item) => <MenuItem key={item} value={item}>{item.replace(/_/g, ' ')}</MenuItem>)}
+                                    </TextField>
+                                    <Button type="submit" disabled={!vendorId}>Link vendor</Button>
+                                </Stack>
                             </Surface>
                         )}
                         {section === 'Transfers' && (
@@ -170,7 +191,8 @@ export default function PrivacyActivityDetail() {
                         )}
                         {section === 'Evidence' && (
                             <Surface>
-                                <Typography>Evidence stays in the shared CLEAN store. A file is not a finding that processing is lawful.</Typography>
+                                <Typography sx={{ mb: 1 }}>Evidence stays in the shared CLEAN store. A file is not a finding that processing is lawful.</Typography>
+                                <AppTable rows={(data.affected?.evidence || []).map((label: string) => ({ label }))} rowKey={(row: any) => row.label} emptyTitle="No linked CLEAN evidence" emptyBody="Link a shared control that already has evidence. Presence of a file is not proof." columns={[{ id: 'label', label: 'Evidence', render: (row: any) => row.label }]} />
                             </Surface>
                         )}
                         {section === 'DPIA' && (
@@ -206,7 +228,17 @@ export default function PrivacyActivityDetail() {
                                 <Typography>Systems: {(data.affected?.systems || []).join(', ') || 'None recorded'}</Typography>
                                 <Typography>Vendors: {(data.affected?.vendors || []).join(', ') || 'None recorded'}</Typography>
                                 <Typography>Data: {(data.affected?.dataCategories || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Subjects: {(data.affected?.dataSubjects || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Jurisdictions: {(data.affected?.jurisdictions || []).join(', ') || 'None recorded'}</Typography>
                                 <Typography>Transfers: {(data.affected?.transfers || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Privacy risks: {(data.affected?.privacyRisks || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Controls: {(data.affected?.controls || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Evidence: {(data.affected?.evidence || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Requirements: {(data.affected?.requirements || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Gaps: {(data.affected?.gaps || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>DPIAs: {(data.affected?.dpias || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Rights requests: {(data.affected?.rightsRequests || []).join(', ') || 'None recorded'}</Typography>
+                                <Typography>Retention: {(data.affected?.retentionRules || []).join(', ') || 'None recorded'}</Typography>
                             </Surface>
                         )}
                         {section === 'History' && (

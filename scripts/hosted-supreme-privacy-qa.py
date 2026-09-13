@@ -150,15 +150,26 @@ def seed(token: str):
         api("POST", f"/api/v1/privacy/activities/{activity}/parties", token, {"partyType": "SYSTEM", "systemName": "Claims platform"})
         status, vendors = api("GET", "/api/v1/vendors", token)
         vendor_id = None
-        vendor_rows = vendors.get("data") if isinstance(vendors.get("data"), list) else (vendors.get("data") or {}).get("items") or []
+        vendor_name = None
+        vendor_rows = (
+            vendors.get("vendors")
+            or (vendors.get("data") if isinstance(vendors.get("data"), list) else None)
+            or (vendors.get("data") or {}).get("vendors")
+            or (vendors.get("data") or {}).get("items")
+            or []
+        )
         if status == 200 and vendor_rows:
             vendor_id = vendor_rows[0].get("id")
+            vendor_name = vendor_rows[0].get("name")
             api("POST", f"/api/v1/privacy/activities/{activity}/parties", token, {
                 "partyType": "VENDOR",
                 "vendorId": vendor_id,
-                "recipientName": vendor_rows[0].get("name"),
+                "recipientName": vendor_name,
                 "privacyRole": "PROCESSOR",
             })
+            record("vendor link", "PASS" if vendor_id else "FAIL", f"{vendor_name} {vendor_id}")
+        else:
+            record("vendor link", "FAIL", f"{status} no Third Party vendor found")
         status, transfer = api("POST", "/api/v1/privacy/transfers", token, {
             "activityPublicId": activity,
             "sourceJurisdiction": "US-NY",
@@ -175,7 +186,12 @@ def seed(token: str):
             "title": "Claims privacy review",
             "screening": [{"key": "sensitive_data", "answer": True}, {"key": "cross_border", "answer": True}],
         })
-        record("dpia screening", "PASS" if status == 201 and "legally required" not in json.dumps(dpia).lower() else "FAIL", str((dpia.get("data") or {}).get("advice")))
+        advice = str((dpia.get("data") or {}).get("advice") or "")
+        record(
+            "dpia screening",
+            "PASS" if status == 201 and "not a statement that a dpia is legally required" in advice.lower() else "FAIL",
+            advice,
+        )
         status, rights = api("POST", "/api/v1/privacy/rights", token, {
             "activityPublicId": activity,
             "requestType": "ACCESS",
@@ -184,19 +200,39 @@ def seed(token: str):
         })
         record("rights", "PASS" if status == 201 and str((rights.get("data") or {}).get("publicId")).startswith("DSR-") else "FAIL", str((rights.get("data") or {}).get("publicId")))
         api("POST", "/api/v1/privacy/retention", token, {"activityPublicId": activity, "period": "7 years after claim close"})
+        _, controls = api("GET", "/api/v1/scc/controls", token)
+        control_rows = (controls.get("data") if isinstance(controls.get("data"), list) else None) or []
+        tpr = next((row for row in control_rows if str(row.get("controlKey") or "").upper() == "TPR-01"), control_rows[0] if control_rows else None)
+        if tpr:
+            api("POST", f"/api/v1/privacy/activities/{activity}/links", token, {"targetType": "CONTROL", "targetId": tpr.get("controlKey") or tpr.get("id")})
+        _, risks = api("GET", "/api/v1/erm/risks", token)
+        risk_rows = (risks.get("data") if isinstance(risks.get("data"), list) else None) or []
+        if risk_rows:
+            api("POST", f"/api/v1/privacy/activities/{activity}/links", token, {"targetType": "RISK", "targetId": risk_rows[0].get("publicId") or risk_rows[0].get("id")})
+        _, requirements = api("GET", "/api/v1/compliance/requirements", token)
+        requirement_rows = (requirements.get("data") if isinstance(requirements.get("data"), list) else None) or []
+        if requirement_rows:
+            api("POST", f"/api/v1/privacy/activities/{activity}/links", token, {"targetType": "REQUIREMENT", "targetId": requirement_rows[0].get("publicId") or requirement_rows[0].get("id")})
         status, map_payload = api("GET", "/api/v1/privacy/data-map?dataKind=FINANCIAL", token)
-        record("data map financial", "PASS" if status == 200 and (map_payload.get("data") or {}).get("rows") else "PARTIAL", f"{status} rows={len((map_payload.get("data") or {}).get("rows") or [])}")
+        map_rows = ((map_payload.get("data") or {}).get("rows") or [])
+        record("data map financial", "PASS" if status == 200 and map_rows else "PARTIAL", f"{status} rows={len(map_rows)}")
         RESULTS["workflow"] = {
             "activity": activity,
             "transfer": transfer_id,
             "dpia": (dpia.get("data") or {}).get("publicId"),
             "rights": (rights.get("data") or {}).get("publicId"),
             "vendorId": vendor_id,
+            "vendorName": vendor_name,
+            "control": (tpr or {}).get("controlKey") if tpr else None,
+            "risk": risk_rows[0].get("publicId") if risk_rows else None,
+            "requirement": requirement_rows[0].get("publicId") if requirement_rows else None,
         }
         status, affected = api("GET", f"/api/v1/privacy/affected?kind=activity&id={activity}", token)
         RESULTS["chain"] = affected.get("data") or {}
-        record("what is affected", "PASS" if status == 200 else "FAIL", json.dumps(RESULTS["chain"])[:300])
-    for kind in ["ropa", "executive", "board"]:
+        chain = RESULTS["chain"]
+        chain_ready = bool(chain.get("vendors") and chain.get("transfers") and chain.get("controls"))
+        record("what is affected", "PASS" if status == 200 and chain_ready else "PARTIAL", json.dumps(chain)[:400])
+    for kind in ["ropa", "risk", "dpia", "transfers", "rights", "retention", "processors", "executive", "board"]:
         status, payload = api("GET", f"/api/v1/privacy/reports/{kind}.pdf", token)
         record(f"report {kind}", "PASS" if status == 200 and payload.get("binary") else "FAIL", str(status))
         if payload.get("content"):
@@ -205,6 +241,11 @@ def seed(token: str):
     record("board pptx", "PASS" if status == 200 and pptx.get("binary") else "FAIL", str(status))
     if pptx.get("content"):
         save_binary("Supreme-Privacy-Board.pptx", pptx)
+    for fmt in ["csv", "xlsx"]:
+        status, payload = api("GET", f"/api/v1/privacy/export/{fmt}", token)
+        record(f"export {fmt}", "PASS" if status == 200 and payload.get("binary") else "FAIL", str(status))
+        if payload.get("content"):
+            save_binary(f"Supreme-Privacy-Register.{fmt}", payload)
     return RESULTS["workflow"]
 
 
@@ -235,6 +276,12 @@ def main():
             pages.append(("activity-detail", f"/privacy-ops/activities/{activity}"))
         for name, path in pages:
             page.goto(f"{BASE}{path}", wait_until="networkidle")
+            if name == "dashboard":
+                copy = page.inner_text("body")
+                record("dashboard copy spaces", "PASS" if "Know the data" in copy else "FAIL", copy[:160])
+            if name == "rights":
+                copy = page.inner_text("body")
+                record("rights list mask", "PASS" if "hosted.requester@example.com" not in copy else "FAIL", copy[:200])
             for width in (375, 768, 1024, 1440, 1920):
                 shot(page, f"{name}-{width}", width)
             overflow = page.evaluate("() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2")

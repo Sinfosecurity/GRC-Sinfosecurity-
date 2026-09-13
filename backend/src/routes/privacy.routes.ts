@@ -205,7 +205,7 @@ router.post('/dpias/:publicId/decision', requirePermission(PERMISSIONS['dpia.app
 
 router.get('/rights', requirePermission(PERMISSIONS['rightsRequest.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await enterprisePrivacyService.listRights(orgId(req, req.query.organizationId), identity(req)) });
+        res.json({ success: true, data: await enterprisePrivacyService.listRights(orgId(req, req.query.organizationId), false) });
     } catch (error) {
         next(error);
     }
