@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. RAW JSON SCORING EDITOR: REMOVED. RISK METHODOLOGY WORKSPACE: IMPLEMENTED. HOSTED PRODUCT LEADERSHIP ACCEPTANCE: PENDING. Cursor cannot declare #12 PASS.
 
-**NEXT ACTION:** Product Leadership hosted review of the Risk Scoring Methodology workspace, plus invitation inbox confirmation and remaining visual acceptance. Remaining UX-P2/P3 stay open. Do not invite external testers unless separately approved. Do not mark PASS because #13 or #14 started. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership hosted review of the Reports assessment selector (`docs/private-beta/hosted-ux-qa/reports-assessment-selector/`) and the Risk Scoring Methodology workspace, plus invitation inbox confirmation and remaining visual acceptance. Remaining UX-P2/P3 stay open. Do not invite external testers unless separately approved. Do not mark PASS because #13 or #14 started. Do not merge `main` or deploy commercial production.
 
 ---
 
