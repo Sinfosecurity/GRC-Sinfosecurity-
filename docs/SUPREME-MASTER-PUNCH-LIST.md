@@ -237,7 +237,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PARTIAL — implementation returned; hosted CI / Product Leadership review required. Not commercial production.
 
-**CERTIFICATION SHA:** local implementation evidence in `docs/GOVERNANCE-GRAPH-CERTIFICATION.md`. Hosted CI SHA to be recorded when GitHub Actions passes the exact commit.
+**CERTIFICATION SHA:** implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` (hosted CI run `34749488009` PASS)
 
 **EVIDENCE:** Product Leadership authorization 2026-09-13. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. Domain inventory, data model, operations, customer doc, and certification recorded. #12 remains PARTIAL.
 

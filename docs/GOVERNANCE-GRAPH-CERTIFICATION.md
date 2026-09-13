@@ -3,6 +3,8 @@
 **ITEM:** #13 Governance Graph  
 **DATE:** 2026-09-13  
 **STARTING SHA:** `70e4953e9d9eba13ac8604b721c81216a4e149ad`  
+**IMPLEMENTATION SHA:** `8ec44343fea25a027bedd048ae7097fca17a06b7`  
+**GITHUB CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34749488009 PASS on `8ec44343fea25a027bedd048ae7097fca17a06b7`  
 **BRANCH:** `supreme-risk-transformation`  
 **#12:** remains PARTIAL / OPEN IN PARALLEL  
 **#14 STARTED:** NO  
@@ -35,7 +37,8 @@
 
 ## Known non-closures
 
-- Hosted Supreme CI on the final documentation SHA is required before program PASS.
+- Hosted Supreme CI PASS on implementation SHA `8ec4434` (run `34749488009`). A later documentation commit may follow and is not the CI SHA.
+- Hosted browser acceptance of the Graph Explorer is not recorded.
 - #12 invitation inbox confirmation, visual acceptance, UX-P2/P3, and commercial NO-GO remain #12 issues.
 - Private external testers are not authorized.
 - Browser verification of the explorer on hosted staging was not completed in this implementation turn.
