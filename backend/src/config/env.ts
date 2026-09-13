@@ -74,6 +74,21 @@ export function validateEnv(env: NodeJS.ProcessEnv = process.env): AppEnv {
         );
     }
 
+    if ((env.APP_ENVIRONMENT || '').toLowerCase() === 'production') {
+        const customerUrl = env.CUSTOMER_FRONTEND_URL || env.FRONTEND_URL || '';
+        const adminUrl = env.ADMIN_FRONTEND_URL || env.FRONTEND_URL || '';
+        if (!customerUrl || /localhost|127\.0\.0\.1/i.test(customerUrl)) {
+            throw new Error(
+                'CUSTOMER_FRONTEND_URL must be a non-localhost production origin when APP_ENVIRONMENT=production.'
+            );
+        }
+        if (!adminUrl || /localhost|127\.0\.0\.1/i.test(adminUrl)) {
+            throw new Error(
+                'ADMIN_FRONTEND_URL must be a non-localhost production origin when APP_ENVIRONMENT=production.'
+            );
+        }
+    }
+
     return {
         nodeEnv,
         isProduction,

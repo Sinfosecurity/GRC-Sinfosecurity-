@@ -44,9 +44,10 @@ No secret values. Staging classes are “set / unset / generated” only.
 | `STRIPE_PRICE_STARTER_ANNUAL` | Annual Starter | REQUIRED if annual sold | NON-SECRET id | staging test IDs | new live IDs |
 | `STRIPE_PRICE_PROFESSIONAL` | Monthly Professional | REQUIRED | NON-SECRET id | staging test IDs | new live IDs |
 | `STRIPE_PRICE_PROFESSIONAL_ANNUAL` | Annual Professional | REQUIRED if annual sold | NON-SECRET id | staging test IDs | new live IDs |
+| `STRIPE_PRICE_BUSINESS` | Monthly Business | REQUIRED if Business self-serve | NON-SECRET id | add test IDs | new live IDs — do not reuse staging |
+| `STRIPE_PRICE_BUSINESS_ANNUAL` | Annual Business | REQUIRED if annual Business sold | NON-SECRET id | add test IDs | new live IDs |
 | `STRIPE_PRICE_ENTERPRISE` | Enterprise (if ever checkout) | OPTIONAL | NON-SECRET id | may be unset | sales-led; no auto Enterprise checkout |
 | `STRIPE_PRICE_ENTERPRISE_ANNUAL` | Enterprise annual | OPTIONAL | NON-SECRET id | may be unset | sales-led |
-| `STRIPE_PRICE_BUSINESS*` | Business | **MISSING** | — | absent | **BLOCKED** until entitlements exist |
 | `CLAMAV_HOST` / `CLAMAV_PORT` / `CLAMAV_TIMEOUT_MS` | Malware | REQUIRED for CONNECTED | NON-SECRET | private pserv | private production scanner |
 | `MALWARE_SCAN_DISABLED` | Kill switch | OPTIONAL | NON-SECRET | unset/false | false |
 | `ALLOW_PENDING_DOWNLOADS` | Download policy | REQUIRED | NON-SECRET | `false` | `false` |
@@ -76,6 +77,7 @@ Refuses to start when:
 - `JWT_REFRESH_SECRET` weak
 - `DATABASE_URL` missing
 - `ENCRYPTION_KEY` missing or weak
+- `APP_ENVIRONMENT=production` with localhost `CUSTOMER_FRONTEND_URL` / `ADMIN_FRONTEND_URL`
 
 Optional Stripe/email/AI/Mongo/ClamAV are **not** fatal. Live Stripe keys in a non-live configuration become billing `ERROR`. Missing ClamAV is fail-closed for downloads, not a crash.
 

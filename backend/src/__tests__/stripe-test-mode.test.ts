@@ -36,5 +36,7 @@ describe('Stripe test-mode policy', () => {
         expect(stripePriceEnvName('starter')).toBe('STRIPE_PRICE_STARTER');
         expect(stripePriceEnvName('PROFESSIONAL', 'annual')).toBe('STRIPE_PRICE_PROFESSIONAL_ANNUAL');
         expect(stripePriceEnvName('enterprise', 'yearly')).toBe('STRIPE_PRICE_ENTERPRISE_ANNUAL');
+        expect(stripePriceEnvName('BUSINESS')).toBe('STRIPE_PRICE_BUSINESS');
+        expect(stripePriceEnvName('business', 'annual')).toBe('STRIPE_PRICE_BUSINESS_ANNUAL');
     });
 });

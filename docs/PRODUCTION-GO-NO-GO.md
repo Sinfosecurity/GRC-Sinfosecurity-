@@ -2,7 +2,7 @@
 
 **Rehearsal date:** 2026-09-13
 **Actual production GO:** NO
-**#11 started:** NO
+**#11 started:** YES — launch verdict is superseded by `docs/PRODUCTION-RELEASE-CHECKLIST.md`. This file remains #10 rehearsal evidence.
 
 This checklist is for a future public launch. Uncertain items are not PASS.
 

@@ -14,7 +14,7 @@ import ThirdPartyProduct from '../ThirdPartyProduct';
 import PublicStatus from '../PublicStatus';
 import Frameworks from '../Frameworks';
 import { contrastRatio } from '../../marketing/contrast';
-import { metaForPath, robotsPolicy, ROUTE_META } from '../../marketing/PageMeta';
+import { metaForPath, robotsPolicy, robotsPolicyForPath, ROUTE_META } from '../../marketing/PageMeta';
 import { routerFuture } from '../../marketing/routerFuture';
 
 const marketingCss = readFileSync(path.join(__dirname, '../../marketing/marketing.css'), 'utf8');
@@ -70,6 +70,16 @@ describe('site audit remediation', () => {
         expect(ROUTE_META['/request-demo'].title).toBe('Request a Demo — Supreme');
         expect(robotsPolicy({ VITE_ENVIRONMENT: 'staging' })).toBe('noindex,nofollow');
         expect(robotsPolicy({ VITE_ENVIRONMENT: 'production', DEV: false })).toBe('index,follow');
+        const production = { VITE_ENVIRONMENT: 'production', DEV: false };
+        expect(robotsPolicyForPath('/', production)).toBe('index,follow');
+        expect(robotsPolicyForPath('/pricing', production)).toBe('index,follow');
+        expect(robotsPolicyForPath('/products/third-party', production)).toBe('index,follow');
+        expect(robotsPolicyForPath('/admin', production)).toBe('noindex,nofollow');
+        expect(robotsPolicyForPath('/admin/login', production)).toBe('noindex,nofollow');
+        expect(robotsPolicyForPath('/platform', production)).toBe('noindex,nofollow');
+        expect(robotsPolicyForPath('/dashboard', production)).toBe('noindex,nofollow');
+        expect(robotsPolicyForPath('/login', production)).toBe('noindex,nofollow');
+        expect(robotsPolicyForPath('/', production, 'admin.supremerisk.com')).toBe('noindex,nofollow');
     });
 
     it('wraps register and forgot-password in the marketing shell', () => {

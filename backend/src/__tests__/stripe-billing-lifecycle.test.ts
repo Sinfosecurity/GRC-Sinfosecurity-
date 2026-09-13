@@ -32,6 +32,8 @@ const PRICES = {
     STRIPE_PRICE_STARTER_ANNUAL: 'price_starter_year',
     STRIPE_PRICE_PROFESSIONAL: 'price_pro_month',
     STRIPE_PRICE_PROFESSIONAL_ANNUAL: 'price_pro_year',
+    STRIPE_PRICE_BUSINESS: 'price_biz_month',
+    STRIPE_PRICE_BUSINESS_ANNUAL: 'price_biz_year',
     STRIPE_PRICE_ENTERPRISE: 'price_ent_month',
     STRIPE_PRICE_ENTERPRISE_ANNUAL: 'price_ent_year',
 };
@@ -71,13 +73,17 @@ describe('Stripe billing lifecycle', () => {
         process.env = { ...original };
     });
 
-    it('maps all six staging prices to plan and interval', () => {
+    it('maps monthly and annual prices for every published plan including BUSINESS', () => {
         expect(planFromStripePriceId(PRICES.STRIPE_PRICE_STARTER)).toBe('STARTER');
         expect(intervalFromStripePriceId(PRICES.STRIPE_PRICE_STARTER)).toBe('month');
         expect(planFromStripePriceId(PRICES.STRIPE_PRICE_STARTER_ANNUAL)).toBe('STARTER');
         expect(intervalFromStripePriceId(PRICES.STRIPE_PRICE_STARTER_ANNUAL)).toBe('year');
         expect(planFromStripePriceId(PRICES.STRIPE_PRICE_PROFESSIONAL)).toBe('PROFESSIONAL');
         expect(intervalFromStripePriceId(PRICES.STRIPE_PRICE_PROFESSIONAL_ANNUAL)).toBe('year');
+        expect(planFromStripePriceId(PRICES.STRIPE_PRICE_BUSINESS)).toBe('BUSINESS');
+        expect(intervalFromStripePriceId(PRICES.STRIPE_PRICE_BUSINESS)).toBe('month');
+        expect(planFromStripePriceId(PRICES.STRIPE_PRICE_BUSINESS_ANNUAL)).toBe('BUSINESS');
+        expect(intervalFromStripePriceId(PRICES.STRIPE_PRICE_BUSINESS_ANNUAL)).toBe('year');
         expect(planFromStripePriceId(PRICES.STRIPE_PRICE_ENTERPRISE)).toBe('ENTERPRISE');
         expect(intervalFromStripePriceId(PRICES.STRIPE_PRICE_ENTERPRISE_ANNUAL)).toBe('year');
     });

@@ -76,6 +76,17 @@ describe('entitlement enforcement', () => {
         expect((deny as jest.Mock).mock.calls[0][0].statusCode).toBe(403);
     });
 
+    it('allows Business advanced reporting and denies SSO', async () => {
+        billingStatus.mockReturnValue('CONNECTED');
+        prisma.organization.findUnique.mockResolvedValue({ plan: 'BUSINESS' });
+        const allow = jest.fn() as NextFunction;
+        await requireEntitlement('advancedReporting')(mockReq(), res, allow);
+        expect(allow).toHaveBeenCalledWith();
+        const deny = jest.fn() as NextFunction;
+        await requireEntitlement('sso')(mockReq(), res, deny);
+        expect((deny as jest.Mock).mock.calls[0][0].statusCode).toBe(403);
+    });
+
     it('allows Enterprise SSO from backend plan state', async () => {
         billingStatus.mockReturnValue('CONNECTED');
         prisma.organization.findUnique.mockResolvedValue({ plan: 'ENTERPRISE' });

@@ -142,6 +142,36 @@ export function metaForPath(pathname: string): RouteMeta {
     return ROUTE_META['/404'];
 }
 
+const INDEXABLE_MARKETING_PATHS = new Set([
+    '/',
+    '/pricing',
+    '/trust',
+    '/security',
+    '/request-demo',
+    '/privacy',
+    '/terms',
+    '/subprocessors',
+    '/status',
+    '/demo',
+    '/frameworks',
+]);
+
+const NOINDEX_EXACT_PATHS = new Set([
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/activate',
+    '/reset-password',
+    '/mfa',
+]);
+
+function isNoindexAppPath(pathname: string): boolean {
+    if (NOINDEX_EXACT_PATHS.has(pathname)) return true;
+    return ['/admin', '/platform', '/dashboard'].some(
+        (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    );
+}
+
 export function robotsPolicy(env: { VITE_ENVIRONMENT?: string; DEV?: boolean } = {
     VITE_ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
     DEV: import.meta.env.DEV,
@@ -149,12 +179,36 @@ export function robotsPolicy(env: { VITE_ENVIRONMENT?: string; DEV?: boolean } =
     return env.VITE_ENVIRONMENT === 'production' && !env.DEV ? 'index,follow' : 'noindex,nofollow';
 }
 
+export function robotsPolicyForPath(
+    pathname: string,
+    env: { VITE_ENVIRONMENT?: string; DEV?: boolean } = {
+        VITE_ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
+        DEV: import.meta.env.DEV,
+    },
+    hostname?: string,
+) {
+    if (env.VITE_ENVIRONMENT !== 'production' || env.DEV) {
+        return 'noindex,nofollow';
+    }
+    const host = (hostname || (typeof window !== 'undefined' ? window.location.hostname : '')).toLowerCase();
+    if (host === 'admin.supremerisk.com') {
+        return 'noindex,nofollow';
+    }
+    if (isNoindexAppPath(pathname)) {
+        return 'noindex,nofollow';
+    }
+    if (INDEXABLE_MARKETING_PATHS.has(pathname) || pathname.startsWith('/products/')) {
+        return 'index,follow';
+    }
+    return 'noindex,nofollow';
+}
+
 export default function PageMeta() {
     const location = useLocation();
     const meta = metaForPath(location.pathname);
     const origin = import.meta.env.VITE_PUBLIC_SITE_URL || window.location.origin;
     const canonical = `${String(origin).replace(/\/$/, '')}${location.pathname}`;
-    const robots = robotsPolicy();
+    const robots = robotsPolicyForPath(location.pathname);
 
     useEffect(() => {
         document.title = meta.title;

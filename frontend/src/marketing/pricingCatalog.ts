@@ -165,6 +165,10 @@ export const PRICING_FAQS = [
         question: 'Are implementation services included?',
         answer: 'Published plan prices cover the software subscription. Implementation and rollout assistance are scoped with sales when needed.',
     },
+    {
+        question: 'Are there published user or vendor limits?',
+        answer: 'Published plan prices do not include contractual seat or vendor caps. Program scale is discussed with sales when needed.',
+    },
 ];
 
 export const ANNUAL_SAVINGS_COPY = 'Save 2 months with annual billing';

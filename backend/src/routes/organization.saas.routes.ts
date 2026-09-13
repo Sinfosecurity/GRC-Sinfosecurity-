@@ -2,7 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../config/database';
 import { authenticate, AuthRequest, requirePermission } from '../middleware/auth';
 import { PERMISSIONS } from '../security/rbac';
-import { entitlementsFor } from '../billing/plans';
+import { ALLOWANCE_ENFORCEMENT, entitlementsFor } from '../billing/plans';
 import { recordAudit } from '../services/auditEventService';
 import { ApiError } from '../middleware/errorHandler';
 
@@ -22,6 +22,7 @@ router.get('/current', async (req: AuthRequest, res: Response, next: NextFunctio
             data: {
                 ...organization,
                 entitlements: entitlementsFor(organization.plan),
+                allowanceEnforcement: ALLOWANCE_ENFORCEMENT,
             },
         });
     } catch (error) {

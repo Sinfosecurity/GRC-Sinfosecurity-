@@ -27,6 +27,8 @@ describe('administration APIs', () => {
             .set('Authorization', `Bearer ${token}`);
         expect(current.status).toBe(200);
         expect(current.body.data.name).toContain('Admin Org');
+        expect(current.body.data.allowanceEnforcement).toBe('COMMERCIAL_NOT_ENFORCED');
+        expect(current.body.data.entitlements.maxVendors).toBe(25);
 
         const updated = await request(app)
             .patch('/api/v1/organization/current')

@@ -43,6 +43,15 @@ function securityHeadersPlugin() {
           '  Permissions-Policy: camera=(), microphone=(), geolocation=()',
           '  X-Frame-Options: DENY',
           '',
+          '/admin/*',
+          '  X-Robots-Tag: noindex, nofollow',
+          '',
+          '/platform/*',
+          '  X-Robots-Tag: noindex, nofollow',
+          '',
+          '/dashboard/*',
+          '  X-Robots-Tag: noindex, nofollow',
+          '',
         ].join('\n'),
       });
     },
@@ -58,7 +67,20 @@ function robotsPolicyPlugin() {
         type: 'asset',
         fileName: 'robots.txt',
         source: production
-          ? 'User-agent: *\nAllow: /\n'
+          ? [
+              'User-agent: *',
+              'Allow: /',
+              'Disallow: /admin',
+              'Disallow: /platform',
+              'Disallow: /dashboard',
+              'Disallow: /login',
+              'Disallow: /register',
+              'Disallow: /forgot-password',
+              'Disallow: /activate',
+              'Disallow: /reset-password',
+              'Disallow: /mfa',
+              '',
+            ].join('\n')
           : 'User-agent: *\nDisallow: /\n',
       });
     },

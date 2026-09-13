@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**Do not start #11** until Product Leadership accepts #10.
+**Do not start #12** until Product Leadership records GO or an explicit Conditional GO on #11.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -181,13 +181,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Documented rehearsal of deploy, migrate, rollback, and secrets against a non-production target. Production DNS unchanged.
 
-**CURRENT STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance before #11
+**CURRENT STATUS:** PASS
 
-**CERTIFICATION SHA:** rehearsal recorded against security baseline `227dc3215783df523a3b6dc8973928e66ef43df3`
+**CERTIFICATION SHA:** `346450044d1418bc75c6ce4dd4291fc499adb823`
 
-**EVIDENCE:** `docs/PRODUCTION-CUTOVER-REHEARSAL.md`, `docs/PRODUCTION-CUTOVER-RUNBOOK.md`, `docs/PRODUCTION-CONFIGURATION-MATRIX.md`, `docs/PRODUCTION-GO-NO-GO.md`. Production DNS unchanged. Production not deployed.
+**EVIDENCE:** `docs/PRODUCTION-CUTOVER-REHEARSAL.md`, `docs/PRODUCTION-CUTOVER-RUNBOOK.md`, `docs/PRODUCTION-CONFIGURATION-MATRIX.md`, `docs/PRODUCTION-GO-NO-GO.md`. Product Leadership authorized #11 from this SHA. Production DNS unchanged. Production not deployed.
 
-**NEXT ACTION:** Product Leadership review. Do not start #11 until accepted.
+**NEXT ACTION:** Closed as rehearsal. Launch verdict lives on #11.
 
 ---
 
@@ -199,13 +199,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Every checklist item has evidence. Product Leadership signs the go/no-go.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** EVIDENCE RESULT PASS — production ready NO; GO/NO-GO is NO-GO pending Product Leadership
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** pin the #11 commit in `docs/SUPREME-PROGRAM-STATE.md` (`RELEASE_CANDIDATE_SHA`)
 
-**EVIDENCE:** Planning notes in `docs/PRODUCTION-CUTOVER-CHECKLIST.md` and `docs/RAILWAY-PRODUCTION-CHECKLIST.md` are not this gate.
+**EVIDENCE:** `docs/PRODUCTION-RELEASE-CHECKLIST.md`, `docs/PRODUCTION-USER-ACTIONS.md`. BUSINESS entitlements implemented. Admin/app noindex implemented. Production not deployed. DNS unchanged. #12 not started.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Product Leadership review. Do not start #12. Do not merge `main` or change production DNS.
 
 ---
 

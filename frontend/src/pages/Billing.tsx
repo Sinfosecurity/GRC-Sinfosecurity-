@@ -3,7 +3,7 @@ import { Alert, Box, Button, Card, CardContent, Stack, Typography } from '@mui/m
 import { billingAPI } from '../services/api';
 import QueryState from '../components/QueryState';
 
-const PLANS = ['STARTER', 'PROFESSIONAL', 'ENTERPRISE'] as const;
+const PLANS = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE'] as const;
 const INTERVALS = [
     { id: 'month', label: 'Monthly' },
     { id: 'year', label: 'Annual' },

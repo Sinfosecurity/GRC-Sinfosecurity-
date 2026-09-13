@@ -1,4 +1,7 @@
-export type PlanId = 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+export type PlanId = 'STARTER' | 'PROFESSIONAL' | 'BUSINESS' | 'ENTERPRISE';
+
+/** Numeric seats/vendors are commercial allowances, not hard-enforced product limits. */
+export const ALLOWANCE_ENFORCEMENT = 'COMMERCIAL_NOT_ENFORCED' as const;
 
 export type Entitlements = {
     maxUsers: number;
@@ -35,6 +38,17 @@ export const PLAN_ENTITLEMENTS: Record<PlanId, Entitlements> = {
         apiAccess: true,
         integrations: true,
     },
+    BUSINESS: {
+        maxUsers: 75,
+        maxVendors: 750,
+        assessments: true,
+        continuousMonitoring: true,
+        aiUsage: true,
+        advancedReporting: true,
+        sso: false,
+        apiAccess: true,
+        integrations: true,
+    },
     ENTERPRISE: {
         maxUsers: Number.POSITIVE_INFINITY,
         maxVendors: Number.POSITIVE_INFINITY,
@@ -50,7 +64,7 @@ export const PLAN_ENTITLEMENTS: Record<PlanId, Entitlements> = {
 
 export function normalizePlan(plan?: string | null): PlanId {
     const value = (plan || 'STARTER').toUpperCase();
-    if (value === 'PROFESSIONAL' || value === 'ENTERPRISE' || value === 'STARTER') {
+    if (value === 'PROFESSIONAL' || value === 'BUSINESS' || value === 'ENTERPRISE' || value === 'STARTER') {
         return value;
     }
     return 'STARTER';
@@ -78,6 +92,8 @@ const PRICE_ENV_BY_PLAN: Array<{ env: string; plan: PlanId; interval: 'month' | 
     { env: 'STRIPE_PRICE_STARTER_ANNUAL', plan: 'STARTER', interval: 'year' },
     { env: 'STRIPE_PRICE_PROFESSIONAL', plan: 'PROFESSIONAL', interval: 'month' },
     { env: 'STRIPE_PRICE_PROFESSIONAL_ANNUAL', plan: 'PROFESSIONAL', interval: 'year' },
+    { env: 'STRIPE_PRICE_BUSINESS', plan: 'BUSINESS', interval: 'month' },
+    { env: 'STRIPE_PRICE_BUSINESS_ANNUAL', plan: 'BUSINESS', interval: 'year' },
     { env: 'STRIPE_PRICE_ENTERPRISE', plan: 'ENTERPRISE', interval: 'month' },
     { env: 'STRIPE_PRICE_ENTERPRISE_ANNUAL', plan: 'ENTERPRISE', interval: 'year' },
 ];
