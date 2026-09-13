@@ -253,13 +253,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Control catalog and evidence objects are reusable across products without duplicate uploads as the source of truth.
 
-**CURRENT STATUS:** PARTIAL — implementation returned on `supreme-risk-transformation`. Product Leadership has not accepted the hosted Control Center / Evidence Library / coverage experience. Not commercial production.
+**CURRENT STATUS:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW. Hosted implementation is on staging. Product Leadership has not accepted the Control Center / Evidence Library / coverage experience. Not commercial production.
 
-**CERTIFICATION SHA:** pending hosted deploy of the #14 implementation SHA. Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`.
+**CERTIFICATION SHA:** implementation `a743c8a00910fac77d9046a27c2f0eb36d13abd2` (hosted frontend and API). Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`. Hosted CI run `34760658744` PASS.
 
-**EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification notes `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Do not mark PASS from code alone.
+**EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Hosted screenshots `docs/private-beta/hosted-ux-qa/shared-control-evidence/`. Do not mark PASS from code or this file alone.
 
-**NEXT ACTION:** Product Leadership visual and operational review of the hosted experience. Keep #12 PARTIAL. Do not start #15. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership hosted review. Keep #12 PARTIAL. Do not start #15. Do not merge `main` or deploy commercial production.
 
 ---
 

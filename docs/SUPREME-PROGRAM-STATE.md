@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #14 Shared Control & Evidence Layer
 
-**CURRENT ITEM STATUS:** PARTIAL — implementation in progress / returned; Product Leadership hosted acceptance required
+**CURRENT ITEM STATUS:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -20,7 +20,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PRIVATE EXTERNAL TESTERS:** NOT AUTHORIZED unless Product Leadership separately approves
 
-**CURRENT VERIFIED SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2` (program-acceptance snapshot; engineering HEAD is later — do not silently reconcile)
+**CURRENT VERIFIED SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2` (hosted #14 implementation under Product Leadership review; not a #14 PASS acceptance SHA. Prior program-acceptance snapshot `358eab7ece3e0dbb2f53d494328f7302f1f071d2` remains the last #12 customer-ready attempt and is still not accepted.)
 
 **#13 STARTING SHA:** `70e4953e9d9eba13ac8604b721c81216a4e149ad`
 
@@ -49,6 +49,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#13 AUTHORIZED:** YES — Product Leadership 2026-09-13; later accepted
 **#14 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#14 STARTING SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`
+**#14 IMPLEMENTATION SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`
+**#14 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34760658744 PASS
+**#14 HOSTED FRONTEND SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`
+**#14 HOSTED API SHA:** `a743c8a00910fac77d9046a27c2f0eb36d13abd2`
 **#15 AUTHORIZED:** NO
 
 ---
@@ -57,7 +61,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #14 Shared Control & Evidence Layer
 
-**STATUS:** PARTIAL — common-control plane and evidence reuse implemented; hosted Product Leadership acceptance is still required
+**STATUS:** PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW — hosted CI PASS; staging frontend and API are `a743c8a`; Product Leadership has not accepted the visual experience
 
 See `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md` and `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. #15 is not authorized.
 
@@ -90,21 +94,21 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md`. Do not mark #12 PASS because #13 start
 
 ## CURRENT OBJECTIVE
 
-Implement #13 Governance Graph on the transformation branch. Keep #12 PARTIAL. Do not start #14. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Hold #14 for Product Leadership hosted review. Keep #12 PARTIAL. Do not start #15. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#13 Governance Graph** — authorized and in progress.
+**#14 Shared Control & Evidence Layer** — hosted implementation returned; Product Leadership review required.
 
-**Next item after #13:** #14 Shared Control & Evidence Layer — **NOT AUTHORIZED**.
+**Next item after #14:** #15 Supreme Risk — **NOT AUTHORIZED**.
 
 ---
 
 ## DO NOT START
 
-- **#14** or later gates.
+- **#15** or later gates.
 - Production DNS, `main` merge, or production deploy.
 - Live Stripe or commercial sale.
 - External testers without a separate Product Leadership approval.
@@ -136,7 +140,7 @@ Implement #13 Governance Graph on the transformation branch. Keep #12 PARTIAL. D
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership review of #13 evidence when implementation returns. #14 requires a separate authorization. #12 remains PARTIAL until Product Leadership separately changes it.
+Product Leadership hosted review of #14. #15 is not authorized. #12 remains PARTIAL until Product Leadership separately changes it.
 
 ---
 
@@ -168,8 +172,9 @@ Do not invent percentages.
 | 10 | Production Cutover Rehearsal | PASS |
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
 | 12 | Supreme Third Party Production v1 | PARTIAL / OPEN IN PARALLEL; commercial production NO-GO |
-| 13 | Governance Graph | PARTIAL — implementation returned; hosted CI required |
-| 14–38, 40 | Later modules / GTM / packs | NOT STARTED |
+| 13 | Governance Graph | Product Leadership accepted (2026-09-13) |
+| 14 | Shared Control & Evidence Layer | PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW |
+| 15–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
 Marketing preview pages are not implementation.
@@ -202,3 +207,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** AUTHORIZED / IN PROGRESS -> PARTIAL (implementation returned; hosted CI PASS; Product Leadership review required)  
 **SHA:** implementation `8ec44343fea25a027bedd048ae7097fca17a06b7`  
 **EVIDENCE:** Hosted Supreme CI run `34749488009` PASS. Explorer hosted visual acceptance is not recorded. #12 remains PARTIAL. #14 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #14 Shared Control & Evidence Layer  
+**STATUS CHANGE:** AUTHORIZED / IN PROGRESS -> PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW  
+**SHA:** implementation `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
+**EVIDENCE:** Hosted Supreme CI run `34760658744` PASS. Staging frontend and API both `a743c8a`. Hosted Control Center / Evidence Library / coverage walkthrough recorded. Product Leadership has not accepted. #12 remains PARTIAL. #15 is not authorized.
