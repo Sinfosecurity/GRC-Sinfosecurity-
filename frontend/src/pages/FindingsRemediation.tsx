@@ -7,6 +7,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import MetricCard from '../components/design/MetricCard';
 import AppTable from '../components/design/AppTable';
 import { tprmAPI, vendorAPI } from '../services/api';
+import EntityRelationships from '../components/EntityRelationships';
 
 type Finding = {
     id: string;
@@ -178,6 +179,7 @@ export default function FindingsRemediation() {
                                 setSelected(updated.data.data);
                                 await load();
                             }}>Close finding</Button>
+                            <EntityRelationships sourceModel="VendorIssue" sourceId={selected.id} />
                             <Button onClick={() => setSelected(null)}>Close panel</Button>
                         </Stack>
                     </Box>

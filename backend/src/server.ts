@@ -52,6 +52,7 @@ import demoRoutes from './routes/demo.routes';
 import platformRoutes from './routes/platform.routes';
 import supportRoutes from './routes/support.routes';
 import emailWebhookRoutes from './routes/email.webhook.routes';
+import governanceRoutes from './routes/governance.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -254,6 +255,7 @@ app.use(`${API_PREFIX}/system`, systemRoutes);
 app.use(`${API_PREFIX}/integrations`, ...tenantContent, integrationRoutes);
 app.use(`${API_PREFIX}/questionnaires`, ...tenantContent, questionnaireRoutes);
 app.use(`${API_PREFIX}/tprm`, ...tenantContent, tprmRoutes);
+app.use(`${API_PREFIX}/governance`, ...tenantContent, governanceRoutes);
 app.use(`${API_PREFIX}/demo-requests`, demoRoutes);
 app.use(`${API_PREFIX}/platform`, platformRoutes);
 app.use(`${API_PREFIX}/support`, supportRoutes);

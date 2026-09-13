@@ -6,6 +6,7 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import { tprmAPI, vendorAPI } from '../services/api';
+import EntityRelationships from '../components/EntityRelationships';
 
 type Stored = {
     id: string;
@@ -117,6 +118,8 @@ export default function DocumentManagement() {
                     ]}
                 />
             </QueryState>
+            {vendorId && <Box sx={{ mt: 2 }}><EntityRelationships sourceModel="Vendor" sourceId={vendorId} /></Box>}
+            {items[0] && <Box sx={{ mt: 2 }}><EntityRelationships sourceModel="StoredObject" sourceId={items[0].id} /></Box>}
         </Box>
     );
 }

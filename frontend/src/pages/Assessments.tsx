@@ -26,6 +26,7 @@ import WorkflowStepper from '../components/design/WorkflowStepper';
 import TemplateCard from '../components/design/TemplateCard';
 import { color } from '../design/tokens';
 import { tprmAPI, vendorAPI } from '../services/api';
+import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 
 type TemplateQuestion = {
@@ -361,6 +362,9 @@ export default function Assessments() {
                             {progress}% complete · {answered} of {visible.length} answered · {evidenceDue} evidence requests outstanding
                         </Typography>
                         <LinearProgress variant="determinate" value={progress} sx={{ mt: 0.75 }} />
+                        <Box sx={{ mt: 2 }}>
+                            <EntityRelationships sourceModel="VendorAssessment" sourceId={selected.id} />
+                        </Box>
                     </Box>
                     <Stack direction={{ xs: 'column', lg: 'row' }}>
                         <Box sx={{ width: { xs: '100%', lg: 240 }, p: 2, borderRight: { lg: `1px solid ${color.line}` } }}>

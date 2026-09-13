@@ -63,6 +63,7 @@ const LegalDraft = lazy(() => import('./pages/LegalDraft'));
 const SecurityOverview = lazy(() => import('./pages/SecurityOverview'));
 const PublicStatus = lazy(() => import('./pages/PublicStatus'));
 const HelpSupport = lazy(() => import('./pages/HelpSupport'));
+const GovernanceGraphExplorer = lazy(() => import('./pages/GovernanceGraphExplorer'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -153,6 +154,7 @@ export default function App() {
                     <Route path="settings" element={<Settings />} />
                     <Route path="environment" element={<EnvironmentStatus />} />
                     <Route path="help" element={<HelpSupport />} />
+                    <Route path="governance-graph" element={<GovernanceGraphExplorer />} />
                 </Route>
                 <Route element={<ProtectedRoute allowedRoles={['PLATFORM_OWNER', 'PLATFORM_ADMIN', 'SUPERADMIN', 'SUPPORT_ADMIN', 'SUPPORT_ANALYST', 'BILLING_SUPPORT', 'SECURITY_ADMIN']}><PlatformLayout /></ProtectedRoute>}>
                     <Route path="/platform" element={<PlatformOverview />} />

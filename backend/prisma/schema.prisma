@@ -129,6 +129,8 @@ model Organization {
   supportSessions             SupportAccessSession[]
   notificationDeliveries      NotificationDeliveryLog[]
   operationalEvents           OperationalEvent[]
+  governanceNodes             GovernanceNode[]
+  governanceEdges             GovernanceEdge[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -2716,4 +2718,126 @@ model PrivilegeElevation {
   requestId String?
 
   @@index([userId, expiresAt])
+}
+
+enum GovernanceNodeType {
+  ORGANIZATION
+  BUSINESS_UNIT
+  VENDOR
+  SYSTEM
+  APPLICATION
+  ASSET
+  DATA_ASSET
+  AI_SYSTEM
+  RISK
+  CONTROL
+  REQUIREMENT
+  FRAMEWORK
+  REGULATION
+  POLICY
+  CONTRACT
+  ASSESSMENT
+  EVIDENCE
+  FINDING
+  REMEDIATION
+  DECISION
+  INCIDENT
+}
+
+enum GovernanceRelationshipType {
+  OWNS
+  BELONGS_TO
+  USES
+  DEPENDS_ON
+  PROVIDES_SERVICE_TO
+  HOSTS
+  PROCESSES
+  STORES
+  SHARES_WITH
+  HAS_RISK
+  AFFECTS
+  MITIGATES
+  CONTROLLED_BY
+  MAPS_TO
+  REQUIRED_BY
+  SATISFIES
+  SUPPORTED_BY
+  EVIDENCED_BY
+  ASSESSED_BY
+  HAS_FINDING
+  REMEDIATED_BY
+  APPLIES_TO
+  INFORMS
+  APPROVED_BY
+  ACCEPTED_BY
+  MONITORED_BY
+  TRIGGERED_BY
+  GOVERNED_BY
+  COVERED_BY
+}
+
+enum GovernanceProvenance {
+  SYSTEM
+  USER
+  IMPORT
+  ASSESSMENT
+  RULE
+  INTELLIGENCE
+  AI_SUGGESTED
+  AI_APPROVED
+}
+
+enum GovernanceAuthority {
+  AUTHORITATIVE
+  VERIFIED
+  DERIVED
+  SUGGESTED
+}
+
+model GovernanceNode {
+  id             String              @id @default(uuid())
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  nodeType       GovernanceNodeType
+  sourceModel    String
+  sourceId       String
+  displayLabel   String
+  status         String              @default("ACTIVE")
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  archivedAt     DateTime?
+  outgoingEdges  GovernanceEdge[]    @relation("GovernanceEdgeFrom")
+  incomingEdges  GovernanceEdge[]    @relation("GovernanceEdgeTo")
+
+  @@unique([organizationId, nodeType, sourceModel, sourceId])
+  @@index([organizationId, nodeType])
+  @@index([organizationId, sourceModel, sourceId])
+  @@index([organizationId, archivedAt])
+  @@index([displayLabel])
+}
+
+model GovernanceEdge {
+  id               String                       @id @default(uuid())
+  organization     Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId   String
+  fromNode         GovernanceNode               @relation("GovernanceEdgeFrom", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  fromNodeId       String
+  toNode           GovernanceNode               @relation("GovernanceEdgeTo", fields: [toNodeId], references: [id], onDelete: Cascade)
+  toNodeId         String
+  relationshipType GovernanceRelationshipType
+  provenance       GovernanceProvenance         @default(SYSTEM)
+  authority        GovernanceAuthority          @default(AUTHORITATIVE)
+  isDerived        Boolean                      @default(false)
+  createdBy        String?
+  validFrom        DateTime                     @default(now())
+  validTo          DateTime?
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+  archivedAt       DateTime?
+
+  @@index([organizationId, relationshipType])
+  @@index([organizationId, fromNodeId])
+  @@index([organizationId, toNodeId])
+  @@index([organizationId, archivedAt])
+  @@index([fromNodeId, toNodeId, relationshipType])
 }

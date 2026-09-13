@@ -331,6 +331,10 @@ export async function populateRecoveryDataset(prisma: PrismaClient, objectRoot: 
         { name: 'Payroll Hub B', tier: 'HIGH' },
     ]);
 
+    const { backfillOrganization } = await import('../services/governanceGraphService');
+    await backfillOrganization(orgA.org.id);
+    await backfillOrganization(orgB.org.id);
+
     const demoDir = path.join(objectRoot, '_application-state');
     fs.mkdirSync(demoDir, { recursive: true });
     fs.appendFileSync(

@@ -38,6 +38,8 @@ export const PERMISSIONS = {
     'monitoring.read': 'monitoring.read',
     'monitoring.manage': 'monitoring.manage',
     'questionnaire.manage': 'questionnaire.manage',
+    'governanceGraph.read': 'governanceGraph.read',
+    'governanceGraph.manage': 'governanceGraph.manage',
     'platform.overview': 'platform.overview',
     'platform.organizations.read': 'platform.organizations.read',
     'platform.support.read': 'platform.support.read',
@@ -120,6 +122,7 @@ const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['risk.read'],
     PERMISSIONS['notification.read'],
     PERMISSIONS['monitoring.read'],
+    PERMISSIONS['governanceGraph.read'],
 ];
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
@@ -149,6 +152,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['audit.read'],
         PERMISSIONS['monitoring.manage'],
         PERMISSIONS['questionnaire.manage'],
+        PERMISSIONS['governanceGraph.manage'],
     ],
     ASSESSOR: [
         ...READ_PORTFOLIO,

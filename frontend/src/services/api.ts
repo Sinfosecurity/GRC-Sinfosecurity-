@@ -239,6 +239,20 @@ export const tprmAPI = {
         api.get(`/tprm/reports/board.${format}`, { responseType: 'blob', params }),
 };
 
+export const governanceAPI = {
+    summary: () => api.get('/governance/summary'),
+    search: (params?: unknown) => api.get('/governance/search', { params }),
+    backfill: () => api.post('/governance/backfill'),
+    reconcile: () => api.post('/governance/reconcile'),
+    node: (nodeId: string) => api.get(`/governance/nodes/${nodeId}`),
+    relationships: (nodeId: string, params?: unknown) => api.get(`/governance/nodes/${nodeId}/relationships`, { params }),
+    neighbors: (nodeId: string) => api.get(`/governance/nodes/${nodeId}/neighbors`),
+    lineage: (nodeId: string, depth?: number) => api.get(`/governance/nodes/${nodeId}/lineage`, { params: depth ? { depth } : undefined }),
+    impact: (nodeId: string, depth?: number) => api.get(`/governance/nodes/${nodeId}/impact`, { params: depth ? { depth } : undefined }),
+    path: (fromNodeId: string, toNodeId: string) => api.get('/governance/path', { params: { fromNodeId, toNodeId } }),
+    exportGraph: () => api.get('/governance/export'),
+};
+
 export const vendorAPI = {
     getAll: (filters?: unknown) => api.get('/vendors', { params: filters }),
     getById: (id: string) => api.get(`/vendors/${id}`),

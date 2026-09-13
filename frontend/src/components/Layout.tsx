@@ -26,6 +26,7 @@ import {
     ExtensionOutlined,
     GavelOutlined,
     HelpOutline,
+    AccountTreeOutlined,
     HistoryOutlined,
     Menu as MenuIcon,
     MonitorHeartOutlined,
@@ -64,7 +65,10 @@ const menuSections: NavSection[] = [
     },
     {
         title: 'Insights',
-        items: [{ text: 'Reports', path: '/reports', icon: <DescriptionOutlined fontSize="small" />, permission: 'report.read' }],
+        items: [
+            { text: 'Reports', path: '/reports', icon: <DescriptionOutlined fontSize="small" />, permission: 'report.read' },
+            { text: 'Governance Graph', path: '/governance-graph', icon: <AccountTreeOutlined fontSize="small" />, permission: 'governanceGraph.read' },
+        ],
     },
     {
         title: 'Administration',

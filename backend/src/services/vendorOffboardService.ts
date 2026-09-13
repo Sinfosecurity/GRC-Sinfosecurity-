@@ -102,6 +102,16 @@ export const vendorOffboardService = {
             metadata: { outstanding: preview.outstanding, recordsRetained: true },
         });
 
+        const { applySourceLifecycle } = await import('./governanceGraphService');
+        await applySourceLifecycle({
+            organizationId: input.organizationId,
+            sourceModel: 'Vendor',
+            sourceId: input.vendorId,
+            status: next,
+            archivedAt: next === VendorStatus.TERMINATED ? new Date() : null,
+            actorUserId: input.actorUserId,
+        }).catch(() => undefined);
+
         return {
             ...preview,
             vendor: { ...preview.vendor, status: next },

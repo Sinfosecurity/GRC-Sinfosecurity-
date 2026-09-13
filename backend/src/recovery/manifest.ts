@@ -19,6 +19,8 @@ export const AUTHORITATIVE_TABLES = [
     'AuditEvent',
     'SubscriptionEvent',
     'InAppNotification',
+    'GovernanceNode',
+    'GovernanceEdge',
 ] as const;
 
 export type RecoveryManifest = {

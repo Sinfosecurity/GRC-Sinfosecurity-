@@ -8,6 +8,7 @@ import MetricCard from '../components/design/MetricCard';
 import Surface from '../components/design/Surface';
 import { color } from '../design/tokens';
 import { tprmAPI, vendorAPI } from '../services/api';
+import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 
 type Brief = {
@@ -223,6 +224,7 @@ export default function DecisionBriefs() {
                                         </Alert>
                                     )}
                                 </Surface>
+                                <EntityRelationships sourceModel="RiskDecisionBrief" sourceId={selected.id} />
                             </Stack>
                         </Box>
                     )}

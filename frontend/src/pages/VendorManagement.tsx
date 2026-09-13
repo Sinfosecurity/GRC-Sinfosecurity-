@@ -28,6 +28,7 @@ import MetricCard from '../components/design/MetricCard';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
 import { tprmAPI, vendorAPI } from '../services/api';
+import EntityRelationships from '../components/EntityRelationships';
 
 interface Vendor {
     id: string | number;
@@ -426,6 +427,7 @@ export default function VendorManagement() {
                                     <Button onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Create finding</Button>
                                     <Button onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Make decision</Button>
                                 </Stack>
+                                <EntityRelationships sourceModel="Vendor" sourceId={String(selectedVendor.id)} />
                             </Stack>
                         )}
                         {detailTab === 1 && (

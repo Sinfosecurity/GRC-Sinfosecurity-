@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO and does not authorize #13.
+**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership later authorized **#13 Governance Graph** while **#12 remains PARTIAL**.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox receipt is USER ACTION REQUIRED. #13 is not authorized.
+**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox placement / deliverability remains USER ACTION REQUIRED. #13 is authorized in parallel and does not close this item.
 
 **CERTIFICATION SHA:** Cursor cannot declare visual PASS. Latest hosted evidence SHA is recorded in `docs/PRIVATE-BETA-CERTIFICATION.md`.
 
 **EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. Cursor cannot declare #12 PASS.
 
-**NEXT ACTION:** Product Leadership must confirm a real controlled inbox received the invitation. Provider accept is not delivery. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership must confirm a real controlled inbox received the invitation and complete visual acceptance. Remaining UX-P2/P3 stay open. Do not invite external testers unless separately approved. Do not mark PASS because #13 started. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -231,17 +231,17 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **PURPOSE:** Shared graph of organizations, assets, vendors, controls, evidence, and decisions across modules.
 
-**DEPENDENCIES:** #12 as a commercial production product (private-testing PASS is not sufficient), #1
+**DEPENDENCIES:** #1. Product Leadership authorized this item while #12 remains PARTIAL / open in parallel. Commercial production PASS on #12 is still not required to implement the graph. #14 is not authorized.
 
-**DEFINITION OF DONE:** Authoritative graph model with tenant isolation, versioning, and no mock nodes. Marketing preview is not done.
+**DEFINITION OF DONE:** Authoritative graph model with tenant isolation, provenance, temporal relationship state, idempotent TPRM backfill, explainable query APIs, and a professional explorer. No separate graph database. Marketing preview is not done.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** PARTIAL — implementation returned; hosted CI / Product Leadership review required. Not commercial production.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** local implementation evidence in `docs/GOVERNANCE-GRAPH-CERTIFICATION.md`. Hosted CI SHA to be recorded when GitHub Actions passes the exact commit.
 
-**EVIDENCE:** Target architecture only (`docs/SUPREME-GOVERNANCE-PLATFORM-ROADMAP.md`).
+**EVIDENCE:** Product Leadership authorization 2026-09-13. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. Domain inventory, data model, operations, customer doc, and certification recorded. #12 remains PARTIAL.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Record hosted CI on the exact SHA. Keep #12 PARTIAL. Do not start #14. Do not merge `main` or deploy commercial production.
 
 ---
 

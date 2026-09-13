@@ -4,6 +4,7 @@ import { canSeeNav } from '../navAccess';
 describe('canSeeNav', () => {
     it('hides administration from viewers', () => {
         expect(canSeeNav('VIEWER', 'vendor.read')).toBe(true);
+        expect(canSeeNav('VIEWER', 'governanceGraph.read')).toBe(true);
         expect(canSeeNav('VIEWER', 'user.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'billing.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'platform')).toBe(false);
