@@ -5,21 +5,22 @@
 }
 
 :root {
-  --navy-950: #070d16;
-  --navy-900: #0b1220;
-  --navy-850: #101827;
-  --navy-800: #151e30;
-  --ink: #e8e4dc;
-  --ink-muted: #a8b0bd;
-  --ink-faint: #7d8796;
-  --gold: #c4a46a;
-  --gold-dim: rgba(196, 164, 106, 0.14);
-  --line: rgba(232, 228, 220, 0.08);
-  --line-strong: rgba(232, 228, 220, 0.16);
+  --navy-950: #07111c;
+  --navy-900: #0c1826;
+  --navy-850: #122033;
+  --navy-800: #18283e;
+  --workspace: #f3efe6;
+  --ink: #14202e;
+  --ink-muted: #5a6573;
+  --ink-faint: #7a8491;
+  --gold: #b0893a;
+  --gold-dim: rgba(176, 137, 58, 0.12);
+  --line: rgba(20, 32, 46, 0.1);
+  --line-strong: rgba(20, 32, 46, 0.18);
   --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
   --font-ui: "Source Sans 3", "Source Sans Pro", "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
-  --radius: 6px;
+  --radius: 8px;
 }
 
 html,
@@ -32,9 +33,7 @@ body {
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background:
-    radial-gradient(1200px 600px at 8% -10%, rgba(196, 164, 106, 0.05), transparent 55%),
-    var(--navy-900);
+  background: var(--workspace);
   color: var(--ink);
   overflow-x: hidden;
 }
@@ -49,9 +48,9 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #243352;
+  background: #9aa6b5;
   border-radius: 8px;
-  border: 2px solid var(--navy-900);
+  border: 2px solid var(--workspace);
 }
 
 a {

@@ -17,7 +17,7 @@ export default function EmptyState({ title, body, action }: Props) {
                 textAlign: 'left',
                 border: `1px dashed ${color.lineStrong}`,
                 borderRadius: '8px',
-                bgcolor: 'rgba(16,24,39,0.4)',
+                bgcolor: color.surface,
                 maxWidth: 560,
             }}
         >
