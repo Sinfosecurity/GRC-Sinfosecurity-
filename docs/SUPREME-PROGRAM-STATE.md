@@ -8,11 +8,13 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT VERIFIED SHA:** `5912ccafee28b87898548da9721adf79c5bbacb6`
+**CURRENT VERIFIED SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2`
 
 **RELEASE_CANDIDATE_SHA:** `5912ccafee28b87898548da9721adf79c5bbacb6`
 
 **#12 STARTING SHA:** `0e52e203459b1d3a8130ad063a5284e33898144c`
+
+**#12 IMPLEMENTATION SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2`
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -23,7 +25,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — private-testing implementation complete; commercial production remains NO-GO
+**#12 STARTED:** YES — PASS as private-testing release candidate; commercial production remains NO-GO
 **#13 AUTHORIZED:** NO
 
 ---
@@ -32,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #12 Supreme Third Party Production v1 / Private Testing Release
 
-**STATUS:** IMPLEMENTATION COMPLETE — private-testing release candidate; commercial production NO-GO; hosted CI pending
+**STATUS:** PASS as private-testing release candidate; commercial production NO-GO
 
 See `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, and `docs/private-beta/`.
 
@@ -70,7 +72,7 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-Deliver and certify the #12 private-testing release candidate. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
+#12 private-testing release candidate is certified. Invite selected humans with synthetic data only. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
@@ -125,10 +127,13 @@ Deliver and certify the #12 private-testing release candidate. Do not commercial
 | SHA `9a195a27c67851566bef1cfa6bee461d2350d557` | Run `34725113001` PASS — https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34725113001 |
 | SHA `227dc3215783df523a3b6dc8973928e66ef43df3` | Run `34729299577` PASS — https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34729299577 |
 | SHA `5912ccafee28b87898548da9721adf79c5bbacb6` | Run `34733153974` PASS — https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34733153974 |
+| SHA `358eab7ece3e0dbb2f53d494328f7302f1f071d2` | Run `34734519024` PASS — https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34734519024 |
 | Runner | GitHub-hosted |
 | Note | Earlier `docs/CI-CERTIFICATION.md` recorded a GitHub billing lock. Later hosted runs on the SHAs above succeeded. |
 
 #11 hosted quality on `5912cca` : 248 backend tests, 114 frontend tests, typecheck, production build, secret scan, public-build safety PASS.
+
+#12 hosted quality on `358eab7` : 252 backend tests, 114 frontend tests, typecheck, production build, secret scan, public-build safety PASS. `pipefail` from #11 remains.
 
 ---
 
@@ -138,7 +143,7 @@ None for engineering start of #13. Product Leadership may later decide whether p
 
 Distinguish:
 
-- **IMPLEMENTATION RESULT** — #12 private-testing implementation complete; hosted CI pending at draft
+- **IMPLEMENTATION RESULT** — #12 PASS as private-testing release candidate; hosted CI `34734519024` on `358eab7`
 - **PROGRAM ACCEPTANCE** — this file does not authorize commercial production GO or #13.
 
 ---
@@ -170,7 +175,7 @@ Do not invent percentages.
 | 9 | Final Security Review | EVIDENCE RESULT PASS; HOSTED CLOSURE PASS |
 | 10 | Production Cutover Rehearsal | PASS |
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
-| 12 | Supreme Third Party Production v1 | IMPLEMENTATION COMPLETE — private-testing RC; commercial production NO-GO |
+| 12 | Supreme Third Party Production v1 | PASS as private-testing RC; commercial production NO-GO |
 | 13–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -276,6 +281,6 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 ### 2026-09-13
 
 **ITEM:** #12 Supreme Third Party Production v1
-**STATUS CHANGE:** NOT STARTED AS FINAL PRODUCTION RELEASE GATE -> IMPLEMENTATION COMPLETE (private-testing release candidate; commercial production remains NO-GO; not #13 authorization)
-**SHA:** starting `0e52e203459b1d3a8130ad063a5284e33898144c`; implementation SHA recorded after commit
+**STATUS CHANGE:** NOT STARTED AS FINAL PRODUCTION RELEASE GATE -> PASS as private-testing release candidate (commercial production remains NO-GO; not #13 authorization)
+**SHA:** implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` (hosted CI run `34734519024` PASS)
 **EVIDENCE:** `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, `docs/private-beta/`

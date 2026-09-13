@@ -20,8 +20,8 @@ Product Leadership authorized #12 as a **controlled private-testing release**, n
 | Starting SHA | `0e52e203459b1d3a8130ad063a5284e33898144c` |
 | Accepted #11 RC SHA | `5912ccafee28b87898548da9721adf79c5bbacb6` (ancestor) |
 | Branch | `supreme-risk-transformation` |
-| Implementation SHA | recorded after commit in `docs/SUPREME-PROGRAM-STATE.md` |
-| Hosted CI | recorded after the quality workflow on the implementation SHA |
+| Implementation SHA | `358eab7ece3e0dbb2f53d494328f7302f1f071d2` |
+| Hosted CI | Run `34734519024` PASS — https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34734519024 |
 
 ## What #12 is
 
@@ -187,7 +187,7 @@ Landing no longer says “available now.”
 | Previous security controls regress | PASS locally; hosted CI required |
 | Tester feedback workflow | PASS |
 | Private-beta documentation | PASS |
-| Hosted CI on exact implementation SHA | recorded after push |
+| Hosted CI on exact implementation SHA | PASS — run `34734519024` on `358eab7ece3e0dbb2f53d494328f7302f1f071d2` |
 | No fake production/certification claims | PASS |
 | External pentest / SOC 2 / ISO | Not required |
 | Paid production infrastructure | Not required for private testing |
@@ -196,7 +196,7 @@ Landing no longer says “available now.”
 
 | Question | Answer |
 |---|---|
-| Ready for controlled private testing with synthetic data | YES after hosted CI PASS on the implementation SHA |
+| Ready for controlled private testing with synthetic data | YES |
 | Ready for paid commercial production | NO |
 
 ## Do not
