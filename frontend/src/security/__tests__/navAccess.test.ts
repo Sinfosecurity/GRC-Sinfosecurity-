@@ -8,6 +8,7 @@ describe('canSeeNav', () => {
         expect(canSeeNav('VIEWER', 'control.read')).toBe(true);
         expect(canSeeNav('VIEWER', 'framework.read')).toBe(true);
         expect(canSeeNav('VIEWER', 'compliance.read')).toBe(true);
+        expect(canSeeNav('VIEWER', 'privacy.read')).toBe(true);
         expect(canSeeNav('VIEWER', 'user.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'billing.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'platform')).toBe(false);

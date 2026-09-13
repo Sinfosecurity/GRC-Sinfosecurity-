@@ -78,6 +78,14 @@ const ComplianceGaps = lazy(() => import('./pages/ComplianceGaps'));
 const ComplianceExceptions = lazy(() => import('./pages/ComplianceExceptions'));
 const ComplianceCampaignDetail = lazy(() => import('./pages/ComplianceCampaignDetail'));
 const ComplianceAuditDetail = lazy(() => import('./pages/ComplianceAuditDetail'));
+const PrivacyDashboard = lazy(() => import('./pages/PrivacyDashboard'));
+const PrivacyActivities = lazy(() => import('./pages/PrivacyActivities'));
+const PrivacyActivityDetail = lazy(() => import('./pages/PrivacyActivityDetail'));
+const PrivacyDataMap = lazy(() => import('./pages/PrivacyDataMap'));
+const PrivacyTransfers = lazy(() => import('./pages/PrivacyTransfers'));
+const PrivacyDpias = lazy(() => import('./pages/PrivacyDpias'));
+const PrivacyRights = lazy(() => import('./pages/PrivacyRights'));
+const PrivacyRetention = lazy(() => import('./pages/PrivacyRetention'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -147,6 +155,14 @@ export default function App() {
                     <Route path="compliance/exceptions" element={<ComplianceExceptions />} />
                     <Route path="compliance/campaigns/:publicId" element={<ComplianceCampaignDetail />} />
                     <Route path="compliance/audits/:publicId" element={<ComplianceAuditDetail />} />
+                    <Route path="privacy-ops" element={<PrivacyDashboard />} />
+                    <Route path="privacy-ops/activities" element={<PrivacyActivities />} />
+                    <Route path="privacy-ops/activities/:publicId" element={<PrivacyActivityDetail />} />
+                    <Route path="privacy-ops/data-map" element={<PrivacyDataMap />} />
+                    <Route path="privacy-ops/transfers" element={<PrivacyTransfers />} />
+                    <Route path="privacy-ops/dpias" element={<PrivacyDpias />} />
+                    <Route path="privacy-ops/rights" element={<PrivacyRights />} />
+                    <Route path="privacy-ops/retention" element={<PrivacyRetention />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

@@ -29,6 +29,15 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['evidence.link'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['framework.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['compliance.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['privacy.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['rightsRequest.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['rightsRequest.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['privacy.manage'])).toBe(false);
+        expect(hasPermission('APPROVER', PERMISSIONS['dpia.approve'])).toBe(true);
+        expect(hasPermission('APPROVER', PERMISSIONS['rightsRequest.approve'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['privacy.manage'])).toBe(true);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['processingActivity.create'])).toBe(true);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['privacy.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['framework.activate'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['requirement.attest'])).toBe(false);
         expect(hasPermission('ASSESSOR', PERMISSIONS['requirement.attest'])).toBe(true);

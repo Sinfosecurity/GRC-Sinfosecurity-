@@ -29,6 +29,14 @@ export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
     GovernanceNodeType.COMPLIANCE_GAP,
     GovernanceNodeType.ATTESTATION,
     GovernanceNodeType.COMPLIANCE_PERIOD,
+    GovernanceNodeType.PROCESSING_ACTIVITY,
+    GovernanceNodeType.DATA_CATEGORY,
+    GovernanceNodeType.DATA_SUBJECT_CATEGORY,
+    GovernanceNodeType.TRANSFER,
+    GovernanceNodeType.DPIA,
+    GovernanceNodeType.RIGHTS_REQUEST,
+    GovernanceNodeType.RETENTION_RULE,
+    GovernanceNodeType.CONSENT_RECORD,
 ];
 
 export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { vendorId?: string }) => string> = {
@@ -56,6 +64,12 @@ export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { ve
     ComplianceGap: () => '/compliance/gaps',
     ComplianceException: () => '/compliance/exceptions',
     CompliancePeriod: (id) => `/compliance/audits/${id}`,
+    PrivacyProcessingActivity: (id) => `/privacy-ops/activities/${id}`,
+    PrivacyTransfer: () => '/privacy-ops/transfers',
+    PrivacyDpia: () => '/privacy-ops/dpias',
+    PrivacyRightsRequest: () => '/privacy-ops/rights',
+    PrivacyRetentionRule: () => '/privacy-ops/retention',
+    PrivacyConsentRecord: () => '/privacy-ops',
 };
 
 export function publicNode(node: {

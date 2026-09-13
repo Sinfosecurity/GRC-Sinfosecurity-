@@ -149,6 +149,12 @@ model Organization {
   complianceExceptions        ComplianceException[]
   compliancePeriods           CompliancePeriod[]
   complianceHistory           ComplianceHistory[]
+  privacyActivities           PrivacyProcessingActivity[]
+  privacyTransfers            PrivacyTransfer[]
+  privacyDpias                PrivacyDpia[]
+  privacyRightsRequests       PrivacyRightsRequest[]
+  privacyRetentionRules       PrivacyRetentionRule[]
+  privacyHistory              PrivacyHistory[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -2768,6 +2774,14 @@ enum GovernanceNodeType {
   COMPLIANCE_GAP
   ATTESTATION
   COMPLIANCE_PERIOD
+  PROCESSING_ACTIVITY
+  DATA_CATEGORY
+  DATA_SUBJECT_CATEGORY
+  TRANSFER
+  DPIA
+  RIGHTS_REQUEST
+  RETENTION_RULE
+  CONSENT_RECORD
 }
 
 enum GovernanceRelationshipType {
@@ -2807,6 +2821,8 @@ enum GovernanceRelationshipType {
   INCREASES_EXPOSURE_TO
   ADDRESSES
   GOVERNS
+  TRANSFERS_VIA
+  CONCERNS
 }
 
 enum GovernanceProvenance {
@@ -3947,6 +3963,497 @@ model ComplianceHistory {
 }
 
 model ComplianceCounter {
+  organizationId String
+  kind           String
+  next           Int    @default(1)
+
+  @@id([organizationId, kind])
+}
+
+enum PrivacyActivityStatus {
+  DRAFT
+  ACTIVE
+  UNDER_REVIEW
+  RETIRED
+}
+
+enum PrivacyRole {
+  CONTROLLER
+  PROCESSOR
+  JOINT_CONTROLLER
+  RECIPIENT
+  SERVICE_PROVIDER
+}
+
+enum PrivacyVendorRole {
+  PROCESSOR
+  SUBPROCESSOR
+  CONTROLLER
+  JOINT_CONTROLLER
+  RECIPIENT
+  SERVICE_PROVIDER
+}
+
+enum PrivacyDataSubjectKind {
+  CUSTOMERS
+  EMPLOYEES
+  APPLICANTS
+  CONTRACTORS
+  PROSPECTS
+  WEBSITE_VISITORS
+  CHILDREN
+  PATIENTS
+  STUDENTS
+  SUPPLIERS
+  OTHER
+}
+
+enum PrivacyDataKind {
+  IDENTITY
+  CONTACT
+  FINANCIAL
+  EMPLOYMENT
+  LOCATION
+  ONLINE_IDENTIFIERS
+  DEVICE_NETWORK
+  AUTHENTICATION
+  COMMUNICATIONS
+  HEALTH
+  BIOMETRIC
+  GOVERNMENT_IDENTIFIERS
+  CRIMINAL_LEGAL
+  DEMOGRAPHIC
+  BEHAVIORAL
+  PREFERENCE
+  OTHER
+}
+
+enum PrivacyBasisType {
+  CONSENT
+  CONTRACT
+  LEGAL_OBLIGATION
+  VITAL_INTERESTS
+  PUBLIC_TASK
+  LEGITIMATE_INTERESTS
+  SALE_OPT_OUT
+  BUSINESS_PURPOSE
+  OTHER
+}
+
+enum PrivacyTransferMechanism {
+  ADEQUACY
+  SCC
+  BCR
+  CONSENT_EXCEPTION
+  OTHER
+}
+
+enum PrivacyReviewStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  REVIEW_REQUIRED
+  COMPLETED
+  OVERDUE
+}
+
+enum PrivacyDpiaDecision {
+  PROCEED
+  PROCEED_WITH_CONDITIONS
+  DO_NOT_PROCEED
+  FURTHER_REVIEW
+}
+
+enum PrivacyRightsType {
+  ACCESS
+  CORRECTION
+  DELETION
+  RESTRICTION
+  OBJECTION
+  PORTABILITY
+  OPT_OUT
+  CONSENT_WITHDRAWAL
+  OTHER
+}
+
+enum PrivacyVerificationStatus {
+  NOT_STARTED
+  PENDING
+  VERIFIED
+  FAILED
+  EXCEPTION
+}
+
+enum PrivacyRightsStatus {
+  RECEIVED
+  VERIFYING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  DENIED
+  CLOSED
+}
+
+enum PrivacyDeletionStatus {
+  REQUESTED
+  PENDING
+  VERIFIED
+  LEGAL_HOLD
+  NOT_APPLICABLE
+}
+
+enum PrivacyConsentStatus {
+  GIVEN
+  WITHDRAWN
+  EXPIRED
+  MANUAL
+}
+
+model PrivacyProcessingActivity {
+  id                 String                 @id @default(uuid())
+  organization       Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  publicId           String
+  name               String
+  description        String?
+  businessProcess    String?
+  businessUnitId     String?
+  ownerUserId        String?
+  controllerRole     PrivacyRole            @default(CONTROLLER)
+  status             PrivacyActivityStatus  @default(DRAFT)
+  jurisdictions      String[]
+  storageLocations   String[]
+  sourceOfData       String?
+  retentionSummary   String?
+  disposalMethod     String?
+  dpiaRequired       Boolean                @default(false)
+  dpiaStatus         String?
+  riskLevel          String?
+  effectiveFrom      DateTime?
+  effectiveTo        DateTime?
+  reviewAt           DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  purposes           PrivacyPurpose[]
+  dataCategories     PrivacyActivityData[]
+  dataSubjects       PrivacyActivitySubject[]
+  parties            PrivacyActivityParty[]
+  transfers          PrivacyTransfer[]
+  dpias              PrivacyDpia[]
+  rightsRequests     PrivacyRightsRequest[]
+  retentionRules     PrivacyRetentionRule[]
+  noticeVersions     PrivacyNoticeVersion[]
+  incidentLinks      PrivacyIncidentLink[]
+  deletionTasks      PrivacyDeletionTask[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model PrivacyPurpose {
+  id             String                     @id @default(uuid())
+  organizationId String
+  activity       PrivacyProcessingActivity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId     String
+  name           String
+  summary        String?
+  noticeVersion  PrivacyNoticeVersion?      @relation(fields: [noticeVersionId], references: [id])
+  noticeVersionId String?
+  status         String                     @default("ACTIVE")
+  effectiveFrom  DateTime?
+  createdAt      DateTime                   @default(now())
+  bases          PrivacyLawfulBasis[]
+
+  @@index([activityId])
+  @@index([organizationId])
+}
+
+model PrivacyLawfulBasis {
+  id             String         @id @default(uuid())
+  organizationId String
+  purpose        PrivacyPurpose @relation(fields: [purposeId], references: [id], onDelete: Cascade)
+  purposeId      String
+  basisType      PrivacyBasisType
+  rationale      String
+  regime         String
+  ownerUserId    String?
+  storedObjectId String?
+  effectiveFrom  DateTime?
+  reviewAt       DateTime?
+  status         String         @default("RECORDED")
+  createdAt      DateTime       @default(now())
+
+  @@index([purposeId])
+  @@index([organizationId])
+}
+
+model PrivacyActivityData {
+  id             String                    @id @default(uuid())
+  organizationId String
+  activity       PrivacyProcessingActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId     String
+  kind           PrivacyDataKind
+  label          String
+  sensitive      Boolean                   @default(false)
+  createdAt      DateTime                  @default(now())
+
+  @@index([activityId])
+  @@index([organizationId, kind])
+}
+
+model PrivacyActivitySubject {
+  id             String                    @id @default(uuid())
+  organizationId String
+  activity       PrivacyProcessingActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId     String
+  kind           PrivacyDataSubjectKind
+  label          String
+  createdAt      DateTime                  @default(now())
+
+  @@index([activityId])
+  @@index([organizationId, kind])
+}
+
+model PrivacyActivityParty {
+  id             String                    @id @default(uuid())
+  organizationId String
+  activity       PrivacyProcessingActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId     String
+  partyType      String
+  vendorId       String?
+  systemName     String?
+  recipientName  String?
+  privacyRole    PrivacyVendorRole         @default(PROCESSOR)
+  jurisdiction   String?
+  createdAt      DateTime                  @default(now())
+
+  @@index([activityId])
+  @@index([organizationId, vendorId])
+}
+
+model PrivacyTransfer {
+  id                   String                    @id @default(uuid())
+  organization         Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  publicId             String
+  activity             PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId           String?
+  vendorId             String?
+  sourceJurisdiction   String
+  destinationJurisdiction String
+  recipientName        String?
+  dataSummary          String?
+  mechanism            PrivacyTransferMechanism
+  supplementaryMeasures String?
+  ownerUserId          String?
+  reviewAt             DateTime?
+  status               PrivacyReviewStatus       @default(REVIEW_REQUIRED)
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  assessments          PrivacyTransferAssessment[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model PrivacyTransferAssessment {
+  id             String          @id @default(uuid())
+  organizationId String
+  transfer       PrivacyTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  transferId     String
+  publicId       String
+  sensitivity    String?
+  governmentAccess String?
+  measures       String?
+  decision       String?
+  ownerUserId    String?
+  reviewAt       DateTime?
+  status         PrivacyReviewStatus @default(IN_PROGRESS)
+  createdAt      DateTime        @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([transferId])
+}
+
+model PrivacyDpia {
+  id             String                    @id @default(uuid())
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  publicId       String
+  activity       PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId     String?
+  title          String
+  trigger        String?
+  scope          String?
+  necessity      String?
+  residualNote   String?
+  enterpriseRiskId String?
+  ownerUserId    String?
+  reviewAt       DateTime?
+  decision       PrivacyDpiaDecision?
+  status         PrivacyReviewStatus       @default(NOT_STARTED)
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  screening      PrivacyDpiaScreening[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model PrivacyDpiaScreening {
+  id             String     @id @default(uuid())
+  organizationId String
+  dpia           PrivacyDpia @relation(fields: [dpiaId], references: [id], onDelete: Cascade)
+  dpiaId         String
+  questionKey    String
+  answer         Boolean
+  createdAt      DateTime   @default(now())
+
+  @@index([dpiaId])
+}
+
+model PrivacyRightsRequest {
+  id                   String                    @id @default(uuid())
+  organization         Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  publicId             String
+  activity             PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId           String?
+  requestType          PrivacyRightsType
+  regime               String
+  requesterRef         String
+  requesterIdentity    String?
+  verificationStatus   PrivacyVerificationStatus @default(NOT_STARTED)
+  receivedAt           DateTime
+  originalDueAt        DateTime?
+  extensionDays        Int?
+  dueAt                DateTime?
+  deadlineWhy          String?
+  ownerUserId          String?
+  status               PrivacyRightsStatus       @default(RECEIVED)
+  decision             String?
+  completedAt          DateTime?
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  tasks                PrivacyRightsTask[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model PrivacyRightsTask {
+  id             String               @id @default(uuid())
+  organizationId String
+  request        PrivacyRightsRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  requestId      String
+  taskType       String
+  targetLabel    String
+  vendorId       String?
+  status         String               @default("OPEN")
+  notes          String?
+  createdAt      DateTime             @default(now())
+
+  @@index([requestId])
+}
+
+model PrivacyConsentRecord {
+  id             String               @id @default(uuid())
+  organizationId String
+  publicId       String
+  purpose        String
+  subjectRef     String
+  choice         PrivacyConsentStatus @default(MANUAL)
+  source         String               @default("MANUAL")
+  noticeVersion  String?
+  withdrawnAt    DateTime?
+  createdAt      DateTime             @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId])
+}
+
+model PrivacyNoticeVersion {
+  id             String                    @id @default(uuid())
+  organizationId String
+  activity       PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId     String?
+  version        String
+  title          String
+  effectiveFrom  DateTime
+  storedObjectId String?
+  createdAt      DateTime                  @default(now())
+  purposes       PrivacyPurpose[]
+
+  @@index([organizationId, effectiveFrom])
+}
+
+model PrivacyRetentionRule {
+  id             String                    @id @default(uuid())
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  publicId       String
+  activity       PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId     String?
+  dataKind       PrivacyDataKind?
+  systemName     String?
+  period         String
+  triggerEvent   String?
+  disposalMethod String?
+  legalHold      Boolean                   @default(false)
+  ownerUserId    String?
+  reviewAt       DateTime?
+  createdAt      DateTime                  @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId])
+}
+
+model PrivacyDeletionTask {
+  id             String                    @id @default(uuid())
+  organizationId String
+  publicId       String
+  activity       PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId     String?
+  status         PrivacyDeletionStatus     @default(REQUESTED)
+  attestation    String?
+  storedObjectId String?
+  ownerUserId    String?
+  dueAt          DateTime?
+  createdAt      DateTime                  @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+}
+
+model PrivacyIncidentLink {
+  id             String                    @id @default(uuid())
+  organizationId String
+  activity       PrivacyProcessingActivity? @relation(fields: [activityId], references: [id])
+  activityId     String?
+  incidentId     String?
+  findingId      String?
+  note           String?
+  createdAt      DateTime                  @default(now())
+
+  @@index([organizationId])
+}
+
+model PrivacyHistory {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  entityType     String
+  entityId       String
+  eventType      String
+  summary        String
+  change         String?
+  actorUserId    String?
+  payload        Json?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, entityType, entityId, createdAt])
+}
+
+model PrivacyCounter {
   organizationId String
   kind           String
   next           Int    @default(1)

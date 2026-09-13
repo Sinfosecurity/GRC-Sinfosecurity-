@@ -43,3 +43,24 @@ Supreme can differentiate where evidence exists: Governance Graph impact, shared
 | UX | Workspace + tables, no UUID labels | Dense enterprise UX | Consumer-simple | Implemented for #16 review | `/compliance` |
 
 Supreme can differentiate on honest readiness language, shared CLEAN evidence, and common-control reuse across programs. It does not claim content-library parity with OneTrust/Archer or automation parity with Vanta/Drata.
+
+## Privacy operations capabilities (#17)
+
+Conceptual benchmark only against OneTrust, TrustArc, Transcend, BigID, Securiti, ServiceNow, and Archer. This is not a claim of superiority.
+
+| Capability category | Supreme equivalent | Market category | Current status | Evidence |
+|---|---|---|---|---|
+| ROPA / processing activities | `PrivacyProcessingActivity` with `PA-00001` | OneTrust / TrustArc / Archer | Implemented as operations workspace, not inventory CRUD | `/privacy-ops/activities` |
+| Data mapping | Structured source → system → process → vendor → storage paths | OneTrust / BigID / Securiti | Implemented as tables and directional paths, not spaghetti visualization | `/privacy-ops/data-map` |
+| DSR / DSAR | `PrivacyRightsRequest` with masked list views | OneTrust / Transcend / Securiti | Implemented. Deadlines are configured, not legal advice | `/privacy-ops/rights` |
+| DPIA / PIA | Screening + assessment + decision | OneTrust / TrustArc | Implemented. Screening recommends review; never “legally required” | `/privacy-ops/dpias` |
+| Vendor / processors | Privacy roles on existing `Vendor` | OneTrust / ServiceNow / Archer | Implemented. No second vendor database | `/privacy/vendors/:id` |
+| Transfers / TIA | `PrivacyTransfer` + assessment | OneTrust / TrustArc | Implemented. Mechanism is recorded, not declared lawful | `/privacy-ops/transfers` |
+| Retention / disposal | Rules + deletion tasks | OneTrust / BigID | Implemented. Surfaces due work; no auto-delete | `/privacy-ops/retention` |
+| Privacy risk | Links to #15 `EnterpriseRisk` | ServiceNow / Archer | Implemented by reuse, not a privacy-only engine | Activity Risks section |
+| Compliance integration | Links to #16 requirements / gaps | OneTrust / ServiceNow | Implemented. No second compliance engine | Graph `REQUIRED_BY` |
+| Evidence reuse | #14 CLEAN evidence via shared controls | OneTrust / ServiceNow | Implemented. Presence is not proof | Control / Evidence sections |
+| Governance Graph | Projected privacy nodes and edges | Limited elsewhere | Implemented as projection only | `PROCESSING_ACTIVITY`, `TRANSFERS_VIA` |
+| UX | `/privacy-ops` workspaces, human IDs | Dense privacy suites | Implemented for Product Leadership review | `/privacy-ops` |
+
+Supreme can differentiate where evidence exists: honest legal language, shared CLEAN evidence, Governance Graph impact, and reuse of Vendor / Risk / Compliance records. It does not claim cookie-consent platform parity with OneTrust or discovery-scale parity with BigID/Securiti.

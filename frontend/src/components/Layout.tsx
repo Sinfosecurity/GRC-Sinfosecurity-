@@ -29,6 +29,7 @@ import {
     AccountTreeOutlined,
     FactCheckOutlined,
     VerifiedUserOutlined,
+    GppGoodOutlined,
     WarningAmberOutlined,
     HistoryOutlined,
     HubOutlined,
@@ -79,6 +80,13 @@ const menuSections: NavSection[] = [
         items: [
             { text: 'Supreme Compliance', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },
             { text: 'Frameworks', path: '/compliance/frameworks', icon: <HubOutlined fontSize="small" />, permission: 'compliance.read' },
+        ],
+    },
+    {
+        title: 'Privacy',
+        items: [
+            { text: 'Supreme Privacy', path: '/privacy-ops', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Processing activities', path: '/privacy-ops/activities', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
         ],
     },
     {

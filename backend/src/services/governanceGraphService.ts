@@ -525,6 +525,21 @@ async function compliancePublicIdClause(organizationId: string, q: string): Prom
         .map((sourceId) => ({ sourceId }));
 }
 
+async function privacyPublicIdClause(organizationId: string, q: string): Promise<Prisma.GovernanceNodeWhereInput[]> {
+    const needle = q.trim();
+    if (!/^(PA|DSR|XFR|DPIA|RET|TIA|DEL|CNS)-/i.test(needle)) return [];
+    const [activity, rights, transfer, dpia, retention] = await Promise.all([
+        prisma.privacyProcessingActivity.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.privacyRightsRequest.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.privacyTransfer.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.privacyDpia.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.privacyRetentionRule.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+    ]);
+    return [activity?.id, rights?.id, transfer?.id, dpia?.id, retention?.id]
+        .filter((id): id is string => Boolean(id))
+        .map((sourceId) => ({ sourceId }));
+}
+
 export async function searchNodes(organizationId: string, query: {
     q?: string;
     nodeType?: GovernanceNodeType;
@@ -544,6 +559,7 @@ export async function searchNodes(organizationId: string, query: {
                       { displayLabel: { contains: query.q, mode: 'insensitive' } },
                       { sourceId: { contains: query.q, mode: 'insensitive' } },
                       ...await compliancePublicIdClause(organizationId, query.q),
+                      ...await privacyPublicIdClause(organizationId, query.q),
                   ],
               }
             : {}),

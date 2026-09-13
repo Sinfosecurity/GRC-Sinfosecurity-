@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #16 Supreme Compliance
+**CURRENT ITEM:** #17 Supreme Privacy
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**CURRENT ITEM STATUS:** AUTHORIZED / IN PROGRESS
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -69,17 +69,26 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#16 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34779911121 PASS on `3c580a1`
 **#16 HOSTED FRONTEND SHA:** `3c580a147930ae4d89c7d812b3506405bb79eac3`
 **#16 HOSTED API SHA:** `3c580a147930ae4d89c7d812b3506405bb79eac3`
-**#17 AUTHORIZED:** NO
+**#16 PROGRAM ACCEPTANCE:** PASS — Product Leadership accepted (2026-09-13)
+**#17 AUTHORIZED:** YES — Product Leadership 2026-09-13
+**#17 STARTING SHA:** `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`
+**#18 AUTHORIZED:** NO
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #17 Supreme Privacy
+
+**STATUS:** AUTHORIZED / IN PROGRESS
+
+See `docs/ADR-SUPREME-PRIVACY.md`. #18 is not authorized. #12 remains PARTIAL.
+
 ### #16 Supreme Compliance
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**STATUS:** PASS — Product Leadership accepted (2026-09-13)
 
-See `docs/ADR-SUPREME-COMPLIANCE.md` and `docs/private-beta/hosted-ux-qa/supreme-compliance/`. #17 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-COMPLIANCE.md` and `docs/private-beta/hosted-ux-qa/supreme-compliance/`. #17 is authorized. #12 remains PARTIAL.
 
 ### #15 Supreme Risk
 
@@ -128,13 +137,13 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Product Leadership final hosted review of #16 Supreme Compliance operations UX. Keep #12 PARTIAL. Do not start #17. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Implement #17 Supreme Privacy. Keep #12 PARTIAL. Do not start #18. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#16 Supreme Compliance** — hosted Product Leadership final review required. Do not start #17.
+**#17 Supreme Privacy** — authorized. Do not start #18.
 
 **#12** remains PARTIAL / open in parallel.
 
@@ -142,7 +151,7 @@ Product Leadership final hosted review of #16 Supreme Compliance operations UX. 
 
 ## DO NOT START
 
-- **#17** or later gates.
+- **#18** or later gates.
 - Production DNS, `main` merge, or production deploy.
 - Live Stripe or commercial sale.
 - External testers without a separate Product Leadership approval.
@@ -174,7 +183,7 @@ Product Leadership final hosted review of #16 Supreme Compliance operations UX. 
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership final hosted review of #16 Supreme Compliance. Do not declare #16 PASS from this file. #15 is accepted. #12 remains PARTIAL until Product Leadership separately changes it. #17 is not authorized.
+Product Leadership hosted review of #17 Supreme Privacy after implementation. Do not declare #17 PASS from this file. #16 is accepted. #12 remains PARTIAL. #18 is not authorized.
 
 ---
 
@@ -209,7 +218,7 @@ Do not invent percentages.
 | 13 | Governance Graph | Product Leadership accepted (2026-09-13) |
 | 14 | Shared Control & Evidence Layer | Product Leadership accepted PASS (2026-09-13) |
 | 15 | Supreme Risk | PASS — Product Leadership accepted (2026-09-13) |
-| 16 | Supreme Compliance | PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED |
+| 16 | Supreme Compliance | PASS — Product Leadership accepted (2026-09-13) |
 | 17–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -299,3 +308,17 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED  
 **SHA:** Closure `3c580a147930ae4d89c7d812b3506405bb79eac3`  
 **EVIDENCE:** Hosted Supreme CI run `34779911121` PASS. Staging frontend and API both `3c580a1`. Operations UX closure recorded in `docs/private-beta/hosted-ux-qa/supreme-compliance/`. Not PASS. #12 remains PARTIAL. #17 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #16 Supreme Compliance  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED -> PASS — Product Leadership accepted  
+**SHA:** Closure `3c580a147930ae4d89c7d812b3506405bb79eac3`; documentation `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`  
+**EVIDENCE:** Explicit Product Leadership acceptance. Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel. #17 authorized separately.
+
+### 2026-09-13
+
+**ITEM:** #17 Supreme Privacy  
+**STATUS CHANGE:** NOT STARTED -> AUTHORIZED / IN PROGRESS  
+**SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`  
+**EVIDENCE:** Explicit Product Leadership authorization. #16 is PASS. #12 remains PARTIAL. #18 is not authorized. Hosted staging remains `3c580a1` until this item deploys. That mismatch is not silently reconciled.

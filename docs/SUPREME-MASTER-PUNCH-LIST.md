@@ -289,13 +289,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Framework packs, control status, and evidence reuse. Legacy ISO/TISAX pages are not this product.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13)
 
-**CERTIFICATION SHA:** Closure `3c580a147930ae4d89c7d812b3506405bb79eac3`. Base implementation `42370e22303fa18b53c92c34d08f279d7f14f4e8`. Starting SHA `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`. Not PASS.
+**CERTIFICATION SHA:** Closure `3c580a147930ae4d89c7d812b3506405bb79eac3`. Base implementation `42370e22303fa18b53c92c34d08f279d7f14f4e8`. Starting SHA `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`.
 
-**EVIDENCE:** `docs/ADR-SUPREME-COMPLIANCE.md`, `docs/private-beta/hosted-ux-qa/supreme-compliance/`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34779911121 PASS. Staging frontend and API both `3c580a1`. Legacy `/compliance` mock is not this product; it remains at `/legacy/compliance`.
+**EVIDENCE:** `docs/ADR-SUPREME-COMPLIANCE.md`, `docs/private-beta/hosted-ux-qa/supreme-compliance/`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34779911121 PASS. Product Leadership accepted. Legacy `/compliance` mock is not this product; it remains at `/legacy/compliance`.
 
-**NEXT ACTION:** Product Leadership final hosted review. Do not start #17. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep closed unless a later gate finds a regression. #17 is authorized. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -307,13 +307,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Privacy objects and workflows with truthful provider status.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** AUTHORIZED / IN PROGRESS
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Not PASS.
 
-**EVIDENCE:** None as a product.
+**EVIDENCE:** Product Leadership authorization 2026-09-13. See `docs/ADR-SUPREME-PRIVACY.md`.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Implement Supreme Privacy on #13–#16. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 
