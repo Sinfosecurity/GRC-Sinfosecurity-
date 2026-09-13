@@ -509,6 +509,22 @@ export async function impact(organizationId: string, nodeId: string, maxDepth = 
     return { ...result, relatedCounts: byType };
 }
 
+async function compliancePublicIdClause(organizationId: string, q: string): Promise<Prisma.GovernanceNodeWhereInput[]> {
+    const needle = q.trim();
+    if (!/^(GAP|EXC|ATT|AUD|ACT|CAM|CRS)-/i.test(needle)) return [];
+    const [gap, exception, attestation, period, activation, campaign] = await Promise.all([
+        prisma.complianceGap.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.complianceException.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.complianceAttestation.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.compliancePeriod.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.complianceActivation.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+        prisma.complianceAttestationCampaign.findFirst({ where: { organizationId, publicId: { equals: needle, mode: 'insensitive' } }, select: { id: true } }),
+    ]);
+    return [gap?.id, exception?.id, attestation?.id, period?.id, activation?.id, campaign?.id]
+        .filter((id): id is string => Boolean(id))
+        .map((sourceId) => ({ sourceId }));
+}
+
 export async function searchNodes(organizationId: string, query: {
     q?: string;
     nodeType?: GovernanceNodeType;
@@ -527,6 +543,7 @@ export async function searchNodes(organizationId: string, query: {
                   OR: [
                       { displayLabel: { contains: query.q, mode: 'insensitive' } },
                       { sourceId: { contains: query.q, mode: 'insensitive' } },
+                      ...await compliancePublicIdClause(organizationId, query.q),
                   ],
               }
             : {}),

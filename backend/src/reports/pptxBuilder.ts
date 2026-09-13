@@ -8,9 +8,33 @@ function xml(value: string): string {
         .replace(/"/g, '&quot;');
 }
 
-function slideXml(title: string, bullets: string[]): string {
-    const lines = [title, ...bullets.slice(0, 8).map((item) => `• ${item}`)].map((line, index) => {
-        const y = 800000 + index * 480000;
+export type BoardSlide = {
+    title: string;
+    bullets?: string[];
+    kpis?: Array<{ label: string; value: string }>;
+    footnote?: string;
+};
+
+function slideXml(title: string, bullets: string[], kpis: Array<{ label: string; value: string }> = [], footnote?: string): string {
+    const kpiShapes = kpis.slice(0, 4).map((kpi, index) => {
+        const x = 457200 + index * 2100000;
+        return `<p:sp>
+      <p:nvSpPr><p:cNvPr id="${20 + index}" name="k${index}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
+      <p:spPr>
+        <a:xfrm><a:off x="${x}" y="1600000"/><a:ext cx="1950000" cy="1100000"/></a:xfrm>
+        <a:prstGeom prst="roundRect"><a:avLst/></a:prstGeom>
+        <a:solidFill><a:srgbClr val="F8FAFC"/></a:solidFill>
+        <a:ln w="12700"><a:solidFill><a:srgbClr val="CBD5E1"/></a:solidFill></a:ln>
+      </p:spPr>
+      <p:txBody>
+        <a:bodyPr anchor="ctr"/><a:lstStyle/>
+        <a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="en-US" sz="2000" b="1" dirty="0"><a:solidFill><a:srgbClr val="0F172A"/></a:solidFill></a:rPr><a:t>${xml(kpi.value.slice(0, 18))}</a:t></a:r></a:p>
+        <a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="en-US" sz="1100" dirty="0"><a:solidFill><a:srgbClr val="475569"/></a:solidFill></a:rPr><a:t>${xml(kpi.label.slice(0, 28))}</a:t></a:r></a:p>
+      </p:txBody>
+    </p:sp>`;
+    }).join('');
+    const lines = [title, ...bullets.slice(0, 8).map((item) => `• ${item}`), ...(footnote ? [footnote] : [])].map((line, index) => {
+        const y = (kpis.length ? 2900000 : 800000) + index * 420000;
         return `<p:sp>
       <p:nvSpPr><p:cNvPr id="${index + 2}" name="t${index}"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>
       <p:spPr>
@@ -31,6 +55,7 @@ function slideXml(title: string, bullets: string[]): string {
     <p:spTree>
       <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
       <p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>
+      ${kpiShapes}
       ${lines}
     </p:spTree>
   </p:cSld>
@@ -38,7 +63,7 @@ function slideXml(title: string, bullets: string[]): string {
 </p:sld>`;
 }
 
-export async function buildPptx(slides: Array<{ title: string; bullets: string[] }>): Promise<Buffer> {
+export async function buildPptx(slides: Array<BoardSlide | { title: string; bullets: string[] }>): Promise<Buffer> {
     const zip = new JSZip();
     zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
@@ -64,7 +89,7 @@ export async function buildPptx(slides: Array<{ title: string; bullets: string[]
   <p:notesSz cx="6858000" cy="9144000"/>
 </p:presentation>`);
     slides.forEach((slide, index) => {
-        zip.file(`ppt/slides/slide${index + 1}.xml`, slideXml(slide.title, slide.bullets));
+        zip.file(`ppt/slides/slide${index + 1}.xml`, slideXml(slide.title, slide.bullets || [], 'kpis' in slide ? slide.kpis || [] : [], 'footnote' in slide ? slide.footnote : undefined));
     });
     return zip.generateAsync({ type: 'nodebuffer', mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
 }

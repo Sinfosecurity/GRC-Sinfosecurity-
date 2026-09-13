@@ -25,10 +25,13 @@ import { notifyUser } from './notificationDeliveryService';
 import {
     buildReadiness,
     COMPLIANCE_HONESTY,
+    daysBetween,
     evidenceCoverageLabel,
     humanComplianceLabel,
     neutralizeSpreadsheetCell,
     nextComplianceId,
+    rankAttention,
+    type AttentionItem,
 } from './enterpriseComplianceEngine';
 
 const USABLE_EVIDENCE = ['SUPPORTS', 'PARTIALLY_SUPPORTS'] as const;
@@ -109,6 +112,101 @@ async function projectActivation(organizationId: string, activation: { id: strin
         status: activation.status,
         actorUserId,
     });
+}
+
+async function projectScopedGap(organizationId: string, gap: {
+    id: string;
+    publicId: string;
+    title: string;
+    activationId?: string | null;
+    requirementStateId?: string | null;
+    organizationControlId?: string | null;
+    findingId?: string | null;
+    enterpriseRiskId?: string | null;
+}, actorUserId?: string | null) {
+    const hasRelationship = Boolean(gap.requirementStateId || gap.organizationControlId || gap.findingId || gap.enterpriseRiskId || gap.activationId);
+    if (!hasRelationship) return;
+    const gapNode = await ensureNode({
+        organizationId,
+        nodeType: GovernanceNodeType.COMPLIANCE_GAP,
+        sourceModel: 'ComplianceGap',
+        sourceId: gap.id,
+        displayLabel: `${gap.publicId} ${gap.title}`.trim(),
+        actorUserId,
+    });
+    if (gap.organizationControlId) {
+        const controlNode = await ensureNode({
+            organizationId,
+            nodeType: GovernanceNodeType.CONTROL,
+            sourceModel: 'OrganizationControl',
+            sourceId: gap.organizationControlId,
+            displayLabel: 'Control',
+            actorUserId,
+        });
+        await createRelationship({
+            organizationId,
+            fromNodeId: gapNode.node.id,
+            toNodeId: controlNode.node.id,
+            relationshipType: GovernanceRelationshipType.ASSOCIATED_WITH,
+            createdBy: actorUserId,
+        });
+    }
+    if (gap.enterpriseRiskId) {
+        const risk = await prisma.enterpriseRisk.findFirst({ where: { organizationId, id: gap.enterpriseRiskId } });
+        if (risk) {
+            const riskNode = await ensureNode({
+                organizationId,
+                nodeType: GovernanceNodeType.RISK,
+                sourceModel: 'EnterpriseRisk',
+                sourceId: risk.id,
+                displayLabel: `${risk.publicId} ${risk.title}`,
+                actorUserId,
+            });
+            await createRelationship({
+                organizationId,
+                fromNodeId: gapNode.node.id,
+                toNodeId: riskNode.node.id,
+                relationshipType: GovernanceRelationshipType.ASSOCIATED_WITH,
+                createdBy: actorUserId,
+            });
+        }
+    }
+}
+
+async function projectScopedException(organizationId: string, exception: {
+    id: string;
+    publicId: string;
+    scope: string;
+    organizationControlId?: string | null;
+    requirementStateId?: string | null;
+    activationId?: string | null;
+}, actorUserId?: string | null) {
+    if (!exception.organizationControlId && !exception.requirementStateId && !exception.activationId) return;
+    const exceptionNode = await ensureNode({
+        organizationId,
+        nodeType: GovernanceNodeType.EXCEPTION,
+        sourceModel: 'ComplianceException',
+        sourceId: exception.id,
+        displayLabel: `${exception.publicId} ${exception.scope}`.trim(),
+        actorUserId,
+    });
+    if (exception.organizationControlId) {
+        const controlNode = await ensureNode({
+            organizationId,
+            nodeType: GovernanceNodeType.CONTROL,
+            sourceModel: 'OrganizationControl',
+            sourceId: exception.organizationControlId,
+            displayLabel: 'Control',
+            actorUserId,
+        });
+        await createRelationship({
+            organizationId,
+            fromNodeId: exceptionNode.node.id,
+            toNodeId: controlNode.node.id,
+            relationshipType: GovernanceRelationshipType.APPLIES_TO,
+            createdBy: actorUserId,
+        });
+    }
 }
 
 function usableEvidenceWhere(organizationId: string) {
@@ -249,14 +347,8 @@ export const enterpriseComplianceService = {
         ]);
         const overdueCampaigns = campaigns.filter((row) => row.dueAt && row.dueAt < now && row.status !== 'CLOSED');
         const expiredExceptions = exceptions.filter((row) => row.status === 'EXPIRED' || (row.expiresAt && row.expiresAt < now && row.status === 'APPROVED'));
-        const attention = [
-            ...overdueCampaigns.map((row) => ({ kind: 'Overdue attestations', title: row.name, href: `/compliance/campaigns/${row.publicId}`, publicId: row.publicId })),
-            ...expiredExceptions.map((row) => ({ kind: 'Expired exceptions', title: row.scope, href: `/compliance/exceptions`, publicId: row.publicId })),
-            ...gaps.filter((row) => row.source === 'UNMAPPED').slice(0, 8).map((row) => ({ kind: 'Requirements with no mapped controls', title: row.title, href: `/compliance/gaps`, publicId: row.publicId })),
-            ...gaps.filter((row) => row.source === 'FAILED_TEST').slice(0, 6).map((row) => ({ kind: 'Failed control tests', title: row.title, href: `/compliance/gaps`, publicId: row.publicId })),
-            ...gaps.filter((row) => row.source === 'EVIDENCE_EXPIRED').slice(0, 6).map((row) => ({ kind: 'Expired evidence', title: row.title, href: `/compliance/gaps`, publicId: row.publicId })),
-            ...periods.filter((row) => row.endAt && row.endAt < now).map((row) => ({ kind: 'Upcoming framework/audit deadlines', title: row.name, href: `/compliance/audits/${row.publicId}`, publicId: row.publicId })),
-        ].slice(0, 16);
+        await this.projectLiveGraph(organizationId);
+        const attention = await this.attentionQueue(organizationId);
         return {
             honesty: COMPLIANCE_HONESTY,
             totals: {
@@ -272,6 +364,7 @@ export const enterpriseComplianceService = {
             campaigns: campaigns.map((row) => ({ publicId: row.publicId, name: row.name, status: humanComplianceLabel(row.dueAt && row.dueAt < now && row.status !== 'CLOSED' ? 'OVERDUE' : row.status), dueAt: row.dueAt })),
             periods: periods.map((row) => ({ publicId: row.publicId, name: row.name, status: humanComplianceLabel(row.status), endAt: row.endAt })),
             attention,
+            attentionCount: attention.length,
             changed: changed.map((row) => ({
                 title: row.eventType,
                 change: row.change,
@@ -281,6 +374,253 @@ export const enterpriseComplianceService = {
                 entityType: row.entityType,
             })),
         };
+    },
+
+    async projectLiveGraph(organizationId: string) {
+        const [gaps, exceptions, attestations, periods] = await Promise.all([
+            prisma.complianceGap.findMany({ where: { organizationId, status: { not: 'CLOSED' } }, take: 80 }),
+            prisma.complianceException.findMany({ where: { organizationId, status: { not: 'CLOSED' } }, take: 40 }),
+            prisma.complianceAttestation.findMany({ where: { organizationId }, take: 40 }),
+            prisma.compliancePeriod.findMany({ where: { organizationId }, take: 20 }),
+        ]);
+        for (const gap of gaps) await projectScopedGap(organizationId, gap);
+        for (const exception of exceptions) await projectScopedException(organizationId, exception);
+        for (const attestation of attestations) {
+            await ensureNode({
+                organizationId,
+                nodeType: GovernanceNodeType.ATTESTATION,
+                sourceModel: 'ComplianceAttestation',
+                sourceId: attestation.id,
+                displayLabel: attestation.publicId,
+            });
+        }
+        for (const period of periods) {
+            await ensureNode({
+                organizationId,
+                nodeType: GovernanceNodeType.COMPLIANCE_PERIOD,
+                sourceModel: 'CompliancePeriod',
+                sourceId: period.id,
+                displayLabel: `${period.publicId} ${period.name}`,
+            });
+        }
+    },
+
+    async attentionQueue(organizationId: string): Promise<AttentionItem[]> {
+        const now = new Date();
+        const soon = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const activations = await prisma.complianceActivation.findMany({
+            where: { organizationId, status: { not: 'CLOSED' } },
+            include: { frameworkVersion: { include: { framework: true } } },
+        });
+        const activationIds = activations.map((row) => row.id);
+        const programLabel = (activationId?: string | null) => {
+            const row = activations.find((item) => item.id === activationId);
+            return row ? `${row.frameworkVersion.framework.name} ${row.frameworkVersion.version}` : null;
+        };
+        const [gaps, exceptions, campaigns, assignments, periods, states] = await Promise.all([
+            prisma.complianceGap.findMany({
+                where: { organizationId, status: { not: 'CLOSED' } },
+                include: { requirementState: { include: { requirement: true } } },
+                take: 80,
+            }),
+            prisma.complianceException.findMany({ where: { organizationId, status: { in: ['REQUESTED', 'APPROVED', 'EXPIRED'] } } }),
+            prisma.complianceAttestationCampaign.findMany({ where: { organizationId, status: { not: 'CLOSED' } } }),
+            prisma.complianceCampaignAssignment.findMany({ where: { organizationId } }),
+            prisma.compliancePeriod.findMany({ where: { organizationId, status: { in: ['PREPARING', 'IN_PROGRESS'] } } }),
+            prisma.complianceRequirementState.findMany({
+                where: { organizationId, activationId: { in: activationIds }, applicability: 'APPLICABLE' },
+                include: { requirement: { include: { mappings: { where: { validTo: null } } } }, activation: true },
+            }),
+        ]);
+        const mappedControlIds = [...new Set(states.flatMap((state) => state.requirement.mappings.map((map) => map.organizationControlId || map.catalogEntryId).filter(Boolean)))] as string[];
+        const controls = mappedControlIds.length
+            ? await prisma.organizationControl.findMany({
+                where: { organizationId, OR: [{ id: { in: mappedControlIds } }, { catalogEntryId: { in: mappedControlIds } }] },
+                include: { tests: { orderBy: { testedAt: 'desc' }, take: 1 } },
+            })
+            : [];
+        const evidenceLinks = await prisma.evidenceGovernanceLink.findMany({
+            where: { organizationId, validTo: null, targetType: 'CONTROL', targetId: { in: controls.map((row) => row.id) } },
+            include: { storedObject: true },
+        });
+        const findingIds = [...new Set([
+            ...gaps.map((row) => row.findingId).filter(Boolean),
+            ...controls.flatMap((row) => row.tests.map((test) => test.findingId).filter(Boolean)),
+        ])] as string[];
+        const findings = findingIds.length
+            ? await prisma.vendorIssue.findMany({
+                where: { organizationId, id: { in: findingIds }, severity: { in: ['HIGH', 'CRITICAL'] }, status: { notIn: ['CLOSED', 'RESOLVED', 'RISK_ACCEPTED'] } },
+            })
+            : [];
+        const ownerIds = [
+            ...activations.map((row) => row.ownerUserId),
+            ...exceptions.map((row) => row.ownerUserId),
+            ...campaigns.map((row) => row.ownerUserId),
+            ...assignments.map((row) => row.attestorUserId),
+            ...states.map((row) => row.ownerUserId),
+            ...findings.map((row) => row.assignedTo),
+        ];
+        const names = await userNames(organizationId, ownerIds);
+        const items: AttentionItem[] = [];
+        for (const campaign of campaigns.filter((row) => row.dueAt && row.dueAt < now && row.status !== 'CLOSED')) {
+            items.push({
+                type: 'Overdue attestations',
+                why: `${campaign.name} passed its due date without closing.`,
+                framework: programLabel(campaign.activationId),
+                related: campaign.publicId,
+                owner: ownerLabel(names, campaign.ownerUserId),
+                dueAt: campaign.dueAt!.toISOString(),
+                ageDays: daysBetween(campaign.dueAt!),
+                severity: 'High',
+                href: `/compliance/campaigns/${campaign.publicId}`,
+                publicId: campaign.publicId,
+                priority: 1,
+            });
+        }
+        for (const assignment of assignments) {
+            const campaign = campaigns.find((row) => row.id === assignment.campaignId);
+            if (!campaign?.dueAt || campaign.dueAt >= now || campaign.status === 'CLOSED') continue;
+            items.push({
+                type: 'Overdue attestations',
+                why: 'An assigned attestor has not closed this campaign before the due date.',
+                framework: programLabel(campaign.activationId),
+                related: campaign.publicId,
+                owner: ownerLabel(names, assignment.attestorUserId),
+                dueAt: campaign.dueAt.toISOString(),
+                ageDays: daysBetween(campaign.dueAt),
+                severity: 'High',
+                href: `/compliance/campaigns/${campaign.publicId}`,
+                publicId: `${campaign.publicId}:${assignment.id}`,
+                priority: 1,
+            });
+        }
+        for (const control of controls.filter((row) => row.implementationStatus === 'IMPLEMENTED' && (!row.tests[0] || row.tests[0].result === 'NOT_TESTED'))) {
+            items.push({
+                type: 'Implemented controls that are not tested',
+                why: `${control.controlKey} is implemented. Not tested is not pass.`,
+                framework: activations[0] ? `${activations[0].frameworkVersion.framework.name} ${activations[0].frameworkVersion.version}` : null,
+                related: control.controlKey,
+                owner: ownerLabel(names, control.ownerUserId),
+                dueAt: control.nextTestAt?.toISOString() || null,
+                ageDays: daysBetween(control.updatedAt),
+                severity: 'Medium',
+                href: `/control-center/${control.id}`,
+                publicId: control.controlKey,
+                priority: 3,
+            });
+        }
+        for (const control of controls.filter((row) => row.tests[0]?.result === 'FAIL')) {
+            items.push({
+                type: 'Failed control tests',
+                why: `${control.controlKey} failed its latest recorded test.`,
+                framework: null,
+                related: control.controlKey,
+                owner: ownerLabel(names, control.ownerUserId),
+                dueAt: control.tests[0]?.testedAt?.toISOString() || null,
+                ageDays: control.tests[0]?.testedAt ? daysBetween(control.tests[0].testedAt) : null,
+                severity: 'High',
+                href: `/control-center/${control.id}`,
+                publicId: `${control.controlKey}-fail`,
+                priority: 2,
+            });
+        }
+        for (const finding of findings) {
+            items.push({
+                type: 'Open high-severity findings',
+                why: `${humanComplianceLabel(finding.severity)} finding remains open and is tied to an activated compliance program.`,
+                framework: null,
+                related: finding.title,
+                owner: ownerLabel(names, finding.assignedTo),
+                dueAt: finding.targetRemediationDate?.toISOString() || null,
+                ageDays: daysBetween(finding.identifiedDate),
+                severity: humanComplianceLabel(finding.severity),
+                href: '/findings',
+                publicId: `finding-${finding.title.slice(0, 40)}`,
+                priority: finding.severity === 'CRITICAL' ? 1 : 2,
+            });
+        }
+        for (const link of evidenceLinks) {
+            const expired = link.freshness === 'EXPIRED' || (link.expiresAt && link.expiresAt < now);
+            const expiring = !expired && (link.freshness === 'EXPIRING' || (link.expiresAt && link.expiresAt <= soon));
+            if (!expired && !expiring) continue;
+            const control = controls.find((row) => row.id === link.targetId);
+            items.push({
+                type: expired ? 'Expired evidence' : 'Expiring evidence',
+                why: expired
+                    ? `${link.storedObject.filename} is expired. A file is not compliance.`
+                    : `${link.storedObject.filename} expires within the configured 30-day threshold.`,
+                framework: null,
+                related: control?.controlKey || null,
+                owner: null,
+                dueAt: link.expiresAt?.toISOString() || null,
+                ageDays: link.expiresAt ? daysBetween(link.expiresAt) : null,
+                severity: expired ? 'High' : 'Medium',
+                href: '/control-center',
+                publicId: link.id,
+                priority: expired ? 2 : 4,
+            });
+        }
+        for (const exception of exceptions.filter((row) => row.status === 'EXPIRED' || (row.expiresAt && row.expiresAt < now && row.status === 'APPROVED'))) {
+            items.push({
+                type: 'Expired exceptions',
+                why: `${exception.publicId} reached its end date. An exception does not make the control effective.`,
+                framework: programLabel(exception.activationId),
+                related: exception.scope,
+                owner: ownerLabel(names, exception.ownerUserId),
+                dueAt: exception.expiresAt?.toISOString() || null,
+                ageDays: exception.expiresAt ? daysBetween(exception.expiresAt) : null,
+                severity: 'High',
+                href: '/compliance/exceptions',
+                publicId: exception.publicId,
+                priority: 2,
+            });
+        }
+        for (const gap of gaps.filter((row) => row.source === 'UNMAPPED')) {
+            items.push({
+                type: 'Requirements with no mapped controls',
+                why: gap.title,
+                framework: programLabel(gap.activationId),
+                related: gap.requirementState?.requirement.requirementKey || gap.publicId,
+                owner: ownerLabel(names, gap.ownerUserId),
+                dueAt: gap.dueDate?.toISOString() || null,
+                ageDays: daysBetween(gap.createdAt),
+                severity: 'High',
+                href: '/compliance/gaps',
+                publicId: gap.publicId,
+                priority: 2,
+            });
+        }
+        for (const period of periods.filter((row) => row.endAt && row.endAt < now)) {
+            items.push({
+                type: 'Overdue compliance/audit deadlines',
+                why: `${period.name} ended and is still open.`,
+                framework: programLabel(period.activationId),
+                related: period.publicId,
+                owner: ownerLabel(names, period.ownerUserId),
+                dueAt: period.endAt!.toISOString(),
+                ageDays: daysBetween(period.endAt!),
+                severity: 'High',
+                href: `/compliance/audits/${period.publicId}`,
+                publicId: period.publicId,
+                priority: 2,
+            });
+        }
+        for (const activation of activations.filter((row) => row.targetDate && row.targetDate < now)) {
+            items.push({
+                type: 'Overdue compliance/audit deadlines',
+                why: `${activation.frameworkVersion.framework.name} ${activation.frameworkVersion.version} passed its target date.`,
+                framework: `${activation.frameworkVersion.framework.name} ${activation.frameworkVersion.version}`,
+                related: activation.publicId,
+                owner: ownerLabel(names, activation.ownerUserId),
+                dueAt: activation.targetDate!.toISOString(),
+                ageDays: daysBetween(activation.targetDate!),
+                severity: 'Medium',
+                href: `/compliance/frameworks/${activation.publicId}`,
+                publicId: activation.publicId,
+                priority: 3,
+            });
+        }
+        return rankAttention(items);
     },
 
     async readinessFor(organizationId: string, activationId: string) {
@@ -379,6 +719,12 @@ export const enterpriseComplianceService = {
             statusKey: activation.status,
             readiness,
             remainingWork: this.remainingWork(readiness, states, gaps),
+            existingReuse: await this.existingReuse(organizationId, activation.id),
+            crumbs: [
+                { label: 'Compliance', href: '/compliance' },
+                { label: activation.frameworkVersion.framework.name, href: '/compliance/frameworks' },
+                { label: activation.frameworkVersion.version },
+            ],
             requirements: states,
             gaps: gaps.map((row) => ({ publicId: row.publicId, title: row.title, source: humanComplianceLabel(row.source), status: humanComplianceLabel(row.status) })),
             exceptions: exceptions.map((row) => ({ publicId: row.publicId, scope: row.scope, type: humanComplianceLabel(row.type), status: humanComplianceLabel(row.status), expiresAt: row.expiresAt })),
@@ -390,14 +736,52 @@ export const enterpriseComplianceService = {
 
     remainingWork(readiness: Awaited<ReturnType<typeof buildReadiness>>, states: Array<{ applicability: string; mapped: boolean }>, gaps: Array<{ status: string }>) {
         const unmapped = states.filter((row) => row.applicability === 'Applicable' && !row.mapped).length;
-        const openGaps = gaps.filter((row) => row.status !== 'CLOSED').length;
+        const openGaps = gaps.filter((row) => row.status !== 'CLOSED' && row.status !== 'Closed').length;
         return {
             unmappedRequirements: unmapped,
             openGaps,
             notDetermined: readiness.totals.notDetermined,
+            mappedDisplay: readiness.metrics.requirementCoverage.display,
+            evidenceDisplay: readiness.metrics.evidenceCoverage.display,
+            testedDisplay: readiness.metrics.testingCoverage.display,
             message: readiness.calculable
-                ? `${readiness.metrics.requirementCoverage.percent ?? 0}% of applicable requirements are mapped. ${readiness.metrics.evidenceCoverage.percent ?? 0}% already have current evidence. ${unmapped} requirements remain unmapped. ${openGaps} gaps are open.`
+                ? `${readiness.metrics.requirementCoverage.display} of applicable requirements are mapped. ${readiness.metrics.evidenceCoverage.display} already have current evidence. ${unmapped} requirements remain unmapped. ${openGaps} gaps are open.`
                 : readiness.emptyReason,
+        };
+    },
+
+    async existingReuse(organizationId: string, activationId: string) {
+        const states = await prisma.complianceRequirementState.findMany({
+            where: { organizationId, activationId },
+            include: { requirement: { include: { mappings: { where: { validTo: null } } } } },
+        });
+        const mappedIds = [...new Set(states.flatMap((row) => row.requirement.mappings.map((map) => map.organizationControlId || map.catalogEntryId).filter(Boolean)))] as string[];
+        const controls = mappedIds.length
+            ? await prisma.organizationControl.findMany({
+                where: { organizationId, OR: [{ id: { in: mappedIds } }, { catalogEntryId: { in: mappedIds } }] },
+                include: { tests: { orderBy: { testedAt: 'desc' }, take: 1 } },
+            })
+            : [];
+        const evidence = controls.length
+            ? await prisma.evidenceGovernanceLink.findMany({
+                where: { ...usableEvidenceWhere(organizationId), targetType: 'CONTROL', targetId: { in: controls.map((row) => row.id) }, freshness: { in: [EvidenceFreshness.CURRENT, EvidenceFreshness.EXPIRING] } },
+            })
+            : [];
+        const exceptions = await prisma.complianceException.count({ where: { organizationId, activationId, status: { in: ['REQUESTED', 'APPROVED'] } } });
+        const relatedRisks = await prisma.complianceGap.count({ where: { organizationId, activationId, enterpriseRiskId: { not: null } } });
+        const mappedControls = controls.length;
+        const testedControls = controls.filter((row) => row.tests[0] && TESTED_RESULTS.includes(row.tests[0].result as typeof TESTED_RESULTS[number])).length;
+        const implementedGaps = controls.filter((row) => row.implementationStatus !== 'IMPLEMENTED').length;
+        const cleanEvidence = new Set(evidence.map((row) => row.storedObjectId)).size;
+        return {
+            mappedControls,
+            cleanEvidence,
+            testedControls,
+            implementationGaps: implementedGaps,
+            evidenceGaps: Math.max(0, mappedControls - cleanEvidence),
+            exceptions,
+            relatedRisks,
+            message: `${mappedControls} common controls are already mapped. ${cleanEvidence} CLEAN evidence item${cleanEvidence === 1 ? '' : 's'} can be reused. ${testedControls} mapped control${testedControls === 1 ? '' : 's'} already have a recorded test. ${implementedGaps} remaining implementation gap${implementedGaps === 1 ? '' : 's'}. ${Math.max(0, mappedControls - cleanEvidence)} remaining evidence gap${mappedControls - cleanEvidence === 1 ? '' : 's'}. ${exceptions} open exception${exceptions === 1 ? '' : 's'}. ${relatedRisks} related risk link${relatedRisks === 1 ? '' : 's'}.`,
         };
     },
 
@@ -519,9 +903,21 @@ export const enterpriseComplianceService = {
                 : Promise.resolve([]),
         ]);
         const cleanExisting = evidence.filter((link) => link.storedObject.scanStatus === 'CLEAN' && USABLE_EVIDENCE.includes(link.relationship as typeof USABLE_EVIDENCE[number]));
+        const storedIds = [...new Set(evidence.map((link) => link.storedObjectId))];
+        const reuseLinks = storedIds.length
+            ? await prisma.evidenceGovernanceLink.findMany({ where: { organizationId, storedObjectId: { in: storedIds }, validTo: null } })
+            : [];
+        const reuseRequirementIds = reuseLinks.filter((link) => link.targetType === 'REQUIREMENT').map((link) => link.targetId);
+        const reuseStates = reuseRequirementIds.length
+            ? await prisma.complianceRequirementState.findMany({
+                where: { organizationId, requirementId: { in: reuseRequirementIds } },
+                include: { activation: { include: { frameworkVersion: { include: { framework: true } } } } },
+            })
+            : [];
         return {
             honesty: COMPLIANCE_HONESTY,
             publicId: state.publicId,
+            frameworkRequirementId: state.requirementId,
             requirementKey: state.requirement.requirementKey,
             summary: state.requirement.supremeSummary,
             sourceUrl: state.requirement.sourceUrl,
@@ -550,18 +946,28 @@ export const enterpriseComplianceService = {
                     nextTestAt: latest?.nextTestAt || control.nextTestAt,
                 };
             }),
-            evidence: evidence.map((link) => ({
-                id: link.id,
-                filename: link.storedObject.filename,
-                coverage: evidenceCoverageLabel({
-                    scanStatus: link.storedObject.scanStatus,
-                    freshness: link.freshness,
-                    expiresAt: link.expiresAt,
-                    relationship: link.relationship,
-                }),
-                relationship: humanComplianceLabel(link.relationship),
-                usable: link.storedObject.scanStatus === 'CLEAN' && USABLE_EVIDENCE.includes(link.relationship as typeof USABLE_EVIDENCE[number]),
-            })),
+            evidence: evidence.map((link) => {
+                const objectLinks = reuseLinks.filter((row) => row.storedObjectId === link.storedObjectId);
+                const programs = [...new Set(reuseStates.filter((row) => objectLinks.some((item) => item.targetType === 'REQUIREMENT' && item.targetId === row.requirementId)).map((row) => row.activation.frameworkVersion.framework.name))];
+                return {
+                    id: link.id,
+                    storedObjectId: link.storedObjectId,
+                    filename: link.storedObject.filename,
+                    coverage: evidenceCoverageLabel({
+                        scanStatus: link.storedObject.scanStatus,
+                        freshness: link.freshness,
+                        expiresAt: link.expiresAt,
+                        relationship: link.relationship,
+                    }),
+                    relationship: humanComplianceLabel(link.relationship),
+                    usable: link.storedObject.scanStatus === 'CLEAN' && USABLE_EVIDENCE.includes(link.relationship as typeof USABLE_EVIDENCE[number]),
+                    reuse: {
+                        controls: objectLinks.filter((row) => row.targetType === 'CONTROL').length,
+                        requirements: objectLinks.filter((row) => row.targetType === 'REQUIREMENT').length,
+                        programs: programs.length,
+                    },
+                };
+            }),
             existingEvidenceOffer: cleanExisting.length
                 ? `${cleanExisting.length} CLEAN evidence item${cleanExisting.length === 1 ? '' : 's'} already support this requirement or its mapped controls. Use existing evidence before uploading a new file.`
                 : 'No CLEAN reusable evidence is linked yet. Upload only if nothing existing applies.',
@@ -727,7 +1133,7 @@ export const enterpriseComplianceService = {
             );
             if (match) continue;
             const linkedFinding = item.findingId || null;
-            await prisma.complianceGap.create({
+            const createdGap = await prisma.complianceGap.create({
                 data: {
                     organizationId,
                     publicId: await nextId(organizationId, 'GAP'),
@@ -742,6 +1148,7 @@ export const enterpriseComplianceService = {
                 },
             });
             created += 1;
+            await projectScopedGap(organizationId, createdGap, actorUserId);
         }
         if (created) {
             await history(organizationId, 'ACTIVATION', activation.id, 'Gaps refreshed', `${created} gap${created === 1 ? '' : 's'} opened from live control, evidence, and test records.`, actorUserId);
@@ -792,34 +1199,7 @@ export const enterpriseComplianceService = {
                 status: input.findingId ? 'LINKED_FINDING' : 'OPEN',
             },
         });
-        if (input.enterpriseRiskId) {
-            const risk = await prisma.enterpriseRisk.findFirst({ where: { organizationId, id: input.enterpriseRiskId } });
-            if (risk) {
-                const gapNode = await ensureNode({
-                    organizationId,
-                    nodeType: GovernanceNodeType.COMPLIANCE_GAP,
-                    sourceModel: 'ComplianceGap',
-                    sourceId: gap.id,
-                    displayLabel: gap.publicId,
-                    actorUserId,
-                });
-                const riskNode = await ensureNode({
-                    organizationId,
-                    nodeType: GovernanceNodeType.RISK,
-                    sourceModel: 'EnterpriseRisk',
-                    sourceId: risk.id,
-                    displayLabel: `${risk.publicId} ${risk.title}`,
-                    actorUserId,
-                });
-                await createRelationship({
-                    organizationId,
-                    fromNodeId: gapNode.node.id,
-                    toNodeId: riskNode.node.id,
-                    relationshipType: GovernanceRelationshipType.ASSOCIATED_WITH,
-                    createdBy: actorUserId,
-                });
-            }
-        }
+        await projectScopedGap(organizationId, gap, actorUserId);
         await history(organizationId, 'GAP', gap.id, 'Gap opened', gap.title, actorUserId);
         await audit({ organizationId, actorUserId, action: 'compliance.gap.opened', resourceType: 'ComplianceGap', resourceId: gap.id });
         return gap;
@@ -882,33 +1262,7 @@ export const enterpriseComplianceService = {
                 enterpriseRiskId: input.enterpriseRiskId || null,
             },
         });
-        if (input.organizationControlId || input.requirementStateId) {
-            const exceptionNode = await ensureNode({
-                organizationId,
-                nodeType: GovernanceNodeType.EXCEPTION,
-                sourceModel: 'ComplianceException',
-                sourceId: exception.id,
-                displayLabel: exception.publicId,
-                actorUserId,
-            });
-            if (input.organizationControlId) {
-                const controlNode = await ensureNode({
-                    organizationId,
-                    nodeType: GovernanceNodeType.CONTROL,
-                    sourceModel: 'OrganizationControl',
-                    sourceId: input.organizationControlId,
-                    displayLabel: 'Control',
-                    actorUserId,
-                });
-                await createRelationship({
-                    organizationId,
-                    fromNodeId: exceptionNode.node.id,
-                    toNodeId: controlNode.node.id,
-                    relationshipType: GovernanceRelationshipType.APPLIES_TO,
-                    createdBy: actorUserId,
-                });
-            }
-        }
+        await projectScopedException(organizationId, exception, actorUserId);
         await history(organizationId, 'EXCEPTION', exception.id, 'Exception requested', exception.scope, actorUserId);
         await audit({ organizationId, actorUserId, action: 'compliance.exception.requested', resourceType: 'ComplianceException', resourceId: exception.id });
         return exception;
@@ -991,18 +1345,97 @@ export const enterpriseComplianceService = {
         const status = campaign.dueAt && campaign.dueAt < now && campaign.status !== 'CLOSED' && campaign.status !== 'REVIEWED'
             ? 'OVERDUE'
             : campaign.status;
+        const controlIds = [...new Set([
+            ...campaign.assignments.map((row) => row.organizationControlId).filter(Boolean),
+            ...campaign.attestations.map((row) => row.organizationControlId),
+        ])] as string[];
+        const controls = controlIds.length
+            ? await prisma.organizationControl.findMany({ where: { organizationId, id: { in: controlIds } } })
+            : [];
+        const requirementIds = campaign.attestations.map((row) => row.requirementStateId).filter(Boolean) as string[];
+        const requirements = requirementIds.length
+            ? await prisma.complianceRequirementState.findMany({
+                where: { organizationId, id: { in: requirementIds } },
+                include: { requirement: true },
+            })
+            : [];
+        const evidence = controlIds.length
+            ? await prisma.evidenceGovernanceLink.findMany({
+                where: { organizationId, validTo: null, targetType: 'CONTROL', targetId: { in: controlIds } },
+                include: { storedObject: true },
+            })
+            : [];
+        const names = await userNames(organizationId, [
+            campaign.ownerUserId,
+            ...campaign.assignments.flatMap((row) => [row.attestorUserId, row.reviewerUserId]),
+            ...campaign.attestations.flatMap((row) => [row.attestorUserId, row.reviewerUserId]),
+        ]);
+        const queue = campaign.attestations.map((attestation) => {
+            const control = controls.find((row) => row.id === attestation.organizationControlId);
+            const requirement = requirements.find((row) => row.id === attestation.requirementStateId);
+            const links = evidence.filter((link) => link.targetId === attestation.organizationControlId);
+            const overdue = Boolean(campaign.dueAt && campaign.dueAt < now && attestation.reviewStatus === 'PENDING');
+            const reviewKey = overdue
+                ? 'OVERDUE'
+                : attestation.reviewStatus === 'REVIEWED' || attestation.reviewStatus === 'REJECTED'
+                    ? attestation.reviewStatus
+                    : 'SUBMITTED';
+            return {
+                publicId: attestation.publicId,
+                control: control ? `${control.controlKey} · ${control.title}` : 'Unassigned control',
+                requirement: requirement?.requirement.requirementKey || null,
+                attestor: ownerLabel(names, attestation.attestorUserId),
+                reviewer: ownerLabel(names, attestation.reviewerUserId),
+                attestationStatus: humanComplianceLabel(attestation.status),
+                reviewStatus: humanComplianceLabel(overdue ? 'OVERDUE' : attestation.reviewStatus),
+                filterKey: reviewKey,
+                submittedAt: attestation.attestedAt,
+                dueAt: campaign.dueAt,
+                evidenceCount: links.length,
+                evidenceState: links[0]
+                    ? evidenceCoverageLabel({ scanStatus: links[0].storedObject.scanStatus, freshness: links[0].freshness, expiresAt: links[0].expiresAt, relationship: links[0].relationship })
+                    : 'Evidence missing',
+                notes: attestation.reviewNotes || attestation.statement,
+                overdue,
+                honesty: 'This is a governance statement. Review does not change control effectiveness.',
+            };
+        });
+        for (const assignment of campaign.assignments) {
+            const hasAttestation = campaign.attestations.some((row) => row.attestorUserId === assignment.attestorUserId && (!assignment.organizationControlId || row.organizationControlId === assignment.organizationControlId));
+            if (hasAttestation) continue;
+            const control = controls.find((row) => row.id === assignment.organizationControlId);
+            const overdue = Boolean(campaign.dueAt && campaign.dueAt < now);
+            queue.push({
+                publicId: `assignment-${assignment.id.slice(0, 8)}`,
+                control: control ? `${control.controlKey} · ${control.title}` : 'Campaign assignment',
+                requirement: null,
+                attestor: ownerLabel(names, assignment.attestorUserId),
+                reviewer: ownerLabel(names, assignment.reviewerUserId),
+                attestationStatus: 'Not started',
+                reviewStatus: overdue ? 'Overdue' : 'Not started',
+                filterKey: overdue ? 'OVERDUE' : campaign.status === 'IN_PROGRESS' ? 'IN_PROGRESS' : 'NOT_STARTED',
+                submittedAt: null,
+                dueAt: campaign.dueAt,
+                evidenceCount: 0,
+                evidenceState: 'Evidence missing',
+                notes: null,
+                overdue,
+                honesty: 'This is a governance statement. Review does not change control effectiveness.',
+            });
+        }
         return {
             publicId: campaign.publicId,
             name: campaign.name,
-            framework: campaign.activation?.frameworkVersion.framework.name || null,
+            framework: campaign.activation ? `${campaign.activation.frameworkVersion.framework.name} ${campaign.activation.frameworkVersion.version}` : null,
             periodStart: campaign.periodStart,
             periodEnd: campaign.periodEnd,
             dueAt: campaign.dueAt,
             status: humanComplianceLabel(status),
             statusKey: status,
-            assignments: campaign.assignments.length,
+            assignmentCount: campaign.assignments.length,
             submitted: campaign.attestations.length,
-            honesty: 'An attestation is a governance statement. It is not a control test and does not prove effectiveness.',
+            queue,
+            honesty: 'An attestation is a governance statement. It is not a control test and does not prove effectiveness. Review uses Reviewed or Rejected, not Approved.',
         };
     },
 
@@ -1052,13 +1485,24 @@ export const enterpriseComplianceService = {
     },
 
     async reviewAttestation(organizationId: string, publicId: string, actorUserId: string | null, input: { reviewStatus: ComplianceAttestationReviewStatus; reviewNotes?: string }) {
+        if (input.reviewStatus !== 'REVIEWED' && input.reviewStatus !== 'REJECTED') {
+            throw new ApiError(400, 'Review uses Reviewed or Rejected, not Approved.');
+        }
         const attestation = await prisma.complianceAttestation.findFirst({ where: { organizationId, publicId } });
         if (!attestation) throw new ApiError(404, 'Attestation not found');
         const updated = await prisma.complianceAttestation.update({
             where: { id: attestation.id },
             data: { reviewStatus: input.reviewStatus, reviewerUserId: actorUserId, reviewedAt: new Date(), reviewNotes: input.reviewNotes || null },
         });
-        await history(organizationId, 'ATTESTATION', attestation.id, 'Attestation reviewed', `Review is ${humanComplianceLabel(input.reviewStatus)}.`, actorUserId);
+        await history(organizationId, 'ATTESTATION', attestation.id, 'Attestation reviewed', `Review is ${humanComplianceLabel(input.reviewStatus)}. Control effectiveness is unchanged.`, actorUserId);
+        await audit({
+            organizationId,
+            actorUserId,
+            action: 'compliance.attestation.reviewed',
+            resourceType: 'ComplianceAttestation',
+            resourceId: attestation.id,
+            metadata: { reviewStatus: input.reviewStatus, effectivenessUnchanged: true },
+        });
         return updated;
     },
 
@@ -1378,6 +1822,42 @@ export const enterpriseComplianceService = {
             implementation: neutralizeSpreadsheetCell(row.implementation),
             latestTest: neutralizeSpreadsheetCell(row.latestTest),
         }));
+    },
+
+    async exportPack(organizationId: string) {
+        const [requirements, gaps, controls] = await Promise.all([
+            this.listRequirements(organizationId, {}),
+            this.listGaps(organizationId),
+            prisma.organizationControl.findMany({ where: { organizationId, status: 'ACTIVE' }, take: 500 }),
+        ]);
+        return {
+            rows: [
+                ...requirements.map((row) => ({
+                    sheet: 'Requirements',
+                    id: neutralizeSpreadsheetCell(row.requirementKey),
+                    title: neutralizeSpreadsheetCell(row.summary),
+                    framework: neutralizeSpreadsheetCell(`${row.framework} ${row.version}`),
+                    status: neutralizeSpreadsheetCell(row.applicability),
+                    owner: neutralizeSpreadsheetCell(row.owner),
+                })),
+                ...controls.map((row) => ({
+                    sheet: 'Controls',
+                    id: neutralizeSpreadsheetCell(row.controlKey),
+                    title: neutralizeSpreadsheetCell(row.title),
+                    framework: 'Common control',
+                    status: neutralizeSpreadsheetCell(humanComplianceLabel(row.implementationStatus)),
+                    owner: 'Assigned in Control Center',
+                })),
+                ...gaps.map((row) => ({
+                    sheet: 'Gaps',
+                    id: neutralizeSpreadsheetCell(row.publicId),
+                    title: neutralizeSpreadsheetCell(row.title),
+                    framework: '',
+                    status: neutralizeSpreadsheetCell(row.status),
+                    owner: '',
+                })),
+            ],
+        };
     },
 
     async pack(organizationId: string) {

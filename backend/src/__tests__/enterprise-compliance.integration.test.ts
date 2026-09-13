@@ -136,4 +136,94 @@ describe('supreme compliance tenant isolation and honesty', () => {
         expect(preview.status).toBe(200);
         expect(preview.body.data.rows[0].requirementKey).toBe("'=1+1");
     });
+
+    it('commits a validated import and keeps it inside the tenant', async () => {
+        const key = (await request(app).get(`${API}/compliance/requirements/${requirementA}`).set('Authorization', `Bearer ${tokenA}`)).body.data.requirementKey;
+        const preview = await request(app).post(`${API}/compliance/import/preview`).set('Authorization', `Bearer ${tokenA}`).send({
+            rows: [{ requirementKey: key, applicability: 'UNDER_REVIEW' }],
+        });
+        expect(preview.body.data.rows[0].ok).toBe(true);
+        const commit = await request(app).post(`${API}/compliance/import/commit`).set('Authorization', `Bearer ${tokenA}`).send({
+            rows: [{ requirementKey: key, applicability: 'UNDER_REVIEW' }],
+        });
+        expect(commit.status).toBe(200);
+        expect(commit.body.data.updated).toBe(1);
+        const leaked = await request(app).post(`${API}/compliance/import/commit`).set('Authorization', `Bearer ${tokenB}`).send({
+            rows: [{ requirementKey: key, applicability: 'APPLICABLE' }],
+        });
+        expect(leaked.body.data.updated).toBe(0);
+        const after = await request(app).get(`${API}/compliance/requirements/${requirementA}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(after.body.data.applicability).toBe('Under review');
+    });
+
+    it('returns a campaign review queue and does not use Approved', async () => {
+        const campaign = await request(app).post(`${API}/compliance/campaigns`).set('Authorization', `Bearer ${tokenA}`).send({
+            name: 'Review workspace',
+            activationId: activationA,
+            dueAt: new Date(Date.now() - 86400000).toISOString(),
+        });
+        const requirement = await request(app).get(`${API}/compliance/requirements/${requirementA}`).set('Authorization', `Bearer ${tokenA}`);
+        const controlId = requirement.body.data.controls[0]?.id;
+        if (controlId) {
+            const attested = await request(app).post(`${API}/compliance/attestations`).set('Authorization', `Bearer ${tokenA}`).send({
+                campaignId: campaign.body.data.publicId,
+                organizationControlId: controlId,
+                status: 'IMPLEMENTED',
+                statement: 'MFA is in use. This is a governance statement.',
+            });
+            const before = await request(app).get(`${API}/scc/controls/${controlId}`).set('Authorization', `Bearer ${tokenA}`);
+            const beforeEffectiveness = before.body.data?.effectivenessStatus || before.body.data?.control?.effectivenessStatus;
+            const reviewed = await request(app).post(`${API}/compliance/attestations/${attested.body.data.publicId}/review`).set('Authorization', `Bearer ${tokenA}`).send({
+                reviewStatus: 'REVIEWED',
+                reviewNotes: 'Reviewed. Not a control test.',
+            });
+            expect(reviewed.status).toBe(200);
+            expect(JSON.stringify(reviewed.body)).not.toMatch(/"APPROVED"/);
+            const rejectedWord = await request(app).post(`${API}/compliance/attestations/${attested.body.data.publicId}/review`).set('Authorization', `Bearer ${tokenA}`).send({
+                reviewStatus: 'APPROVED',
+                reviewNotes: 'Should be rejected.',
+            });
+            expect(rejectedWord.status).toBe(400);
+            const after = await request(app).get(`${API}/scc/controls/${controlId}`).set('Authorization', `Bearer ${tokenA}`);
+            const afterEffectiveness = after.body.data?.effectivenessStatus || after.body.data?.control?.effectivenessStatus;
+            expect(afterEffectiveness).toBe(beforeEffectiveness);
+        }
+        const detail = await request(app).get(`${API}/compliance/campaigns/${campaign.body.data.publicId}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(detail.status).toBe(200);
+        expect(detail.body.data.queue.length).toBeGreaterThan(0);
+        expect(JSON.stringify(detail.body.data)).toMatch(/governance statement/i);
+        expect(JSON.stringify(detail.body.data)).toMatch(/Reviewed or Rejected/);
+    });
+
+    it('surfaces a populated attention queue from live overdue records', async () => {
+        const dashboard = await request(app).get(`${API}/compliance/dashboard`).set('Authorization', `Bearer ${tokenA}`);
+        expect(dashboard.status).toBe(200);
+        const attention = dashboard.body.data.attention || [];
+        expect(attention.some((row: { type: string }) => row.type === 'Overdue attestations' || row.type === 'Requirements with no mapped controls' || row.type === 'Implemented controls that are not tested')).toBe(true);
+        expect(attention[0]).toHaveProperty('why');
+        expect(attention[0]).toHaveProperty('href');
+    });
+
+    it('resolves compliance gap public IDs through graph search after live projection', async () => {
+        const refreshed = await request(app).post(`${API}/compliance/activations/${activationA}/gaps/refresh`).set('Authorization', `Bearer ${tokenA}`).send({});
+        expect(refreshed.status).toBe(200);
+        let listed = await request(app).get(`${API}/compliance/gaps`).set('Authorization', `Bearer ${tokenA}`);
+        let gapId = (listed.body.data || [])[0]?.publicId;
+        if (!gapId) {
+            const created = await request(app).post(`${API}/compliance/gaps`).set('Authorization', `Bearer ${tokenA}`).send({
+                activationId: activationA,
+                source: 'UNMAPPED',
+                title: 'Graph discoverability gap',
+                explanation: 'Created so GAP public IDs can be resolved in search.',
+            });
+            expect(created.status).toBe(201);
+            gapId = created.body.data.publicId;
+        }
+        expect(gapId).toMatch(/^GAP-/);
+        const dashboard = await request(app).get(`${API}/compliance/dashboard`).set('Authorization', `Bearer ${tokenA}`);
+        expect(dashboard.status).toBe(200);
+        const search = await request(app).get(`${API}/governance/search`).query({ q: gapId }).set('Authorization', `Bearer ${tokenA}`);
+        expect(search.status).toBe(200);
+        expect((search.body.data.nodes || []).some((row: { displayLabel?: string; sourceId?: string }) => String(row.displayLabel || '').includes(gapId))).toBe(true);
+    });
 });

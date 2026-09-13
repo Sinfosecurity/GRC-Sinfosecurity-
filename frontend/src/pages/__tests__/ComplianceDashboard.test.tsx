@@ -33,7 +33,7 @@ describe('Supreme Compliance dashboard', () => {
                     gaps: [],
                     exceptions: [],
                     campaigns: [],
-                    attention: [{ kind: 'Expired exceptions', title: 'Temporary remote-admin path', href: '/compliance/exceptions', publicId: 'EXC-00001' }],
+                    attention: [{ type: 'Expired exceptions', why: 'EXC-00001 reached its end date.', framework: 'NYDFS 500-ref', related: 'Temporary remote-admin path', owner: 'Report Proof', dueAt: '2026-09-01T00:00:00.000Z', severity: 'High', href: '/compliance/exceptions', publicId: 'EXC-00001' }],
                     changed: [{ title: 'Framework activated', change: null, summary: 'NIST Cybersecurity Framework 2.0-ref is now in this compliance program.', actor: 'Report Proof', createdAt: '2026-09-13T12:00:00.000Z' }],
                 },
             },
@@ -50,5 +50,45 @@ describe('Supreme Compliance dashboard', () => {
         expect(screen.getAllByText(/not certification/i).length).toBeGreaterThan(0);
         expect(screen.getByText(/Requirement coverage 68%/)).toBeInTheDocument();
         expect(screen.queryByText(/you are iso 27001 certified/i)).not.toBeInTheDocument();
+        expect(screen.getAllByText(/Expired exceptions/).length).toBeGreaterThan(0);
+        expect(screen.getByText(/EXC-00001 reached its end date/)).toBeInTheDocument();
+    });
+
+    it('does not print 0% testing coverage when the denominator is not meaningful', async () => {
+        const { complianceAPI } = await import('../../services/api');
+        (complianceAPI.dashboard as any).mockResolvedValue({
+            data: {
+                data: {
+                    honesty: 'Readiness and coverage are not certification, attestation, or a claim that this organization is compliant.',
+                    totals: { activeFrameworks: 1, openGaps: 0, overdueAttestations: 0, expiredExceptions: 0, openPeriods: 0 },
+                    frameworks: [{
+                        publicId: 'ACT-00002',
+                        name: 'ISO/IEC 27001',
+                        version: '2022-ref',
+                        status: 'Active',
+                        calculable: true,
+                        emptyReason: null,
+                        metrics: {
+                            requirementCoverage: { percent: null, numerator: 0, denominator: 0, display: 'Not calculated' },
+                            implementationCoverage: { percent: null, numerator: 0, denominator: 0, display: 'Not calculated' },
+                            testingCoverage: { percent: null, numerator: 0, denominator: 0, display: 'No implemented mapped controls to test', emptyReason: 'No implemented mapped controls to test' },
+                            evidenceCoverage: { percent: null, numerator: 0, denominator: 0, display: 'Not calculated' },
+                        },
+                    }],
+                    gaps: [],
+                    exceptions: [],
+                    campaigns: [],
+                    attention: [],
+                    changed: [],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/compliance']}>
+                <ComplianceDashboard />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText(/No implemented mapped controls to test/)).toBeInTheDocument();
+        expect(screen.queryByText(/Tested 0%/)).not.toBeInTheDocument();
     });
 });

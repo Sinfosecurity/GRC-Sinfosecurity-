@@ -14,6 +14,8 @@ export interface HealthCheckResult {
     uptime: number;
     version: string;
     environment: string;
+    runtimeMode: string;
+    deploymentEnvironment: string;
     gitSha: string | null;
     checks: {
         [key: string]: {
@@ -87,7 +89,9 @@ export class HealthChecker {
             timestamp: new Date().toISOString(),
             uptime: process.uptime(),
             version: process.env.npm_package_version || '1.0.0',
-            environment: process.env.NODE_ENV || 'development',
+            runtimeMode: process.env.NODE_ENV || 'development',
+            deploymentEnvironment: process.env.APP_ENVIRONMENT || process.env.VITE_ENVIRONMENT || process.env.NODE_ENV || 'development',
+            environment: process.env.APP_ENVIRONMENT || process.env.VITE_ENVIRONMENT || process.env.NODE_ENV || 'development',
             gitSha: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || process.env.SOURCE_VERSION || null,
             checks: results,
         };

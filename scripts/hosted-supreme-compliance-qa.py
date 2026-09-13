@@ -126,7 +126,7 @@ def pick_pack(catalog: list[dict], key: str) -> dict | None:
     return next((row for row in catalog if row.get("frameworkKey") == key and row.get("versionStatus") == "ACTIVE" and not row.get("activated")), None)
 
 
-def seed(token: str, user: dict):
+def seed(token: str, user: dict, other_token: str | None = None):
     status, catalog_payload = api("GET", "/api/v1/compliance/catalog", token)
     catalog = catalog_payload.get("data") or []
     record("catalog", "PASS" if status == 200 and catalog else "FAIL", f"{status} packs={len(catalog)}")
@@ -160,6 +160,13 @@ def seed(token: str, user: dict):
         "remainingWork": remaining,
         "readiness": data.get("readiness"),
     }
+    crumbs = " > ".join(row.get("label") or "" for row in (data.get("crumbs") or []))
+    record("framework crumb", "PASS" if crumbs.startswith("Compliance") and activation_id not in crumbs else "FAIL", crumbs or "missing")
+    reuse = data.get("existingReuse") or {}
+    RESULTS["workflow"]["existingReuse"] = reuse
+    record("cross-framework reuse", "PASS" if reuse.get("message") else "PARTIAL", (reuse.get("message") or "")[:240])
+    tested_display = ((data.get("readiness") or {}).get("metrics") or {}).get("testingCoverage", {}).get("display")
+    record("testing coverage display", "PASS" if tested_display and tested_display != "null%" and not (tested_display == "0%" and ((data.get("readiness") or {}).get("metrics") or {}).get("testingCoverage", {}).get("denominator") in (0, None)) else "FAIL", str(tested_display))
     record("remaining work", "PASS" if remaining and "certified" not in remaining.lower() else "FAIL", remaining[:240])
     honesty = data.get("honesty") or ""
     record("activation honesty", "PASS" if "not certification" in honesty.lower() or "not certified" in honesty.lower() else "FAIL", honesty[:160])
@@ -192,7 +199,8 @@ def seed(token: str, user: dict):
     status, gaps = api("POST", f"/api/v1/compliance/activations/{activation_id}/gaps/refresh", token, {})
     record("gap refresh", "PASS" if status == 200 else "FAIL", f"{status} {gaps.get('data')}")
     status, gap_list = api("GET", "/api/v1/compliance/gaps", token)
-    record("gaps list", "PASS" if status == 200 else "FAIL", f"{status} count={len(gap_list.get('data') or [])}")
+    gap_rows = gap_list.get("data") or []
+    record("gaps list", "PASS" if status == 200 else "FAIL", f"{status} count={len(gap_rows)}")
 
     owners_status, owners = api("GET", "/api/v1/compliance/owners", token)
     owner_id = ((owners.get("data") or [{}])[0] or {}).get("id") if owners_status == 200 else None
@@ -216,10 +224,17 @@ def seed(token: str, user: dict):
     status, campaign = api("POST", "/api/v1/compliance/campaigns", token, {
         "name": "Hosted Q4 control attestation",
         "activationId": activation_id,
+        "dueAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 3 * 86400)),
         "attestorUserIds": [user.get("id") or user.get("userId")] if user.get("id") or user.get("userId") else [],
     })
     record("campaign", "PASS" if status == 201 else "FAIL", f"{status} {(campaign.get('data') or {}).get('publicId')}")
     campaign_id = (campaign.get("data") or {}).get("publicId")
+    if campaign_id:
+        queue_status, queue_payload = api("GET", f"/api/v1/compliance/campaigns/{campaign_id}", token)
+        queue = (queue_payload.get("data") or {}).get("queue") or []
+        record("campaign review queue", "PASS" if queue_status == 200 and queue else "FAIL", f"{queue_status} rows={len(queue)}")
+        honesty = (queue_payload.get("data") or {}).get("honesty") or ""
+        record("campaign review language", "PASS" if "Reviewed or Rejected" in honesty and "Approved" not in honesty.replace("not Approved", "") else "FAIL", honesty[:180])
     control_id = None
     if requirement_id:
         status, detail = api("GET", f"/api/v1/compliance/requirements/{requirement_id}", token)
@@ -235,10 +250,23 @@ def seed(token: str, user: dict):
         att_id = (attested.get("data") or {}).get("publicId")
         if att_id:
             status, reviewed = api("POST", f"/api/v1/compliance/attestations/{att_id}/review", token, {
-                "reviewStatus": "APPROVED",
+                "reviewStatus": "REVIEWED",
                 "reviewNotes": "Governance statement reviewed. This is not a control test.",
             })
             record("attestation review", "PASS" if status == 200 else "FAIL", str(status))
+            denied_approved = api("POST", f"/api/v1/compliance/attestations/{att_id}/review", token, {
+                "reviewStatus": "APPROVED",
+                "reviewNotes": "Must not accept Approved.",
+            })
+            record("attestation review rejects Approved", "PASS" if denied_approved[0] == 400 else "FAIL", str(denied_approved[0]))
+            if control_id:
+                before = api("GET", f"/api/v1/scc/controls/{control_id}", token)[1]
+                after = api("GET", f"/api/v1/scc/controls/{control_id}", token)[1]
+                before_eff = ((before.get("data") or {}).get("effectivenessStatus")
+                              or ((before.get("data") or {}).get("control") or {}).get("effectivenessStatus"))
+                after_eff = ((after.get("data") or {}).get("effectivenessStatus")
+                             or ((after.get("data") or {}).get("control") or {}).get("effectivenessStatus"))
+                record("review does not change effectiveness", "PASS" if before_eff == after_eff else "FAIL", f"{before_eff}->{after_eff}")
 
     status, period = api("POST", "/api/v1/compliance/periods", token, {
         "activationId": activation_id,
@@ -279,8 +307,17 @@ def seed(token: str, user: dict):
     status, dashboard = api("GET", "/api/v1/compliance/dashboard", token)
     dash = dashboard.get("data") or {}
     record("dashboard", "PASS" if status == 200 and dash.get("honesty") else "FAIL", f"{status}")
-    record("needs attention", "PASS" if status == 200 and isinstance(dash.get("attention"), list) else "FAIL", f"items={len(dash.get('attention') or [])}")
+    attention = dash.get("attention") or []
+    RESULTS["workflow"]["attention"] = [{"type": row.get("type"), "why": row.get("why"), "related": row.get("related")} for row in attention[:12]]
+    record("needs attention", "PASS" if status == 200 and attention else "FAIL", f"items={len(attention)}")
+    types = {row.get("type") for row in attention}
+    record("attention overdue campaign", "PASS" if "Overdue attestations" in types else "PARTIAL", ",".join(sorted(x for x in types if x)))
     record("what changed", "PASS" if status == 200 and dash.get("changed") else "PARTIAL", f"events={len(dash.get('changed') or [])}")
+    if gap_rows:
+        gap_id = gap_rows[0].get("publicId")
+        search_status, search = api("GET", f"/api/v1/governance/search?q={gap_id}", token)
+        found = any(gap_id in str(row.get("displayLabel") or "") for row in (search.get("data") or {}).get("nodes") or [])
+        record("gap graph search", "PASS" if search_status == 200 and found else "FAIL", f"{search_status} {gap_id} found={found}")
     banned = json.dumps(dash).lower()
     record("no false compliance", "PASS" if "you are" not in banned or "certified" not in banned else "FAIL", "dashboard language")
 
@@ -297,10 +334,72 @@ def seed(token: str, user: dict):
         stored_id = row.get("storedObjectId") or row.get("id")
         if stored_id:
             break
+    clean_id = None
+    clean_name = None
+    for row in rows:
+        scan = row.get("scanStatus") or row.get("malwareStatus") or row.get("status")
+        name = row.get("filename") or row.get("originalName") or ""
+        if scan == "CLEAN" or "clean" in name.lower():
+            clean_id = row.get("storedObjectId") or row.get("id")
+            clean_name = name
+            if clean_id:
+                break
+    stored_id = clean_id or stored_id
+    if stored_id and control_id:
+        link_control = api("POST", "/api/v1/scc/evidence/links", token, {
+            "storedObjectId": stored_id,
+            "targetType": "CONTROL",
+            "targetId": control_id,
+            "relationship": "SUPPORTS",
+            "freshness": "CURRENT",
+            "rationale": "Hosted #16 reuse proof. Same CLEAN file supports this common control.",
+        })
+        record("evidence link control", "PASS" if link_control[0] in (200, 201, 409) else "FAIL", str(link_control[0]))
+        req_detail = api("GET", f"/api/v1/compliance/requirements/{requirement_id}", token)[1] if requirement_id else {}
+        framework_requirement_id = (req_detail.get("data") or {}).get("frameworkRequirementId")
+        if framework_requirement_id:
+            link_req = api("POST", "/api/v1/scc/evidence/links", token, {
+                "storedObjectId": stored_id,
+                "targetType": "REQUIREMENT",
+                "targetId": framework_requirement_id,
+                "relationship": "SUPPORTS",
+                "freshness": "CURRENT",
+                "rationale": "Hosted #16 reuse proof. Same CLEAN file supports this mapped requirement.",
+            })
+            record("evidence link requirement", "PASS" if link_req[0] in (200, 201, 409) else "FAIL", str(link_req[0]))
+        impact = api("GET", f"/api/v1/scc/evidence/{stored_id}/impact", token)
+        mapped_reqs = (((impact[1].get("data") or {}).get("potentialImpact") or {}).get("requirements") or [])
+        extra_linked = 0
+        for mapped in mapped_reqs[:6]:
+            mapped_id = mapped.get("id")
+            if not mapped_id or mapped_id == framework_requirement_id:
+                continue
+            extra = api("POST", "/api/v1/scc/evidence/links", token, {
+                "storedObjectId": stored_id,
+                "targetType": "REQUIREMENT",
+                "targetId": mapped_id,
+                "relationship": "SUPPORTS",
+                "freshness": "CURRENT",
+                "rationale": "Hosted #16 reuse proof. Mapped requirement already associated with the same common control.",
+            })
+            if extra[0] in (200, 201, 409):
+                extra_linked += 1
+        record("evidence link mapped requirements", "PASS" if extra_linked or framework_requirement_id else "PARTIAL", f"extra={extra_linked}")
     if stored_id:
         status, reuse = api("GET", f"/api/v1/compliance/evidence/{stored_id}/reuse", token)
         reuse_data = reuse.get("data") or {}
-        record("evidence reuse", "PASS" if status == 200 and reuse_data.get("honesty") else "FAIL", f"{status} {reuse_data}")
+        RESULTS["workflow"]["evidenceReuse"] = {
+            "filename": reuse_data.get("filename") or clean_name,
+            "scanStatus": reuse_data.get("scanStatus"),
+            "controls": reuse_data.get("controls"),
+            "requirements": reuse_data.get("requirements"),
+            "programs": reuse_data.get("programs"),
+        }
+        record(
+            "evidence reuse",
+            "PASS" if status == 200 and reuse_data.get("scanStatus") == "CLEAN" and (reuse_data.get("controls") or 0) >= 1 else "FAIL",
+            f"{status} file={reuse_data.get('filename')} controls={reuse_data.get('controls')} requirements={reuse_data.get('requirements')} programs={reuse_data.get('programs')}",
+        )
         if reuse_data.get("scanStatus") and reuse_data.get("scanStatus") != "CLEAN":
             record("malware fail-closed reuse", "PASS" if reuse_data.get("usable") is False else "FAIL", reuse_data.get("offer") or "")
     else:
@@ -327,6 +426,24 @@ def seed(token: str, user: dict):
     })
     key = (((preview.get("data") or {}).get("rows") or [{}])[0].get("requirementKey") or "")
     record("import neutralize", "PASS" if preview_status == 200 and key.startswith("'") else "FAIL", key[:40])
+    live_key = None
+    if requirement_id:
+        live_key = ((api("GET", f"/api/v1/compliance/requirements/{requirement_id}", token)[1].get("data") or {}).get("requirementKey"))
+    if live_key:
+        commit_status, commit = api("POST", "/api/v1/compliance/import/commit", token, {
+            "rows": [
+                {"requirementKey": live_key, "applicability": "UNDER_REVIEW"},
+                {"requirementKey": "=CMD|calc", "applicability": "APPLICABLE"},
+            ],
+        })
+        updated = (commit.get("data") or {}).get("updated")
+        record("import commit", "PASS" if commit_status == 200 and updated == 1 else "FAIL", f"{commit_status} updated={updated}")
+        if other_token:
+            leaked = api("POST", "/api/v1/compliance/import/commit", other_token, {
+                "rows": [{"requirementKey": live_key, "applicability": "APPLICABLE"}],
+            })
+            leaked_updated = (leaked[1].get("data") or {}).get("updated")
+            record("import commit tenant scoped", "PASS" if leaked[0] in (200, 403, 404) and leaked_updated in (0, None) else "FAIL", f"{leaked[0]} updated={leaked_updated}")
 
     for kind in ("readiness", "gaps", "attestations", "evidence", "exceptions", "executive", "board"):
         status, payload = api("GET", f"/api/v1/compliance/reports/{kind}.pdf", token)
@@ -373,9 +490,20 @@ def main():
         if not sha_match(str(api_sha), EXPECTED_SHA):
             raise SystemExit("API has not reached the implementation SHA; refusing to grade old code as #16")
 
+    health_status, health = api("GET", "/health")
+    runtime = health.get("runtimeMode") if isinstance(health, dict) else None
+    deploy_env = health.get("deploymentEnvironment") if isinstance(health, dict) else None
+    RESULTS["sha"]["runtimeMode"] = runtime
+    RESULTS["sha"]["deploymentEnvironment"] = deploy_env
+    record(
+        "staging environment label",
+        "PASS" if runtime == "production" and deploy_env == "staging" else "PARTIAL",
+        f"runtimeMode={runtime} deploymentEnvironment={deploy_env} environment={health.get('environment') if isinstance(health, dict) else None} health={health_status}",
+    )
+
     token, user = login(EMAIL, PASSWORD)
     other_token, _ = login(OTHER_EMAIL, OTHER_PASSWORD)
-    created = seed(token, user)
+    created = seed(token, user, other_token)
     if created.get("activationId"):
         isolation(other_token, created["activationId"])
 

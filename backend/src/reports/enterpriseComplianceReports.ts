@@ -52,10 +52,10 @@ export async function renderCompliancePdf(organizationId: string, kind: string) 
                 ],
                 pack.dashboard.frameworks.map((row) => ({
                     name: `${row.name} ${row.version}`,
-                    mapped: row.metrics.requirementCoverage.percent == null ? 'Not calculated' : `${row.metrics.requirementCoverage.percent}%`,
-                    implemented: row.metrics.implementationCoverage.percent == null ? 'Not calculated' : `${row.metrics.implementationCoverage.percent}%`,
-                    tested: row.metrics.testingCoverage.percent == null ? 'Not calculated' : `${row.metrics.testingCoverage.percent}%`,
-                    evidence: row.metrics.evidenceCoverage.percent == null ? 'Not calculated' : `${row.metrics.evidenceCoverage.percent}%`,
+                    mapped: row.metrics.requirementCoverage.display,
+                    implemented: row.metrics.implementationCoverage.display,
+                    tested: row.metrics.testingCoverage.display,
+                    evidence: row.metrics.evidenceCoverage.display,
                 })),
                 'No active framework',
                 'No framework is activated for this organization. Activation is opt-in.',
@@ -116,35 +116,71 @@ export async function renderCompliancePdf(organizationId: string, kind: string) 
         }
         drawSectionTitle(doc, 'Needs attention');
         drawBullets(doc, pack.dashboard.attention.length
-            ? pack.dashboard.attention.map((row) => `${row.kind}: ${row.title}`)
+            ? pack.dashboard.attention.map((row) => `${row.type}: ${row.why}`)
             : ['No attention items from live records.']);
     });
 }
 
 export async function renderComplianceBoardPptx(organizationId: string) {
     const pack = await enterpriseComplianceService.pack(organizationId);
+    const first = pack.dashboard.frameworks[0];
     const slides = [
-        { title: 'Compliance Board Summary', bullets: [pack.name, 'Readiness is not certification.', pack.honesty] },
         {
-            title: 'Enterprise compliance posture',
-            bullets: [
-                `${pack.dashboard.totals.activeFrameworks} active framework program${pack.dashboard.totals.activeFrameworks === 1 ? '' : 's'}`,
-                `${pack.dashboard.totals.openGaps} open gaps`,
-                `${pack.dashboard.totals.overdueAttestations} overdue attestation campaigns`,
-                `${pack.dashboard.totals.expiredExceptions} expired exceptions`,
+            title: 'Compliance Board Summary',
+            kpis: [
+                { label: 'Active programs', value: String(pack.dashboard.totals.activeFrameworks) },
+                { label: 'Open gaps', value: String(pack.dashboard.totals.openGaps) },
+                { label: 'Overdue attestations', value: String(pack.dashboard.totals.overdueAttestations) },
+                { label: 'Expired exceptions', value: String(pack.dashboard.totals.expiredExceptions) },
             ],
+            bullets: [pack.name, 'Readiness is not certification.', 'Live tenant records only.'],
+            footnote: pack.honesty,
         },
         {
-            title: 'Framework readiness',
+            title: 'Coverage',
+            kpis: first ? [
+                { label: 'Mapped', value: first.metrics.requirementCoverage.display },
+                { label: 'Implemented', value: first.metrics.implementationCoverage.display },
+                { label: 'Tested', value: first.metrics.testingCoverage.display },
+                { label: 'Evidence', value: first.metrics.evidenceCoverage.display },
+            ] : [],
             bullets: pack.dashboard.frameworks.length
-                ? pack.dashboard.frameworks.map((row) => {
-                    const mapped = row.metrics.requirementCoverage.percent;
-                    return `${row.name} ${row.version}: ${mapped == null ? 'readiness not calculated' : `${mapped}% requirement coverage`}`;
-                })
+                ? pack.dashboard.frameworks.map((row) => `${row.name} ${row.version}: mapped ${row.metrics.requirementCoverage.display}`)
                 : ['No framework is activated.'],
         },
         {
-            title: 'Gaps',
+            title: 'Evidence health',
+            kpis: first ? [
+                { label: 'Evidence coverage', value: first.metrics.evidenceCoverage.display },
+                { label: 'Open gaps', value: String(pack.dashboard.totals.openGaps) },
+                { label: 'Expired exceptions', value: String(pack.dashboard.totals.expiredExceptions) },
+                { label: 'Active programs', value: String(pack.dashboard.totals.activeFrameworks) },
+            ] : [],
+            bullets: [
+                'CLEAN current supporting links only count toward evidence coverage.',
+                'A file is not compliance.',
+                'Malware policy remains fail-closed.',
+            ],
+        },
+        {
+            title: 'Testing status',
+            kpis: first ? [
+                { label: 'Testing coverage', value: first.metrics.testingCoverage.display },
+                { label: 'Implemented', value: first.metrics.implementationCoverage.display },
+                { label: 'Mapped', value: first.metrics.requirementCoverage.display },
+                { label: 'Overdue', value: String(pack.dashboard.totals.overdueAttestations) },
+            ] : [],
+            bullets: [
+                first ? `Testing coverage ${first.metrics.testingCoverage.display}` : 'No activated program.',
+                first?.metrics.testingCoverage.emptyReason || 'Not tested is not pass. Not applicable is not pass.',
+            ],
+        },
+        {
+            title: 'Major gaps',
+            kpis: [
+                { label: 'Open gaps', value: String(pack.dashboard.totals.openGaps) },
+                { label: 'Attention items', value: String(pack.dashboard.attention.length) },
+            ],
             bullets: pack.gaps.length ? pack.gaps.slice(0, 8).map((row) => `${row.publicId} ${row.title}`) : ['No gaps recorded.'],
         },
         {
@@ -152,10 +188,17 @@ export async function renderComplianceBoardPptx(organizationId: string) {
             bullets: pack.exceptions.length ? pack.exceptions.slice(0, 8).map((row) => `${row.publicId} ${row.scope} — ${row.status}`) : ['No exceptions recorded.'],
         },
         {
-            title: 'Key attention items',
+            title: 'Needs attention',
             bullets: pack.dashboard.attention.length
-                ? pack.dashboard.attention.slice(0, 8).map((row) => `${row.kind}: ${row.title}`)
+                ? pack.dashboard.attention.slice(0, 8).map((row) => `${row.type}: ${row.why}`)
                 : ['No attention items from live records.'],
+        },
+        {
+            title: 'Decisions / next actions',
+            bullets: pack.dashboard.attention.length
+                ? pack.dashboard.attention.slice(0, 6).map((row) => `Review ${row.related || row.publicId} — ${row.type}`)
+                : ['No management action is required from the current live queue.'],
+            footnote: 'An attestation is not a control test. Residual risk does not change unless Supreme Risk recalculates it.',
         },
     ];
     return {
@@ -165,36 +208,33 @@ export async function renderComplianceBoardPptx(organizationId: string) {
 }
 
 export async function renderComplianceWorkbook(organizationId: string, format: 'csv' | 'xlsx') {
-    const rows = await enterpriseComplianceService.exportRows(organizationId);
+    const pack = await enterpriseComplianceService.exportPack(organizationId);
     if (format === 'csv') {
-        const header = ['Requirement', 'Summary', 'Framework', 'Version', 'Applicability', 'Owner', 'Implementation', 'Latest test'];
-        const lines = [header.join(','), ...rows.map((row) => [
-            csvEscape(row.requirement),
-            csvEscape(row.summary),
+        const header = ['Sheet', 'ID', 'Title', 'Framework', 'Status', 'Owner'];
+        const lines = [header.join(','), ...pack.rows.map((row) => [
+            csvEscape(row.sheet),
+            csvEscape(row.id),
+            csvEscape(row.title),
             csvEscape(row.framework),
-            csvEscape(row.version),
-            csvEscape(row.applicability),
+            csvEscape(row.status),
             csvEscape(row.owner),
-            csvEscape(row.implementation),
-            csvEscape(row.latestTest),
         ].join(','))];
-        return { buffer: Buffer.from(lines.join('\n'), 'utf8'), filenameParts: ['Supreme-Compliance-Requirements'] };
+        return { buffer: Buffer.from(lines.join('\n'), 'utf8'), filenameParts: ['Supreme-Compliance-Register'] };
     }
     const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Requirements');
-    sheet.addRow(['Requirement', 'Summary', 'Framework', 'Version', 'Applicability', 'Owner', 'Implementation', 'Latest test']);
-    for (const row of rows) {
-        sheet.addRow([
-            neutralizeSpreadsheetCell(row.requirement),
-            neutralizeSpreadsheetCell(row.summary),
-            neutralizeSpreadsheetCell(row.framework),
-            neutralizeSpreadsheetCell(row.version),
-            neutralizeSpreadsheetCell(row.applicability),
-            neutralizeSpreadsheetCell(row.owner),
-            neutralizeSpreadsheetCell(row.implementation),
-            neutralizeSpreadsheetCell(row.latestTest),
-        ]);
+    for (const name of ['Requirements', 'Controls', 'Gaps'] as const) {
+        const sheet = workbook.addWorksheet(name);
+        sheet.addRow(['ID', 'Title', 'Framework', 'Status', 'Owner']);
+        for (const row of pack.rows.filter((item) => item.sheet === name)) {
+            sheet.addRow([
+                neutralizeSpreadsheetCell(row.id),
+                neutralizeSpreadsheetCell(row.title),
+                neutralizeSpreadsheetCell(row.framework),
+                neutralizeSpreadsheetCell(row.status),
+                neutralizeSpreadsheetCell(row.owner),
+            ]);
+        }
     }
     const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
-    return { buffer, filenameParts: ['Supreme-Compliance-Requirements'] };
+    return { buffer, filenameParts: ['Supreme-Compliance-Register'] };
 }

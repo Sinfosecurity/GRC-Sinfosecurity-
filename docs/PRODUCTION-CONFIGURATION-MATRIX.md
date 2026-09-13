@@ -4,6 +4,13 @@ No secret values. Staging classes are “set / unset / generated” only.
 
 `APP_ENVIRONMENT=production` plus `NODE_ENV=production` is the production profile. Hosted staging today uses `NODE_ENV=production` and `APP_ENVIRONMENT=staging`.
 
+`NODE_ENV=production` is the optimized runtime and fail-fast profile. It is not the customer-facing deployment label. `/health` therefore reports:
+
+- `runtimeMode`: `NODE_ENV` (hosted staging remains `production`)
+- `deploymentEnvironment` / `environment`: `APP_ENVIRONMENT` (hosted staging is `staging`)
+
+Do not bind the deployment label to `NODE_ENV`. Do not weaken production fail-fast to make staging look healthier.
+
 | Variable | Purpose | Required | Secret | Staging class | Production action |
 |---|---|---|---|---|---|
 | `NODE_ENV` | Runtime profile; fail-fast | REQUIRED | NON-SECRET | `production` on hosted staging | `production` |

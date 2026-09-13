@@ -43,7 +43,7 @@ export default function ComplianceFrameworkDetail() {
     return (
         <>
             <PageHeader
-                crumbs={[{ label: 'Compliance' }, { label: 'Frameworks', to: '/compliance/frameworks' }, { label: publicId || 'Program' }]}
+                crumbs={data?.crumbs?.map((crumb: { label: string; href?: string }) => ({ label: crumb.label, to: crumb.href })) || [{ label: 'Compliance' }, { label: 'Frameworks', to: '/compliance/frameworks' }]}
                 title={data ? `${data.name} ${data.version}` : 'Framework program'}
                 description={data?.remainingWork?.message || 'Live readiness from this tenant. Not certified or compliant.'}
             />
@@ -67,15 +67,25 @@ export default function ComplianceFrameworkDetail() {
                                 <Typography>Scope: {data.scope || 'Organization'}</Typography>
                                 {data.readiness.calculable ? (
                                     <Box sx={{ mt: 2 }}>
-                                        <Typography>Requirement coverage {data.readiness.metrics.requirementCoverage.percent}% ({data.readiness.metrics.requirementCoverage.numerator}/{data.readiness.metrics.requirementCoverage.denominator})</Typography>
-                                        <Typography>Implemented {data.readiness.metrics.implementationCoverage.percent}%</Typography>
-                                        <Typography>Tested {data.readiness.metrics.testingCoverage.percent}%</Typography>
-                                        <Typography>Evidence available {data.readiness.metrics.evidenceCoverage.percent}%</Typography>
+                                        <Typography>Requirement coverage {data.readiness.metrics.requirementCoverage.display} ({data.readiness.metrics.requirementCoverage.numerator}/{data.readiness.metrics.requirementCoverage.denominator})</Typography>
+                                        <Typography>Implemented {data.readiness.metrics.implementationCoverage.display}</Typography>
+                                        <Typography>Tested {data.readiness.metrics.testingCoverage.display}</Typography>
+                                        <Typography>Evidence available {data.readiness.metrics.evidenceCoverage.display}</Typography>
+                                        {data.readiness.metrics.testingCoverage.emptyReason && (
+                                            <Typography color="text.secondary">{data.readiness.metrics.testingCoverage.emptyReason}</Typography>
+                                        )}
                                         <Typography color="text.secondary" sx={{ mt: 1 }}>{data.readiness.metrics.requirementCoverage.formula}</Typography>
                                     </Box>
                                 ) : (
                                     <Typography sx={{ mt: 2 }}>{data.readiness.emptyReason}</Typography>
                                 )}
+                                {data.existingReuse && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography fontWeight={700}>Already reusable from common controls</Typography>
+                                        <Typography color="text.secondary">{data.existingReuse.message}</Typography>
+                                    </Box>
+                                )}
+                                <Typography color="text.secondary" sx={{ mt: 1 }}>Program {data.publicId}</Typography>
                                 <Button sx={{ mt: 2 }} onClick={() => complianceAPI.refreshGaps(publicId!).then(load)}>Refresh gaps from live records</Button>
                             </Surface>
                         )}

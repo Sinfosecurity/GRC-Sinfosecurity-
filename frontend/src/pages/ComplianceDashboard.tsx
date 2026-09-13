@@ -19,18 +19,32 @@ type Dashboard = {
         status: string;
         calculable: boolean;
         emptyReason: string | null;
-        metrics: Record<string, { percent: number | null; numerator: number; denominator: number }>;
+        metrics: Record<string, { percent: number | null; numerator: number; denominator: number; display?: string; emptyReason?: string | null }>;
         remainingWork?: { message: string | null };
     }>;
     gaps: Array<{ publicId: string; title: string; source: string; status: string }>;
     exceptions: Array<{ publicId: string; scope: string; type: string; status: string }>;
     campaigns: Array<{ publicId: string; name: string; status: string }>;
-    attention: Array<{ kind: string; title: string; href: string; publicId: string }>;
+    attention: Array<{
+        type: string;
+        why: string;
+        framework: string | null;
+        related: string | null;
+        owner: string | null;
+        dueAt: string | null;
+        ageDays?: number | null;
+        severity: string | null;
+        href: string;
+        publicId: string;
+    }>;
     changed: Array<{ title: string; change: string | null; summary: string; actor: string; createdAt: string }>;
 };
 
-function pct(value: number | null | undefined) {
-    return value == null ? 'Not calculated' : `${value}%`;
+function coverage(metric?: { display?: string; percent?: number | null; emptyReason?: string | null }) {
+    if (!metric) return 'Not calculated';
+    if (metric.display) return metric.display;
+    if (metric.percent == null) return metric.emptyReason || 'Not calculated';
+    return `${metric.percent}%`;
 }
 
 export default function ComplianceDashboard() {
@@ -75,11 +89,17 @@ export default function ComplianceDashboard() {
                         <Surface>
                             <Typography variant="h6" sx={{ mb: 1.5 }}>Needs attention</Typography>
                             {!data.attention.length && <Typography color="text.secondary">No attention items from live records.</Typography>}
-                            <Stack spacing={1}>
+                            <Stack spacing={1.5}>
                                 {data.attention.map((row) => (
-                                    <Box key={`${row.kind}-${row.publicId}`} sx={{ cursor: 'pointer' }} onClick={() => navigate(row.href)}>
-                                        <Typography fontWeight={600}>{row.kind}</Typography>
-                                        <Typography color="text.secondary">{row.title}</Typography>
+                                    <Box key={`${row.type}-${row.publicId}`} sx={{ cursor: 'pointer' }} onClick={() => navigate(row.href)}>
+                                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                                            <Typography fontWeight={700}>{row.type}</Typography>
+                                            {row.severity && <StatusBadge tone={row.severity === 'Critical' || row.severity === 'High' ? 'critical' : 'medium'} label={row.severity} />}
+                                        </Stack>
+                                        <Typography>{row.why}</Typography>
+                                        <Typography color="text.secondary">
+                                            {[row.framework, row.related, row.owner, row.dueAt ? new Date(row.dueAt).toLocaleDateString() : null, row.ageDays != null ? `${row.ageDays}d` : null].filter(Boolean).join(' · ')}
+                                        </Typography>
                                     </Box>
                                 ))}
                             </Stack>
@@ -95,7 +115,7 @@ export default function ComplianceDashboard() {
                                     </Stack>
                                     {row.calculable ? (
                                         <Typography color="text.secondary">
-                                            Requirement coverage {pct(row.metrics.requirementCoverage?.percent)} · Implemented {pct(row.metrics.implementationCoverage?.percent)} · Tested {pct(row.metrics.testingCoverage?.percent)} · Evidence {pct(row.metrics.evidenceCoverage?.percent)}
+                                            Requirement coverage {coverage(row.metrics.requirementCoverage)} · Implemented {coverage(row.metrics.implementationCoverage)} · Tested {coverage(row.metrics.testingCoverage)} · Evidence {coverage(row.metrics.evidenceCoverage)}
                                         </Typography>
                                     ) : (
                                         <Typography color="text.secondary">{row.emptyReason}</Typography>

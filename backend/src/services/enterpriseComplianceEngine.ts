@@ -82,8 +82,39 @@ export type CoverageMetric = {
     numerator: number;
     denominator: number;
     percent: number | null;
+    display: string;
+    emptyReason: string | null;
     formula: string;
 };
+
+export function coverageDisplay(metric: Pick<CoverageMetric, 'percent' | 'denominator' | 'label'>): string {
+    if (metric.percent == null || metric.denominator <= 0) {
+        return metric.label === 'Testing coverage' ? 'No implemented mapped controls to test' : 'Not calculated';
+    }
+    return `${metric.percent}%`;
+}
+
+export type AttentionItem = {
+    type: string;
+    why: string;
+    framework: string | null;
+    related: string | null;
+    owner: string | null;
+    dueAt: string | null;
+    ageDays: number | null;
+    severity: string | null;
+    href: string;
+    publicId: string;
+    priority: number;
+};
+
+export function daysBetween(from: Date, to = new Date()) {
+    return Math.max(0, Math.floor((to.getTime() - from.getTime()) / 86400000));
+}
+
+export function rankAttention(items: AttentionItem[]) {
+    return [...items].sort((a, b) => a.priority - b.priority || (b.ageDays || 0) - (a.ageDays || 0)).slice(0, 24);
+}
 
 export type ReadinessInput = {
     totalRequirements: number;
@@ -103,13 +134,21 @@ export function buildReadiness(input: ReadinessInput) {
         if (denominator <= 0) return null;
         return Math.round((numerator / denominator) * 100);
     };
-    const metric = (label: string, numerator: number, denominator: number, formula: string): CoverageMetric => ({
-        label,
-        numerator,
-        denominator,
-        percent: percent(numerator, denominator),
-        formula,
-    });
+    const metric = (label: string, numerator: number, denominator: number, formula: string): CoverageMetric => {
+        const value = percent(numerator, denominator);
+        const emptyReason = denominator <= 0
+            ? (label === 'Testing coverage' ? 'No implemented mapped controls to test' : 'Not calculated')
+            : null;
+        return {
+            label,
+            numerator,
+            denominator,
+            percent: value,
+            display: value == null ? (emptyReason || 'Not calculated') : `${value}%`,
+            emptyReason,
+            formula,
+        };
+    };
     const calculable = input.applicable > 0;
     return {
         honesty: COMPLIANCE_HONESTY,

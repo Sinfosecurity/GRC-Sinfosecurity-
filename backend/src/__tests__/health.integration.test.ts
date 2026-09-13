@@ -35,6 +35,10 @@ describe('Health Check API', () => {
 
             expect(response.body).toHaveProperty('version');
             expect(response.body).toHaveProperty('gitSha');
+            expect(response.body).toHaveProperty('runtimeMode');
+            expect(response.body).toHaveProperty('deploymentEnvironment');
+            expect(response.body.runtimeMode).toBe(process.env.NODE_ENV || 'test');
+            expect(response.body.deploymentEnvironment).toBe(process.env.APP_ENVIRONMENT || process.env.VITE_ENVIRONMENT || process.env.NODE_ENV || 'test');
         });
 
         it('should check database connections in production mode', async () => {

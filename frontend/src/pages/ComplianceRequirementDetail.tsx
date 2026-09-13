@@ -107,7 +107,14 @@ export default function ComplianceRequirementDetail() {
                             <Surface>
                                 <Alert severity="info" sx={{ mb: 2 }}>{data.existingEvidenceOffer}</Alert>
                                 {data.evidence.map((item: any) => (
-                                    <Typography key={item.id}>{item.filename} · {item.coverage} · {item.relationship}</Typography>
+                                    <Box key={item.id} sx={{ mb: 1 }}>
+                                        <Typography>{item.filename} · {item.coverage} · {item.relationship}</Typography>
+                                        {item.reuse && (
+                                            <Typography color="text.secondary">
+                                                Reuse: {item.reuse.controls} control{item.reuse.controls === 1 ? '' : 's'} · {item.reuse.requirements} requirement{item.reuse.requirements === 1 ? '' : 's'} · {item.reuse.programs} program{item.reuse.programs === 1 ? '' : 's'}
+                                            </Typography>
+                                        )}
+                                    </Box>
                                 ))}
                                 <Button sx={{ mt: 1 }} onClick={() => navigate('/documents')}>Use existing evidence</Button>
                             </Surface>
