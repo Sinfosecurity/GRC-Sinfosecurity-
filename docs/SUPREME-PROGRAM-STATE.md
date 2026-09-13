@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #13 Governance Graph
 
-**CURRENT ITEM STATUS:** PARTIAL — implementation returned; hosted CI required for program PASS
+**CURRENT ITEM STATUS:** PARTIAL — hosted Graph Explorer rejected (429 on ordinary use); remediation in progress
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -51,7 +51,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #13 Governance Graph
 
-**STATUS:** PARTIAL — implementation returned; hosted CI / Product Leadership review required
+**STATUS:** PARTIAL — hosted explorer rejected; 429/UX remediation is not Product Leadership acceptance
 
 PostgreSQL/Prisma relationship layer. No separate graph database. #14 is not authorized.
 

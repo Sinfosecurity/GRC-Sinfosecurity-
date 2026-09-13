@@ -91,6 +91,9 @@ export const uploadLimiter = createCategoryLimiter('upload');
 /** Full report pack is ~10 files; 40/hour allows a session plus retries. */
 export const reportLimiter = createCategoryLimiter('report');
 
+/** Interactive governance-graph reads. Separate from PDF report generation. */
+export const graphLimiter = createCategoryLimiter('graph');
+
 export const billingLimiter = createCategoryLimiter('billing');
 
 export const adminLimiter = createCategoryLimiter('admin');

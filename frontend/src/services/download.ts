@@ -37,7 +37,7 @@ export function downloadErrorMessage(error: unknown): string {
             return error.message || 'Your role can view reports but cannot download them. An organization admin, risk manager, assessor, or approver can export.';
         }
         if (error.status === 404) return 'This report cannot be generated because the record was not found.';
-        if (error.status === 429) return 'Too many requests. Please try again later.';
+        if (error.status === 429) return 'Too many requests were made in a short period. Please wait a moment and try again.';
         if (error.status === 503) return 'A required provider is unavailable.';
         if (error.status === 500) return 'Report generation failed.';
         return error.message;

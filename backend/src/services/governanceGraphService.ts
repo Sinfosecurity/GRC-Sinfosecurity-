@@ -312,6 +312,27 @@ export async function findRelationship(organizationId: string, edgeId: string) {
     return edge;
 }
 
+export async function findNodeBySource(
+    organizationId: string,
+    sourceModel: string,
+    sourceId: string,
+    nodeType?: GovernanceNodeType
+) {
+    const node = await prisma.governanceNode.findFirst({
+        where: {
+            organizationId,
+            sourceModel,
+            sourceId,
+            ...(nodeType ? { nodeType } : {}),
+        },
+        orderBy: { createdAt: 'asc' },
+    });
+    if (!node) {
+        throw new ApiError(404, 'Graph node not found');
+    }
+    return node;
+}
+
 export async function getNode(organizationId: string, nodeId: string) {
     const node = await prisma.governanceNode.findFirst({
         where: { id: nodeId, organizationId },
@@ -1162,6 +1183,7 @@ export const governanceGraphService = {
     archiveRelationship,
     approveSuggestedRelationship,
     findRelationship,
+    findNodeBySource,
     getNode,
     neighbors,
     pathBetween,

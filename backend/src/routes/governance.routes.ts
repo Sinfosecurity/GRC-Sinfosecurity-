@@ -10,11 +10,11 @@ import { PERMISSIONS } from '../security/rbac';
 import { requireTenant, rejectClientTenantOverride } from '../security/tenant';
 import { ApiError } from '../middleware/errorHandler';
 import { governanceGraphService } from '../services/governanceGraphService';
-import { GRAPH_MAX_DEPTH } from '../services/governanceGraphTaxonomy';
-import { createCategoryLimiter } from '../middleware/rateLimiter';
+import { GRAPH_MAX_DEPTH, publicNode } from '../services/governanceGraphTaxonomy';
+import { bulkOperationLimiter, graphLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
-const graphLimiter = createCategoryLimiter('report');
+const graphWriteLimiter = bulkOperationLimiter;
 
 function parseEnum<T extends string>(value: unknown, allowed: readonly T[], label: string): T | undefined {
     if (value === undefined || value === null || value === '') return undefined;
@@ -79,7 +79,7 @@ router.get('/export', requirePermission(PERMISSIONS['governanceGraph.read']), as
     }
 });
 
-router.post('/backfill', requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/backfill', graphWriteLimiter, requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = requireTenant(req.user);
         rejectClientTenantOverride(organizationId, req.body?.organizationId);
@@ -90,7 +90,7 @@ router.post('/backfill', requirePermission(PERMISSIONS['governanceGraph.manage']
     }
 });
 
-router.post('/reconcile', requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/reconcile', graphWriteLimiter, requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = requireTenant(req.user);
         rejectClientTenantOverride(organizationId, req.body?.organizationId);
@@ -100,11 +100,27 @@ router.post('/reconcile', requirePermission(PERMISSIONS['governanceGraph.manage'
     }
 });
 
+router.get('/nodes/lookup', requirePermission(PERMISSIONS['governanceGraph.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const organizationId = requireTenant(req.user);
+        const sourceModel = typeof req.query.sourceModel === 'string' ? req.query.sourceModel : '';
+        const sourceId = typeof req.query.sourceId === 'string' ? req.query.sourceId : '';
+        if (!sourceModel || !sourceId) {
+            throw new ApiError(400, 'sourceModel and sourceId are required');
+        }
+        const nodeType = parseEnum(req.query.nodeType, Object.values(GovernanceNodeType), 'nodeType');
+        const node = await governanceGraphService.findNodeBySource(organizationId, sourceModel, sourceId, nodeType);
+        res.json({ success: true, data: publicNode(node) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/nodes/:nodeId', requirePermission(PERMISSIONS['governanceGraph.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = requireTenant(req.user);
         const node = await governanceGraphService.getNode(organizationId, req.params.nodeId);
-        res.json({ success: true, data: node });
+        res.json({ success: true, data: publicNode(node) });
     } catch (error) {
         next(error);
     }
@@ -185,7 +201,7 @@ router.get('/edges/:edgeId', requirePermission(PERMISSIONS['governanceGraph.read
     }
 });
 
-router.post('/relationships', requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/relationships', graphWriteLimiter, requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = requireTenant(req.user);
         rejectClientTenantOverride(organizationId, req.body?.organizationId);
@@ -211,7 +227,7 @@ router.post('/relationships', requirePermission(PERMISSIONS['governanceGraph.man
     }
 });
 
-router.post('/relationships/:edgeId/archive', requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/relationships/:edgeId/archive', graphWriteLimiter, requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = requireTenant(req.user);
         res.json({
@@ -227,7 +243,7 @@ router.post('/relationships/:edgeId/archive', requirePermission(PERMISSIONS['gov
     }
 });
 
-router.post('/relationships/:edgeId/approve', requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/relationships/:edgeId/approve', graphWriteLimiter, requirePermission(PERMISSIONS['governanceGraph.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const organizationId = requireTenant(req.user);
         res.json({

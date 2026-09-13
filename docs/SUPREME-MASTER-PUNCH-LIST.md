@@ -235,13 +235,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Authoritative graph model with tenant isolation, provenance, temporal relationship state, idempotent TPRM backfill, explainable query APIs, and a professional explorer. No separate graph database. Marketing preview is not done.
 
-**CURRENT STATUS:** PARTIAL — implementation returned; hosted CI / Product Leadership review required. Not commercial production.
+**CURRENT STATUS:** PARTIAL — Product Leadership rejected hosted Graph Explorer after ordinary use returned 429. Rate-limit/UX remediation is in this branch. Not commercial production.
 
-**CERTIFICATION SHA:** implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` (hosted CI run `34749488009` PASS)
+**CERTIFICATION SHA:** first implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` (hosted CI run `34749488009` PASS). Hosted explorer rejection followed that SHA. Remediation SHA is recorded in `docs/GOVERNANCE-GRAPH-CERTIFICATION.md` after deploy.
 
-**EVIDENCE:** Product Leadership authorization 2026-09-13. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. Domain inventory, data model, operations, customer doc, and certification recorded. #12 remains PARTIAL.
+**EVIDENCE:** Product Leadership authorization 2026-09-13. Hosted rejection: `/governance/*` shared the report limiter (40/hour) and the explorer issued ~6 requests per load/select. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. #12 remains PARTIAL.
 
-**NEXT ACTION:** Record hosted CI on the exact SHA. Keep #12 PARTIAL. Do not start #14. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership must re-review the hosted explorer after the 429/UX fix. Keep #12 PARTIAL. Do not start #14. Do not merge `main` or deploy commercial production.
 
 ---
 

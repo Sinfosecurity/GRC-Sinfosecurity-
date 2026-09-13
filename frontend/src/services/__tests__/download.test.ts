@@ -15,6 +15,6 @@ describe('report download helpers', () => {
         expect(downloadErrorMessage(new ApiClientError('Plan does not include advancedReporting', 403))).not.toMatch(/private-beta/i);
         expect(downloadErrorMessage(new ApiClientError('missing', 404))).toContain('not found');
         expect(downloadErrorMessage(new ApiClientError('auth', 401))).toContain('Sign in');
-        expect(downloadErrorMessage(new ApiClientError('slow down', 429))).toBe('Too many requests. Please try again later.');
+        expect(downloadErrorMessage(new ApiClientError('slow down', 429))).toBe('Too many requests were made in a short period. Please wait a moment and try again.');
     });
 });

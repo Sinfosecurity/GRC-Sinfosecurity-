@@ -25,7 +25,7 @@ export default function Login() {
             navigate(typeof result.nextPath === 'string' ? result.nextPath : '/dashboard');
         } catch (err: any) {
             setError(err.status === 429
-                ? 'Too many requests. Please try again later.'
+                ? 'Too many requests were made in a short period. Please wait a moment and try again.'
                 : err.message || 'Unable to sign in');
         } finally {
             setLoading(false);

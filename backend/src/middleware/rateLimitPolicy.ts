@@ -19,6 +19,7 @@ export type RateLimitCategory =
     | 'demo_ip'
     | 'upload'
     | 'report'
+    | 'graph'
     | 'billing'
     | 'admin'
     | 'ai'
@@ -49,6 +50,7 @@ const DEFAULTS: Record<RateLimitCategory, RateLimitSpec> = {
     demo_ip: { max: 20, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-closed', keying: 'ip' },
     upload: { max: 40, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     report: { max: 40, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
+    graph: { max: 180, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     billing: { max: 10, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     admin: { max: 20, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     ai: { max: 30, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
@@ -118,7 +120,7 @@ export function customerRateLimitBody() {
     return {
         error: {
             code: 'RATE_LIMITED' as const,
-            message: 'Too many requests. Please try again later.',
+            message: 'Too many requests were made in a short period. Please wait a moment and try again.',
         },
     };
 }

@@ -249,6 +249,13 @@ describe('governance graph', () => {
         expect(searchA.status).toBe(200);
         const nodeA = searchA.body.data.nodes.find((row: { nodeType: string }) => row.nodeType === 'VENDOR');
         expect(nodeA).toBeTruthy();
+        const lookupA = await request(app)
+            .get(`${API}/governance/nodes/lookup`)
+            .query({ sourceModel: 'Vendor', sourceId: vendorA })
+            .set('Authorization', `Bearer ${tokenA}`);
+        expect(lookupA.status).toBe(200);
+        expect(lookupA.body.data.id).toBe(nodeA.id);
+        expect(lookupA.body.data.recordHref).toContain('vendor-management');
 
         const searchB = await request(app).get(`${API}/governance/search?q=Graph`).set('Authorization', `Bearer ${tokenB}`);
         const nodeB = searchB.body.data.nodes.find((row: { nodeType: string }) => row.nodeType === 'VENDOR');

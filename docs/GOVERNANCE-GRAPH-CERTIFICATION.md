@@ -35,13 +35,30 @@
 | Synthetic scale | 5,000 nodes / 15,000 edges; search 19–21ms; neighbors 9–11ms; 2-hop 21–29ms; 3-hop 18–21ms; impact 17–20ms; lineage 8ms. Not enterprise-scale certification. |
 | P0/P1 open for #13 | NONE observed in local tests |
 
+## Hosted explorer rejection (2026-09-13)
+
+Product Leadership tested live `/governance-graph` and received “Too many attempts. Too many requests. Please try again later.” during ordinary use. #13 remains PARTIAL.
+
+| Fact | Finding |
+|---|---|
+| Limiter that fired | **report** (`createCategoryLimiter('report')`) on all `/governance/*` routes |
+| Not the cause | general API 800/15m; search/traversal depth (400/timeout); frontend retry loop |
+| Endpoints returning 429 | `GET /governance/summary`, `GET /governance/search`, `GET /governance/nodes/:id/relationships`, `GET /governance/nodes/:id/impact`, `GET /governance/nodes/:id/lineage`, `POST /governance/backfill` — same shared report bucket as PDF downloads |
+| Root cause | Graph reads shared the 40-request / 60-minute / user+org report budget. Explorer `load()` also posted backfill and fetched summary + search + relationships + impact + lineage on every page load and every node click (~6 requests). React Strict Mode can double that. EntityRelationships on other pages used the same bucket. QueryState titled “Too many attempts” and then appended the API 429 sentence. |
+| Request count before | Typical open: 6. Each node click: +6. Five searches plus several clicks exceeded 40/hour. |
+| Request count after | Open: 2 (`summary` + `search`). Select: 1 (`relationships`). Impact tab: 1 (cached). Lineage tab: 1 (cached). Search: 1 debounced (~400ms), stale requests aborted. No backfill on ordinary load. |
+| Limiter policy after | `graph` 180 / 15 min / user+org / fail-open for interactive reads. Report PDFs stay 40 / 60 min. Graph writes also use `bulk` 5 / 60 min. General API 800 / 15 min unchanged. Abuse protection is preserved. |
+
+429 copy is now a single sentence: “Too many requests were made in a short period. Please wait a moment and try again.”
+
+The explorer landing page shows guidance and recent stored relationship changes. A selected node opens a relationship workspace (entity, summary, direct relationships, impact, lineage, related-record links). No force-directed graph.
+
 ## Known non-closures
 
-- Hosted Supreme CI PASS on implementation SHA `8ec4434` (run `34749488009`). A later documentation commit may follow and is not the CI SHA.
-- Hosted browser acceptance of the Graph Explorer is not recorded.
+- Hosted Supreme CI PASS on first implementation SHA `8ec4434` (run `34749488009`). Product Leadership later rejected that hosted explorer.
+- #13 remains PARTIAL until Product Leadership reviews the remediating hosted experience.
 - #12 invitation inbox confirmation, visual acceptance, UX-P2/P3, and commercial NO-GO remain #12 issues.
 - Private external testers are not authorized.
-- Browser verification of the explorer on hosted staging was not completed in this implementation turn.
 - #14 is not authorized and was not started.
 
 ## Threat model (local)

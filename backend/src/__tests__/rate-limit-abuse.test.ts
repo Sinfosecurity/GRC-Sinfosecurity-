@@ -38,6 +38,7 @@ describe('deterministic rate-limit abuse', () => {
             activation: { max: 2, windowMs: 60_000 },
             demo: { max: 2, windowMs: 60_000 },
             report: { max: 2, windowMs: 60_000 },
+            graph: { max: 2, windowMs: 60_000 },
             upload: { max: 2, windowMs: 60_000 },
             billing: { max: 2, windowMs: 60_000 },
             general: { max: 3, windowMs: 60_000 },
@@ -63,7 +64,7 @@ describe('deterministic rate-limit abuse', () => {
         expect(limited.body).toEqual({
             error: {
                 code: 'RATE_LIMITED',
-                message: 'Too many requests. Please try again later.',
+                message: 'Too many requests were made in a short period. Please wait a moment and try again.',
             },
         });
         expect(limited.headers['retry-after']).toBeDefined();
@@ -142,6 +143,40 @@ describe('deterministic rate-limit abuse', () => {
         const store = new WindowCounterStore('general');
         const result = await store.increment('general:ip:203.0.113.1');
         expect(result.totalHits).toBe(0);
+    });
+
+    it('keeps graph reads on a dedicated budget separate from report PDFs', () => {
+        resetRateLimitPolicy();
+        const graph = getRateLimitSpec('graph');
+        const report = getRateLimitSpec('report');
+        expect(graph.max).toBe(180);
+        expect(graph.windowMs).toBe(15 * 60 * 1000);
+        expect(graph.keying).toBe('user+org');
+        expect(graph.failurePolicy).toBe('fail-open');
+        expect(report.max).toBe(40);
+        expect(report.windowMs).toBe(60 * 60 * 1000);
+    });
+
+    it('throttles graph bursts without consuming the report limiter', async () => {
+        delete process.env.REDIS_URL;
+        overrideRateLimitPolicy({ graph: { max: 2, windowMs: 60_000 }, report: { max: 2, windowMs: 60_000 } });
+        resetMemoryRateLimitStore();
+        const app = express();
+        app.set('trust proxy', 1);
+        app.use(express.json());
+        app.get('/graph', (req, _res, next) => {
+            (req as any).user = { id: 'user-graph', organizationId: 'org-graph' };
+            next();
+        }, createCategoryLimiter('graph'), (_req, res) => res.json({ ok: true }));
+        app.post('/report', (req, _res, next) => {
+            (req as any).user = { id: 'user-graph', organizationId: 'org-graph' };
+            next();
+        }, createCategoryLimiter('report'), (_req, res) => res.json({ ok: true }));
+
+        await request(app).get('/graph').expect(200);
+        await request(app).get('/graph').expect(200);
+        await request(app).get('/graph').expect(429);
+        await request(app).post('/report').expect(200);
     });
 
     it('throttles report, upload, billing, and password-reset bursts', async () => {

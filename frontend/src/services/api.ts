@@ -54,9 +54,12 @@ api.interceptors.response.use(
         const apiCode = typeof nestedError === 'object' && nestedError
             ? (nestedError as { code?: string }).code
             : undefined;
+        const rateLimitedMessage =
+            (typeof nestedError === 'object' && nestedError?.message) ||
+            'Too many requests were made in a short period. Please wait a moment and try again.';
         const message =
             (status === 429
-                ? (typeof nestedError === 'object' && nestedError?.message) || 'Too many requests. Please try again later.'
+                ? rateLimitedMessage
                 : detailMessage ||
                     (typeof nestedError === 'string' ? nestedError : nestedError?.message) ||
                     payload?.message) ||
@@ -240,15 +243,20 @@ export const tprmAPI = {
 };
 
 export const governanceAPI = {
-    summary: () => api.get('/governance/summary'),
-    search: (params?: unknown) => api.get('/governance/search', { params }),
+    summary: (config?: { signal?: AbortSignal }) => api.get('/governance/summary', config),
+    search: (params?: unknown, config?: { signal?: AbortSignal }) => api.get('/governance/search', { params, ...config }),
+    lookup: (params: { sourceModel: string; sourceId: string; nodeType?: string }, config?: { signal?: AbortSignal }) =>
+        api.get('/governance/nodes/lookup', { params, ...config }),
     backfill: () => api.post('/governance/backfill'),
     reconcile: () => api.post('/governance/reconcile'),
-    node: (nodeId: string) => api.get(`/governance/nodes/${nodeId}`),
-    relationships: (nodeId: string, params?: unknown) => api.get(`/governance/nodes/${nodeId}/relationships`, { params }),
+    node: (nodeId: string, config?: { signal?: AbortSignal }) => api.get(`/governance/nodes/${nodeId}`, config),
+    relationships: (nodeId: string, params?: unknown, config?: { signal?: AbortSignal }) =>
+        api.get(`/governance/nodes/${nodeId}/relationships`, { params, ...config }),
     neighbors: (nodeId: string) => api.get(`/governance/nodes/${nodeId}/neighbors`),
-    lineage: (nodeId: string, depth?: number) => api.get(`/governance/nodes/${nodeId}/lineage`, { params: depth ? { depth } : undefined }),
-    impact: (nodeId: string, depth?: number) => api.get(`/governance/nodes/${nodeId}/impact`, { params: depth ? { depth } : undefined }),
+    lineage: (nodeId: string, depth?: number, config?: { signal?: AbortSignal }) =>
+        api.get(`/governance/nodes/${nodeId}/lineage`, { params: depth ? { depth } : undefined, ...config }),
+    impact: (nodeId: string, depth?: number, config?: { signal?: AbortSignal }) =>
+        api.get(`/governance/nodes/${nodeId}/impact`, { params: depth ? { depth } : undefined, ...config }),
     path: (fromNodeId: string, toNodeId: string) => api.get('/governance/path', { params: { fromNodeId, toNodeId } }),
     exportGraph: () => api.get('/governance/export'),
 };

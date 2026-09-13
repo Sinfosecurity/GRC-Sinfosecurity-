@@ -40,12 +40,9 @@ export default function EntityRelationships({
         setLoading(true);
         setError(null);
         governanceAPI
-            .search({ q: sourceId })
+            .lookup({ sourceModel, sourceId })
             .then(async (res) => {
-                const match = (res.data.data?.nodes || []).find(
-                    (item: GraphNode & { sourceModel?: string; sourceId?: string }) =>
-                        item.sourceModel === sourceModel && item.sourceId === sourceId
-                );
+                const match = res.data.data;
                 if (!match) {
                     if (!cancelled) {
                         setNode(null);
@@ -60,7 +57,13 @@ export default function EntityRelationships({
                 }
             })
             .catch((err) => {
-                if (!cancelled) setError(err.message || 'Unable to load relationships');
+                if (cancelled) return;
+                if (err.status === 404) {
+                    setNode(null);
+                    setRelationships([]);
+                    return;
+                }
+                setError(err.message || 'Unable to load relationships');
             })
             .finally(() => {
                 if (!cancelled) setLoading(false);

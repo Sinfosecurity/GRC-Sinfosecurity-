@@ -26,7 +26,7 @@ Logged as `rate_limit_store_unavailable`. There is no silent downgrade.
 | Category | Policy when Redis is configured but unavailable |
 |---|---|
 | login, login_ip, signup, password_reset, password_reset_ip, activation, demo, demo_ip, mfa, sso, strict | **Fail closed** — request is treated as over-limit (429) |
-| general, report, upload, billing, admin, ai, bulk | **Fail open** — request proceeds; failure is logged and counted |
+| general, report, graph, upload, billing, admin, ai, bulk | **Fail open** — request proceeds; failure is logged and counted |
 
 If `REDIS_URL` is unset, the process uses memory counters and logs the store mode. That is an explicit single-instance configuration, not a hidden fallback from Redis.
 
@@ -36,7 +36,7 @@ If `REDIS_URL` is unset, the process uses memory counters and logs the store mod
 {
   "error": {
     "code": "RATE_LIMITED",
-    "message": "Too many requests. Please try again later."
+    "message": "Too many requests were made in a short period. Please wait a moment and try again."
   }
 }
 ```
@@ -57,6 +57,8 @@ If `REDIS_URL` is unset, the process uses memory counters and logs the store mod
 | demo | `POST /demo-requests` | 8 | 15 min | email + IP | Redis/memory | fail-closed |
 | demo_ip | `POST /demo-requests` | 20 | 15 min | IP | Redis/memory | fail-closed |
 | report | TPRM report downloads | 40 | 60 min | org + user | Redis/memory | fail-open |
+| graph | `/governance/*` interactive reads | 180 | 15 min | org + user | Redis/memory | fail-open |
+| bulk | Graph writes (`/backfill`, `/reconcile`, create/archive/approve) and other bulk jobs | 5 | 60 min | org + user | Redis/memory | fail-open |
 | upload | TPRM evidence upload | 40 | 60 min | org + user | Redis/memory | fail-open |
 | billing | `POST /billing/checkout`, `/billing/portal` | 10 | 15 min | org + user | Redis/memory | fail-open |
 | admin | invite / resend | 20 | 60 min | org + user | Redis/memory | fail-open |
@@ -73,7 +75,7 @@ Org A report/upload/billing/admin/AI activity does not consume Org B’s allowan
 
 ## Frontend 429 UX
 
-Interactive login, signup, password reset, activation, Request Demo, QueryState, and report downloads show a customer-safe 429 message. Form values are preserved. There is no automatic retry loop.
+Interactive login, signup, password reset, activation, QueryState, Graph Explorer, and report downloads show one customer-safe 429 sentence: “Too many requests were made in a short period. Please wait a moment and try again.” Form values are preserved. There is no automatic retry loop. Graph reads no longer share the report PDF budget.
 
 Request Demo 429 copy: “Too many requests have been submitted. Please wait a little while and try again.”
 

@@ -26,7 +26,7 @@ type Props = {
 const KIND_TITLE: Record<QueryErrorKind, string> = {
     PERMISSION_DENIED: 'You cannot do this',
     VALIDATION: 'Check the information entered',
-    RATE_LIMITED: 'Too many attempts',
+    RATE_LIMITED: 'Too many requests',
     NOT_CONFIGURED: 'Not available yet',
     PROVIDER_ERROR: 'Service unavailable',
     API_FAILURE: 'Request failed',
@@ -35,7 +35,7 @@ const KIND_TITLE: Record<QueryErrorKind, string> = {
 const KIND_HINT: Record<QueryErrorKind, string> = {
     PERMISSION_DENIED: 'Ask an organization administrator if you expected access.',
     VALIDATION: 'Correct the highlighted fields and try again.',
-    RATE_LIMITED: 'Wait a moment, then retry.',
+    RATE_LIMITED: '',
     NOT_CONFIGURED: 'This capability is unavailable until it is configured for this environment.',
     PROVIDER_ERROR: 'Try again shortly. If it continues, submit a support request.',
     API_FAILURE: 'Some services are temporarily unavailable. Retry in a moment. If it continues, submit a support request from Help.',
@@ -81,8 +81,15 @@ export default function QueryState({
     }
     if (error) {
         const kind = errorKind || classifyApiError({ message: error });
+        if (kind === 'RATE_LIMITED') {
+            return (
+                <Alert severity="warning">
+                    Too many requests were made in a short period. Please wait a moment and try again.
+                </Alert>
+            );
+        }
         return (
-            <Alert severity={kind === 'PERMISSION_DENIED' || kind === 'RATE_LIMITED' ? 'warning' : 'error'}>
+            <Alert severity={kind === 'PERMISSION_DENIED' ? 'warning' : 'error'}>
                 <strong>{KIND_TITLE[kind]}.</strong> {sanitizeError(error)} {KIND_HINT[kind]}
             </Alert>
         );

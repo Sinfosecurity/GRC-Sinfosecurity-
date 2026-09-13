@@ -29,7 +29,7 @@ export default function AdminLogin() {
             navigate('/platform');
         } catch (err: unknown) {
             const status = typeof err === 'object' && err && 'status' in err ? Number((err as { status?: number }).status) : 0;
-            setError(status === 429 ? 'Too many requests. Please try again later.' : 'Unable to sign in');
+            setError(status === 429 ? 'Too many requests were made in a short period. Please wait a moment and try again.' : 'Unable to sign in');
         } finally {
             setLoading(false);
         }
