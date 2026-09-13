@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { integrationAPI } from '../services/api';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 
 const PROVIDERS = ['slack', 'jira', 'servicenow', 'siem'];
 
@@ -19,10 +20,11 @@ export default function Integrations() {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Integrations</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Status is reported by the server. NOT_CONFIGURED means the integration is available to connect later, not that it is working.
-            </Typography>
+            <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Integrations' }]}
+                title="Integrations"
+                description="Status is reported by the server. Not configured means the integration can be connected later — not that it is working."
+            />
             <QueryState loading={loading} error={error}>
                 <Grid container spacing={2}>
                     {PROVIDERS.map((provider) => (

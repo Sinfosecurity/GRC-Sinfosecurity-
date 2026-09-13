@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 import { tenantSupportAPI } from '../platform/api';
 
 const CATEGORIES = [
@@ -57,12 +58,11 @@ export default function HelpSupport() {
 
     return (
         <Box sx={{ maxWidth: 760 }}>
-            <Typography variant="overline" sx={{ letterSpacing: '0.12em' }}>Help & Support</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Get help</Typography>
-            <Typography sx={{ color: 'text.secondary', mb: 3 }}>
-                Submit a support request or private-beta feedback. We will review it and follow up. No contractual response time is promised.
-                Optional screenshots must already be CLEAN evidence in this tenant — uploads cannot bypass malware scanning.
-            </Typography>
+            <PageHeader
+                crumbs={[{ label: 'Support' }, { label: 'Help & Support' }]}
+                title="Help and support"
+                description="Submit a support request or private-beta feedback. We will review it and follow up. No contractual response time is promised. Optional screenshots must already be CLEAN evidence in this tenant."
+            />
             <TextField fullWidth label="Subject" value={subject} onChange={(event) => setSubject(event.target.value)} sx={{ mb: 2 }} />
             <TextField select fullWidth label="Feedback type" value={kind} onChange={(event) => setKind(event.target.value)} sx={{ mb: 2 }}>
                 {FEEDBACK_KINDS.map(([value, label]) => <MenuItem key={value} value={value}>{label}</MenuItem>)}

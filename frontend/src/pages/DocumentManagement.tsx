@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Alert, Box, Button, Card, CardContent, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
+import StatusBadge from '../components/design/StatusBadge';
+import AppTable from '../components/design/AppTable';
 import { tprmAPI, vendorAPI } from '../services/api';
 
 type Stored = {
@@ -14,6 +17,13 @@ type Stored = {
     uploadedAt: string;
     size: number;
 };
+
+function scanTone(status: string): 'success' | 'critical' | 'high' | 'neutral' {
+    if (status === 'CLEAN') return 'success';
+    if (status === 'INFECTED') return 'critical';
+    if (status === 'PENDING' || status === 'FAILED' || status === 'NOT_CONFIGURED') return 'high';
+    return 'neutral';
+}
 
 export default function DocumentManagement() {
     const [searchParams] = useSearchParams();
@@ -43,13 +53,14 @@ export default function DocumentManagement() {
     }, []);
 
     return (
-        <Box sx={{ maxWidth: 1000 }}>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Verified Evidence Vault</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Tenant-scoped stored objects only. Scan status is never assumed CLEAN.
-            </Typography>
-            <Chip label={`Storage ${storageStatus}`} sx={{ mb: 3 }} />
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
+        <Box sx={{ maxWidth: 1200 }}>
+            <PageHeader
+                crumbs={[{ label: 'Third-party risk' }, { label: 'Evidence' }]}
+                title="Evidence"
+                description="Documents linked to vendors and assessments. Scan status is never assumed clean. Download stays blocked until a file is cleared."
+                meta={<StatusBadge kind="plain" tone={storageStatus === 'NOT_CONFIGURED' ? 'high' : 'info'} label={storageStatus === 'NOT_CONFIGURED' ? 'Storage not ready' : 'Storage ready'} />}
+            />
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
                 <TextField select label="Link upload to vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 280 }}>
                     <MenuItem value="">Select vendor</MenuItem>
                     {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
@@ -79,35 +90,32 @@ export default function DocumentManagement() {
                 </Button>
             </Stack>
             {!vendorId && <Alert severity="info" sx={{ mb: 2 }}>Select a vendor so the file is stored and linked atomically. Unlinked uploads are disabled.</Alert>}
-            <QueryState loading={loading} error={error} empty={items.length === 0} emptyTitle="No evidence uploaded" emptyBody="Uploads appear here with checksum, classification, and malware scan status.">
-                <Stack spacing={1.5}>
-                    {items.map((item) => (
-                        <Card key={item.id} sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
-                            <CardContent>
-                                <Stack direction="row" justifyContent="space-between">
-                                    <Box>
-                                        <Typography fontWeight={700}>{item.filename}</Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {item.ownerType}/{item.ownerId} · {item.classification} · {item.size} bytes
-                                        </Typography>
-                                    </Box>
-                                    <Chip
-                                        label={item.scanStatus}
-                                        color={
-                                            item.scanStatus === 'CLEAN'
-                                                ? 'success'
-                                                : item.scanStatus === 'INFECTED'
-                                                  ? 'error'
-                                                  : item.scanStatus === 'NOT_CONFIGURED' || item.scanStatus === 'PENDING' || item.scanStatus === 'FAILED'
-                                                    ? 'warning'
-                                                    : 'default'
-                                        }
-                                    />
-                                </Stack>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Stack>
+            <QueryState
+                loading={loading}
+                error={error}
+                empty={items.length === 0}
+                emptyTitle="No evidence uploaded"
+                emptyBody="Uploads appear here with classification and malware scan status. Choose a vendor, then attach a file."
+            >
+                <AppTable
+                    rows={items}
+                    rowKey={(row) => row.id}
+                    searchPlaceholder="Search evidence"
+                    searchValue={(row) => `${row.filename} ${row.classification} ${row.scanStatus}`}
+                    columns={[
+                        { id: 'file', label: 'File', sortValue: (row) => row.filename, render: (row) => (
+                            <Box>
+                                <Typography variant="subtitle2">{row.filename}</Typography>
+                                <Typography variant="caption">{row.ownerType} · {row.classification}</Typography>
+                            </Box>
+                        ) },
+                        { id: 'scan', label: 'Scan', sortValue: (row) => row.scanStatus, render: (row) => (
+                            <StatusBadge kind="plain" tone={scanTone(row.scanStatus)} label={row.scanStatus} />
+                        ) },
+                        { id: 'size', label: 'Size', hideOnMobile: true, sortValue: (row) => row.size, render: (row) => `${row.size} bytes` },
+                        { id: 'when', label: 'Uploaded', hideOnMobile: true, sortValue: (row) => row.uploadedAt, render: (row) => row.uploadedAt?.slice(0, 10) || '—' },
+                    ]}
+                />
             </QueryState>
         </Box>
     );

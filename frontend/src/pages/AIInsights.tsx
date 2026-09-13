@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Alert, Box, Button, Card, CardContent, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 import { aiAPI } from '../services/api';
 
 const features = [
@@ -37,13 +38,11 @@ export default function AIInsights() {
 
     return (
         <Box sx={{ maxWidth: 860 }}>
-            <Typography variant="overline" sx={{ color: '#38bdf8', fontWeight: 800, letterSpacing: '0.14em' }}>
-                AI Evidence Analyst
-            </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Assist, never own the score</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Output must stay labeled FACTS / INFERENCES / RECOMMENDATIONS. Residual risk still comes from the deterministic engine.
-            </Typography>
+            <PageHeader
+                crumbs={[{ label: 'Intelligence' }, { label: 'AI Analyst' }]}
+                title="AI analyst"
+                description="Assistance stays labeled as facts, inferences, and recommendations. Residual risk still comes from the deterministic engine."
+            />
             {!loading && (
                 <Alert severity={status === 'NOT_CONFIGURED' ? 'info' : status === 'ERROR' ? 'error' : 'success'} sx={{ mb: 2 }}>
                     {status === 'NOT_CONFIGURED'

@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
-import { Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { Alert, Box } from '@mui/material';
+import EmptyState from './design/EmptyState';
+import SkeletonBlock from './design/SkeletonBlock';
 
 export type QueryErrorKind =
     | 'PERMISSION_DENIED'
@@ -16,17 +18,27 @@ type Props = {
     empty?: boolean;
     emptyTitle?: string;
     emptyBody?: string;
+    emptyAction?: ReactNode;
     notConfigured?: boolean;
     children: ReactNode;
 };
 
 const KIND_TITLE: Record<QueryErrorKind, string> = {
-    PERMISSION_DENIED: 'Permission denied',
-    VALIDATION: 'Validation error',
-    RATE_LIMITED: 'Rate limited',
-    NOT_CONFIGURED: 'Not configured',
-    PROVIDER_ERROR: 'Provider error',
+    PERMISSION_DENIED: 'You cannot do this',
+    VALIDATION: 'Check the information entered',
+    RATE_LIMITED: 'Too many attempts',
+    NOT_CONFIGURED: 'Not available yet',
+    PROVIDER_ERROR: 'Service unavailable',
     API_FAILURE: 'Request failed',
+};
+
+const KIND_HINT: Record<QueryErrorKind, string> = {
+    PERMISSION_DENIED: 'Ask an organization administrator if you expected access.',
+    VALIDATION: 'Correct the highlighted fields and try again.',
+    RATE_LIMITED: 'Wait a moment, then retry.',
+    NOT_CONFIGURED: 'This capability is unavailable until it is configured for this environment.',
+    PROVIDER_ERROR: 'Try again shortly. If it continues, submit a support request.',
+    API_FAILURE: 'Refresh the page. If it continues, submit a support request from Help.',
 };
 
 export function classifyApiError(err: { status?: number; message?: string } | null | undefined): QueryErrorKind {
@@ -39,6 +51,13 @@ export function classifyApiError(err: { status?: number; message?: string } | nu
     return 'API_FAILURE';
 }
 
+function sanitizeError(message: string): string {
+    return message
+        .replace(/stripe|openai|anthropic|virustotal|clamav|s3|r2|sendgrid/gi, 'the connected service')
+        .replace(/\bECONNREFUSED\b|\bENOTFOUND\b|\bPrisma\b|\bTypeError\b/gi, 'a service error')
+        .replace(/permission denied|insufficient (role|permission)s?/gi, 'you do not have access');
+}
+
 export default function QueryState({
     loading,
     error,
@@ -46,32 +65,32 @@ export default function QueryState({
     empty,
     emptyTitle = 'Nothing here yet',
     emptyBody = 'When records exist for this organization, they will appear here.',
+    emptyAction,
     notConfigured,
     children,
 }: Props) {
     if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight={240} role="status">
-                <CircularProgress />
-            </Box>
-        );
+        return <SkeletonBlock />;
     }
     if (notConfigured) {
-        return <Alert severity="info">NOT_CONFIGURED — this capability is unavailable until a production provider is configured.</Alert>;
+        return (
+            <Alert severity="info">
+                This capability is unavailable until it is configured for this environment.
+            </Alert>
+        );
     }
     if (error) {
         const kind = errorKind || classifyApiError({ message: error });
         return (
             <Alert severity={kind === 'PERMISSION_DENIED' || kind === 'RATE_LIMITED' ? 'warning' : 'error'}>
-                <strong>{KIND_TITLE[kind]}.</strong> {error}
+                <strong>{KIND_TITLE[kind]}.</strong> {sanitizeError(error)} {KIND_HINT[kind]}
             </Alert>
         );
     }
     if (empty) {
         return (
-            <Box sx={{ py: 8, textAlign: 'center' }}>
-                <Typography variant="h6">{emptyTitle}</Typography>
-                <Typography color="text.secondary">{emptyBody}</Typography>
+            <Box sx={{ py: 1 }}>
+                <EmptyState title={emptyTitle} body={emptyBody} action={emptyAction} />
             </Box>
         );
     }

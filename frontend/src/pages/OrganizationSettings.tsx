@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardContent, Grid, MenuItem, TextField } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 import { organizationAPI } from '../services/api';
 
 const emptyForm = {
@@ -66,13 +67,11 @@ export default function OrganizationSettings() {
 
     return (
         <Box sx={{ maxWidth: 880 }}>
-            <Typography variant="overline" sx={{ color: '#94a3b8', fontWeight: 800, letterSpacing: '0.14em' }}>
-                Administration
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Organization profile</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Tenant-scoped organization record. Logo upload is not supported in this release.
-            </Typography>
+            <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Organization' }]}
+                title="Organization"
+                description="Tenant-scoped organization record. Logo upload is not supported in this release."
+            />
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             <QueryState loading={loading} error={error}>
                 <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>

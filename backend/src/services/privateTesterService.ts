@@ -197,13 +197,15 @@ export const privateTesterService = {
         }
 
         if (organization.isDemo !== enabled) {
+            const restoreStanding = enabled
+                && (organization.status === OrganizationStatus.SUSPENDED
+                    || organization.status === OrganizationStatus.PAST_DUE
+                    || organization.status === OrganizationStatus.CANCELLED);
             await prisma.organization.update({
                 where: { id: organizationId },
                 data: {
                     isDemo: enabled,
-                    ...(enabled && organization.status === OrganizationStatus.SUSPENDED
-                        ? { status: OrganizationStatus.TRIAL }
-                        : {}),
+                    ...(restoreStanding ? { status: OrganizationStatus.TRIAL } : {}),
                 },
             });
             await recordAudit({

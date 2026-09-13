@@ -25,7 +25,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — REOPENED / PARTIAL after Product Leadership browser review
+**#12 STARTED:** YES — FAIL customer-facing product experience after Product Leadership hosted review
 **#13 AUTHORIZED:** NO
 
 ---
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #12 Supreme Third Party Production v1 / Private Testing Release
 
-**STATUS:** REOPENED / PARTIAL — commercial production NO-GO; #13 not authorized
+**STATUS:** FAIL — CUSTOMER-FACING PRODUCT EXPERIENCE; commercial production NO-GO; #13 not authorized
 
 See `docs/PRIVATE-BETA-CERTIFICATION.md`, `docs/PRIVATE-BETA-TEST-PLAN.md`, and `docs/private-beta/`.
 
@@ -72,7 +72,7 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-Remediate #12 after Product Leadership rejected hosted Reports again: Supreme Investigation is a STARTER org without evaluation access, so every download stays disabled. Platform Owner can now designate testing organizations through the console. #12 stays PARTIAL. Do not claim Reports PASS from unit tests. Do not invite external testers. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
+Rebuild the customer product experience after Product Leadership rejected the hosted Assessment/admin UI and the API-unreachable banner. #12 stays FAIL until Product Leadership visual and functional acceptance. Do not start #13. Do not invite external testers. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 

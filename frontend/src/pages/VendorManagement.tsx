@@ -3,21 +3,12 @@ import {
     Box,
     Typography,
     Grid,
-    Card,
-    CardContent,
     Button,
-    Chip,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
+    Drawer,
     TextField,
     FormControl,
     InputLabel,
@@ -25,13 +16,17 @@ import {
     MenuItem,
     Tabs,
     Tab,
-    LinearProgress,
     Alert,
     Snackbar,
+    Stack,
 } from '@mui/material';
-import { Add, Business, Assessment, CheckCircle, Warning, Error as ErrorIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
+import StatusBadge from '../components/design/StatusBadge';
+import MetricCard from '../components/design/MetricCard';
+import AppTable from '../components/design/AppTable';
+import Surface from '../components/design/Surface';
 import { tprmAPI, vendorAPI } from '../services/api';
 
 interface Vendor {
@@ -97,33 +92,6 @@ function displayTier(tier?: string) {
     return tier.charAt(0) + tier.slice(1).toLowerCase();
 }
 
-const getTierColor = (tier: string) => {
-    const colors: Record<string, string> = {
-        'Critical': '#f5576c',
-        'High': '#fa709a',
-        'Medium': '#fee140',
-        'Low': '#43e97b'
-    };
-    return colors[tier] || '#667eea';
-};
-
-const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-        'Not Started': '#888',
-        'In Progress': '#00f2fe',
-        'Completed': '#43e97b',
-        'Overdue': '#f5576c'
-    };
-    return colors[status] || '#667eea';
-};
-
-const getScoreColor = (score: number) => {
-    if (score >= 90) return '#43e97b';
-    if (score >= 75) return '#00f2fe';
-    if (score >= 60) return '#fee140';
-    return '#f5576c';
-};
-
 export default function VendorManagement() {
     const navigate = useNavigate();
     const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -132,6 +100,7 @@ export default function VendorManagement() {
     const [error, setError] = useState<string | null>(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
     const [tabValue, setTabValue] = useState(0);
+    const [detailTab, setDetailTab] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
     const [offboardVendor, setOffboardVendor] = useState<Vendor | null>(null);
@@ -160,10 +129,9 @@ export default function VendorManagement() {
         servicesProvided: '',
         dataAccess: '',
         website: '',
-        businessOwner: ''
+        businessOwner: '',
     });
 
-    // Load vendors and statistics on mount
     useEffect(() => {
         loadVendors();
         loadStatistics();
@@ -187,12 +155,11 @@ export default function VendorManagement() {
                     nextReview: v.nextReviewDate ? new Date(v.nextReviewDate).toISOString().split('T')[0] : 'N/A',
                     contactEmail: v.contactEmail || v.primaryContact || 'N/A',
                     dataAccess: (v.dataTypesAccessed || v.dataCategories || []).join(', ') || 'N/A',
-                    assessmentStatus: displayAssessmentStatus(v.assessmentStatus)
+                    assessmentStatus: displayAssessmentStatus(v.assessmentStatus),
                 }));
                 setVendors(mappedVendors);
             }
         } catch (err: any) {
-            console.error('Failed to load vendors:', err);
             setError(err.message || 'Failed to load vendors.');
             setVendors([]);
         } finally {
@@ -204,14 +171,14 @@ export default function VendorManagement() {
         try {
             const response = await vendorAPI.getStatistics();
             setStatistics(response.data);
-        } catch (err) {
-            console.error('Failed to load statistics:', err);
+        } catch {
+            // Metrics stay blank rather than inventing values.
         }
     };
 
-    const criticalVendors = statistics?.tierDistribution?.Critical || vendors.filter(v => v.tier === 'Critical').length;
-    const overdueAssessments = vendors.filter(v => v.assessmentStatus === 'Overdue').length;
-    const avgRiskScore = statistics?.averageRiskScore || (vendors.reduce((sum, v) => sum + v.riskScore, 0) / vendors.length).toFixed(0);
+    const criticalVendors = statistics?.tierDistribution?.Critical || vendors.filter((v) => v.tier === 'Critical').length;
+    const overdueAssessments = vendors.filter((v) => v.assessmentStatus === 'Overdue').length;
+    const highVendors = vendors.filter((v) => v.tier === 'Critical' || v.tier === 'High').length;
 
     const handleAddVendor = async () => {
         const missing = [
@@ -257,16 +224,12 @@ export default function VendorManagement() {
                 servicesProvided: '',
                 dataAccess: '',
                 website: '',
-                businessOwner: ''
+                businessOwner: '',
             });
             await loadVendors();
             await loadStatistics();
         } catch (err: any) {
-            setSnackbar({
-                open: true,
-                message: err.message || 'Failed to add vendor',
-                severity: 'error'
-            });
+            setSnackbar({ open: true, message: err.message || 'Failed to add vendor', severity: 'error' });
         } finally {
             setSaving(false);
         }
@@ -274,6 +237,7 @@ export default function VendorManagement() {
 
     const handleViewVendor = (vendor: Vendor) => {
         setSelectedVendor(vendor);
+        setDetailTab(0);
         setRiskExplanation(null);
         setRiskExplanationError(null);
         tprmAPI.riskExplanation(String(vendor.id))
@@ -290,420 +254,126 @@ export default function VendorManagement() {
         navigate('/assessments');
     };
 
+    const filtered = vendors.filter((vendor) => {
+        if (tabValue === 1) return vendor.tier === 'Critical' || vendor.tier === 'High';
+        if (tabValue === 2) return vendor.assessmentStatus !== 'Completed';
+        return true;
+    });
+
     return (
         <Box>
-            {/* Snackbar for notifications */}
-            <Snackbar 
-                open={snackbar.open} 
-                autoHideDuration={6000} 
-                onClose={() => setSnackbar({ ...snackbar, open: false })}
-            >
+            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                 <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                     {snackbar.message}
                 </Alert>
             </Snackbar>
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                        Vendor Risk Management (TPRM)
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                        Assess and manage third-party vendor risks
-                    </Typography>
-                </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => setOpenDialog(true)}
-                    disabled={saving}
-                    sx={{
-                        background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                        color: '#000',
-                        '&:hover': {
-                            background: 'linear-gradient(135deg, #38f9d7 0%, #43e97b 100%)',
-                        }
-                    }}
-                >
-                    Add Vendor
-                </Button>
-            </Box>
+            <PageHeader
+                title="Third Parties"
+                description="Search, filter, and open a vendor record. Residual risk and reviews come from persisted tenant data only."
+                actions={<Button variant="contained" onClick={() => setOpenDialog(true)} disabled={saving}>Add third party</Button>}
+            />
 
-            <Box sx={{ mb: 3 }}>
-                <QueryState
-                    loading={loading && vendors.length === 0}
-                    error={error}
-                    empty={!loading && vendors.length === 0}
-                    emptyTitle="No vendors yet"
-                    emptyBody="Add a vendor with type, category, contact, and services. The new record appears in this list immediately."
-                >
-                    <span />
-                </QueryState>
-            </Box>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
+                <MetricCard label="Total" value={vendors.length} />
+                <MetricCard label="Critical" value={criticalVendors} />
+                <MetricCard label="High risk" value={highVendors} />
+                <MetricCard label="Due for review" value={overdueAssessments} />
+            </Stack>
 
-            {/* Stats Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: '#667eea', fontWeight: 700 }}>
-                                {vendors.length}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Total Vendors
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: '#f5576c', fontWeight: 700 }}>
-                                {criticalVendors}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Critical Vendors
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: getScoreColor(Number(avgRiskScore)), fontWeight: 700 }}>
-                                {avgRiskScore}%
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Avg Risk Score
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <CardContent>
-                            <Typography variant="h3" sx={{ color: overdueAssessments > 0 ? '#f5576c' : '#43e97b', fontWeight: 700 }}>
-                                {overdueAssessments}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Overdue Assessments
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
+            <Tabs value={tabValue} onChange={(_, value) => setTabValue(value)} sx={{ mb: 2 }}>
+                <Tab label="All" />
+                <Tab label="Critical & high" />
+                <Tab label="Assessments pending" />
+            </Tabs>
 
-            {/* Tier Distribution */}
-            <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)', mb: 4 }}>
-                <CardContent>
-                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-                        Vendor Risk Tier Distribution
-                    </Typography>
-                    <Grid container spacing={2}>
-                        {tiers.map(tier => {
-                            const count = vendors.filter(v => v.tier === tier.label).length;
-                            const percentage = ((count / vendors.length) * 100).toFixed(0);
-                            return (
-                                <Grid item xs={12} sm={6} md={3} key={tier.value}>
-                                    <Box sx={{
-                                        p: 2,
-                                        border: '2px solid',
-                                        borderColor: getTierColor(tier.label),
-                                        borderRadius: 2,
-                                        bgcolor: `${getTierColor(tier.label)}10`
-                                    }}>
-                                        <Typography variant="h4" sx={{ color: getTierColor(tier.label), fontWeight: 700 }}>
-                                            {count}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                            {tier.label} Tier ({percentage}%)
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                            );
-                        })}
-                    </Grid>
-                </CardContent>
-            </Card>
-
-            {/* Vendors Table */}
-            <Card sx={{ bgcolor: '#1a1f3a', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <CardContent>
-                    <Box sx={{ borderBottom: 1, borderColor: 'rgba(255,255,255,0.1)', mb: 2 }}>
-                        <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
-                            <Tab label="All Vendors" />
-                            <Tab label="Critical & High" />
-                            <Tab label="Pending Assessments" />
-                        </Tabs>
-                    </Box>
-
-                    <TableContainer component={Paper} sx={{ bgcolor: 'transparent' }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Vendor</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Category</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Tier</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Risk Score</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Compliance</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Assessment</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Next Review</TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Actions</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {vendors
-                                    .filter(v => {
-                                        if (tabValue === 1) return v.tier === 'Critical' || v.tier === 'High';
-                                        if (tabValue === 2) return v.assessmentStatus !== 'Completed';
-                                        return true;
-                                    })
-                                    .map((vendor) => (
-                                        <TableRow
-                                            key={vendor.id}
-                                            sx={{
-                                                '&:hover': { bgcolor: 'rgba(102, 126, 234, 0.05)' },
-                                                cursor: 'pointer',
-                                            }}
-                                            onClick={() => handleViewVendor(vendor)}
-                                        >
-                                            <TableCell>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Business sx={{ color: '#667eea' }} />
-                                                    <Box>
-                                                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'white' }}>
-                                                            {vendor.name}
-                                                        </Typography>
-                                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                                                            {vendor.contactEmail}
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    label={vendor.category}
-                                                    size="small"
-                                                    sx={{ bgcolor: 'rgba(102, 126, 234, 0.2)', color: '#667eea' }}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    label={vendor.tier}
-                                                    size="small"
-                                                    icon={
-                                                        vendor.tier === 'Critical' ? <ErrorIcon /> :
-                                                            vendor.tier === 'High' ? <Warning /> :
-                                                                <CheckCircle />
-                                                    }
-                                                    sx={{
-                                                        bgcolor: `${getTierColor(vendor.tier)}20`,
-                                                        color: getTierColor(vendor.tier),
-                                                        fontWeight: 600
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Box sx={{ width: 100 }}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                        <Typography variant="caption">{vendor.riskScore}%</Typography>
-                                                    </Box>
-                                                    <LinearProgress
-                                                        variant="determinate"
-                                                        value={vendor.riskScore}
-                                                        sx={{
-                                                            height: 6,
-                                                            borderRadius: 3,
-                                                            bgcolor: 'rgba(255,255,255,0.1)',
-                                                            '& .MuiLinearProgress-bar': {
-                                                                bgcolor: getScoreColor(vendor.riskScore),
-                                                                borderRadius: 3
-                                                            }
-                                                        }}
-                                                    />
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Box sx={{ width: 100 }}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                        <Typography variant="caption">{vendor.complianceScore}%</Typography>
-                                                    </Box>
-                                                    <LinearProgress
-                                                        variant="determinate"
-                                                        value={vendor.complianceScore}
-                                                        sx={{
-                                                            height: 6,
-                                                            borderRadius: 3,
-                                                            bgcolor: 'rgba(255,255,255,0.1)',
-                                                            '& .MuiLinearProgress-bar': {
-                                                                bgcolor: getScoreColor(vendor.complianceScore),
-                                                                borderRadius: 3
-                                                            }
-                                                        }}
-                                                    />
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    label={vendor.assessmentStatus}
-                                                    size="small"
-                                                    sx={{
-                                                        bgcolor: `${getStatusColor(vendor.assessmentStatus)}20`,
-                                                        color: getStatusColor(vendor.assessmentStatus),
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                                {vendor.nextReview}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    size="small"
-                                                    startIcon={<Assessment />}
-                                                    sx={{ color: '#667eea' }}
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
-                                                        handleStartAssessment(vendor);
-                                                    }}
-                                                >
-                                                    Assess
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </CardContent>
-            </Card>
-
-            {/* Add Vendor Dialog */}
-            <Dialog
-                open={openDialog}
-                onClose={() => setOpenDialog(false)}
-                maxWidth="md"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        bgcolor: '#1a1f3a',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                    }
-                }}
+            <QueryState
+                loading={loading && vendors.length === 0}
+                error={error}
+                empty={!loading && vendors.length === 0}
+                emptyTitle="No vendors yet"
+                emptyBody="Add a vendor with type, category, contact, and services. The new record appears in this list immediately."
+                emptyAction={<Button variant="contained" onClick={() => setOpenDialog(true)}>Add vendor</Button>}
             >
-                <DialogTitle sx={{ color: 'white' }}>Add New Vendor</DialogTitle>
+                <AppTable
+                    rows={filtered}
+                    rowKey={(row) => String(row.id)}
+                    onRowClick={handleViewVendor}
+                    searchPlaceholder="Search vendors"
+                    searchValue={(row) => `${row.name} ${row.category} ${row.tier} ${row.contactEmail} ${row.status}`}
+                    emptyTitle="No vendors match this view"
+                    emptyBody="Change the filter or search to see other vendors."
+                    columns={[
+                        { id: 'name', label: 'Vendor', sortValue: (row) => row.name, render: (row) => (
+                            <Box>
+                                <Typography variant="subtitle2">{row.name}</Typography>
+                                <Typography variant="caption">{row.contactEmail}</Typography>
+                            </Box>
+                        ) },
+                        { id: 'category', label: 'Category', hideOnMobile: true, sortValue: (row) => row.category, render: (row) => (categories.find((item) => item.value === row.category)?.label || row.category.replace(/_/g, ' ').toLowerCase()) },
+                        { id: 'tier', label: 'Tier', sortValue: (row) => row.tier, render: (row) => <StatusBadge value={row.tier} kind="severity" /> },
+                        { id: 'risk', label: 'Inherent risk', hideOnMobile: true, sortValue: (row) => row.riskScore, render: (row) => `${row.riskScore}` },
+                        { id: 'assessment', label: 'Assessment', sortValue: (row) => row.assessmentStatus, render: (row) => (
+                            <StatusBadge kind="plain" tone={row.assessmentStatus === 'Overdue' ? 'critical' : row.assessmentStatus === 'Completed' ? 'success' : 'high'} label={row.assessmentStatus} />
+                        ) },
+                        { id: 'review', label: 'Next review', hideOnMobile: true, sortValue: (row) => row.nextReview, render: (row) => row.nextReview },
+                        { id: 'action', label: '', render: (row) => (
+                            <Button size="small" onClick={(event) => { event.stopPropagation(); handleStartAssessment(row); }}>
+                                Assess
+                            </Button>
+                        ) },
+                    ]}
+                />
+            </QueryState>
+
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
+                <DialogTitle>Add vendor</DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid container spacing={2} sx={{ mt: 0.5 }}>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Vendor Name"
-                                value={newVendor.name}
-                                onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })}
-                                required
-                            />
+                            <TextField fullWidth label="Vendor name" value={newVendor.name} onChange={(e) => setNewVendor({ ...newVendor, name: e.target.value })} required />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <FormControl fullWidth required>
                                 <InputLabel id="vendor-type-label">Vendor type</InputLabel>
-                                <Select
-                                    labelId="vendor-type-label"
-                                    inputProps={{ 'aria-label': 'Vendor type' }}
-                                    value={newVendor.vendorType}
-                                    onChange={(e) => setNewVendor({ ...newVendor, vendorType: e.target.value })}
-                                    label="Vendor type"
-                                >
-                                    {vendorTypes.map((item) => (
-                                        <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>
-                                    ))}
+                                <Select labelId="vendor-type-label" inputProps={{ 'aria-label': 'Vendor type' }} value={newVendor.vendorType} onChange={(e) => setNewVendor({ ...newVendor, vendorType: e.target.value })} label="Vendor type">
+                                    {vendorTypes.map((item) => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <FormControl fullWidth required>
                                 <InputLabel id="vendor-category-label">Category</InputLabel>
-                                <Select
-                                    labelId="vendor-category-label"
-                                    inputProps={{ 'aria-label': 'Category' }}
-                                    value={newVendor.category}
-                                    onChange={(e) => setNewVendor({ ...newVendor, category: e.target.value })}
-                                    label="Category"
-                                >
-                                    {categories.map((cat) => (
-                                        <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>
-                                    ))}
+                                <Select labelId="vendor-category-label" inputProps={{ 'aria-label': 'Category' }} value={newVendor.category} onChange={(e) => setNewVendor({ ...newVendor, category: e.target.value })} label="Category">
+                                    {categories.map((cat) => <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <FormControl fullWidth required>
-                                <InputLabel>Risk Tier</InputLabel>
-                                <Select
-                                    value={newVendor.tier}
-                                    onChange={(e) => setNewVendor({ ...newVendor, tier: e.target.value })}
-                                    label="Risk Tier"
-                                >
-                                    {tiers.map((tier) => (
-                                        <MenuItem key={tier.value} value={tier.value}>{tier.label}</MenuItem>
-                                    ))}
+                                <InputLabel>Risk tier</InputLabel>
+                                <Select value={newVendor.tier} onChange={(e) => setNewVendor({ ...newVendor, tier: e.target.value })} label="Risk tier">
+                                    {tiers.map((tier) => <MenuItem key={tier.value} value={tier.value}>{tier.label}</MenuItem>)}
                                 </Select>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Primary contact"
-                                value={newVendor.primaryContact}
-                                onChange={(e) => setNewVendor({ ...newVendor, primaryContact: e.target.value })}
-                                required
-                            />
+                            <TextField fullWidth label="Primary contact" value={newVendor.primaryContact} onChange={(e) => setNewVendor({ ...newVendor, primaryContact: e.target.value })} required />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Contact Email"
-                                type="email"
-                                value={newVendor.contactEmail}
-                                onChange={(e) => setNewVendor({ ...newVendor, contactEmail: e.target.value })}
-                                required
-                            />
+                            <TextField fullWidth label="Contact email" type="email" value={newVendor.contactEmail} onChange={(e) => setNewVendor({ ...newVendor, contactEmail: e.target.value })} required />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Website"
-                                value={newVendor.website}
-                                onChange={(e) => setNewVendor({ ...newVendor, website: e.target.value })}
-                            />
+                            <TextField fullWidth label="Website" value={newVendor.website} onChange={(e) => setNewVendor({ ...newVendor, website: e.target.value })} />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth
-                                label="Business owner"
-                                value={newVendor.businessOwner}
-                                onChange={(e) => setNewVendor({ ...newVendor, businessOwner: e.target.value })}
-                            />
+                            <TextField fullWidth label="Business owner" value={newVendor.businessOwner} onChange={(e) => setNewVendor({ ...newVendor, businessOwner: e.target.value })} />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={2}
-                                label="Services provided"
-                                value={newVendor.servicesProvided}
-                                onChange={(e) => setNewVendor({ ...newVendor, servicesProvided: e.target.value })}
-                                required
-                            />
+                            <TextField fullWidth multiline rows={2} label="Services provided" value={newVendor.servicesProvided} onChange={(e) => setNewVendor({ ...newVendor, servicesProvided: e.target.value })} required />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={2}
-                                label="Data Access"
-                                value={newVendor.dataAccess}
-                                onChange={(e) => setNewVendor({ ...newVendor, dataAccess: e.target.value })}
-                                placeholder="e.g., Customer PII, Payment Data, Employee Records"
-                            />
+                            <TextField fullWidth multiline rows={2} label="Data access" value={newVendor.dataAccess} onChange={(e) => setNewVendor({ ...newVendor, dataAccess: e.target.value })} helperText="Example: Customer PII, payment data" />
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -713,178 +383,128 @@ export default function VendorManagement() {
                         onClick={handleAddVendor}
                         variant="contained"
                         disabled={saving || !newVendor.name || !newVendor.vendorType || !newVendor.category || !newVendor.primaryContact || !newVendor.contactEmail || !newVendor.servicesProvided}
-                        sx={{
-                            background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                            color: '#000'
-                        }}
                     >
-                        Add Vendor
+                        Add vendor
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Vendor Detail Dialog */}
-            <Dialog
-                open={!!selectedVendor}
-                onClose={() => setSelectedVendor(null)}
-                maxWidth="md"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        bgcolor: '#1a1f3a',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                    }
-                }}
-            >
+            <Drawer anchor="right" open={Boolean(selectedVendor)} onClose={() => setSelectedVendor(null)} PaperProps={{ sx: { width: { xs: '100%', md: 560 } } }}>
                 {selectedVendor && (
-                    <>
-                        <DialogTitle sx={{ color: 'white' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Business sx={{ fontSize: 40, color: '#667eea' }} />
-                                <Box>
-                                    <Typography variant="h5">{selectedVendor.name}</Typography>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        {selectedVendor.category}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </DialogTitle>
-                        <DialogContent>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Risk Tier
-                                    </Typography>
-                                    <Chip
-                                        label={selectedVendor.tier}
-                                        sx={{
-                                            bgcolor: `${getTierColor(selectedVendor.tier)}20`,
-                                            color: getTierColor(selectedVendor.tier),
-                                            fontWeight: 600,
-                                            mt: 0.5
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Assessment Status
-                                    </Typography>
-                                    <Chip
-                                        label={selectedVendor.assessmentStatus}
-                                        sx={{
-                                            bgcolor: `${getStatusColor(selectedVendor.assessmentStatus)}20`,
-                                            color: getStatusColor(selectedVendor.assessmentStatus),
-                                            mt: 0.5
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Risk Score
-                                    </Typography>
-                                    <Typography variant="h6" sx={{ color: getScoreColor(selectedVendor.riskScore) }}>
-                                        {selectedVendor.riskScore}%
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Compliance Score
-                                    </Typography>
-                                    <Typography variant="h6" sx={{ color: getScoreColor(selectedVendor.complianceScore) }}>
-                                        {selectedVendor.complianceScore}%
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Data Access
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'white', mt: 0.5 }}>
-                                        {selectedVendor.dataAccess}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Last Assessment
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'white', mt: 0.5 }}>
-                                        {selectedVendor.lastAssessment}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                        Next Review
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'white', mt: 0.5 }}>
-                                        {selectedVendor.nextReview}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
-                                        Explainable risk
-                                    </Typography>
-                                    {riskExplanationError && <Alert severity="error" sx={{ mb: 1 }}>{riskExplanationError}</Alert>}
-                                    {!riskExplanationError && !riskExplanation && (
-                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>Loading risk explanation…</Typography>
-                                    )}
-                                    {riskExplanation?.latest ? (
-                                        <Box>
-                                            <Typography variant="body2" sx={{ color: 'white' }}>
-                                                Inherent risk {riskExplanation.latest.inherentRisk}
+                    <Box sx={{ p: 3 }}>
+                        <Typography variant="overline">Vendor</Typography>
+                        <Typography variant="h3" sx={{ mb: 1 }}>{selectedVendor.name}</Typography>
+                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+                            <StatusBadge value={selectedVendor.tier} kind="severity" />
+                            <StatusBadge kind="plain" label={selectedVendor.status} />
+                            <StatusBadge kind="plain" tone={selectedVendor.assessmentStatus === 'Overdue' ? 'critical' : 'info'} label={selectedVendor.assessmentStatus} />
+                        </Stack>
+                        <Typography variant="body2" sx={{ mb: 2 }}>
+                            Next action: {selectedVendor.assessmentStatus === 'Completed' ? 'Open a decision brief or review findings.' : 'Start or continue the assessment.'}
+                        </Typography>
+                        <Tabs value={detailTab} onChange={(_, value) => setDetailTab(value)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>
+                            {['Overview', 'Risk', 'Assessments', 'Evidence', 'Findings', 'Monitoring', 'Decisions', 'Activity'].map((label) => (
+                                <Tab key={label} label={label} />
+                            ))}
+                        </Tabs>
+
+                        {detailTab === 0 && (
+                            <Stack spacing={1.5}>
+                                <Surface>
+                                    <Typography variant="caption">Category</Typography>
+                                    <Typography>{categories.find((item) => item.value === selectedVendor.category)?.label || selectedVendor.category.replace(/_/g, ' ')}</Typography>
+                                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>Contact</Typography>
+                                    <Typography>{selectedVendor.contactEmail}</Typography>
+                                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>Data access</Typography>
+                                    <Typography>{selectedVendor.dataAccess}</Typography>
+                                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>Next review</Typography>
+                                    <Typography>{selectedVendor.nextReview}</Typography>
+                                </Surface>
+                                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                    <Button variant="contained" onClick={() => handleStartAssessment()}>Start assessment</Button>
+                                    <Button onClick={() => navigate(`/documents?vendorId=${selectedVendor.id}`)}>Request evidence</Button>
+                                    <Button onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Create finding</Button>
+                                    <Button onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Make decision</Button>
+                                </Stack>
+                            </Stack>
+                        )}
+                        {detailTab === 1 && (
+                            <Stack spacing={1.5}>
+                                <MetricCard label="Inherent / recorded score" value={`${selectedVendor.riskScore}`} />
+                                {riskExplanationError && <Alert severity="error">{riskExplanationError}</Alert>}
+                                {!riskExplanationError && !riskExplanation && <Typography variant="body2">Loading risk explanation…</Typography>}
+                                {riskExplanation?.latest ? (
+                                    <Surface>
+                                        <Typography variant="h5" sx={{ mb: 1 }}>Explainable residual risk</Typography>
+                                        <Typography variant="body2">Inherent {riskExplanation.latest.inherentRisk}</Typography>
+                                        <Typography variant="body2">Control effectiveness {riskExplanation.latest.controlEffectiveness}</Typography>
+                                        <Typography variant="body2">Residual {riskExplanation.latest.residualRisk}</Typography>
+                                        <Typography variant="body2">Band {riskExplanation.latest.riskBand}</Typography>
+                                        <Typography variant="caption">Methodology {riskExplanation.methodologyVersion}</Typography>
+                                        {(riskExplanation.latest.factors || []).map((factor) => (
+                                            <Typography key={factor.label} variant="caption" display="block" sx={{ mt: 0.5 }}>
+                                                {factor.label}: {factor.points >= 0 ? '+' : ''}{factor.points}
                                             </Typography>
-                                            <Typography variant="body2" sx={{ color: 'white' }}>
-                                                Control effectiveness {riskExplanation.latest.controlEffectiveness}
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: 'white' }}>
-                                                Residual risk {riskExplanation.latest.residualRisk}
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: 'white' }}>
-                                                Risk band {riskExplanation.latest.riskBand}
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: 'white' }}>
-                                                Score methodology version {riskExplanation.methodologyVersion}
-                                            </Typography>
-                                            {(riskExplanation.latest.factors || []).map((factor) => (
-                                                <Typography key={factor.label} variant="caption" display="block" sx={{ color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>
-                                                    {factor.label}: {factor.points >= 0 ? '+' : ''}{factor.points}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    ) : riskExplanation ? (
-                                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                            No persisted score yet. Complete an assessment to calculate residual risk.
-                                        </Typography>
-                                    ) : null}
-                                </Grid>
-                            </Grid>
-                        </DialogContent>
-                        <DialogActions sx={{ flexWrap: 'wrap', gap: 1, justifyContent: 'flex-start', px: 3, pb: 2 }}>
-                            <Button onClick={() => setSelectedVendor(null)}>Close</Button>
-                            <Button variant="contained" startIcon={<Assessment />} onClick={() => handleStartAssessment()}>
-                                Start Assessment
-                            </Button>
-                            <Button onClick={() => navigate(`/documents?vendorId=${selectedVendor.id}`)}>Evidence</Button>
-                            <Button onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Findings</Button>
-                            <Button onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Decision brief</Button>
-                            <Button onClick={() => navigate('/monitoring')}>Monitoring</Button>
-                            <Button onClick={() => navigate(`/reports?vendorId=${selectedVendor.id}`)}>Reports</Button>
-                            <Button
-                                color="warning"
-                                onClick={() => {
-                                    setOffboardVendor(selectedVendor);
-                                    setOffboardNotes('');
-                                    setOffboardAck(false);
-                                    setOffboardPreview(null);
-                                    tprmAPI.offboardPreview(String(selectedVendor.id))
-                                        .then((res) => setOffboardPreview(res.data.data))
-                                        .catch((err) => setError(err.message));
-                                }}
-                            >
-                                Offboard
-                            </Button>
-                        </DialogActions>
-                    </>
+                                        ))}
+                                    </Surface>
+                                ) : riskExplanation ? (
+                                    <Typography variant="body2">No persisted score yet. Complete an assessment to calculate residual risk.</Typography>
+                                ) : null}
+                            </Stack>
+                        )}
+                        {detailTab === 2 && (
+                            <Stack spacing={1.5}>
+                                <Typography variant="body2">Open the assessment workspace for this vendor. Existing questionnaires stay linked to the record.</Typography>
+                                <Button variant="contained" onClick={() => handleStartAssessment()}>Open assessments</Button>
+                            </Stack>
+                        )}
+                        {detailTab === 3 && (
+                            <Stack spacing={1.5}>
+                                <Typography variant="body2">Evidence must be stored and scanned before it can be downloaded.</Typography>
+                                <Button variant="contained" onClick={() => navigate(`/documents?vendorId=${selectedVendor.id}`)}>Open evidence</Button>
+                            </Stack>
+                        )}
+                        {detailTab === 4 && (
+                            <Stack spacing={1.5}>
+                                <Typography variant="body2">Findings and corrective action live in the remediation workspace.</Typography>
+                                <Button variant="contained" onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Open findings</Button>
+                            </Stack>
+                        )}
+                        {detailTab === 5 && (
+                            <Stack spacing={1.5}>
+                                <Typography variant="body2">Only recorded signals appear. External ratings are not invented.</Typography>
+                                <Button variant="contained" onClick={() => navigate('/monitoring')}>Open monitoring</Button>
+                            </Stack>
+                        )}
+                        {detailTab === 6 && (
+                            <Stack spacing={1.5}>
+                                <Typography variant="body2">Generate or continue a decision brief from persisted residual risk.</Typography>
+                                <Button variant="contained" onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Open decisions</Button>
+                            </Stack>
+                        )}
+                        {detailTab === 7 && (
+                            <Stack spacing={1.5}>
+                                <Typography variant="body2">Significant actions write tenant-scoped audit events.</Typography>
+                                <Button variant="outlined" onClick={() => navigate('/activity-log')}>Open audit log</Button>
+                                <Button
+                                    color="warning"
+                                    onClick={() => {
+                                        setOffboardVendor(selectedVendor);
+                                        setOffboardNotes('');
+                                        setOffboardAck(false);
+                                        setOffboardPreview(null);
+                                        tprmAPI.offboardPreview(String(selectedVendor.id))
+                                            .then((res) => setOffboardPreview(res.data.data))
+                                            .catch((err) => setError(err.message));
+                                    }}
+                                >
+                                    Offboard
+                                </Button>
+                            </Stack>
+                        )}
+                    </Box>
                 )}
-            </Dialog>
+            </Drawer>
 
             <Dialog open={Boolean(offboardVendor)} onClose={() => setOffboardVendor(null)} fullWidth maxWidth="sm">
                 <DialogTitle>Offboard vendor</DialogTitle>
@@ -897,15 +517,7 @@ export default function VendorManagement() {
                             Open findings: {offboardPreview.outstanding.openFindings}. Open assessments: {offboardPreview.outstanding.openAssessments}. Evidence objects: {offboardPreview.outstanding.evidenceCount}.
                         </Alert>
                     )}
-                    <TextField
-                        fullWidth
-                        multiline
-                        minRows={3}
-                        label="Exit notes"
-                        value={offboardNotes}
-                        onChange={(event) => setOffboardNotes(event.target.value)}
-                        sx={{ mb: 2 }}
-                    />
+                    <TextField fullWidth multiline minRows={3} label="Exit notes" value={offboardNotes} onChange={(event) => setOffboardNotes(event.target.value)} sx={{ mb: 2 }} />
                     <Button variant="text" onClick={() => setOffboardAck((value) => !value)}>
                         {offboardAck ? 'Outstanding risks acknowledged' : 'Acknowledge outstanding risks'}
                     </Button>
@@ -935,7 +547,6 @@ export default function VendorManagement() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
         </Box>
     );
 }

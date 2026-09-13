@@ -15,9 +15,9 @@ describe('Layout Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
-        expect(screen.getByText(/Vendors/i)).toBeInTheDocument();
-        expect(screen.getByText(/Assessments/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Overview/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Vendors/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Assessments/i).length).toBeGreaterThan(0);
     });
 
     it('displays user information in sidebar', () => {
@@ -42,7 +42,36 @@ describe('Layout Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText(/Sign out/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Test/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Team/i).length).toBeGreaterThan(0);
+        localStorage.clear();
+    });
+
+    it('hides administration from viewers', () => {
+        localStorage.setItem('token', 'test-token');
+        localStorage.setItem(
+            'user',
+            JSON.stringify({
+                id: '2',
+                email: 'viewer@example.com',
+                firstName: 'View',
+                lastName: 'Er',
+                role: 'VIEWER',
+                organizationId: 'org1',
+            })
+        );
+
+        render(
+            <MemoryRouter future={routerFuture}>
+                <AuthProvider>
+                    <Layout />
+                </AuthProvider>
+            </MemoryRouter>
+        );
+
+        expect(screen.getAllByText(/Vendors/i).length).toBeGreaterThan(0);
+        expect(screen.queryByText(/^Team$/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Billing/i)).not.toBeInTheDocument();
         localStorage.clear();
     });
 });

@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Box, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
+import StatusBadge from '../components/design/StatusBadge';
+import AppTable from '../components/design/AppTable';
+import MetricCard from '../components/design/MetricCard';
+import { Stack } from '@mui/material';
 import { tprmAPI } from '../services/api';
 
 type Signal = {
@@ -31,36 +36,43 @@ export default function ContinuousMonitoring() {
             .finally(() => setLoading(false));
     }, []);
 
+    const actionable = signals.filter((row) => row.requiresAction).length;
+
     return (
-        <Box sx={{ maxWidth: 1000 }}>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Continuous monitoring</Typography>
-            <Typography color="text.secondary" sx={{ mb: 2 }}>
-                Only recorded vendor signals are shown. External rating feeds are not simulated.
-            </Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-                <Chip label={`Provider ${providerStatus}`} />
-                <Chip label={`Signals ${signalCount}`} variant="outlined" />
+        <Box sx={{ maxWidth: 1200 }}>
+            <PageHeader
+                crumbs={[{ label: 'Third-party risk' }, { label: 'Monitoring' }]}
+                title="Continuous monitoring"
+                description="Only recorded vendor signals are shown. External rating feeds are not simulated or backfilled."
+                meta={<StatusBadge kind="plain" tone={providerStatus === 'CONNECTED' ? 'success' : providerStatus === 'NOT_CONFIGURED' ? 'medium' : 'high'} label={providerStatus === 'CONNECTED' ? 'Provider connected' : signals.length ? 'Signals detected' : providerStatus === 'NOT_CONFIGURED' ? 'Not configured' : 'No signals'} />}
+            />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }}>
+                <MetricCard label="Recorded signals" value={signalCount} />
+                <MetricCard label="Require action" value={actionable} />
             </Stack>
             <QueryState
                 loading={loading}
                 error={error}
                 empty={signals.length === 0}
                 emptyTitle="No monitoring signals"
-                emptyBody="When a connected provider records a vendor signal, it will appear here and can raise findings."
+                emptyBody="When a connected provider records a vendor signal, it appears here and can raise a finding. An empty list is truthful — it is not a healthy-score placeholder."
             >
-                <Stack spacing={1.5}>
-                    {signals.map((signal) => (
-                        <Card key={signal.id} sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
-                            <CardContent>
-                                <Typography fontWeight={700}>{signal.vendor?.name || 'Vendor'}</Typography>
-                                <Typography color="text.secondary">
-                                    {signal.monitoringType}: {signal.riskIndicator}
-                                </Typography>
-                                <Chip size="small" label={signal.riskLevel} sx={{ mt: 1 }} />
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Stack>
+                <AppTable
+                    rows={signals}
+                    rowKey={(row) => row.id}
+                    searchPlaceholder="Search signals"
+                    searchValue={(row) => `${row.vendor?.name || ''} ${row.monitoringType} ${row.riskIndicator} ${row.riskLevel}`}
+                    columns={[
+                        { id: 'vendor', label: 'Vendor', sortValue: (row) => row.vendor?.name || '', render: (row) => (
+                            <Typography variant="subtitle2">{row.vendor?.name || 'Vendor'}</Typography>
+                        ) },
+                        { id: 'type', label: 'Type', hideOnMobile: true, sortValue: (row) => row.monitoringType, render: (row) => row.monitoringType },
+                        { id: 'indicator', label: 'Indicator', render: (row) => row.riskIndicator },
+                        { id: 'level', label: 'Level', sortValue: (row) => row.riskLevel, render: (row) => <StatusBadge value={row.riskLevel} kind="severity" /> },
+                        { id: 'action', label: 'Action', hideOnMobile: true, render: (row) => row.requiresAction ? 'Required' : 'Informational' },
+                        { id: 'when', label: 'Detected', hideOnMobile: true, sortValue: (row) => row.detectedAt, render: (row) => row.detectedAt?.slice(0, 16) || '—' },
+                    ]}
+                />
             </QueryState>
         </Box>
     );

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Alert, Box, Button, Card, CardContent, Chip, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Drawer, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
+import StatusBadge from '../components/design/StatusBadge';
+import MetricCard from '../components/design/MetricCard';
+import AppTable from '../components/design/AppTable';
 import { tprmAPI, vendorAPI } from '../services/api';
 
 type Finding = {
@@ -80,79 +84,105 @@ export default function FindingsRemediation() {
         }
     };
 
+    const filtered = vendorId ? findings.filter((row) => row.vendor?.id === vendorId) : findings;
+
     return (
         <Box sx={{ maxWidth: 1200 }}>
-            <Typography variant="overline" sx={{ color: '#f87171', fontWeight: 800, letterSpacing: '0.14em' }}>
-                Findings & Remediation
-            </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>Open issues across the vendor portfolio</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Findings are no longer buried inside a vendor record. Remediation plans, validation, and risk acceptance live here.
-            </Typography>
-            <Card sx={{ mb: 3, bgcolor: 'rgba(15,23,42,0.8)' }}>
-                <CardContent>
-                    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                        <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
-                            <MenuItem value="">Select vendor</MenuItem>
-                            {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
-                                <MenuItem value={vendorId}>Selected vendor</MenuItem>
-                            )}
-                            {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
-                        </TextField>
-                        <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />
-                        <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 140 }}>
-                            {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
-                        </TextField>
-                        <Button variant="contained" disabled={!vendorId || !title || busy} onClick={create}>Create finding</Button>
-                    </Stack>
-                    <TextField fullWidth sx={{ mt: 2 }} label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-                </CardContent>
-            </Card>
-            <QueryState loading={loading} error={error} empty={findings.length === 0} emptyTitle="No findings" emptyBody="When assessments or monitoring create issues, they appear here.">
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                    <Card sx={{ flex: 1, bgcolor: 'rgba(15,23,42,0.85)' }}>
-                        <CardContent>
-                            {findings.map((finding) => (
-                                <Box key={finding.id} onClick={() => { setSelected(finding); setCap(finding.correctiveActionPlan || ''); setTarget(finding.targetRemediationDate?.slice(0, 10) || ''); }} sx={{ py: 1.5, cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Chip size="small" label={finding.severity} color={finding.severity === 'CRITICAL' ? 'error' : 'warning'} />
-                                        <Typography fontWeight={700}>{finding.title}</Typography>
-                                    </Stack>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {finding.vendor?.name} · {finding.status} · {finding.assignedTo || 'unassigned'}
-                                    </Typography>
-                                </Box>
-                            ))}
-                        </CardContent>
-                    </Card>
-                    {selected && (
-                        <Card sx={{ flex: 1, bgcolor: 'rgba(15,23,42,0.85)' }}>
-                            <CardContent>
-                                <Typography variant="h5">{selected.title}</Typography>
-                                <Typography color="text.secondary" sx={{ my: 1 }}>{selected.description}</Typography>
-                                <Alert severity={selected.status === 'RISK_ACCEPTED' ? 'warning' : 'info'} sx={{ mb: 2 }}>
-                                    Status {selected.status}. Risk acceptance here is a finding disposition, not a residual-score control.
-                                </Alert>
-                                <Stack spacing={2}>
-                                    <TextField label="Corrective action plan" multiline minRows={3} value={cap} onChange={(e) => setCap(e.target.value)} />
-                                    <TextField type="date" label="Target remediation" InputLabelProps={{ shrink: true }} value={target} onChange={(e) => setTarget(e.target.value)} />
-                                    <Button variant="contained" disabled={busy} onClick={saveCap}>Save remediation plan</Button>
-                                    <Button disabled={busy} onClick={async () => {
-                                        const updated = await tprmAPI.validateFinding(selected.id, { approved: true, validationNotes: 'Validated from findings workspace' });
-                                        setSelected(updated.data.data);
-                                        await load();
-                                    }}>Validate remediation</Button>
-                                    <Button disabled={busy} onClick={async () => {
-                                        const updated = await tprmAPI.closeFinding(selected.id, { closureNotes: 'Closed from findings workspace' });
-                                        setSelected(updated.data.data);
-                                        await load();
-                                    }}>Close finding</Button>
-                                </Stack>
-                            </CardContent>
-                        </Card>
+            <PageHeader
+                title="Findings"
+                description="Remediate issues from assessments and monitoring. Severity uses tone plus a label — not color alone."
+            />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }} useFlexGap flexWrap="wrap">
+                <MetricCard label="Critical" value={findings.filter((row) => row.severity === 'CRITICAL').length} />
+                <MetricCard label="High" value={findings.filter((row) => row.severity === 'HIGH').length} />
+                <MetricCard label="Overdue" value={findings.filter((row) => row.targetRemediationDate && new Date(row.targetRemediationDate).getTime() < Date.now() && !['CLOSED', 'RISK_ACCEPTED', 'RESOLVED'].includes(row.status)).length} />
+                <MetricCard label="Due soon" value={findings.filter((row) => {
+                    if (!row.targetRemediationDate || ['CLOSED', 'RISK_ACCEPTED', 'RESOLVED'].includes(row.status)) return false;
+                    const due = new Date(row.targetRemediationDate).getTime();
+                    return due >= Date.now() && due <= Date.now() + 7 * 86400000;
+                }).length} />
+            </Stack>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
+                <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                    <MenuItem value="">All vendors</MenuItem>
+                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                        <MenuItem value={vendorId}>Selected vendor</MenuItem>
                     )}
-                </Stack>
+                    {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                </TextField>
+                <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />
+                <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 140 }}>
+                    {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
+                </TextField>
+                <Button variant="contained" disabled={!vendorId || !title || busy} onClick={create}>Create finding</Button>
+            </Stack>
+            <TextField fullWidth sx={{ mb: 3 }} label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+            <QueryState
+                loading={loading}
+                error={error}
+                empty={filtered.length === 0}
+                emptyTitle="No findings yet"
+                emptyBody="When assessments or monitoring create issues — or you record one here — they appear with a remediation path."
+            >
+                <AppTable
+                    rows={filtered}
+                    rowKey={(row) => row.id}
+                    onRowClick={(row) => {
+                        setSelected(row);
+                        setCap(row.correctiveActionPlan || '');
+                        setTarget(row.targetRemediationDate?.slice(0, 10) || '');
+                    }}
+                    searchPlaceholder="Search findings"
+                    searchValue={(row) => `${row.title} ${row.vendor?.name || ''} ${row.status} ${row.severity}`}
+                    columns={[
+                        { id: 'title', label: 'Finding', sortValue: (row) => row.title, render: (row) => (
+                            <Box>
+                                <Typography variant="subtitle2">{row.title}</Typography>
+                                <Typography variant="caption">{row.vendor?.name || 'Vendor'}</Typography>
+                            </Box>
+                        ) },
+                        { id: 'severity', label: 'Severity', sortValue: (row) => row.severity, render: (row) => <StatusBadge value={row.severity} kind="severity" /> },
+                        { id: 'status', label: 'Status', sortValue: (row) => row.status, render: (row) => <StatusBadge value={row.status} /> },
+                        { id: 'owner', label: 'Owner', hideOnMobile: true, render: (row) => row.assignedTo || 'Unassigned' },
+                        { id: 'due', label: 'Due', hideOnMobile: true, sortValue: (row) => row.targetRemediationDate || '', render: (row) => row.targetRemediationDate?.slice(0, 10) || '—' },
+                    ]}
+                />
             </QueryState>
+
+            <Drawer anchor="right" open={Boolean(selected)} onClose={() => setSelected(null)} PaperProps={{ sx: { width: { xs: '100%', sm: 460 } } }}>
+                {selected && (
+                    <Box sx={{ p: 3 }}>
+                        <Typography variant="overline">Finding</Typography>
+                        <Typography variant="h4" sx={{ mb: 1 }}>{selected.title}</Typography>
+                        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                            <StatusBadge value={selected.severity} kind="severity" />
+                            <StatusBadge value={selected.status} />
+                        </Stack>
+                        <Typography variant="body2" sx={{ mb: 2 }}>{selected.description}</Typography>
+                        <Alert severity={selected.status === 'RISK_ACCEPTED' ? 'warning' : 'info'} sx={{ mb: 2 }}>
+                            {selected.status === 'RISK_ACCEPTED'
+                                ? 'Accepted here is a finding disposition. It does not change residual risk by itself.'
+                                : 'Record a plan, then validate and close. History stays with the vendor.'}
+                        </Alert>
+                        <Stack spacing={2}>
+                            <TextField label="Corrective action plan" multiline minRows={3} value={cap} onChange={(e) => setCap(e.target.value)} />
+                            <TextField type="date" label="Target remediation" InputLabelProps={{ shrink: true }} value={target} onChange={(e) => setTarget(e.target.value)} />
+                            <Button variant="contained" disabled={busy} onClick={saveCap}>Save remediation plan</Button>
+                            <Button disabled={busy} onClick={async () => {
+                                const updated = await tprmAPI.validateFinding(selected.id, { approved: true, validationNotes: 'Validated from findings workspace' });
+                                setSelected(updated.data.data);
+                                await load();
+                            }}>Mark verification complete</Button>
+                            <Button disabled={busy} onClick={async () => {
+                                const updated = await tprmAPI.closeFinding(selected.id, { closureNotes: 'Closed from findings workspace' });
+                                setSelected(updated.data.data);
+                                await load();
+                            }}>Close finding</Button>
+                            <Button onClick={() => setSelected(null)}>Close panel</Button>
+                        </Stack>
+                    </Box>
+                )}
+            </Drawer>
         </Box>
     );
 }

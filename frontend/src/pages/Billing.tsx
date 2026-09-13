@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
 import { billingAPI } from '../services/api';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 
 const PLANS = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE'] as const;
 const INTERVALS = [
@@ -42,7 +43,11 @@ export default function Billing() {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ mb: 1, fontWeight: 800 }}>Billing</Typography>
+            <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Billing' }]}
+                title="Billing"
+                description="Private testing uses Stripe test mode only, if billing is configured. A successful test checkout is not a commercial purchase."
+            />
             <Alert severity="info" sx={{ mb: 3 }}>
                 Private testing uses Stripe test mode only, if billing is configured. Do not enter a real production card. A successful test checkout is not a commercial purchase.
             </Alert>

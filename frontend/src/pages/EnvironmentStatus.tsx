@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Chip, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 import { systemAPI } from '../services/api';
 
 export default function EnvironmentStatus() {
@@ -17,8 +18,11 @@ export default function EnvironmentStatus() {
 
     return (
         <Box sx={{ maxWidth: 720 }}>
-            <Typography variant="overline" sx={{ fontWeight: 800, letterSpacing: '0.14em' }}>Administration</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>Environment status</Typography>
+            <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Environment' }]}
+                title="Environment status"
+                description="Provider and environment facts from the server. This page does not invent connected status."
+            />
             <QueryState loading={loading} error={error}>
                 <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
                     <CardContent>

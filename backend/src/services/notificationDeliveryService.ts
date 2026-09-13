@@ -25,7 +25,7 @@ export type NotificationEvent =
     | 'ops.alert';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
-export type EmailDeliveryStatus = 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';
+export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';
 
 let lastDelivery: 'none' | 'success' | 'failure' = 'none';
 
@@ -68,6 +68,8 @@ export async function deliverEmail(input: {
     body: string;
     eventType?: string;
     organizationId?: string;
+    resourceType?: string;
+    resourceId?: string;
 }): Promise<{ status: EmailDeliveryStatus; messageId?: string }> {
     if (!isEmailConfigured()) {
         logger.info('Email notification skipped: email provider not configured', {
@@ -113,17 +115,19 @@ export async function deliverEmail(input: {
         await recordNotificationDelivery({
             organizationId: input.organizationId,
             eventType: input.eventType || 'email',
-            status: 'DELIVERED',
+            status: 'ACCEPTED',
             recipient: input.to,
+            resourceType: input.resourceType,
+            resourceId: input.resourceId,
         });
         logger.info('Email notification result', {
             eventType: input.eventType,
             organizationId: input.organizationId,
             recipient: maskEmail(input.to),
-            deliveryStatus: 'DELIVERED',
+            deliveryStatus: 'ACCEPTED',
             messageId,
         });
-        return { status: 'DELIVERED', messageId };
+        return { status: 'ACCEPTED', messageId };
     } catch (error) {
         recordEmailDelivery(false);
         await recordNotificationDelivery({
@@ -131,6 +135,8 @@ export async function deliverEmail(input: {
             eventType: input.eventType || 'email',
             status: 'FAILED',
             recipient: input.to,
+            resourceType: input.resourceType,
+            resourceId: input.resourceId,
         });
         logger.error('Email notification failed; business record unchanged', {
             eventType: input.eventType,
@@ -180,13 +186,16 @@ export async function notify(input: {
         }
     }
 
-    if (email && input.emailTo) {
+    const forceEmail = input.eventType === 'user.invitation' || input.eventType === 'auth.password_reset';
+    if ((email || forceEmail) && input.emailTo) {
         const delivered = await deliverEmail({
             to: input.emailTo,
             subject: input.title,
             body: input.emailBody || input.body,
             eventType: input.eventType,
             organizationId: input.organizationId,
+            resourceType: input.resourceType,
+            resourceId: input.resourceId,
         });
         return { inApp, email: delivered.status, messageId: delivered.messageId };
     }

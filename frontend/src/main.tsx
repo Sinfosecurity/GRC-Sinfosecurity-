@@ -14,19 +14,19 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <ErrorBoundary>
-            <Provider store={store}>
-                <BrowserRouter future={routerFuture}>
-                    <NotificationProvider>
-                        <AuthProvider>
-                            <ThemeProvider theme={theme}>
-                                <CssBaseline />
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <ErrorBoundary>
+                <Provider store={store}>
+                    <BrowserRouter future={routerFuture}>
+                        <NotificationProvider>
+                            <AuthProvider>
                                 <App />
-                            </ThemeProvider>
-                        </AuthProvider>
-                    </NotificationProvider>
-                </BrowserRouter>
-            </Provider>
-        </ErrorBoundary>
+                            </AuthProvider>
+                        </NotificationProvider>
+                    </BrowserRouter>
+                </Provider>
+            </ErrorBoundary>
+        </ThemeProvider>
     </React.StrictMode>,
 )

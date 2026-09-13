@@ -73,12 +73,12 @@ class ErrorBoundary extends Component<Props, State> {
             <ErrorOutlineIcon sx={{ fontSize: 80, color: 'error.main' }} />
             
             <Typography variant="h3" gutterBottom>
-              Oops! Something went wrong
+              This page could not be shown
             </Typography>
             
             <Typography variant="body1" color="text.secondary" paragraph>
-              We encountered an unexpected error. Don't worry, your data is safe.
-              Please try refreshing the page or contact support if the problem persists.
+              Refresh the page. If it continues, submit a request from Help & Support.
+              Your organization records were not changed.
             </Typography>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (

@@ -5,7 +5,27 @@ import { recordAudit } from './auditEventService';
 import { ApiError } from '../middleware/errorHandler';
 import { permissionsForRole } from '../security/rbac';
 import { emailStatus, notify } from './notificationDeliveryService';
-import { invitationEmailBody } from './publicFrontendUrl';
+import { invitationEmailBody, portalFrontendUrl } from './publicFrontendUrl';
+
+export const CUSTOMER_ROLE_LABELS: Record<string, { label: string; description: string }> = {
+    ORGANIZATION_ADMIN: { label: 'Organization Admin', description: 'Manages the organization, people, and Third Party settings.' },
+    ADMIN: { label: 'Organization Admin', description: 'Manages the organization, people, and Third Party settings.' },
+    RISK_MANAGER: { label: 'Risk Manager', description: 'Owns residual risk, findings, and decisions.' },
+    ASSESSOR: { label: 'Assessor', description: 'Completes assessments and attaches evidence.' },
+    APPROVER: { label: 'Approver', description: 'Reviews assessments and records decisions.' },
+    VIEWER: { label: 'Viewer', description: 'Can view records but cannot export or change work.' },
+    AUDITOR: { label: 'Auditor', description: 'Reads records and audit history.' },
+    BUSINESS_OWNER: { label: 'Business Owner', description: 'Follows vendors they own and related work.' },
+    COMPLIANCE_OFFICER: { label: 'Assessor', description: 'Completes assessments and attaches evidence.' },
+    USER: { label: 'Viewer', description: 'Can view records but cannot export or change work.' },
+};
+
+export function customerDeliveryLabel(status?: string | null) {
+    if (status === 'DELIVERED' || status === 'ACCEPTED' || status === 'QUEUED') return 'queued';
+    if (status === 'FAILED' || status === 'BOUNCED' || status === 'ERROR') return 'not sent';
+    if (status === 'NOT_CONFIGURED') return 'not sent';
+    return 'unknown';
+}
 
 const PLATFORM_ROLES = new Set<Role>([
     Role.SUPERADMIN,
@@ -78,6 +98,8 @@ function publicUser(user: {
         lastLogin: user.lastLogin,
         createdAt: user.createdAt,
         permissions: permissionsForRole(user.role),
+        roleLabel: CUSTOMER_ROLE_LABELS[user.role]?.label || user.role.replace(/_/g, ' ').toLowerCase(),
+        roleDescription: CUSTOMER_ROLE_LABELS[user.role]?.description || '',
     };
 }
 
@@ -208,27 +230,51 @@ export const identityUserService = {
             nextRole: role,
             action: 'invite',
         });
-        const result = await authService.invite({ organizationId, invitedById, email, role });
+        const normalized = email.trim().toLowerCase();
+        if (!normalized || !normalized.includes('@')) {
+            throw new ApiError(400, 'Enter a valid work email.');
+        }
+        const actor = await prisma.user.findUnique({ where: { id: invitedById }, select: { email: true } });
+        if (actor?.email?.toLowerCase() === normalized) {
+            throw new ApiError(400, 'You already have access. Invite a different person.');
+        }
+        const existingMember = await prisma.user.findUnique({ where: { email: normalized } });
+        if (existingMember) {
+            if (existingMember.organizationId === organizationId) {
+                throw new ApiError(409, 'That person already has access to this organization.');
+            }
+            throw new ApiError(409, 'That email already belongs to a Supreme user. Invite a unique work email.');
+        }
+        const pending = await prisma.accountInvitation.findFirst({
+            where: { organizationId, email: normalized, status: 'PENDING' },
+        });
+        if (pending) {
+            return this.resendInvitation(organizationId, pending.id, invitedById, actorRole);
+        }
+        const result = await authService.invite({ organizationId, invitedById, email: normalized, role });
         const delivery = await notify({
             organizationId,
             userId: invitedById,
             eventType: 'user.invitation',
-            title: 'You are invited to Supreme Risk',
-            body: `An administrator invited you with role ${role}.`,
+            title: 'You are invited to Supreme',
+            body: `An administrator invited you as ${CUSTOMER_ROLE_LABELS[role]?.label || 'a team member'}.`,
             emailBody: invitationEmailBody(role, result.token),
             resourceType: 'AccountInvitation',
             resourceId: result.invitation.id,
-            emailTo: email,
+            emailTo: normalized,
         });
+        const emailDelivery = typeof delivery === 'object' && delivery && 'email' in delivery ? String(delivery.email) : emailStatus();
         return invitationApiPayload({
             invitation: result.invitation,
-            emailStatus: typeof delivery === 'object' && delivery && 'email' in delivery ? delivery.email : emailStatus(),
+            emailStatus: emailDelivery,
+            delivery: customerDeliveryLabel(emailDelivery),
+            activationUrl: `${portalFrontendUrl('CUSTOMER').replace(/\/$/, '')}/activate?token=${result.token}`,
             token: result.token,
         });
     },
 
     async listInvitations(organizationId: string) {
-        return prisma.accountInvitation.findMany({
+        const rows = await prisma.accountInvitation.findMany({
             where: { organizationId },
             orderBy: { createdAt: 'desc' },
             take: 100,
@@ -240,7 +286,21 @@ export const identityUserService = {
                 expiresAt: true,
                 createdAt: true,
                 acceptedAt: true,
+                invitedBy: { select: { firstName: true, lastName: true, email: true } },
             },
+        });
+        const deliveries = await prisma.notificationDeliveryLog.findMany({
+            where: { organizationId, resourceId: { in: rows.map((row) => row.id) } },
+            orderBy: { createdAt: 'desc' },
+        });
+        return rows.map((row) => {
+            const latest = deliveries.find((item) => item.resourceId === row.id);
+            return {
+                ...row,
+                invitedByName: row.invitedBy ? `${row.invitedBy.firstName} ${row.invitedBy.lastName}`.trim() : '—',
+                emailDelivery: customerDeliveryLabel(latest?.status),
+                emailAttemptedAt: latest?.createdAt || null,
+            };
         });
     },
 
@@ -281,9 +341,12 @@ export const identityUserService = {
             resourceId: invitation.id,
             result: 'success',
         });
+        const emailDelivery = typeof delivery === 'object' && delivery && 'email' in delivery ? String(delivery.email) : emailStatus();
         return invitationApiPayload({
             invitation: { ...invitation, expiresAt: result.expiresAt },
-            emailStatus: typeof delivery === 'object' && delivery && 'email' in delivery ? delivery.email : emailStatus(),
+            emailStatus: emailDelivery,
+            delivery: customerDeliveryLabel(emailDelivery),
+            activationUrl: `${portalFrontendUrl('CUSTOMER').replace(/\/$/, '')}/activate?token=${result.token}`,
             token: result.token,
         });
     },

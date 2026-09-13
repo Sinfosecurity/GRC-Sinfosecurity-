@@ -19,6 +19,10 @@ jest.mock('../config/logger', () => ({
     default: { info: jest.fn(), error: jest.fn() },
 }));
 
+jest.mock('../services/opsEventService', () => ({
+    recordNotificationDelivery: jest.fn().mockResolvedValue(undefined),
+}));
+
 const { prisma } = require('../config/database');
 const { sendSmtpMail } = require('../services/smtpClient');
 const logger = require('../config/logger').default;
@@ -60,7 +64,7 @@ describe('workflow notification delivery', () => {
         expect(emailStatus()).toBe('DEGRADED');
         sendSmtpMail.mockResolvedValue({ messageId: 'msg-1' });
         const result = await notify(base);
-        expect(result.email).toBe('DELIVERED');
+        expect(result.email).toBe('ACCEPTED');
         expect(emailStatus()).toBe('CONNECTED');
         expect(sendSmtpMail).toHaveBeenCalledWith(
             expect.objectContaining({ to: 'owner@org-a.test', subject: 'Assessment assigned' })
@@ -90,7 +94,7 @@ describe('workflow notification delivery', () => {
         expect(logged).not.toContain('super-secret-token');
         expect(logged).not.toContain('owner@org-a.test');
         expect(logged).toContain('o***@org-a.test');
-        expect(logged).toContain('DELIVERED');
+        expect(logged).toContain('ACCEPTED');
         expect(logged).toContain('msg-1');
     });
 

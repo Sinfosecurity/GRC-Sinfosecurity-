@@ -44,6 +44,6 @@ describe('invitation revoke', () => {
                 firstName: 'Invite',
                 lastName: 'Ee',
             })
-        ).rejects.toThrow(/invalid or expired/i);
+        ).rejects.toThrow(/revoked|expired|not valid/i);
     });
 });

@@ -648,8 +648,14 @@ export const authService = {
         const invitation = await prisma.accountInvitation.findUnique({
             where: { tokenHash: hashToken(token) },
         });
-        if (!invitation || invitation.status !== 'PENDING' || invitation.expiresAt < new Date()) {
-            throw new ApiError(400, 'Invitation is invalid or expired');
+        if (!invitation) {
+            throw new ApiError(400, 'This invitation is not valid. Ask your organization administrator for a new invitation.');
+        }
+        if (invitation.status === 'REVOKED') {
+            throw new ApiError(400, 'This invitation has been revoked. Ask your organization administrator for a new invitation.');
+        }
+        if (invitation.status !== 'PENDING' || invitation.expiresAt < new Date()) {
+            throw new ApiError(400, 'This invitation has expired. Ask your organization administrator for a new invitation.');
         }
         const existing = await prisma.user.findUnique({ where: { email: invitation.email } });
         if (existing) {

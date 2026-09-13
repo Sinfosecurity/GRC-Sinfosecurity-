@@ -382,6 +382,27 @@ const SCOPE_BY_TIER: Record<string, string[]> = {
     CRITICAL: ['inherent-risk', 'information-security', 'privacy', 'bcdr', 'identity', 'cloud-saas', 'incident', 'fourth-party', 'soc2'],
 };
 
+const PLAN_REASON: Record<string, string> = {
+    'inherent-risk': 'Determines due-diligence scope before controls are credited.',
+    'information-security': 'Network, system, or data access requires a security program review.',
+    privacy: 'The relationship may process personal or confidential information.',
+    bcdr: 'The vendor is an operational dependency that needs continuity coverage.',
+    'cloud-saas': 'Hosted or SaaS delivery requires a cloud-control review.',
+    incident: 'An incident at this vendor could require customer or regulator notice.',
+    identity: 'Privileged or production access requires identity-control review.',
+    'fourth-party': 'Concentration and subcontracting risk rises at this tier.',
+    soc2: 'Customers often expect an assurance review at this residual-risk level.',
+    resilience: 'Payment or financial operations raise resilience expectations.',
+    regulatory: 'The relationship may support a regulated activity.',
+};
+
+function reasonFor(key: string, vendor: { vendorType?: string | null; tier?: string | null }) {
+    if (key === 'cloud-saas' && /SAAS|CLOUD/i.test(String(vendor.vendorType || ''))) {
+        return 'Hosted service — cloud and SaaS controls apply.';
+    }
+    return PLAN_REASON[key] || 'Recommended from this vendor’s recorded risk tier.';
+}
+
 export async function recommendAssessments(organizationId: string, vendorId: string) {
     const vendor = await prisma.vendor.findFirst({
         where: { id: vendorId, organizationId },
@@ -393,14 +414,43 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     const extra: string[] = [];
     if (/PAYMENT|FINANCIAL/i.test(String(vendor.vendorType || ''))) extra.push('resilience', 'regulatory');
     const wanted = new Set([...keys, ...extra]);
-    const names = SUPREME_LIBRARY.filter((item) => wanted.has(item.key)).map((item) => item.name);
+    const requiredKeys = new Set(['inherent-risk']);
+    const recommendedKeys = new Set([...wanted].filter((key) => key !== 'inherent-risk'));
+    const optionalKeys = SUPREME_LIBRARY.map((item) => item.key).filter((key) => !wanted.has(key));
+    const allKeys = [...requiredKeys, ...recommendedKeys, ...optionalKeys];
+    const names = SUPREME_LIBRARY.filter((item) => allKeys.includes(item.key)).map((item) => item.name);
     const templates = await prisma.questionnaireTemplate.findMany({
         where: { organizationId: null, isActive: true, name: { in: names } },
         select: { id: true, name: true, version: true, framework: true },
     });
+    const byName = Object.fromEntries(templates.map((row) => [row.name, row]));
+    const toItems = (keysToMap: string[]) =>
+        keysToMap
+            .map((key) => {
+                const library = SUPREME_LIBRARY.find((item) => item.key === key);
+                const template = library ? byName[library.name] : undefined;
+                if (!library || !template) return null;
+                return {
+                    id: template.id,
+                    key,
+                    name: template.name,
+                    version: template.version,
+                    framework: template.framework,
+                    purpose: library.purpose,
+                    reason: reasonFor(key, vendor),
+                };
+            })
+            .filter(Boolean);
+
+    const required = toItems([...requiredKeys]);
+    const recommended = toItems([...recommendedKeys]);
+    const optional = toItems(optionalKeys);
     return {
         vendor,
-        rationale: `Recommended from vendor tier ${vendor.tier}. This is assessment scope, not a change to the residual-risk score.`,
-        templates,
+        rationale: `Recommended from recorded vendor tier ${vendor.tier}. This is assessment scope, not a residual-risk score change. Aligned assessments do not provide certification.`,
+        required,
+        recommended,
+        optional,
+        templates: [...required, ...recommended],
     };
 }

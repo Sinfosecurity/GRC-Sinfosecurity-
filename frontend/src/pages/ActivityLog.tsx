@@ -16,6 +16,7 @@ import {
     Typography,
 } from '@mui/material';
 import QueryState from '../components/QueryState';
+import PageHeader from '../components/design/PageHeader';
 import { auditAPI } from '../services/api';
 
 type AuditRow = {
@@ -71,13 +72,11 @@ export default function ActivityLog() {
 
     return (
         <Box sx={{ maxWidth: 1200 }}>
-            <Typography variant="overline" sx={{ color: '#94a3b8', fontWeight: 800, letterSpacing: '0.14em' }}>
-                Administration
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Audit log</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Tenant-scoped events only. Search by actor, action, resource, or result.
-            </Typography>
+            <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Audit Log' }]}
+                title="Audit log"
+                description="Tenant-scoped events only. Search by actor, action, resource, or result."
+            />
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
                 <TextField label="Search" value={q} onChange={(e) => setQ(e.target.value)} sx={{ minWidth: 220 }} />
                 <TextField label="Action" value={action} onChange={(e) => setAction(e.target.value)} sx={{ minWidth: 180 }} />

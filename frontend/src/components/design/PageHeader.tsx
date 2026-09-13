@@ -1,0 +1,54 @@
+import type { ReactNode } from 'react';
+import { Box, Breadcrumbs, Link, Stack, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+
+type Crumb = { label: string; to?: string };
+
+type Props = {
+    eyebrow?: string;
+    title: string;
+    description?: string;
+    crumbs?: Crumb[];
+    actions?: ReactNode;
+    meta?: ReactNode;
+};
+
+export default function PageHeader({ eyebrow, title, description, crumbs, actions, meta }: Props) {
+    return (
+        <Box component="header" sx={{ mb: 3 }}>
+            {crumbs && crumbs.length > 0 && (
+                <Breadcrumbs
+                    aria-label="Breadcrumb"
+                    sx={{ mb: 1, '& .MuiBreadcrumbs-separator': { color: 'text.secondary' } }}
+                >
+                    {crumbs.map((crumb) =>
+                        crumb.to ? (
+                            <Link key={crumb.label} component={RouterLink} to={crumb.to} underline="hover" color="text.secondary" variant="caption">
+                                {crumb.label}
+                            </Link>
+                        ) : (
+                            <Typography key={crumb.label} variant="caption" color="text.primary">{crumb.label}</Typography>
+                        )
+                    )}
+                </Breadcrumbs>
+            )}
+            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ md: 'flex-start' }}>
+                <Box sx={{ minWidth: 0, maxWidth: 760 }}>
+                    {eyebrow && <Typography variant="overline">{eyebrow}</Typography>}
+                    <Typography variant="h1" component="h1">{title}</Typography>
+                    {description && (
+                        <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 640 }}>
+                            {description}
+                        </Typography>
+                    )}
+                    {meta && <Box sx={{ mt: 1.25 }}>{meta}</Box>}
+                </Box>
+                {actions && (
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ flexShrink: 0 }}>
+                        {actions}
+                    </Stack>
+                )}
+            </Stack>
+        </Box>
+    );
+}

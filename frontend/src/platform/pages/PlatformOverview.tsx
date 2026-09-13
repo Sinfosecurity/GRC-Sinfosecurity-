@@ -14,7 +14,7 @@ export default function PlatformOverview() {
         Promise.all([platformAPI.overview(), platformAPI.attention()])
             .then(([overview, queue]) => {
                 setData(overview.data.data);
-                setAttention(queue.data.data);
+                setAttention(Array.isArray(queue.data.data) ? queue.data.data : []);
             })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));

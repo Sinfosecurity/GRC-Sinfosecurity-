@@ -13,8 +13,16 @@ jest.mock('../services/notificationDeliveryService', () => ({
     emailStatus: jest.fn(() => 'DEGRADED'),
 }));
 
+jest.mock('../config/database', () => ({
+    prisma: {
+        user: { findUnique: jest.fn() },
+        accountInvitation: { findFirst: jest.fn() },
+    },
+}));
+
 const { authService } = require('../services/authService');
 const { notify } = require('../services/notificationDeliveryService');
+const { prisma } = require('../config/database');
 
 describe('invitation email activation links', () => {
     const previousFrontend = process.env.FRONTEND_BASE_URL;
@@ -27,7 +35,13 @@ describe('invitation email activation links', () => {
             invitation: { id: 'inv-1' },
             token: 'opaque-invite-token',
         });
-        notify.mockResolvedValue({ inApp: true, email: 'DELIVERED' });
+        notify.mockResolvedValue({ inApp: true, email: 'ACCEPTED' });
+        prisma.user.findUnique
+            .mockResolvedValueOnce({ email: 'admin@org-a.test' })
+            .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce({ email: 'admin@org-a.test' })
+            .mockResolvedValueOnce(null);
+        prisma.accountInvitation.findFirst.mockResolvedValue(null);
     });
 
     afterAll(() => {
@@ -54,7 +68,8 @@ describe('invitation email activation links', () => {
             })
         );
         expect(delivered.invitation.id).toBe('inv-1');
-        expect(delivered.emailStatus).toBe('DELIVERED');
+        expect(delivered.emailStatus).toBe('ACCEPTED');
+        expect(delivered.delivery).toBe('queued');
 
         notify.mockResolvedValue({ inApp: true, email: 'FAILED' });
         const failed = await identityUserService.invite(

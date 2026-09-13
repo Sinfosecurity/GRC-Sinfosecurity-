@@ -43,7 +43,7 @@ describe('Reports page', () => {
         const { tprmAPI } = await import('../../services/api');
         (tprmAPI.downloadExecutivePdf as any).mockResolvedValue({ data: new Blob(['%PDF']), headers: { 'content-type': 'application/pdf' } });
         renderReports();
-        const buttons = await screen.findAllByRole('button', { name: /Download PDF/i });
+        const buttons = await screen.findAllByRole('button', { name: /Generate PDF/i });
         await userEvent.click(buttons[0]);
         expect(await screen.findByText(/Downloaded Supreme-Risk-Executive-Report.pdf/)).toBeInTheDocument();
     });
@@ -54,7 +54,7 @@ describe('Reports page', () => {
         (tprmAPI.downloadExecutivePdf as any).mockRejectedValue(new Error('generation failed'));
         (downloadErrorMessage as any).mockReturnValue('Report generation failed.');
         renderReports();
-        const buttons = await screen.findAllByRole('button', { name: /Download PDF/i });
+        const buttons = await screen.findAllByRole('button', { name: /Generate PDF/i });
         await userEvent.click(buttons[0]);
         expect(await screen.findByText(/Report generation failed/)).toBeInTheDocument();
     });

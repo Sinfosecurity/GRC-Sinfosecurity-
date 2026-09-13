@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Box, TextField, Typography } from '@mui/material';
+import { Box, Drawer, IconButton, TextField, Typography } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../contexts/AuthContext';
 import { environmentLabel } from '../components/DevPreviewBanner';
 import { useEffect, useState } from 'react';
@@ -22,6 +23,7 @@ const NAV = [
 export default function PlatformLayout() {
     const { user } = useAuth();
     const location = useLocation();
+    const [mobileOpen, setMobileOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [hits, setHits] = useState<{ organizations: Array<{ id: string; name: string }>; tickets: Array<{ id: string; displayId: string }> }>({
         organizations: [],
@@ -40,12 +42,57 @@ export default function PlatformLayout() {
         return () => window.clearTimeout(handle);
     }, [query]);
 
+    const nav = (
+        <>
+            <Typography sx={{ fontFamily: 'Newsreader, serif', fontSize: 22, fontWeight: 600, color: '#e8c9a0' }}>
+                Supreme Operations
+            </Typography>
+            <Typography variant="caption" sx={{ display: 'block', color: '#c4955c', letterSpacing: '0.12em', mb: 3 }}>
+                {staging ? 'SUPREME RISK — STAGING' : 'INTERNAL CONSOLE'}
+            </Typography>
+            {NAV.map((item) => (
+                <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    style={{ textDecoration: 'none' }}
+                    onClick={() => setMobileOpen(false)}
+                >
+                    {({ isActive }) => (
+                        <Box
+                            sx={{
+                                px: 1.5,
+                                py: 1,
+                                mb: 0.5,
+                                borderRadius: 1,
+                                color: isActive ? '#1b1410' : '#e8d7c3',
+                                bgcolor: isActive ? '#c4955c' : 'transparent',
+                                fontSize: 14,
+                                fontWeight: isActive ? 700 : 500,
+                            }}
+                        >
+                            {item.label}
+                        </Box>
+                    )}
+                </NavLink>
+            ))}
+            <Box sx={{ mt: 4 }}>
+                <Typography variant="caption" sx={{ color: '#a3856a' }}>
+                    Signed in as
+                </Typography>
+                <Typography sx={{ fontSize: 13 }}>{user?.email}</Typography>
+                <Typography sx={{ fontSize: 12, color: '#c4955c' }}>{user?.role}</Typography>
+            </Box>
+        </>
+    );
+
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#140f0c', color: '#f3e8dc' }}>
             <Box
                 component="nav"
                 aria-label="Platform owner navigation"
                 sx={{
+                    display: { xs: 'none', md: 'block' },
                     width: 250,
                     flexShrink: 0,
                     borderRight: '1px solid rgba(196,149,92,0.2)',
@@ -57,54 +104,31 @@ export default function PlatformLayout() {
                     overflowY: 'auto',
                 }}
             >
-                <Typography sx={{ fontFamily: 'Newsreader, serif', fontSize: 22, fontWeight: 600, color: '#e8c9a0' }}>
-                    Supreme Operations
-                </Typography>
-                <Typography variant="caption" sx={{ display: 'block', color: '#c4955c', letterSpacing: '0.12em', mb: 3 }}>
-                    {staging ? 'SUPREME RISK — STAGING' : 'INTERNAL CONSOLE'}
-                </Typography>
-                {NAV.map((item) => (
-                    <NavLink
-                        key={item.to}
-                        to={item.to}
-                        end={item.end}
-                        style={{ textDecoration: 'none' }}
-                    >
-                        {({ isActive }) => (
-                            <Box
-                                sx={{
-                                    px: 1.5,
-                                    py: 1,
-                                    mb: 0.5,
-                                    borderRadius: 1,
-                                    color: isActive ? '#1b1410' : '#e8d7c3',
-                                    bgcolor: isActive ? '#c4955c' : 'transparent',
-                                    fontSize: 14,
-                                    fontWeight: isActive ? 700 : 500,
-                                }}
-                            >
-                                {item.label}
-                            </Box>
-                        )}
-                    </NavLink>
-                ))}
-                <Box sx={{ mt: 4 }}>
-                    <Typography variant="caption" sx={{ color: '#a3856a' }}>
-                        Signed in as
-                    </Typography>
-                    <Typography sx={{ fontSize: 13 }}>{user?.email}</Typography>
-                    <Typography sx={{ fontSize: 12, color: '#c4955c' }}>{user?.role}</Typography>
-                </Box>
+                {nav}
             </Box>
+            <Drawer
+                variant="temporary"
+                open={mobileOpen}
+                onClose={() => setMobileOpen(false)}
+                ModalProps={{ keepMounted: true }}
+                sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: 250, bgcolor: '#1b1410', p: 2.5, color: '#f3e8dc' } }}
+            >
+                {nav}
+            </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 4 }, minWidth: 0 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-                    <Typography sx={{ fontFamily: 'Newsreader, serif', fontSize: 28 }}>{documentTitle(location.pathname)}</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <IconButton aria-label="Open platform navigation" onClick={() => setMobileOpen(true)} sx={{ display: { xs: 'inline-flex', md: 'none' }, color: '#e8c9a0' }}>
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography sx={{ fontFamily: 'Newsreader, serif', fontSize: { xs: 22, md: 28 } }}>{documentTitle(location.pathname)}</Typography>
+                    </Box>
                     <TextField
                         size="small"
                         label="Search organizations, tickets, leads"
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
-                        sx={{ minWidth: 280, '& .MuiInputBase-root': { bgcolor: '#221910' } }}
+                        sx={{ minWidth: { xs: '100%', sm: 280 }, '& .MuiInputBase-root': { bgcolor: '#221910' } }}
                     />
                 </Box>
                 {hits.organizations.length + hits.tickets.length > 0 && (
@@ -128,6 +152,7 @@ export default function PlatformLayout() {
 }
 
 function documentTitle(path: string) {
+    if (path.startsWith('/platform/testers')) return 'Private testers';
     if (path.startsWith('/platform/organizations')) return 'Organizations';
     if (path.startsWith('/platform/support')) return 'Support';
     if (path.startsWith('/platform/incidents')) return 'Incidents';

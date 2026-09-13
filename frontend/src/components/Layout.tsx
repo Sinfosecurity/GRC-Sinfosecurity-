@@ -1,198 +1,302 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { isPlatformStaff } from '../platform/roles';
-import { Box, List, ListItem, ListItemIcon, ListItemText, Typography, Avatar, Stack } from '@mui/material';
 import {
-    Dashboard as DashboardIcon,
-    Assessment as RiskIcon,
-    Shield as ControlsIcon,
-    Warning as IncidentIcon,
-    Description as PolicyIcon,
-    Settings as SettingsIcon,
-    Business as OrgIcon,
-    History as ActivityIcon,
-    People as UserIcon,
-    Analytics as AnalyticsIcon,
-    AccountTree as WorkflowIcon,
-    Timeline as PredictiveIcon,
-    Assessment as ReportIcon,
-    Store as VendorIcon,
+    Box,
+    Drawer,
+    IconButton,
+    InputBase,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Tooltip,
+    Typography,
+} from '@mui/material';
+import {
+    AssessmentOutlined,
+    BusinessOutlined,
+    CreditCardOutlined,
+    DashboardOutlined,
+    DescriptionOutlined,
+    ExtensionOutlined,
+    GavelOutlined,
+    HelpOutline,
+    HistoryOutlined,
+    Menu as MenuIcon,
+    MonitorHeartOutlined,
+    NotificationsNone,
+    PeopleOutlined,
+    QuizOutlined,
+    ReportProblemOutlined,
+    Search,
+    SettingsOutlined,
 } from '@mui/icons-material';
+import { color } from '../design/tokens';
+import { canSeeNav, type NavPermission } from '../security/navAccess';
+import { organizationAPI } from '../services/api';
 
-const drawerWidth = 280;
+const EXPANDED = 248;
+const COLLAPSED = 72;
 
-const menuSections = [
+type NavItem = { text: string; path: string; icon: React.ReactNode; permission: NavPermission };
+type NavSection = { title: string; items: NavItem[] };
+
+const menuSections: NavSection[] = [
     {
-        title: 'Home',
-        items: [{ text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon />, color: '#fbbf24' }],
+        title: 'Overview',
+        items: [{ text: 'Overview', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' }],
     },
     {
-        title: 'Third Party',
+        title: 'Third Parties',
         items: [
-            { text: 'Vendors', path: '/vendor-management', icon: <VendorIcon />, color: '#14b8a6' },
-            { text: 'Assessments', path: '/assessments', icon: <RiskIcon />, color: '#06b6d4' },
-            { text: 'Evidence', path: '/documents', icon: <PolicyIcon />, color: '#a78bfa' },
-            { text: 'Findings', path: '/findings', icon: <IncidentIcon />, color: '#ef4444' },
-            { text: 'Monitoring', path: '/monitoring', icon: <PredictiveIcon />, color: '#f59e0b' },
-            { text: 'Decision Briefs', path: '/decision-briefs', icon: <ReportIcon />, color: '#fbbf24' },
+            { text: 'Vendors', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
+            { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
+            { text: 'Evidence', path: '/documents', icon: <DescriptionOutlined fontSize="small" />, permission: 'evidence.read' },
+            { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
+            { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
+            { text: 'Decisions', path: '/decision-briefs', icon: <GavelOutlined fontSize="small" />, permission: 'approval.read' },
         ],
     },
     {
-        title: 'Intelligence',
+        title: 'Insights',
+        items: [{ text: 'Reports', path: '/reports', icon: <DescriptionOutlined fontSize="small" />, permission: 'report.read' }],
+    },
+    {
+        title: 'Administration',
         items: [
-            { text: 'AI Analyst', path: '/ai-insights', icon: <AnalyticsIcon />, color: '#38bdf8' },
-            { text: 'Reports', path: '/reports', icon: <ReportIcon />, color: '#94a3b8' },
-            { text: 'Help & Support', path: '/help', icon: <IncidentIcon />, color: '#e8c9a0' },
+            { text: 'Team', path: '/user-management', icon: <PeopleOutlined fontSize="small" />, permission: 'user.manage' },
+            { text: 'Assessment Library', path: '/questionnaires', icon: <QuizOutlined fontSize="small" />, permission: 'questionnaire.manage' },
+            { text: 'Integrations', path: '/integrations', icon: <ExtensionOutlined fontSize="small" />, permission: 'integration.manage' },
+            { text: 'Billing', path: '/billing', icon: <CreditCardOutlined fontSize="small" />, permission: 'billing.manage' },
+            { text: 'Audit', path: '/activity-log', icon: <HistoryOutlined fontSize="small" />, permission: 'audit.read' },
+            { text: 'Platform console', path: '/platform', icon: <SettingsOutlined fontSize="small" />, permission: 'platform' },
         ],
     },
 ];
 
-const adminItems = [
-    { text: 'Organization', path: '/organization-settings', icon: <OrgIcon />, color: '#64748b' },
-    { text: 'Users & Roles', path: '/user-management', icon: <UserIcon />, color: '#f43f5e' },
-    { text: 'Questionnaires', path: '/questionnaires', icon: <PolicyIcon />, color: '#06b6d4' },
-    { text: 'Integrations', path: '/integrations', icon: <WorkflowIcon />, color: '#10b981' },
-    { text: 'Billing', path: '/billing', icon: <AnalyticsIcon />, color: '#3b82f6' },
-    { text: 'Audit Log', path: '/activity-log', icon: <ActivityIcon />, color: '#64748b' },
-    { text: 'Environment', path: '/environment', icon: <SettingsIcon />, color: '#22d3ee' },
-    { text: 'Security', path: '/settings', icon: <SettingsIcon />, color: '#8b5cf6' },
-    { text: 'Platform console', path: '/platform', icon: <AnalyticsIcon />, color: '#c4955c', platformOnly: true },
-];
+function environmentCaption() {
+    const env = import.meta.env.VITE_ENVIRONMENT;
+    if (env === 'private-beta' || env === 'beta') return 'Private testing';
+    if (env === 'staging') return 'Staging';
+    return 'Development';
+}
+
+function NavList({
+    collapsed,
+    onNavigate,
+    role,
+    permissions,
+    pathname,
+    sections,
+}: {
+    collapsed: boolean;
+    onNavigate: (path: string) => void;
+    role?: string;
+    permissions?: string[];
+    pathname: string;
+    sections: NavSection[];
+}) {
+    return (
+        <List sx={{ px: collapsed ? 0.75 : 1.25, py: 0.5 }} disablePadding>
+            {sections.map((section) => {
+                const items = section.items.filter((item) => canSeeNav(role, item.permission, permissions));
+                if (items.length === 0) return null;
+                return (
+                    <Box key={section.title} sx={{ mb: 1.5 }}>
+                        {!collapsed && (
+                            <Typography sx={{ px: 1.25, mb: 0.5, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: color.navMuted }}>
+                                {section.title}
+                            </Typography>
+                        )}
+                        {items.map((item) => {
+                            const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
+                            const button = (
+                                <ListItemButton
+                                    key={item.text}
+                                    onClick={() => onNavigate(item.path)}
+                                    selected={isActive}
+                                    aria-current={isActive ? 'page' : undefined}
+                                    sx={{
+                                        mb: 0.25,
+                                        borderRadius: '8px',
+                                        minHeight: 36,
+                                        px: collapsed ? 1 : 1.25,
+                                        justifyContent: collapsed ? 'center' : 'flex-start',
+                                        color: isActive ? color.navInk : color.navMuted,
+                                        '&.Mui-selected': { bgcolor: 'rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' } },
+                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
+                                    }}
+                                >
+                                    <ListItemIcon sx={{ minWidth: collapsed ? 0 : 32, color: 'inherit', justifyContent: 'center' }}>
+                                        {item.icon}
+                                    </ListItemIcon>
+                                    {!collapsed && (
+                                        <ListItemText
+                                            primary={item.text}
+                                            primaryTypographyProps={{ fontWeight: isActive ? 700 : 500, fontSize: '0.86rem', color: 'inherit' }}
+                                        />
+                                    )}
+                                </ListItemButton>
+                            );
+                            return collapsed ? <Tooltip key={item.text} title={item.text} placement="right">{button}</Tooltip> : button;
+                        })}
+                    </Box>
+                );
+            })}
+        </List>
+    );
+}
 
 export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuth();
+    const [collapsed, setCollapsed] = useState(() => localStorage.getItem('supreme.nav.collapsed') === '1');
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [query, setQuery] = useState('');
+    const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
+    const [orgName, setOrgName] = useState('');
+
+    useEffect(() => {
+        localStorage.setItem('supreme.nav.collapsed', collapsed ? '1' : '0');
+    }, [collapsed]);
+
+    useEffect(() => {
+        organizationAPI.getCurrent()
+            .then((response) => setOrgName(response.data.data?.name || ''))
+            .catch(() => setOrgName(''));
+    }, []);
+
+    const searchable = useMemo(
+        () => menuSections.flatMap((section) => section.items).filter((item) => canSeeNav(user?.role, item.permission, user?.permissions)),
+        [user]
+    );
+
+    const desktopWidth = collapsed ? COLLAPSED : EXPANDED;
+    const go = (path: string) => {
+        navigate(path);
+        setMobileOpen(false);
+        setQuery('');
+    };
+
+    const sidebar = (isCollapsed: boolean) => (
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', color: color.navInk }}>
+            <Box sx={{ px: isCollapsed ? 1 : 1.75, py: 2 }}>
+                <Typography sx={{ fontFamily: '"Newsreader", serif', fontSize: isCollapsed ? 18 : 18, fontWeight: 550 }}>
+                    {isCollapsed ? 'S' : 'Supreme'}
+                </Typography>
+                {!isCollapsed && (
+                    <Typography sx={{ fontSize: 11, color: color.navMuted, mt: 0.25 }}>Third Party · {environmentCaption()}</Typography>
+                )}
+            </Box>
+            <Box sx={{ flex: 1, overflowY: 'auto' }}>
+                <NavList
+                    collapsed={isCollapsed}
+                    onNavigate={go}
+                    role={user?.role}
+                    permissions={user?.permissions}
+                    pathname={location.pathname}
+                    sections={menuSections}
+                />
+            </Box>
+        </Box>
+    );
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default', overflowX: 'hidden' }}>
-            {/* Sidebar */}
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
             <Box
                 component="nav"
+                aria-label="Product navigation"
                 sx={{
-                    width: drawerWidth,
+                    display: { xs: 'none', md: 'block' },
+                    width: desktopWidth,
                     flexShrink: 0,
-                    bgcolor: 'rgba(15, 23, 42, 0.6)',
-                    borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(20px)',
-                    display: 'flex',
-                    flexDirection: 'column',
+                    bgcolor: color.navy950,
                     position: 'sticky',
                     top: 0,
                     height: '100vh',
-                    overflowY: 'auto',
-                    '::-webkit-scrollbar': { width: '4px' },
+                    overflow: 'hidden',
                 }}
             >
-                {/* Logo */}
-                <Box sx={{ p: 4, mb: 1 }}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                        <Avatar sx={{
-                            width: 48,
-                            height: 48,
-                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                            boxShadow: '0 8px 16px -4px rgba(99, 102, 241, 0.5)'
-                        }}>
-                            <ControlsIcon />
-                        </Avatar>
-                        <Box>
-                            <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: '-0.02em', color: 'white' }}>
-                                Supreme Risk
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-                                {import.meta.env.VITE_ENVIRONMENT === 'private-beta' || import.meta.env.VITE_ENVIRONMENT === 'beta'
-                                    ? 'PRIVATE BETA / TEST'
-                                    : import.meta.env.VITE_ENVIRONMENT === 'staging' ? 'STAGING' : 'DEVELOPMENT PREVIEW'}
-                            </Typography>
-                        </Box>
-                    </Stack>
-                </Box>
-
-                {/* Navigation */}
-                <List sx={{ flex: 1, px: 2, py: 1 }}>
-                    {menuSections.map((section) => (
-                        <Box key={section.title} sx={{ mb: 2 }}>
-                            <Typography variant="overline" sx={{ px: 2, mb: 1, display: 'block', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
-                                {section.title}
-                            </Typography>
-                            {section.items.map((item) => {
-                                const isActive = location.pathname === item.path;
-                                return (
-                                    <ListItem
-                                        key={item.text}
-                                        onClick={() => navigate(item.path)}
-                                        sx={{
-                                            mb: 0.5,
-                                            borderRadius: 2,
-                                            cursor: 'pointer',
-                                            background: isActive ? `linear-gradient(90deg, ${item.color}20 0%, transparent 100%)` : 'transparent',
-                                            borderLeft: isActive ? `3px solid ${item.color}` : '3px solid transparent',
-                                            '&:hover': { background: 'rgba(255, 255, 255, 0.03)' },
-                                        }}
-                                    >
-                                        <ListItemIcon sx={{ color: isActive ? item.color : 'rgba(255,255,255,0.5)', minWidth: 40 }}>
-                                            {item.icon}
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            primary={item.text}
-                                            primaryTypographyProps={{
-                                                fontWeight: isActive ? 600 : 500,
-                                                fontSize: '0.9rem',
-                                                color: isActive ? 'white' : 'rgba(255,255,255,0.7)',
-                                            }}
-                                        />
-                                    </ListItem>
-                                );
-                            })}
-                        </Box>
-                    ))}
-                </List>
-
-                {/* Settings at bottom */}
-                <Box sx={{ p: 2, mt: 'auto', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Typography variant="overline" sx={{ px: 1, mb: 1, display: 'block', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
-                        Administration
-                    </Typography>
-                    <List disablePadding>
-                        {adminItems.filter((item) => !('platformOnly' in item && item.platformOnly) || isPlatformStaff(user?.role)).map((item) => (
-                            <ListItem
-                                key={item.text}
-                                onClick={() => navigate(item.path)}
-                                sx={{ borderRadius: 2, mb: 0.5, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' } }}
-                            >
-                                <ListItemIcon sx={{ color: 'rgba(255,255,255,0.5)', minWidth: 40 }}>{item.icon}</ListItemIcon>
-                                <ListItemText primary={item.text} primaryTypographyProps={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }} />
-                            </ListItem>
-                        ))}
-                        <ListItem
-                            onClick={async () => {
-                                await logout();
-                                navigate('/login');
-                            }}
-                            sx={{ borderRadius: 2, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' } }}
-                        >
-                            <ListItemIcon sx={{ color: 'rgba(255,255,255,0.5)', minWidth: 40 }}><SettingsIcon /></ListItemIcon>
-                            <ListItemText
-                                primary={user ? `Sign out (${user.email})` : 'Sign out'}
-                                primaryTypographyProps={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}
-                            />
-                        </ListItem>
-                    </List>
-                </Box>
+                {sidebar(collapsed)}
             </Box>
-
-            {/* Main Content */}
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 4,
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
-                    bgcolor: 'transparent',
-                    color: 'text.primary',
-                }}
-            >
-                <Outlet />
+            {mobileOpen && (
+                <Drawer
+                    variant="temporary"
+                    open
+                    onClose={() => setMobileOpen(false)}
+                    sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: EXPANDED, bgcolor: color.navy950, border: 'none' } }}
+                >
+                    {sidebar(false)}
+                </Drawer>
+            )}
+            <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                <Box
+                    component="header"
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        px: { xs: 1.5, md: 3 },
+                        py: 1,
+                        bgcolor: color.navy950,
+                        color: color.navInk,
+                        minHeight: 56,
+                    }}
+                >
+                    <IconButton aria-label="Open navigation" onClick={() => setMobileOpen(true)} sx={{ display: { md: 'none' }, color: color.navInk }}>
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontSize: 13, color: color.navMuted, minWidth: 140 }}>
+                        {orgName || 'Organization'}
+                    </Typography>
+                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 1, px: 1.25, py: 0.5, maxWidth: 520 }}>
+                        <Search fontSize="small" sx={{ color: color.navMuted }} />
+                        <InputBase
+                            placeholder="Search vendors, assessments, reports"
+                            value={query}
+                            onChange={(event) => setQuery(event.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key !== 'Enter' || !query.trim()) return;
+                                const match = searchable.find((item) => item.text.toLowerCase().includes(query.trim().toLowerCase()));
+                                if (match) go(match.path);
+                            }}
+                            sx={{ color: color.navInk, fontSize: 14, width: '100%' }}
+                            inputProps={{ 'aria-label': 'Search' }}
+                        />
+                    </Box>
+                    <Tooltip title="Notifications">
+                        <IconButton aria-label="Notifications" sx={{ color: color.navInk }} onClick={() => navigate('/dashboard')}>
+                            <NotificationsNone />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Help">
+                        <IconButton aria-label="Help" sx={{ color: color.navInk }} onClick={() => navigate('/help')}>
+                            <HelpOutline />
+                        </IconButton>
+                    </Tooltip>
+                    <Typography
+                        component="button"
+                        onClick={(event) => setMenuEl(event.currentTarget)}
+                        sx={{ border: 0, bgcolor: 'transparent', color: color.navInk, cursor: 'pointer', font: 'inherit', fontSize: 13 }}
+                    >
+                        {user?.firstName || user?.email || 'Account'}
+                    </Typography>
+                    <Menu anchorEl={menuEl} open={Boolean(menuEl)} onClose={() => setMenuEl(null)}>
+                        <MenuItem disabled>{user?.email}</MenuItem>
+                        <MenuItem onClick={() => { setMenuEl(null); navigate('/organization-settings'); }}>Organization</MenuItem>
+                        <MenuItem onClick={() => { setCollapsed((value) => !value); setMenuEl(null); }}>
+                            {collapsed ? 'Expand navigation' : 'Collapse navigation'}
+                        </MenuItem>
+                        <MenuItem onClick={async () => { setMenuEl(null); await logout(); navigate('/login'); }}>Sign out</MenuItem>
+                    </Menu>
+                </Box>
+                <Box component="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: { xs: 2, md: 3 } }}>
+                    <Outlet />
+                </Box>
             </Box>
         </Box>
     );

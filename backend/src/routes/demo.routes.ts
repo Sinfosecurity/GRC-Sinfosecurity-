@@ -31,8 +31,8 @@ type DemoRecord = {
     plan?: string;
     selectedPlan?: string;
     source?: string;
-    salesNotification: 'NOT_CONFIGURED' | 'DELIVERED' | 'FAILED';
-    prospectAcknowledgement: 'NOT_CONFIGURED' | 'DELIVERED' | 'FAILED' | 'SKIPPED';
+    salesNotification: 'NOT_CONFIGURED' | 'ACCEPTED' | 'DELIVERED' | 'FAILED';
+    prospectAcknowledgement: 'NOT_CONFIGURED' | 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'SKIPPED';
     duplicateOf?: string;
 };
 

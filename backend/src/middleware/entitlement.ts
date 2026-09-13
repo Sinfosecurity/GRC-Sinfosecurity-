@@ -32,7 +32,7 @@ export async function enforceSubscriptionWrites(req: AuthRequest, res: Response,
             return next();
         }
         if (organization.status === 'PAST_DUE' || organization.status === 'CANCELLED' || organization.status === 'SUSPENDED') {
-            return next(new ApiError(403, 'Organization billing is not in good standing'));
+            return next(new ApiError(403, 'This organization cannot make changes until billing is current. An organization administrator can review billing.'));
         }
         return next();
     } catch (error) {

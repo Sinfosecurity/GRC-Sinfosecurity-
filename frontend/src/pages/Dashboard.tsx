@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Card, CardContent, Chip, Stack, Typography } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import QueryState from '../components/QueryState';
-import { healthCheck, tprmAPI, vendorAPI } from '../services/api';
+import PageHeader from '../components/design/PageHeader';
+import MetricCard from '../components/design/MetricCard';
+import StatusBadge from '../components/design/StatusBadge';
+import Surface from '../components/design/Surface';
+import { color } from '../design/tokens';
+import { useAuth } from '../contexts/AuthContext';
+import { tprmAPI, vendorAPI } from '../services/api';
 
 type AttentionItem = {
     id: string;
@@ -14,44 +20,61 @@ type AttentionItem = {
     href: string;
 };
 
-const severityColor: Record<string, string> = {
-    CRITICAL: '#ef4444',
-    HIGH: '#f59e0b',
-    MEDIUM: '#38bdf8',
-};
+function greeting(name?: string) {
+    const hour = new Date().getHours();
+    const when = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    return name ? `${when}, ${name}` : when;
+}
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [online, setOnline] = useState(false);
     const [items, setItems] = useState<AttentionItem[]>([]);
-    const [stats, setStats] = useState<{ totalVendors?: number; highRiskVendors?: number; overdueReviews?: number; activeIssues?: number } | null>(null);
+    const [stats, setStats] = useState<{
+        totalVendors?: number;
+        highRiskVendors?: number;
+        overdueReviews?: number;
+        activeIssues?: number;
+        criticalVendors?: number;
+    } | null>(null);
+    const [assessments, setAssessments] = useState<Array<{ id: string; status: string; dueDate?: string | null }>>([]);
+    const [findings, setFindings] = useState<Array<{ id: string; status: string; targetRemediationDate?: string | null }>>([]);
+    const [briefs, setBriefs] = useState<Array<{ id: string; status: string; humanDecision?: string | null }>>([]);
 
     useEffect(() => {
         let cancelled = false;
         (async () => {
             try {
-                const [health, attention, statistics] = await Promise.allSettled([
-                    healthCheck(),
+                const [attention, statistics, assessmentRes, findingRes, briefRes] = await Promise.allSettled([
                     tprmAPI.attention(),
                     vendorAPI.getStatistics(),
+                    tprmAPI.listAssessments(),
+                    tprmAPI.listFindings(),
+                    tprmAPI.listBriefs(),
                 ]);
                 if (cancelled) return;
-                if (health.status === 'fulfilled') {
-                    setOnline(health.value?.status === 'ok' || health.value?.status === 'healthy');
-                }
                 if (attention.status === 'fulfilled') {
                     setItems(attention.value.data.data.items || []);
                 } else {
-                    setError(attention.reason?.message || 'Unable to load attention queue');
+                    setError(attention.reason?.message || 'Unable to load work that needs attention.');
                 }
                 if (statistics.status === 'fulfilled') {
                     const body = statistics.value.data;
                     setStats(body.summary || body);
                 }
+                if (assessmentRes.status === 'fulfilled') {
+                    setAssessments(assessmentRes.value.data.data || []);
+                }
+                if (findingRes.status === 'fulfilled') {
+                    setFindings(findingRes.value.data.data || []);
+                }
+                if (briefRes.status === 'fulfilled') {
+                    setBriefs(briefRes.value.data.data || []);
+                }
             } catch (err: any) {
-                if (!cancelled) setError(err.message || 'Unable to load dashboard');
+                if (!cancelled) setError(err.message || 'Unable to load the overview.');
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -61,99 +84,99 @@ export default function Dashboard() {
         };
     }, []);
 
+    const now = Date.now();
+    const work = useMemo(() => {
+        const dueAssessments = assessments.filter((row) => {
+            if (row.status === 'COMPLETED') return false;
+            if (!row.dueDate) return row.status !== 'COMPLETED';
+            return new Date(row.dueDate).getTime() <= now + 7 * 86400000;
+        }).length;
+        const pendingDecisions = briefs.filter((row) => !row.humanDecision && row.status !== 'DECIDED').length;
+        const overdueFindings = findings.filter((row) => {
+            if (['CLOSED', 'RISK_ACCEPTED', 'RESOLVED'].includes(row.status)) return false;
+            return row.targetRemediationDate ? new Date(row.targetRemediationDate).getTime() < now : false;
+        }).length;
+        return { dueAssessments, pendingDecisions, overdueFindings };
+    }, [assessments, briefs, findings, now]);
+
     return (
-        <Box sx={{ maxWidth: 1100 }}>
-            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} sx={{ mb: 4 }}>
-                <Box>
-                    <Typography variant="overline" sx={{ color: '#fbbf24', letterSpacing: '0.16em', fontWeight: 800 }}>
-                        Home
-                    </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 800, letterSpacing: '-0.04em' }}>
-                        What needs attention today
-                    </Typography>
-                    <Typography color="text.secondary">
-                        Live third-party work from this tenant. Empty means nothing is overdue — it does not invent alerts.
-                    </Typography>
-                </Box>
-                <Chip
-                    label={online ? 'API connected' : 'API unreachable'}
-                    sx={{
-                        alignSelf: 'flex-start',
-                        bgcolor: online ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
-                        color: online ? '#34d399' : '#f87171',
-                        fontWeight: 700,
-                    }}
-                />
+        <Box sx={{ maxWidth: 1280 }}>
+            <PageHeader
+                title={greeting(user?.firstName)}
+                description="What needs attention in this organization today. Counts come from live records only."
+                actions={<Button variant="contained" onClick={() => navigate('/assessments')}>New assessment</Button>}
+            />
+
+            <Typography variant="overline" sx={{ display: 'block', mb: 1 }}>Third-party risk overview</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
+                <MetricCard label="Critical vendors" value={stats?.criticalVendors ?? '—'} onClick={() => navigate('/vendor-management')} />
+                <MetricCard label="High risk" value={stats?.highRiskVendors ?? '—'} onClick={() => navigate('/vendor-management')} />
+                <MetricCard label="Assessments due" value={work.dueAssessments} onClick={() => navigate('/assessments')} />
+                <MetricCard label="Overdue findings" value={work.overdueFindings} onClick={() => navigate('/findings')} />
+                <MetricCard label="Pending decisions" value={work.pendingDecisions} onClick={() => navigate('/decision-briefs')} />
             </Stack>
 
-            <Card sx={{ mb: 4, bgcolor: 'rgba(15,23,42,0.7)', border: '1px solid rgba(251,191,36,0.18)' }}>
-                <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Getting started</Typography>
-                    <Typography color="text.secondary" sx={{ mb: 2 }}>
-                        Complete one vendor lifecycle. You do not need database or internal architecture knowledge.
-                    </Typography>
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap="wrap" useFlexGap>
-                        {[
-                            { label: '1. Add a vendor', href: '/vendor-management' },
-                            { label: '2. Start an assessment', href: '/assessments' },
-                            { label: '3. Upload evidence', href: '/documents' },
-                            { label: '4. Track findings', href: '/findings' },
-                            { label: '5. Make a decision', href: '/decision-briefs' },
-                            { label: '6. Review reports', href: '/reports' },
-                            { label: '7. Send feedback', href: '/help' },
-                        ].map((step) => (
-                            <Button key={step.href} variant="outlined" onClick={() => navigate(step.href)}>
-                                {step.label}
-                            </Button>
-                        ))}
+            <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} sx={{ mb: 3 }} alignItems="stretch">
+                <Surface>
+                    <Typography variant="h5">Your work</Typography>
+                    <Typography variant="body2" sx={{ mb: 1.5 }}>Open items assigned to this organization, not invented targets.</Typography>
+                    <Stack spacing={1}>
+                        <Typography>{work.dueAssessments} assessments due or in progress</Typography>
+                        <Typography>{work.pendingDecisions} decisions waiting</Typography>
+                        <Typography>{work.overdueFindings} remediations overdue</Typography>
                     </Stack>
-                </CardContent>
-            </Card>
-
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
-                {[
-                    { label: 'Vendors', value: stats?.totalVendors ?? '—' },
-                    { label: 'High residual', value: stats?.highRiskVendors ?? '—' },
-                    { label: 'Overdue reviews', value: stats?.overdueReviews ?? '—' },
-                    { label: 'Open issues', value: stats?.activeIssues ?? '—' },
-                ].map((card) => (
-                    <Card key={card.label} sx={{ flex: 1, bgcolor: 'rgba(15,23,42,0.7)', border: '1px solid rgba(251,191,36,0.18)' }}>
-                        <CardContent>
-                            <Typography variant="h4" sx={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 700 }}>
-                                {card.value}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">{card.label}</Typography>
-                        </CardContent>
-                    </Card>
-                ))}
+                </Surface>
+                <Surface>
+                    <Typography variant="h5">Portfolio snapshot</Typography>
+                    <Typography variant="body2" sx={{ mb: 1.5 }}>
+                        {stats?.totalVendors ?? '—'} third parties · {stats?.overdueReviews ?? '—'} overdue reviews · {stats?.activeIssues ?? '—'} open issues
+                    </Typography>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        <Button onClick={() => navigate('/vendor-management')}>Third parties</Button>
+                        <Button onClick={() => navigate('/monitoring')}>Monitoring</Button>
+                        <Button onClick={() => navigate('/reports')}>Reports</Button>
+                    </Stack>
+                </Surface>
             </Stack>
 
-            <QueryState loading={loading} error={error} empty={items.length === 0} emptyTitle="Nothing needs attention" emptyBody="When reviews, findings, evidence, or monitoring signals require action, they will appear here.">
-                <Stack spacing={1.5}>
-                    {items.map((item, index) => (
-                        <Card
+            <Typography variant="h5" sx={{ mb: 1.5 }}>Needs attention</Typography>
+            <QueryState
+                loading={loading}
+                error={error}
+                empty={items.length === 0}
+                emptyTitle="Nothing needs attention"
+                emptyBody="When reviews, findings, evidence, or monitoring signals require action, they appear here."
+                emptyAction={<Button variant="outlined" onClick={() => navigate('/vendor-management')}>Review third parties</Button>}
+            >
+                <Stack spacing={1}>
+                    {items.map((item) => (
+                        <Box
                             key={item.id}
                             sx={{
-                                bgcolor: 'rgba(15,23,42,0.85)',
-                                borderLeft: `4px solid ${severityColor[item.severity]}`,
-                                border: '1px solid rgba(255,255,255,0.06)',
+                                display: 'flex',
+                                flexDirection: { xs: 'column', md: 'row' },
+                                justifyContent: 'space-between',
+                                gap: 1.5,
+                                px: 2,
+                                py: 1.5,
+                                border: `1px solid ${color.line}`,
+                                borderLeft: `3px solid ${item.severity === 'CRITICAL' ? color.critical : item.severity === 'HIGH' ? color.high : color.medium}`,
+                                bgcolor: color.surface,
+                                borderRadius: '8px',
                             }}
                         >
-                            <CardContent>
-                                <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ md: 'center' }}>
-                                    <Box>
-                                        <Typography variant="caption" sx={{ color: severityColor[item.severity], fontWeight: 800 }}>
-                                            {index + 1}. {item.severity}
-                                        </Typography>
-                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>{item.title}</Typography>
-                                        <Typography color="text.secondary">{item.detail}</Typography>
-                                    </Box>
-                                    <Button variant="contained" onClick={() => navigate(item.href)} sx={{ bgcolor: '#b45309', '&:hover': { bgcolor: '#92400e' } }}>
-                                        {item.action}
-                                    </Button>
+                            <Box>
+                                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                                    <StatusBadge value={item.severity} kind="severity" />
+                                    {item.vendorName && <Typography variant="caption">{item.vendorName}</Typography>}
                                 </Stack>
-                            </CardContent>
-                        </Card>
+                                <Typography variant="subtitle1">{item.title}</Typography>
+                                <Typography variant="body2">{item.detail}</Typography>
+                            </Box>
+                            <Button variant="contained" onClick={() => navigate(item.href)} sx={{ alignSelf: { md: 'center' } }}>
+                                {item.action}
+                            </Button>
+                        </Box>
                     ))}
                 </Stack>
             </QueryState>

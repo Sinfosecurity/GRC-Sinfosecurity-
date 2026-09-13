@@ -126,6 +126,8 @@ router.post('/invite', requirePermission(PERMISSIONS['user.manage']), adminLimit
             data: {
                 invitation: result.invitation,
                 emailStatus: result.emailStatus,
+                delivery: result.delivery,
+                activationUrl: result.activationUrl,
                 ...(result.token ? { token: result.token } : {}),
             },
         });

@@ -28,7 +28,7 @@ describe('ErrorBoundary', () => {
             </ErrorBoundary>
         );
 
-        expect(screen.getByText(/Something went wrong/i)).toBeInTheDocument();
+        expect(screen.getByText(/This page could not be shown/i)).toBeInTheDocument();
         expect(screen.getByText(/Try Again/i)).toBeInTheDocument();
 
         // Restore console.error
