@@ -47,7 +47,7 @@ def record_request(response):
 def shot(page, name: str, width: int):
     page.set_viewport_size({"width": width, "height": 900 if width >= 1000 else 812})
     time.sleep(0.4)
-    path = OUT / f"{name}-{width}.png"
+    path = OUT / f"{name}.png"
     page.screenshot(path=str(path), full_page=True)
     return path
 
@@ -71,9 +71,9 @@ def main() -> int:
         page.goto(f"{BASE}/governance-graph", wait_until="domcontentloaded")
         page.get_by_role("heading", name="Governance Graph").wait_for()
         page.wait_for_timeout(1500)
-        shot(page, "landing", 1440)
+        shot(page, "landing-1440", 1440)
 
-        search = page.get_by_label("Search")
+        search = page.get_by_role("main").get_by_label("Search")
         for term in ("Harbor", "Northwind", "vendor", "risk", "Cloud"):
             search.fill("")
             search.fill(term)
@@ -88,22 +88,22 @@ def main() -> int:
         page.get_by_role("option", name="All types").click()
         page.wait_for_timeout(800)
 
-        object_buttons = page.locator("button").filter(has_text=re.compile(r"VENDOR|ASSESSMENT|FINDING|RISK|EVIDENCE|DECISION", re.I))
-        if object_buttons.count() == 0:
-            object_buttons = page.get_by_role("button").filter(has_text=re.compile(r".+"))
-        object_buttons.first.click()
+        vendor = page.get_by_role("main").get_by_role("button").filter(has_text=re.compile(r"Northwind Cloud", re.I))
+        if vendor.count() == 0:
+            vendor = page.get_by_role("main").get_by_role("button").filter(has_text=re.compile(r"VENDOR", re.I))
+        vendor.first.click()
         page.get_by_text("Selected entity").wait_for()
         page.wait_for_timeout(800)
-        shot(page, "selected-entity", 1440)
-        shot(page, "direct-relationships", 1440)
+        shot(page, "selected-entity-1440", 1440)
+        shot(page, "direct-relationships-1440", 1440)
 
         page.get_by_role("tab", name="Impact").click()
         page.wait_for_timeout(900)
-        shot(page, "impact", 1440)
+        shot(page, "impact-1440", 1440)
 
         page.get_by_role("tab", name="Lineage").click()
         page.wait_for_timeout(900)
-        shot(page, "lineage", 1440)
+        shot(page, "lineage-1440", 1440)
 
         page.go_back()
         page.wait_for_timeout(600)
@@ -118,11 +118,10 @@ def main() -> int:
         search.fill("")
         page.wait_for_timeout(700)
 
-        shot(page, "graph-1440", 1440)
-        shot(page, "graph-375", 375)
-        shot(page, "selected-375", 375)
+        shot(page, "desktop-1440", 1440)
         page.get_by_role("tab", name="Relationships").click()
         page.wait_for_timeout(400)
+        shot(page, "mobile-375", 375)
         shot(page, "relationships-375", 375)
 
         browser.close()

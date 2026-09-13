@@ -251,6 +251,23 @@ export default function GovernanceGraphExplorer() {
     };
 
     const recentExamples = (summary?.recentChanges || []).slice(0, 6);
+    const TYPE_RANK: Record<string, number> = {
+        VENDOR: 0,
+        DECISION: 1,
+        FINDING: 2,
+        ASSESSMENT: 3,
+        RISK: 4,
+        ORGANIZATION: 5,
+        CONTROL: 6,
+        CONTRACT: 7,
+        REMEDIATION: 8,
+        EVIDENCE: 9,
+    };
+    const rankedNodes = [...nodes].sort((left, right) => {
+        const rankDelta = (TYPE_RANK[left.nodeType] ?? 50) - (TYPE_RANK[right.nodeType] ?? 50);
+        if (rankDelta !== 0) return rankDelta;
+        return left.displayLabel.localeCompare(right.displayLabel);
+    });
 
     return (
         <Box sx={{ maxWidth: 1280 }}>
@@ -289,13 +306,17 @@ export default function GovernanceGraphExplorer() {
                 emptyTitle={summary?.nodeCount ? 'No graph records match' : 'No graph records yet'}
                 emptyBody="The graph only stores proven relationships from this organization’s third-party records."
             >
-                <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2}>
+                <Stack
+                    direction={{ xs: 'column', lg: 'row' }}
+                    spacing={2}
+                    sx={{ flexDirection: { xs: selected ? 'column-reverse' : 'column', lg: 'row' } }}
+                >
                     <Box sx={{ width: { xs: '100%', lg: 320 }, flexShrink: 0 }}>
                         <Surface>
                             <Typography variant="h5" sx={{ mb: 1 }}>Objects</Typography>
                             {loadingList && <Typography variant="body2">Updating results…</Typography>}
-                            <Box component="ul" sx={{ m: 0, pl: 0, listStyle: 'none' }}>
-                                {nodes.map((node) => (
+                            <Box component="ul" sx={{ m: 0, pl: 0, listStyle: 'none', maxHeight: { xs: 260, lg: '68vh' }, overflowY: 'auto' }}>
+                                {rankedNodes.map((node) => (
                                     <Box key={node.id} component="li">
                                         <Button
                                             fullWidth
