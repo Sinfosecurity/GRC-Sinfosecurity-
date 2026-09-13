@@ -1,50 +1,89 @@
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { DEFAULT_QUESTIONNAIRE_SECTIONS, DEFAULT_QUESTIONNAIRE_VERSION } from './questionnaireCatalog';
-import { ensureSupremeLibrary } from './questionnaireLibrary';
+import { ensureSupremeLibrary, SUPREME_LIBRARY } from './questionnaireLibrary';
+import { PLATFORM_SCOPE, presentQuestionnaireTemplate, templateScopeKey } from './questionnairePresentation';
+
+const DEFAULT_LIBRARY_KEY = 'standard-due-diligence';
+
+function isUniqueViolation(error: unknown) {
+    return typeof error === 'object' && error !== null && 'code' in error && (error as { code?: string }).code === 'P2002';
+}
 
 export async function ensureDefaultQuestionnaire(organizationId?: string) {
+    const scopeKey = organizationId ? templateScopeKey(organizationId) : PLATFORM_SCOPE;
     const existing = await prisma.questionnaireTemplate.findFirst({
         where: {
-            organizationId: organizationId || null,
-            name: 'Supreme Risk Standard Due Diligence',
-            version: DEFAULT_QUESTIONNAIRE_VERSION,
+            OR: [
+                { scopeKey, libraryKey: DEFAULT_LIBRARY_KEY },
+                {
+                    organizationId: organizationId || null,
+                    name: 'Supreme Risk Standard Due Diligence',
+                    version: DEFAULT_QUESTIONNAIRE_VERSION,
+                },
+            ],
         },
         include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
+        orderBy: { createdAt: 'asc' },
     });
     if (existing) {
+        if (existing.source !== 'SUPREME' || existing.libraryKey !== DEFAULT_LIBRARY_KEY || existing.scopeKey !== scopeKey) {
+            return prisma.questionnaireTemplate.update({
+                where: { id: existing.id },
+                data: {
+                    source: 'SUPREME',
+                    libraryKey: DEFAULT_LIBRARY_KEY,
+                    scopeKey,
+                    isActive: true,
+                },
+                include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
+            });
+        }
         return existing;
     }
 
-    return prisma.questionnaireTemplate.create({
-        data: {
-            organizationId: organizationId || undefined,
-            name: 'Supreme Risk Standard Due Diligence',
-            framework: 'Custom',
-            version: DEFAULT_QUESTIONNAIRE_VERSION,
-            isActive: true,
-            sections: {
-                create: DEFAULT_QUESTIONNAIRE_SECTIONS.map((section, sectionIndex) => ({
-                    title: section.title,
-                    sortOrder: sectionIndex,
-                    questions: {
-                        create: section.questions.map((q, qIndex) => ({
-                            questionKey: q.id,
-                            questionText: q.question,
-                            questionType: q.questionType || 'SINGLE_CHOICE',
-                            category: q.category,
-                            weight: q.weight,
-                            required: true,
-                            evidenceRequired: q.evidenceRequired || false,
-                            options: q.options,
-                            sortOrder: qIndex,
-                        })),
-                    },
-                })),
+    try {
+        return await prisma.questionnaireTemplate.create({
+            data: {
+                organizationId: organizationId || undefined,
+                name: 'Supreme Risk Standard Due Diligence',
+                framework: 'Custom',
+                version: DEFAULT_QUESTIONNAIRE_VERSION,
+                source: 'SUPREME',
+                libraryKey: DEFAULT_LIBRARY_KEY,
+                scopeKey,
+                isActive: true,
+                sections: {
+                    create: DEFAULT_QUESTIONNAIRE_SECTIONS.map((section, sectionIndex) => ({
+                        title: section.title,
+                        sortOrder: sectionIndex,
+                        questions: {
+                            create: section.questions.map((q, qIndex) => ({
+                                questionKey: q.id,
+                                questionText: q.question,
+                                questionType: q.questionType || 'SINGLE_CHOICE',
+                                category: q.category,
+                                weight: q.weight,
+                                required: true,
+                                evidenceRequired: q.evidenceRequired || false,
+                                options: q.options,
+                                sortOrder: qIndex,
+                            })),
+                        },
+                    })),
+                },
             },
-        },
-        include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
-    });
+            include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
+        });
+    } catch (error) {
+        if (!isUniqueViolation(error)) throw error;
+        const raced = await prisma.questionnaireTemplate.findFirst({
+            where: { scopeKey, name: 'Supreme Risk Standard Due Diligence', version: DEFAULT_QUESTIONNAIRE_VERSION },
+            include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
+        });
+        if (!raced) throw error;
+        return raced;
+    }
 }
 
 export async function getActiveTemplate(organizationId: string, framework = 'Custom') {
@@ -65,13 +104,20 @@ export async function cloneTemplate(organizationId: string, templateId: string, 
         include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
     });
     if (!source) throw new ApiError(404, 'Template not found');
-    const cloneName = String(name || `${source.name} (organization copy ${new Date().toISOString().slice(0, 10)})`).trim();
+    const requested = String(name || `${source.name} — Custom`).trim();
+    const taken = await prisma.questionnaireTemplate.findFirst({
+        where: { organizationId, name: requested, version: '1.0.0' },
+    });
+    const cloneName = taken ? `${requested} (${new Date().toISOString().slice(0, 10)})` : requested;
     return prisma.questionnaireTemplate.create({
         data: {
             organizationId,
             name: cloneName,
             framework: source.framework,
             version: '1.0.0',
+            source: 'CLONED',
+            libraryKey: null,
+            scopeKey: templateScopeKey(organizationId),
             isActive: true,
             sections: {
                 create: source.sections.map((section) => ({
@@ -102,24 +148,31 @@ export async function cloneTemplate(organizationId: string, templateId: string, 
 export async function listTemplates(organizationId: string) {
     await ensureSupremeLibrary();
     await ensureDefaultQuestionnaire();
-    return prisma.questionnaireTemplate.findMany({
+    const rows = await prisma.questionnaireTemplate.findMany({
         where: {
+            isActive: true,
             OR: [{ organizationId }, { organizationId: null }],
         },
         include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: [{ name: 'asc' }, { version: 'asc' }],
+    });
+    return rows.map((row) => {
+        const library = SUPREME_LIBRARY.find((item) => item.key === row.libraryKey || item.name === row.name);
+        return presentQuestionnaireTemplate(row, { purpose: library?.purpose });
     });
 }
 
 export async function getTemplateById(organizationId: string, templateId: string) {
     await ensureSupremeLibrary();
     await ensureDefaultQuestionnaire();
-    return prisma.questionnaireTemplate.findFirst({
+    const row = await prisma.questionnaireTemplate.findFirst({
         where: {
             id: templateId,
-            isActive: true,
             OR: [{ organizationId }, { organizationId: null }],
         },
         include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
     });
+    if (!row) return null;
+    const library = SUPREME_LIBRARY.find((item) => item.key === row.libraryKey || item.name === row.name);
+    return presentQuestionnaireTemplate(row, { purpose: library?.purpose });
 }

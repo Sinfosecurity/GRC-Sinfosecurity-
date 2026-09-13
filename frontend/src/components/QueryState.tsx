@@ -38,7 +38,7 @@ const KIND_HINT: Record<QueryErrorKind, string> = {
     RATE_LIMITED: 'Wait a moment, then retry.',
     NOT_CONFIGURED: 'This capability is unavailable until it is configured for this environment.',
     PROVIDER_ERROR: 'Try again shortly. If it continues, submit a support request.',
-    API_FAILURE: 'Refresh the page. If it continues, submit a support request from Help.',
+    API_FAILURE: 'Some services are temporarily unavailable. Retry in a moment. If it continues, submit a support request from Help.',
 };
 
 export function classifyApiError(err: { status?: number; message?: string } | null | undefined): QueryErrorKind {

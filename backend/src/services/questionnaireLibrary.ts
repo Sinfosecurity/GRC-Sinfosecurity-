@@ -1,5 +1,11 @@
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import {
+    PLATFORM_SCOPE,
+    pickCanonicalTemplate,
+    presentQuestionnaireTemplate,
+    templateScopeKey,
+} from './questionnairePresentation';
 
 export type LibraryQuestion = {
     id: string;
@@ -337,42 +343,125 @@ export const SUPREME_LIBRARY: LibraryTemplate[] = [
     },
 ];
 
-export async function ensureSupremeLibrary() {
+function isUniqueViolation(error: unknown) {
+    return typeof error === 'object' && error !== null && 'code' in error && (error as { code?: string }).code === 'P2002';
+}
+
+export async function reconcileDuplicateTemplates() {
+    const rows = await prisma.questionnaireTemplate.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true, version: true, scopeKey: true, organizationId: true, createdAt: true },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    });
+    const groups = new Map<string, typeof rows>();
+    for (const row of rows) {
+        const key = `${row.scopeKey || templateScopeKey(row.organizationId)}::${row.name}::${row.version}`;
+        groups.set(key, [...(groups.get(key) || []), row]);
+    }
+    for (const group of groups.values()) {
+        if (group.length < 2) continue;
+        const { canonical, duplicates } = pickCanonicalTemplate(group);
+        for (const duplicate of duplicates) {
+            await prisma.vendorAssessment.updateMany({
+                where: { templateId: duplicate.id },
+                data: { templateId: canonical.id },
+            });
+            const stillReferenced = await prisma.vendorAssessment.count({ where: { templateId: duplicate.id } });
+            if (stillReferenced === 0) {
+                await prisma.questionnaireTemplate.delete({ where: { id: duplicate.id } });
+            } else {
+                await prisma.questionnaireTemplate.update({
+                    where: { id: duplicate.id },
+                    data: {
+                        isActive: false,
+                        libraryKey: null,
+                        name: `${duplicate.name} (archived duplicate)`,
+                    },
+                });
+            }
+        }
+    }
+}
+
+async function createSupremeTemplate(template: LibraryTemplate) {
+    await prisma.questionnaireTemplate.create({
+        data: {
+            name: template.name,
+            framework: template.framework,
+            version: template.version,
+            source: 'SUPREME',
+            libraryKey: template.key,
+            scopeKey: PLATFORM_SCOPE,
+            isActive: true,
+            sections: {
+                create: template.sections.map((section, sectionIndex) => ({
+                    title: section.title,
+                    sortOrder: sectionIndex,
+                    questions: {
+                        create: section.questions.map((item, qIndex) => ({
+                            questionKey: item.id,
+                            questionText: item.guidance ? `${item.question}\n\nGuidance: ${item.guidance}` : item.question,
+                            questionType: item.questionType || 'SINGLE_CHOICE',
+                            category: item.category,
+                            weight: item.weight,
+                            required: true,
+                            evidenceRequired: Boolean(item.evidenceRequired),
+                            options: item.options,
+                            conditionalOnKey: item.conditionalOnKey,
+                            conditionalValue: item.conditionalValue,
+                            sortOrder: qIndex,
+                        })),
+                    },
+                })),
+            },
+        },
+    });
+}
+
+async function ensureSupremeLibraryOnce() {
+    await reconcileDuplicateTemplates();
     for (const template of SUPREME_LIBRARY) {
         const existing = await prisma.questionnaireTemplate.findFirst({
-            where: { organizationId: null, name: template.name, version: template.version },
-        });
-        if (existing) continue;
-        await prisma.questionnaireTemplate.create({
-            data: {
-                name: template.name,
-                framework: template.framework,
-                version: template.version,
-                isActive: true,
-                sections: {
-                    create: template.sections.map((section, sectionIndex) => ({
-                        title: section.title,
-                        sortOrder: sectionIndex,
-                        questions: {
-                            create: section.questions.map((item, qIndex) => ({
-                                questionKey: item.id,
-                                questionText: item.guidance ? `${item.question}\n\nGuidance: ${item.guidance}` : item.question,
-                                questionType: item.questionType || 'SINGLE_CHOICE',
-                                category: item.category,
-                                weight: item.weight,
-                                required: true,
-                                evidenceRequired: Boolean(item.evidenceRequired),
-                                options: item.options,
-                                conditionalOnKey: item.conditionalOnKey,
-                                conditionalValue: item.conditionalValue,
-                                sortOrder: qIndex,
-                            })),
-                        },
-                    })),
-                },
+            where: {
+                OR: [
+                    { scopeKey: PLATFORM_SCOPE, libraryKey: template.key },
+                    { scopeKey: PLATFORM_SCOPE, name: template.name, version: template.version },
+                    { organizationId: null, name: template.name, version: template.version },
+                ],
             },
+            orderBy: { createdAt: 'asc' },
+        });
+        if (existing) {
+            if (existing.source !== 'SUPREME' || existing.libraryKey !== template.key || existing.scopeKey !== PLATFORM_SCOPE) {
+                await prisma.questionnaireTemplate.update({
+                    where: { id: existing.id },
+                    data: {
+                        source: 'SUPREME',
+                        libraryKey: template.key,
+                        scopeKey: PLATFORM_SCOPE,
+                        isActive: true,
+                    },
+                });
+            }
+            continue;
+        }
+        try {
+            await createSupremeTemplate(template);
+        } catch (error) {
+            if (!isUniqueViolation(error)) throw error;
+        }
+    }
+}
+
+let ensureInFlight: Promise<void> | null = null;
+
+export async function ensureSupremeLibrary() {
+    if (!ensureInFlight) {
+        ensureInFlight = ensureSupremeLibraryOnce().finally(() => {
+            ensureInFlight = null;
         });
     }
+    await ensureInFlight;
 }
 
 const SCOPE_BY_TIER: Record<string, string[]> = {
@@ -420,16 +509,21 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     const allKeys = [...requiredKeys, ...recommendedKeys, ...optionalKeys];
     const names = SUPREME_LIBRARY.filter((item) => allKeys.includes(item.key)).map((item) => item.name);
     const templates = await prisma.questionnaireTemplate.findMany({
-        where: { organizationId: null, isActive: true, name: { in: names } },
-        select: { id: true, name: true, version: true, framework: true },
+        where: { organizationId: null, isActive: true, source: 'SUPREME', name: { in: names } },
+        include: { sections: { include: { questions: { select: { evidenceRequired: true } } } } },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     });
-    const byName = Object.fromEntries(templates.map((row) => [row.name, row]));
+    const byName: Record<string, (typeof templates)[number]> = {};
+    for (const row of templates) {
+        if (!byName[row.name]) byName[row.name] = row;
+    }
     const toItems = (keysToMap: string[]) =>
         keysToMap
             .map((key) => {
                 const library = SUPREME_LIBRARY.find((item) => item.key === key);
                 const template = library ? byName[library.name] : undefined;
                 if (!library || !template) return null;
+                const presented = presentQuestionnaireTemplate(template, { purpose: library.purpose });
                 return {
                     id: template.id,
                     key,
@@ -438,6 +532,13 @@ export async function recommendAssessments(organizationId: string, vendorId: str
                     framework: template.framework,
                     purpose: library.purpose,
                     reason: reasonFor(key, vendor),
+                    source: presented.source,
+                    sourceLabel: presented.sourceLabel,
+                    category: presented.category,
+                    questionCount: presented.questionCount,
+                    domainCount: presented.domainCount,
+                    estimatedMinutes: presented.estimatedMinutes,
+                    evidenceRequired: presented.evidenceRequired,
                 };
             })
             .filter(Boolean);

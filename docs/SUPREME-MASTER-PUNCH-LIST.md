@@ -221,9 +221,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CERTIFICATION SHA:** prior implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` is no longer accepted. Cursor cannot declare visual PASS.
 
-**EVIDENCE:** Premium UX rebuild is in progress (light workspace + dark nav, Assessment Center + wizard, Team/invitation delivery states, private-testing entitlement skip of billing standing, dashboard no longer treats `/health` `degraded` as unreachable). Hosted visual acceptance remains Product Leadership only.
+**EVIDENCE:** Duplicate hosted templates were caused by platform `organizationId` NULL rows plus a non-idempotent `ensureSupremeLibrary()` race. Source/scope uniqueness, safe remapping, and seed idempotency are implemented. Dashboard no longer treats `/health` `degraded` as unreachable. Invitation provider accept is proven; inbox receipt is not. Hosted visual acceptance remains Product Leadership only. Cursor cannot declare #12 PASS.
 
-**NEXT ACTION:** Deploy staging, prove API reachability, invitation delivery, and golden journey. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Deploy the uniqueness migration to staging, prove one canonical Supreme template per version, and keep the four hosted blockers open until Product Leadership inspects staging. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
 
 ---
 

@@ -72,7 +72,7 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-Rebuild the customer product experience after Product Leadership rejected the hosted Assessment/admin UI and the API-unreachable banner. #12 stays FAIL until Product Leadership visual and functional acceptance. Do not start #13. Do not invite external testers. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Close the four hosted #12 blockers together: API reliability, invitation inbox, duplicate assessment templates, and premium UX. #12 stays FAIL until Product Leadership visual and functional acceptance. Do not start #13. Do not invite external testers. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 

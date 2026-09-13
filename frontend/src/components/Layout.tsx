@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
+    Alert,
     Box,
+    Button,
     Drawer,
     IconButton,
     InputBase,
@@ -36,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { color } from '../design/tokens';
 import { canSeeNav, type NavPermission } from '../security/navAccess';
-import { organizationAPI } from '../services/api';
+import { healthCheck, organizationAPI } from '../services/api';
 
 const EXPANDED = 248;
 const COLLAPSED = 72;
@@ -159,15 +161,35 @@ export default function Layout() {
     const [query, setQuery] = useState('');
     const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
     const [orgName, setOrgName] = useState('');
+    const [serviceNotice, setServiceNotice] = useState(false);
+    const [lastChecked, setLastChecked] = useState<string | null>(null);
 
     useEffect(() => {
         localStorage.setItem('supreme.nav.collapsed', collapsed ? '1' : '0');
     }, [collapsed]);
 
+    const refreshServices = () => {
+        healthCheck()
+            .then(() => {
+                setServiceNotice(false);
+                setLastChecked(new Date().toLocaleTimeString());
+            })
+            .catch(() => {
+                setServiceNotice(true);
+                setLastChecked(new Date().toLocaleTimeString());
+            });
+    };
+
     useEffect(() => {
         organizationAPI.getCurrent()
             .then((response) => setOrgName(response.data.data?.name || ''))
-            .catch(() => setOrgName(''));
+            .catch((error) => {
+                setOrgName('');
+                if (!error?.response) setServiceNotice(true);
+            });
+        refreshServices();
+        const timer = window.setInterval(refreshServices, 45000);
+        return () => window.clearInterval(timer);
     }, []);
 
     const searchable = useMemo(
@@ -295,6 +317,15 @@ export default function Layout() {
                     </Menu>
                 </Box>
                 <Box component="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: { xs: 2, md: 3 } }}>
+                    {serviceNotice && (
+                        <Alert
+                            severity="warning"
+                            sx={{ mb: 2 }}
+                            action={<Button color="inherit" size="small" onClick={refreshServices}>Retry</Button>}
+                        >
+                            Some services are temporarily unavailable.{lastChecked ? ` Last checked ${lastChecked}.` : ''}
+                        </Alert>
+                    )}
                     <Outlet />
                 </Box>
             </Box>

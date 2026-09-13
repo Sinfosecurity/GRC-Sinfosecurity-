@@ -23,6 +23,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import MetricCard from '../components/design/MetricCard';
 import WorkflowStepper from '../components/design/WorkflowStepper';
+import TemplateCard from '../components/design/TemplateCard';
 import { color } from '../design/tokens';
 import { tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
@@ -44,6 +45,14 @@ type Template = {
     version: string;
     framework: string;
     purpose?: string;
+    source?: string;
+    sourceLabel?: string;
+    category?: string;
+    questionCount?: number;
+    domainCount?: number;
+    estimatedMinutes?: number;
+    evidenceRequired?: boolean;
+    organizationId?: string | null;
     sections: Array<{ id: string; title: string; questions: TemplateQuestion[] }>;
 };
 
@@ -77,6 +86,14 @@ type PlanItem = {
     version: string;
     reason?: string;
     purpose?: string;
+    source?: string;
+    sourceLabel?: string;
+    category?: string;
+    questionCount?: number;
+    domainCount?: number;
+    estimatedMinutes?: number;
+    evidenceRequired?: boolean;
+    framework?: string;
 };
 
 type VendorRow = {
@@ -485,11 +502,7 @@ export default function Assessments() {
             {tab === 3 ? (
                 <Stack spacing={1.5}>
                     {templates.map((template) => (
-                        <Surface key={template.id}>
-                            <Typography variant="subtitle1">{template.name}</Typography>
-                            <Typography variant="body2">{template.framework} · v{template.version}</Typography>
-                            <Typography variant="caption">Aligned assessment — does not provide certification.</Typography>
-                        </Surface>
+                        <TemplateCard key={template.id} template={template} />
                     ))}
                 </Stack>
             ) : (
@@ -578,15 +591,14 @@ export default function Assessments() {
                                     {group.items.map((item) => {
                                         const checked = selectedTemplateIds.includes(item.id);
                                         return (
-                                            <Box
-                                                key={item.id}
-                                                onClick={() => setSelectedTemplateIds((current) => (
-                                                    current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id]
-                                                ))}
-                                                sx={{ p: 1.5, mt: 1, border: `1px solid ${color.line}`, borderRadius: '8px', cursor: 'pointer', bgcolor: checked ? color.goldDim : color.surface }}
-                                            >
-                                                <Typography variant="subtitle2">{checked ? '✓ ' : ''}{item.name}</Typography>
-                                                <Typography variant="body2">{item.reason || item.purpose}</Typography>
+                                            <Box key={item.id} sx={{ mt: 1 }}>
+                                                <TemplateCard
+                                                    template={{ ...item, purpose: item.reason || item.purpose }}
+                                                    selected={checked}
+                                                    onSelect={() => setSelectedTemplateIds((current) => (
+                                                        current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id]
+                                                    ))}
+                                                />
                                             </Box>
                                         );
                                     })}
@@ -597,16 +609,35 @@ export default function Assessments() {
                     {wizardStep === 2 && (
                         <Stack spacing={2} sx={{ mt: 1 }}>
                             <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-                            <Typography variant="body2">{selectedTemplateIds.length} questionnaire(s) selected. Owner assignment uses your account unless a later workflow assigns another assessor.</Typography>
+                            <Typography variant="body2">
+                                {selectedTemplateIds.length} questionnaire(s) selected. Add or remove templates below. Cloned organization templates are labeled separately from Supreme templates.
+                            </Typography>
+                            <Stack spacing={1}>
+                                {templates.map((template) => (
+                                    <TemplateCard
+                                        key={template.id}
+                                        template={template}
+                                        selected={selectedTemplateIds.includes(template.id)}
+                                        onSelect={() => setSelectedTemplateIds((current) => (
+                                            current.includes(template.id) ? current.filter((id) => id !== template.id) : [...current, template.id]
+                                        ))}
+                                    />
+                                ))}
+                            </Stack>
                         </Stack>
                     )}
                     {wizardStep === 3 && (
                         <Box>
                             <Typography variant="subtitle1">{chosenVendor?.name}</Typography>
                             <Typography variant="body2" sx={{ mb: 1 }}>Due {dueDate || 'not set'}</Typography>
-                            {selectedTemplateIds.map((id) => (
-                                <Typography key={id} variant="body2">• {templates.find((row) => row.id === id)?.name || id}</Typography>
-                            ))}
+                            <Stack spacing={1}>
+                                {selectedTemplateIds.map((id) => {
+                                    const template = templates.find((row) => row.id === id);
+                                    return template
+                                        ? <TemplateCard key={id} template={template} selected />
+                                        : <Typography key={id} variant="body2">• {id}</Typography>;
+                                })}
+                            </Stack>
                         </Box>
                     )}
                 </DialogContent>

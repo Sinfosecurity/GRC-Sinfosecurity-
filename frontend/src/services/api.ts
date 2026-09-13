@@ -67,7 +67,7 @@ api.interceptors.response.use(
                     : status === 503
                         ? 'A required provider is unavailable.'
                         : !error.response
-                            ? 'Network error. The server did not respond.'
+                            ? 'Some services are temporarily unavailable.'
                             : 'The request failed.');
 
         if (status === 401) {
@@ -310,10 +310,21 @@ export const healthCheck = async () => {
     if (!API_BASE_URL && import.meta.env.PROD) {
         throw new ApiClientError('API URL is not configured', 503, 'NOT_CONFIGURED');
     }
-    const baseUrl = API_BASE_URL || 'http://localhost:4000/api/v1';
-    const healthUrl = baseUrl.replace('/api/v1', '/health');
-    const response = await axios.get(healthUrl, { timeout: 4000 });
-    return response.data;
+    const baseUrl = API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:4000/api/v1' : '');
+    if (!baseUrl) {
+        throw new ApiClientError('API URL is not configured', 503, 'NOT_CONFIGURED');
+    }
+    const healthUrl = baseUrl.replace(/\/api\/v1\/?$/, '/health');
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+            const response = await axios.get(healthUrl, { timeout: 12000 });
+            return response.data;
+        } catch (error) {
+            lastError = error;
+        }
+    }
+    throw lastError;
 };
 
 export default api;
