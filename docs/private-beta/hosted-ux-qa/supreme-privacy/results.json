@@ -13,7 +13,7 @@
     {
       "name": "create activity",
       "result": "PASS",
-      "detail": "201 PA-00002"
+      "detail": "201 PA-00003"
     },
     {
       "name": "vendor link",
@@ -23,7 +23,7 @@
     {
       "name": "transfer",
       "result": "PASS",
-      "detail": "201 XFR-00002"
+      "detail": "201 XFR-00003"
     },
     {
       "name": "dpia screening",
@@ -33,17 +33,42 @@
     {
       "name": "rights",
       "result": "PASS",
-      "detail": "DSR-00002"
+      "detail": "DSR-00003"
     },
     {
       "name": "data map financial",
       "result": "PASS",
-      "detail": "200 rows=2"
+      "detail": "200 rows=3"
+    },
+    {
+      "name": "vendor privacy",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "deletion",
+      "result": "PASS",
+      "detail": "DEL-00001"
+    },
+    {
+      "name": "deletion legal hold",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "consent provider",
+      "result": "PASS",
+      "detail": "Not configured / manual"
+    },
+    {
+      "name": "incident",
+      "result": "PASS",
+      "detail": "PIN-00001"
     },
     {
       "name": "what is affected",
       "result": "PASS",
-      "detail": "{\"systems\": [\"Claims platform\"], \"vendors\": [\"Supreme Investigation (vendor residual 13)\"], \"dataCategories\": [\"Financial\"], \"dataSubjects\": [\"CUSTOMERS\"], \"jurisdictions\": [\"US-NY\", \"IE\"], \"transfers\": [\"XFR-00002\"], \"privacyRisks\": [\"RISK-00001 Privileged access failure\"], \"controls\": [\"TPR-01\"], \"requirements\": [\"CRS-00001\"], \"evidence\": [\"sr-clean-evidence.txt (CLEAN)\"], \"gaps\": [\"GAP-00001 50"
+      "detail": "{\"systems\": [\"Claims platform\"], \"vendors\": [\"Supreme Investigation (vendor residual 13)\"], \"dataCategories\": [\"Financial\"], \"dataSubjects\": [\"Customers\"], \"jurisdictions\": [\"US-NY\", \"IE\"], \"transfers\": [\"XFR-00003\"], \"privacyRisks\": [\"RISK-00001 Privileged access failure\"], \"controls\": [\"TPR-01\"], \"requirements\": [\"CRS-00001\"], \"evidence\": [\"sr-clean-evidence.txt (CLEAN)\"], \"gaps\": [\"GAP-00001 50"
     },
     {
       "name": "report ropa",
@@ -94,6 +119,16 @@
       "name": "board pptx",
       "result": "PASS",
       "detail": "200"
+    },
+    {
+      "name": "board pptx slides",
+      "result": "PASS",
+      "detail": "12 slides"
+    },
+    {
+      "name": "board pptx cover",
+      "result": "PASS",
+      "detail": "SUPREME PRIVACY Board Risk Committee report Elite Claims 2026-09-13  \u00b7  Live tenant records only  \u00b7  No trend available Prepared for CPO, DPO, General Counsel, CISO, CRO, and the B"
     },
     {
       "name": "export csv",
@@ -156,9 +191,49 @@
       "detail": "/privacy-ops/retention"
     },
     {
+      "name": "overflow vendors",
+      "result": "PASS",
+      "detail": "/privacy-ops/vendors"
+    },
+    {
+      "name": "overflow deletions",
+      "result": "PASS",
+      "detail": "/privacy-ops/deletions"
+    },
+    {
+      "name": "overflow consent",
+      "result": "PASS",
+      "detail": "/privacy-ops/consent"
+    },
+    {
+      "name": "overflow incidents",
+      "result": "PASS",
+      "detail": "/privacy-ops/incidents"
+    },
+    {
+      "name": "overflow import",
+      "result": "PASS",
+      "detail": "/privacy-ops/import"
+    },
+    {
+      "name": "humanized labels",
+      "result": "PASS",
+      "detail": "SUPREME RISK \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nSupreme\n\nThird Party \u00b7 Staging\n\nOVERVIEW\n\nOverview\n\nTHIRD PARTIES\n\nVendors\nAssessments\nEvidence\nFindings\nMonitoring"
+    },
+    {
       "name": "overflow activity-detail",
       "result": "PASS",
-      "detail": "/privacy-ops/activities/PA-00002"
+      "detail": "/privacy-ops/activities/PA-00003"
+    },
+    {
+      "name": "overflow vendor-detail",
+      "result": "PASS",
+      "detail": "/privacy-ops/vendors/2afc74ad-a4e0-4a34-a2c4-40e88af5d376"
+    },
+    {
+      "name": "board pptx visual qa",
+      "result": "PARTIAL",
+      "detail": "12 rendered slide cards"
     }
   ],
   "shots": [
@@ -209,29 +284,73 @@
     "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-1024.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/retention-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendors-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendors-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendors-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendors-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendors-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/deletions-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/deletions-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/deletions-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/deletions-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/deletions-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/consent-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/consent-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/consent-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/consent-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/consent-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/incidents-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/incidents-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/incidents-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/incidents-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/incidents-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/import-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/import-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/import-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/import-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/import-1920.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-375.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-768.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-1024.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/activity-detail-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendor-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendor-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendor-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendor-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/vendor-detail-1920.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-compliance-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-risk-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-graph-1440.png",
-    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-controls-1440.png"
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-controls-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-reports-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/regression-methodology-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-1.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-2.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-3.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-4.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-5.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-6.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-7.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-8.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-9.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-10.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-11.png",
+    "docs/private-beta/hosted-ux-qa/supreme-privacy/board-slide-12.png"
   ],
   "sha": {
-    "api": "20811dafcbb5f55899e07d5abe19357024e5d43d",
-    "frontend": "20811dafcbb5f55899e07d5abe19357024e5d43d",
+    "api": "9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8",
+    "frontend": "9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8",
     "healthStatus": 200,
     "health": {
       "status": "degraded",
-      "timestamp": "2026-09-13T21:11:34.058Z",
-      "uptime": 522.27048308,
+      "timestamp": "2026-09-13T21:46:38.471Z",
+      "uptime": 458.93810575,
       "version": "1.0.0",
       "runtimeMode": "production",
       "deploymentEnvironment": "staging",
       "environment": "staging",
-      "gitSha": "20811dafcbb5f55899e07d5abe19357024e5d43d",
+      "gitSha": "9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8",
       "checks": {
         "mongodb": {
           "status": "degraded",
@@ -304,21 +423,21 @@
         "postgres": {
           "status": "up",
           "message": "PostgreSQL connection healthy",
-          "responseTime": 1
+          "responseTime": 2
         }
       },
       "memory": {
-        "rss": 197591040,
-        "heapUsed": 85970256,
-        "heapTotal": 89284608
+        "rss": 198619136,
+        "heapUsed": 85943824,
+        "heapTotal": 88809472
       }
     }
   },
   "workflow": {
-    "activity": "PA-00002",
-    "transfer": "XFR-00002",
-    "dpia": "DPIA-00002",
-    "rights": "DSR-00002",
+    "activity": "PA-00003",
+    "transfer": "XFR-00003",
+    "dpia": "DPIA-00003",
+    "rights": "DSR-00003",
     "vendorId": "2afc74ad-a4e0-4a34-a2c4-40e88af5d376",
     "vendorName": "Supreme Investigation",
     "control": "TPR-01",
@@ -336,14 +455,14 @@
       "Financial"
     ],
     "dataSubjects": [
-      "CUSTOMERS"
+      "Customers"
     ],
     "jurisdictions": [
       "US-NY",
       "IE"
     ],
     "transfers": [
-      "XFR-00002"
+      "XFR-00003"
     ],
     "privacyRisks": [
       "RISK-00001 Privileged access failure"
@@ -362,16 +481,227 @@
       "GAP-00002 500.07 has no current CLEAN evidence \u00b7 OPEN"
     ],
     "dpias": [
-      "DPIA-00002"
+      "DPIA-00003"
     ],
     "rightsRequests": [
-      "DSR-00002"
+      "DSR-00003"
     ],
     "retentionRules": [
-      "RET-00002"
+      "RET-00003"
     ]
   },
   "discrepancies": [],
-  "hostedFrontendSha": "20811dafcbb5f55899e07d5abe19357024e5d43d",
-  "hostedApiSha": "20811dafcbb5f55899e07d5abe19357024e5d43d"
+  "vendorPrivacy": {
+    "vendor": {
+      "id": "2afc74ad-a4e0-4a34-a2c4-40e88af5d376",
+      "name": "Supreme Investigation",
+      "residualRisk": 13,
+      "href": "/vendors"
+    },
+    "roles": [
+      "Processor"
+    ],
+    "activities": [
+      {
+        "publicId": "PA-00002",
+        "name": "Claims servicing",
+        "href": "/privacy-ops/activities/PA-00002",
+        "data": [
+          "Financial"
+        ],
+        "subjects": [
+          "Customers"
+        ],
+        "jurisdictions": [
+          "US-NY",
+          "IE"
+        ],
+        "transfers": [
+          "XFR-00002"
+        ]
+      },
+      {
+        "publicId": "PA-00003",
+        "name": "Claims servicing",
+        "href": "/privacy-ops/activities/PA-00003",
+        "data": [
+          "Financial"
+        ],
+        "subjects": [
+          "Customers"
+        ],
+        "jurisdictions": [
+          "US-NY",
+          "IE"
+        ],
+        "transfers": [
+          "XFR-00003"
+        ]
+      }
+    ],
+    "dataCategories": [
+      "Financial"
+    ],
+    "dataSubjects": [
+      "Customers"
+    ],
+    "jurisdictions": [
+      "US-NY",
+      "IE"
+    ],
+    "transfers": [
+      {
+        "publicId": "XFR-00002",
+        "path": "US-NY \u2192 IE",
+        "status": "Review Required"
+      },
+      {
+        "publicId": "XFR-00003",
+        "path": "US-NY \u2192 IE",
+        "status": "Review Required"
+      }
+    ],
+    "contracts": [],
+    "assessments": [
+      {
+        "id": "b1a2971f-69f0-4092-a239-1e1be7970300",
+        "status": "In Progress"
+      },
+      {
+        "id": "2ce23392-9b67-4ed5-b150-09927d0b709b",
+        "status": "Cancelled"
+      },
+      {
+        "id": "8ebc09b4-2994-40c8-b476-a607386a75ed",
+        "status": "Cancelled"
+      },
+      {
+        "id": "663dfd9e-59f9-4392-8e6e-4b4638138232",
+        "status": "Completed"
+      },
+      {
+        "id": "679605fa-f7bf-4691-b771-c5b840dcc4ec",
+        "status": "Not Started"
+      }
+    ],
+    "dpias": [
+      {
+        "publicId": "DPIA-00002",
+        "title": "Claims privacy review",
+        "status": "In Progress"
+      },
+      {
+        "publicId": "DPIA-00003",
+        "title": "Claims privacy review",
+        "status": "In Progress"
+      }
+    ],
+    "privacyRisks": [
+      "RISK-00001 Privileged access failure"
+    ],
+    "controls": [
+      "TPR-01"
+    ],
+    "evidence": [
+      "sr-clean-evidence.txt (CLEAN)"
+    ],
+    "gaps": [
+      "GAP-00001 500.07 is mapped to controls that are not implemented \u00b7 OPEN",
+      "GAP-00002 500.07 has no current CLEAN evidence \u00b7 OPEN"
+    ],
+    "requirements": [
+      "CRS-00001"
+    ],
+    "retention": [
+      "RET-00002",
+      "RET-00003"
+    ],
+    "findings": [
+      {
+        "id": "85f06455-4073-4b2c-8472-fcb24d7f9137",
+        "title": "Private-beta MFA evidence gap",
+        "status": "In Progress"
+      }
+    ],
+    "thirdPartyResidual": 13,
+    "honesty": "Vendor identity remains the Third Party record. Privacy adds role and processing links only."
+  },
+  "boardSlides": [
+    "SUPREME PRIVACY \u00b7 Board Risk Committee report \u00b7 Elite Claims \u00b7 2026-09-13  \u00b7  Live tenant records only  \u00b7  No trend available \u00b7 Prepared for CPO, DPO, General Counsel, CISO, CRO, and the Board Risk Committee. \u00b7 A recorded legal basis is not a finding that processing is lawful. A DPIA is not a claim that GDPR is satisfied. A configured deadline is not legal advice. A closed deletion task is not pro",
+    "Privacy posture at a glance \u00b7 Recorded operations, not a finding that processing is lawful. \u00b7 3 \u00b7 Active processing \u00b7 3 \u00b7 Open rights requests \u00b7 3 \u00b7 Transfers in review \u00b7 3 \u00b7 High-risk processing \u00b7 No trend available. Supreme does not invent arrows when history is insufficient. \u00b7 Active processing  3 \u00b7 Open rights  3 \u00b7 Transfers in review  3 \u00b7 High-risk processing  3 \u00b7 Supreme Privacy Board Report",
+    "Processing and data footprint \u00b7 Where personal data is recorded to be processed. \u00b7 3 \u00b7 Activities in view \u00b7 2 \u00b7 Jurisdictions \u00b7 1 \u00b7 Data categories \u00b7 1 \u00b7 Linked processors \u00b7 PA-00001  Claims servicing  \u00b7  Active  \u00b7  US-NY, IE \u00b7 PA-00002  Claims servicing  \u00b7  Active  \u00b7  US-NY, IE \u00b7 PA-00003  Claims servicing  \u00b7  Active  \u00b7  US-NY, IE \u00b7 Supreme Privacy Board Report  \u00b7  Confidential  \u00b7  Not legal advi",
+    "Highest privacy risks \u00b7 Linked Supreme Risk records only. No invented residual scores. \u00b7 3 \u00b7 High-risk activities \u00b7 4 \u00b7 Open gaps \u00b7 1 \u00b7 Processors with issues \u00b7 0 \u00b7 Evidence refresh \u00b7 PA-00001  Claims servicing  \u00b7  risk High \u00b7 PA-00002  Claims servicing  \u00b7  risk High \u00b7 PA-00003  Claims servicing  \u00b7  risk High \u00b7  \u00b7 Supreme Privacy Board Report  \u00b7  Confidential  \u00b7  Not legal advice \u00b7 4 / 12",
+    "International transfer posture \u00b7 A recorded mechanism is not a finding that a transfer is lawful. \u00b7 3 \u00b7 Transfers recorded \u00b7 3 \u00b7 Review required \u00b7 3 \u00b7 Mechanism recorded \u00b7 None invented \u00b7 Lawfulness finding \u00b7 XFR-00001  US-NY \u2192 IE  \u00b7  Scc  \u00b7  Review Required \u00b7 XFR-00002  US-NY \u2192 IE  \u00b7  Scc  \u00b7  Review Required \u00b7 XFR-00003  US-NY \u2192 IE  \u00b7  Scc  \u00b7  Review Required \u00b7 Supreme Privacy Board Report  \u00b7  Co",
+    "Rights-request posture \u00b7 Requester identity is withheld from this board view. \u00b7 3 \u00b7 Open requests \u00b7 0 \u00b7 Overdue (configured) \u00b7 3 \u00b7 Recorded requests \u00b7 Configured \u00b7 Deadline model \u00b7 DSR-00001  Access  \u00b7  Received  \u00b7  configured due 2026-10-13 \u00b7 DSR-00002  Access  \u00b7  Received  \u00b7  configured due 2026-10-13 \u00b7 DSR-00003  Access  \u00b7  Received  \u00b7  configured due 2026-10-13 \u00b7 Supreme Privacy Board Report  ",
+    "DPIA / assessment posture \u00b7 Screening recommends review. It does not say a DPIA is legally required. \u00b7 3 \u00b7 DPIAs recorded \u00b7 0 \u00b7 DPIAs due \u00b7 0 \u00b7 Decisions recorded \u00b7 Review \u00b7 Not legal clearance \u00b7 DPIA-00001  Claims privacy review  \u00b7  In Progress \u00b7 DPIA-00002  Claims privacy review  \u00b7  In Progress \u00b7 DPIA-00003  Claims privacy review  \u00b7  In Progress \u00b7 Supreme Privacy Board Report  \u00b7  Confidential  \u00b7",
+    "Vendor / processor exposure \u00b7 Third Party identity is reused. Privacy adds role and links only. \u00b7 1 \u00b7 Linked processors \u00b7 1 \u00b7 With privacy issues \u00b7 3 \u00b7 Transfer paths \u00b7 0 \u00b7 Evidence refresh \u00b7 PA-00001  processors: None recorded \u00b7 PA-00002  processors: Supreme Investigation (Processor) \u00b7 PA-00003  processors: Supreme Investigation (Processor) \u00b7 Supreme Privacy Board Report  \u00b7  Confidential  \u00b7  Not ",
+    "Retention / deletion posture \u00b7 Closed tasks are not proof that external-system data is deleted. \u00b7 3 \u00b7 Retention rules \u00b7 0 \u00b7 Actions due \u00b7 1 \u00b7 Deletion pending \u00b7 Manual \u00b7 Auto-delete \u00b7 RET-00001  7 years after claim close  \u00b7  Scheduled \u00b7 RET-00002  7 years after claim close  \u00b7  Scheduled \u00b7 RET-00003  7 years after claim close  \u00b7  Scheduled \u00b7 Supreme Privacy Board Report  \u00b7  Confidential  \u00b7  Not leg",
+    "Evidence / control health \u00b7 CLEAN presence is not proof. Shared #14 evidence is reused. \u00b7 0 \u00b7 Evidence refresh \u00b7 4 \u00b7 Open gaps \u00b7 Shared \u00b7 Control plane \u00b7 Fail-closed \u00b7 Malware policy \u00b7 GAP-00001  Open privacy-related gap: GAP-00001 500.07 is mapped to controls that are not implemented. A gap is remaining work, not a legal conclusion. \u00b7 GAP-00003  Open privacy-related gap: GAP-00003 A.15 is mapped ",
+    "Key decisions required \u00b7 Human-authoritative. Supreme does not issue legal conclusions. \u00b7 XFR-00001  Transfer requiring review \u2014 XFR-00001 US-NY \u2192 IE is recorded as review required. This is not a lawfulness finding. \u00b7 XFR-00002  Transfer requiring review \u2014 XFR-00002 US-NY \u2192 IE is recorded as review required. This is not a lawfulness finding. \u00b7 XFR-00003  Transfer requiring review \u2014 XFR-00003 US-NY",
+    "Priority actions / next 90 days \u00b7 Taken from the live attention queue. No invented program. \u00b7 1. Review XFR-00001 \u2014 Transfer requiring review \u00b7 2. Review XFR-00002 \u2014 Transfer requiring review \u00b7 3. Review XFR-00003 \u2014 Transfer requiring review \u00b7 4. Review GAP-00001 \u2014 Open privacy-related gap \u00b7 5. Review GAP-00003 \u2014 Open privacy-related gap \u00b7 6. Review GAP-00002 \u2014 Open privacy-related gap \u00b7 7. Review"
+  ],
+  "boardVisualNotes": [
+    {
+      "slide": "ppt/slides/slide1.xml",
+      "defects": [],
+      "chars": 431
+    },
+    {
+      "slide": "ppt/slides/slide2.xml",
+      "defects": [],
+      "chars": 447
+    },
+    {
+      "slide": "ppt/slides/slide3.xml",
+      "defects": [],
+      "chars": 411
+    },
+    {
+      "slide": "ppt/slides/slide4.xml",
+      "defects": [],
+      "chars": 391
+    },
+    {
+      "slide": "ppt/slides/slide5.xml",
+      "defects": [],
+      "chars": 440
+    },
+    {
+      "slide": "ppt/slides/slide6.xml",
+      "defects": [],
+      "chars": 445
+    },
+    {
+      "slide": "ppt/slides/slide7.xml",
+      "defects": [],
+      "chars": 427
+    },
+    {
+      "slide": "ppt/slides/slide8.xml",
+      "defects": [],
+      "chars": 421
+    },
+    {
+      "slide": "ppt/slides/slide9.xml",
+      "defects": [],
+      "chars": 418
+    },
+    {
+      "slide": "ppt/slides/slide10.xml",
+      "defects": [],
+      "chars": 838
+    },
+    {
+      "slide": "ppt/slides/slide11.xml",
+      "defects": [],
+      "chars": 1128
+    },
+    {
+      "slide": "ppt/slides/slide12.xml",
+      "defects": [],
+      "chars": 589
+    }
+  ],
+  "hostedFrontendSha": "9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8",
+  "hostedApiSha": "9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8"
 }

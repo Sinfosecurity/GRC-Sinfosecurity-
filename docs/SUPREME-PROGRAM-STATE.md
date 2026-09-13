@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #17 Supreme Privacy
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -73,9 +73,10 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#17 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#17 STARTING SHA:** `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`
 **#17 IMPLEMENTATION SHA:** `134d12860c595603106180c35ad3a10a328917f7`
-**#17 CLOSURE SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`
-**#17 HOSTED FRONTEND SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`
-**#17 HOSTED API SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`
+**#17 CLOSURE SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
+**#17 HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34784381903 PASS on `9976e81`
+**#17 HOSTED FRONTEND SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
+**#17 HOSTED API SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`
 **#18 AUTHORIZED:** NO
 
 ---
@@ -84,7 +85,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #17 Supreme Privacy
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
 See `docs/ADR-SUPREME-PRIVACY.md` and `docs/private-beta/hosted-ux-qa/supreme-privacy/`. #18 is not authorized. #12 remains PARTIAL.
 
@@ -147,7 +148,7 @@ Product Leadership hosted review of #17 Supreme Privacy. Keep #12 PARTIAL. Do no
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#17 Supreme Privacy** — Product Leadership review required. Do not start #18.
+**#17 Supreme Privacy** — Product Leadership final review required. Do not start #18.
 
 **#12** remains PARTIAL / open in parallel.
 
@@ -223,7 +224,8 @@ Do not invent percentages.
 | 14 | Shared Control & Evidence Layer | Product Leadership accepted PASS (2026-09-13) |
 | 15 | Supreme Risk | PASS — Product Leadership accepted (2026-09-13) |
 | 16 | Supreme Compliance | PASS — Product Leadership accepted (2026-09-13) |
-| 17–38, 40 | Later modules / GTM / packs | NOT STARTED |
+| 17 | Supreme Privacy | PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED |
+| 18–38, 40 | Later modules / GTM / packs | NOT STARTED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
 Marketing preview pages are not implementation.
@@ -333,3 +335,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** AUTHORIZED / IN PROGRESS -> PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED  
 **SHA:** Implementation `134d12860c595603106180c35ad3a10a328917f7`; closure `20811dafcbb5f55899e07d5abe19357024e5d43d`  
 **EVIDENCE:** Hosted Supreme CI run `34782536022` PASS. Staging frontend and API both `20811da`. Hosted Elite Claims walkthrough recorded in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Not PASS. #12 remains PARTIAL. #18 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #17 Supreme Privacy  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED  
+**SHA:** Closure `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`  
+**EVIDENCE:** Hosted Supreme CI run `34784381903` PASS. Staging frontend and API both `9976e81`. Operational workspaces and 12-slide board PPTX recorded in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Board PPTX visual QA is PARTIAL (HTML slide cards, not native Office renders). Not PASS. #12 remains PARTIAL. #18 is not authorized.

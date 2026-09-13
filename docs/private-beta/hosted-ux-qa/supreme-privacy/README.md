@@ -3,12 +3,13 @@
 **Date:** 2026-09-13  
 **Starting SHA:** `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`  
 **Implementation SHA:** `134d12860c595603106180c35ad3a10a328917f7`  
-**Closure SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`  
-**Hosted frontend SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`  
-**Hosted API SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`  
-**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34782536022 PASS  
-**Backend tests:** 335  
-**Frontend tests:** 149  
+**Base implementation SHA:** `20811dafcbb5f55899e07d5abe19357024e5d43d`  
+**Closure SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`  
+**Hosted frontend SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`  
+**Hosted API SHA:** `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34784381903 PASS  
+**Backend tests:** 338  
+**Frontend tests:** 154  
 **Tenant:** Elite Claims (`report-proof-20260913@staging.supremerisk.test`)  
 **Environment:** https://supreme-risk-staging.onrender.com  
 **API:** https://supreme-risk-staging-api.onrender.com  
@@ -17,54 +18,52 @@
 
 ## Discrepancies (not silently reconciled)
 
-- At #17 start, hosted frontend and API were still `3c580a1` (#16 closure). After this item deployed, both report `20811da`.
+- Documentation commit after this walkthrough will be ahead of hosted `9976e81`. That mismatch is recorded, not reconciled.
 - Hosted `/health` remains `degraded` for preexisting reasons: MongoDB `NOT_CONFIGURED`, email `DEGRADED`, AI `NOT_CONFIGURED`, high heap. Postgres, Redis, Stripe test mode, and malware CONNECTED / fail-closed downloads are unchanged.
-- Walkthrough created `PA-00001` on `134d128`, then `PA-00002` on `20811da`. The integrated chain below uses `PA-00002`.
+- Earlier walkthroughs created `PA-00001` and `PA-00002`. This closure walkthrough uses `PA-00003`.
 
 ## Differentiating workflow (live hosted records)
 
-A claims-servicing processing activity was recorded on Elite Claims. Supreme immediately showed:
+A claims-servicing processing activity was recorded on Elite Claims. Supreme showed:
 
-- Processing activity `PA-00002` Claims servicing
+- Processing activity `PA-00003` Claims servicing
 - Personal data: Financial
 - Data subjects: Customers
 - Jurisdictions: US-NY, IE
 - System: Claims platform
 - Processor: Supreme Investigation (Third Party residual 13)
-- Transfer `XFR-00002` US-NY → IE, mechanism SCC, review required — not a lawfulness finding
-- DPIA `DPIA-00002`: “DPIA may be required / review recommended. This is not a statement that a DPIA is legally required.”
-- Rights request `DSR-00002` with configured deadline (not legal advice)
-- Retention `RET-00002`
-- Attention queue: transfers requiring review plus open #16 gaps
+- Transfer `XFR-00003` US-NY → IE
+- DPIA `DPIA-00003`: review recommended, not legally required
+- Rights request `DSR-00003` with list masking
+- Retention `RET-00003`
+- Deletion tasks `DEL-00001` / `DEL-00002` (legal hold refused close)
+- Consent `CNS-00001` provider **Not configured / manual**
+- Privacy incident assessment `PIN-00001` linked to `RISK-00001` without automatic residual change
 
-## Integrated governance chain (authoritative links only)
+## Vendor privacy workspace (UI, not API-only)
 
-Vendor **Supreme Investigation**  
-→ Processing activity **PA-00002**  
-→ Personal data **Financial**  
-→ Transfer **XFR-00002**  
-→ Privacy risk **RISK-00001 Privileged access failure**  
-→ Common control **TPR-01**  
-→ CLEAN evidence **sr-clean-evidence.txt (CLEAN)**  
-→ Compliance requirement **CRS-00001**  
-→ Gaps **GAP-00001** (mapped control not implemented) and **GAP-00002** (no current CLEAN evidence)  
-→ Attention / review required on the Privacy dashboard
-
-No invented relationships. Vendor identity remains the Third Party record.
+`/privacy-ops/vendors` and `/privacy-ops/vendors/{id}` reuse the Third Party vendor **Supreme Investigation**. Hosted detail showed processor role, PA-00002/PA-00003, Financial/Customers, US-NY/IE, residual 13, TPR-01, CLEAN `sr-clean-evidence.txt`, CRS-00001, GAP-00001/GAP-00002, transfers, DPIAs, and Third Party assessments. Vendor → Privacy and Privacy → Vendor navigation both exist.
 
 ## Honesty checks
 
 - Recorded legal basis is not a finding that processing is lawful
 - DPIA screening does not say a DPIA is legally required
 - Configured DSR deadline is not legal advice
-- Rights list shows `h•••@example.com`, not the raw requester email
-- Cross-tenant read of `PA-00002` returned 404
+- Rights list does not show `hosted.requester@example.com`
+- Cross-tenant read of `PA-00003` returned 404
 - Consent collector remains **Not configured / manual**
+- Closed deletion language is task/attestation only
+- Legal hold close returned 400
+- Incident copy does not say “You must notify”
 
 ## Board PPTX
 
-`Supreme-Privacy-Board.pptx` is a 6-slide PK zip with KPI tiles, honesty language, transfer/rights posture, attention, and decisions required. Product Leadership visual acceptance is still required. A valid PPTX is not treated as PASS.
+`Supreme-Privacy-Board.pptx` is a 12-slide 16:9 PK zip with cover, KPI tiles, “No trend available”, and Board Risk Committee audience language. Visual QA used extracted slide text plus HTML cards (`board-slide-*.png`). That is not a native Office render. Board PPTX visual QA remains PARTIAL.
+
+## Viewport notes
+
+Overflow checks passed on dashboard, activities, data-map, transfers, DPIAs, rights, retention, vendors, deletions, consent, incidents, import, activity-detail, and vendor-detail. 375/768 deletion and incident tables are dense; later columns wrap or sit in horizontal table scroll. That is PARTIAL density, not a page-level overflow FAIL.
 
 ## #12–#16 regression shots
 
-`regression-compliance-1440.png`, `regression-risk-1440.png`, `regression-graph-1440.png`, `regression-controls-1440.png`. No breakage observed. #12 remains PARTIAL.
+`regression-compliance-1440.png`, `regression-risk-1440.png`, `regression-graph-1440.png`, `regression-controls-1440.png`, `regression-reports-1440.png`, `regression-methodology-1440.png`. No breakage observed. #12 remains PARTIAL.

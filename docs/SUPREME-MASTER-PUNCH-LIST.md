@@ -307,13 +307,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Privacy objects and workflows with truthful provider status.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Implementation `134d12860c595603106180c35ad3a10a328917f7`. Closure `20811dafcbb5f55899e07d5abe19357024e5d43d`. Hosted frontend and API both `20811da`. Not PASS.
+**CERTIFICATION SHA:** Starting SHA `6aaf0253fb153867de4ff964a47bcfd8cbde79bc`. Implementation `134d12860c595603106180c35ad3a10a328917f7`. Prior core closure `20811dafcbb5f55899e07d5abe19357024e5d43d`. Operational closure `9976e811550c09b0a1fc5961f8dabd8f4fc0b4b8`. Hosted frontend and API both `9976e81`. Not PASS.
 
-**EVIDENCE:** `docs/ADR-SUPREME-PRIVACY.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. CI `34782536022` PASS. Cursor does not declare #17 PASS.
+**EVIDENCE:** `docs/ADR-SUPREME-PRIVACY.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. CI `34784381903` PASS. Cursor does not declare #17 PASS.
 
-**NEXT ACTION:** Product Leadership hosted review. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership final hosted review. Do not start #18. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
 ---
 
