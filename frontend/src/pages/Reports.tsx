@@ -84,6 +84,7 @@ export default function Reports() {
     const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
     const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [assessmentId, setAssessmentId] = useState('');
+    const [showHistory, setShowHistory] = useState(false);
     const [busyId, setBusyId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -113,6 +114,7 @@ export default function Reports() {
     useEffect(() => {
         if (!vendorId) {
             setAssessmentId('');
+            setShowHistory(false);
             return;
         }
         const preferred = pickLatestAssessment(vendorAssessments.filter((row) => ACTIVE_STATUSES.has(row.status)));
@@ -230,11 +232,24 @@ export default function Reports() {
                         )}
                         {history.length > 0 && (
                             <Box sx={{ mt: 2 }} data-testid="assessment-history">
-                                <Typography variant="subtitle2" sx={{ mb: 1 }}>Other assessments</Typography>
-                                <Typography variant="body2" sx={{ mb: 1 }}>Historical questionnaires stay available when you need a specific report. They do not replace the current assessment.</Typography>
-                                <Stack spacing={1}>
-                                    {history.map((row) => renderAssessmentCard(row, false))}
-                                </Stack>
+                                <Button
+                                    size="small"
+                                    variant="text"
+                                    onClick={() => setShowHistory((open) => !open)}
+                                    aria-expanded={showHistory}
+                                >
+                                    {showHistory ? 'Hide other assessments' : `Show other assessments (${history.length})`}
+                                </Button>
+                                {showHistory && (
+                                    <Box sx={{ mt: 1 }}>
+                                        <Typography variant="body2" sx={{ mb: 1 }}>
+                                            Historical questionnaires stay available when you need a specific report. They do not replace the current assessment.
+                                        </Typography>
+                                        <Stack spacing={1}>
+                                            {history.map((row) => renderAssessmentCard(row, false))}
+                                        </Stack>
+                                    </Box>
+                                )}
                             </Box>
                         )}
                     </Surface>

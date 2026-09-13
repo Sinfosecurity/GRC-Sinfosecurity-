@@ -98,6 +98,8 @@ describe('Reports page', () => {
         await user.click(await screen.findByRole('option', { name: 'Supreme Investigation' }));
         expect(await screen.findByTestId('current-assessment')).toHaveTextContent('Initial Due Diligence');
         expect(screen.getByTestId('current-assessment')).toHaveTextContent('Completed');
+        expect(screen.getByTestId('assessment-history')).toHaveTextContent('Show other assessments (1)');
+        await user.click(screen.getByRole('button', { name: /Show other assessments/ }));
         expect(screen.getByTestId('assessment-history')).toHaveTextContent('Information Security Assessment');
         expect(screen.queryByText('INITIAL_DUE_DILIGENCE')).not.toBeInTheDocument();
         expect(screen.queryByRole('combobox', { name: 'Assessment' })).not.toBeInTheDocument();
