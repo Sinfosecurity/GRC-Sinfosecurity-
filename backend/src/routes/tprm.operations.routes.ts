@@ -353,6 +353,31 @@ router.put('/scoring-methodology', requirePermission(PERMISSIONS['questionnaire.
     }
 });
 
+router.post('/scoring-methodology/draft', requirePermission(PERMISSIONS['questionnaire.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const data = await scoringMethodologyService.recordDraftAction(req.user!.organizationId, req.user!.id, {
+            action: req.body?.action,
+            sourceVersion: req.body?.sourceVersion,
+            weights: req.body?.weights,
+        });
+        res.status(201).json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/scoring-methodology/preview', requirePermission(PERMISSIONS['questionnaire.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        if (!req.body?.weights || typeof req.body.weights !== 'object') {
+            throw new ApiError(400, 'weights are required');
+        }
+        const data = await scoringMethodologyService.previewImpact(req.user!.organizationId, req.body.weights);
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/decision-briefs/:briefId/pdf', requirePermission(PERMISSIONS['report.export']), requireReportKind('operational'), requireEntitlement('advancedReporting'), reportLimiter, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         await reportGenerationService.decisionBriefPdf(actor(req), req.params.briefId, res);

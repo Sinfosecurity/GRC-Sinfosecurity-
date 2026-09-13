@@ -197,6 +197,18 @@ Application change: `smtp.resend.com` is treated as Resend. Invitations use the 
 
 REAL EMAIL RECEIVED remains unconfirmed. #12 stays PARTIAL.
 
+## Risk Scoring Methodology workspace (2026-09-13)
+
+Parallel #12 UX remediation. Not #12 PASS. Not a #14 status change.
+
+| Field | Value |
+|---|---|
+| RAW JSON SCORING EDITOR | REMOVED |
+| RISK METHODOLOGY WORKSPACE | IMPLEMENTED |
+| HOSTED PRODUCT LEADERSHIP ACCEPTANCE | PENDING |
+
+Evidence: `docs/RISK-METHODOLOGY-WORKSPACE.md`. The deterministic engine is unchanged. Historical `ScoreCalculation` rows are not rewritten by publish or preview.
+
 If Product Leadership authorizes DNS later, add an apex SPF/DMARC policy that does not break Google Workspace MX on `sinfosecurity.com`. Copy the exact remaining records from the Resend domain Records tab. Do not invent DKIM values.
 
 ## Defects

@@ -229,6 +229,8 @@ export const tprmAPI = {
     closeFinding: (issueId: string, data: unknown) => api.post(`/tprm/findings/${issueId}/close`, data),
     scoringMethodology: () => api.get('/tprm/scoring-methodology'),
     publishScoringMethodology: (data: unknown) => api.put('/tprm/scoring-methodology', data),
+    saveScoringMethodologyDraft: (data: unknown) => api.post('/tprm/scoring-methodology/draft', data),
+    previewScoringMethodology: (data: unknown) => api.post('/tprm/scoring-methodology/preview', data),
     downloadExecutivePdf: (params?: unknown) => api.get('/tprm/reports/executive.pdf', { responseType: 'blob', params }),
     downloadScorecardPdf: (vendorId: string) =>
         api.get(`/tprm/reports/vendors/${vendorId}/scorecard.pdf`, { responseType: 'blob' }),

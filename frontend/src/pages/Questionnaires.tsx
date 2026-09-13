@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
-import Surface from '../components/design/Surface';
 import TemplateCard from '../components/design/TemplateCard';
 import { tprmAPI } from '../services/api';
+import ScoringMethodologyEditor from '../components/ScoringMethodologyEditor';
+import { useAuth } from '../contexts/AuthContext';
+import { canSeeNav } from '../security/navAccess';
 
 type Template = {
     id: string;
@@ -35,46 +37,31 @@ function libraryGroup(template: Template) {
 }
 
 export default function Questionnaires() {
+    const { user } = useAuth();
+    const canManage = canSeeNav(user?.role, 'questionnaire.manage', user?.permissions);
     const [templates, setTemplates] = useState<Template[]>([]);
     const [methodology, setMethodology] = useState<any>(null);
-    const [weights, setWeights] = useState('');
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
-    const load = async () => {
-        setLoading(true);
+    const load = async (silent = false) => {
+        if (!silent) setLoading(true);
         try {
             const [templateRes, scoringRes] = await Promise.all([tprmAPI.questionnaires(), tprmAPI.scoringMethodology()]);
             setTemplates(templateRes.data.data || []);
             setMethodology(scoringRes.data.data);
-            setWeights(JSON.stringify(scoringRes.data.data.active.weights, null, 2));
         } catch (err: any) {
             setError(err.message);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
     useEffect(() => {
         load();
     }, []);
-
-    const publish = async () => {
-        setMessage(null);
-        try {
-            await tprmAPI.publishScoringMethodology({
-                name: 'Organization scoring methodology',
-                notes: 'Published from the assessment library. Historical ScoreCalculation rows stay unchanged.',
-                weights: JSON.parse(weights),
-            });
-            setMessage('New methodology version published. Future recalculations use it; historical scores are not rewritten.');
-            await load();
-        } catch (err: any) {
-            setError(err.message);
-        }
-    };
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -94,7 +81,7 @@ export default function Questionnaires() {
     }, [filtered]);
 
     return (
-        <Box sx={{ maxWidth: 1100 }}>
+        <Box sx={{ maxWidth: 1280 }}>
             <PageHeader
                 title="Assessment library"
                 description="Choose a Supreme template by purpose. Framework-aligned assessments do not provide certification."
@@ -128,19 +115,13 @@ export default function Questionnaires() {
                             </Stack>
                         </Box>
                     ))}
-                    <Surface>
-                        <Typography variant="h5">Scoring methodology</Typography>
-                        <Typography variant="body2" sx={{ mb: 2 }}>
-                            Engine {methodology?.engineVersion || '—'}. Active version {methodology?.active?.version || '—'}. Publishing creates a new version and does not rewrite historical calculations.
-                        </Typography>
-                        <details>
-                            <summary>Advanced scoring weights</summary>
-                            <TextField fullWidth multiline minRows={8} value={weights} onChange={(e) => setWeights(e.target.value)} sx={{ mt: 2 }} />
-                            <Button sx={{ mt: 2 }} variant="contained" onClick={publish}>Publish new version</Button>
-                        </details>
-                    </Surface>
                 </Stack>
             </QueryState>
+            {!loading && methodology && (
+                <Box sx={{ mt: 3 }}>
+                    <ScoringMethodologyEditor methodology={methodology} onPublished={() => load(true)} canManage={canManage} />
+                </Box>
+            )}
         </Box>
     );
 }

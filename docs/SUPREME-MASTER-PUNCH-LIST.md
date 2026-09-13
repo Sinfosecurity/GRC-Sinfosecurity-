@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox placement / deliverability remains USER ACTION REQUIRED. #13 is authorized in parallel and does not close this item.
+**CURRENT STATUS:** PARTIAL — Product Leadership visual/functional acceptance pending. Invitation inbox placement / deliverability remains USER ACTION REQUIRED. Raw JSON scoring editor is removed; Risk Scoring Methodology workspace is implemented and pending hosted Product Leadership acceptance. Not PASS.
 
-**CERTIFICATION SHA:** Cursor cannot declare visual PASS. Latest hosted evidence SHA is recorded in `docs/PRIVATE-BETA-CERTIFICATION.md`.
+**CERTIFICATION SHA:** Cursor cannot declare visual PASS. Latest hosted evidence SHA is recorded in `docs/PRIVATE-BETA-CERTIFICATION.md`. Methodology workspace evidence: `docs/RISK-METHODOLOGY-WORKSPACE.md`.
 
-**EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. Cursor cannot declare #12 PASS.
+**EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. RAW JSON SCORING EDITOR: REMOVED. RISK METHODOLOGY WORKSPACE: IMPLEMENTED. HOSTED PRODUCT LEADERSHIP ACCEPTANCE: PENDING. Cursor cannot declare #12 PASS.
 
-**NEXT ACTION:** Product Leadership must confirm a real controlled inbox received the invitation and complete visual acceptance. Remaining UX-P2/P3 stay open. Do not invite external testers unless separately approved. Do not mark PASS because #13 started. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership hosted review of the Risk Scoring Methodology workspace, plus invitation inbox confirmation and remaining visual acceptance. Remaining UX-P2/P3 stay open. Do not invite external testers unless separately approved. Do not mark PASS because #13 or #14 started. Do not merge `main` or deploy commercial production.
 
 ---
 

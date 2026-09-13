@@ -23,6 +23,10 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['framework.manage'])).toBe(false);
         expect(hasPermission('ASSESSOR', PERMISSIONS['control.test'])).toBe(true);
         expect(hasPermission('ASSESSOR', PERMISSIONS['control.manage'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['questionnaire.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['questionnaire.manage'])).toBe(false);
+        expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['questionnaire.manage'])).toBe(true);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['questionnaire.manage'])).toBe(true);
         expect(hasPermission('APPROVER', PERMISSIONS['control.approve'])).toBe(true);
         expect(hasPermission('APPROVER', PERMISSIONS['evidence.review'])).toBe(true);
         expect(hasPermission('RISK_MANAGER', PERMISSIONS['control.manage'])).toBe(true);

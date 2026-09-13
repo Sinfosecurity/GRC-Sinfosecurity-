@@ -83,8 +83,13 @@ Known open #12 issues:
 - final Product Leadership visual acceptance
 - remaining UX-P2/P3 items
 - commercial production NO-GO
+- hosted Product Leadership acceptance of the Risk Scoring Methodology workspace
 
-See `docs/PRIVATE-BETA-CERTIFICATION.md`. Do not mark #12 PASS because #13 started.
+RAW JSON SCORING EDITOR: REMOVED  
+RISK METHODOLOGY WORKSPACE: IMPLEMENTED  
+HOSTED PRODUCT LEADERSHIP ACCEPTANCE: PENDING
+
+See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md`. Do not mark #12 PASS because #13 or #14 started.
 
 ### #11 Production Release Checklist
 
@@ -214,3 +219,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** AUTHORIZED / IN PROGRESS -> PARTIAL / READY FOR PRODUCT LEADERSHIP REVIEW  
 **SHA:** implementation `a743c8a00910fac77d9046a27c2f0eb36d13abd2`  
 **EVIDENCE:** Hosted Supreme CI run `34760658744` PASS. Staging frontend and API both `a743c8a`. Hosted Control Center / Evidence Library / coverage walkthrough recorded. Product Leadership has not accepted. #12 remains PARTIAL. #15 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #12 Supreme Third Party Production v1  
+**STATUS CHANGE:** PARTIAL remains PARTIAL — raw JSON scoring editor removed; Risk Scoring Methodology workspace implemented; hosted acceptance pending  
+**SHA:** recorded in `docs/RISK-METHODOLOGY-WORKSPACE.md` after commit  
+**EVIDENCE:** Customer-facing JSON textarea removed. Structured thresholds and factors, draft/publish/history, and immutable published versions returned. Deterministic engine unchanged. #12 is not PASS. #14 is not PASS. #15 is not authorized.
