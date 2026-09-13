@@ -163,7 +163,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** EVIDENCE RESULT PASS — awaiting Product Leadership acceptance before #10
 
-**CERTIFICATION SHA:** (this #9 sprint commit)
+**CERTIFICATION SHA:** `309b76336a351ab43ce7627efa22272b94a34298`
 
 **EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md`, `docs/SECURITY-ARCHITECTURE.md`, `docs/PENETRATION-TEST-SCOPE.md`, `docs/SOC2-ISO-READINESS-MAPPING.md`
 

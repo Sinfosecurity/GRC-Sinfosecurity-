@@ -8,8 +8,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13 01:30 UTC
 
-**CURRENT VERIFIED SHA:** `806975fd8d8093dd11bc987db82518b75110e636`
-(updated to the #9 implementation SHA after that commit lands)
+**CURRENT VERIFIED SHA:** `309b76336a351ab43ce7627efa22272b94a34298`
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -221,5 +220,5 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 
 **ITEM:** #9 Final Security Review
 **STATUS CHANGE:** NOT STARTED -> EVIDENCE RESULT PASS (not #10 authorization)
-**SHA:** (this #9 sprint commit)
+**SHA:** `309b76336a351ab43ce7627efa22272b94a34298`
 **EVIDENCE:** `docs/FINAL-SECURITY-REVIEW.md`
