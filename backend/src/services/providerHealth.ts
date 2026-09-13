@@ -1,6 +1,7 @@
 import { prisma } from '../config/database';
 import { redisClient } from '../config/database';
 import { emailStatus } from './notificationDeliveryService';
+import { emailProviderSnapshot } from './emailProvider';
 import { objectStorageService } from './objectStorageService';
 import { billingStatus } from '../billing/stripeBillingService';
 import { isProviderConfigured } from '../config/env';
@@ -60,6 +61,9 @@ export async function providerHealth() {
         malwarePolicy: storage.downloadPolicy,
         redis,
         email: emailStatus(),
+        emailProvider: emailProviderSnapshot().EMAIL_PROVIDER_SELECTED,
+        emailFrom: emailProviderSnapshot().FROM_ADDRESS,
+        emailWebhook: emailProviderSnapshot().WEBHOOK_CONFIGURED,
         stripe: billingStatus(),
         lastStripeWebhook,
         ai: isProviderConfigured('OPENAI_API_KEY') || isProviderConfigured('AI_API_KEY') ? 'CONNECTED' : 'NOT_CONFIGURED',

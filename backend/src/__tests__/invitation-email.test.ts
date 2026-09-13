@@ -74,7 +74,7 @@ describe('invitation email activation links', () => {
         );
         expect(delivered.invitation.id).toBe('inv-1');
         expect(delivered.emailStatus).toBe('ACCEPTED');
-        expect(delivered.delivery).toBe('queued');
+        expect(delivered.delivery).toBe('sent');
 
         notify.mockResolvedValue({ inApp: true, email: 'FAILED' });
         const failed = await identityUserService.invite(
@@ -87,4 +87,15 @@ describe('invitation email activation links', () => {
         expect(failed.invitation.id).toBe('inv-1');
         expect(failed.emailStatus).toBe('FAILED');
     });
+
+    it('rejects a self-invite without sending mail', async () => {
+        prisma.user.findUnique.mockReset();
+        prisma.user.findUnique.mockResolvedValue({ email: 'admin@org-a.test' });
+        notify.mockClear();
+        await expect(
+            identityUserService.invite('org-a', 'admin-1', 'admin@org-a.test', Role.VIEWER, Role.ORGANIZATION_ADMIN)
+        ).rejects.toThrow(/already have access/i);
+        expect(notify).not.toHaveBeenCalled();
+    });
 });
+

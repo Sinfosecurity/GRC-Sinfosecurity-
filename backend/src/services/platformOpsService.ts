@@ -434,10 +434,42 @@ export const platformOpsService = {
 
     async notificationFailures() {
         return prisma.notificationDeliveryLog.findMany({
-            where: { status: { in: ['FAILED', 'NOT_CONFIGURED'] } },
+            where: { status: { in: ['FAILED', 'NOT_CONFIGURED', 'BOUNCED', 'REJECTED', 'COMPLAINED'] } },
             orderBy: { createdAt: 'desc' },
             take: 100,
         });
+    },
+
+    async emailDeliveries() {
+        const { emailProviderSnapshot } = await import('./emailProvider');
+        const invitations = await prisma.accountInvitation.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                status: true,
+                organizationId: true,
+                emailProvider: true,
+                providerMessageId: true,
+                emailDeliveryStatus: true,
+                emailSentAt: true,
+                emailDeliveredAt: true,
+                emailFailedAt: true,
+                emailLastError: true,
+                createdAt: true,
+            },
+        });
+        const events = await prisma.emailDeliveryEvent.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 50,
+        });
+        return {
+            provider: emailProviderSnapshot(),
+            invitations,
+            events,
+        };
     },
 
     async reportFailures() {

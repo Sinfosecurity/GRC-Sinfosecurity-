@@ -5,7 +5,7 @@ import { recordAudit } from './auditEventService';
 import { ApiError } from '../middleware/errorHandler';
 import { permissionsForRole } from '../security/rbac';
 import { emailStatus, notify } from './notificationDeliveryService';
-import { invitationEmailBody, portalFrontendUrl } from './publicFrontendUrl';
+import { invitationEmailBody, invitationEmailHtml, portalFrontendUrl } from './publicFrontendUrl';
 
 export const CUSTOMER_ROLE_LABELS: Record<string, { label: string; description: string }> = {
     ORGANIZATION_ADMIN: { label: 'Organization Admin', description: 'Manages the organization, people, and Third Party settings.' },
@@ -21,9 +21,12 @@ export const CUSTOMER_ROLE_LABELS: Record<string, { label: string; description: 
 };
 
 export function customerDeliveryLabel(status?: string | null) {
-    if (status === 'DELIVERED' || status === 'ACCEPTED' || status === 'QUEUED') return 'queued';
-    if (status === 'FAILED' || status === 'BOUNCED' || status === 'ERROR') return 'not sent';
-    if (status === 'NOT_CONFIGURED') return 'not sent';
+    if (status === 'DELIVERED') return 'delivered';
+    if (status === 'SENT' || status === 'ACCEPTED' || status === 'QUEUED') return 'sent';
+    if (status === 'BOUNCED') return 'bounced';
+    if (status === 'FAILED' || status === 'REJECTED' || status === 'COMPLAINED' || status === 'ERROR' || status === 'NOT_CONFIGURED') {
+        return 'failed';
+    }
     return 'unknown';
 }
 
@@ -103,10 +106,16 @@ function publicUser(user: {
     };
 }
 
-export function invitationApiPayload<T extends { token?: string }>(result: T): Omit<T, 'token'> & { token?: string } {
-    const { token, ...safe } = result;
+export function invitationApiPayload<T extends { token?: string; activationUrl?: string; delivery?: string }>(
+    result: T
+): Omit<T, 'token' | 'activationUrl'> & { token?: string; activationUrl?: string } {
+    const { token, activationUrl, ...safe } = result;
+    const failed = result.delivery === 'failed' || result.delivery === 'unknown';
     if (process.env.NODE_ENV === 'test' && token) {
-        return { ...safe, token };
+        return { ...safe, token, activationUrl };
+    }
+    if (failed && activationUrl) {
+        return { ...safe, activationUrl };
     }
     return safe;
 }
@@ -269,6 +278,11 @@ export const identityUserService = {
                 invitedByName,
                 roleLabel,
             }),
+            emailHtml: invitationEmailHtml(role, result.token, process.env, {
+                organizationName: organization?.name,
+                invitedByName,
+                roleLabel,
+            }),
             resourceType: 'AccountInvitation',
             resourceId: result.invitation.id,
             emailTo: normalized,
@@ -297,6 +311,10 @@ export const identityUserService = {
                 createdAt: true,
                 acceptedAt: true,
                 invitedBy: { select: { firstName: true, lastName: true, email: true } },
+                emailDeliveryStatus: true,
+                emailSentAt: true,
+                emailDeliveredAt: true,
+                emailFailedAt: true,
             },
         });
         const deliveries = await prisma.notificationDeliveryLog.findMany({
@@ -305,11 +323,20 @@ export const identityUserService = {
         });
         return rows.map((row) => {
             const latest = deliveries.find((item) => item.resourceId === row.id);
+            const deliveryStatus = row.emailDeliveryStatus || latest?.status;
             return {
-                ...row,
+                id: row.id,
+                email: row.email,
+                role: row.role,
+                status: row.status,
+                expiresAt: row.expiresAt,
+                createdAt: row.createdAt,
+                acceptedAt: row.acceptedAt,
                 invitedByName: row.invitedBy ? `${row.invitedBy.firstName} ${row.invitedBy.lastName}`.trim() : '—',
-                emailDelivery: customerDeliveryLabel(latest?.status),
-                emailAttemptedAt: latest?.createdAt || null,
+                emailDelivery: customerDeliveryLabel(deliveryStatus),
+                emailAttemptedAt: row.emailSentAt || latest?.createdAt || null,
+                emailDeliveredAt: row.emailDeliveredAt || null,
+                emailFailedAt: row.emailFailedAt || null,
             };
         });
     },
@@ -345,6 +372,11 @@ export const identityUserService = {
             title: 'Your Supreme invitation was resent',
             body: `${invitedByName} resent your invitation as ${roleLabel}.`,
             emailBody: invitationEmailBody(invitation.role, result.token, process.env, {
+                organizationName: organization?.name,
+                invitedByName,
+                roleLabel,
+            }),
+            emailHtml: invitationEmailHtml(invitation.role, result.token, process.env, {
                 organizationName: organization?.name,
                 invitedByName,
                 roleLabel,

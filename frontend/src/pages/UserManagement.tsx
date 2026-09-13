@@ -21,6 +21,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import { usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { deliveryLabel } from './invitationDelivery';
 
 const ASSIGNABLE_ROLES = [
     { value: 'ORGANIZATION_ADMIN', label: 'Organization Admin', description: 'Manages the organization, people, and Third Party settings.' },
@@ -34,12 +35,6 @@ function roleLabel(role?: string) {
     return ASSIGNABLE_ROLES.find((item) => item.value === role)?.label
         || ({ ADMIN: 'Organization Admin', COMPLIANCE_OFFICER: 'Assessor', BUSINESS_OWNER: 'Business Owner', AUDITOR: 'Auditor', USER: 'Viewer' } as Record<string, string>)[role || '']
         || (role || '').replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function deliveryLabel(value?: string) {
-    if (value === 'queued') return 'Email queued';
-    if (value === 'not sent') return 'Email not sent';
-    return 'Delivery unknown';
 }
 
 type OrgUser = {
@@ -104,13 +99,17 @@ export default function UserManagement() {
             const response = await usersAPI.invite({ email, role });
             const delivery = response.data.data?.delivery;
             const url = response.data.data?.activationUrl;
-            setActivationUrl(url || null);
+            setActivationUrl(delivery === 'failed' || delivery === 'unknown' ? url || null : null);
             setMessage(
-                delivery === 'queued'
-                    ? 'Invitation created. The invitation email has been queued.'
-                    : delivery === 'not sent'
-                        ? 'Invitation created. The email could not be queued. Copy the activation link and send it securely.'
-                        : 'Invitation created.'
+                delivery === 'delivered'
+                    ? 'Invitation created. The email was delivered.'
+                    : delivery === 'sent'
+                        ? 'Invitation created. The email was sent. Delivery confirmation is tracked separately.'
+                        : delivery === 'bounced'
+                            ? 'Invitation created, but the email bounced.'
+                            : delivery === 'failed'
+                                ? 'Invitation created. The email could not be sent. Copy the activation link and send it securely.'
+                                : 'Invitation created.'
             );
             setEmail('');
             setInviteOpen(false);
@@ -170,11 +169,11 @@ export default function UserManagement() {
             const response = await usersAPI.resendInvitation(id);
             const delivery = response.data.data?.delivery;
             const url = response.data.data?.activationUrl;
-            setActivationUrl(url || null);
+            setActivationUrl(delivery === 'failed' || delivery === 'unknown' ? url || null : null);
             setMessage(
-                delivery === 'queued'
-                    ? 'Invitation updated. A new email has been queued. The previous activation link is no longer valid.'
-                    : 'Invitation updated. Copy the new activation link. The previous link is no longer valid.'
+                delivery === 'sent' || delivery === 'delivered'
+                    ? 'Invitation updated. A new email was sent. The previous activation link is no longer valid.'
+                    : 'Invitation updated. The previous activation link is no longer valid.'
             );
         } catch (err: any) {
             setError(err.message);

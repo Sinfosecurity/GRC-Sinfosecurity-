@@ -2080,22 +2080,30 @@ model PasswordResetToken {
 }
 
 model AccountInvitation {
-  id             String           @id @default(uuid())
-  email          String
-  role           Role
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String
-  invitedBy      User?            @relation("InvitedBy", fields: [invitedById], references: [id])
-  invitedById    String?
-  tokenHash      String           @unique
-  status         InvitationStatus @default(PENDING)
-  expiresAt      DateTime
-  acceptedAt     DateTime?
-  createdAt      DateTime         @default(now())
+  id                  String           @id @default(uuid())
+  email               String
+  role                Role
+  organization        Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId      String
+  invitedBy           User?            @relation("InvitedBy", fields: [invitedById], references: [id])
+  invitedById         String?
+  tokenHash           String           @unique
+  status              InvitationStatus @default(PENDING)
+  expiresAt           DateTime
+  acceptedAt          DateTime?
+  createdAt           DateTime         @default(now())
+  emailProvider       String?
+  providerMessageId   String?
+  emailDeliveryStatus String?
+  emailSentAt         DateTime?
+  emailDeliveredAt    DateTime?
+  emailFailedAt       DateTime?
+  emailLastError      String?
 
   @@index([organizationId])
   @@index([email])
   @@index([status])
+  @@index([providerMessageId])
 }
 
 model AuditEvent {
@@ -2604,20 +2612,46 @@ model DemoLead {
 }
 
 model NotificationDeliveryLog {
-  id             String        @id @default(uuid())
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  organizationId String?
-  eventType      String
-  status         String
-  recipientMask  String?
-  resourceType   String?
-  resourceId     String?
-  createdAt      DateTime      @default(now())
+  id                String        @id @default(uuid())
+  organization      Organization? @relation(fields: [organizationId], references: [id])
+  organizationId    String?
+  eventType         String
+  status            String
+  recipientMask     String?
+  resourceType      String?
+  resourceId        String?
+  provider          String?
+  providerMessageId String?
+  lastError         String?
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  failedAt          DateTime?
+  createdAt         DateTime      @default(now())
 
   @@index([organizationId])
   @@index([status])
   @@index([eventType])
   @@index([createdAt])
+  @@index([providerMessageId])
+}
+
+model EmailDeliveryEvent {
+  id                String   @id @default(uuid())
+  provider          String
+  providerEventId   String   @unique
+  providerMessageId String?
+  eventType         String
+  deliveryStatus    String
+  recipientMask     String?
+  resourceType      String?
+  resourceId        String?
+  organizationId    String?
+  lastError         String?
+  createdAt         DateTime @default(now())
+
+  @@index([providerMessageId])
+  @@index([resourceId])
+  @@index([organizationId])
 }
 
 model OperationalEvent {

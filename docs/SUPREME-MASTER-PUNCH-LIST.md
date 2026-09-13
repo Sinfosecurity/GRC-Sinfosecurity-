@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. Cursor cannot declare #12 PASS.
 
-**NEXT ACTION:** Product Leadership hosted review. Provide/approve a real controlled test inbox before invitation P1 can close. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Product Leadership must confirm a real controlled inbox received the invitation. Provider accept is not delivery. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
 
 ---
 

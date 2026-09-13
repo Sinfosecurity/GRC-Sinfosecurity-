@@ -6,7 +6,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-13
+**LAST UPDATED:** 2026-09-13 (invitation email P1 still open; real inbox receipt unconfirmed)
 
 **CURRENT VERIFIED SHA:** `358eab7ece3e0dbb2f53d494328f7302f1f071d2`
 

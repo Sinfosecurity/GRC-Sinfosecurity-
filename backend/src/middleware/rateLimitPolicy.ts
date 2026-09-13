@@ -91,6 +91,7 @@ export function shouldSkipRateLimit(req: Pick<Request, 'path' | 'originalUrl'>, 
         req.path === '/health/basic' ||
         /\/health(\/|$|\?)/.test(path) ||
         /\/billing\/webhook/.test(path) ||
+        /\/webhooks\/resend/.test(path) ||
         req.path === '/metrics'
     );
 }

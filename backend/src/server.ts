@@ -51,6 +51,7 @@ import tprmRoutes from './routes/tprm.routes';
 import demoRoutes from './routes/demo.routes';
 import platformRoutes from './routes/platform.routes';
 import supportRoutes from './routes/support.routes';
+import emailWebhookRoutes from './routes/email.webhook.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -150,7 +151,7 @@ app.use(requestLogger({ logBody: false, logResponse: false }));
 app.use(express.json({
     limit: '10mb',
     verify: (req: any, _res, buf) => {
-        if (req.originalUrl?.includes('/billing/webhook')) {
+        if (req.originalUrl?.includes('/billing/webhook') || req.originalUrl?.includes('/webhooks/resend')) {
             req.rawBody = buf;
         }
     },
@@ -256,6 +257,7 @@ app.use(`${API_PREFIX}/tprm`, ...tenantContent, tprmRoutes);
 app.use(`${API_PREFIX}/demo-requests`, demoRoutes);
 app.use(`${API_PREFIX}/platform`, platformRoutes);
 app.use(`${API_PREFIX}/support`, supportRoutes);
+app.use(`${API_PREFIX}/webhooks`, emailWebhookRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

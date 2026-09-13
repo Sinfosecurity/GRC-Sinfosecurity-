@@ -82,13 +82,15 @@ export function PlatformProviders() {
     const [data, setData] = useState<Record<string, string> | null>(null);
     const [malware, setMalware] = useState<Array<Record<string, string>>>([]);
     const [notes, setNotes] = useState<Array<Record<string, string>>>([]);
+    const [emailOps, setEmailOps] = useState<{ provider?: Record<string, string>; invitations?: Array<Record<string, string>> } | null>(null);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
-        Promise.all([platformAPI.providers(), platformAPI.malware(), platformAPI.notifications()])
-            .then(([providers, scans, failures]) => {
+        Promise.all([platformAPI.providers(), platformAPI.malware(), platformAPI.notifications(), platformAPI.emailDeliveries()])
+            .then(([providers, scans, failures, deliveries]) => {
                 setData(providers.data.data);
                 setMalware(failures ? scans.data.data : []);
                 setNotes(failures.data.data);
+                setEmailOps(deliveries.data.data);
             })
             .catch((err) => setError(err.message));
     }, []);
@@ -102,6 +104,16 @@ export function PlatformProviders() {
             <Panel title="Malware / evidence operations">
                 {malware.length === 0 ? <EmptyState>No failed, infected, or pending evidence objects recorded.</EmptyState> : malware.map((row) => (
                     <Typography key={row.id}>{row.scanStatus} · {row.filename} · org {row.organizationId}</Typography>
+                ))}
+            </Panel>
+            <Panel title="Invitation email delivery">
+                {emailOps?.provider && Object.entries(emailOps.provider).map(([key, value]) => (
+                    <Typography key={key}>{key}: {String(value ?? '—')}</Typography>
+                ))}
+                {(emailOps?.invitations || []).length === 0 ? <EmptyState>No invitation delivery records.</EmptyState> : (emailOps?.invitations || []).map((row) => (
+                    <Typography key={row.id}>
+                        {row.email} · invitation {row.status} · email {row.emailDeliveryStatus || 'unknown'} · {row.emailProvider || '—'} · {row.providerMessageId || 'no message id'}
+                    </Typography>
                 ))}
             </Panel>
             <Panel title="Notification failures">

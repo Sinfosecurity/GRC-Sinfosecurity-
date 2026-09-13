@@ -9,8 +9,12 @@ export async function recordNotificationDelivery(input: {
     recipient?: string | null;
     resourceType?: string | null;
     resourceId?: string | null;
+    provider?: string | null;
+    providerMessageId?: string | null;
+    lastError?: string | null;
 }) {
     try {
+        const now = new Date();
         await prisma.notificationDeliveryLog.create({
             data: {
                 organizationId: input.organizationId || undefined,
@@ -19,8 +23,28 @@ export async function recordNotificationDelivery(input: {
                 recipientMask: input.recipient ? maskEmail(input.recipient) : undefined,
                 resourceType: input.resourceType || undefined,
                 resourceId: input.resourceId || undefined,
+                provider: input.provider || undefined,
+                providerMessageId: input.providerMessageId || undefined,
+                lastError: input.lastError || undefined,
+                sentAt: ['ACCEPTED', 'SENT', 'DELIVERED'].includes(input.status) ? now : undefined,
+                deliveredAt: input.status === 'DELIVERED' ? now : undefined,
+                failedAt: ['FAILED', 'BOUNCED', 'REJECTED', 'COMPLAINED'].includes(input.status) ? now : undefined,
             },
         });
+        if (input.resourceType === 'AccountInvitation' && input.resourceId) {
+            await prisma.accountInvitation.updateMany({
+                where: { id: input.resourceId, organizationId: input.organizationId || undefined },
+                data: {
+                    emailProvider: input.provider || undefined,
+                    providerMessageId: input.providerMessageId || undefined,
+                    emailDeliveryStatus: input.status,
+                    emailSentAt: ['ACCEPTED', 'SENT', 'DELIVERED'].includes(input.status) ? now : undefined,
+                    emailDeliveredAt: input.status === 'DELIVERED' ? now : undefined,
+                    emailFailedAt: ['FAILED', 'BOUNCED', 'REJECTED', 'COMPLAINED'].includes(input.status) ? now : undefined,
+                    emailLastError: input.lastError || undefined,
+                },
+            });
+        }
     } catch (error) {
         logger.error('Failed to persist notification delivery log', {
             eventType: input.eventType,

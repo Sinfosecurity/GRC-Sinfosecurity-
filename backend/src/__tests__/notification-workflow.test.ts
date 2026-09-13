@@ -42,6 +42,8 @@ describe('workflow notification delivery', () => {
     beforeEach(() => {
         delete process.env.SMTP_HOST;
         delete process.env.SENDGRID_API_KEY;
+        delete process.env.RESEND_API_KEY;
+        delete process.env.EMAIL_PROVIDER;
         resetEmailDeliveryState();
         prisma.notificationPreference.findUnique.mockResolvedValue(null);
         prisma.inAppNotification.create.mockResolvedValue({ id: 'n1' });

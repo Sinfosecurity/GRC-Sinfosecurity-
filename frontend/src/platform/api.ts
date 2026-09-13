@@ -22,6 +22,7 @@ export const platformAPI = {
     providers: () => api.get('/platform/provider-health'),
     billing: () => api.get('/platform/billing'),
     notifications: () => api.get('/platform/notifications'),
+    emailDeliveries: () => api.get('/platform/email-deliveries'),
     malware: () => api.get('/platform/malware'),
     reports: () => api.get('/platform/reports'),
     audit: () => api.get('/platform/audit'),

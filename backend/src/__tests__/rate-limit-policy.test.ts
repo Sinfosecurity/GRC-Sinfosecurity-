@@ -27,6 +27,13 @@ describe('production-like rate limit policy', () => {
             { NODE_ENV: 'production' }
         )).toBe(true);
     });
+
+    it('skips Resend delivery webhooks from end-user IP limiting', () => {
+        expect(shouldSkipRateLimit(
+            { path: '/v1/webhooks/resend', originalUrl: '/api/v1/webhooks/resend' },
+            { NODE_ENV: 'production' }
+        )).toBe(true);
+    });
 });
 
 describe('proxy-safe client IP', () => {

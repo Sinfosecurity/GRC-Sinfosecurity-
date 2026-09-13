@@ -64,6 +64,21 @@ export function invitationEmailBody(
     ].join('\n');
 }
 
+export function invitationEmailHtml(
+    role: string,
+    token: string,
+    env: NodeJS.ProcessEnv = process.env,
+    extras: { organizationName?: string; invitedByName?: string; roleLabel?: string } = {}
+) {
+    const text = invitationEmailBody(role, token, env, extras);
+    const escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    const withLinks = escaped.replace(/(https:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
+    return `<p>${withLinks.replace(/\n/g, '<br/>')}</p>`;
+}
+
 export function passwordResetEmailBody(token: string, env: NodeJS.ProcessEnv = process.env, plane: 'CUSTOMER' | 'PLATFORM' = 'CUSTOMER') {
     const origin = portalFrontendUrl(plane, env);
     const resetUrl = `${origin}${plane === 'PLATFORM' ? '/admin/reset-password' : '/reset-password'}?token=${token}`;

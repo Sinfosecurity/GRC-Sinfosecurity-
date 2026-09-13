@@ -286,6 +286,14 @@ router.get('/notifications', requirePlatformPermission(PERMISSIONS['platform.ove
     }
 });
 
+router.get('/email-deliveries', requirePlatformPermission(PERMISSIONS['platform.overview']), async (_req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await platformOpsService.emailDeliveries() });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/malware', requirePlatformPermission(PERMISSIONS['platform.organizations.read']), async (_req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await platformOpsService.malwareOperations() });

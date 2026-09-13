@@ -167,12 +167,44 @@ Landing no longer says “available now.”
 | #10 Cutover rehearsal | Not re-run; production still not deployed |
 | #11 Release checklist | Historical NO-GO preserved |
 
+## Invitation email path (2026-09-13)
+
+Hosted API env inspection (key presence only; secrets not printed):
+
+| Fact | Value |
+|---|---|
+| EMAIL_PROVIDER explicit | NO |
+| RESEND_API_KEY | NO |
+| SENDGRID_API_KEY | NO |
+| SMTP_HOST | smtp.resend.com |
+| SMTP_FROM_EMAIL | noreply@sinfosecurity.com |
+| SMTP_FROM_NAME | Supreme Risk |
+| SMTP_USER | resend |
+| RESEND_WEBHOOK_SECRET | NO |
+
+Public DNS (do not change without Product Leadership):
+
+| Domain | Record | Observed |
+|---|---|---|
+| sinfosecurity.com | DKIM `resend._domainkey` | Present |
+| send.sinfosecurity.com | SPF `v=spf1 include:amazonses.com ~all` | Present |
+| send.sinfosecurity.com | MX `feedback-smtp.us-east-1.amazonses.com` | Present |
+| sinfosecurity.com apex | SPF | Absent |
+| sinfosecurity.com | DMARC | Absent |
+| supremerisk.com | SPF | Outlook only (`-all`) — not the current From domain |
+
+Application change: `smtp.resend.com` is treated as Resend. Invitations use the Resend HTTP API, persist provider message IDs, and accept signed `/api/v1/webhooks/resend` events. Customer Team UI shows Sent / Delivered / Bounced / Delivery problem / Unknown, separate from invitation PENDING/ACCEPTED/REVOKED.
+
+REAL EMAIL RECEIVED remains unconfirmed. #12 stays PARTIAL.
+
+If Product Leadership authorizes DNS later, add an apex SPF/DMARC policy that does not break Google Workspace MX on `sinfosecurity.com`. Copy the exact remaining records from the Resend domain Records tab. Do not invent DKIM values.
+
 ## Defects
 
 | Severity | Open |
 |---|---|
 | P0 | 0 known |
-| P1 | Invitation inbox receipt — USER ACTION REQUIRED: no real controlled inbox is available inside this environment. Provider accept ≠ delivered. |
+| P1 | Invitation inbox receipt — USER ACTION REQUIRED. Hosted staging was sending through Resend SMTP (`smtp.resend.com`) and treating SMTP accept as "Email queued". Resend HTTP API + delivery lifecycle are now implemented. REAL EMAIL RECEIVED is still unconfirmed. |
 | P2 | Vendor Detail remains a drawer, not a full-page flagship workspace. Platform Console interior not captured (Org Admin correctly denied; Platform Owner MFA not used). |
 | P3 | HelpSupport unit test `act(...)` warning; dedicated private-beta host is not the current Render staging label |
 

@@ -1,9 +1,16 @@
 import { prisma } from '../config/database';
-import { isProviderConfigured } from '../config/env';
 import logger from '../config/logger';
 import { maskEmail } from './publicFrontendUrl';
 import { sendSmtpMail } from './smtpClient';
 import { recordNotificationDelivery } from './opsEventService';
+import {
+    emailFromAddress,
+    emailFromName,
+    emailReplyTo,
+    safeProviderError,
+    selectedEmailProvider,
+} from './emailProvider';
+import { getResendEmail, sendResendEmail } from './resendClient';
 
 export type NotificationEvent =
     | 'assessment.assigned'
@@ -38,7 +45,7 @@ export function recordEmailDelivery(success: boolean) {
 }
 
 export function isEmailConfigured() {
-    return isProviderConfigured('SENDGRID_API_KEY') || isProviderConfigured('SMTP_HOST');
+    return selectedEmailProvider() !== 'NONE';
 }
 
 export function emailStatus(): EmailProviderStatus {
@@ -59,28 +66,54 @@ export function salesNotificationRecipient(env: NodeJS.ProcessEnv = process.env)
 }
 
 /**
- * Shared transactional mail path (SendGrid, otherwise SMTP/Resend).
- * Callers must keep internal delivery state off public responses.
+ * Shared transactional mail path. Provider selection is explicit and
+ * deterministic: EMAIL_PROVIDER if set, otherwise Resend, then SendGrid, then SMTP.
  */
 export async function deliverEmail(input: {
     to: string;
     subject: string;
     body: string;
+    html?: string;
     eventType?: string;
     organizationId?: string;
     resourceType?: string;
     resourceId?: string;
-}): Promise<{ status: EmailDeliveryStatus; messageId?: string }> {
-    if (!isEmailConfigured()) {
-        logger.info('Email notification skipped: email provider not configured', {
+}): Promise<{ status: EmailDeliveryStatus; messageId?: string; provider?: string }> {
+    const provider = selectedEmailProvider();
+    if (provider === 'NONE') {
+        logger.info(`Email notification skipped ${JSON.stringify({
             eventType: input.eventType,
             organizationId: input.organizationId,
-        });
-        return { status: 'NOT_CONFIGURED' };
+            deliveryStatus: 'NOT_CONFIGURED',
+        })}`);
+        return { status: 'NOT_CONFIGURED', provider };
     }
     try {
+        const fromEmail = emailFromAddress(process.env, provider);
+        if (provider !== 'SMTP' && !fromEmail) {
+            throw new Error(`${provider}_FROM_EMAIL is not configured`);
+        }
         let messageId: string | undefined;
-        if (isProviderConfigured('SENDGRID_API_KEY')) {
+        if (provider === 'RESEND') {
+            const sent = await sendResendEmail({
+                to: input.to,
+                subject: input.subject,
+                body: input.body,
+                html: input.html,
+                tags: [
+                    input.eventType ? { name: 'event', value: input.eventType.replace(/[^a-z0-9_]/gi, '_') } : undefined,
+                    input.resourceId ? { name: 'resource', value: input.resourceId } : undefined,
+                ].filter((item): item is { name: string; value: string } => Boolean(item)),
+            });
+            messageId = sent.messageId;
+            if (messageId) {
+                const inspected = await getResendEmail(messageId);
+                if (inspected?.lastEvent === 'bounced' || inspected?.lastEvent === 'failed') {
+                    throw new Error(`Resend last_event ${inspected.lastEvent}`);
+                }
+            }
+        } else if (provider === 'SENDGRID') {
+            const replyTo = emailReplyTo();
             const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
                 method: 'POST',
                 headers: {
@@ -90,26 +123,28 @@ export async function deliverEmail(input: {
                 body: JSON.stringify({
                     personalizations: [{ to: [{ email: input.to }] }],
                     from: {
-                        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@supremerisk.com',
-                        name: process.env.SENDGRID_FROM_NAME || 'Supreme',
+                        email: fromEmail,
+                        name: emailFromName(process.env, provider),
                     },
+                    reply_to: replyTo ? { email: replyTo } : undefined,
                     subject: input.subject,
-                    content: [{ type: 'text/plain', value: input.body }],
+                    content: [
+                        { type: 'text/plain', value: input.body },
+                        input.html ? { type: 'text/html', value: input.html } : undefined,
+                    ].filter(Boolean),
                 }),
             });
             if (!response.ok) {
                 throw new Error(`SendGrid responded ${response.status}`);
             }
             messageId = response.headers.get('x-message-id') || undefined;
-        } else if (isProviderConfigured('SMTP_HOST')) {
+        } else {
             const sent = await sendSmtpMail({
                 to: input.to,
                 subject: input.subject,
                 body: input.body,
             });
             messageId = sent.messageId;
-        } else {
-            return { status: 'NOT_CONFIGURED' };
         }
         recordEmailDelivery(true);
         await recordNotificationDelivery({
@@ -119,17 +154,21 @@ export async function deliverEmail(input: {
             recipient: input.to,
             resourceType: input.resourceType,
             resourceId: input.resourceId,
+            provider,
+            providerMessageId: messageId,
         });
-        logger.info('Email notification result', {
+        logger.info(`Email notification result ${JSON.stringify({
             eventType: input.eventType,
             organizationId: input.organizationId,
             recipient: maskEmail(input.to),
             deliveryStatus: 'ACCEPTED',
+            provider,
             messageId,
-        });
-        return { status: 'ACCEPTED', messageId };
+        })}`);
+        return { status: 'ACCEPTED', messageId, provider };
     } catch (error) {
         recordEmailDelivery(false);
+        const lastError = safeProviderError(error);
         await recordNotificationDelivery({
             organizationId: input.organizationId,
             eventType: input.eventType || 'email',
@@ -137,15 +176,18 @@ export async function deliverEmail(input: {
             recipient: input.to,
             resourceType: input.resourceType,
             resourceId: input.resourceId,
+            provider,
+            lastError,
         });
-        logger.error('Email notification failed; business record unchanged', {
+        logger.error(`Email notification failed ${JSON.stringify({
             eventType: input.eventType,
             organizationId: input.organizationId,
             recipient: maskEmail(input.to),
             deliveryStatus: 'FAILED',
-            error: error instanceof Error ? error.message : String(error),
-        });
-        return { status: 'FAILED' };
+            provider,
+            error: lastError,
+        })}`);
+        return { status: 'FAILED', provider };
     }
 }
 
@@ -159,6 +201,7 @@ export async function notify(input: {
     resourceId?: string;
     emailTo?: string;
     emailBody?: string;
+    emailHtml?: string;
 }) {
     const pref = await prisma.notificationPreference.findUnique({
         where: { userId_eventType: { userId: input.userId, eventType: input.eventType } },
@@ -192,6 +235,7 @@ export async function notify(input: {
             to: input.emailTo,
             subject: input.title,
             body: input.emailBody || input.body,
+            html: input.emailHtml,
             eventType: input.eventType,
             organizationId: input.organizationId,
             resourceType: input.resourceType,
