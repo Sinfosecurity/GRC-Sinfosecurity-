@@ -23,10 +23,13 @@ export async function enforceSubscriptionWrites(req: AuthRequest, res: Response,
     try {
         const organization = await prisma.organization.findUnique({
             where: { id: req.user.organizationId },
-            select: { status: true },
+            select: { status: true, isDemo: true },
         });
         if (!organization) {
             return next(new ApiError(404, 'Organization not found'));
+        }
+        if (organizationHasEvaluationAccess(organization)) {
+            return next();
         }
         if (organization.status === 'PAST_DUE' || organization.status === 'CANCELLED' || organization.status === 'SUSPENDED') {
             return next(new ApiError(403, 'Organization billing is not in good standing'));
@@ -37,9 +40,33 @@ export async function enforceSubscriptionWrites(req: AuthRequest, res: Response,
     }
 }
 
-export function privateBetaUnlocks(feature: keyof Entitlements): boolean {
-    return feature === 'advancedReporting' || feature === 'assessments' || feature === 'continuousMonitoring';
+/** Product features a designated testing organization may use without a paid plan. */
+export const EVALUATION_FEATURES: Array<keyof Entitlements> = [
+    'assessments',
+    'continuousMonitoring',
+    'advancedReporting',
+];
+
+export function organizationHasEvaluationAccess(organization?: { isDemo?: boolean | null } | null): boolean {
+    return Boolean(organization?.isDemo);
 }
+
+export function privateBetaUnlocks(feature: keyof Entitlements): boolean {
+    return EVALUATION_FEATURES.includes(feature);
+}
+
+export function organizationHasProductFeature(
+    organization: { plan?: string | null; isDemo?: boolean | null } | null | undefined,
+    feature: keyof Entitlements
+): boolean {
+    if (organizationHasEvaluationAccess(organization) && privateBetaUnlocks(feature)) {
+        return true;
+    }
+    return assertEntitlement(organization?.plan, feature);
+}
+
+export const SUBSCRIPTION_FEATURE_DENIED =
+    'This capability is not included in the current subscription. Contact your organization administrator if you expected access.';
 
 export function requireEntitlement(feature: keyof Entitlements) {
     return async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -54,13 +81,10 @@ export function requireEntitlement(feature: keyof Entitlements) {
                 where: { id: req.user.organizationId },
                 select: { plan: true, isDemo: true },
             });
-            if (organization?.isDemo && privateBetaUnlocks(feature)) {
+            if (organizationHasProductFeature(organization, feature)) {
                 return next();
             }
-            if (!assertEntitlement(organization?.plan, feature)) {
-                return next(new ApiError(403, `Plan does not include ${feature}`));
-            }
-            return next();
+            return next(new ApiError(403, SUBSCRIPTION_FEATURE_DENIED));
         } catch (error) {
             return next(error);
         }

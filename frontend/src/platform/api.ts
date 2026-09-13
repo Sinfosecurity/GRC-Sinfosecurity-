@@ -7,6 +7,8 @@ export const platformAPI = {
     testers: () => api.get('/platform/testers'),
     createTester: (data: unknown) => api.post('/platform/testers', data),
     disableTester: (organizationId: string) => api.post(`/platform/testers/${organizationId}/disable`),
+    setOrganizationTestingAccess: (organizationId: string, enabled: boolean) =>
+        api.post(`/platform/organizations/${organizationId}/testing-access`, { enabled }),
     organizations: (params?: Record<string, string>) => api.get('/platform/organizations', { params }),
     organization: (id: string) => api.get(`/platform/organizations/${id}`),
     tickets: (params?: Record<string, string>) => api.get('/platform/support/tickets', { params }),

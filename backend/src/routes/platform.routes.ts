@@ -111,6 +111,22 @@ router.post('/testers/:organizationId/disable', requirePlatformPermission(PERMIS
     }
 });
 
+router.post('/organizations/:id/testing-access', requirePlatformPermission(PERMISSIONS['platform.testers.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const enabled = req.body?.enabled;
+        if (typeof enabled !== 'boolean') {
+            res.status(400).json({ success: false, error: 'enabled must be true or false' });
+            return;
+        }
+        res.json({
+            success: true,
+            data: await privateTesterService.setTestingAccess(req.params.id, enabled, req.user!.id),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/organizations/:id', requirePlatformPermission(PERMISSIONS['platform.organizations.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await platformOpsService.organizationDetail(req.params.id) });

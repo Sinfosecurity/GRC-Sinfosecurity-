@@ -72,7 +72,7 @@ Product Leadership authorized PASS as a #9 dependency. ADR remains controlling.
 
 ## CURRENT OBJECTIVE
 
-Remediate #12 private-beta product and UX after Product Leadership rejected the prior PASS. Do not invite external testers yet. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
+Remediate #12 after Product Leadership rejected hosted Reports again: Supreme Investigation is a STARTER org without evaluation access, so every download stays disabled. Platform Owner can now designate testing organizations through the console. #12 stays PARTIAL. Do not claim Reports PASS from unit tests. Do not invite external testers. Do not commercially launch. Do not start #13. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 

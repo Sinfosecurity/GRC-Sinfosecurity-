@@ -14,6 +14,7 @@ export interface HealthCheckResult {
     uptime: number;
     version: string;
     environment: string;
+    gitSha: string | null;
     checks: {
         [key: string]: {
             status: 'up' | 'down' | 'degraded';
@@ -87,6 +88,7 @@ export class HealthChecker {
             uptime: process.uptime(),
             version: process.env.npm_package_version || '1.0.0',
             environment: process.env.NODE_ENV || 'development',
+            gitSha: process.env.RENDER_GIT_COMMIT || process.env.GIT_SHA || process.env.SOURCE_VERSION || null,
             checks: results,
         };
     }

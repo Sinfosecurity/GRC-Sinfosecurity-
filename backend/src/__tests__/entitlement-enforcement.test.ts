@@ -71,6 +71,16 @@ describe('entitlement enforcement', () => {
         await requireEntitlement('advancedReporting')(mockReq(), res, next);
         const error = (next as jest.Mock).mock.calls[0][0];
         expect(error.statusCode).toBe(403);
+        expect(error.message).toMatch(/current subscription/i);
+        expect(error.message).not.toMatch(/private-beta tester/i);
+    });
+
+    it('does not apply commercial billing standing to a designated testing organization', async () => {
+        billingStatus.mockReturnValue('CONNECTED');
+        prisma.organization.findUnique.mockResolvedValue({ status: 'PAST_DUE', isDemo: true });
+        const next = jest.fn() as NextFunction;
+        await enforceSubscriptionWrites(mockReq(), res, next);
+        expect(next).toHaveBeenCalledWith();
     });
 
     it('allows Professional advanced reporting and denies SSO', async () => {

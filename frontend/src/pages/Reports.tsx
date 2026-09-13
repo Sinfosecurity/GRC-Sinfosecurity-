@@ -25,6 +25,7 @@ const catalog: CatalogItem[] = [
 
 type Capabilities = {
     plan?: string;
+    testingAccess?: boolean;
     isDemo?: boolean;
     entitled?: boolean;
     canExportOperational?: boolean;
@@ -101,9 +102,9 @@ export default function Reports() {
             <Typography color="text.secondary" sx={{ mb: 3 }}>
                 Files are generated from this organization’s records. If a download is not available for your role or plan, the button stays off and the reason is shown.
             </Typography>
-            {capabilities?.isDemo && (
+            {(capabilities?.testingAccess || capabilities?.isDemo) && (
                 <Alert severity="info" sx={{ mb: 2 }}>
-                    Private-beta tester organization. Report exports are included for evaluation. This is not a paid production subscription.
+                    Evaluation access is enabled for this organization. Available downloads follow your role. Billing remains test-only and is not a production subscription.
                 </Alert>
             )}
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}

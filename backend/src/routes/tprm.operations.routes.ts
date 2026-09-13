@@ -14,9 +14,8 @@ import type { ReportFilters } from '../reports/portfolioData';
 import { prisma } from '../config/database';
 import { reportLimiter, uploadLimiter } from '../middleware/rateLimiter';
 import { notifyUser } from '../services/notificationDeliveryService';
-import { requireEntitlement, privateBetaUnlocks } from '../middleware/entitlement';
+import { requireEntitlement, organizationHasProductFeature, organizationHasEvaluationAccess } from '../middleware/entitlement';
 import { canExportReport, reportDenialReason, type ReportKind } from '../security/reportAuthorization';
-import { assertEntitlement } from '../billing/plans';
 import { ensureSupremeLibrary, recommendAssessments } from '../services/questionnaireLibrary';
 import { cloneTemplate } from '../services/questionnaireService';
 
@@ -79,19 +78,20 @@ router.get('/reports/capabilities', requirePermission(PERMISSIONS['report.read']
             where: { id: req.user!.organizationId },
             select: { plan: true, isDemo: true },
         });
-        const entitled = Boolean(organization?.isDemo && privateBetaUnlocks('advancedReporting'))
-            || assertEntitlement(organization?.plan, 'advancedReporting');
+        const entitled = organizationHasProductFeature(organization, 'advancedReporting');
+        const testingAccess = organizationHasEvaluationAccess(organization);
         const operationalReason = !entitled
-            ? 'This download is not included in the current plan. Private-beta tester organizations can export reports.'
+            ? 'This report is not included in the current subscription. Contact your organization administrator if you expected access.'
             : reportDenialReason(req.user!.role, 'operational');
         const boardReason = !entitled
-            ? 'This download is not included in the current plan. Private-beta tester organizations can export reports.'
+            ? 'This report is not included in the current subscription. Contact your organization administrator if you expected access.'
             : reportDenialReason(req.user!.role, 'board');
         res.json({
             success: true,
             data: {
                 plan: organization?.plan || 'STARTER',
-                isDemo: Boolean(organization?.isDemo),
+                testingAccess,
+                isDemo: testingAccess,
                 entitled,
                 canExportOperational: entitled && canExportReport(req.user!.role, 'operational'),
                 canExportBoard: entitled && canExportReport(req.user!.role, 'board'),

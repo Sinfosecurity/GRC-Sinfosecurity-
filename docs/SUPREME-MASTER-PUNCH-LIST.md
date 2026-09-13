@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** REOPENED / PARTIAL — Product Leadership rejected prior PASS after real-browser review
+**CURRENT STATUS:** REOPENED / PARTIAL — Product Leadership rejected prior PASS after real-browser review; hosted Reports remain blocked for undesignated STARTER orgs; #13 not authorized
 
-**CERTIFICATION SHA:** prior implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` is no longer accepted as customer-ready
+**CERTIFICATION SHA:** prior implementation `358eab7ece3e0dbb2f53d494328f7302f1f071d2` is no longer accepted. Later remediations are **not** a Reports PASS.
 
-**EVIDENCE:** Product Leadership staging review: authorized tester could not download Executive Report; questionnaire library and UX judged not commercially adequate. Remediation in progress.
+**EVIDENCE:** Evaluation access is now an authorized Platform workflow (`POST /platform/organizations/:id/testing-access`) instead of a database edit. Organization entitlement and user RBAC are separate. Customer-facing “private-beta tester organizations can export reports” copy is removed. Hosted Executive PDF download is still required before Reports PASS.
 
-**NEXT ACTION:** Complete product/UX remediation. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Designate the Product Leadership staging organization through Platform, then prove hosted report downloads. Do not invite external testers. Do not start #13. Do not merge `main` or deploy commercial production.
 
 ---
 

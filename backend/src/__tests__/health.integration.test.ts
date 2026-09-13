@@ -34,6 +34,7 @@ describe('Health Check API', () => {
                 .expect(200);
 
             expect(response.body).toHaveProperty('version');
+            expect(response.body).toHaveProperty('gitSha');
         });
 
         it('should check database connections in production mode', async () => {

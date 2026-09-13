@@ -43,7 +43,7 @@ export default function PlatformOrganizations() {
                 <Table size="small" aria-label="Organization directory">
                     <TableHead>
                         <TableRow>
-                            {['Organization', 'Plan', 'Status', 'Users', 'Vendors', 'Tickets', 'Health'].map((col) => (
+                            {['Organization', 'Plan', 'Status', 'Evaluation', 'Users', 'Vendors', 'Tickets', 'Health'].map((col) => (
                                 <TableCell key={col} sx={{ color: '#c4955c' }}>{col}</TableCell>
                             ))}
                         </TableRow>
@@ -56,6 +56,7 @@ export default function PlatformOrganizations() {
                                 </TableCell>
                                 <TableCell>{String(row.plan)}</TableCell>
                                 <TableCell>{String(row.status)}</TableCell>
+                                <TableCell>{row.testingAccess || row.isDemo ? 'Enabled' : 'Off'}</TableCell>
                                 <TableCell>{String(row.activeUsers)}</TableCell>
                                 <TableCell>{String(row.vendorCount)}</TableCell>
                                 <TableCell>{String(row.openSupportTickets)}</TableCell>

@@ -28,8 +28,8 @@ export function downloadErrorMessage(error: unknown): string {
     if (error instanceof ApiClientError) {
         if (error.status === 401) return 'Sign in is required to download this report.';
         if (error.status === 403) {
-            if (/plan does not include/i.test(error.message)) {
-                return 'This download is not included in the current plan. Private-beta tester organizations can export reports. Ask an organization administrator if you expected access.';
+            if (/plan does not include/i.test(error.message) || /not included in the current subscription/i.test(error.message)) {
+                return 'This report is not included in the current subscription. Contact your organization administrator if you expected access.';
             }
             if (/board packs/i.test(error.message)) {
                 return error.message;

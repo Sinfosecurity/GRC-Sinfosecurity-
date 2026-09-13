@@ -163,4 +163,66 @@ describe('private tester management', () => {
             });
         expect(reuse.status).toBe(409);
     });
+
+    it('designates an existing organization without inventing a paid plan and still enforces role', async () => {
+        const denied = await request(app)
+            .post(`${API}/platform/organizations/${customer.orgId}/testing-access`)
+            .set('Authorization', `Bearer ${customer.token}`)
+            .send({ enabled: true });
+        expect(denied.status).toBeGreaterThanOrEqual(401);
+
+        const before = await request(app)
+            .get(`${API}/tprm/reports/capabilities`)
+            .set('Authorization', `Bearer ${customer.token}`);
+        expect(before.status).toBe(200);
+        expect(before.body.data.testingAccess).toBe(false);
+        expect(before.body.data.entitled).toBe(false);
+        expect(before.body.data.operationalReason).toMatch(/current subscription/i);
+        expect(before.body.data.operationalReason).not.toMatch(/private-beta tester/i);
+
+        const granted = await request(app)
+            .post(`${API}/platform/organizations/${customer.orgId}/testing-access`)
+            .set('Authorization', `Bearer ${ownerToken}`)
+            .send({ enabled: true });
+        expect(granted.status).toBe(200);
+        expect(granted.body.data.testingAccess).toBe(true);
+        expect(granted.body.data.plan).toBe('STARTER');
+        expect(granted.body.data.billingChargeable).toBe(false);
+
+        const adminCaps = await request(app)
+            .get(`${API}/tprm/reports/capabilities`)
+            .set('Authorization', `Bearer ${customer.token}`);
+        expect(adminCaps.body.data.testingAccess).toBe(true);
+        expect(adminCaps.body.data.entitled).toBe(true);
+        expect(adminCaps.body.data.canExportOperational).toBe(true);
+        expect(adminCaps.body.data.canExportBoard).toBe(true);
+
+        await prisma.user.update({ where: { id: customer.userId }, data: { role: Role.VIEWER } });
+        const viewerLogin = await request(app).post(`${API}/auth/login`).send({
+            email: customer.email,
+            password: PASSWORD,
+            plane: 'CUSTOMER',
+        });
+        const viewerToken = viewerLogin.body.data.token as string;
+        const viewerCaps = await request(app)
+            .get(`${API}/tprm/reports/capabilities`)
+            .set('Authorization', `Bearer ${viewerToken}`);
+        expect(viewerCaps.body.data.testingAccess).toBe(true);
+        expect(viewerCaps.body.data.entitled).toBe(true);
+        expect(viewerCaps.body.data.canExportOperational).toBe(false);
+        expect(viewerCaps.body.data.canExportBoard).toBe(false);
+        expect(viewerCaps.body.data.operationalReason).toMatch(/cannot download/i);
+
+        const viewerExport = await request(app)
+            .get(`${API}/tprm/reports/executive.pdf`)
+            .set('Authorization', `Bearer ${viewerToken}`);
+        expect(viewerExport.status).toBe(403);
+
+        await prisma.user.update({ where: { id: customer.userId }, data: { role: Role.ORGANIZATION_ADMIN } });
+        const revoked = await request(app)
+            .post(`${API}/platform/organizations/${customer.orgId}/testing-access`)
+            .set('Authorization', `Bearer ${ownerToken}`)
+            .send({ enabled: false });
+        expect(revoked.body.data.testingAccess).toBe(false);
+    });
 });

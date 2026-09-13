@@ -34,6 +34,14 @@ function securityHeadersPlugin() {
     generateBundle() {
       this.emitFile({
         type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify({
+          gitSha: process.env.RENDER_GIT_COMMIT || process.env.VITE_GIT_SHA || process.env.GIT_SHA || null,
+          builtAt: new Date().toISOString(),
+        }),
+      });
+      this.emitFile({
+        type: 'asset',
         fileName: '_headers',
         source: [
           '/*',

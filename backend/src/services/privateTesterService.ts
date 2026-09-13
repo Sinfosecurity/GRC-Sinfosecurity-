@@ -185,4 +185,49 @@ export const privateTesterService = {
 
         return { organizationId, status: OrganizationStatus.SUSPENDED, disabledUsers: users.length };
     },
+
+    /**
+     * Designate or revoke evaluation access on an existing organization.
+     * Does not suspend users, invent a paid plan, or require database access.
+     */
+    async setTestingAccess(organizationId: string, enabled: boolean, actorUserId: string) {
+        const organization = await prisma.organization.findUnique({ where: { id: organizationId } });
+        if (!organization) {
+            throw new ApiError(404, 'Organization not found');
+        }
+
+        if (organization.isDemo !== enabled) {
+            await prisma.organization.update({
+                where: { id: organizationId },
+                data: {
+                    isDemo: enabled,
+                    ...(enabled && organization.status === OrganizationStatus.SUSPENDED
+                        ? { status: OrganizationStatus.TRIAL }
+                        : {}),
+                },
+            });
+            await recordAudit({
+                organizationId,
+                actorUserId,
+                action: enabled ? 'private_beta.testing_access_granted' : 'private_beta.testing_access_revoked',
+                resourceType: 'Organization',
+                resourceId: organizationId,
+                result: 'success',
+                metadata: { previousTestingAccess: organization.isDemo, testingAccess: enabled },
+            });
+        }
+
+        const current = await prisma.organization.findUnique({
+            where: { id: organizationId },
+            select: { id: true, name: true, plan: true, status: true, isDemo: true },
+        });
+        return {
+            organizationId: current!.id,
+            name: current!.name,
+            plan: current!.plan,
+            status: current!.status,
+            testingAccess: Boolean(current!.isDemo),
+            billingChargeable: false,
+        };
+    },
 };
