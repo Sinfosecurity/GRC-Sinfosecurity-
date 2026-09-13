@@ -8,6 +8,14 @@ jest.setTimeout(60000);
 const PASSWORD = 'ErmPass1xx';
 const API = '/api/v1';
 
+function fileBuffer(res: { body: unknown; text?: string }): Buffer {
+    if (Buffer.isBuffer(res.body)) return res.body;
+    if (typeof res.body === 'string') return Buffer.from(res.body, 'binary');
+    if (res.body instanceof Uint8Array) return Buffer.from(res.body);
+    if (typeof res.text === 'string' && res.text.length) return Buffer.from(res.text, 'binary');
+    return Buffer.from(JSON.stringify(res.body || ''));
+}
+
 describe('enterprise risk tenant isolation and scoring', () => {
     const suffix = `${Date.now()}`;
     let tokenA = '';
@@ -114,10 +122,10 @@ describe('enterprise risk tenant isolation and scoring', () => {
         const pptx = await request(app).get(`${API}/erm/reports/board.pptx`).set('Authorization', `Bearer ${tokenA}`);
         expect(pptx.status).toBe(200);
         expect(pptx.headers['content-type']).toMatch(/presentationml/);
-        expect(Buffer.from(pptx.body).subarray(0, 2).toString()).toBe('PK');
+        expect(fileBuffer(pptx).subarray(0, 2).toString()).toBe('PK');
         const pdf = await request(app).get(`${API}/erm/reports/board.pdf`).set('Authorization', `Bearer ${tokenA}`);
         expect(pdf.status).toBe(200);
-        expect(Buffer.from(pdf.body).subarray(0, 4).toString()).toBe('%PDF');
+        expect(fileBuffer(pdf).subarray(0, 4).toString()).toBe('%PDF');
     });
 
     it('assigns an owner without inventing one', async () => {
