@@ -12,6 +12,8 @@ import { calculateVendorRiskAt } from './deterministicRiskEngine';
 import { explainableRiskService } from './explainableRiskService';
 import { assertVendorTransition } from './vendorLifecycle';
 import { recordAudit } from './auditEventService';
+import { allocateVendorPublicId } from './vendorOnboardingService';
+import { extractVendorDomain } from './vendorOnboardingScoring';
 
 export interface CreateVendorInput {
     name: string;
@@ -91,6 +93,7 @@ class VendorManagementService {
             const nextReviewDate = this.calculateNextReviewDate(data.tier);
 
             const createData: Prisma.VendorUncheckedCreateInput = {
+                publicId: await allocateVendorPublicId(data.organizationId),
                 name: data.name,
                 legalName: data.legalName,
                 vendorType: data.vendorType,
@@ -100,6 +103,7 @@ class VendorManagementService {
                 contactEmail: data.contactEmail,
                 contactPhone: data.contactPhone,
                 website: data.website,
+                domain: extractVendorDomain(data.website),
                 businessOwner: data.businessOwner,
                 relationshipOwner: data.relationshipOwner,
                 servicesProvided: data.servicesProvided,

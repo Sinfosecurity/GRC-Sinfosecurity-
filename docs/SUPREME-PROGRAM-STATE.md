@@ -143,6 +143,7 @@ Known open #12 issues:
 - commercial production NO-GO
 - hosted Product Leadership acceptance of the Risk Scoring Methodology workspace
 - hosted Reports assessment selector (UX-031): remediations hosted on frontend `7bf040a` / API `8a3d8fc`; Product Leadership re-review required. See `docs/private-beta/hosted-ux-qa/reports-assessment-selector/`
+- Automation Closure Phase A (request → intake → explainable tier → due-diligence plan) is implemented and requires hosted Product Leadership review. Vendor portal / Phase B is not authorized. See `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`
 
 RAW JSON SCORING EDITOR: REMOVED  
 RISK METHODOLOGY WORKSPACE: IMPLEMENTED  

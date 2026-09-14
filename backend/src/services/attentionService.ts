@@ -1,4 +1,4 @@
-import { AssessmentStatus, VendorIssueStatus, VendorStatus } from '@prisma/client';
+import { AssessmentStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 
 export type AttentionSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM';
@@ -19,6 +19,33 @@ export const attentionService = {
         const now = new Date();
         const in45Days = new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000);
         const items: AttentionItem[] = [];
+
+        const onboarding = await prisma.vendorOnboarding.findMany({
+            where: {
+                organizationId,
+                stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN] },
+            },
+            include: { vendor: { select: { id: true, name: true, publicId: true } } },
+            take: 25,
+        });
+        for (const row of onboarding) {
+            const due = row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt;
+            const overdue = Boolean(due && due < now);
+            items.push({
+                id: `onboarding-${row.vendorId}`,
+                severity: overdue ? 'HIGH' : 'MEDIUM',
+                action: row.stage === VendorOnboardingStage.INTAKE ? 'COMPLETE INTAKE' : row.stage === VendorOnboardingStage.TIER_REVIEW ? 'CONFIRM TIER' : 'CONFIRM PLAN',
+                title: row.stage === VendorOnboardingStage.INTAKE
+                    ? `Complete vendor intake for ${row.vendor.name}`
+                    : row.stage === VendorOnboardingStage.TIER_REVIEW
+                        ? `Confirm recommended tier for ${row.vendor.name}`
+                        : `Confirm due-diligence plan for ${row.vendor.name}`,
+                detail: `${row.vendor.publicId || 'Vendor'} · due ${due ? due.toISOString().slice(0, 10) : 'not set'}${overdue ? ' · overdue' : ''}.`,
+                vendorId: row.vendorId,
+                vendorName: row.vendor.name,
+                href: `/vendor-onboarding/${row.vendor.publicId || row.vendorId}`,
+            });
+        }
 
         const overdueReviews = await prisma.vendor.findMany({
             where: { organizationId, status: VendorStatus.ACTIVE, nextReviewDate: { lt: now } },

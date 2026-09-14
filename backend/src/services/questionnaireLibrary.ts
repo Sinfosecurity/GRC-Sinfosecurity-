@@ -48,31 +48,33 @@ export const SUPREME_LIBRARY: LibraryTemplate[] = [
         key: 'inherent-risk',
         name: 'Inherent Risk Questionnaire',
         framework: 'Supreme Inherent Risk',
-        version: '1.0.0',
-        purpose: 'Establish inherent exposure before controls are credited.',
+        version: '2.0.0',
+        purpose: 'Internal intake and inherent exposure before due diligence is scoped. Completed by the business owner, not the vendor.',
         sections: [
             {
-                title: 'Service criticality',
+                title: 'Engagement details',
                 questions: [
-                    q('ir_1', 'What business services depend on this vendor?', 'Risk management', ['Customer-facing revenue', 'Internal operations', 'Regulated process', 'Non-critical support', 'Unknown'], { weight: 10 }),
-                    q('ir_2', 'If the vendor failed for 24 hours, what is the operational impact?', 'Business continuity', ['Severe customer or regulatory impact', 'Material internal disruption', 'Limited inconvenience', 'Negligible', 'Unknown'], { weight: 10 }),
-                    q('ir_3', 'How difficult would it be to replace this vendor within 30 days?', 'Fourth-party / concentration', ['Very difficult / unique', 'Difficult', 'Possible with effort', 'Readily replaceable', 'Unknown'], { weight: 8 }),
+                    q('ir_eng_what', 'What will this third party do for the organization?', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'Describe the service or product in business language.' }),
+                    q('ir_eng_category', 'What is the service category?', 'Engagement', ['SaaS', 'Professional services', 'Hosting or cloud', 'Staffing', 'Hardware', 'Payment or financial operations', 'Other'], { weight: 0 }),
+                    q('ir_availability', 'If this vendor became unavailable, how quickly would the organization feel it?', 'Business continuity', ['Negligible', 'After 1 month / minor', 'After 1 week / significant', 'Within 1 day / severe'], { weight: 10 }),
+                    q('ir_eng_contract', 'What contract type or term is expected?', 'Engagement', ['Master services agreement', 'Statement of work', 'Subscription', 'Purchase order only', 'Not yet known'], { weight: 0 }),
+                    q('ir_eng_contact', 'Who is the primary vendor contact?', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
+                    q('ir_eng_security', 'Who is the vendor security or privacy contact, if known?', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
                 ],
             },
             {
-                title: 'Data and access',
+                title: 'Inherent risk',
                 questions: [
-                    q('ir_4', 'Does the vendor host or process the organization’s data?', 'Data protection', YN, { weight: 10 }),
-                    q('ir_5', 'Which data categories can the vendor access?', 'Privacy', ['None', 'Business contact only', 'Confidential business data', 'Personal data', 'Sensitive personal or payment data', 'Unknown'], { weight: 10, conditionalOnKey: 'ir_4', conditionalValue: 'Yes' }),
-                    q('ir_6', 'Does the vendor have privileged or production access to systems?', 'Identity/access', YN, { weight: 9 }),
-                    q('ir_7', 'Is the vendor connected to the production network or identity provider?', 'Network security', YN, { weight: 8 }),
-                ],
-            },
-            {
-                title: 'Regulatory exposure',
-                questions: [
-                    q('ir_8', 'Does this relationship support a regulated activity?', 'Compliance', YN, { weight: 9 }),
-                    q('ir_9', 'Would a vendor incident require customer, regulator, or law-enforcement notice?', 'Incident response', YN, { weight: 9 }),
+                    q('ir_data', 'What types of organization data will the vendor access, store, or process?', 'Privacy', ['None', 'Internal only', 'Confidential', 'Personal data', 'PHI / highly sensitive', 'Cardholder (PCI)'], { weight: 10 }),
+                    q('ir_volume', 'About how many records or individuals are affected?', 'Privacy', ['Fewer than 1,000', '1,000 to 10,000', '10,000 to 100,000', 'More than 100,000'], { weight: 8 }),
+                    q('ir_access', 'Will the vendor connect to organization systems (API, SSO, network, or privileged access)?', 'Identity/access', ['No', 'Read-only API', 'Read-write', 'Privileged or network access'], { weight: 10 }),
+                    q('ir_onsite', 'Will the vendor’s staff work on site or use organization devices?', 'Physical security', ['No', 'Yes'], { weight: 6 }),
+                    q('ir_geo', 'Where will data be stored or processed?', 'Privacy', ['Domestic only', 'Same region', 'Outside region'], { weight: 8 }),
+                    q('ir_regulated', 'Is this service customer-facing or does it affect a regulated process?', 'Compliance', ['No', 'Yes'], { weight: 8 }),
+                    q('ir_fourth', 'Does the vendor rely on subcontractors for this service?', 'Fourth-party / concentration', ['No', 'Yes', 'Unknown'], { weight: 6 }),
+                    q('ir_spend', 'What is the estimated annual spend?', 'Risk management', ['Under $25k', '$25k–$250k', 'More than $250k'], { weight: 4 }),
+                    q('ir_ai', 'Does the engagement involve AI or machine-learning processing of organization data?', 'AI governance', ['No', 'Yes'], { weight: 6 }),
+                    q('ir_1', 'What business services depend on this vendor?', 'Risk management', ['Customer-facing revenue', 'Internal operations', 'Regulated process', 'Non-critical support', 'Unknown'], { weight: 8 }),
                 ],
             },
         ],
@@ -383,6 +385,43 @@ export async function reconcileDuplicateTemplates() {
     }
 }
 
+async function replaceSupremeTemplate(existingId: string, template: LibraryTemplate) {
+    await prisma.questionnaireSection.deleteMany({ where: { templateId: existingId } });
+    await prisma.questionnaireTemplate.update({
+        where: { id: existingId },
+        data: {
+            name: template.name,
+            framework: template.framework,
+            version: template.version,
+            source: 'SUPREME',
+            libraryKey: template.key,
+            scopeKey: PLATFORM_SCOPE,
+            isActive: true,
+            sections: {
+                create: template.sections.map((section, sectionIndex) => ({
+                    title: section.title,
+                    sortOrder: sectionIndex,
+                    questions: {
+                        create: section.questions.map((item, qIndex) => ({
+                            questionKey: item.id,
+                            questionText: item.guidance ? `${item.question}\n\nGuidance: ${item.guidance}` : item.question,
+                            questionType: item.questionType || 'SINGLE_CHOICE',
+                            category: item.category,
+                            weight: item.weight,
+                            required: true,
+                            evidenceRequired: Boolean(item.evidenceRequired),
+                            options: item.options,
+                            conditionalOnKey: item.conditionalOnKey,
+                            conditionalValue: item.conditionalValue,
+                            sortOrder: qIndex,
+                        })),
+                    },
+                })),
+            },
+        },
+    });
+}
+
 async function createSupremeTemplate(template: LibraryTemplate) {
     await prisma.questionnaireTemplate.create({
         data: {
@@ -432,6 +471,9 @@ async function ensureSupremeLibraryOnce() {
             orderBy: { createdAt: 'asc' },
         });
         if (existing) {
+            if (existing.version !== template.version) {
+                await replaceSupremeTemplate(existing.id, template);
+            }
             if (existing.source !== 'SUPREME' || existing.libraryKey !== template.key || existing.scopeKey !== PLATFORM_SCOPE) {
                 await prisma.questionnaireTemplate.update({
                     where: { id: existing.id },
@@ -485,26 +527,71 @@ const PLAN_REASON: Record<string, string> = {
     regulatory: 'The relationship may support a regulated activity.',
 };
 
-function reasonFor(key: string, vendor: { vendorType?: string | null; tier?: string | null }) {
+function reasonFor(key: string, vendor: { vendorType?: string | null; tier?: string | null }, signals?: IntakeAwareSignals) {
+    if (key === 'information-security' && signals?.systemAccess) {
+        return 'Vendor accesses company systems.';
+    }
+    if (key === 'privacy' && signals?.personalData) {
+        return 'Personal data is involved.';
+    }
+    if (key === 'bcdr' && signals?.criticalDependency) {
+        return 'Critical business dependency.';
+    }
+    if (key === 'fourth-party' && signals?.fourthParty) {
+        return 'Subcontractors recorded.';
+    }
+    if (key === 'identity' && signals?.privilegedAccess) {
+        return 'Privileged or production access recorded.';
+    }
     if (key === 'cloud-saas' && /SAAS|CLOUD/i.test(String(vendor.vendorType || ''))) {
         return 'Hosted service — cloud and SaaS controls apply.';
     }
     return PLAN_REASON[key] || 'Recommended from this vendor’s recorded risk tier.';
 }
 
-export async function recommendAssessments(organizationId: string, vendorId: string) {
+export type IntakeAwareSignals = {
+    personalData?: boolean;
+    privilegedAccess?: boolean;
+    systemAccess?: boolean;
+    fourthParty?: boolean;
+    aiInvolved?: boolean;
+    criticalDependency?: boolean;
+};
+
+export async function getLibraryTemplateByKey(key: string) {
+    await ensureSupremeLibrary();
+    const library = SUPREME_LIBRARY.find((item) => item.key === key);
+    if (!library) return null;
+    return prisma.questionnaireTemplate.findFirst({
+        where: { scopeKey: PLATFORM_SCOPE, libraryKey: key, version: library.version, isActive: true },
+        include: { sections: { include: { questions: true }, orderBy: { sortOrder: 'asc' } } },
+        orderBy: { createdAt: 'desc' },
+    });
+}
+
+export async function recommendAssessments(organizationId: string, vendorId: string, signals?: IntakeAwareSignals, tierOverride?: string) {
     const vendor = await prisma.vendor.findFirst({
         where: { id: vendorId, organizationId },
         select: { id: true, name: true, tier: true, inherentRiskScore: true, vendorType: true },
     });
     if (!vendor) throw new ApiError(404, 'Vendor not found');
     await ensureSupremeLibrary();
-    const keys = SCOPE_BY_TIER[vendor.tier] || SCOPE_BY_TIER.MEDIUM;
+    const tier = tierOverride || vendor.tier;
+    const keys = SCOPE_BY_TIER[tier] || SCOPE_BY_TIER.MEDIUM;
     const extra: string[] = [];
     if (/PAYMENT|FINANCIAL/i.test(String(vendor.vendorType || ''))) extra.push('resilience', 'regulatory');
+    if (signals?.personalData) extra.push('privacy');
+    if (signals?.systemAccess || signals?.privilegedAccess) extra.push('information-security');
+    if (signals?.privilegedAccess) extra.push('identity');
+    if (signals?.criticalDependency) extra.push('bcdr');
+    if (signals?.fourthParty) extra.push('fourth-party');
     const wanted = new Set([...keys, ...extra]);
-    const requiredKeys = new Set(['inherent-risk']);
-    const recommendedKeys = new Set([...wanted].filter((key) => key !== 'inherent-risk'));
+    const requiredKeys = new Set<string>(['inherent-risk']);
+    if (signals?.systemAccess || signals?.privilegedAccess) requiredKeys.add('information-security');
+    if (signals?.personalData) requiredKeys.add('privacy');
+    if (signals?.criticalDependency) requiredKeys.add('bcdr');
+    if (signals?.fourthParty) requiredKeys.add('fourth-party');
+    const recommendedKeys = new Set([...wanted].filter((key) => !requiredKeys.has(key)));
     const optionalKeys = SUPREME_LIBRARY.map((item) => item.key).filter((key) => !wanted.has(key));
     const allKeys = [...requiredKeys, ...recommendedKeys, ...optionalKeys];
     const names = SUPREME_LIBRARY.filter((item) => allKeys.includes(item.key)).map((item) => item.name);
@@ -515,7 +602,9 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     });
     const byName: Record<string, (typeof templates)[number]> = {};
     for (const row of templates) {
-        if (!byName[row.name]) byName[row.name] = row;
+        if (!byName[row.name] || String(row.version) > String(byName[row.name].version)) {
+            byName[row.name] = row;
+        }
     }
     const toItems = (keysToMap: string[]) =>
         keysToMap
@@ -531,7 +620,11 @@ export async function recommendAssessments(organizationId: string, vendorId: str
                     version: template.version,
                     framework: template.framework,
                     purpose: library.purpose,
-                    reason: reasonFor(key, vendor),
+                    reason: reasonFor(key, vendor, signals),
+                    requirement: requiredKeys.has(key) ? 'Required' : recommendedKeys.has(key) ? 'Recommended' : 'Optional',
+                    expectedEvidence: presented.evidenceRequired
+                        ? 'Current policy, report, or dated attestation for the controls in this assessment.'
+                        : 'Recorded answers. Evidence only if a later reviewer asks for it.',
                     source: presented.source,
                     sourceLabel: presented.sourceLabel,
                     category: presented.category,
@@ -548,7 +641,7 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     const optional = toItems(optionalKeys);
     return {
         vendor,
-        rationale: `Recommended from recorded vendor tier ${vendor.tier}. This is assessment scope, not a residual-risk score change. Aligned assessments do not provide certification.`,
+        rationale: `Recommended from recorded vendor tier ${tier}. This is assessment scope, not a residual-risk score change. Aligned assessments do not provide certification.`,
         required,
         recommended,
         optional,

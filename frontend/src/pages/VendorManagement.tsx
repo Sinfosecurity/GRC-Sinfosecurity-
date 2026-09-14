@@ -32,6 +32,7 @@ import EntityRelationships from '../components/EntityRelationships';
 
 interface Vendor {
     id: string | number;
+    publicId?: string;
     name: string;
     category: string;
     tier: 'Critical' | 'High' | 'Medium' | 'Low';
@@ -147,6 +148,7 @@ export default function VendorManagement() {
             if (response.data.vendors) {
                 const mappedVendors = response.data.vendors.map((v: any) => ({
                     id: v.id,
+                    publicId: v.publicId,
                     name: v.name,
                     category: v.category,
                     tier: displayTier(v.tier) as Vendor['tier'],
@@ -277,7 +279,12 @@ export default function VendorManagement() {
             <PageHeader
                 title="Third Parties"
                 description="Search, filter, and open a vendor record. Residual risk and reviews come from persisted tenant data only."
-                actions={<Button variant="contained" onClick={() => setOpenDialog(true)} disabled={saving}>Add third party</Button>}
+                actions={
+                    <Stack direction="row" spacing={1}>
+                        <Button onClick={() => navigate('/vendor-onboarding')}>Onboard Third Party</Button>
+                        <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={saving}>Add existing record</Button>
+                    </Stack>
+                }
             />
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
@@ -313,7 +320,7 @@ export default function VendorManagement() {
                         { id: 'name', label: 'Vendor', sortValue: (row) => row.name, render: (row) => (
                             <Box>
                                 <Typography variant="subtitle2">{row.name}</Typography>
-                                <Typography variant="caption">{row.contactEmail}</Typography>
+                                <Typography variant="caption">{row.publicId || row.contactEmail}</Typography>
                             </Box>
                         ) },
                         { id: 'category', label: 'Category', hideOnMobile: true, sortValue: (row) => row.category, render: (row) => (categories.find((item) => item.value === row.category)?.label || row.category.replace(/_/g, ' ').toLowerCase()) },

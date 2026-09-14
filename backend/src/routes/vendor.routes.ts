@@ -38,11 +38,13 @@ import vendorAssessmentService from '../services/vendorAssessmentService';
 import vendorContractService from '../services/vendorContractService';
 import vendorIssueService from '../services/vendorIssueService';
 import vendorContinuousMonitoring from '../services/vendorContinuousMonitoring';
+import vendorOnboardingRoutes from './vendorOnboarding.routes';
 
 const router = express.Router();
 
 // Apply authentication to all routes
 router.use(authenticate);
+router.use('/onboarding', vendorOnboardingRoutes);
 
 // ==========================================
 // VENDOR CRUD OPERATIONS

@@ -428,6 +428,19 @@ export const governanceAPI = {
     exportGraph: () => api.get('/governance/export'),
 };
 
+export const vendorOnboardingAPI = {
+    list: () => api.get('/vendors/onboarding'),
+    owners: () => api.get('/vendors/onboarding/owners'),
+    duplicates: (data: unknown) => api.post('/vendors/onboarding/duplicates', data),
+    create: (data: unknown) => api.post('/vendors/onboarding', data),
+    get: (id: string) => api.get(`/vendors/onboarding/${id}`),
+    saveIntake: (id: string, answers: unknown[]) => api.patch(`/vendors/onboarding/${id}/intake`, { answers }),
+    completeIntake: (id: string, answers: unknown[], attested: boolean) =>
+        api.post(`/vendors/onboarding/${id}/intake/complete`, { answers, attested }),
+    confirmTier: (id: string, data?: unknown) => api.post(`/vendors/onboarding/${id}/tier/confirm`, data || { confirm: true }),
+    confirmPlan: (id: string) => api.post(`/vendors/onboarding/${id}/plan/confirm`),
+};
+
 export const vendorAPI = {
     getAll: (filters?: unknown) => api.get('/vendors', { params: filters }),
     getById: (id: string) => api.get(`/vendors/${id}`),

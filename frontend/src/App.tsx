@@ -27,6 +27,8 @@ const AIInsights = lazy(() => import('./pages/AIInsights'));
 const PredictiveAnalytics = lazy(() => import('./pages/PredictiveAnalytics'));
 const Reports = lazy(() => import('./pages/Reports'));
 const VendorManagement = lazy(() => import('./pages/VendorManagement'));
+const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
+const VendorOnboardingWorkspace = lazy(() => import('./pages/VendorOnboardingWorkspace'));
 const SOCReports = lazy(() => import('./pages/SOCReports'));
 const OnboardingWizard = lazy(() => import('./pages/OnboardingWizard'));
 const ISO27001 = lazy(() => import('./pages/ISO27001'));
@@ -220,6 +222,8 @@ export default function App() {
                     <Route path="predictive-analytics" element={LEGACY_ENABLED ? <PredictiveAnalytics /> : <LegacyQuarantine />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="vendor-management" element={<VendorManagement />} />
+                    <Route path="vendor-onboarding" element={<VendorOnboarding />} />
+                    <Route path="vendor-onboarding/:id" element={<VendorOnboardingWorkspace />} />
                     <Route path="assessments" element={<Assessments />} />
                     <Route path="findings" element={<FindingsRemediation />} />
                     <Route path="decision-briefs" element={<DecisionBriefs />} />

@@ -165,6 +165,7 @@ model Organization {
   policies                    Policy[]
   compliance                  ComplianceFramework[]
   vendors                     Vendor[]
+  vendorOnboardings           VendorOnboarding[]
   vendorAssessments           VendorAssessment[]
   vendorContracts             VendorContract[]
   vendorIssues                VendorIssue[]
@@ -522,6 +523,7 @@ model AuditLog {
 // Vendor/Third-Party Inventory
 model Vendor {
   id                    String              @id @default(uuid())
+  publicId              String?
   name                  String
   legalName             String?
   vendorType            VendorType
@@ -536,6 +538,8 @@ model Vendor {
   contactEmail          String
   contactPhone          String?
   website               String?
+  domain                String?
+  country               String?
   
   // Risk Classification
   inherentRiskScore     Int                 @default(0) // 0-100
@@ -543,8 +547,14 @@ model Vendor {
   criticalityLevel      CriticalityLevel    @default(MEDIUM)
   
   // Business Details
-  businessOwner         String?             // Internal business owner
-  relationshipOwner     String?             // Internal relationship manager
+  businessOwner         String?             // Internal business owner (legacy display name)
+  relationshipOwner     String?             // Internal relationship manager (legacy display name)
+  requesterUserId       String?
+  businessOwnerUserId   String?
+  relationshipOwnerUserId String?
+  businessUnit          String?
+  estimatedAnnualSpend  Decimal?            @db.Decimal(15, 2)
+  targetStartDate       DateTime?
   servicesProvided      String              // Description of services
   contractValue         Decimal?            @db.Decimal(15, 2)
   currency              String?             @default("USD")
@@ -567,6 +577,7 @@ model Vendor {
   updatedAt             DateTime            @updatedAt
   
   // Relations
+  onboarding            VendorOnboarding?
   assessments           VendorAssessment[]
   contracts             VendorContract[]
   issues                VendorIssue[]
@@ -592,6 +603,7 @@ model Vendor {
   baa                   VendorBAA?
   isoControlMappings    VendorISOControlMapping[]
   
+  @@unique([organizationId, publicId])
   @@index([organizationId])
   @@index([tier])
   @@index([status])
@@ -600,9 +612,56 @@ model Vendor {
   @@index([organizationId, status])
   @@index([organizationId, tier])
   @@index([organizationId, nextReviewDate])
+  @@index([organizationId, domain])
   @@index([status, tier])
   @@index([createdAt])
   @@index([lastReviewDate])
+  @@index([businessOwnerUserId])
+}
+
+enum VendorOnboardingStage {
+  REQUEST
+  INTAKE
+  TIER_REVIEW
+  DUE_DILIGENCE_PLAN
+  READY_TO_SEND
+}
+
+model VendorOnboarding {
+  id                    String                 @id @default(uuid())
+  vendor                Vendor                 @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId              String                 @unique
+  organization          Organization           @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  stage                 VendorOnboardingStage  @default(INTAKE)
+  intakeAssessmentId    String?
+  intakeDueAt           DateTime?
+  intakeStartedAt       DateTime?
+  intakeCompletedAt     DateTime?
+  intakeAttestedAt      DateTime?
+  intakeAttestedBy      String?
+  recommendedTier       VendorTier?
+  recommendedScore      Int?
+  recommendedFactors    Json?
+  hardFloors            Json?
+  confirmedTier         VendorTier?
+  tierConfirmedAt       DateTime?
+  tierConfirmedBy       String?
+  overrideReason        String?
+  previousRecommendedTier VendorTier?
+  tierReviewDueAt       DateTime?
+  plan                  Json?
+  planConfirmedAt       DateTime?
+  planConfirmedBy       String?
+  lastReminderAt        DateTime?
+  reminderCount         Int                    @default(0)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@index([organizationId])
+  @@index([organizationId, stage])
+  @@index([intakeDueAt])
+  @@index([tierReviewDueAt])
 }
 
 enum VendorType {

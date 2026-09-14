@@ -61,6 +61,7 @@ const menuSections: NavSection[] = [
         title: 'Third Parties',
         items: [
             { text: 'Vendors', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
+            { text: 'Onboard Third Party', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
             { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
             { text: 'Evidence', path: '/documents', icon: <DescriptionOutlined fontSize="small" />, permission: 'evidence.read' },
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },

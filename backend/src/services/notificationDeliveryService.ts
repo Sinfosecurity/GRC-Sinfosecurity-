@@ -374,5 +374,8 @@ export async function scanDueNotifications(now = new Date()) {
         sent.push({ eventType, resourceId: finding.id });
     }
 
+    const { scanOnboardingAttention } = await import('./vendorOnboardingService');
+    await scanOnboardingAttention(now);
+
     return sent;
 }
