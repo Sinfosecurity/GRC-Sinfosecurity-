@@ -22,7 +22,7 @@ EMAIL = os.environ.get("E2E_EMAIL", "report-proof-20260913@staging.supremerisk.t
 PASSWORD = os.environ.get("E2E_PASSWORD", "ReportProof1x")
 OTHER_EMAIL = os.environ.get("E2E_OTHER_EMAIL", "admin@sinfosecurity.com")
 OTHER_PASSWORD = os.environ.get("E2E_OTHER_PASSWORD", "Admin@123")
-REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c")
+REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "99bfe89419d064e8ab20317e917b70da22dbd03a")
 RESULTS: dict = {"checks": [], "shots": [], "sha": {}, "workflow": {}, "discrepancies": [], "uxReserved": []}
 
 

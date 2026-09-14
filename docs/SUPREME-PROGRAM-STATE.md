@@ -60,13 +60,21 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#12 PHASE B HOSTED API SHA:** `faefbf38a5dcfa16b8986f0f777a55806ea8d7f6`
 
-**#12 PHASE B TOKEN CLOSURE:** hosted first activation 200 / reuse 410 on `faefbf3`. Expired token not hosted-proved (no clock hook). Product Leadership review still required. Not PASS.
+**#12 PHASE B TOKEN CLOSURE:** hosted first activation 200 / reuse 410 reproved on Phase C walkthrough `99bfe89`. Expired token is integration-tested by backdating `expiresAt` (410, no JWT). Not hosted-proved; no staging clock hook. Product Leadership review still required. Not PASS.
 
 **#12 PHASE B PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS.
 
 **#12 PHASE C AUTHORIZED:** YES — Product Leadership 2026-09-14. Finish remaining Phase B closures, then build Phase C. Phase D polish later. Not PASS.
 
-**#12 PHASE C PROGRAM ACCEPTANCE:** PENDING — implementation for review. Hosted golden-path evidence not yet recorded. Not PASS.
+**#12 PHASE C IMPLEMENTATION SHA:** `7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c`
+
+**#12 PHASE C HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34806881048 PASS on `99bfe89`
+
+**#12 PHASE C HOSTED FRONTEND SHA:** `7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c`
+
+**#12 PHASE C HOSTED API SHA:** `99bfe89419d064e8ab20317e917b70da22dbd03a`
+
+**#12 PHASE C PROGRAM ACCEPTANCE:** PENDING — hosted for Product Leadership review. Not PASS.
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -77,7 +85,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — PARTIAL; Phase A accepted; Phase B hosted for Product Leadership review; Phase C authorized and implemented for review; invitation inbox / visual acceptance remain; open in parallel with accepted #13–#18
+**#12 STARTED:** YES — PARTIAL; Phase A accepted; Phase B hosted for Product Leadership review; Phase C hosted for Product Leadership review; invitation inbox / visual acceptance remain; open in parallel with accepted #13–#18
 **#13 AUTHORIZED:** YES — Product Leadership 2026-09-13; later accepted
 **#14 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#14 STARTING SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`

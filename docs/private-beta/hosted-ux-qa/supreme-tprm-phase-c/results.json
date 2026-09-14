@@ -1,0 +1,328 @@
+{
+  "checks": [
+    {
+      "name": "hosted-api-sha",
+      "result": "PASS",
+      "detail": "99bfe89419d064e8ab20317e917b70da22dbd03a"
+    },
+    {
+      "name": "hosted-frontend-sha",
+      "result": "PARTIAL",
+      "detail": "7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c"
+    },
+    {
+      "name": "request-golden",
+      "result": "PASS",
+      "detail": "201 VND-2026-0011"
+    },
+    {
+      "name": "phase-a-golden",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send-due-diligence",
+      "result": "PASS",
+      "detail": "201 {'status': 'Pending', 'emailStatus': 'Queued', 'emailTruth': 'Provider accepted or queued the message. This is not inbox delivery.', 'sentAt': '2026-09-14T04:53:54.020Z', 'expiresAt': '2026-09-28T04:53:53.563Z'}"
+    },
+    {
+      "name": "email-honesty",
+      "result": "PASS",
+      "detail": "{'status': 'Pending', 'emailStatus': 'Queued', 'emailTruth': 'Provider accepted or queued the message. This is not inbox delivery.', 'sentAt': '2026-09-14T04:53:54.020Z', 'expiresAt': '2026-09-28T04:53:53.563Z'}"
+    },
+    {
+      "name": "resend-invalidates-old-token",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "revoked-token",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "first-activation",
+      "result": "PASS",
+      "detail": "200 sessionId=d9dd6c10-5533-4f22-a724-67f209e8e9f1"
+    },
+    {
+      "name": "token-reuse",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "expired-token-hosted",
+      "result": "PARTIAL",
+      "detail": "No staging clock hook. Deterministic local integration test backdates expiresAt and expects 410."
+    },
+    {
+      "name": "vendor-plane-boundary",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "cross-tenant",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "request-cross",
+      "result": "PASS",
+      "detail": "201 VND-2026-0012"
+    },
+    {
+      "name": "phase-a-cross",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "activate-cross-vendor",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "cross-vendor",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "vendor-submit",
+      "result": "PASS",
+      "detail": "6 assessments"
+    },
+    {
+      "name": "draft-findings",
+      "result": "PASS",
+      "detail": "36 drafts"
+    },
+    {
+      "name": "finding-confirm",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "finding-adjust",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "residual-before",
+      "result": "PASS",
+      "detail": "200 residual=58"
+    },
+    {
+      "name": "confirmed-findings",
+      "result": "PASS",
+      "detail": "[{\"id\": \"534514d8-2942-4bbe-9f64-e25151b4d469\", \"title\": \"Response needs review: Is a named security owner accountable for this service?\", \"severity\": \"HIGH\", \"status\": \"OPEN\", \"assignedTo\": null, \"dueDate\": null, \"cap\": null, \"validatedAt\": null}, {\"id\": \"e7d05f4a-4818-429b-b305-f8ef0037b820\", \"title\": \"Response needs review: Is multi-factor authentication required for privileged access?\", \"sever"
+    },
+    {
+      "name": "remediation-assigned",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "close-without-evidence",
+      "result": "PASS",
+      "detail": "409 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Close requires governed remediation evidence.\", \"statusCode\": 409, \"timestamp\": \"2026-09-14T04:54:33.243Z\", \"requestId\""
+    },
+    {
+      "name": "remediation-evidence-upload",
+      "result": "PASS",
+      "detail": "201 scan=CLEAN"
+    },
+    {
+      "name": "close-before-clean-or-validation",
+      "result": "PASS",
+      "detail": "409 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"An analyst must validate remediation before close.\", \"statusCode\": 409, \"timestamp\": \"2026-09-14T04:54:33.733Z\", \"requestId\": \"60436edd-765b-4f53-a041-6ff03d94"
+    },
+    {
+      "name": "evidence-clean",
+      "result": "PASS",
+      "detail": "scan=CLEAN"
+    },
+    {
+      "name": "remediation-validated",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "finding-closed",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"id\": \"cafe09c9-de00-40ac-acb0-d9568f89a7b8\", \"publicId\": \"VND-2026-0011\", \"name\": \"Phase C golden 1789361629\", \"legalName\": \"Phase C golden 1789361629\","
+    },
+    {
+      "name": "risk-acceptance",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "acceptance-does-not-change-residual",
+      "result": "PASS",
+      "detail": "before=58 after=58"
+    },
+    {
+      "name": "risk-decision-brief",
+      "result": "PASS",
+      "detail": "[{\"id\": \"9db93a65-16c2-4d80-866c-a15518ae14f6\", \"decision\": \"RISK_ACCEPTED\", \"conditions\": \"Complete the inventory before the next scheduled review.\", \"residualRisk\": 58, \"nextReviewDate\": \"2027-05-24T04:54:35.731Z\"}]"
+    },
+    {
+      "name": "contract-attest",
+      "result": "PASS",
+      "detail": "200 items=7"
+    },
+    {
+      "name": "contract-human-attestation",
+      "result": "PASS",
+      "detail": "attested"
+    },
+    {
+      "name": "approve-with-conditions",
+      "result": "PASS",
+      "detail": "200 APPROVE_WITH_CONDITIONS"
+    },
+    {
+      "name": "approval-package",
+      "result": "PASS",
+      "detail": "{\"residual\": 58, \"openFindings\": 0, \"accepted\": 1, \"contract\": true}"
+    },
+    {
+      "name": "activation",
+      "result": "PASS",
+      "detail": "200 ACTIVE ACTIVE"
+    },
+    {
+      "name": "active-vendor",
+      "result": "PASS",
+      "detail": "2027-05-24T04:54:37.135Z"
+    },
+    {
+      "name": "monitoring",
+      "result": "PASS",
+      "detail": "{\"vendorStatus\": \"ACTIVE\", \"residualRisk\": 58, \"openFindings\": 0, \"acceptedRisks\": 1, \"overdueRemediation\": 0, \"nextReassessment\": \"2027-05-24T04:54:37.135Z\", \"contractAttested\": true, \"acceptanceExpiring\": 0, \"externalIntelligence\": \"Only shown when a monitoring provider is connected.\"}"
+    },
+    {
+      "name": "workspace-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "workspace-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "findings-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "contract-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "approval-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "active-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "history-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "reassessment-recommendation",
+      "result": "PASS",
+      "detail": "{\"recommendation\": \"Full reassessment\", \"changedAnswers\": 0, \"expiredEvidence\": 0, \"unresolvedFindings\": 0, \"previousAnswersEligible\": true, \"newScope\": {\"privacy\": true, \"aiGovernance\": true}, \"nextAction\": \"Start a full reassessment.\"}"
+    },
+    {
+      "name": "expired-evidence-truth",
+      "result": "PASS",
+      "detail": "expiredEvidence=0"
+    },
+    {
+      "name": "reassessment-started",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "historical-assessment-preservation",
+      "result": "PASS",
+      "detail": "200 rows=7; reassessment does not overwrite prior rows; recommendation is advisory."
+    },
+    {
+      "name": "offboarding",
+      "result": "PASS",
+      "detail": "200 OFFBOARDING OFFBOARDING"
+    },
+    {
+      "name": "historical-governance-preservation",
+      "result": "PASS",
+      "detail": "history=50 docs=True"
+    },
+    {
+      "name": "request-reject",
+      "result": "PASS",
+      "detail": "201 VND-2026-0013"
+    },
+    {
+      "name": "phase-a-reject",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "rejection",
+      "result": "PASS",
+      "detail": "200 REJECT REJECTED"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/findings-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/contract-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/approval-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/active-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/history-1440.png"
+  ],
+  "sha": {
+    "api": "99bfe89419d064e8ab20317e917b70da22dbd03a",
+    "frontend": "7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c",
+    "required": "99bfe89419d064e8ab20317e917b70da22dbd03a",
+    "environment": "staging",
+    "health": "degraded"
+  },
+  "workflow": {
+    "publicId": "VND-2026-0011",
+    "vendorId": "cafe09c9-de00-40ac-acb0-d9568f89a7b8",
+    "planTriggers": {
+      "privacy": true,
+      "resilience": true,
+      "aiGovernance": true
+    },
+    "rejectPublicId": "VND-2026-0013",
+    "emailStatus": "Queued",
+    "emailTruth": "Provider accepted or queued the message. This is not inbox delivery.",
+    "submittedAssessments": 6,
+    "residualBefore": 58,
+    "approval": "APPROVE_WITH_CONDITIONS",
+    "activeStatus": "ACTIVE",
+    "offboardingStage": "OFFBOARDING",
+    "reassessment": "Full reassessment"
+  },
+  "discrepancies": [
+    "Hosted frontend SHA 7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c differs from hosted API SHA 99bfe89419d064e8ab20317e917b70da22dbd03a. Not silently reconciled."
+  ],
+  "uxReserved": [
+    "Customer history remains verbose and event-list heavy.",
+    "Phase C tabs are functional, not a premium visual system.",
+    "Invitation email honesty is text-only; no delivery timeline.",
+    "Approval package is summarized in the workspace, not a dedicated decision brief page.",
+    "Reassessment recommendation is shown; a full targeted questionnaire delta UI is not built."
+  ]
+}
