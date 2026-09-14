@@ -48,7 +48,7 @@ export default function PlatformLayout() {
                 Supreme Operations
             </Typography>
             <Typography variant="caption" sx={{ display: 'block', color: '#c4955c', letterSpacing: '0.12em', mb: 3 }}>
-                {staging ? 'SUPREME RISK — STAGING' : 'INTERNAL CONSOLE'}
+                {staging ? 'SUPREME OPERATIONS — STAGING' : 'INTERNAL CONSOLE'}
             </Typography>
             {NAV.map((item) => (
                 <NavLink

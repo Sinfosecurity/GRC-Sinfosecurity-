@@ -4,8 +4,7 @@ import { Alert, Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, 
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import StatusBadge from '../components/design/StatusBadge';
-import WorkflowStepper from '../components/design/WorkflowStepper';
+import LifecycleHeader from '../components/design/LifecycleHeader';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
@@ -52,6 +51,7 @@ export default function VendorOnboardingWorkspace() {
     const [acceptance, setAcceptance] = useState<Record<string, { rationale: string; conditions: string }>>({});
     const [exitNotes, setExitNotes] = useState('');
     const [acknowledgeOutstanding, setAcknowledgeOutstanding] = useState(false);
+    const [reassessment, setReassessment] = useState<any>(null);
 
     const load = () => {
         vendorOnboardingAPI.get(id)
@@ -74,6 +74,12 @@ export default function VendorOnboardingWorkspace() {
                     for (const question of section.questions || []) next[question.key] = question.response || '';
                 }
                 setAnswers(next);
+                const stage = response.data.data.stage;
+                if (['Active', 'Reassessment', 'Offboarding'].includes(String(stage))) {
+                    vendorOnboardingAPI.reassessment(id)
+                        .then((rec) => setReassessment(rec.data.data?.reassessment || rec.data.data))
+                        .catch(() => setReassessment(null));
+                }
             })
             .catch((err) => setError(err.message || 'Unable to load onboarding'));
     };
@@ -117,17 +123,23 @@ export default function VendorOnboardingWorkspace() {
                 <Stack spacing={2.5} sx={{ minWidth: 0, overflowX: 'hidden' }}>
                     <PageHeader
                         crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Onboard', to: '/vendor-onboarding' }, { label: data.publicId || data.name }]}
-                        title={`${data.publicId || 'Vendor'}  ${data.name}`}
-                        description={`${data.workflowStatus || data.stage} · ${data.nextActionOwner || data.owner} · Next: ${data.nextAction}`}
-                        meta={
-                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                <StatusBadge kind="plain" label={data.workflowStatus || data.stage} />
-                                <StatusBadge kind="plain" label={data.nextActionOwner ? `Owner: ${data.nextActionOwner}` : data.owner} />
-                                <StatusBadge kind="plain" label={data.overdue ? 'Overdue' : formatShortDate(data.dueDate)} tone={data.overdue ? 'critical' : 'info'} />
-                            </Stack>
-                        }
+                        title={data.name}
+                        description="Supreme prepared this lifecycle. Confirm the next human action below."
                     />
-                    <WorkflowStepper steps={STEPS} active={stepperIndex(data.stage)} />
+                    <LifecycleHeader
+                        name={data.name}
+                        publicId={data.publicId}
+                        tier={data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier}
+                        status={data.workflowStatus || data.lifecycle?.vendorStatus}
+                        owner={data.owner}
+                        stage={data.stage}
+                        nextAction={data.nextAction}
+                        nextActionOwner={data.nextActionOwner}
+                        dueDate={data.dueDate}
+                        overdue={data.overdue}
+                        steps={STEPS}
+                        activeStep={stepperIndex(data.stage)}
+                    />
                     {error && <Alert severity="error">{error}</Alert>}
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
                         <Tab label="Request" />
@@ -377,15 +389,24 @@ export default function VendorOnboardingWorkspace() {
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Contract review</Typography>
-                                <Typography variant="body2">Required items come from vendor tier and the recorded due-diligence plan. Legal attestation is required before approval.</Typography>
+                                <Typography variant="body2">This is an attestation workspace, not legal advice. Required items come from tier and the due-diligence plan.</Typography>
                             </Surface>
-                            {(data.lifecycle?.checklist || []).map((item: any) => (
-                                <FormControlLabel
-                                    key={item.key}
-                                    control={<Checkbox checked={Boolean(clauses[item.key])} disabled={!data.canReviewTier || Boolean(data.lifecycle?.contractAttestedAt)} onChange={(event) => setClauses({ ...clauses, [item.key]: event.target.checked })} />}
-                                    label={`${item.label}${item.required ? ' (required)' : ''} — ${item.rationale}`}
-                                />
-                            ))}
+                            {['Security', 'Privacy', 'Incident', 'Subprocessors', 'Data lifecycle', 'Assurance'].map((group) => {
+                                const items = (data.lifecycle?.checklist || []).filter((item: any) => clauseGroup(item.key) === group);
+                                if (!items.length) return null;
+                                return (
+                                    <Surface key={group}>
+                                        <Typography variant="subtitle1">{group}</Typography>
+                                        {items.map((item: any) => (
+                                            <FormControlLabel
+                                                key={item.key}
+                                                control={<Checkbox checked={Boolean(clauses[item.key])} disabled={!data.canReviewTier || Boolean(data.lifecycle?.contractAttestedAt)} onChange={(event) => setClauses({ ...clauses, [item.key]: event.target.checked })} />}
+                                                label={`${item.label} — ${item.required ? 'Required' : 'Not applicable unless in scope'}. ${item.rationale}`}
+                                            />
+                                        ))}
+                                    </Surface>
+                                );
+                            })}
                             {data.lifecycle?.contractAttestedAt && <Alert severity="success">Contract controls were attested {formatShortDate(data.lifecycle.contractAttestedAt)}.</Alert>}
                             {data.canReviewTier && !data.lifecycle?.contractAttestedAt && (
                                 <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.attestContract(id, { attested: true, clauses }))}>Attest required contract controls</Button>
@@ -396,10 +417,18 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 8 && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="h6">Approval</Typography>
-                                <Typography variant="body2">
-                                    Residual {data.lifecycle?.residualRisk ?? 'not scored'} · Open findings {data.lifecycle?.monitoring?.openFindings ?? 0} · Accepted risks {data.lifecycle?.monitoring?.acceptedRisks ?? 0} · Contract {data.lifecycle?.contractAttestedAt ? 'attested' : 'not attested'}
-                                </Typography>
+                                <Typography variant="h6">Decision required</Typography>
+                                <Typography variant="body2" sx={{ mb: 1.5 }}>Supreme prepared this summary. A person must approve, approve with conditions, or reject.</Typography>
+                                <Fact label="Vendor" value={`${data.publicId || ''} ${data.name}`.trim()} />
+                                <Fact label="Service" value={data.request?.service || data.request?.name} />
+                                <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
+                                <Fact label="Inherent risk" value={data.tierReview?.inherentRisk != null ? String(data.tierReview.inherentRisk) : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
+                                <Fact label="Residual risk" value={data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                                <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
+                                <Fact label="Accepted risks" value={String(data.lifecycle?.monitoring?.acceptedRisks ?? 0)} />
+                                <Fact label="Contract" value={data.lifecycle?.contractAttestedAt ? 'Attested' : 'Not attested'} />
+                                <Fact label="Business owner" value={data.owner} />
+                                <Fact label="Privacy / AI in scope" value={privacyAiScope(data)} />
                             </Surface>
                             {data.lifecycle?.approvalDecision && <Alert severity="info">Decision: {humanizeLabel(data.lifecycle.approvalDecision)}{data.lifecycle.approvalConditions ? `. ${data.lifecycle.approvalConditions}` : ''}</Alert>}
                             {data.canReviewTier && (
@@ -422,27 +451,54 @@ export default function VendorOnboardingWorkspace() {
 
                     {tab === 9 && (
                         <Stack spacing={1.5}>
+                            {['Active', 'Reassessment'].includes(String(data.stage)) && (
+                                <Alert severity="success">Onboarding is complete. This workspace is now lifecycle management.</Alert>
+                            )}
                             <Surface>
-                                <Typography variant="h6">Active monitoring</Typography>
+                                <Typography variant="h6">Active relationship</Typography>
                                 <Fact label="Vendor status" value={humanizeLabel(data.lifecycle?.vendorStatus || data.lifecycle?.monitoring?.vendorStatus)} />
                                 <Fact label="Residual risk" value={data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
                                 <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
                                 <Fact label="Overdue remediation" value={String(data.lifecycle?.monitoring?.overdueRemediation ?? 0)} />
+                                <Fact label="Accepted risks" value={String(data.lifecycle?.monitoring?.acceptedRisks ?? 0)} />
                                 <Fact label="Next reassessment" value={formatShortDate(data.lifecycle?.nextReassessmentAt || data.lifecycle?.monitoring?.nextReassessment)} />
                                 <Fact label="External intelligence" value={data.lifecycle?.monitoring?.externalIntelligence} />
                             </Surface>
-                            {data.canReviewTier && (
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.startReassessment(id))}>Start reassessment</Button>
-                                </Stack>
-                            )}
-                            {data.canReviewTier && (
-                                <Stack spacing={1.5}>
-                                    <TextField fullWidth multiline minRows={2} label="Exit notes" value={exitNotes} onChange={(event) => setExitNotes(event.target.value)} />
-                                    <FormControlLabel control={<Checkbox checked={acknowledgeOutstanding} onChange={(event) => setAcknowledgeOutstanding(event.target.checked)} />} label="Acknowledge outstanding findings or assessments. Records are retained." />
-                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.offboard(id, { exitNotes, acknowledgeOutstanding }))}>Start offboarding</Button>
-                                </Stack>
-                            )}
+                            <Surface>
+                                <Typography variant="h6">Reassessment</Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>
+                                    {reassessment?.recommendation
+                                        ? `${reassessment.recommendation}. ${reassessment.nextAction || ''}`
+                                        : 'Supreme will recommend a targeted or full reassessment from the previous assessment, expired evidence, and open findings. Previous answers are shown for confirmation, not auto-approved.'}
+                                </Typography>
+                                {reassessment && (
+                                    <>
+                                        <Fact label="Changed answers" value={String(reassessment.changedAnswers ?? 0)} />
+                                        <Fact label="Expired evidence" value={String(reassessment.expiredEvidence ?? 0)} />
+                                        <Fact label="Unresolved findings" value={String(reassessment.unresolvedFindings ?? 0)} />
+                                        <Fact label="Previous answers available" value={reassessment.previousAnswersEligible ? 'Yes — confirm, do not pre-approve' : 'No prior vendor answers'} />
+                                    </>
+                                )}
+                                {data.canReviewTier && (
+                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.startReassessment(id))}>Start recommended reassessment</Button>
+                                )}
+                            </Surface>
+                            <Surface>
+                                <Typography variant="h6">Offboarding</Typography>
+                                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                                    Closure retains the governance history. Records are not deleted when a vendor is offboarded.
+                                </Typography>
+                                <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
+                                <Fact label="Accepted risks still recorded" value={String(data.lifecycle?.monitoring?.acceptedRisks ?? 0)} />
+                                <Fact label="Contract" value={data.lifecycle?.contractAttestedAt ? 'Attested — closeout still required' : 'Not attested'} />
+                                {data.canReviewTier && (
+                                    <Stack spacing={1.5} sx={{ mt: 1 }}>
+                                        <TextField fullWidth multiline minRows={2} label="Exit notes" value={exitNotes} onChange={(event) => setExitNotes(event.target.value)} />
+                                        <FormControlLabel control={<Checkbox checked={acknowledgeOutstanding} onChange={(event) => setAcknowledgeOutstanding(event.target.checked)} />} label="I acknowledge outstanding findings or assessments. History is retained." />
+                                        <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.offboard(id, { exitNotes, acknowledgeOutstanding }))}>Start guided offboarding</Button>
+                                    </Stack>
+                                )}
+                            </Surface>
                         </Stack>
                     )}
 
@@ -474,4 +530,22 @@ function Fact({ label, value }: { label: string; value?: string | null }) {
             <Typography sx={{ mb: 1 }}>{value || 'Not recorded'}</Typography>
         </>
     );
+}
+
+function clauseGroup(key: string) {
+    if (key === 'dpa' || key === 'baa') return 'Privacy';
+    if (key === 'breach_notification') return 'Incident';
+    if (key === 'subprocessor') return 'Subprocessors';
+    if (key === 'deletion_return') return 'Data lifecycle';
+    if (key === 'right_to_audit') return 'Assurance';
+    return 'Security';
+}
+
+function privacyAiScope(data: any) {
+    const triggers = data.plan?.triggers || data.lifecycle?.plan?.triggers || {};
+    const parts = [
+        triggers.privacy ? 'Privacy in scope' : null,
+        triggers.aiGovernance ? 'AI in scope' : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : 'Not recorded as in scope';
 }

@@ -28,7 +28,7 @@ export const PRODUCTS: ProductModule[] = [
         subtitle: 'Enterprise Risk Management',
         summary: 'Enterprise risk register, heatmap, appetite, and treatments connected to the same evidence and decisions.',
         purpose: 'Connect enterprise, operational, cyber and third-party risk into one risk view.',
-        status: 'preview',
+        status: 'available',
         href: '/products/risk',
         points: ['Risk register', 'Heatmap', 'Appetite', 'Treatments'],
     },
@@ -38,7 +38,7 @@ export const PRODUCTS: ProductModule[] = [
         subtitle: 'Controls & Frameworks',
         summary: 'Map controls once and reuse evidence across frameworks, audits, and vendor reviews.',
         purpose: 'Map controls, frameworks, evidence and findings without duplicating assurance work.',
-        status: 'preview',
+        status: 'available',
         href: '/products/compliance',
         points: ['Controls', 'Framework mapping', 'Evidence reuse'],
     },
@@ -48,7 +48,7 @@ export const PRODUCTS: ProductModule[] = [
         subtitle: 'Privacy Management',
         summary: 'Connect processing activities, vendors, and privacy risk on the same governance graph.',
         purpose: 'Privacy management connected to vendors, systems, evidence and risk.',
-        status: 'roadmap',
+        status: 'available',
         href: '/products/privacy',
         points: ['Processing inventory', 'Vendor linkage', 'Privacy risk'],
     },
@@ -58,7 +58,7 @@ export const PRODUCTS: ProductModule[] = [
         subtitle: 'AI Governance',
         summary: 'Inventory AI systems, record use, and require a human decision before residual risk changes.',
         purpose: 'Govern AI inventory, assessments, controls and approval decisions.',
-        status: 'roadmap',
+        status: 'available',
         href: '/products/ai-governance',
         points: ['AI inventory', 'Use cases', 'Human approval'],
     },
@@ -92,19 +92,17 @@ export const PLATFORM_FOUNDATION = [
     'Decisions',
     'Audit',
     'Identity',
-    'Automation',
-    'Intelligence',
 ] as const;
 
 export const GRAPH_NODES = [
-    'Identity',
-    'Evidence',
-    'Controls',
+    'Third Parties',
     'Risks',
+    'Controls',
+    'Evidence',
+    'Frameworks',
+    'Privacy',
+    'AI',
     'Decisions',
-    'Audit',
-    'Automation',
-    'Intelligence',
 ] as const;
 
 export const DIFFERENTIATORS = [
@@ -125,8 +123,8 @@ export const DIFFERENTIATORS = [
         body: 'See how vendors, controls, risks, AI systems, privacy, and regulations affect one another.',
     },
     {
-        title: 'Intelligent automation',
-        body: 'Automate repetitive work without letting automation own residual risk or the final decision.',
+        title: 'Human authority',
+        body: 'Supreme prepares the record. A person records the decision. Residual risk is not rewritten by acceptance or automation.',
     },
     {
         title: 'Faster to implement',
@@ -185,7 +183,7 @@ export const FOOTER_GROUPS: { title: string; links: { label: string; href: strin
         title: 'Products',
         links: [
             { label: 'Supreme Third Party', href: '/products/third-party' },
-            { label: 'Connected platform', href: '/#platform' },
+            { label: 'Connected platform', href: '/connected-platform' },
         ],
     },
     {

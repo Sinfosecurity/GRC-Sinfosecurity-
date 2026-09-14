@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-14
 
-**CURRENT ITEM:** #12 Automation Closure Phase C
+**CURRENT ITEM:** UNNUMBERED — Premium Experience & Brand Closure (parallel to #12)
 
-**CURRENT ITEM STATUS:** #12 PARTIAL / OPEN; Phase A PASS — Product Leadership accepted; Phase B hosted for Product Leadership review; Phase C authorized and implemented for review; #18 PASS — Product Leadership accepted
+**CURRENT ITEM STATUS:** Premium Experience PARTIAL — Product Leadership final review required. #12 PARTIAL / OPEN; Phase A PASS; Phase B and Phase C hosted for Product Leadership review. #13–#18 remain as previously recorded. #19 / #20 NOT AUTHORIZED.
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -75,6 +75,12 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#12 PHASE C HOSTED API SHA:** `99bfe89419d064e8ab20317e917b70da22dbd03a`
 
 **#12 PHASE C PROGRAM ACCEPTANCE:** PENDING — hosted for Product Leadership review. Not PASS.
+
+**PREMIUM EXPERIENCE AUTHORIZED:** YES — Product Leadership 2026-09-14. Not #19. Not #20.
+
+**PREMIUM EXPERIENCE STARTING SHA:** `10746ea4f76aeccc6ee27cb62e5760910aad53fe`
+
+**PREMIUM EXPERIENCE PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS.
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 

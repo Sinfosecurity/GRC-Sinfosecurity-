@@ -47,7 +47,8 @@ describe('Marketing navigation', () => {
         renderAt('/');
         await userEvent.click(screen.getByRole('button', { name: 'Products' }));
         expect(screen.getByRole('menuitem', { name: /Supreme Third Party/i })).toHaveAttribute('href', '/products/third-party');
-        expect(screen.getByRole('menuitem', { name: /Supreme Privacy/i })).toHaveTextContent(/Roadmap/i);
+        expect(screen.getByRole('menuitem', { name: /Supreme Privacy/i })).toHaveTextContent(/Private beta/i);
+        expect(screen.getByRole('menuitem', { name: /Supreme Intelligence/i })).toHaveTextContent(/Roadmap/i);
     });
 
     it('keeps legal drafts from pretending counsel approved them', () => {

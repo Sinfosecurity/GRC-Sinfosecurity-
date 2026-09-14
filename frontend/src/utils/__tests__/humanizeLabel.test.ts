@@ -9,6 +9,10 @@ describe('customer-facing AI labels', () => {
         expect(humanizeLabel('NOT_REVIEWED')).toBe('Not Reviewed');
         expect(humanizeLabel('HUMAN_IN_THE_LOOP')).toBe('Human in the Loop');
         expect(humanizeLabel('NOT_RECORDED')).toBe('Not Recorded');
+        expect(humanizeLabel('PENDING_REVIEW')).toBe('Under Review');
+        expect(humanizeLabel('SATISFIED_BY')).toBe('Mapped to Control');
+        expect(humanizeLabel('SUPPORTED_BY')).toBe('Supported by Evidence');
+        expect(humanizeLabel('INITIAL_DUE_DILIGENCE')).toBe('Initial Due Diligence');
         expect(humanizeLabel('AI-00001')).toBe('AI-00001');
         expect(humanizeLabel('Unknown / Not recorded')).toBe('Unknown / Not recorded');
     });

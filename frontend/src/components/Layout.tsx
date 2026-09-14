@@ -54,78 +54,65 @@ type NavSection = { title: string; items: NavItem[] };
 
 const menuSections: NavSection[] = [
     {
-        title: 'Overview',
-        items: [{ text: 'Overview', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' }],
+        title: 'Home',
+        items: [{ text: 'Home', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' }],
     },
     {
         title: 'Third Parties',
         items: [
-            { text: 'Vendors', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
-            { text: 'Onboard Third Party', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
+            { text: 'Third Parties', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
+            { text: 'Onboard', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
             { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
-            { text: 'Evidence', path: '/documents', icon: <DescriptionOutlined fontSize="small" />, permission: 'evidence.read' },
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
             { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
             { text: 'Decisions', path: '/decision-briefs', icon: <GavelOutlined fontSize="small" />, permission: 'approval.read' },
         ],
     },
     {
-        title: 'Enterprise Risk',
+        title: 'Risk',
         items: [
-            { text: 'Supreme Risk', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
-            { text: 'Risk register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
+            { text: 'Overview', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
+            { text: 'Register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
         ],
     },
     {
         title: 'Compliance',
         items: [
-            { text: 'Supreme Compliance', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },
+            { text: 'Overview', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },
             { text: 'Frameworks', path: '/compliance/frameworks', icon: <HubOutlined fontSize="small" />, permission: 'compliance.read' },
+            { text: 'Gaps', path: '/compliance/gaps', icon: <ReportProblemOutlined fontSize="small" />, permission: 'compliance.read' },
         ],
     },
     {
         title: 'Privacy',
         items: [
-            { text: 'Supreme Privacy', path: '/privacy-ops', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Processing activities', path: '/privacy-ops/activities', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Vendor privacy', path: '/privacy-ops/vendors', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Rights requests', path: '/privacy-ops/rights', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Deletion', path: '/privacy-ops/deletions', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Consent', path: '/privacy-ops/consent', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Incidents', path: '/privacy-ops/incidents', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
-            { text: 'Import', path: '/privacy-ops/import', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Overview', path: '/privacy-ops', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Activities', path: '/privacy-ops/activities', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Rights', path: '/privacy-ops/rights', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Transfers', path: '/privacy-ops/transfers', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
         ],
     },
     {
         title: 'AI Governance',
         items: [
-            { text: 'Supreme AI Governance', path: '/ai-governance', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'AI register', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Providers', path: '/ai-governance/providers', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'AI controls', path: '/ai-governance/controls', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'NIST AI RMF', path: '/ai-governance/readiness/nist-ai-rmf', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'ISO 42001', path: '/ai-governance/readiness/iso-42001', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Assessments', path: '/ai-governance/assessments', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Overview', path: '/ai-governance', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Systems', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
             { text: 'Approvals', path: '/ai-governance/approvals', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Incidents', path: '/ai-governance/incidents', icon: <ReportProblemOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Regulatory', path: '/ai-governance/regulatory', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Exceptions', path: '/ai-governance/exceptions', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Import', path: '/ai-governance/import', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
         ],
     },
     {
-        title: 'Controls',
+        title: 'Governance',
         items: [
-            { text: 'Control Center', path: '/control-center', icon: <FactCheckOutlined fontSize="small" />, permission: 'control.read' },
-            { text: 'Framework coverage', path: '/framework-coverage', icon: <HubOutlined fontSize="small" />, permission: 'framework.read' },
+            { text: 'Controls', path: '/control-center', icon: <FactCheckOutlined fontSize="small" />, permission: 'control.read' },
+            { text: 'Evidence', path: '/documents', icon: <DescriptionOutlined fontSize="small" />, permission: 'evidence.read' },
+            { text: 'Graph', path: '/governance-graph', icon: <AccountTreeOutlined fontSize="small" />, permission: 'governanceGraph.read' },
         ],
     },
     {
-        title: 'Insights',
+        title: 'Reports',
         items: [
             { text: 'Reports', path: '/reports', icon: <DescriptionOutlined fontSize="small" />, permission: 'report.read' },
-            { text: 'Governance Graph', path: '/governance-graph', icon: <AccountTreeOutlined fontSize="small" />, permission: 'governanceGraph.read' },
         ],
     },
     {
@@ -273,7 +260,7 @@ export default function Layout() {
                     {isCollapsed ? 'S' : 'Supreme'}
                 </Typography>
                 {!isCollapsed && (
-                    <Typography sx={{ fontSize: 11, color: color.navMuted, mt: 0.25 }}>Third Party · {environmentCaption()}</Typography>
+                    <Typography sx={{ fontSize: 11, color: color.navMuted, mt: 0.25 }}>Governance · {environmentCaption()}</Typography>
                 )}
             </Box>
             <Box sx={{ flex: 1, overflowY: 'auto' }}>
@@ -340,7 +327,7 @@ export default function Layout() {
                     <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 1, px: 1.25, py: 0.5, maxWidth: 520 }}>
                         <Search fontSize="small" sx={{ color: color.navMuted }} />
                         <InputBase
-                            placeholder="Search vendors, assessments, reports"
+                            placeholder="Search names and pages"
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
                             onKeyDown={(event) => {

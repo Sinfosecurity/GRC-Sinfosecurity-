@@ -108,6 +108,21 @@ export default function ThirdPartyProduct() {
 
             <section className="mkt-section">
                 <div className="mkt-shell">
+                    <p className="mkt-kicker">Connected platform</p>
+                    <h2 className="mkt-display">The same vendor record feeds risk, evidence, privacy, and AI.</h2>
+                    <p className="mkt-lede">
+                        Third Party is the operating path. It is not a separate product island.
+                        A change in scope can require a risk decision, control evidence, a privacy
+                        review, or an AI approval — on the same graph.
+                    </p>
+                    <div className="mkt-hero-actions">
+                        <Link className="mkt-btn mkt-btn-ghost" to="/connected-platform">Why Supreme is one platform</Link>
+                    </div>
+                </div>
+            </section>
+
+            <section className="mkt-section">
+                <div className="mkt-shell">
                     <p className="mkt-kicker">Reports</p>
                     <h2 className="mkt-display">Exports from the tenant that owns the data.</h2>
                     <p className="mkt-lede">

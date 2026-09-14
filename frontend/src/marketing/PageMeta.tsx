@@ -7,7 +7,7 @@ type RouteMeta = {
 };
 
 const DEFAULT_DESCRIPTION =
-    'Supreme is a connected governance platform. Supreme Third Party is available for vendor risk, assessments, evidence, findings, explainable residual risk, decision briefs, and reports.';
+    'Supreme is a connected governance platform. See what changed, know what it affects, and act on what needs attention. Supreme does the administration. Humans make the decisions.';
 
 export const ROUTE_META: Record<string, RouteMeta> = {
     '/': {
@@ -19,21 +19,33 @@ export const ROUTE_META: Record<string, RouteMeta> = {
         description:
             'Supreme Third Party manages vendor lifecycle, assessments, evidence, findings, explainable residual risk, Decision Briefs, monitoring, and reports.',
     },
+    '/connected-platform': {
+        title: 'One Platform — Supreme',
+        description: 'How Supreme connects vendors, risk, controls, evidence, requirements, privacy, AI, and decisions on one graph.',
+    },
     '/products/risk': {
         title: 'Supreme Risk — Enterprise Risk Management',
-        description: 'Supreme Risk is a preview of enterprise risk on the same governance graph. It is not sold as a finished production module.',
+        description: 'Supreme Risk is in private testing: attention, appetite, treatments, and recorded decisions on the same governance graph.',
     },
     '/products/compliance': {
         title: 'Supreme Compliance — Controls & Frameworks',
-        description: 'Supreme Compliance is a preview of control and framework mapping on the Supreme graph. Certification is not implied.',
+        description: 'Supreme Compliance is in private testing for readiness, mapped controls, evidence, and gaps. Certification is not implied.',
     },
     '/products/privacy': {
         title: 'Supreme Privacy — Privacy Management',
-        description: 'Supreme Privacy is a roadmap product for connecting processing activities, vendors, and privacy risk.',
+        description: 'Supreme Privacy is in private testing for processing activities, transfers, rights, and vendor privacy on the same graph.',
     },
     '/products/ai-governance': {
         title: 'Supreme AI Governance',
-        description: 'Supreme AI Governance is a roadmap product. Human decision remains authoritative over residual risk.',
+        description: 'Supreme AI Governance is in private testing for systems, use, testing, and human approval. Residual risk stays human-authoritative.',
+    },
+    '/products/governance-graph': {
+        title: 'Governance Graph — Supreme',
+        description: 'See what a change affects across third parties, risk, controls, evidence, privacy, and AI.',
+    },
+    '/products/controls-evidence': {
+        title: 'Shared Controls & Evidence — Supreme',
+        description: 'Implement once, reuse evidence, and understand that implemented is not effective and a file is not a test.',
     },
     '/products/intelligence': {
         title: 'Supreme Intelligence — External Risk Intelligence',
@@ -154,6 +166,7 @@ const INDEXABLE_MARKETING_PATHS = new Set([
     '/status',
     '/demo',
     '/frameworks',
+    '/connected-platform',
 ]);
 
 const NOINDEX_EXACT_PATHS = new Set([

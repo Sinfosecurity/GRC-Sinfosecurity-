@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { findingTone, severityTone, toneColor } from '../../design/tokens';
+import { humanizeLabel } from '../../utils/humanizeLabel';
 
 type Tone = 'critical' | 'high' | 'medium' | 'low' | 'info' | 'success' | 'neutral';
 
@@ -20,7 +21,7 @@ function resolve(value?: string | null, kind: Props['kind'] = 'status'): { label
         const mapped = findingTone[key];
         if (mapped) return mapped;
     }
-    return { label: value || '—', tone: 'neutral' };
+    return { label: humanizeLabel(value), tone: 'neutral' };
 }
 
 export default function StatusBadge({ value, kind = 'status', label, tone }: Props) {

@@ -54,8 +54,8 @@ export default function DevPreviewBanner() {
                 {environmentLabel() === 'PRIVATE_BETA'
                     ? 'SUPREME — PRIVATE BETA / TEST'
                     : environmentLabel() === 'STAGING'
-                        ? 'SUPREME RISK — STAGING'
-                        : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
+                        ? 'SUPREME — STAGING'
+                        : 'SUPREME — DEVELOPMENT PREVIEW'}
             </Typography>
             <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, fontSize: '0.7rem' }}>
                 {environmentLabel() === 'PRIVATE_BETA'

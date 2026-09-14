@@ -20,6 +20,7 @@ vi.mock('../../services/api', () => ({
         send: vi.fn(),
         resend: vi.fn(),
         reviewFinding: vi.fn(),
+        reassessment: vi.fn().mockResolvedValue({ data: { data: { recommendation: 'Targeted reassessment' } } }),
     },
 }));
 
@@ -95,7 +96,8 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect(await screen.findByRole('heading', { name: /VND-2026-0001/ })).toBeInTheDocument();
+        expect((await screen.findAllByRole('heading', { name: 'Acme Payroll' })).length).toBeGreaterThan(0);
+        expect(screen.getAllByText('VND-2026-0001').length).toBeGreaterThan(0);
         expect(screen.getByText(/Supreme recommends high/i)).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Assessment Plan' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Findings' })).toBeInTheDocument();

@@ -18,6 +18,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import MetricCard from '../components/design/MetricCard';
 import QueryState from '../components/QueryState';
 import { governanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 const NODE_TYPES = ['', 'ORGANIZATION', 'VENDOR', 'ASSESSMENT', 'EVIDENCE', 'FINDING', 'REMEDIATION', 'RISK', 'DECISION', 'CONTRACT', 'CONTROL', 'FRAMEWORK', 'REQUIREMENT', 'CONTROL_TEST', 'EXCEPTION', 'COMPLIANCE_GAP', 'ATTESTATION', 'COMPLIANCE_PERIOD'];
 const RELATIONSHIP_TYPES = ['', 'OWNS', 'USES', 'HAS_RISK', 'ASSESSED_BY', 'HAS_FINDING', 'REMEDIATED_BY', 'SUPPORTED_BY', 'APPLIES_TO', 'CONTROLLED_BY', 'MITIGATES'];
@@ -60,7 +61,7 @@ function otherNode(row: Relationship, selectedId: string) {
 }
 
 function formatType(value?: string) {
-    return (value || '').replace(/_/g, ' ');
+    return humanizeLabel(value);
 }
 
 export default function GovernanceGraphExplorer() {
@@ -278,16 +279,16 @@ export default function GovernanceGraphExplorer() {
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }} useFlexGap flexWrap="wrap">
                 <TextField label="Search" value={q} onChange={(event) => setQ(event.target.value)} sx={{ minWidth: 220, flex: 1 }} />
                 <TextField select label="Node type" value={nodeType} onChange={(event) => setNodeType(event.target.value)} sx={{ minWidth: 180 }}>
-                    {NODE_TYPES.map((value) => <MenuItem key={value || 'all'} value={value}>{value || 'All types'}</MenuItem>)}
+                    {NODE_TYPES.map((value) => <MenuItem key={value || 'all'} value={value}>{value ? formatType(value) : 'All types'}</MenuItem>)}
                 </TextField>
                 <TextField select label="Relationship" value={relationshipType} onChange={(event) => setRelationshipType(event.target.value)} sx={{ minWidth: 180 }}>
-                    {RELATIONSHIP_TYPES.map((value) => <MenuItem key={value || 'all'} value={value}>{value || 'All relationships'}</MenuItem>)}
+                    {RELATIONSHIP_TYPES.map((value) => <MenuItem key={value || 'all'} value={value}>{value ? formatType(value) : 'All relationships'}</MenuItem>)}
                 </TextField>
                 <TextField select label="Status" value={status} onChange={(event) => setStatus(event.target.value)} sx={{ minWidth: 160 }}>
-                    {STATUSES.map((value) => <MenuItem key={value || 'all'} value={value}>{value || 'All statuses'}</MenuItem>)}
+                    {STATUSES.map((value) => <MenuItem key={value || 'all'} value={value}>{value ? formatType(value) : 'All statuses'}</MenuItem>)}
                 </TextField>
                 <TextField select label="Provenance" value={provenance} onChange={(event) => setProvenance(event.target.value)} sx={{ minWidth: 160 }}>
-                    {PROVENANCES.map((value) => <MenuItem key={value || 'all'} value={value}>{value || 'All provenance'}</MenuItem>)}
+                    {PROVENANCES.map((value) => <MenuItem key={value || 'all'} value={value}>{value ? formatType(value) : 'All provenance'}</MenuItem>)}
                 </TextField>
             </Stack>
 

@@ -44,8 +44,9 @@ export default function Pricing() {
                     <p className="mkt-kicker">Pricing</p>
                     <h1 className="mkt-display">Straightforward pricing for serious governance.</h1>
                     <p className="mkt-lede">
-                        Start with third-party risk management and scale as your governance program grows.
-                        Choose the plan that fits your organization today.
+                        Plans are described by the governance work they cover, not by internal billing codes.
+                        Published prices are for planning conversations. Live production purchasing is not enabled.
+                        Staging or test checkout, when shown, is test-mode only.
                     </p>
 
                     <div className="mkt-billing-bar">

@@ -41,7 +41,7 @@ export default function Login() {
                         <h1 className="mkt-display">Sign in</h1>
                         {environmentLabel() && (
                             <p className="mkt-kicker">
-                                {environmentLabel() === 'STAGING' ? 'SUPREME RISK — STAGING' : 'SUPREME RISK — DEVELOPMENT PREVIEW'}
+                                {environmentLabel() === 'STAGING' ? 'Supreme Governance Platform — Staging' : 'Supreme Governance Platform — Development'}
                             </p>
                         )}
                         <p className="mkt-lede">

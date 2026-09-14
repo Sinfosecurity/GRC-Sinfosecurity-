@@ -26,9 +26,74 @@ function greeting(name?: string) {
     return name ? `${when}, ${name}` : when;
 }
 
+function homeForRole(role?: string) {
+    switch (role) {
+        case 'BUSINESS_OWNER':
+            return {
+                job: 'Complete vendor intake, confirm changes, and approve remediation that belongs to you.',
+                cta: 'Onboard a third party',
+                href: '/vendor-onboarding',
+                workspace: { label: 'Your vendors', href: '/vendor-management' },
+            };
+        case 'ASSESSOR':
+            return {
+                job: 'Assessments waiting for review, potential findings, and reassessments that are due.',
+                cta: 'Open assessments',
+                href: '/assessments',
+                workspace: { label: 'Findings', href: '/findings' },
+            };
+        case 'RISK_MANAGER':
+        case 'MANAGER':
+            return {
+                job: 'Decisions waiting, treatments that are overdue, and residual risk that needs a person.',
+                cta: 'Open decisions',
+                href: '/decision-briefs',
+                workspace: { label: 'Risk overview', href: '/risks' },
+            };
+        case 'COMPLIANCE_OFFICER':
+            return {
+                job: 'Gaps, attestations, and evidence that still need action. Readiness is not certification.',
+                cta: 'Open compliance',
+                href: '/compliance',
+                workspace: { label: 'Gaps', href: '/compliance/gaps' },
+            };
+        case 'APPROVER':
+            return {
+                job: 'Decisions that require your authority. Supreme prepared the record; you decide.',
+                cta: 'Open decisions',
+                href: '/decision-briefs',
+                workspace: { label: 'Reports', href: '/reports' },
+            };
+        case 'AUDITOR':
+            return {
+                job: 'Trace what changed, what evidence supports it, and what decision was recorded.',
+                cta: 'Open evidence',
+                href: '/documents',
+                workspace: { label: 'Audit', href: '/activity-log' },
+            };
+        case 'ORGANIZATION_ADMIN':
+        case 'ADMIN':
+        case 'ORG_ADMIN':
+            return {
+                job: 'See what needs attention first. Administration stays available when you need it.',
+                cta: 'Review attention',
+                href: '/vendor-management',
+                workspace: { label: 'Team', href: '/user-management' },
+            };
+        default:
+            return {
+                job: 'What needs attention in this organization today. Counts come from live records only.',
+                cta: 'Review third parties',
+                href: '/vendor-management',
+                workspace: { label: 'Reports', href: '/reports' },
+            };
+    }
+}
+
 export default function Dashboard() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const home = homeForRole(user?.role);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [items, setItems] = useState<AttentionItem[]>([]);
@@ -99,15 +164,35 @@ export default function Dashboard() {
         return { dueAssessments, pendingDecisions, overdueFindings };
     }, [assessments, briefs, findings, now]);
 
+    const firstRun = !loading && stats?.totalVendors === 0 && items.length === 0;
+
     return (
         <Box sx={{ maxWidth: 1280 }}>
             <PageHeader
                 title={greeting(user?.firstName)}
-                description="What needs attention in this organization today. Counts come from live records only."
-                actions={<Button variant="contained" onClick={() => navigate('/assessments')}>New assessment</Button>}
+                description={home.job}
+                actions={<Button variant="contained" onClick={() => navigate(home.href)}>{home.cta}</Button>}
             />
 
-            <Typography variant="overline" sx={{ display: 'block', mb: 1 }}>Third-party risk overview</Typography>
+            {firstRun && (
+                <Box sx={{ mb: 3 }}>
+                <Surface>
+                    <Typography variant="h5">Start here</Typography>
+                    <Typography variant="body2" sx={{ mb: 1.5 }}>
+                        Supreme does the administration. You do not need to configure every product before value appears.
+                    </Typography>
+                    <Stack spacing={0.75} sx={{ mb: 1.5 }}>
+                        <Typography>1. Onboard a third party</Typography>
+                        <Typography>2. Review the risk methodology when you are ready</Typography>
+                        <Typography>3. Open Control Center and activate frameworks only if you need them</Typography>
+                        <Typography>4. Configure Privacy or AI Governance when those programs apply</Typography>
+                    </Stack>
+                    <Button variant="contained" onClick={() => navigate('/vendor-onboarding')}>Onboard a third party</Button>
+                </Surface>
+                </Box>
+            )}
+
+            <Typography variant="overline" sx={{ display: 'block', mb: 1 }}>What needs attention</Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
                 <MetricCard label="Critical vendors" value={stats?.criticalVendors ?? '—'} onClick={() => navigate('/vendor-management')} />
                 <MetricCard label="High risk" value={stats?.highRiskVendors ?? '—'} onClick={() => navigate('/vendor-management')} />
@@ -118,12 +203,16 @@ export default function Dashboard() {
 
             <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} sx={{ mb: 3 }} alignItems="stretch">
                 <Surface>
-                    <Typography variant="h5">Your work</Typography>
-                    <Typography variant="body2" sx={{ mb: 1.5 }}>Open items assigned to this organization, not invented targets.</Typography>
+                    <Typography variant="h5">Your next action</Typography>
+                    <Typography variant="body2" sx={{ mb: 1.5 }}>{home.job}</Typography>
                     <Stack spacing={1}>
                         <Typography>{work.dueAssessments} assessments due or in progress</Typography>
                         <Typography>{work.pendingDecisions} decisions waiting</Typography>
                         <Typography>{work.overdueFindings} remediations overdue</Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1.5 }}>
+                        <Button variant="contained" onClick={() => navigate(home.href)}>{home.cta}</Button>
+                        <Button onClick={() => navigate(home.workspace.href)}>{home.workspace.label}</Button>
                     </Stack>
                 </Surface>
                 <Surface>
@@ -145,8 +234,8 @@ export default function Dashboard() {
                 error={error}
                 empty={items.length === 0}
                 emptyTitle="Nothing needs attention"
-                emptyBody="When reviews, findings, evidence, or monitoring signals require action, they appear here."
-                emptyAction={<Button variant="outlined" onClick={() => navigate('/vendor-management')}>Review third parties</Button>}
+                emptyBody="Supreme will surface reviews, findings, evidence, and monitoring here when they require action. An empty queue can mean the recorded work is current."
+                emptyAction={<Button variant="outlined" onClick={() => navigate(home.href)}>{home.cta}</Button>}
             >
                 <Stack spacing={1}>
                     {items.map((item) => (

@@ -739,3 +739,21 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 **EVIDENCE:** Placeholders only in `docs/SUPREME-PROGRAM-STATE.md`. Percentages are not invented.
 
 **NEXT ACTION:** Define weighted models after Product Leadership authorizes them.
+
+---
+
+## UNNUMBERED. Supreme Governance Platform — Premium Experience & Brand Closure
+
+**PURPOSE:** Make Supreme feel like one deliberately designed governance platform: IA, language, public story, shell, Third Party lifecycle presentation, and honesty. This is not #19 or #20.
+
+**DEPENDENCIES:** Accepted #13–#18; #12 Phase A–C functional baseline. Do not start #19 or #20.
+
+**DEFINITION OF DONE:** Product Leadership hosted review of public, auth, shell, home, Third Party lifecycle, and vendor portal. Cursor does not declare Premium Platform PASS.
+
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+
+**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Implementation SHA recorded after commit. Not hosted-proved in the engineering return.
+
+**EVIDENCE:** `docs/SUPREME-PREMIUM-EXPERIENCE-AUDIT.md`. Visual index: `docs/private-beta/hosted-ux-qa/premium-experience/README.md`.
+
+**NEXT ACTION:** Product Leadership hosted review. Do not merge `main`. Do not deploy production. Do not start #19 or #20.

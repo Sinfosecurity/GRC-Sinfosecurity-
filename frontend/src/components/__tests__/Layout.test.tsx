@@ -15,8 +15,8 @@ describe('Layout Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getAllByText(/Overview/i).length).toBeGreaterThan(0);
-        expect(screen.getAllByText(/Vendors/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/^Home$/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Third Parties/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Assessments/i).length).toBeGreaterThan(0);
     });
 
@@ -69,7 +69,7 @@ describe('Layout Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getAllByText(/Vendors/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Third Parties/i).length).toBeGreaterThan(0);
         expect(screen.queryByText(/^Team$/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Billing/i)).not.toBeInTheDocument();
         localStorage.clear();

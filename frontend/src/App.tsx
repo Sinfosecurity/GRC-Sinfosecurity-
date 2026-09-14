@@ -63,6 +63,8 @@ const TrustCenter = lazy(() => import('./pages/TrustCenter'));
 const MarketingPlaceholder = lazy(() => import('./pages/MarketingPlaceholder'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ThirdPartyProduct = lazy(() => import('./pages/ThirdPartyProduct'));
+const ProductStory = lazy(() => import('./pages/ProductStory'));
+const PlatformStory = lazy(() => import('./pages/PlatformStory'));
 const Frameworks = lazy(() => import('./pages/Frameworks'));
 const LegalDraft = lazy(() => import('./pages/LegalDraft'));
 const SecurityOverview = lazy(() => import('./pages/SecurityOverview'));
@@ -158,8 +160,9 @@ export default function App() {
                     <Route path="/vendor-assessment/activate" element={<VendorAssessmentActivate />} />
                     <Route path="/vendor-assessment" element={<VendorAssessmentPortal />} />
                     <Route path="/vendor-assessment/:assessmentId" element={<VendorAssessmentQuestionnaire />} />
+                    <Route path="/connected-platform" element={<PlatformStory />} />
                     <Route path="/products/third-party" element={<ThirdPartyProduct />} />
-                    <Route path="/products/:slug" element={<MarketingPlaceholder />} />
+                    <Route path="/products/:slug" element={<ProductStory />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/admin/login" element={<AdminLogin />} />
                     <Route path="/admin/mfa" element={<AdminMfaChallenge />} />

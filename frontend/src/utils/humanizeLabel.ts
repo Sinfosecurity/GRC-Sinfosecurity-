@@ -1,6 +1,7 @@
 const CUSTOMER_LABELS: Record<string, string> = {
     NOT_CLASSIFIED: 'Not Classified',
     APPROVED_WITH_CONDITIONS: 'Approved with Conditions',
+    APPROVE_WITH_CONDITIONS: 'Approve with Conditions',
     NOT_TESTED: 'Not Tested',
     NOT_REVIEWED: 'Not Reviewed',
     HUMAN_IN_THE_LOOP: 'Human in the Loop',
@@ -9,6 +10,19 @@ const CUSTOMER_LABELS: Record<string, string> = {
     IN_REVIEW: 'In Review',
     NOT_STARTED: 'Not Started',
     PARTIALLY_EFFECTIVE: 'Partially Effective',
+    PENDING_REVIEW: 'Under Review',
+    SATISFIED_BY: 'Mapped to Control',
+    SUPPORTED_BY: 'Supported by Evidence',
+    INITIAL_DUE_DILIGENCE: 'Initial Due Diligence',
+    RISK_ACCEPTED: 'Risk Accepted',
+    IN_PROGRESS: 'In Progress',
+    NEEDS_ATTENTION: 'Needs Attention',
+    READY_FOR_DECISION: 'Ready for Decision',
+    AWAITING_VENDOR: 'Waiting for Vendor',
+    NOT_CONFIGURED: 'Not Configured',
+    CLEAN: 'Ready',
+    PENDING: 'Scan in progress',
+    INFECTED: 'Blocked',
 };
 
 export function humanizeLabel(value?: string | null): string {

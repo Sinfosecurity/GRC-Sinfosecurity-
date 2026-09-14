@@ -100,7 +100,7 @@ export default function RiskDashboard() {
         <Box sx={{ maxWidth: 1280, overflowX: 'hidden' }}>
             <PageHeader
                 title="Supreme Risk"
-                description="Know what matters. See what it affects. Act on what needs attention."
+                description="What needs attention, what changed, and what requires a decision. The register remains available; it is not the whole product."
                 actions={(
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                         <Button variant="outlined" onClick={() => navigate('/risks/register')}>Risk register</Button>

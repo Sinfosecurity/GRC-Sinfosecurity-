@@ -6,6 +6,7 @@ import {
     PLATFORM_FOUNDATION,
     PRODUCTS,
     TRUST_CAPABILITIES,
+    availabilityLabel,
 } from '../marketing/catalog';
 import CommandCenter from '../marketing/visuals/CommandCenter';
 import DecisionBriefCard from '../marketing/visuals/DecisionBriefCard';
@@ -13,8 +14,7 @@ import ExplainableScore from '../marketing/visuals/ExplainableScore';
 import GovernanceGraph from '../marketing/visuals/GovernanceGraph';
 import ReportPreviews from '../marketing/visuals/ReportPreviews';
 
-const FLAGSHIP = PRODUCTS[0];
-const PREVIEW = PRODUCTS.filter((product) => product.status === 'preview');
+const OPERATIONAL = PRODUCTS.filter((product) => product.status === 'available');
 const ROADMAP = PRODUCTS.filter((product) => product.status === 'roadmap');
 
 export default function Landing() {
@@ -25,12 +25,12 @@ export default function Landing() {
                     <div>
                         <p className="mkt-kicker">Supreme Governance Platform</p>
                         <h1 className="mkt-display">
-                            Govern the third parties that can put the business at risk.
+                            See what changed. Know what it affects. Act on what needs attention.
                         </h1>
                         <p className="mkt-lede">
-                            Supreme is one connected governance platform. Supreme Third Party is
-                            the active private-beta product. The remaining products share the same graph and are
-                            labelled Preview or Roadmap until they are operational.
+                            Supreme connects third parties, risk, controls, evidence, frameworks,
+                            privacy, and AI so the right people see the decision that is required.
+                            Supreme does the administration. Humans make the decisions.
                         </p>
                         <div className="mkt-hero-actions">
                             <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Request a Demo</Link>
@@ -44,43 +44,28 @@ export default function Landing() {
 
             <section id="platform" className="mkt-section">
                 <div className="mkt-shell">
-                    <p className="mkt-kicker">Platform</p>
-                    <h2 className="mkt-display">A flagship product, then a connected platform.</h2>
+                    <p className="mkt-kicker">One platform</p>
+                    <h2 className="mkt-display">A change in one place should be visible everywhere it matters.</h2>
                     <p className="mkt-lede">
-                        Start with third-party risk in private testing. Expand into one connected governance
-                        platform as your program grows.
+                        A third party, risk, control, privacy issue, or AI system changes.
+                        Supreme records what happened, shows what it affects, and asks a person
+                        for the decision. Evidence is captured once and reused.
                     </p>
                     <p className="mkt-lede">
-                        Supreme connects third-party risk, enterprise risk, compliance,
-                        privacy, AI governance, intelligence and automation through a shared
-                        governance foundation.
+                        Third Party, Risk, Compliance, Privacy, and AI Governance are in private
+                        testing on the same graph. Intelligence and Automation remain on the roadmap
+                        and are not sold as live products.
                     </p>
                     <div className="mkt-platform">
                         <div className="mkt-platform-top">
-                            <article className="mkt-product-card mkt-product-flagship">
-                                <span className="mkt-pill">Private beta</span>
-                                <h3>{FLAGSHIP.name}</h3>
-                                <p>{FLAGSHIP.subtitle}</p>
-                                <p className="mkt-note">{FLAGSHIP.purpose}</p>
-                                <div className="mkt-chip-row">
-                                    {FLAGSHIP.points.map((point) => (
-                                        <span key={point} className="mkt-chip">{point}</span>
-                                    ))}
-                                </div>
-                                <Link className="mkt-btn mkt-btn-ghost mkt-platform-cta" to={FLAGSHIP.href}>
-                                    Explore Supreme Third Party
+                            {OPERATIONAL.map((product) => (
+                                <Link key={product.slug} className={`mkt-product-card${product.slug === 'third-party' ? ' mkt-product-flagship' : ''}`} to={product.href}>
+                                    <span className="mkt-pill">{availabilityLabel(product.status)}</span>
+                                    <h3>{product.name}</h3>
+                                    <p>{product.subtitle}</p>
+                                    <p className="mkt-note">{product.purpose}</p>
                                 </Link>
-                            </article>
-                            <div className="mkt-platform-preview">
-                                {PREVIEW.map((product) => (
-                                    <Link key={product.slug} className="mkt-product-card" to={product.href}>
-                                        <span className="mkt-pill">Preview</span>
-                                        <h3>{product.name}</h3>
-                                        <p>{product.subtitle}</p>
-                                        <p className="mkt-note">{product.purpose}</p>
-                                    </Link>
-                                ))}
-                            </div>
+                            ))}
                         </div>
                         <div className="mkt-platform-roadmap" aria-label="Connected roadmap">
                             {ROADMAP.map((product) => (
@@ -93,7 +78,7 @@ export default function Landing() {
                         </div>
                         <div className="mkt-foundation">
                             <p className="mkt-kicker">One shared governance foundation</p>
-                            <p className="mkt-foundation-line">Seven products. One governance foundation.</p>
+                            <p className="mkt-foundation-line">Evidence once. Govern everywhere.</p>
                             <ul className="mkt-foundation-rail">
                                 {PLATFORM_FOUNDATION.map((item) => (
                                     <li key={item}>{item}</li>
@@ -101,25 +86,26 @@ export default function Landing() {
                             </ul>
                         </div>
                         <div className="mkt-hero-actions">
-                            <Link className="mkt-btn mkt-btn-ghost" to="/demo">See the product tour</Link>
+                            <Link className="mkt-btn mkt-btn-ghost" to="/connected-platform">Why Supreme is one platform</Link>
+                            <Link className="mkt-btn mkt-btn-text" to="/products/third-party">Explore Supreme Third Party</Link>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section id="third-party" className="mkt-section">
+            <section id="how" className="mkt-section">
                 <div className="mkt-shell mkt-split">
                     <div className="mkt-copy">
-                        <p className="mkt-kicker">Flagship product</p>
-                        <h2 className="mkt-display">Supreme Third Party is the operational path.</h2>
+                        <p className="mkt-kicker">How Supreme works</p>
+                        <h2 className="mkt-display">Prepare the record. Ask for the decision.</h2>
                         <p className="mkt-lede">
-                            Vendor intake, assessments, evidence, findings, residual scoring,
-                            Decision Briefs, monitoring, and tenant-scoped reports already run in
-                            the product. That is the work a CISO or procurement owner can inspect today.
+                            Intake, scoring, evidence, findings, and monitoring are administration.
+                            Approve, accept residual risk, or reject is a human act. The score that
+                            was seen stays on the brief.
                         </p>
                         <div className="mkt-hero-actions">
                             <Link className="mkt-btn mkt-btn-gold" to="/request-demo">Request a Demo</Link>
-                            <Link className="mkt-btn mkt-btn-ghost" to="/products/third-party">Supreme Third Party</Link>
+                            <Link className="mkt-btn mkt-btn-ghost" to="/demo">See the product tour</Link>
                         </div>
                     </div>
                     <ExplainableScore />
@@ -129,12 +115,12 @@ export default function Landing() {
             <section id="decisions" className="mkt-section">
                 <div className="mkt-shell mkt-split reverse">
                     <div className="mkt-copy">
-                        <p className="mkt-kicker">Decision model</p>
+                        <p className="mkt-kicker">Human authority</p>
                         <h2 className="mkt-display">A recorded human decision, with the score that was seen.</h2>
                         <p className="mkt-lede">
                             Residual risk is calculated from contributing factors. A person then
-                            approves, rejects, or accepts that residual. The brief keeps the
-                            snapshot. Automation and AI do not own the number.
+                            approves, rejects, or accepts that residual. Acceptance does not reduce
+                            the score. Automation does not own the number.
                         </p>
                     </div>
                     <DecisionBriefCard />
@@ -143,8 +129,8 @@ export default function Landing() {
 
             <section id="graph" className="mkt-section">
                 <div className="mkt-shell">
-                    <p className="mkt-kicker">Governance architecture</p>
-                    <h2 className="mkt-display">The same objects, reused instead of re-keyed.</h2>
+                    <p className="mkt-kicker">Connected impact</p>
+                    <h2 className="mkt-display">Vendor to risk to control to evidence to decision.</h2>
                     <p className="mkt-lede">
                         Identity, evidence, controls, risks, decisions, and audit sit on one graph.
                         Framework names such as NIST or SOC 2 are labels on that work, not a
@@ -166,7 +152,7 @@ export default function Landing() {
 
             <section id="reports" className="mkt-section">
                 <div className="mkt-shell">
-                    <p className="mkt-kicker">Product proof</p>
+                    <p className="mkt-kicker">Executive reporting</p>
                     <h2 className="mkt-display">The report pack is generated from the tenant’s own records.</h2>
                     <p className="mkt-lede">
                         Executive, scorecard, assessment, findings, monitoring, and board files

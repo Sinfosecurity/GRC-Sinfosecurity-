@@ -40,7 +40,7 @@ export default function AdminLogin() {
             <section style={{ width: 'min(440px, 100%)', border: '1px solid rgba(196,149,92,0.25)', background: '#1b1410', padding: 32 }}>
                 <p style={{ letterSpacing: '0.14em', textTransform: 'uppercase', color: '#c4955c', fontSize: 12 }}>Internal admin plane</p>
                 <h1 style={{ fontFamily: 'Newsreader, serif', fontSize: 32, margin: '8px 0 12px' }}>Supreme operations</h1>
-                {staging && <p>SUPREME RISK — STAGING</p>}
+                {staging && <p>Supreme operations — Staging</p>}
                 <p style={{ color: '#d7c4ae' }}>Sign in with your Supreme identity. Privileged access requires MFA.</p>
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="admin-email" style={{ display: 'block', marginTop: 16 }}>Work email</label>

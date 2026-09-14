@@ -35,9 +35,9 @@ describe('Landing Page', () => {
 
     it('sells the platform instead of embedding a login form', () => {
         renderLanding();
-        expect(screen.getByRole('heading', { name: /Govern the third parties that can put the business at risk/i })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /See what changed\. Know what it affects\. Act on what needs attention/i })).toBeInTheDocument();
         expect(screen.getAllByText(/Supreme Governance Platform/i).length).toBeGreaterThan(0);
-        expect(screen.getByText(/A flagship product, then a connected platform/i)).toBeInTheDocument();
+        expect(screen.getByText(/A change in one place should be visible everywhere it matters/i)).toBeInTheDocument();
         expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Log In' })).not.toBeInTheDocument();
     });
@@ -50,7 +50,7 @@ describe('Landing Page', () => {
         expect(screen.getAllByRole('link', { name: /Trust & Security/i })[0]).toHaveAttribute('href', '/trust');
         expect(screen.getByRole('link', { name: 'Explore Supreme Third Party' })).toHaveAttribute('href', '/products/third-party');
         expect(screen.getByText(/One shared governance foundation/i)).toBeInTheDocument();
-        expect(screen.getByText(/Seven products\. One governance foundation/i)).toBeInTheDocument();
+        expect(screen.getByText(/Evidence once\. Govern everywhere/i)).toBeInTheDocument();
     });
 
     it('labels unfinished products instead of selling them as live', async () => {
@@ -58,9 +58,9 @@ describe('Landing Page', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Products' }));
         expect(screen.getAllByText('Supreme Third Party').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Roadmap').length).toBeGreaterThan(0);
-        expect(screen.getAllByText('Preview').length).toBeGreaterThan(0);
         expect(screen.getAllByText('Private beta').length).toBeGreaterThan(0);
-        expect(screen.getByText(/active private-beta product/i)).toBeInTheDocument();
+        expect(screen.getByText(/Intelligence and Automation remain on the roadmap/i)).toBeInTheDocument();
+        expect(screen.queryByText(/AI-powered GRC/i)).not.toBeInTheDocument();
     });
 
     it('sends an authenticated visitor to the dashboard from the header', () => {

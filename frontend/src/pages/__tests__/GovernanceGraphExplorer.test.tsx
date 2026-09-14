@@ -92,7 +92,7 @@ describe('Governance Graph Explorer', () => {
         await screen.findByText('Select an object');
         await userEvent.click(screen.getAllByRole('button', { name: /Harbor Cloud/i })[0]);
         expect(await screen.findByRole('heading', { level: 3, name: 'Harbor Cloud' })).toBeInTheDocument();
-        expect((await screen.findAllByText('HAS RISK')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Has Risk')).length).toBeGreaterThan(0);
         expect(screen.getByRole('link', { name: /Open authoritative record/i })).toBeInTheDocument();
         await waitFor(() => expect(governanceAPI.relationships).toHaveBeenCalledTimes(1));
         expect(governanceAPI.summary).toHaveBeenCalledTimes(1);
@@ -114,10 +114,10 @@ describe('Governance Graph Explorer', () => {
         renderExplorer();
         await userEvent.click((await screen.findAllByRole('button', { name: /Harbor Cloud/i }))[0]);
         await screen.findByRole('heading', { level: 3, name: 'Harbor Cloud' });
-        expect((await screen.findAllByText('HAS RISK')).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText('Has Risk')).length).toBeGreaterThan(0);
         await userEvent.click(screen.getByLabelText('Relationship'));
-        await userEvent.click(await screen.findByRole('option', { name: 'HAS_RISK' }));
-        expect((await screen.findAllByText('HAS RISK')).length).toBeGreaterThan(0);
+        await userEvent.click(await screen.findByRole('option', { name: 'Has Risk' }));
+        expect((await screen.findAllByText('Has Risk')).length).toBeGreaterThan(0);
         expect(governanceAPI.relationships).toHaveBeenCalledTimes(1);
         expect(governanceAPI.search).toHaveBeenCalledTimes(1);
     });

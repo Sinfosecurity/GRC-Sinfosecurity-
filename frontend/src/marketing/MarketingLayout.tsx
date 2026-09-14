@@ -10,7 +10,7 @@ type MarketingLayoutProps = {
 };
 
 const DESKTOP_LINKS = [
-    { label: 'Platform', href: '/#platform' },
+    { label: 'Platform', href: '/connected-platform' },
     { label: 'Frameworks', href: '/frameworks' },
     { label: 'Trust', href: '/trust' },
     { label: 'Pricing', href: '/pricing' },
@@ -19,7 +19,7 @@ const DESKTOP_LINKS = [
 const MOBILE_GROUPS = [
     {
         title: 'Platform',
-        links: [{ label: 'Connected platform', href: '/#platform' }],
+        links: [{ label: 'Connected platform', href: '/connected-platform' }],
     },
     {
         title: 'Products',
