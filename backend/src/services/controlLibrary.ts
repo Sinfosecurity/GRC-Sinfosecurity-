@@ -65,6 +65,10 @@ export const SUPREME_COMMON_CONTROLS: CatalogControl[] = [
     { controlKey: 'BKP-01', title: 'Evidence objects are included in backup scope', description: 'Object-store evidence is in the same backup/restore scope as the authoritative database, or the gap is recorded as an exception.', objective: 'Files are not silently omitted from restore.', domain: 'BACKUP', category: 'Scope', controlType: 'PREVENTIVE' },
     { controlKey: 'AWR-01', title: 'People who handle vendor risk receive role-specific instruction', description: 'Assessors and approvers receive instruction on residual-risk honesty, evidence reuse, and malware download rules before they act in production.', objective: 'Operators know the honesty rules.', domain: 'SECURITY_AWARENESS', category: 'Role instruction', controlType: 'DIRECTIVE' },
     { controlKey: 'PER-01', title: 'Access is not granted before identity is verified', description: 'New workforce or contractor access to this platform or to a critical vendor portal waits until the person’s identity and role are confirmed.', objective: 'Access follows identity, not the other way around.', domain: 'PERSONNEL_SECURITY', category: 'Vetting', controlType: 'PREVENTIVE' },
+    { controlKey: 'AIG-01', title: 'AI systems are inventoried before production use', description: 'Each AI system in use has a recorded identity, owner, purpose, and lifecycle state. A recorded row is not an approval.', objective: 'Shadow AI is visible.', domain: 'AI_GOVERNANCE', category: 'Inventory', controlType: 'PREVENTIVE' },
+    { controlKey: 'AIG-02', title: 'Human oversight is recorded for material AI uses', description: 'Material AI uses record whether a human can review, override, and stop the system.', objective: 'Authority stays human.', domain: 'AI_GOVERNANCE', category: 'Oversight', controlType: 'DIRECTIVE' },
+    { controlKey: 'AIG-03', title: 'AI tests are recorded by a human, not invented', description: 'Accuracy, bias, security, or red-team results exist only when a person records method, date, and result.', objective: 'No fake evaluation.', domain: 'AI_GOVERNANCE', category: 'Testing', controlType: 'DETECTIVE' },
+    { controlKey: 'AIG-04', title: 'AI approval is a human decision', description: 'Approved, restricted, suspended, or retired states require a named decision maker and rationale.', objective: 'AI cannot approve itself.', domain: 'AI_GOVERNANCE', category: 'Approval', controlType: 'DIRECTIVE' },
 ];
 
 export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
@@ -203,6 +207,32 @@ export const SUPREME_FRAMEWORK_PACKS: CatalogFramework[] = [
             { requirementKey: 'A.5', supremeSummary: 'Supreme summary (2013-ref): information security policy ownership is recorded. This identifier belongs to a superseded pack.', maps: [{ controlKey: 'GOV-01', strength: 'PRIMARY' }] },
             { requirementKey: 'A.9', supremeSummary: 'Supreme summary (2013-ref): access control includes unique identity and removal when a role ends.', maps: [{ controlKey: 'IAM-01', strength: 'PRIMARY' }, { controlKey: 'IAM-02', strength: 'CONTRIBUTING' }] },
             { requirementKey: 'A.15', supremeSummary: 'Supreme summary (2013-ref): supplier relationships are identified before data is shared.', maps: [{ controlKey: 'TPR-01', strength: 'PRIMARY' }] },
+        ],
+    },
+    {
+        frameworkKey: 'NIST_AI_RMF',
+        name: 'NIST AI Risk Management Framework',
+        publisher: 'NIST',
+        sourceUrl: 'https://www.nist.gov/itl/ai-risk-management-framework',
+        version: '1.0-ref',
+        requirements: [
+            { requirementKey: 'GOVERN', supremeSummary: 'Supreme summary: AI roles, policies, and human authority are assigned and kept current. This is readiness language, not a NIST certification.', sourceUrl: 'https://www.nist.gov/itl/ai-risk-management-framework', maps: [{ controlKey: 'AIG-01', strength: 'PRIMARY' }, { controlKey: 'AIG-02', strength: 'CONTRIBUTING' }, { controlKey: 'GOV-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'MAP', supremeSummary: 'Supreme summary: AI systems, uses, data, and context are inventoried before they are treated as understood.', maps: [{ controlKey: 'AIG-01', strength: 'PRIMARY' }, { controlKey: 'AST-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: 'MEASURE', supremeSummary: 'Supreme summary: tests and evaluations are recorded by humans. Missing tests stay Not tested.', maps: [{ controlKey: 'AIG-03', strength: 'PRIMARY' }] },
+            { requirementKey: 'MANAGE', supremeSummary: 'Supreme summary: residual AI risk, incidents, and restrictions are governed by human decisions.', maps: [{ controlKey: 'AIG-04', strength: 'PRIMARY' }, { controlKey: 'RSK-02', strength: 'CONTRIBUTING' }] },
+        ],
+    },
+    {
+        frameworkKey: 'ISO_42001',
+        name: 'ISO/IEC 42001',
+        publisher: 'ISO',
+        sourceUrl: 'https://www.iso.org/standard/81230.html',
+        version: '2023-ref',
+        requirements: [
+            { requirementKey: '4', supremeSummary: 'Supreme summary: the organization records the context and scope of its AI management system. Readiness only. Not ISO 42001 certified.', sourceUrl: 'https://www.iso.org/standard/81230.html', maps: [{ controlKey: 'AIG-01', strength: 'PRIMARY' }, { controlKey: 'GOV-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: '5', supremeSummary: 'Supreme summary: leadership assigns AI accountability and does not treat inventory as approval.', maps: [{ controlKey: 'AIG-04', strength: 'PRIMARY' }, { controlKey: 'AIG-02', strength: 'CONTRIBUTING' }] },
+            { requirementKey: '8', supremeSummary: 'Supreme summary: AI operation includes recorded use cases, data, and human oversight.', maps: [{ controlKey: 'AIG-02', strength: 'PRIMARY' }, { controlKey: 'AIG-01', strength: 'CONTRIBUTING' }] },
+            { requirementKey: '9', supremeSummary: 'Supreme summary: performance evaluation uses recorded tests. Results are never invented.', maps: [{ controlKey: 'AIG-03', strength: 'PRIMARY' }] },
         ],
     },
 ];

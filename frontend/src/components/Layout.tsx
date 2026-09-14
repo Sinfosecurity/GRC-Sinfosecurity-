@@ -96,6 +96,21 @@ const menuSections: NavSection[] = [
         ],
     },
     {
+        title: 'AI Governance',
+        items: [
+            { text: 'Supreme AI Governance', path: '/ai-governance', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'AI register', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Providers', path: '/ai-governance/providers', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Assessments', path: '/ai-governance/assessments', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Approvals', path: '/ai-governance/approvals', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Incidents', path: '/ai-governance/incidents', icon: <ReportProblemOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Regulatory', path: '/ai-governance/regulatory', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Exceptions', path: '/ai-governance/exceptions', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Import', path: '/ai-governance/import', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
+        ],
+    },
+    {
         title: 'Controls',
         items: [
             { text: 'Control Center', path: '/control-center', icon: <FactCheckOutlined fontSize="small" />, permission: 'control.read' },

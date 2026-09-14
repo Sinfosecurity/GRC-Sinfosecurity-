@@ -37,6 +37,12 @@ export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
     GovernanceNodeType.RIGHTS_REQUEST,
     GovernanceNodeType.RETENTION_RULE,
     GovernanceNodeType.CONSENT_RECORD,
+    GovernanceNodeType.AI_SYSTEM,
+    GovernanceNodeType.AI_USE_CASE,
+    GovernanceNodeType.AI_MODEL,
+    GovernanceNodeType.AI_PROVIDER,
+    GovernanceNodeType.AI_TEST,
+    GovernanceNodeType.AI_ASSESSMENT,
 ];
 
 export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { vendorId?: string }) => string> = {
@@ -70,6 +76,13 @@ export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { ve
     PrivacyRightsRequest: () => '/privacy-ops/rights',
     PrivacyRetentionRule: () => '/privacy-ops/retention',
     PrivacyConsentRecord: () => '/privacy-ops',
+    AiSystem: (id) => `/ai-governance/systems/${id}`,
+    AiUseCase: (id) => `/ai-governance/use-cases/${id}`,
+    AiModelProvider: () => '/ai-governance/providers',
+    AiTest: () => '/ai-governance/testing',
+    AiAssessment: () => '/ai-governance/assessments',
+    AiApproval: () => '/ai-governance/approvals',
+    AiIncident: () => '/ai-governance/incidents',
 };
 
 export function publicNode(node: {

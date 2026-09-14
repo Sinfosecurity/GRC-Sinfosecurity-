@@ -92,6 +92,18 @@ const PrivacyDeletions = lazy(() => import('./pages/PrivacyDeletions'));
 const PrivacyConsent = lazy(() => import('./pages/PrivacyConsent'));
 const PrivacyIncidents = lazy(() => import('./pages/PrivacyIncidents'));
 const PrivacyImport = lazy(() => import('./pages/PrivacyImport'));
+const AiDashboard = lazy(() => import('./pages/AiDashboard'));
+const AiRegister = lazy(() => import('./pages/AiRegister'));
+const AiSystemDetail = lazy(() => import('./pages/AiSystemDetail'));
+const AiUseCaseDetail = lazy(() => import('./pages/AiUseCaseDetail'));
+const AiProviders = lazy(() => import('./pages/AiProviders'));
+const AiAssessments = lazy(() => import('./pages/AiAssessments'));
+const AiTesting = lazy(() => import('./pages/AiTesting'));
+const AiApprovals = lazy(() => import('./pages/AiApprovals'));
+const AiIncidents = lazy(() => import('./pages/AiIncidents'));
+const AiRegulatory = lazy(() => import('./pages/AiRegulatory'));
+const AiExceptions = lazy(() => import('./pages/AiExceptions'));
+const AiImport = lazy(() => import('./pages/AiImport'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -175,6 +187,18 @@ export default function App() {
                     <Route path="privacy-ops/consent" element={<PrivacyConsent />} />
                     <Route path="privacy-ops/incidents" element={<PrivacyIncidents />} />
                     <Route path="privacy-ops/import" element={<PrivacyImport />} />
+                    <Route path="ai-governance" element={<AiDashboard />} />
+                    <Route path="ai-governance/systems" element={<AiRegister />} />
+                    <Route path="ai-governance/systems/:publicId" element={<AiSystemDetail />} />
+                    <Route path="ai-governance/use-cases/:publicId" element={<AiUseCaseDetail />} />
+                    <Route path="ai-governance/providers" element={<AiProviders />} />
+                    <Route path="ai-governance/assessments" element={<AiAssessments />} />
+                    <Route path="ai-governance/testing" element={<AiTesting />} />
+                    <Route path="ai-governance/approvals" element={<AiApprovals />} />
+                    <Route path="ai-governance/incidents" element={<AiIncidents />} />
+                    <Route path="ai-governance/regulatory" element={<AiRegulatory />} />
+                    <Route path="ai-governance/exceptions" element={<AiExceptions />} />
+                    <Route path="ai-governance/import" element={<AiImport />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

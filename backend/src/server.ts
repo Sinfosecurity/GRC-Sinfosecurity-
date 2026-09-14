@@ -56,6 +56,7 @@ import governanceRoutes from './routes/governance.routes';
 import sccRoutes from './routes/scc.routes';
 import ermRoutes from './routes/erm.routes';
 import privacyRoutes from './routes/privacy.routes';
+import aiGovernanceRoutes from './routes/aiGovernance.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -262,6 +263,7 @@ app.use(`${API_PREFIX}/governance`, ...tenantContent, governanceRoutes);
 app.use(`${API_PREFIX}/scc`, ...tenantContent, sccRoutes);
 app.use(`${API_PREFIX}/erm`, ...tenantContent, ermRoutes);
 app.use(`${API_PREFIX}/privacy`, ...tenantContent, privacyRoutes);
+app.use(`${API_PREFIX}/ai-governance`, ...tenantContent, aiGovernanceRoutes);
 app.use(`${API_PREFIX}/demo-requests`, demoRoutes);
 app.use(`${API_PREFIX}/platform`, platformRoutes);
 app.use(`${API_PREFIX}/support`, supportRoutes);

@@ -155,6 +155,10 @@ model Organization {
   privacyRightsRequests       PrivacyRightsRequest[]
   privacyRetentionRules       PrivacyRetentionRule[]
   privacyHistory              PrivacyHistory[]
+  aiSystems                   AiSystem[]
+  aiUseCases                  AiUseCase[]
+  aiModelProviders            AiModelProvider[]
+  aiHistory                   AiHistory[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -2754,6 +2758,11 @@ enum GovernanceNodeType {
   ASSET
   DATA_ASSET
   AI_SYSTEM
+  AI_USE_CASE
+  AI_MODEL
+  AI_PROVIDER
+  AI_TEST
+  AI_ASSESSMENT
   RISK
   CONTROL
   REQUIREMENT
@@ -2935,6 +2944,7 @@ enum CommonControlDomain {
   BACKUP
   SECURITY_AWARENESS
   PERSONNEL_SECURITY
+  AI_GOVERNANCE
 }
 
 enum CommonControlType {
@@ -4509,6 +4519,504 @@ model PrivacyHistory {
 }
 
 model PrivacyCounter {
+  organizationId String
+  kind           String
+  next           Int    @default(1)
+
+  @@id([organizationId, kind])
+}
+
+enum AiLifecycleState {
+  PROPOSED
+  IN_REVIEW
+  PILOT
+  APPROVED
+  PRODUCTION
+  RESTRICTED
+  SUSPENDED
+  RETIRED
+}
+
+enum AiDeploymentKind {
+  INTERNAL
+  EXTERNAL
+  HYBRID
+  UNKNOWN
+}
+
+enum AiAutonomyLevel {
+  ASSISTIVE
+  HUMAN_IN_THE_LOOP
+  HUMAN_ON_THE_LOOP
+  AUTONOMOUS
+  NOT_RECORDED
+}
+
+enum AiImpactClass {
+  MINIMAL
+  LIMITED
+  ELEVATED
+  HIGH
+  NOT_CLASSIFIED
+}
+
+enum AiApprovalDecision {
+  APPROVED
+  APPROVED_WITH_CONDITIONS
+  RESTRICTED
+  REJECTED
+  SUSPENDED
+  RETIRED
+}
+
+enum AiTestKind {
+  ACCURACY
+  ROBUSTNESS
+  BIAS_FAIRNESS
+  SECURITY
+  PROMPT_INJECTION
+  DATA_LEAKAGE
+  HALLUCINATION
+  SAFETY
+  RED_TEAM
+  HUMAN_OVERSIGHT
+  PERFORMANCE
+  DRIFT
+}
+
+enum AiTestResult {
+  PASS
+  FAIL
+  PARTIAL
+  NOT_TESTED
+  NOT_APPLICABLE
+}
+
+enum AiIncidentStatus {
+  OPEN
+  IN_REVIEW
+  MITIGATING
+  CLOSED
+}
+
+enum AiExceptionStatus {
+  ACTIVE
+  EXPIRED
+  CLOSED
+}
+
+enum AiRegulatoryStatus {
+  NOT_REVIEWED
+  IN_REVIEW
+  POTENTIAL
+  NOT_APPLICABLE
+  RECORDED
+}
+
+enum AiScoreRating {
+  MINIMAL
+  LIMITED
+  ELEVATED
+  HIGH
+}
+
+model AiSystem {
+  id                    String            @id @default(uuid())
+  organization          Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  publicId              String
+  name                  String
+  description           String?
+  businessPurpose       String?
+  businessUnit          String?
+  businessOwner         String?
+  technicalOwner        String?
+  riskOwner             String?
+  vendorId              String?
+  modelProviderName     String?
+  modelVersion          String?
+  deploymentKind        AiDeploymentKind  @default(UNKNOWN)
+  developmentStatus     String?
+  productionStatus      String?
+  lifecycle             AiLifecycleState  @default(PROPOSED)
+  useCaseClass          String?
+  decisionInfluence     String?
+  autonomy              AiAutonomyLevel   @default(NOT_RECORDED)
+  humanOversightSummary String?
+  dataCategories        String[]
+  personalData          Boolean           @default(false)
+  sensitiveData         Boolean           @default(false)
+  jurisdictions         String[]
+  systemsIntegrated     String[]
+  usersAffected         String?
+  subjectsAffected      String?
+  criticality           String?
+  inherentRating        AiScoreRating?
+  residualRating        AiScoreRating?
+  organizationClass     AiImpactClass     @default(NOT_CLASSIFIED)
+  reviewAt              DateTime?
+  lastAssessedAt        DateTime?
+  lastTestedAt          DateTime?
+  retirementAt          DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  useCases              AiUseCase[]
+  models                AiSystemModel[]
+  oversight             AiOversight?
+  risks                 AiRisk[]
+  scores                AiScoreSnapshot[]
+  assessments           AiAssessment[]
+  tests                 AiTest[]
+  incidents             AiIncident[]
+  approvals             AiApproval[]
+  exceptions            AiException[]
+  changes               AiChange[]
+  regulatoryReviews     AiRegulatoryReview[]
+  controlLinks          AiControlLink[]
+  privacyLinks          AiPrivacyLink[]
+  riskLinks             AiEnterpriseRiskLink[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, lifecycle])
+  @@index([organizationId, vendorId])
+}
+
+model AiUseCase {
+  id                 String           @id @default(uuid())
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  system             AiSystem         @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId           String
+  publicId           String
+  name               String
+  purpose            String?
+  businessProcess    String?
+  decisionInfluence  String?
+  affectedPersons    String?
+  dataSummary        String?
+  owner              String?
+  jurisdiction       String?
+  autonomy           AiAutonomyLevel  @default(NOT_RECORDED)
+  organizationClass  AiImpactClass    @default(NOT_CLASSIFIED)
+  approvalStatus     String?
+  humanOversight     String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  assessments        AiAssessment[]
+  tests              AiTest[]
+  incidents          AiIncident[]
+  approvals          AiApproval[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiModelProvider {
+  id                   String     @id @default(uuid())
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  publicId             String
+  vendorId             String?
+  providerName         String
+  modelFamily          String?
+  modelVersion         String?
+  hosting              String?
+  deployment           String?
+  trainingDataAssertion String?
+  retentionAssertion   String?
+  availabilityStatus   String     @default("Unknown / Not recorded")
+  notes                String?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  systems              AiSystemModel[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, vendorId])
+}
+
+model AiSystemModel {
+  id             String          @id @default(uuid())
+  organizationId String
+  system         AiSystem        @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  provider       AiModelProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId     String
+  effectiveFrom  DateTime        @default(now())
+  effectiveTo    DateTime?
+  createdAt      DateTime        @default(now())
+
+  @@index([organizationId, systemId])
+}
+
+model AiOversight {
+  id                 String   @id @default(uuid())
+  organizationId     String
+  system             AiSystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId           String   @unique
+  humanReviewRequired Boolean @default(true)
+  humanCanOverride   Boolean  @default(true)
+  humanCanStop       Boolean  @default(true)
+  reviewPoint        String?
+  approvalThreshold  String?
+  escalationPath     String?
+  oversightOwner     String?
+  evidenceNote       String?
+  exceptionNote      String?
+  updatedAt          DateTime @updatedAt
+}
+
+model AiRisk {
+  id             String        @id @default(uuid())
+  organizationId String
+  system         AiSystem      @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  publicId       String
+  category       String
+  applies        Boolean       @default(true)
+  note           String?
+  createdAt      DateTime      @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiScoreSnapshot {
+  id                 String        @id @default(uuid())
+  organizationId     String
+  system             AiSystem      @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId           String
+  methodologyVersion String
+  impact             Int
+  likelihood         Int
+  autonomy           Int
+  decisionCriticality Int
+  dataSensitivity    Int
+  affectedPopulation Int
+  oversightStrength  Int
+  externalExposure   Int
+  vendorDependency   Int
+  testingStatus      Int
+  controlEffectiveness Int
+  score              Int
+  rating             AiScoreRating
+  rationale          String
+  inputs             Json
+  calculation        String
+  kind               String        @default("RESIDUAL")
+  createdAt          DateTime      @default(now())
+
+  @@index([organizationId, systemId, createdAt])
+}
+
+model AiAssessment {
+  id             String           @id @default(uuid())
+  organizationId String
+  system         AiSystem         @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  useCase        AiUseCase?       @relation(fields: [useCaseId], references: [id])
+  useCaseId      String?
+  publicId       String
+  purpose        String?
+  stakeholders   String?
+  residualNote   String?
+  recommendation String?
+  decision       String?
+  conditions     String?
+  reviewAt       DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  screening      AiAssessmentScreening[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiAssessmentScreening {
+  id             String       @id @default(uuid())
+  organizationId String
+  assessment     AiAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId   String
+  questionKey    String
+  answer         Boolean
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, assessmentId])
+}
+
+model AiTest {
+  id             String       @id @default(uuid())
+  organizationId String
+  system         AiSystem     @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  useCase        AiUseCase?   @relation(fields: [useCaseId], references: [id])
+  useCaseId      String?
+  publicId       String
+  kind           AiTestKind
+  method         String?
+  datasetRef     String?
+  tester         String?
+  testedAt       DateTime?
+  result         AiTestResult @default(NOT_TESTED)
+  threshold      String?
+  notes          String?
+  evidenceNote   String?
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiIncident {
+  id             String           @id @default(uuid())
+  organizationId String
+  system         AiSystem         @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  useCase        AiUseCase?       @relation(fields: [useCaseId], references: [id])
+  useCaseId      String?
+  publicId       String
+  title          String
+  severity       String
+  impact         String?
+  status         AiIncidentStatus @default(OPEN)
+  owner          String?
+  decision       String?
+  closedAt       DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId, status])
+}
+
+model AiApproval {
+  id             String             @id @default(uuid())
+  organizationId String
+  system         AiSystem           @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  useCase        AiUseCase?         @relation(fields: [useCaseId], references: [id])
+  useCaseId      String?
+  publicId       String
+  decision       AiApprovalDecision
+  decisionMaker  String
+  authority      String?
+  rationale      String
+  conditions     String?
+  reviewAt       DateTime?
+  createdAt      DateTime           @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiException {
+  id             String            @id @default(uuid())
+  organizationId String
+  system         AiSystem          @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  publicId       String
+  scope          String
+  rationale      String
+  owner          String?
+  approver       String?
+  expiresAt      DateTime
+  conditions     String?
+  status         AiExceptionStatus @default(ACTIVE)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId, status])
+}
+
+model AiChange {
+  id             String   @id @default(uuid())
+  organizationId String
+  system         AiSystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  publicId       String
+  changeType     String
+  summary        String
+  reviewRequired Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiRegulatoryReview {
+  id             String             @id @default(uuid())
+  organizationId String
+  system         AiSystem           @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  publicId       String
+  regime         String
+  jurisdiction   String?
+  status         AiRegulatoryStatus @default(NOT_REVIEWED)
+  owner          String?
+  rationale      String?
+  legalReview    String?
+  effectiveAt    DateTime?
+  version        String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, systemId])
+}
+
+model AiControlLink {
+  id             String   @id @default(uuid())
+  organizationId String
+  system         AiSystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  controlId      String
+  note           String?
+  createdAt      DateTime @default(now())
+
+  @@unique([organizationId, systemId, controlId])
+}
+
+model AiPrivacyLink {
+  id             String   @id @default(uuid())
+  organizationId String
+  system         AiSystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  activityId     String
+  note           String?
+  createdAt      DateTime @default(now())
+
+  @@unique([organizationId, systemId, activityId])
+}
+
+model AiEnterpriseRiskLink {
+  id             String   @id @default(uuid())
+  organizationId String
+  system         AiSystem @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  systemId       String
+  enterpriseRiskId String
+  note           String?
+  createdAt      DateTime @default(now())
+
+  @@unique([organizationId, systemId, enterpriseRiskId])
+}
+
+model AiHistory {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  entityType     String
+  entityId       String
+  eventType      String
+  summary        String
+  change         String?
+  actorUserId    String?
+  payload        Json?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, entityType, entityId, createdAt])
+}
+
+model AiCounter {
   organizationId String
   kind           String
   next           Int    @default(1)

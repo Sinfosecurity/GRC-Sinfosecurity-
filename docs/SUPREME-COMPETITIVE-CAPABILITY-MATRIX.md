@@ -1,6 +1,6 @@
 # Supreme Competitive Capability Matrix
 
-**Item:** #16 Supreme Compliance (extends #15 matrix)  
+**Item:** #16 Supreme Compliance (extends #15 matrix); #18 Supreme AI Governance section appended  
 **Date:** 2026-09-13  
 **Honesty rule:** Competitor names identify market categories only. This document does not copy proprietary UI, help text, control content, or code. Status is Supreme’s current implementation, not a claim that Supreme is better.
 
@@ -64,3 +64,25 @@ Conceptual benchmark only against OneTrust, TrustArc, Transcend, BigID, Securiti
 | UX | `/privacy-ops` workspaces, human IDs | Dense privacy suites | Implemented for Product Leadership review | `/privacy-ops` |
 
 Supreme can differentiate where evidence exists: honest legal language, shared CLEAN evidence, Governance Graph impact, and reuse of Vendor / Risk / Compliance records. It does not claim cookie-consent platform parity with OneTrust or discovery-scale parity with BigID/Securiti.
+
+## AI governance capabilities (#18)
+
+Conceptual benchmark only against OneTrust AI Governance, ServiceNow AI Control Tower / IRM, Credo AI, Holistic AI, ModelOp, IBM watsonx.governance, and Microsoft Purview / AI governance capabilities. This is not a claim of superiority.
+
+| Capability category | Supreme equivalent | Market category | Current status | Evidence |
+|---|---|---|---|---|
+| AI inventory | `AiSystem` with `AI-00001` | OneTrust / ServiceNow / ModelOp | Implemented as a register, not a spreadsheet | `/ai-governance/systems` |
+| Use-case governance | Separate `AiUseCase` records | Credo AI / Holistic AI | Implemented. Same model can have different uses | `/ai-governance/use-cases/:id` |
+| Model / provider reference | `AiModelProvider` recorded facts | watsonx / Purview / ModelOp | Implemented. Unknown / Not recorded if not entered | `/ai-governance/providers` |
+| Human oversight | `AiOversight` + approval authority | ServiceNow / OneTrust | Implemented. AI cannot approve itself | System detail + `/ai-governance/approvals` |
+| Risk assessment | Immutable `AiScoreSnapshot` `supreme-ai-1.0.0` | Credo AI / Holistic AI | Implemented as explainable factors, not a black box | Engine + score snapshots |
+| Testing / evaluation | Human-recorded `AiTest` | Credo AI / Holistic AI / watsonx | Implemented. Not tested stays Not tested | `/ai-governance/testing` |
+| Provider / vendor risk | Link to existing `Vendor` | ServiceNow / OneTrust | Implemented. No second vendor database | Provider `vendorId` + Third Party |
+| Privacy integration | Explicit `AiPrivacyLink` to #17 | OneTrust / Purview | Implemented by reuse, not a second privacy engine | Affected + privacy links |
+| Compliance integration | NIST AI RMF / ISO 42001 readiness packs on #16 | OneTrust / ServiceNow | Implemented as identifiers + Supreme summaries. No certification claim | `controlLibrary.ts` |
+| Evidence reuse | #14 CLEAN links only | ServiceNow / OneTrust | Implemented. Presence is not proof | Control / evidence links |
+| Graph impact | Projected AI nodes | Limited elsewhere | Implemented as projection only | `AI_SYSTEM`, `AI_USE_CASE` |
+| Board reporting | Native PPTX + PDF/XLSX | ServiceNow / OneTrust | Implemented to existing Supreme board standard | `/ai-governance/reports/board.pptx` |
+| UX | `/ai-governance` workspaces, human IDs | Dense IRM / AI GRC suites | Implemented for Product Leadership review | `/ai-governance` |
+
+Supreme can differentiate where evidence exists: human authority, explainable scoring, honest regulatory language, Governance Graph impact, and reuse of Vendor / Risk / Privacy / Compliance / Evidence records. It does not claim model-ops telemetry parity with ModelOp/watsonx or legal-content parity with OneTrust.

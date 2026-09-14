@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #17 Supreme Privacy
+**CURRENT ITEM:** #18 Supreme AI Governance
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED
+**CURRENT ITEM STATUS:** AUTHORIZED / IN PROGRESS
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -79,17 +79,26 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#17 HOSTED FRONTEND SHA:** `1dd47b3b82f7c7481579a4e47beda5abd08cc76c`
 **#17 HOSTED API SHA:** `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`
 **#17 FINAL BOARD FIX SHA:** `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`
-**#18 AUTHORIZED:** NO
+**#17 PROGRAM ACCEPTANCE:** PASS — Product Leadership accepted (2026-09-13)
+**#18 AUTHORIZED:** YES — Product Leadership 2026-09-13
+**#18 STARTING SHA:** `17c87d5ecf65b34de6233d7d35967b0e854a77c0`
+**#19 AUTHORIZED:** NO
 
 ---
 
 ## CURRENT ACTIVE ITEMS
 
+### #18 Supreme AI Governance
+
+**STATUS:** AUTHORIZED / IN PROGRESS
+
+See `docs/ADR-SUPREME-AI-GOVERNANCE.md` once committed. #19 is not authorized. #12 remains PARTIAL.
+
 ### #17 Supreme Privacy
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED
+**STATUS:** PASS — Product Leadership accepted (2026-09-13)
 
-See `docs/ADR-SUPREME-PRIVACY.md` and `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Live Elite Claims Board PPTX is 14 native PowerPoint slides after the slide-11 clip fix. #18 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-PRIVACY.md` and `docs/private-beta/hosted-ux-qa/supreme-privacy/`. #18 is authorized. #12 remains PARTIAL.
 
 ### #16 Supreme Compliance
 
@@ -358,3 +367,17 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED  
 **SHA:** Final board fix `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`; DrawingML repair `02fb0c803c150d02e51afbf6e5bbf31cd8a9e918`; wrap/paginate `ea3c153f1a718186fc8431a987873b6468a957a5`  
 **EVIDENCE:** Hosted Supreme CI run `34789986034` PASS on `c7382dd`. Live Elite Claims `/api/v1/privacy/reports/board.pptx` regenerated from hosted API `c7382dd`. Microsoft PowerPoint rendered 14 unique pages. Slide 11 decision copy is wrapped and complete; overflow uses continuation slides 12–14. Hosted frontend remains `1dd47b3` (UI unchanged; mismatch recorded). Not PASS. #12 remains PARTIAL. #18 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #17 Supreme Privacy  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED -> PASS — Product Leadership accepted  
+**SHA:** Final board fix `c7382dd8b5857aaa7e8dfdc9dace255b0ec66bfc`; documentation `17c87d5ecf65b34de6233d7d35967b0e854a77c0`  
+**EVIDENCE:** Explicit Product Leadership acceptance. Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel. #18 authorized separately.
+
+### 2026-09-13
+
+**ITEM:** #18 Supreme AI Governance  
+**STATUS CHANGE:** NOT STARTED -> AUTHORIZED / IN PROGRESS  
+**SHA:** Starting SHA `17c87d5ecf65b34de6233d7d35967b0e854a77c0`  
+**EVIDENCE:** Explicit Product Leadership authorization. #17 is PASS. #12 remains PARTIAL. #19 is not authorized. Hosted frontend remains `1dd47b3`. Hosted API remains `c7382dd`. Branch head `17c87d5` is documentation-ahead of hosted. That mismatch is not silently reconciled.
