@@ -633,6 +633,13 @@ enum VendorOnboardingStage {
   VENDOR_IN_PROGRESS
   SUBMITTED
   UNDER_REVIEW
+  REMEDIATION
+  RISK_ACCEPTANCE
+  CONTRACT_REVIEW
+  APPROVAL
+  ACTIVE
+  REASSESSMENT
+  OFFBOARDING
 }
 
 model VendorOnboarding {
@@ -670,6 +677,18 @@ model VendorOnboarding {
   vendorSubmittedAt     DateTime?
   lastReminderAt        DateTime?
   reminderCount         Int                    @default(0)
+  contractChecklist     Json?
+  contractAttestedAt    DateTime?
+  contractAttestedBy    String?
+  approvalDecision      String?
+  approvalConditions    String?
+  approvedAt            DateTime?
+  approvedBy            String?
+  lifecycleActivatedAt  DateTime?
+  nextReassessmentAt    DateTime?
+  reassessmentFrequencyDays Int?
+  lastReassessmentAt    DateTime?
+  residualAtApproval    Int?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 

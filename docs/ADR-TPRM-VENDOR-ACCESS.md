@@ -6,7 +6,7 @@
 **Starting SHA:** `e889bd5167bc1598854a65cfc935026615b1cef4`  
 **Production-ready claim:** NO  
 **#12 overall:** PARTIAL / OPEN  
-**Phase C / #19 / #20:** NOT AUTHORIZED
+**Phase C / #19 / #20:** Phase C later authorized separately; see `docs/ADR-TPRM-PHASE-C-LIFECYCLE.md`. #19 / #20 remain NOT AUTHORIZED
 
 ## Context
 

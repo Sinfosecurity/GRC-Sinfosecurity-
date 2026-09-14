@@ -59,6 +59,18 @@ describe('Onboard Third Party workspace', () => {
                         assessments: [{ name: 'Information Security Assessment', requirement: 'Required', rationale: 'Vendor accesses company systems', expectedEvidence: 'Current policy', reusableEvidence: [] }],
                         triggers: { privacy: true, aiGovernance: true, resilience: false },
                     },
+                    invitation: {
+                        status: 'Pending',
+                        emailStatus: 'Queued',
+                        emailTruth: 'Provider accepted or queued the message. This is not inbox delivery.',
+                    },
+                    lifecycle: {
+                        residualRisk: 42,
+                        vendorStatus: 'PROPOSED',
+                        checklist: [{ key: 'dpa', label: 'Data processing agreement', required: true, rationale: 'Personal data is in scope.' }],
+                        findings: [],
+                        monitoring: { openFindings: 0, acceptedRisks: 0, overdueRemediation: 0, externalIntelligence: 'Only shown when a monitoring provider is connected.' },
+                    },
                     history: [{ title: 'Tier recommended', detail: 'Supreme recommends High.', at: '2026-09-13' }],
                 },
             },
@@ -86,5 +98,9 @@ describe('Onboard Third Party workspace', () => {
         expect(await screen.findByRole('heading', { name: /VND-2026-0001/ })).toBeInTheDocument();
         expect(screen.getByText(/Supreme recommends high/i)).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Assessment Plan' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Findings' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Contract' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Approval' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Active' })).toBeInTheDocument();
     });
 });

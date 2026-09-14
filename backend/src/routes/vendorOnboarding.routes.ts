@@ -13,13 +13,25 @@ import {
 } from '../services/vendorOnboardingService';
 import {
     activationLink,
-    presentDueDiligence,
     requestClarification,
     resendInvitation,
     reviewFinding,
     sendDueDiligence,
     upsertAssessmentContact,
 } from '../services/vendorDueDiligenceService';
+import {
+    acceptFindingRisk,
+    activateVendor,
+    attestContract,
+    closeFinding,
+    decideApproval,
+    planRemediation,
+    presentLifecycle,
+    recommendReassessment,
+    startOffboarding,
+    startReassessment,
+    validateFinding,
+} from '../services/vendorLifecycleClosureService';
 import { IssueSeverity } from '@prisma/client';
 
 const router = Router();
@@ -66,7 +78,7 @@ router.post('/', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Resp
 
 router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await presentDueDiligence(req.user!.organizationId, req.params.id, actor(req)) });
+        res.json({ success: true, data: await presentLifecycle(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
         next(error);
     }
@@ -157,6 +169,86 @@ router.post('/:id/findings/:findingId/review', authorize(...REVIEW_ROLES), async
                 reason: req.body?.reason,
             }),
         });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/findings/:findingId/remediate', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await planRemediation(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/findings/:findingId/validate', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await validateFinding(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/findings/:findingId/close', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await closeFinding(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/findings/:findingId/accept-risk', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await acceptFindingRisk(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/contract/attest', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await attestContract(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/approval', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await decideApproval(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/activate', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await activateVendor(req.user!.organizationId, req.params.id, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/:id/reassessment', async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await recommendReassessment(req.user!.organizationId, req.params.id, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/reassessment', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await startReassessment(req.user!.organizationId, req.params.id, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/offboard', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await startOffboarding(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
         next(error);
     }

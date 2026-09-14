@@ -29,6 +29,13 @@ const STAGE_LABEL: Record<VendorOnboardingStage, string> = {
     VENDOR_IN_PROGRESS: 'Vendor in progress',
     SUBMITTED: 'Submitted',
     UNDER_REVIEW: 'Under review',
+    REMEDIATION: 'Remediation',
+    RISK_ACCEPTANCE: 'Risk acceptance',
+    CONTRACT_REVIEW: 'Contract review',
+    APPROVAL: 'Approval',
+    ACTIVE: 'Active',
+    REASSESSMENT: 'Reassessment',
+    OFFBOARDING: 'Offboarding',
 };
 
 const TIER_LABEL: Record<VendorTier, string> = {
@@ -57,6 +64,15 @@ const HISTORY_ACTIONS: Record<string, string> = {
     'vendor.finding_adjusted': 'Finding adjusted',
     'vendor.finding_dismissed': 'Finding dismissed',
     'vendor.clarification_requested': 'Clarification requested',
+    'vendor.remediation_planned': 'Remediation assigned',
+    'vendor.remediation_validated': 'Remediation validated',
+    'vendor.finding_closed': 'Finding closed',
+    'vendor.risk_accepted': 'Risk accepted',
+    'vendor.contract_attested': 'Contract attested',
+    'vendor.approval_decided': 'Approval decided',
+    'vendor.activated': 'Vendor activated',
+    'vendor.reassessment_started': 'Reassessment started',
+    'vendor.offboarding_started': 'Offboarding started',
 };
 
 type Actor = { id: string; role: string; name?: string };
@@ -378,6 +394,20 @@ function nextAction(stage: VendorOnboardingStage) {
             return 'Review the vendor submission';
         case VendorOnboardingStage.UNDER_REVIEW:
             return 'Confirm or dismiss draft findings';
+        case VendorOnboardingStage.REMEDIATION:
+            return 'Assign, validate, and close findings';
+        case VendorOnboardingStage.RISK_ACCEPTANCE:
+            return 'Record time-bounded risk acceptance';
+        case VendorOnboardingStage.CONTRACT_REVIEW:
+            return 'Attest required contract controls';
+        case VendorOnboardingStage.APPROVAL:
+            return 'Approve, reject, or approve with conditions';
+        case VendorOnboardingStage.ACTIVE:
+            return 'Monitor the active third party';
+        case VendorOnboardingStage.REASSESSMENT:
+            return 'Complete the recommended reassessment';
+        case VendorOnboardingStage.OFFBOARDING:
+            return 'Finish offboarding and retain records';
         default:
             return 'Review onboarding';
     }

@@ -762,14 +762,19 @@ export async function presentDueDiligence(organizationId: string, vendorKey: str
         workflowStatus,
         nextActionOwner: vendor.onboarding!.stage === VendorOnboardingStage.AWAITING_VENDOR || vendor.onboarding!.stage === VendorOnboardingStage.VENDOR_IN_PROGRESS
             ? 'Vendor'
-            : vendor.onboarding!.stage === VendorOnboardingStage.SUBMITTED || vendor.onboarding!.stage === VendorOnboardingStage.UNDER_REVIEW
-                ? 'Analyst'
-                : 'Business owner',
+            : vendor.onboarding!.stage === VendorOnboardingStage.ACTIVE
+                ? 'Business owner'
+                : ['SUBMITTED', 'UNDER_REVIEW', 'REMEDIATION', 'RISK_ACCEPTANCE', 'CONTRACT_REVIEW', 'APPROVAL', 'REASSESSMENT', 'OFFBOARDING'].includes(vendor.onboarding!.stage)
+                    ? 'Analyst'
+                    : 'Business owner',
         dueDate: vendor.onboarding?.dueDiligenceDueAt?.toISOString() || base.dueDate,
         contact: contact ? { id: contact.id, name: contact.name, email: contact.email, title: contact.title, phone: contact.phone } : null,
         invitation: invitation ? {
             status: INVITE_LABEL[invitation.status],
             emailStatus: deliveryLabel(invitation.emailDeliveryStatus),
+            emailTruth: invitation.emailDeliveryStatus === 'DELIVERED'
+                ? 'The email provider reported delivery. That is not proof a person opened the message.'
+                : 'Provider accepted or queued the message. This is not inbox delivery.',
             sentAt: invitation.emailSentAt,
             expiresAt: invitation.expiresAt,
         } : null,
@@ -904,6 +909,13 @@ export async function reviewFinding(organizationId: string, vendorKey: string, a
             data: { reviewState: IssueReviewState.CONFIRMED },
         });
         await writeHistory(organizationId, actor.id, 'vendor.finding_confirmed', vendor.id, `${actor.name || 'Analyst'} confirmed a finding.`);
+    }
+    const drafts = await prisma.vendorIssue.count({ where: { organizationId, vendorId: vendor.id, reviewState: IssueReviewState.DRAFT } });
+    if (!drafts) {
+        await prisma.vendorOnboarding.update({
+            where: { vendorId: vendor.id },
+            data: { stage: VendorOnboardingStage.REMEDIATION },
+        });
     }
     return presentDueDiligence(organizationId, vendor.id, actor);
 }

@@ -201,4 +201,23 @@ describe('Supreme Third Party onboarding Phase B', () => {
         });
         expect(send.status).toBe(403);
     });
+
+    it('rejects an expired invitation token without issuing a vendor session', async () => {
+        await prisma.vendorOnboarding.update({
+            where: { vendorId },
+            data: { stage: 'AWAITING_VENDOR' },
+        });
+        const sent = await request(app).post(`${API}/vendors/onboarding/${publicId}/invitation/resend`).set('Authorization', `Bearer ${tokenA}`).send({});
+        expect(sent.status).toBe(200);
+        const token = new URL(sent.body.data.activationUrl).searchParams.get('token') || '';
+        expect(token).toBeTruthy();
+        await prisma.vendorAssessmentInvitation.updateMany({
+            where: { vendorId, status: 'PENDING' },
+            data: { expiresAt: new Date(Date.now() - 60 * 1000) },
+        });
+        const expired = await request(app).post(`${API}/vendor-portal/activate`).send({ token });
+        expect(expired.status).toBe(410);
+        expect(expired.body.data?.token).toBeFalsy();
+        expect(JSON.stringify(expired.body)).not.toMatch(/eyJ/);
+    });
 });

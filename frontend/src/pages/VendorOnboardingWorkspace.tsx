@@ -9,12 +9,29 @@ import WorkflowStepper from '../components/design/WorkflowStepper';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
-const STEPS = ['Request', 'Intake', 'Tier Review', 'Due Diligence'];
+const STEPS = ['Request', 'Intake', 'Tier Review', 'Due Diligence', 'Findings', 'Contract', 'Approval', 'Active'];
 
-function stageIndex(stage?: string) {
+function stepperIndex(stage?: string) {
     if (stage === 'Intake') return 1;
     if (stage === 'Tier review') return 2;
     if (['Due diligence', 'Ready to send', 'Awaiting vendor', 'Vendor in progress', 'Submitted', 'Under review'].includes(String(stage))) return 3;
+    if (['Remediation', 'Risk acceptance'].includes(String(stage))) return 4;
+    if (stage === 'Contract review') return 5;
+    if (stage === 'Approval') return 6;
+    if (['Active', 'Reassessment', 'Offboarding'].includes(String(stage))) return 7;
+    return 0;
+}
+
+function defaultTab(stage?: string) {
+    if (stage === 'Intake') return 1;
+    if (stage === 'Tier review') return 2;
+    if (stage === 'Due diligence' || stage === 'Ready to send') return 3;
+    if (['Awaiting vendor', 'Vendor in progress'].includes(String(stage))) return 4;
+    if (['Submitted', 'Under review'].includes(String(stage))) return 5;
+    if (['Remediation', 'Risk acceptance'].includes(String(stage))) return 6;
+    if (stage === 'Contract review') return 7;
+    if (stage === 'Approval') return 8;
+    if (['Active', 'Reassessment', 'Offboarding'].includes(String(stage))) return 9;
     return 0;
 }
 
@@ -30,12 +47,20 @@ export default function VendorOnboardingWorkspace() {
     const [overrideReason, setOverrideReason] = useState('');
     const [contact, setContact] = useState({ name: '', email: '', title: '', phone: '' });
     const [saving, setSaving] = useState(false);
+    const [clauses, setClauses] = useState<Record<string, boolean>>({});
+    const [approval, setApproval] = useState({ decision: 'APPROVE', conditions: '', rationale: '' });
+    const [acceptance, setAcceptance] = useState<Record<string, { rationale: string; conditions: string }>>({});
+    const [exitNotes, setExitNotes] = useState('');
+    const [acknowledgeOutstanding, setAcknowledgeOutstanding] = useState(false);
 
     const load = () => {
         vendorOnboardingAPI.get(id)
             .then((response) => {
                 setData(response.data.data);
-                setTab(stageIndex(response.data.data.stage));
+                setTab(defaultTab(response.data.data.stage));
+                const nextClauses: Record<string, boolean> = {};
+                for (const item of response.data.data.lifecycle?.checklist || []) nextClauses[item.key] = Boolean(item.attested);
+                setClauses(nextClauses);
                 if (response.data.data.contact) {
                     setContact({
                         name: response.data.data.contact.name || '',
@@ -102,7 +127,7 @@ export default function VendorOnboardingWorkspace() {
                             </Stack>
                         }
                     />
-                    <WorkflowStepper steps={STEPS} active={stageIndex(data.stage)} />
+                    <WorkflowStepper steps={STEPS} active={stepperIndex(data.stage)} />
                     {error && <Alert severity="error">{error}</Alert>}
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
                         <Tab label="Request" />
@@ -111,6 +136,10 @@ export default function VendorOnboardingWorkspace() {
                         <Tab label="Assessment Plan" />
                         <Tab label="Due Diligence" />
                         <Tab label="Review" />
+                        <Tab label="Findings" />
+                        <Tab label="Contract" />
+                        <Tab label="Approval" />
+                        <Tab label="Active" />
                         <Tab label="History" />
                     </Tabs>
 
@@ -249,7 +278,9 @@ export default function VendorOnboardingWorkspace() {
                                 <Typography variant="body2">Supreme prepares the invitation. You authorize sending it to the vendor contact.</Typography>
                             </Surface>
                             {data.invitation && (
-                                <Alert severity="info">Invitation {data.invitation.status}. Email {data.invitation.emailStatus}.</Alert>
+                                <Alert severity="info">
+                                    Invitation {data.invitation.status}. Email {data.invitation.emailStatus}. {data.invitation.emailTruth || 'Provider accepted or queued the message. This is not inbox delivery.'}
+                                </Alert>
                             )}
                             <Surface>
                                 <Stack spacing={1.5} component="form" onSubmit={(event) => { event.preventDefault(); run(() => vendorOnboardingAPI.send(id, contact)); }}>
@@ -303,6 +334,119 @@ export default function VendorOnboardingWorkspace() {
                     )}
 
                     {tab === 6 && (
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Findings and remediation</Typography>
+                                <Typography variant="body2">Confirm findings first. Close only with ready remediation evidence. Risk acceptance does not change the residual score.</Typography>
+                            </Surface>
+                            {(data.lifecycle?.findings || []).map((finding: any) => (
+                                <Surface key={finding.id}>
+                                    <Typography variant="subtitle1">{finding.title}</Typography>
+                                    <Typography>{humanizeLabel(finding.severity)} · {humanizeLabel(finding.status)}{finding.dueDate ? ` · Due ${formatShortDate(finding.dueDate)}` : ''}</Typography>
+                                    {finding.cap && <Typography variant="body2">CAP: {finding.cap}</Typography>}
+                                    {data.canReviewTier && ['OPEN', 'IN_PROGRESS', 'PENDING_VALIDATION', 'REMEDIATED'].includes(finding.status) && (
+                                        <Stack spacing={1} sx={{ mt: 1 }}>
+                                            <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.remediateFinding(id, finding.id, { cap: 'Correct the control gap and provide current evidence.' }))}>Assign remediation</Button>
+                                            <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.validateFinding(id, finding.id, { approved: true, notes: 'Remediation validated.' }))}>Validate</Button>
+                                            <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.closeFinding(id, finding.id, {}))}>Close with ready evidence</Button>
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                multiline
+                                                minRows={2}
+                                                label="Acceptance rationale"
+                                                value={acceptance[finding.id]?.rationale || ''}
+                                                onChange={(event) => setAcceptance({ ...acceptance, [finding.id]: { rationale: event.target.value, conditions: acceptance[finding.id]?.conditions || '' } })}
+                                            />
+                                            <TextField
+                                                fullWidth
+                                                label="Acceptance conditions"
+                                                value={acceptance[finding.id]?.conditions || ''}
+                                                onChange={(event) => setAcceptance({ ...acceptance, [finding.id]: { rationale: acceptance[finding.id]?.rationale || '', conditions: event.target.value } })}
+                                            />
+                                            <Button disabled={saving || !acceptance[finding.id]?.rationale} onClick={() => run(() => vendorOnboardingAPI.acceptFindingRisk(id, finding.id, acceptance[finding.id]))}>Accept risk for 180 days</Button>
+                                        </Stack>
+                                    )}
+                                </Surface>
+                            ))}
+                            {!data.lifecycle?.findings?.length && <Typography>No confirmed findings yet.</Typography>}
+                        </Stack>
+                    )}
+
+                    {tab === 7 && (
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Contract review</Typography>
+                                <Typography variant="body2">Required items come from vendor tier and the recorded due-diligence plan. Legal attestation is required before approval.</Typography>
+                            </Surface>
+                            {(data.lifecycle?.checklist || []).map((item: any) => (
+                                <FormControlLabel
+                                    key={item.key}
+                                    control={<Checkbox checked={Boolean(clauses[item.key])} disabled={!data.canReviewTier || Boolean(data.lifecycle?.contractAttestedAt)} onChange={(event) => setClauses({ ...clauses, [item.key]: event.target.checked })} />}
+                                    label={`${item.label}${item.required ? ' (required)' : ''} — ${item.rationale}`}
+                                />
+                            ))}
+                            {data.lifecycle?.contractAttestedAt && <Alert severity="success">Contract controls were attested {formatShortDate(data.lifecycle.contractAttestedAt)}.</Alert>}
+                            {data.canReviewTier && !data.lifecycle?.contractAttestedAt && (
+                                <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.attestContract(id, { attested: true, clauses }))}>Attest required contract controls</Button>
+                            )}
+                        </Stack>
+                    )}
+
+                    {tab === 8 && (
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Approval</Typography>
+                                <Typography variant="body2">
+                                    Residual {data.lifecycle?.residualRisk ?? 'not scored'} · Open findings {data.lifecycle?.monitoring?.openFindings ?? 0} · Accepted risks {data.lifecycle?.monitoring?.acceptedRisks ?? 0} · Contract {data.lifecycle?.contractAttestedAt ? 'attested' : 'not attested'}
+                                </Typography>
+                            </Surface>
+                            {data.lifecycle?.approvalDecision && <Alert severity="info">Decision: {humanizeLabel(data.lifecycle.approvalDecision)}{data.lifecycle.approvalConditions ? `. ${data.lifecycle.approvalConditions}` : ''}</Alert>}
+                            {data.canReviewTier && (
+                                <Stack spacing={1.5}>
+                                    <TextField select label="Decision" value={approval.decision} onChange={(event) => setApproval({ ...approval, decision: event.target.value })}>
+                                        <MenuItem value="APPROVE">Approve</MenuItem>
+                                        <MenuItem value="APPROVE_WITH_CONDITIONS">Approve with conditions</MenuItem>
+                                        <MenuItem value="REJECT">Reject</MenuItem>
+                                    </TextField>
+                                    <TextField fullWidth multiline minRows={2} label="Conditions" value={approval.conditions} onChange={(event) => setApproval({ ...approval, conditions: event.target.value })} />
+                                    <TextField fullWidth multiline minRows={2} label="Rationale" value={approval.rationale} onChange={(event) => setApproval({ ...approval, rationale: event.target.value })} />
+                                    <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.decideApproval(id, approval))}>Record approval decision</Button>
+                                    {['APPROVE', 'APPROVE_WITH_CONDITIONS'].includes(data.lifecycle?.approvalDecision) && data.lifecycle?.vendorStatus !== 'ACTIVE' && (
+                                        <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.activate(id))}>Activate vendor</Button>
+                                    )}
+                                </Stack>
+                            )}
+                        </Stack>
+                    )}
+
+                    {tab === 9 && (
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Active monitoring</Typography>
+                                <Fact label="Vendor status" value={humanizeLabel(data.lifecycle?.vendorStatus || data.lifecycle?.monitoring?.vendorStatus)} />
+                                <Fact label="Residual risk" value={data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                                <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
+                                <Fact label="Overdue remediation" value={String(data.lifecycle?.monitoring?.overdueRemediation ?? 0)} />
+                                <Fact label="Next reassessment" value={formatShortDate(data.lifecycle?.nextReassessmentAt || data.lifecycle?.monitoring?.nextReassessment)} />
+                                <Fact label="External intelligence" value={data.lifecycle?.monitoring?.externalIntelligence} />
+                            </Surface>
+                            {data.canReviewTier && (
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.startReassessment(id))}>Start reassessment</Button>
+                                </Stack>
+                            )}
+                            {data.canReviewTier && (
+                                <Stack spacing={1.5}>
+                                    <TextField fullWidth multiline minRows={2} label="Exit notes" value={exitNotes} onChange={(event) => setExitNotes(event.target.value)} />
+                                    <FormControlLabel control={<Checkbox checked={acknowledgeOutstanding} onChange={(event) => setAcknowledgeOutstanding(event.target.checked)} />} label="Acknowledge outstanding findings or assessments. Records are retained." />
+                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.offboard(id, { exitNotes, acknowledgeOutstanding }))}>Start offboarding</Button>
+                                </Stack>
+                            )}
+                        </Stack>
+                    )}
+
+                    {tab === 10 && (
                         <Surface>
                             <Typography variant="h6">History</Typography>
                             <Stack spacing={1.25} sx={{ mt: 1.5 }}>
