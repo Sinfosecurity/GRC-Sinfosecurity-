@@ -17,6 +17,8 @@ describe('customer-facing AI labels', () => {
         expect(humanizeLabel('QUARANTINED')).toBe('Blocked');
         expect(humanizeLabel('INFECTED')).toBe('Blocked');
         expect(humanizeLabel('FAILED')).toBe('Scan failed');
+        expect(humanizeLabel('UNKNOWN')).toBe('Security status unavailable');
+        expect(humanizeLabel('UNAVAILABLE')).toBe('Security status unavailable');
         expect(humanizeLabel('INITIAL_DUE_DILIGENCE')).toBe('Initial Due Diligence');
         expect(humanizeLabel('AI-00001')).toBe('AI-00001');
         expect(humanizeLabel('Unknown / Not recorded')).toBe('Unknown / Not recorded');

@@ -82,6 +82,11 @@ def main():
                                 impact: row.impact,
                                 help: row.help,
                                 nodes: row.nodes.length,
+                                samples: row.nodes.slice(0, 8).map((node) => ({
+                                    target: node.target,
+                                    html: (node.html || '').slice(0, 180),
+                                    failure: (node.failureSummary || '').slice(0, 240),
+                                })),
                             })),
                             passes: out.passes.length,
                         };

@@ -36,7 +36,7 @@ export default function VendorAssessmentActivate() {
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#0b1f33', color: 'white', px: 2, py: 8 }}>
             <Stack spacing={2} sx={{ maxWidth: 480, mx: 'auto' }}>
-                <Typography variant="overline">Supreme Third Party</Typography>
+                <Typography variant="overline" sx={{ color: '#e7e0d4' }}>Supreme Third Party</Typography>
                 <Typography variant="h4">Open your assessment</Typography>
                 <Typography>Use the secure invitation from the requesting organization. You will only see the assessments assigned to you.</Typography>
                 {error && <Alert severity="error">{error}</Alert>}

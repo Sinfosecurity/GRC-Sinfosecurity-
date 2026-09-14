@@ -27,6 +27,8 @@ const CUSTOMER_LABELS: Record<string, string> = {
     INFECTED: 'Blocked',
     FAILED: 'Scan failed',
     ERROR: 'Scan failed',
+    UNKNOWN: 'Security status unavailable',
+    UNAVAILABLE: 'Security status unavailable',
     EXPIRED: 'Expired',
     EXPIRING: 'Expiring',
     SUPERSEDED: 'Superseded',

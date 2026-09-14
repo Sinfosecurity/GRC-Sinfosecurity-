@@ -2,7 +2,20 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Box, Button, Checkbox, FormControlLabel, LinearProgress, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { vendorPortalAPI } from '../services/api';
-import { formatShortDate } from '../utils/humanizeLabel';
+import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
+
+function evidenceFileStatus(status?: string | null) {
+    if (!status) return null;
+    const key = String(status).trim();
+    if (key === 'Ready' || key === 'CLEAN') return 'Ready';
+    if (key === 'Scanning' || key === 'PENDING' || key === 'PENDING_SCAN') return 'Security check in progress';
+    if (key === 'Blocked' || key === 'INFECTED' || key === 'QUARANTINED') return 'Blocked';
+    if (key === 'Unavailable' || key === 'UNKNOWN' || key === 'unknown' || key === 'Security status unavailable') {
+        return 'Security status unavailable';
+    }
+    const labeled = humanizeLabel(key);
+    return labeled === 'Ready' ? 'Security status unavailable' : labeled;
+}
 
 export default function VendorAssessmentQuestionnaire() {
     const { assessmentId = '' } = useParams();
@@ -112,7 +125,7 @@ export default function VendorAssessmentQuestionnaire() {
                     {current.evidenceRequired && (
                         <Stack spacing={1} sx={{ mt: 2 }}>
                             <Typography>Evidence required</Typography>
-                            <Typography variant="body2">{current.evidenceStatus ? `File status: ${current.evidenceStatus}` : 'Upload the supporting file for this question.'}</Typography>
+                            <Typography variant="body2">{evidenceFileStatus(current.evidenceStatus) ? `File status: ${evidenceFileStatus(current.evidenceStatus)}` : 'Upload the supporting file for this question.'}</Typography>
                             {!current.locked && <Button component="label" disabled={saving}>Upload file<input hidden type="file" onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} /></Button>}
                         </Stack>
                     )}

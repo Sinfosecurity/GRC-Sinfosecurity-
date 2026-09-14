@@ -64,7 +64,7 @@ function scanLabel(status: ScanStatus | string) {
     if (status === ScanStatus.CLEAN) return 'Ready';
     if (status === ScanStatus.PENDING) return 'Scanning';
     if (status === ScanStatus.INFECTED) return 'Blocked';
-    return 'Unavailable';
+    return 'Security status unavailable';
 }
 
 function isUsableEvidence(status: ScanStatus | string) {
@@ -604,7 +604,7 @@ export async function uploadVendorEvidence(actor: VendorActor, assessmentId: str
 export function submissionChecklist(questions: Array<{ key: string; required: boolean; evidenceRequired: boolean; response: string; visible: boolean; hasEvidence: boolean; evidenceStatus?: string | null }>) {
     const visible = questions.filter((row) => row.visible);
     const unanswered = visible.filter((row) => row.required && !row.response);
-    const evidenceMissing = visible.filter((row) => row.evidenceRequired && (!row.hasEvidence || row.evidenceStatus === 'Scanning' || row.evidenceStatus === 'Blocked' || row.evidenceStatus === 'Unavailable'));
+    const evidenceMissing = visible.filter((row) => row.evidenceRequired && (!row.hasEvidence || row.evidenceStatus === 'Scanning' || row.evidenceStatus === 'Blocked' || row.evidenceStatus === 'Unavailable' || row.evidenceStatus === 'Security status unavailable'));
     return {
         remaining: unanswered.length + evidenceMissing.length,
         unanswered: unanswered.map((row) => row.key),
