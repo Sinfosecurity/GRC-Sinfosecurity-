@@ -5,6 +5,7 @@
 **Purpose:** Request → Internal Intake → Inherent Risk → Tier Recommendation → Analyst Confirmation → Due-Diligence Plan  
 **Starting SHA:** `5dae4b6c5d7da9f4a872d4f53703166ccebb1dd0`  
 **Implementation SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`  
+**Documentation SHA:** `9d52d49d83990677b7ac538b00ccf5bf8acdb454`  
 **Hosted frontend SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`  
 **Hosted API SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`  
 **CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34797853693 PASS on `b7f9072`  
