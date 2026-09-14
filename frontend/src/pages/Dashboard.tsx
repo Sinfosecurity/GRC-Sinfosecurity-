@@ -26,6 +26,29 @@ function greeting(name?: string) {
     return name ? `${when}, ${name}` : when;
 }
 
+function domainDashboardsForRole(role?: string): Array<'risk' | 'compliance' | 'privacy' | 'ai'> {
+    switch (role) {
+        case 'RISK_MANAGER':
+        case 'MANAGER':
+        case 'APPROVER':
+            return ['risk'];
+        case 'COMPLIANCE_OFFICER':
+            return ['compliance'];
+        case 'PRIVACY_OFFICER':
+        case 'DPO':
+            return ['privacy'];
+        case 'AI_GOVERNANCE_LEAD':
+        case 'AI_OWNER':
+            return ['ai'];
+        case 'ORGANIZATION_ADMIN':
+        case 'ADMIN':
+        case 'ORG_ADMIN':
+            return ['risk', 'compliance', 'privacy', 'ai'];
+        default:
+            return [];
+    }
+}
+
 function homeForRole(role?: string) {
     switch (role) {
         case 'BUSINESS_OWNER':
@@ -120,9 +143,7 @@ export default function Dashboard() {
         activeIssues?: number;
         criticalVendors?: number;
     } | null>(null);
-    const [assessments, setAssessments] = useState<Array<{ id: string; status: string; dueDate?: string | null }>>([]);
-    const [findings, setFindings] = useState<Array<{ id: string; status: string; targetRemediationDate?: string | null }>>([]);
-    const [briefs, setBriefs] = useState<Array<{ id: string; status: string; humanDecision?: string | null }>>([]);
+    const [work, setWork] = useState({ dueAssessments: 0, overdueFindings: 0, pendingDecisions: 0 });
     const [domain, setDomain] = useState<{
         risk?: { count?: number; items: AttentionItem[] };
         compliance?: { count?: number; items: AttentionItem[] };
@@ -134,20 +155,29 @@ export default function Dashboard() {
         let cancelled = false;
         (async () => {
             try {
-                const [attention, statistics, assessmentRes, findingRes, briefRes, riskRes, complianceRes, privacyRes, aiRes] = await Promise.allSettled([
+                const wanted = domainDashboardsForRole(user?.role);
+                const domainCalls = wanted.map((key) => {
+                    if (key === 'risk') return ermAPI.dashboard();
+                    if (key === 'compliance') return complianceAPI.dashboard();
+                    if (key === 'privacy') return privacyAPI.dashboard();
+                    return aiGovernanceAPI.dashboard();
+                });
+                const [attention, statistics, ...domainSettled] = await Promise.allSettled([
                     tprmAPI.attention(),
                     vendorAPI.getStatistics(),
-                    tprmAPI.listAssessments(),
-                    tprmAPI.listFindings(),
-                    tprmAPI.listBriefs(),
-                    ermAPI.dashboard(),
-                    complianceAPI.dashboard(),
-                    privacyAPI.dashboard(),
-                    aiGovernanceAPI.dashboard(),
+                    ...domainCalls,
                 ]);
                 if (cancelled) return;
                 if (attention.status === 'fulfilled') {
-                    setItems(attention.value.data.data.items || []);
+                    const payload = attention.value.data.data || {};
+                    setItems(payload.items || []);
+                    if (payload.work) {
+                        setWork({
+                            dueAssessments: payload.work.dueAssessments || 0,
+                            overdueFindings: payload.work.overdueFindings || 0,
+                            pendingDecisions: payload.work.pendingDecisions || 0,
+                        });
+                    }
                 } else {
                     setError(attention.reason?.message || 'Unable to load work that needs attention.');
                 }
@@ -155,64 +185,56 @@ export default function Dashboard() {
                     const body = statistics.value.data;
                     setStats(body.summary || body);
                 }
-                if (assessmentRes.status === 'fulfilled') {
-                    setAssessments(assessmentRes.value.data.data || []);
-                }
-                if (findingRes.status === 'fulfilled') {
-                    setFindings(findingRes.value.data.data || []);
-                }
-                if (briefRes.status === 'fulfilled') {
-                    setBriefs(briefRes.value.data.data || []);
-                }
                 const nextDomain: typeof domain = {};
-                if (riskRes.status === 'fulfilled') {
-                    const data = riskRes.value.data.data || {};
-                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
-                        id: `risk-${row.publicId}`,
-                        severity: (row.residualRating === 'CRITICAL' || row.severity === 'CRITICAL' ? 'CRITICAL' : row.residualRating === 'HIGH' || row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
-                        action: 'Open risk',
-                        title: row.title || 'Enterprise risk needs attention',
-                        detail: (row.reasons || []).join(' · ') || row.appetiteStatus || 'Live enterprise risk record.',
-                        href: `/risks/${row.publicId}`,
-                    }));
-                    nextDomain.risk = { count: data.totals?.outsideAppetite ?? data.totals?.overdueTreatments ?? rows.length, items: rows };
-                }
-                if (complianceRes.status === 'fulfilled') {
-                    const data = complianceRes.value.data.data || {};
-                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
-                        id: `cmp-${row.publicId || row.href}`,
-                        severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
-                        action: 'Open compliance',
-                        title: row.why || row.type || 'Compliance needs attention',
-                        detail: [row.framework, row.owner].filter(Boolean).join(' · ') || 'Live compliance record.',
-                        href: row.href || '/compliance',
-                    }));
-                    nextDomain.compliance = { count: data.totals?.openGaps ?? rows.length, items: rows };
-                }
-                if (privacyRes.status === 'fulfilled') {
-                    const data = privacyRes.value.data.data || {};
-                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
-                        id: `prv-${row.publicId || row.href}`,
-                        severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
-                        action: 'Open privacy',
-                        title: row.why || row.type || 'Privacy needs attention',
-                        detail: [row.related, row.owner].filter(Boolean).join(' · ') || 'Live privacy record.',
-                        href: row.href || '/privacy-ops',
-                    }));
-                    nextDomain.privacy = { count: data.totals?.openRightsRequests ?? data.totals?.dpiasDue ?? rows.length, items: rows };
-                }
-                if (aiRes.status === 'fulfilled') {
-                    const data = aiRes.value.data.data || {};
-                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
-                        id: `ai-${row.publicId || row.href}`,
-                        severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
-                        action: 'Open AI',
-                        title: row.why || row.type || 'AI governance needs attention',
-                        detail: row.publicId || 'Live AI governance record.',
-                        href: row.href || '/ai-governance',
-                    }));
-                    nextDomain.ai = { count: data.totals?.awaitingApproval ?? data.totals?.incidentsOpen ?? rows.length, items: rows };
-                }
+                wanted.forEach((key, index) => {
+                    const result = domainSettled[index];
+                    if (!result || result.status !== 'fulfilled') return;
+                    const data = result.value.data.data || {};
+                    if (key === 'risk') {
+                        const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                            id: `risk-${row.publicId}`,
+                            severity: (row.residualRating === 'CRITICAL' || row.severity === 'CRITICAL' ? 'CRITICAL' : row.residualRating === 'HIGH' || row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                            action: 'Open risk',
+                            title: row.title || 'Enterprise risk needs attention',
+                            detail: (row.reasons || []).join(' · ') || row.appetiteStatus || 'Live enterprise risk record.',
+                            href: `/risks/${row.publicId}`,
+                        }));
+                        nextDomain.risk = { count: data.totals?.outsideAppetite ?? data.totals?.overdueTreatments ?? rows.length, items: rows };
+                    }
+                    if (key === 'compliance') {
+                        const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                            id: `cmp-${row.publicId || row.href}`,
+                            severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                            action: 'Open compliance',
+                            title: row.why || row.type || 'Compliance needs attention',
+                            detail: [row.framework, row.owner].filter(Boolean).join(' · ') || 'Live compliance record.',
+                            href: row.href || '/compliance',
+                        }));
+                        nextDomain.compliance = { count: data.totals?.openGaps ?? rows.length, items: rows };
+                    }
+                    if (key === 'privacy') {
+                        const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                            id: `prv-${row.publicId || row.href}`,
+                            severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                            action: 'Open privacy',
+                            title: row.why || row.type || 'Privacy needs attention',
+                            detail: [row.related, row.owner].filter(Boolean).join(' · ') || 'Live privacy record.',
+                            href: row.href || '/privacy-ops',
+                        }));
+                        nextDomain.privacy = { count: data.totals?.openRightsRequests ?? data.totals?.dpiasDue ?? rows.length, items: rows };
+                    }
+                    if (key === 'ai') {
+                        const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                            id: `ai-${row.publicId || row.href}`,
+                            severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                            action: 'Open AI',
+                            title: row.why || row.type || 'AI governance needs attention',
+                            detail: row.publicId || 'Live AI governance record.',
+                            href: row.href || '/ai-governance',
+                        }));
+                        nextDomain.ai = { count: data.totals?.awaitingApproval ?? data.totals?.incidentsOpen ?? rows.length, items: rows };
+                    }
+                });
                 setDomain(nextDomain);
             } catch (err: any) {
                 if (!cancelled) setError(err.message || 'Unable to load the overview.');
@@ -223,22 +245,7 @@ export default function Dashboard() {
         return () => {
             cancelled = true;
         };
-    }, []);
-
-    const now = Date.now();
-    const work = useMemo(() => {
-        const dueAssessments = assessments.filter((row) => {
-            if (row.status === 'COMPLETED') return false;
-            if (!row.dueDate) return row.status !== 'COMPLETED';
-            return new Date(row.dueDate).getTime() <= now + 7 * 86400000;
-        }).length;
-        const pendingDecisions = briefs.filter((row) => !row.humanDecision && row.status !== 'DECIDED').length;
-        const overdueFindings = findings.filter((row) => {
-            if (['CLOSED', 'RISK_ACCEPTED', 'RESOLVED'].includes(row.status)) return false;
-            return row.targetRemediationDate ? new Date(row.targetRemediationDate).getTime() < now : false;
-        }).length;
-        return { dueAssessments, pendingDecisions, overdueFindings };
-    }, [assessments, briefs, findings, now]);
+    }, [user?.role]);
 
     const rolePrimary = useMemo(() => {
         if (['RISK_MANAGER', 'MANAGER'].includes(user?.role || '')) return domain.risk?.items || [];

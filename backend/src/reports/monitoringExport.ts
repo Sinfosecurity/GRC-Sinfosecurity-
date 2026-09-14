@@ -33,7 +33,7 @@ export async function renderMonitoringCsv(organizationId: string, filters: Repor
             ].map((value) => csvEscape(value)).join(',')
         ),
     ];
-    return { buffer: Buffer.from(lines.join('\n'), 'utf8'), filenameParts: ['Supreme-Risk-Monitoring', isoDate(data.generatedAt)] };
+    return { buffer: Buffer.from(lines.join('\n'), 'utf8'), filenameParts: ['Supreme-Governance-Monitoring', isoDate(data.generatedAt)] };
 }
 
 export async function renderMonitoringPdf(organizationId: string, filters: ReportFilters = {}) {
@@ -59,7 +59,7 @@ export async function renderMonitoringPdf(organizationId: string, filters: Repor
         drawCallout(
             doc,
             humanizeProviderStatus(data.providerStatus),
-            'Supreme Risk reports only persisted integration status and recorded vendor signals. Missing credentials or an unconnected provider are shown as a human-readable status, not as an invented clean bill of health.',
+            'Supreme reports only persisted integration status and recorded vendor signals. Missing credentials or an unconnected provider are shown as a human-readable status, not as an invented clean bill of health.',
             riskTone(data.providerStatus)
         );
         drawKpiRow(doc, [
@@ -92,7 +92,7 @@ export async function renderMonitoringPdf(organizationId: string, filters: Repor
             drawEmptyState(
                 doc,
                 'No recorded monitoring signals',
-                'This panel is empty because no VendorMonitoring events exist for the tenant (or selected vendor). Supreme Risk does not invent ratings, news items, or external scores.'
+                'This panel is empty because no monitoring events exist for the tenant (or selected vendor). Supreme does not invent ratings, news items, or external scores.'
             );
         } else {
             drawProfessionalTable(
@@ -118,5 +118,5 @@ export async function renderMonitoringPdf(organizationId: string, filters: Repor
             );
         }
     });
-    return { buffer, filenameParts: ['Supreme-Risk-Monitoring', isoDate(data.generatedAt)] };
+    return { buffer, filenameParts: ['Supreme-Governance-Monitoring', isoDate(data.generatedAt)] };
 }

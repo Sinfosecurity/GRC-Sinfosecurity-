@@ -198,7 +198,7 @@ export async function renderComplianceBoardPptx(organizationId: string) {
             bullets: pack.dashboard.attention.length
                 ? pack.dashboard.attention.slice(0, 6).map((row) => `Review ${row.related || row.publicId} — ${row.type}`)
                 : ['No management action is required from the current live queue.'],
-            footnote: 'An attestation is not a control test. Residual risk does not change unless Supreme Risk recalculates it.',
+            footnote: 'An attestation is not a control test. Residual risk does not change unless Supreme recalculates it.',
         },
     ];
     return {

@@ -42,7 +42,7 @@ export default function PrivacyVendorDetail() {
                             <Typography>Subjects: {(data.dataSubjects || []).join(', ') || 'Not recorded'}</Typography>
                             <Typography>Privacy risks: {(data.privacyRisks || []).join(', ') || 'None recorded'}</Typography>
                             <Typography>Controls: {(data.controls || []).join(', ') || 'None recorded'}</Typography>
-                            <Typography>CLEAN evidence: {(data.evidence || []).join(', ') || 'None recorded'}</Typography>
+                            <Typography>Ready evidence: {(data.evidence || []).join(', ') || 'None recorded'}</Typography>
                             <Typography>Requirements: {(data.requirements || []).join(', ') || 'None recorded'}</Typography>
                             <Typography>Gaps: {(data.gaps || []).join(', ') || 'None recorded'}</Typography>
                             <Typography>Retention: {(data.retention || []).join(', ') || 'None recorded'}</Typography>

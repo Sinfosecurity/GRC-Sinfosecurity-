@@ -7,6 +7,7 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
 import { privacyAPI, vendorAPI } from '../services/api';
+import { humanizeEventType } from '../utils/humanizeLabel';
 
 const SECTIONS = ['Overview', 'Purpose & Basis', 'Data', 'Data Subjects', 'Systems', 'Vendors', 'Transfers', 'Risks', 'Controls', 'Evidence', 'DPIA', 'Retention', 'Rights', 'Relationships', 'History'] as const;
 
@@ -182,7 +183,7 @@ export default function PrivacyActivityDetail() {
                         )}
                         {section === 'Risks' && (
                             <Surface>
-                                <Typography>Linked privacy risks come from Supreme Risk. No invented residual scores.</Typography>
+                                <Typography>Linked privacy risks come from recorded enterprise risk. No invented residual scores.</Typography>
                                 <AppTable rows={(data.affected?.privacyRisks || []).map((label: string) => ({ label }))} rowKey={(row: any) => row.label} emptyTitle="No linked privacy risks" emptyBody="Link an existing enterprise risk if one applies." columns={[{ id: 'label', label: 'Risk', render: (row: any) => row.label }]} />
                             </Surface>
                         )}
@@ -193,8 +194,8 @@ export default function PrivacyActivityDetail() {
                         )}
                         {section === 'Evidence' && (
                             <Surface>
-                                <Typography sx={{ mb: 1 }}>Evidence stays in the shared CLEAN store. A file is not a finding that processing is lawful.</Typography>
-                                <AppTable rows={(data.affected?.evidence || []).map((label: string) => ({ label }))} rowKey={(row: any) => row.label} emptyTitle="No linked CLEAN evidence" emptyBody="Link a shared control that already has evidence. Presence of a file is not proof." columns={[{ id: 'label', label: 'Evidence', render: (row: any) => row.label }]} />
+                                <Typography sx={{ mb: 1 }}>Evidence stays in the shared evidence store. A file is not a finding that processing is lawful.</Typography>
+                                <AppTable rows={(data.affected?.evidence || []).map((label: string) => ({ label }))} rowKey={(row: any) => row.label} emptyTitle="No linked ready evidence" emptyBody="Link a shared control that already has evidence. Presence of a file is not proof." columns={[{ id: 'label', label: 'Evidence', render: (row: any) => row.label }]} />
                             </Surface>
                         )}
                         {section === 'DPIA' && (
@@ -246,7 +247,7 @@ export default function PrivacyActivityDetail() {
                         {section === 'History' && (
                             <Surface>
                                 <AppTable rows={data.history || []} rowKey={(row: any) => `${row.eventType}-${row.createdAt}`} emptyTitle="No history" emptyBody="Material changes appear here in customer language." columns={[
-                                    { id: 'eventType', label: 'Event', render: (row: any) => row.eventType },
+                                    { id: 'eventType', label: 'Event', render: (row: any) => humanizeEventType(row.eventType) },
                                     { id: 'summary', label: 'What happened', render: (row: any) => row.summary },
                                 ]} />
                             </Surface>

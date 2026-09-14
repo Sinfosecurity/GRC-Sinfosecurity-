@@ -551,8 +551,8 @@ export const enterprisePrivacyService = {
         for (const gap of gaps.slice(0, 6)) {
             attention.push({
                 type: 'Open privacy-related gap',
-                why: `${gap.publicId} ${gap.title}. A gap is remaining work, not a legal conclusion.`,
-                related: gap.title,
+                why: `${gap.publicId} ${String(gap.title || '').replace(/\bCLEAN\b/g, 'ready')}. A gap is remaining work, not a legal conclusion.`,
+                related: String(gap.title || '').replace(/\bCLEAN\b/g, 'ready'),
                 owner: null,
                 dueAt: null,
                 ageDays: 0,
@@ -1013,7 +1013,7 @@ export const enterprisePrivacyService = {
                 notes: includeIdentity ? row.verificationNotes : undefined,
                 exception: includeIdentity ? row.verificationException : undefined,
                 evidence: includeIdentity && evidence
-                    ? { filename: evidence.filename, scanStatus: evidence.scanStatus, honesty: 'Verification documents are not shown in lists. Non-CLEAN files are not downloadable.' }
+                    ? { filename: evidence.filename, scanStatus: evidence.scanStatus, honesty: 'Verification documents are not shown in lists. Files that are not ready are not downloadable.' }
                     : includeIdentity ? null : undefined,
             },
             tasks: row.tasks.map((task) => ({

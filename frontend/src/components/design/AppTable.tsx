@@ -131,7 +131,15 @@ export default function AppTable<T>({
                             <Box
                                 key={key}
                                 data-testid="record-card"
+                                role={onRowClick ? 'button' : undefined}
+                                tabIndex={onRowClick ? 0 : undefined}
                                 onClick={onRowClick ? () => onRowClick(row) : undefined}
+                                onKeyDown={onRowClick ? (event) => {
+                                    if (event.key === 'Enter' || event.key === ' ') {
+                                        event.preventDefault();
+                                        onRowClick(row);
+                                    }
+                                } : undefined}
                                 sx={{
                                     border: '1px solid',
                                     borderColor: 'divider',
@@ -178,7 +186,7 @@ export default function AppTable<T>({
                 </Stack>
                     ) : (
                     <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', border: '1px solid', borderColor: 'divider', borderRadius: '8px' }}>
-                        <Table size="small" sx={{ minWidth: 640 }}>
+                        <Table size="small" sx={{ minWidth: 640 }} aria-label="Records">
                             <TableHead>
                                 <TableRow>
                                     {columns.map((column) => (
@@ -209,7 +217,14 @@ export default function AppTable<T>({
                                     <TableRow
                                         key={rowKey(row)}
                                         hover
+                                        tabIndex={onRowClick ? 0 : undefined}
                                         onClick={onRowClick ? () => onRowClick(row) : undefined}
+                                        onKeyDown={onRowClick ? (event) => {
+                                            if (event.key === 'Enter' || event.key === ' ') {
+                                                event.preventDefault();
+                                                onRowClick(row);
+                                            }
+                                        } : undefined}
                                         sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
                                     >
                                         {columns.map((column) => (

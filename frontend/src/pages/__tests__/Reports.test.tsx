@@ -57,7 +57,7 @@ vi.mock('../../services/api', () => ({
 }));
 
 vi.mock('../../services/download', () => ({
-    downloadBinaryResponse: vi.fn().mockResolvedValue('Supreme-Risk-Executive-Report.pdf'),
+    downloadBinaryResponse: vi.fn().mockResolvedValue('Supreme-Governance-Executive-Report.pdf'),
     downloadErrorMessage: vi.fn((err: Error) => err.message),
 }));
 
@@ -72,7 +72,7 @@ describe('Reports page', () => {
         renderReports();
         const buttons = await screen.findAllByRole('button', { name: /Generate PDF/i });
         await userEvent.click(buttons[0]);
-        expect(await screen.findByText(/Downloaded Supreme-Risk-Executive-Report.pdf/)).toBeInTheDocument();
+        expect(await screen.findByText(/Downloaded Supreme-Governance-Executive-Report.pdf/)).toBeInTheDocument();
     });
 
     it('shows error state when generation fails', async () => {

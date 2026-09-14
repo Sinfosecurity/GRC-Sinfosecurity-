@@ -21,7 +21,9 @@ const CUSTOMER_LABELS: Record<string, string> = {
     AWAITING_VENDOR: 'Waiting for Vendor',
     NOT_CONFIGURED: 'Not Configured',
     CLEAN: 'Ready',
-    PENDING: 'Scan in progress',
+    PENDING: 'Security check in progress',
+    PENDING_SCAN: 'Security check in progress',
+    QUARANTINED: 'Blocked',
     INFECTED: 'Blocked',
     FAILED: 'Scan failed',
     ERROR: 'Scan failed',
@@ -37,11 +39,23 @@ export function humanizeLabel(value?: string | null): string {
     if (!value) return '—';
     const key = String(value).trim();
     if (CUSTOMER_LABELS[key]) return CUSTOMER_LABELS[key];
+    if (key.includes('.')) return humanizeEventType(key);
     if (!/^[A-Z0-9_]+$/.test(key)) return key;
     return key
         .replace(/_/g, ' ')
         .toLowerCase()
         .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export function humanizeEventType(value?: string | null): string {
+    if (!value) return '—';
+    const key = String(value).trim();
+    if (CUSTOMER_LABELS[key]) return CUSTOMER_LABELS[key];
+    return key
+        .split(/[.\s]+/)
+        .filter(Boolean)
+        .map((part) => part.replace(/[_-]/g, ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase()))
+        .join(' ');
 }
 
 export function formatShortDate(value?: string | null): string {

@@ -13,6 +13,8 @@ export default function MetricCard({ label, value, hint, onClick }: Props) {
     return (
         <Box
             component={onClick ? 'button' : 'div'}
+            type={onClick ? 'button' : undefined}
+            aria-label={onClick ? `${label}: ${value}` : undefined}
             onClick={onClick}
             sx={{
                 flex: 1,

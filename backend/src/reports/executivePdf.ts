@@ -125,5 +125,5 @@ export async function renderExecutivePdf(organizationId: string, filters: Report
         drawSectionTitle(doc, 'Management recommendations');
         drawBullets(doc, data.recommendations);
     });
-    return { buffer, filenameParts: ['Supreme-Risk-Executive-Report', reportDate] };
+    return { buffer, filenameParts: ['Supreme-Governance-Executive-Report', reportDate] };
 }

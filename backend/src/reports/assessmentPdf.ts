@@ -259,5 +259,5 @@ export async function renderAssessmentPdf(organizationId: string, assessmentId: 
         }
     });
 
-    return { buffer, filenameParts: ['Supreme-Risk-Assessment', assessment.vendor.name, reportDate] };
+    return { buffer, filenameParts: ['Supreme-Governance-Assessment', assessment.vendor.name, reportDate] };
 }

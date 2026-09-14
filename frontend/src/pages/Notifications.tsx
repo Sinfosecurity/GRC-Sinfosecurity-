@@ -4,7 +4,7 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import { formatDateTime, humanizeLabel } from '../utils/humanizeLabel';
+import { formatDateTime, humanizeEventType } from '../utils/humanizeLabel';
 import { notificationAPI } from '../services/api';
 
 type Notice = {
@@ -79,7 +79,7 @@ export default function Notifications() {
                     )}
                     {shown.map((row) => (
                         <Surface key={row.id}>
-                            <Typography variant="overline">{humanizeLabel(row.eventType)}</Typography>
+                            <Typography variant="overline">{humanizeEventType(row.eventType)}</Typography>
                             <Typography variant="h6">{row.title}</Typography>
                             <Typography variant="body2" sx={{ mb: 1 }}>{row.body}</Typography>
                             <Typography variant="caption" display="block" sx={{ mb: 1.25 }}>

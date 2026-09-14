@@ -313,7 +313,7 @@ export async function renderPrivacyBoardPptx(organizationId: string) {
 
     const highRisk = activities.filter((row) => /high|critical/i.test(String(row.riskLevel || '')));
     slides.push(slide(`
-      ${header('Highest privacy risks', 'Linked Supreme Risk records only. No invented residual scores.')}
+      ${header('Highest privacy risks', 'Linked enterprise risk records only. No invented residual scores.')}
       ${kpi(10, String(totals.highRiskProcessing), 'High-risk activities', 420000)}
       ${kpi(20, String(totals.openGaps), 'Open gaps', 3120000)}
       ${kpi(30, String(pack.dashboard.totals.processorsWithIssues || 0), 'Processors with issues', 5820000)}

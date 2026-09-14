@@ -125,7 +125,7 @@ export async function renderBoardPdf(organizationId: string, filters: ReportFilt
             { label: 'Signals this period', value: data.signalCount },
             { label: 'Action required', value: data.totals.monitoringAlerts, tone: data.totals.monitoringAlerts ? 'high' : 'low' },
         ]);
-        drawCallout(doc, humanizeProviderStatus(data.providerStatus), 'Provider health is independent of signal count. Supreme Risk does not invent monitoring events.', riskTone(data.providerStatus));
+        drawCallout(doc, humanizeProviderStatus(data.providerStatus), 'Provider health is independent of signal count. Supreme does not invent monitoring events.', riskTone(data.providerStatus));
         if (data.monitoring.length) {
             drawProfessionalTable(
                 doc,
@@ -217,22 +217,23 @@ export async function renderBoardPdf(organizationId: string, filters: ReportFilt
             'Scheduled review dates will appear when vendors have a next review date.'
         );
     });
-    return { buffer, filenameParts: ['Supreme-Risk-Board-Report', reportDate] };
+    return { buffer, filenameParts: ['Supreme-Governance-Board-Report', reportDate] };
 }
 
 export async function renderBoardPptx(organizationId: string, filters: ReportFilters = {}) {
     const data = await loadPortfolioSnapshot(organizationId, filters);
+    const brand = 'Supreme Governance Platform · Confidential — Board';
     const buffer = await buildPptx([
-        { title: 'Executive Summary', bullets: [`${data.organizationName}: ${data.totals.vendors} vendors, ${data.totals.highResidual} high residual risk.`, ...data.observations] },
-        { title: 'Portfolio Risk', bullets: [`Critical vendors: ${data.totals.criticalVendors}`, `Overdue assessments: ${data.totals.overdueAssessments}`, `Critical findings: ${data.totals.criticalFindings}`, `Overdue remediation: ${data.totals.overdueRemediation}`] },
-        { title: 'Risk Heatmap', bullets: ['See the Board PDF for the 5x5 heatmap. Slide form lists residual bands only.', ...data.residualBands.map((row) => `${row.label}: ${row.value}`)] },
-        { title: 'Top Risk Vendors', bullets: data.topRiskVendors.map((vendor) => `${vendor.name}: residual ${vendor.residualRiskScore}`) },
-        { title: 'Risk Trend', bullets: data.riskTrend.slice(-8).map((row) => `${row.month}: ${row.avgResidual}`) },
-        { title: 'Critical Findings', bullets: data.criticalFindings.slice(0, 8).map((issue) => `${issue.vendor.name}: ${issue.title}`) },
-        { title: 'Overdue Remediation', bullets: data.overdueRemediation.slice(0, 8).map((issue) => `${issue.vendor.name}: ${issue.title}`) },
-        { title: 'Monitoring Changes', bullets: [humanizeProviderStatus(data.providerStatus), `Signals ${data.signalCount}`, ...data.monitoring.slice(0, 6).map((row) => `${row.vendor.name}: ${row.riskIndicator}`)] },
-        { title: 'Major Decisions', bullets: data.majorDecisions.slice(0, 8).map((brief) => `${brief.humanDecision || 'UNDECIDED'} residual ${brief.residualRisk}`) },
-        { title: 'Recommendations', bullets: data.recommendations },
+        { title: 'Executive Summary', bullets: [`${data.organizationName}: ${data.totals.vendors} vendors, ${data.totals.highResidual} high residual risk.`, ...data.observations], footnote: brand },
+        { title: 'Portfolio Risk', bullets: [`Critical vendors: ${data.totals.criticalVendors}`, `Overdue assessments: ${data.totals.overdueAssessments}`, `Critical findings: ${data.totals.criticalFindings}`, `Overdue remediation: ${data.totals.overdueRemediation}`], footnote: brand },
+        { title: 'Risk Heatmap', bullets: ['See the Board PDF for the 5x5 heatmap. Slide form lists residual bands only.', ...data.residualBands.map((row) => `${row.label}: ${row.value}`)], footnote: brand },
+        { title: 'Top Risk Vendors', bullets: data.topRiskVendors.map((vendor) => `${vendor.name}: residual ${vendor.residualRiskScore}`), footnote: brand },
+        { title: 'Risk Trend', bullets: data.riskTrend.slice(-8).map((row) => `${row.month}: ${row.avgResidual}`), footnote: brand },
+        { title: 'Critical Findings', bullets: data.criticalFindings.slice(0, 8).map((issue) => `${issue.vendor.name}: ${issue.title}`), footnote: brand },
+        { title: 'Overdue Remediation', bullets: data.overdueRemediation.slice(0, 8).map((issue) => `${issue.vendor.name}: ${issue.title}`), footnote: brand },
+        { title: 'Monitoring Changes', bullets: [humanizeProviderStatus(data.providerStatus), `Signals ${data.signalCount}`, ...data.monitoring.slice(0, 6).map((row) => `${row.vendor.name}: ${row.riskIndicator}`)], footnote: brand },
+        { title: 'Major Decisions', bullets: data.majorDecisions.slice(0, 8).map((brief) => `${humanizeEnum(brief.humanDecision || 'UNDECIDED')} residual ${brief.residualRisk}`), footnote: brand },
+        { title: 'Recommendations', bullets: data.recommendations, footnote: brand },
     ]);
-    return { buffer, filenameParts: ['Supreme-Risk-Board-Report', isoDate(data.generatedAt)] };
+    return { buffer, filenameParts: ['Supreme-Governance-Board-Report', isoDate(data.generatedAt)] };
 }

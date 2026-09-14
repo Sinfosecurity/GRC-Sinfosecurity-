@@ -278,6 +278,7 @@ export default function Layout() {
 
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+            <a className="sr-skip" href="#main">Skip to content</a>
             <Box
                 component="nav"
                 aria-label="Product navigation"
@@ -299,6 +300,8 @@ export default function Layout() {
                     variant="temporary"
                     open
                     onClose={() => setMobileOpen(false)}
+                    ModalProps={{ keepMounted: true }}
+                    PaperProps={{ 'aria-label': 'Product navigation' }}
                     sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: EXPANDED, bgcolor: color.navy950, border: 'none' } }}
                 >
                     {sidebar(false)}
@@ -351,6 +354,10 @@ export default function Layout() {
                     </Tooltip>
                     <Typography
                         component="button"
+                        type="button"
+                        aria-haspopup="menu"
+                        aria-expanded={Boolean(menuEl)}
+                        aria-label="Account menu"
                         onClick={(event) => setMenuEl(event.currentTarget)}
                         sx={{ border: 0, bgcolor: 'transparent', color: color.navInk, cursor: 'pointer', font: 'inherit', fontSize: 13 }}
                     >
@@ -365,7 +372,7 @@ export default function Layout() {
                         <MenuItem onClick={async () => { setMenuEl(null); await logout(); navigate('/login'); }}>Sign out</MenuItem>
                     </Menu>
                 </Box>
-                <Box component="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: { xs: 2, md: 3 } }}>
+                <Box component="main" id="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: { xs: 2, md: 3 } }}>
                     {serviceNotice && (
                         <Alert
                             severity="warning"

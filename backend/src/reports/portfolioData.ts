@@ -9,6 +9,24 @@ export type ReportFilters = {
     to?: Date;
 };
 
+export function residualRiskObservation(count: number): string {
+    return count
+        ? `${count} vendor${count === 1 ? '' : 's'} currently ${count === 1 ? 'sits' : 'sit'} in high or critical residual risk.`
+        : 'No vendors currently sit in high or critical residual risk.';
+}
+
+export function openFindingsObservation(count: number): string {
+    return count
+        ? `${count} critical or high finding${count === 1 ? '' : 's'} ${count === 1 ? 'remains' : 'remain'} open.`
+        : 'No critical or high findings are open.';
+}
+
+export function overdueRemediationObservation(count: number): string {
+    return count
+        ? `${count} remediation item${count === 1 ? ' is' : 's are'} past the target date.`
+        : 'No remediation items are past their target date.';
+}
+
 function dateWhere(from?: Date, to?: Date, field = 'createdAt') {
     if (!from && !to) return {};
     return {
@@ -168,15 +186,9 @@ export async function loadPortfolioSnapshot(organizationId: string, filters: Rep
         ? Math.round(controlScores.reduce((sum, value) => sum + value, 0) / controlScores.length)
         : null;
     const observations = [
-        highResidual.length
-            ? `${highResidual.length} vendor${highResidual.length === 1 ? '' : 's'} currently sit in high or critical residual risk.`
-            : 'No vendors currently sit in high or critical residual risk.',
-        criticalFindings.length
-            ? `${criticalFindings.length} critical or high finding${criticalFindings.length === 1 ? '' : 's'} remain open.`
-            : 'No critical or high findings are open.',
-        overdueRemediation.length
-            ? `${overdueRemediation.length} remediation item${overdueRemediation.length === 1 ? '' : 's'} are past the target date.`
-            : 'No remediation items are past their target date.',
+        residualRiskObservation(highResidual.length),
+        openFindingsObservation(criticalFindings.length),
+        overdueRemediationObservation(overdueRemediation.length),
     ];
     const trendDelta = dataTrendDelta(riskTrend);
     const recommendations: string[] = [];

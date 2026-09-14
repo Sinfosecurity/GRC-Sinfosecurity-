@@ -1,4 +1,4 @@
-import { AssessmentStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
+import { AssessmentStatus, DecisionBriefStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 
 export type AttentionSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM';
@@ -14,8 +14,32 @@ export type AttentionItem = {
     href: string;
 };
 
+function customerScanLabel(status?: string | null): string {
+    switch (String(status || '').toUpperCase()) {
+        case 'CLEAN':
+            return 'Ready';
+        case 'PENDING':
+        case 'PENDING_SCAN':
+            return 'Security check in progress';
+        case 'QUARANTINED':
+        case 'INFECTED':
+            return 'Blocked';
+        case 'FAILED':
+        case 'ERROR':
+            return 'Scan failed';
+        default:
+            return status || 'Not recorded';
+    }
+}
+
+export type AttentionWorkCounts = {
+    dueAssessments: number;
+    overdueFindings: number;
+    pendingDecisions: number;
+};
+
 export const attentionService = {
-    async whatNeedsAttentionToday(organizationId: string): Promise<{ generatedAt: string; items: AttentionItem[] }> {
+    async whatNeedsAttentionToday(organizationId: string): Promise<{ generatedAt: string; items: AttentionItem[]; work: AttentionWorkCounts }> {
         const now = new Date();
         const in45Days = new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000);
         const items: AttentionItem[] = [];
@@ -145,7 +169,7 @@ export const attentionService = {
                 severity: 'HIGH',
                 action: 'REQUEST UPDATED EVIDENCE',
                 title: `${doc.title} expires soon`,
-                detail: `${doc.vendor.name}: valid until ${doc.validUntil?.toISOString().slice(0, 10)}. Scan ${doc.scanStatus}.`,
+                detail: `${doc.vendor.name}: valid until ${doc.validUntil?.toISOString().slice(0, 10)}. ${customerScanLabel(doc.scanStatus)}.`,
                 vendorId: doc.vendorId,
                 vendorName: doc.vendor.name,
                 href: '/documents',
@@ -170,8 +194,37 @@ export const attentionService = {
             });
         }
 
+        const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const [dueAssessments, overdueFindings, pendingDecisions] = await Promise.all([
+            prisma.vendorAssessment.count({
+                where: {
+                    organizationId,
+                    status: { not: AssessmentStatus.COMPLETED },
+                    OR: [{ dueDate: null }, { dueDate: { lte: in7Days } }],
+                },
+            }),
+            prisma.vendorIssue.count({
+                where: {
+                    organizationId,
+                    status: { notIn: [VendorIssueStatus.CLOSED, VendorIssueStatus.RISK_ACCEPTED, VendorIssueStatus.RESOLVED] },
+                    targetRemediationDate: { lt: now },
+                },
+            }),
+            prisma.riskDecisionBrief.count({
+                where: {
+                    organizationId,
+                    humanDecision: null,
+                    status: { not: DecisionBriefStatus.DECIDED },
+                },
+            }),
+        ]);
+
         const rank: Record<AttentionSeverity, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2 };
         items.sort((a, b) => rank[a.severity] - rank[b.severity]);
-        return { generatedAt: now.toISOString(), items };
+        return {
+            generatedAt: now.toISOString(),
+            items,
+            work: { dueAssessments, overdueFindings, pendingDecisions },
+        };
     },
 };

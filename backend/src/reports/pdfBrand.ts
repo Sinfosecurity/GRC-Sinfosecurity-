@@ -14,7 +14,7 @@ const MUTED = '#475569';
 
 export function collectPdf(draw: (doc: PDFKit.PDFDocument) => void): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-        const doc = new PDFDocument({ size: 'LETTER', margin: 48, bufferPages: true, info: { Author: 'Supreme Risk', Creator: 'Supreme Risk' } });
+        const doc = new PDFDocument({ size: 'LETTER', margin: 48, bufferPages: true, info: { Author: 'Supreme Governance Platform', Creator: 'Supreme Governance Platform' } });
         const chunks: Buffer[] = [];
         doc.on('data', (chunk) => chunks.push(chunk as Buffer));
         doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -29,7 +29,7 @@ export function drawBrandHeader(
     input: { organizationName: string; title: string; subtitle?: string; reportDate: string }
 ) {
     doc.rect(0, 0, doc.page.width, 72).fill(NAVY);
-    doc.fillColor('#f8fafc').font('Helvetica-Bold').fontSize(11).text('SUPREME RISK', 48, 18, { continued: true });
+    doc.fillColor('#f8fafc').font('Helvetica-Bold').fontSize(11).text('SUPREME GOVERNANCE PLATFORM', 48, 18, { continued: true });
     doc.font('Helvetica').fontSize(9).fillColor('#fbbf24').text('  ·  CONFIDENTIAL', { continued: false });
     doc.fillColor('#e2e8f0').fontSize(9).text(input.organizationName, 48, 36);
     doc.fillColor('#94a3b8').fontSize(8).text(input.reportDate, 400, 36, { width: 164, align: 'right' });
@@ -49,7 +49,7 @@ export function drawFooter(doc: PDFKit.PDFDocument, note: string) {
     for (let i = 0; i < range.count; i += 1) {
         doc.switchToPage(range.start + i);
         doc.fontSize(8).fillColor(MUTED).text(
-            `Supreme Risk  ·  ${note}  ·  Page ${i + 1} of ${range.count}`,
+            `Supreme Governance Platform  ·  ${note}  ·  Page ${i + 1} of ${range.count}`,
             48,
             doc.page.height - 36,
             { width: doc.page.width - 96, align: 'center' }

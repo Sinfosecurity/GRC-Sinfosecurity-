@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { humanizeLabel } from '../humanizeLabel';
+import { humanizeEventType, humanizeLabel } from '../humanizeLabel';
 
 describe('customer-facing AI labels', () => {
     it('humanizes canonical enums and keeps public IDs', () => {
@@ -13,10 +13,19 @@ describe('customer-facing AI labels', () => {
         expect(humanizeLabel('SATISFIED_BY')).toBe('Mapped to Control');
         expect(humanizeLabel('SUPPORTED_BY')).toBe('Supported by Evidence');
         expect(humanizeLabel('CLEAN')).toBe('Ready');
+        expect(humanizeLabel('PENDING_SCAN')).toBe('Security check in progress');
+        expect(humanizeLabel('QUARANTINED')).toBe('Blocked');
         expect(humanizeLabel('INFECTED')).toBe('Blocked');
         expect(humanizeLabel('FAILED')).toBe('Scan failed');
         expect(humanizeLabel('INITIAL_DUE_DILIGENCE')).toBe('Initial Due Diligence');
         expect(humanizeLabel('AI-00001')).toBe('AI-00001');
         expect(humanizeLabel('Unknown / Not recorded')).toBe('Unknown / Not recorded');
+    });
+
+    it('turns dotted event codes into customer language', () => {
+        expect(humanizeEventType('assessment.assigned')).toBe('Assessment Assigned');
+        expect(humanizeEventType('vendor.review.started')).toBe('Vendor Review Started');
+        expect(humanizeEventType('finding.confirmed')).toBe('Finding Confirmed');
+        expect(humanizeLabel('assessment.assigned')).toBe('Assessment Assigned');
     });
 });

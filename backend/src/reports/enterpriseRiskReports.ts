@@ -86,7 +86,7 @@ export async function renderEnterpriseRiskPdf(organizationId: string, kind: stri
                 }))
             ),
             kind === 'treatment' ? 'No open treatments' : 'No enterprise risks recorded',
-            kind === 'treatment' ? 'Treatment plans appear after they are recorded. A plan does not lower residual risk.' : 'Add risks in Supreme Risk to populate this report.'
+            kind === 'treatment' ? 'Treatment plans appear after they are recorded. A plan does not lower residual risk.' : 'Add risks in Supreme Governance Platform to populate this report.'
         );
         if (kind === 'appetite' || kind === 'board') {
             drawSectionTitle(doc, 'Outside appetite');
@@ -153,7 +153,7 @@ export async function renderEnterpriseRiskBoardPptx(organizationId: string) {
         { title: 'Management decisions', bullets: emptyOr(pack.decisions.map((row) => `${row.risk.publicId} · ${humanizeEnum(row.decision)} · ${humanizeEnum(row.status)}`), 'No recorded acceptances or decisions.') },
         { title: 'Key attention items', bullets: emptyOr(dashboard.attention.map((row) => `${row.publicId} · ${row.title} · ${(row.reasons || []).join(', ')}`), 'Nothing is overdue, unowned, or outside appetite.') },
     ]);
-    return { buffer, filenameParts: ['Supreme-Risk-Board-Summary', isoDate(new Date())] };
+    return { buffer, filenameParts: ['Supreme-Governance-Board-Summary', isoDate(new Date())] };
 }
 
 export async function renderEnterpriseRiskRegister(organizationId: string, format: 'csv' | 'xlsx') {
@@ -165,10 +165,10 @@ export async function renderEnterpriseRiskRegister(organizationId: string, forma
             header.join(','),
             ...rows.map((row) => header.map((key) => csvEscape(String((row as Record<string, unknown>)[key] ?? ''))).join(',')),
         ].join('\n');
-        return { buffer: Buffer.from(body, 'utf8'), filenameParts: ['Supreme-Risk-Register', isoDate(generatedAt)] };
+        return { buffer: Buffer.from(body, 'utf8'), filenameParts: ['Supreme-Governance-Register', isoDate(generatedAt)] };
     }
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Supreme Risk';
+    workbook.creator = 'Supreme Governance Platform';
     const sheet = workbook.addWorksheet('Risk register');
     sheet.columns = [
         { header: 'Risk ID', key: 'publicId', width: 14 },
@@ -189,5 +189,5 @@ export async function renderEnterpriseRiskRegister(organizationId: string, forma
         owner: neutralizeSpreadsheetCell(row.owner),
     }));
     const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
-    return { buffer, filenameParts: ['Supreme-Risk-Register', isoDate(generatedAt)] };
+    return { buffer, filenameParts: ['Supreme-Governance-Register', isoDate(generatedAt)] };
 }

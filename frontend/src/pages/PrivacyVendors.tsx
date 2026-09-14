@@ -26,7 +26,7 @@ export default function PrivacyVendors() {
             <QueryState loading={loading} error={error} empty={false} emptyTitle="" emptyBody="">
                 <Stack spacing={2.5}>
                     <Surface>
-                        <Alert severity="info">This is not a second vendor database. Open a vendor to see processing, transfers, controls, and CLEAN evidence.</Alert>
+                        <Alert severity="info">This is not a second vendor database. Open a vendor to see processing, transfers, controls, and ready evidence.</Alert>
                     </Surface>
                     <Surface>
                         <AppTable
@@ -40,7 +40,7 @@ export default function PrivacyVendors() {
                                 { id: 'roles', label: 'Privacy roles', render: (row) => (row.roles || []).join(', ') || 'Not linked' },
                                 { id: 'activities', label: 'Activities', render: (row) => (row.activities || []).join(', ') || 'None' },
                                 { id: 'risk', label: 'Third Party residual', render: (row) => String(row.residualRisk ?? 'Not scored') },
-                                { id: 'open', label: '', render: (row) => <Button onClick={(event) => { event.stopPropagation(); navigate(`/privacy-ops/vendors/${row.vendorId}`); }}>Open privacy</Button> },
+                                { id: 'open', label: 'Open', render: (row) => <Button onClick={(event) => { event.stopPropagation(); navigate(`/privacy-ops/vendors/${row.vendorId}`); }}>Open privacy</Button> },
                             ]}
                         />
                     </Surface>

@@ -9,7 +9,7 @@ export function downloadFilename(parts: Array<string | null | undefined>, extens
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '')
         .slice(0, 120);
-    return `${body || 'Supreme-Risk-Report'}.${extension}`;
+    return `${body || 'Supreme-Governance-Report'}.${extension}`;
 }
 
 export function sendBinaryFile(

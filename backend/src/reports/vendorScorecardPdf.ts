@@ -180,5 +180,5 @@ export async function renderVendorScorecardPdf(organizationId: string, vendorId:
         ]);
     });
 
-    return { buffer, filenameParts: ['Supreme-Risk-Vendor-Scorecard', vendor.name, reportDate] };
+    return { buffer, filenameParts: ['Supreme-Governance-Vendor-Scorecard', vendor.name, reportDate] };
 }

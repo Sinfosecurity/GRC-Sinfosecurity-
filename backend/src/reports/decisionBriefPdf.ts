@@ -157,5 +157,5 @@ export async function renderDecisionBriefPdf(organizationId: string, briefId: st
         }
     });
 
-    return { buffer, filenameParts: ['Supreme-Risk-Decision-Brief', vendorName, reportDate] };
+    return { buffer, filenameParts: ['Supreme-Governance-Decision-Brief', vendorName, reportDate] };
 }

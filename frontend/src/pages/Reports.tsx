@@ -184,7 +184,7 @@ export default function Reports() {
             else if (item.id === 'cmp-board') response = fmt === 'pptx' ? await complianceAPI.downloadBoardPptx() : await complianceAPI.downloadReport('board');
             else if (item.id === 'cmp-register') response = await complianceAPI.exportRegister(fmt as 'csv' | 'xlsx');
             else response = await tprmAPI.downloadBoard(fmt as 'pdf' | 'pptx');
-            const filename = await downloadBinaryResponse(response, `Supreme-Risk-${item.id}.${fmt}`);
+            const filename = await downloadBinaryResponse(response, `Supreme-Governance-${item.id}.${fmt}`);
             setSuccess(`Downloaded ${filename}`);
         } catch (err) {
             setError(downloadErrorMessage(err));

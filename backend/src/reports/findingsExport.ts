@@ -35,13 +35,13 @@ export async function renderFindingsCsv(organizationId: string, filters: ReportF
         header.join(','),
         ...rows(data).map((row) => header.map((key) => csvEscape(row[key as keyof typeof row])).join(',')),
     ].join('\n');
-    return { buffer: Buffer.from(body, 'utf8'), filenameParts: ['Supreme-Risk-Findings', isoDate(data.generatedAt)] };
+    return { buffer: Buffer.from(body, 'utf8'), filenameParts: ['Supreme-Governance-Findings', isoDate(data.generatedAt)] };
 }
 
 export async function renderFindingsXlsx(organizationId: string, filters: ReportFilters = {}) {
     const data = await loadPortfolioSnapshot(organizationId, filters);
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Supreme Risk';
+    workbook.creator = 'Supreme Governance Platform';
     const sheet = workbook.addWorksheet('Findings');
     sheet.columns = [
         { header: 'Vendor', key: 'vendor', width: 28 },
@@ -68,7 +68,7 @@ export async function renderFindingsXlsx(organizationId: string, filters: Report
         description: neutralizeSpreadsheetValue(row.description),
     }));
     const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
-    return { buffer, filenameParts: ['Supreme-Risk-Findings', isoDate(data.generatedAt)] };
+    return { buffer, filenameParts: ['Supreme-Governance-Findings', isoDate(data.generatedAt)] };
 }
 
 export async function renderFindingsPdf(organizationId: string, filters: ReportFilters = {}) {
@@ -144,5 +144,5 @@ export async function renderFindingsPdf(organizationId: string, filters: ReportF
             });
         }
     });
-    return { buffer, filenameParts: ['Supreme-Risk-Findings', isoDate(data.generatedAt)] };
+    return { buffer, filenameParts: ['Supreme-Governance-Findings', isoDate(data.generatedAt)] };
 }

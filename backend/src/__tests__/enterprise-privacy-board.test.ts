@@ -65,7 +65,7 @@ describe('supreme privacy board pptx', () => {
 
     it('keeps a decision item together instead of leaving a one-word widow on the prior slide', () => {
         const first = 'XFR-00001  Transfer requiring review — XFR-00001 US-NY → IE is recorded as review required. This is not a lawfulness finding.';
-        const second = 'GAP-00002  Open privacy-related gap — GAP-00002 500.07 has no current CLEAN evidence. A gap is remaining work, not a legal conclusion.';
+        const second = 'GAP-00002  Open privacy-related gap — GAP-00002 500.07 has no current ready evidence. A gap is remaining work, not a legal conclusion.';
         const filler = Array.from({ length: 6 }, (_, index) => (
             `${index + 1}. Review XFR-0000${index} — Transfer requiring review. US-NY → IE is recorded as review required. This is not a lawfulness finding.`
         ));
