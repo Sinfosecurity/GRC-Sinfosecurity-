@@ -46,3 +46,14 @@ jest.mock('../config/logger', () => ({
 afterEach(() => {
   jest.clearAllMocks();
 });
+
+afterAll(async () => {
+  try {
+    const db = require('../config/database') as { prisma?: { $disconnect?: () => Promise<void> } };
+    if (typeof db.prisma?.$disconnect === 'function') {
+      await db.prisma.$disconnect();
+    }
+  } catch {
+    // Mocked database modules do not expose a real engine.
+  }
+});

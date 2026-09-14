@@ -79,6 +79,10 @@ describe('Supreme Third Party onboarding Phase B', () => {
         vendorId = ready.vendorId;
     });
 
+    afterAll(async () => {
+        await prisma.$disconnect();
+    });
+
     it('sends due diligence with a hashed invitation and does not add a tenant user', async () => {
         const sent = await request(app).post(`${API}/vendors/onboarding/${publicId}/send`).set('Authorization', `Bearer ${tokenA}`).send({
             name: 'Casey Contact',

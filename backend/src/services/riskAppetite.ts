@@ -6,10 +6,8 @@
  * ISO 27001 Clause 6.1.2: Risk assessment process includes risk acceptance criteria
  */
 
-import { PrismaClient } from '@prisma/client';
 import logger from '../config/logger';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/database';
 
 interface CreateRiskAppetiteInput {
     organizationId: string;

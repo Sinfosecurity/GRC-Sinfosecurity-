@@ -18,8 +18,8 @@ jobs:
       JWT_SECRET: test-jwt-secret-key-which-is-long-enough
       JWT_REFRESH_SECRET: test-refresh-secret-key-which-is-long-enough
       JWT_EXPIRES_IN: 1h
-      DATABASE_URL: postgresql://supreme_test:supreme_test@localhost:5432/supreme_risk_test
-      TEST_DATABASE_URL: postgresql://supreme_test:supreme_test@localhost:5432/supreme_risk_test
+      DATABASE_URL: postgresql://supreme_test:supreme_test@localhost:5432/supreme_risk_test?connection_limit=5&pool_timeout=20
+      TEST_DATABASE_URL: postgresql://supreme_test:supreme_test@localhost:5432/supreme_risk_test?connection_limit=5&pool_timeout=20
       ALLOW_PENDING_DOWNLOADS: "false"
       ALLOW_UNSCANNED_DOWNLOADS: "false"
       ALLOW_LOCAL_OBJECT_STORAGE: "true"
