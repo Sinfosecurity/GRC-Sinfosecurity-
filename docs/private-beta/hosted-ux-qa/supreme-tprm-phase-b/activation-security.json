@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "name": "hosted-api-sha",
+      "result": "PASS",
+      "detail": "faefbf38a5dcfa16b8986f0f777a55806ea8d7f6"
+    },
+    {
+      "name": "send-a",
+      "result": "PASS",
+      "detail": "201 {'status': 'Pending', 'emailStatus': 'Queued', 'sentAt': '2026-09-14T03:47:38.787Z', 'expiresAt': '2026-09-28T03:47:38.419Z'}"
+    },
+    {
+      "name": "email-provider",
+      "result": "PASS",
+      "detail": "Queued"
+    },
+    {
+      "name": "resend-issues-new-link",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "revoked-or-replaced-token",
+      "result": "PASS",
+      "detail": "410 token=False"
+    },
+    {
+      "name": "resend-invalidates-old-token",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "first-activation",
+      "result": "PASS",
+      "detail": "200 sessionId=898ac79c-4767-4867-a700-f92f4a3e8825"
+    },
+    {
+      "name": "token-reuse",
+      "result": "PASS",
+      "detail": "410 token=False"
+    },
+    {
+      "name": "second-session-issued",
+      "result": "PASS",
+      "detail": "second=False replay=False"
+    },
+    {
+      "name": "vendor-plane-boundary",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "cross-tenant",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "send-b",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "activate-b",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "vendor-workspace-a",
+      "result": "PASS",
+      "detail": "200 6"
+    },
+    {
+      "name": "vendor-workspace-b",
+      "result": "PASS",
+      "detail": "200 6"
+    },
+    {
+      "name": "cross-vendor",
+      "result": "PASS",
+      "detail": "[(404, '{\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Assessment not found.\", \"statusCode\": 404, \"timestamp\": \"2026-09-14T03:47:48.033Z\", \"requestId\": \"27bd4f2d-011f-4474-b568-d68546e1fea4\"}}'), (404, '{\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Assessment not found.\", \"statusCode\": 404, \"timestamp\": \"2026-09-14T03:47:48.221Z\", \"requestId\": \"48e1ed9d-22a6-4051-8c6a-88a8265b161d\"}}')] isolated_workspaces=True"
+    },
+    {
+      "name": "expired-token-hosted",
+      "result": "FAIL",
+      "detail": "Cannot backdate expiresAt on hosted staging without a clock hook. Not claimed."
+    }
+  ],
+  "sha": {
+    "api": "faefbf38a5dcfa16b8986f0f777a55806ea8d7f6",
+    "frontend": "2ebb32564a8bd861ee1b8f3e17e65f05227e587f",
+    "environment": "staging",
+    "health": "degraded"
+  },
+  "workflow": {
+    "publicIdA": "VND-2026-0007",
+    "vendorIdA": "a17ec61f-5bde-4e1a-906c-b908081300ca",
+    "publicIdB": "VND-2026-0008",
+    "invitationA": {
+      "status": "Pending",
+      "emailStatus": "Queued",
+      "sentAt": "2026-09-14T03:47:38.787Z",
+      "expiresAt": "2026-09-28T03:47:38.419Z"
+    },
+    "emailStatus": "Queued",
+    "firstActivation": 200,
+    "reuse": 410,
+    "firstSessionId": "898ac79c-4767-4867-a700-f92f4a3e8825",
+    "reuseTokenPresent": false,
+    "revokedStatus": 410,
+    "expiredHosted": "NOT PROVED \u2014 staging has no clock/backdate hook; expiresAt remains 14 days"
+  },
+  "discrepancies": [
+    "Hosted frontend SHA 2ebb32564a8bd861ee1b8f3e17e65f05227e587f differs from hosted API SHA faefbf38a5dcfa16b8986f0f777a55806ea8d7f6. Not silently reconciled."
+  ]
+}

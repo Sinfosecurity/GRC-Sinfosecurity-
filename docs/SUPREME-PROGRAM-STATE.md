@@ -54,11 +54,13 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#12 PHASE B AUTHORIZED:** YES — Product Leadership 2026-09-13, Phase B only
 
-**#12 PHASE B HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34800714986 PASS on `a5dc8e2`
+**#12 PHASE B HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34801731893 PASS on `faefbf3`
 
 **#12 PHASE B HOSTED FRONTEND SHA:** `2ebb32564a8bd861ee1b8f3e17e65f05227e587f`
 
-**#12 PHASE B HOSTED API SHA:** `a5dc8e22c59c6eb99f8f47155ee28c78b4033112`
+**#12 PHASE B HOSTED API SHA:** `faefbf38a5dcfa16b8986f0f777a55806ea8d7f6`
+
+**#12 PHASE B TOKEN CLOSURE:** hosted first activation 200 / reuse 410 on `faefbf3`. Expired token not hosted-proved (no clock hook). Product Leadership review still required. Not PASS.
 
 **#12 PHASE B PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS.
 

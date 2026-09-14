@@ -6,8 +6,10 @@
 **Starting SHA:** `e889bd5167bc1598854a65cfc935026615b1cef4`  
 **Implementation SHA:** recorded on the documentation commit that includes this folder  
 **Hosted frontend SHA at walkthrough:** `2ebb32564a8bd861ee1b8f3e17e65f05227e587f`  
-**Hosted API SHA at walkthrough:** `a5dc8e22c59c6eb99f8f47155ee28c78b4033112`  
-**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34800714986 PASS on `a5dc8e2`  
+**Hosted API SHA at first walkthrough:** `a5dc8e22c59c6eb99f8f47155ee28c78b4033112`  
+**Hosted API SHA after single-use token closure:** `faefbf38a5dcfa16b8986f0f777a55806ea8d7f6`  
+**CI (token-fix SHA):** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34801731893 PASS on `faefbf3`  
+**Security closure:** `SECURITY-CLOSURE.md` / `activation-security.json` — vendors `VND-2026-0007` / `VND-2026-0008`  
 **Backend tests:** 369  
 **Frontend tests:** 163  
 **Tenant:** Elite Claims (`report-proof-20260913@staging.supremerisk.test`)  
