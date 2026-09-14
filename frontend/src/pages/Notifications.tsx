@@ -43,6 +43,9 @@ export default function Notifications() {
 
     useEffect(load, []);
 
+    const unread = items.filter((row) => !row.readAt);
+    const shown = [...unread, ...items.filter((row) => row.readAt)].slice(0, 25);
+
     const open = async (row: Notice) => {
         if (!row.readAt) {
             try {
@@ -63,13 +66,18 @@ export default function Notifications() {
             <QueryState
                 loading={loading}
                 error={error}
-                empty={items.length === 0}
+                empty={shown.length === 0}
                 emptyTitle="Nothing needs attention from notifications"
                 emptyBody="Supreme will list invitations, assessments, findings, and decisions here when they require a person."
                 emptyAction={<Button variant="outlined" onClick={() => navigate('/dashboard')}>Open Home</Button>}
             >
                 <Stack spacing={1.25}>
-                    {items.map((row) => (
+                    {items.length > shown.length && (
+                        <Typography variant="body2">
+                            Showing {shown.length} of {items.length}. Unread first. Older read notices remain in the record and are not deleted.
+                        </Typography>
+                    )}
+                    {shown.map((row) => (
                         <Surface key={row.id}>
                             <Typography variant="overline">{humanizeLabel(row.eventType)}</Typography>
                             <Typography variant="h6">{row.title}</Typography>

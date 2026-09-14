@@ -32,7 +32,7 @@ export default function PageHeader({ eyebrow, title, description, crumbs, action
                     )}
                 </Breadcrumbs>
             )}
-            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ md: 'flex-start' }}>
+            <Stack direction={{ xs: 'column', lg: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ lg: 'flex-start' }}>
                 <Box sx={{ minWidth: 0, maxWidth: 760 }}>
                     {eyebrow && <Typography variant="overline">{eyebrow}</Typography>}
                     <Typography variant="h1" component="h1">{title}</Typography>
@@ -44,9 +44,11 @@ export default function PageHeader({ eyebrow, title, description, crumbs, action
                     {meta && <Box sx={{ mt: 1.25 }}>{meta}</Box>}
                 </Box>
                 {actions && (
-                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ flexShrink: 0 }}>
-                        {actions}
-                    </Stack>
+                    <Box sx={{ minWidth: 0, maxWidth: '100%', flex: { lg: '0 1 520px' } }}>
+                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ justifyContent: { xs: 'flex-start', lg: 'flex-end' } }}>
+                            {actions}
+                        </Stack>
+                    </Box>
                 )}
             </Stack>
         </Box>
