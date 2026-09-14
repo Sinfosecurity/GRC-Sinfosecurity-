@@ -35,6 +35,9 @@ export default function AiDashboard() {
                         <Button onClick={() => navigate('/ai-governance/testing')}>Testing</Button>
                         <Button onClick={() => navigate('/ai-governance/approvals')}>Approvals</Button>
                         <Button onClick={() => navigate('/ai-governance/incidents')}>Incidents</Button>
+                        <Button onClick={() => navigate('/ai-governance/controls')}>AI controls</Button>
+                        <Button onClick={() => navigate('/ai-governance/readiness/nist-ai-rmf')}>NIST AI RMF</Button>
+                        <Button onClick={() => navigate('/ai-governance/readiness/iso-42001')}>ISO 42001</Button>
                         <Button onClick={() => navigate('/ai-governance/import')}>Import</Button>
                         <Button onClick={() => aiGovernanceAPI.downloadReport('executive').then((res) => downloadBinaryResponse(res, 'Supreme-AI-executive.pdf'))}>Executive PDF</Button>
                         <Button onClick={() => aiGovernanceAPI.downloadBoardPptx().then((res) => downloadBinaryResponse(res, 'Supreme-AI-Board.pptx'))}>Board PPTX</Button>

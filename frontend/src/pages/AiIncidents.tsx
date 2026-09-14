@@ -5,6 +5,7 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
 import { aiGovernanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function AiIncidents() {
     const [rows, setRows] = useState<any[]>([]);
@@ -38,7 +39,7 @@ export default function AiIncidents() {
                             { id: 'id', label: 'Incident', render: (row) => row.publicId },
                             { id: 'system', label: 'System', render: (row) => row.system?.publicId },
                             { id: 'title', label: 'Title', render: (row) => row.title },
-                            { id: 'status', label: 'Status', render: (row) => row.status },
+                            { id: 'status', label: 'Status', render: (row) => humanizeLabel(row.status) },
                         ]} />
                     </Surface>
                 </Stack>

@@ -97,6 +97,9 @@ const AiRegister = lazy(() => import('./pages/AiRegister'));
 const AiSystemDetail = lazy(() => import('./pages/AiSystemDetail'));
 const AiUseCaseDetail = lazy(() => import('./pages/AiUseCaseDetail'));
 const AiProviders = lazy(() => import('./pages/AiProviders'));
+const AiProviderDetail = lazy(() => import('./pages/AiProviderDetail'));
+const AiControls = lazy(() => import('./pages/AiControls'));
+const AiReadiness = lazy(() => import('./pages/AiReadiness'));
 const AiAssessments = lazy(() => import('./pages/AiAssessments'));
 const AiTesting = lazy(() => import('./pages/AiTesting'));
 const AiApprovals = lazy(() => import('./pages/AiApprovals'));
@@ -192,6 +195,9 @@ export default function App() {
                     <Route path="ai-governance/systems/:publicId" element={<AiSystemDetail />} />
                     <Route path="ai-governance/use-cases/:publicId" element={<AiUseCaseDetail />} />
                     <Route path="ai-governance/providers" element={<AiProviders />} />
+                    <Route path="ai-governance/providers/:publicId" element={<AiProviderDetail />} />
+                    <Route path="ai-governance/controls" element={<AiControls />} />
+                    <Route path="ai-governance/readiness/:frameworkKey" element={<AiReadiness />} />
                     <Route path="ai-governance/assessments" element={<AiAssessments />} />
                     <Route path="ai-governance/testing" element={<AiTesting />} />
                     <Route path="ai-governance/approvals" element={<AiApprovals />} />

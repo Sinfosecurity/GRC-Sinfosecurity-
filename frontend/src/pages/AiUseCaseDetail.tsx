@@ -5,6 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import { aiGovernanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function AiUseCaseDetail() {
     const { publicId = '' } = useParams();
@@ -34,8 +35,8 @@ export default function AiUseCaseDetail() {
                             <Typography>Decision influence: {data.decisionInfluence || 'Not recorded'}</Typography>
                             <Typography>Affected persons: {data.affectedPersons || 'Not recorded'}</Typography>
                             <Typography>Data: {data.dataSummary || 'Not recorded'}</Typography>
-                            <Typography>Autonomy: {data.autonomy}</Typography>
-                            <Typography>Organization class: {data.organizationClass}</Typography>
+                            <Typography>Autonomy: {humanizeLabel(data.autonomy)}</Typography>
+                            <Typography>Organization class: {humanizeLabel(data.organizationClass)}</Typography>
                             <Typography>Human oversight: {data.humanOversight || 'Not recorded'}</Typography>
                         </Surface>
                     </Stack>

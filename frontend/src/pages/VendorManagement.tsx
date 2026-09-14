@@ -27,7 +27,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import MetricCard from '../components/design/MetricCard';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
-import { tprmAPI, vendorAPI } from '../services/api';
+import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 
 interface Vendor {
@@ -119,6 +119,7 @@ export default function VendorManagement() {
         } | null;
     } | null>(null);
     const [riskExplanationError, setRiskExplanationError] = useState<string | null>(null);
+    const [aiLinks, setAiLinks] = useState<any>(null);
     const [saving, setSaving] = useState(false);
     const [newVendor, setNewVendor] = useState({
         name: '',
@@ -241,9 +242,13 @@ export default function VendorManagement() {
         setDetailTab(0);
         setRiskExplanation(null);
         setRiskExplanationError(null);
+        setAiLinks(null);
         tprmAPI.riskExplanation(String(vendor.id))
             .then((response) => setRiskExplanation(response.data.data))
             .catch((err: any) => setRiskExplanationError(err.message || 'Unable to load risk explanation'));
+        aiGovernanceAPI.vendorLinks(String(vendor.id))
+            .then((response) => setAiLinks(response.data.data))
+            .catch(() => setAiLinks({ systems: [], providers: [] }));
     };
 
     const handleStartAssessment = (vendor?: Vendor | null) => {
@@ -424,10 +429,18 @@ export default function VendorManagement() {
                                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                                     <Button variant="contained" onClick={() => handleStartAssessment()}>Start assessment</Button>
                                     <Button onClick={() => navigate(`/privacy-ops/vendors/${selectedVendor.id}`)}>Open privacy</Button>
+                                    <Button onClick={() => navigate((aiLinks?.systems || [])[0] ? `/ai-governance/systems/${aiLinks.systems[0].publicId}` : '/ai-governance')}>Open AI governance</Button>
                                     <Button onClick={() => navigate(`/documents?vendorId=${selectedVendor.id}`)}>Request evidence</Button>
                                     <Button onClick={() => navigate(`/findings?vendorId=${selectedVendor.id}`)}>Create finding</Button>
                                     <Button onClick={() => navigate(`/decision-briefs?vendorId=${selectedVendor.id}`)}>Make decision</Button>
                                 </Stack>
+                                {(aiLinks?.systems || []).length > 0 && (
+                                    <Surface>
+                                        <Typography variant="h6" sx={{ mb: 1 }}>AI governance</Typography>
+                                        <Typography>{aiLinks.systems.map((row: any) => `${row.publicId} ${row.name}`).join(', ')}</Typography>
+                                        <Button sx={{ mt: 1 }} onClick={() => navigate(`/ai-governance/systems/${aiLinks.systems[0].publicId}`)}>Open linked AI system</Button>
+                                    </Surface>
+                                )}
                                 <EntityRelationships sourceModel="Vendor" sourceId={String(selectedVendor.id)} />
                             </Stack>
                         )}

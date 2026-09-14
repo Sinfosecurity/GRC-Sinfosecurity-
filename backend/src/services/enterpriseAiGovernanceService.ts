@@ -26,10 +26,16 @@ import {
     neutralizeSpreadsheetCell,
     screeningRecommendation,
 } from './enterpriseAiGovernanceEngine';
+import {
+    controlEvidenceWorkspace,
+    frameworkReadiness,
+    vendorSnapshot,
+    versionWindow,
+} from './enterpriseAiGovernanceHydration';
 
 const SYSTEM_INCLUDE = {
     useCases: true,
-    models: { include: { provider: true } },
+    models: { include: { provider: true }, orderBy: { effectiveFrom: 'desc' as const } },
     oversight: true,
     risks: true,
     scores: { orderBy: { createdAt: 'desc' as const }, take: 5 },
@@ -298,6 +304,75 @@ function publicSystem(row: Awaited<ReturnType<typeof systemOrThrow>>) {
     };
 }
 
+async function hydrateSystem(row: Awaited<ReturnType<typeof systemOrThrow>>) {
+    const vendorIds = [...new Set([row.vendorId, ...row.models.map((model) => model.provider.vendorId)].filter(Boolean))] as string[];
+    const vendors = (await Promise.all(vendorIds.map((id) => vendorSnapshot(row.organizationId, id)))).filter(Boolean);
+    const controls = await controlEvidenceWorkspace(row.organizationId, row.controlLinks.map((link) => link.controlId));
+    const [nist, iso] = await Promise.all([
+        frameworkReadiness(row.organizationId, 'NIST_AI_RMF').catch(() => null),
+        frameworkReadiness(row.organizationId, 'ISO_42001').catch(() => null),
+    ]);
+    const currentModel = row.models.find((model) => !model.effectiveTo) || row.models[0] || null;
+    const priorModel = row.models.find((model) => model.id !== currentModel?.id) || null;
+    const modelVersions = row.models.map((model) => ({
+        id: model.id,
+        providerPublicId: model.provider.publicId,
+        providerName: model.provider.providerName,
+        modelFamily: model.provider.modelFamily || 'Not recorded',
+        modelVersion: model.modelVersion || model.provider.modelVersion || 'Not recorded',
+        priorVersion: model.priorVersion || 'Not recorded',
+        changeReason: model.changeReason || 'Not recorded',
+        effectiveFrom: model.effectiveFrom,
+        effectiveTo: model.effectiveTo,
+        status: model.effectiveTo ? 'SUPERSEDED' : (model.status || 'CURRENT'),
+        tests: versionWindow(row.tests, model.effectiveFrom, model.effectiveTo).map((item) => ({ publicId: item.publicId, kind: item.kind, result: item.result })),
+        approvals: versionWindow(row.approvals, model.effectiveFrom, model.effectiveTo).map((item) => ({ publicId: item.publicId, decision: item.decision })),
+        risks: versionWindow(row.risks, model.effectiveFrom, model.effectiveTo).map((item) => ({ publicId: item.publicId, category: item.category })),
+        evidence: controls.flatMap((control) => control.cleanEvidence),
+    }));
+    const latestChange = row.changes[0] || null;
+    return {
+        ...publicSystem(row),
+        vendors,
+        relatedVendor: vendors[0] || null,
+        controlWorkspace: controls,
+        compliance: {
+            honesty: 'Readiness only. Not certified or legally determined.',
+            nistAiRmf: nist,
+            iso42001: iso,
+        },
+        currentModel: currentModel
+            ? {
+                providerPublicId: currentModel.provider.publicId,
+                providerName: currentModel.provider.providerName,
+                modelVersion: currentModel.modelVersion || currentModel.provider.modelVersion || 'Not recorded',
+                effectiveFrom: currentModel.effectiveFrom,
+                vendorId: currentModel.provider.vendorId,
+            }
+            : null,
+        priorModel: priorModel
+            ? {
+                providerPublicId: priorModel.provider.publicId,
+                modelVersion: priorModel.modelVersion || priorModel.provider.modelVersion || 'Not recorded',
+                effectiveTo: priorModel.effectiveTo,
+            }
+            : null,
+        modelVersions,
+        changeReview: latestChange
+            ? {
+                publicId: latestChange.publicId,
+                whatChanged: latestChange.summary,
+                priorVersion: latestChange.priorVersion || priorModel?.modelVersion || 'Not recorded',
+                newVersion: latestChange.newVersion || currentModel?.modelVersion || currentModel?.provider.modelVersion || 'Not recorded',
+                changeReason: latestChange.changeReason || 'Not recorded',
+                reviewRequired: latestChange.reviewRequired,
+                reviewQuestion: 'Review required before this AI continues',
+                humanDecision: 'No automatic approval. A person must record the decision.',
+            }
+            : null,
+    };
+}
+
 export const enterpriseAiGovernanceService = {
     catalog() {
         return {
@@ -361,7 +436,10 @@ export const enterpriseAiGovernanceService = {
                 incidentsOpen: incidents.filter((row) => row.status !== 'CLOSED').length,
                 withoutOwners: systems.filter((row) => !row.businessOwner && !row.technicalOwner).length,
                 personalData: systems.filter((row) => row.personalData).length,
-                externalVendors: new Set(systems.map((row) => row.vendorId).filter(Boolean)).size,
+                externalVendors: new Set([
+                    ...systems.map((row) => row.vendorId).filter(Boolean),
+                    ...(await prisma.aiModelProvider.findMany({ where: { organizationId, vendorId: { not: null } }, select: { vendorId: true } })).map((row) => row.vendorId),
+                ]).size,
                 useCases,
             },
             attention,
@@ -398,7 +476,7 @@ export const enterpriseAiGovernanceService = {
     },
 
     async getSystem(organizationId: string, publicId: string) {
-        return publicSystem(await systemOrThrow(organizationId, publicId));
+        return hydrateSystem(await systemOrThrow(organizationId, publicId));
     },
 
     async createSystem(organizationId: string, body: Record<string, unknown>, actorUserId?: string) {
@@ -437,7 +515,7 @@ export const enterpriseAiGovernanceService = {
         await history(organizationId, 'AiSystem', row.publicId, 'created', `AI system ${row.publicId} recorded`, actorUserId, 'Proposed. Not approved.');
         await audit({ organizationId, actorUserId, action: 'ai.system.created', resourceType: 'AiSystem', resourceId: row.publicId });
         await projectSystem(organizationId, row.id, actorUserId);
-        return publicSystem(await systemOrThrow(organizationId, row.publicId));
+        return hydrateSystem(await systemOrThrow(organizationId, row.publicId));
     },
 
     async updateSystem(organizationId: string, publicId: string, body: Record<string, unknown>, actorUserId?: string) {
@@ -532,26 +610,209 @@ export const enterpriseAiGovernanceService = {
     },
 
     async listProviders(organizationId: string) {
-        return prisma.aiModelProvider.findMany({ where: { organizationId }, orderBy: { publicId: 'asc' } });
+        const rows = await prisma.aiModelProvider.findMany({
+            where: { organizationId },
+            include: { systems: { include: { system: { select: { publicId: true, name: true } } } } },
+            orderBy: { publicId: 'asc' },
+        });
+        return Promise.all(rows.map(async (row) => ({
+            ...row,
+            vendor: await vendorSnapshot(organizationId, row.vendorId),
+            systemCount: row.systems.length,
+        })));
     },
 
-    async attachProvider(organizationId: string, systemPublicId: string, providerPublicId: string, actorUserId?: string) {
+    async getProvider(organizationId: string, publicId: string) {
+        const row = await prisma.aiModelProvider.findFirst({
+            where: { organizationId, OR: [{ publicId }, { id: publicId }] },
+            include: {
+                systems: { include: { system: { include: { useCases: true, incidents: true, regulatoryReviews: true, controlLinks: true, privacyLinks: true } } } },
+            },
+        });
+        if (!row) throw new ApiError(404, 'Model/provider not found');
+        const vendor = await vendorSnapshot(organizationId, row.vendorId);
+        const systemIds = row.systems.map((item) => item.system.id);
+        const controlIds = [...new Set(row.systems.flatMap((item) => item.system.controlLinks.map((link) => link.controlId)))];
+        const activityIds = [...new Set(row.systems.flatMap((item) => item.system.privacyLinks.map((link) => link.activityId)))];
+        const [controls, activities] = await Promise.all([
+            controlEvidenceWorkspace(organizationId, controlIds),
+            activityIds.length
+                ? prisma.privacyProcessingActivity.findMany({ where: { organizationId, id: { in: activityIds } }, select: { publicId: true, name: true } })
+                : Promise.resolve([]),
+        ]);
+        return {
+            ...row,
+            availabilityStatus: row.availabilityStatus || 'Unknown / Not recorded',
+            trainingDataAssertion: row.trainingDataAssertion || 'Unknown / Not recorded',
+            retentionAssertion: row.retentionAssertion || 'Unknown / Not recorded',
+            vendor,
+            models: [{
+                family: row.modelFamily || 'Not recorded',
+                version: row.modelVersion || 'Not recorded',
+                hosting: row.hosting || 'Unknown / Not recorded',
+                deployment: row.deployment || 'Unknown / Not recorded',
+            }],
+            systems: row.systems.map((item) => ({
+                publicId: item.system.publicId,
+                name: item.system.name,
+                modelVersion: item.modelVersion || row.modelVersion || 'Not recorded',
+                status: item.effectiveTo ? 'SUPERSEDED' : 'CURRENT',
+                effectiveFrom: item.effectiveFrom,
+                effectiveTo: item.effectiveTo,
+            })),
+            useCases: row.systems.flatMap((item) => item.system.useCases.map((useCase) => ({ publicId: useCase.publicId, name: useCase.name, systemPublicId: item.system.publicId }))),
+            privacyActivities: activities,
+            transfers: vendor?.transfers || [{ destination: 'Unknown / Not recorded', mechanism: 'Unknown / Not recorded' }],
+            vendorResidualRisk: vendor?.residualRiskScore ?? null,
+            assessments: vendor?.assessments || [],
+            controls,
+            evidence: controls.flatMap((item) => item.cleanEvidence),
+            findings: vendor?.findings || [],
+            incidents: row.systems.flatMap((item) => item.system.incidents.map((incident) => ({ publicId: incident.publicId, title: incident.title, status: incident.status, systemPublicId: item.system.publicId }))),
+            regulatoryReviews: row.systems.flatMap((item) => item.system.regulatoryReviews.map((review) => ({ publicId: review.publicId, regime: review.regime, status: review.status }))),
+            honesty: 'Unknown / Not recorded until a person enters facts. Nothing is scraped or invented.',
+            monitoring: 'Manual / Not configured',
+            systemCount: systemIds.length,
+        };
+    },
+
+    async updateProvider(organizationId: string, publicId: string, body: Record<string, unknown>, actorUserId?: string) {
+        const row = await prisma.aiModelProvider.findFirst({ where: { organizationId, OR: [{ publicId }, { id: publicId }] } });
+        if (!row) throw new ApiError(404, 'Model/provider not found');
+        if (body.vendorId) {
+            const vendor = await prisma.vendor.findFirst({ where: { organizationId, id: String(body.vendorId) } });
+            if (!vendor) throw new ApiError(404, 'Vendor not found');
+        }
+        const updated = await prisma.aiModelProvider.update({
+            where: { id: row.id },
+            data: {
+                vendorId: body.vendorId !== undefined ? (body.vendorId ? String(body.vendorId) : null) : undefined,
+                modelFamily: body.modelFamily !== undefined ? String(body.modelFamily || '') : undefined,
+                modelVersion: body.modelVersion !== undefined ? String(body.modelVersion || '') : undefined,
+                hosting: body.hosting !== undefined ? String(body.hosting || '') : undefined,
+                deployment: body.deployment !== undefined ? String(body.deployment || '') : undefined,
+                trainingDataAssertion: body.trainingDataAssertion !== undefined ? String(body.trainingDataAssertion || '') : undefined,
+                retentionAssertion: body.retentionAssertion !== undefined ? String(body.retentionAssertion || '') : undefined,
+                notes: body.notes !== undefined ? String(body.notes || '') : undefined,
+            },
+        });
+        if (body.vendorId) {
+            await prisma.aiSystem.updateMany({
+                where: { organizationId, vendorId: null, models: { some: { providerId: row.id } } },
+                data: { vendorId: String(body.vendorId) },
+            });
+        }
+        await history(organizationId, 'AiModelProvider', updated.publicId, 'updated', `Provider ${updated.publicId} updated`, actorUserId);
+        return this.getProvider(organizationId, updated.publicId);
+    },
+
+    async attachProvider(organizationId: string, systemPublicId: string, providerPublicId: string, actorUserId?: string, body: Record<string, unknown> = {}) {
         const system = await systemOrThrow(organizationId, systemPublicId);
         const provider = await prisma.aiModelProvider.findFirst({ where: { organizationId, publicId: providerPublicId } });
         if (!provider) throw new ApiError(404, 'Model/provider not found');
-        await prisma.aiSystemModel.create({ data: { organizationId, systemId: system.id, providerId: provider.id } });
+        const current = system.models.find((model) => !model.effectiveTo);
+        const newVersion = body.modelVersion ? String(body.modelVersion) : (provider.modelVersion || 'Not recorded');
+        const priorVersion = current?.modelVersion || current?.provider.modelVersion || 'Not recorded';
+        if (current?.providerId === provider.id && !body.modelVersion && !body.changeReason) {
+            return this.getSystem(organizationId, system.publicId);
+        }
+        if (current) {
+            await prisma.aiSystemModel.update({
+                where: { id: current.id },
+                data: { effectiveTo: new Date(), status: 'SUPERSEDED' },
+            });
+        }
+        if (body.modelVersion) {
+            await prisma.aiModelProvider.update({ where: { id: provider.id }, data: { modelVersion: String(body.modelVersion) } });
+        }
+        await prisma.aiSystemModel.create({
+            data: {
+                organizationId,
+                systemId: system.id,
+                providerId: provider.id,
+                modelVersion: newVersion,
+                priorVersion,
+                changeReason: body.changeReason ? String(body.changeReason) : 'Provider attached',
+                status: 'CURRENT',
+            },
+        });
+        if (provider.vendorId && !system.vendorId) {
+            await prisma.aiSystem.update({ where: { id: system.id }, data: { vendorId: provider.vendorId } });
+        }
+        const affected = await this.affected(organizationId, system.publicId);
         await prisma.aiChange.create({
             data: {
                 organizationId,
                 systemId: system.id,
                 publicId: await nextId(organizationId, 'CHG'),
-                changeType: 'provider_attached',
-                summary: `${provider.publicId} attached to ${system.publicId}. Review required before continued use.`,
+                changeType: current ? 'model_version_changed' : 'provider_attached',
+                summary: current
+                    ? `${provider.publicId} version changed from ${priorVersion} to ${newVersion}. Review required before this AI continues.`
+                    : `${provider.publicId} attached to ${system.publicId}. Review required before this AI continues.`,
+                priorVersion,
+                newVersion,
+                changeReason: body.changeReason ? String(body.changeReason) : (current ? 'Model or provider version changed' : 'Provider attached'),
+                reviewRequired: true,
+                impact: {
+                    useCases: affected.useCases.map((row: { publicId: string }) => row.publicId),
+                    people: system.useCases.map((row) => row.affectedPersons).filter(Boolean),
+                    personalData: system.personalData,
+                    vendorId: provider.vendorId,
+                    tests: affected.tests.map((row: { publicId: string }) => row.publicId),
+                    approvals: affected.approvals.map((row: { publicId: string }) => row.publicId),
+                },
             },
         });
-        await history(organizationId, 'AiSystem', system.publicId, 'model.changed', `Provider ${provider.publicId} attached`, actorUserId);
+        await history(organizationId, 'AiSystem', system.publicId, 'model.changed', `Provider ${provider.publicId} ${current ? 'version changed' : 'attached'}`, actorUserId);
         await projectSystem(organizationId, system.id, actorUserId);
         return this.getSystem(organizationId, system.publicId);
+    },
+
+    async changeVersion(organizationId: string, systemPublicId: string, body: Record<string, unknown>, actorUserId?: string) {
+        const system = await systemOrThrow(organizationId, systemPublicId);
+        const current = system.models.find((model) => !model.effectiveTo) || system.models[0];
+        const providerPublicId = body.providerPublicId ? String(body.providerPublicId) : current?.provider.publicId;
+        if (!providerPublicId) throw new ApiError(400, 'A recorded provider is required before a version change.');
+        if (!body.modelVersion) throw new ApiError(400, 'New model or provider version is required.');
+        return this.attachProvider(organizationId, systemPublicId, providerPublicId, actorUserId, body);
+    },
+
+    async listAiControls(organizationId: string) {
+        const links = await prisma.aiControlLink.findMany({ where: { organizationId }, include: { system: { select: { publicId: true, name: true } } } });
+        const aig = await prisma.organizationControl.findMany({
+            where: { organizationId, archivedAt: null, controlKey: { startsWith: 'AIG-' } },
+        });
+        const ids = [...new Set([...aig.map((row) => row.id), ...links.map((row) => row.controlId)])];
+        const workspace = await controlEvidenceWorkspace(organizationId, ids);
+        return workspace.map((control) => ({
+            ...control,
+            relatedSystems: links.filter((link) => link.controlId === control.id).map((link) => ({ publicId: link.system.publicId, name: link.system.name })),
+        }));
+    },
+
+    async readiness(organizationId: string, frameworkKey: string) {
+        return frameworkReadiness(organizationId, frameworkKey);
+    },
+
+    async vendorLinks(organizationId: string, vendorId: string) {
+        const vendor = await vendorSnapshot(organizationId, vendorId);
+        if (!vendor) throw new ApiError(404, 'Vendor not found');
+        const providers = await prisma.aiModelProvider.findMany({
+            where: { organizationId, vendorId },
+            include: { systems: { include: { system: { select: { publicId: true, name: true, lifecycle: true } } } } },
+        });
+        const systems = providers.flatMap((row) => row.systems.map((item) => ({
+            publicId: item.system.publicId,
+            name: item.system.name,
+            lifecycle: item.system.lifecycle,
+            providerPublicId: row.publicId,
+            providerName: row.providerName,
+        })));
+        return {
+            vendor,
+            providers: providers.map((row) => ({ publicId: row.publicId, providerName: row.providerName, modelVersion: row.modelVersion || 'Not recorded' })),
+            systems,
+        };
     },
 
     async setOversight(organizationId: string, systemPublicId: string, body: Record<string, unknown>, actorUserId?: string) {
@@ -824,7 +1085,10 @@ export const enterpriseAiGovernanceService = {
                 systemId: system.id,
                 publicId: await nextId(organizationId, 'CHG'),
                 changeType: String(body.changeType || 'updated'),
-                summary: String(body.summary || 'Recorded change. Review required.'),
+                summary: String(body.summary || 'Recorded change. Review required before this AI continues.'),
+                priorVersion: body.priorVersion ? String(body.priorVersion) : null,
+                newVersion: body.newVersion ? String(body.newVersion) : null,
+                changeReason: body.changeReason ? String(body.changeReason) : null,
                 reviewRequired: body.reviewRequired !== false,
             },
         });
@@ -834,31 +1098,47 @@ export const enterpriseAiGovernanceService = {
 
     async affected(organizationId: string, systemPublicId: string) {
         const system = await this.getSystem(organizationId, systemPublicId);
-        const vendors = system.models.map((row) => row.provider).filter((row) => row.vendorId);
         const activities = await prisma.privacyProcessingActivity.findMany({
             where: { organizationId, id: { in: system.privacyLinks.map((row) => row.activityId) } },
         });
         const risks = await prisma.enterpriseRisk.findMany({
             where: { organizationId, id: { in: system.riskLinks.map((row) => row.enterpriseRiskId) } },
         });
-        const controls = await prisma.organizationControl.findMany({
-            where: { organizationId, id: { in: system.controlLinks.map((row) => row.controlId) } },
-        });
+        const latestChange = system.changes[0] || null;
         return {
             system: { publicId: system.publicId, name: system.name, lifecycle: system.lifecycle },
-            useCases: system.useCases,
-            vendors,
-            models: system.models.map((row) => row.provider),
+            whatChanged: latestChange
+                ? {
+                    publicId: latestChange.publicId,
+                    summary: latestChange.summary,
+                    priorVersion: latestChange.priorVersion || system.priorModel?.modelVersion || 'Not recorded',
+                    newVersion: latestChange.newVersion || system.currentModel?.modelVersion || 'Not recorded',
+                    changeReason: latestChange.changeReason || 'Not recorded',
+                }
+                : null,
+            useCases: system.useCases.map((row) => ({ publicId: row.publicId, name: row.name, affectedPersons: row.affectedPersons || 'Not recorded' })),
+            vendors: system.vendors || [],
+            models: system.modelVersions,
             dataCategories: system.dataCategories,
             personalData: system.personalData,
             jurisdictions: system.jurisdictions,
             privacyActivities: activities.map((row) => ({ publicId: row.publicId, name: row.name })),
             enterpriseRisks: risks.map((row) => ({ publicId: row.publicId, title: row.title, residualRating: row.residualRating })),
-            controls: controls.map((row) => ({ id: row.id, title: row.title, effectiveness: row.effectivenessStatus })),
+            controls: (system.controlWorkspace || []).map((row: { controlKey: string; title: string; effectivenessStatus: string }) => ({
+                controlKey: row.controlKey,
+                title: row.title,
+                effectiveness: row.effectivenessStatus,
+            })),
+            cleanEvidence: (system.controlWorkspace || []).flatMap((row: { cleanEvidence: Array<{ filename: string }> }) => row.cleanEvidence),
             tests: system.tests,
+            testsRequiringRefresh: system.tests.filter((row) => row.result !== 'NOT_TESTED'),
             incidents: system.incidents,
             approvals: system.approvals,
+            approvalsRequiringReview: system.approvals,
+            compliance: system.compliance,
+            reviewRequired: latestChange?.reviewRequired !== false,
             reviewQuestion: 'What do we need to review before this AI continues?',
+            humanDecision: 'Review required before this AI continues. No automatic approval.',
         };
     },
 

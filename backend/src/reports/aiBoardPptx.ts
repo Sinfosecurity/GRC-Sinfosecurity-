@@ -1,5 +1,6 @@
 import JSZip from 'jszip';
 import { enterpriseAiGovernanceService } from '../services/enterpriseAiGovernanceService';
+import { humanizeAiLabel } from '../services/enterpriseAiGovernanceEngine';
 import { isoDate } from './sendDownload';
 
 function xml(value: string): string {
@@ -303,7 +304,7 @@ export async function renderAiBoardPptx(organizationId: string) {
       ${kpi(20, String(totals.awaitingApproval), 'Awaiting approval', 3120000)}
       ${kpi(30, String(totals.useCases), 'Use cases', 5820000)}
       ${kpi(40, String(totals.withoutOwners), 'Without owners', 8520000)}
-      ${lines(60, systems.slice(0, 6).map((row) => `${row.publicId}  ${row.name}  ·  ${row.lifecycle}  ·  ${row.organizationClass}`), 420000, 3200000)}
+      ${lines(60, systems.slice(0, 6).map((row) => `${row.publicId}  ${row.name}  ·  ${humanizeAiLabel(row.lifecycle)}  ·  ${humanizeAiLabel(row.organizationClass)}`), 420000, 3200000)}
       ${footer(3, total)}
     `));
 

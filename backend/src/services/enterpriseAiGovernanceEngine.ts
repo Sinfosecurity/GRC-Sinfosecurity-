@@ -152,6 +152,39 @@ export function honestyCopy() {
     return 'Recorded AI inventory is not an approval, not a legal applicability finding, and not a model-performance claim. Human approval is required. Monitoring is manual unless a real source is configured.';
 }
 
+const AI_CUSTOMER_LABELS: Record<string, string> = {
+    NOT_CLASSIFIED: 'Not Classified',
+    APPROVED_WITH_CONDITIONS: 'Approved with Conditions',
+    NOT_TESTED: 'Not Tested',
+    NOT_REVIEWED: 'Not Reviewed',
+    HUMAN_IN_THE_LOOP: 'Human in the Loop',
+    NOT_RECORDED: 'Not Recorded',
+    NOT_APPLICABLE: 'Not Applicable',
+    IN_REVIEW: 'In Review',
+    NOT_STARTED: 'Not Started',
+    PARTIALLY_EFFECTIVE: 'Partially Effective',
+};
+
+export function humanizeAiLabel(value?: string | null): string {
+    if (!value) return 'Not recorded';
+    const key = String(value).trim();
+    if (AI_CUSTOMER_LABELS[key]) return AI_CUSTOMER_LABELS[key];
+    if (!/^[A-Z0-9_]+$/.test(key)) return key;
+    return key
+        .replace(/_/g, ' ')
+        .toLowerCase()
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export function isAutomaticLegalClaim(value: string) {
+    const text = String(value || '');
+    if (/does not automatically claim|not a legal finding|potential applicability|review required|not certified|organization classification/i.test(text)
+        && /eu ai act high-risk|iso 42001|nist/i.test(text)) {
+        return false;
+    }
+    return /this system is (an )?(eu ai act )?high-risk|automatically (classified|determined|declared) as.{0,60}high-risk|iso 42001 certified|nist certified|this system is legally prohibited|ai analysis says|model is safe|automatically compliant/i.test(text);
+}
+
 export function neutralizeSpreadsheetCell(value: unknown): string {
     const text = value == null ? '' : String(value);
     if (/^[=+\-@]/.test(text) || text.includes('\t') || text.includes('\r') || text.includes('\n')) {
@@ -161,5 +194,5 @@ export function neutralizeSpreadsheetCell(value: unknown): string {
 }
 
 export function containsForbiddenAiClaim(value: string) {
-    return /eu ai act high-risk|iso 42001 certified|nist certified|this system is legally prohibited|ai analysis says|model is safe|automatically compliant/i.test(value);
+    return isAutomaticLegalClaim(value);
 }

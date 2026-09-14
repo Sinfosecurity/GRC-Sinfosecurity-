@@ -5,6 +5,7 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
 import { aiGovernanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function AiAssessments() {
     const [rows, setRows] = useState<any[]>([]);
@@ -47,7 +48,7 @@ export default function AiAssessments() {
                             { id: 'id', label: 'Assessment', render: (row) => row.publicId },
                             { id: 'system', label: 'System', render: (row) => row.system?.publicId },
                             { id: 'rec', label: 'Recommendation', render: (row) => row.recommendation },
-                            { id: 'decision', label: 'Decision', render: (row) => row.decision || 'Review required' },
+                            { id: 'decision', label: 'Decision', render: (row) => row.decision ? humanizeLabel(row.decision) : 'Review required' },
                         ]} />
                     </Surface>
                 </Stack>

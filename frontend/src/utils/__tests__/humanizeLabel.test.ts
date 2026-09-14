@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { formatShortDate, humanizeLabel } from '../humanizeLabel';
+import { humanizeLabel } from '../humanizeLabel';
 
-describe('humanizeLabel', () => {
-    it('turns assessment enums into customer language', () => {
-        expect(humanizeLabel('INITIAL_DUE_DILIGENCE')).toBe('Initial Due Diligence');
-        expect(humanizeLabel('IN_PROGRESS')).toBe('In Progress');
-    });
-});
-
-describe('formatShortDate', () => {
-    it('formats a persisted timestamp', () => {
-        expect(formatShortDate('2026-09-13T16:00:00.000Z')).toMatch(/Sep 13, 2026/);
+describe('customer-facing AI labels', () => {
+    it('humanizes canonical enums and keeps public IDs', () => {
+        expect(humanizeLabel('NOT_CLASSIFIED')).toBe('Not Classified');
+        expect(humanizeLabel('APPROVED_WITH_CONDITIONS')).toBe('Approved with Conditions');
+        expect(humanizeLabel('NOT_TESTED')).toBe('Not Tested');
+        expect(humanizeLabel('NOT_REVIEWED')).toBe('Not Reviewed');
+        expect(humanizeLabel('HUMAN_IN_THE_LOOP')).toBe('Human in the Loop');
+        expect(humanizeLabel('NOT_RECORDED')).toBe('Not Recorded');
+        expect(humanizeLabel('AI-00001')).toBe('AI-00001');
+        expect(humanizeLabel('Unknown / Not recorded')).toBe('Unknown / Not recorded');
     });
 });

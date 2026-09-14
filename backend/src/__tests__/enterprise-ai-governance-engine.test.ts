@@ -2,6 +2,7 @@ import {
     calculateAiScore,
     containsForbiddenAiClaim,
     honestyCopy,
+    humanizeAiLabel,
     neutralizeSpreadsheetCell,
     nextAiId,
     screeningRecommendation,
@@ -16,6 +17,8 @@ describe('supreme AI governance honesty', () => {
         expect(containsForbiddenAiClaim('This system is EU AI Act High-Risk')).toBe(true);
         expect(containsForbiddenAiClaim('ISO 42001 certified')).toBe(true);
         expect(containsForbiddenAiClaim('Enhanced review may be required')).toBe(false);
+        expect(containsForbiddenAiClaim('Supreme does not automatically claim EU AI Act High-Risk or ISO 42001 certified.')).toBe(false);
+        expect(containsForbiddenAiClaim('Potential applicability. Review required. Organization classification.')).toBe(false);
         expect(neutralizeSpreadsheetCell('=CMD()')).toBe("'=CMD()");
         expect(neutralizeSpreadsheetCell('+1+1')).toBe("'+1+1");
     });
@@ -63,5 +66,15 @@ describe('supreme AI governance honesty', () => {
         expect(hits.recommendation).toMatch(/enhanced review may be required/i);
         expect(hits.recommendation).toMatch(/not a legal prohibition/i);
         expect(hits.recommendation).not.toMatch(/this system is legally prohibited/i);
+    });
+
+    it('humanizes customer-facing AI enums without changing canonical keys', () => {
+        expect(humanizeAiLabel('NOT_CLASSIFIED')).toBe('Not Classified');
+        expect(humanizeAiLabel('APPROVED_WITH_CONDITIONS')).toBe('Approved with Conditions');
+        expect(humanizeAiLabel('NOT_TESTED')).toBe('Not Tested');
+        expect(humanizeAiLabel('NOT_REVIEWED')).toBe('Not Reviewed');
+        expect(humanizeAiLabel('HUMAN_IN_THE_LOOP')).toBe('Human in the Loop');
+        expect(humanizeAiLabel('NOT_RECORDED')).toBe('Not Recorded');
+        expect(humanizeAiLabel('AI-00001')).toBe('AI-00001');
     });
 });

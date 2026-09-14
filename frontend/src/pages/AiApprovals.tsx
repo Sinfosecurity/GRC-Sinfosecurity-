@@ -5,6 +5,7 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
 import { aiGovernanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function AiApprovals() {
     const [rows, setRows] = useState<any[]>([]);
@@ -32,7 +33,7 @@ export default function AiApprovals() {
                         <Stack component="form" onSubmit={create} spacing={1.5}>
                             <TextField label="AI system ID" value={systemPublicId} onChange={(event) => setSystemPublicId(event.target.value)} required />
                             <TextField select label="Decision" value={decision} onChange={(event) => setDecision(event.target.value)}>
-                                {['APPROVED', 'APPROVED_WITH_CONDITIONS', 'RESTRICTED', 'REJECTED', 'SUSPENDED', 'RETIRED'].map((item) => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+                                {['APPROVED', 'APPROVED_WITH_CONDITIONS', 'RESTRICTED', 'REJECTED', 'SUSPENDED', 'RETIRED'].map((item) => <MenuItem key={item} value={item}>{humanizeLabel(item)}</MenuItem>)}
                             </TextField>
                             <TextField label="Decision maker" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} required />
                             <TextField label="Rationale" value={rationale} onChange={(event) => setRationale(event.target.value)} required />
@@ -43,7 +44,7 @@ export default function AiApprovals() {
                         <AppTable rows={rows} rowKey={(row) => row.publicId} emptyTitle="No approvals" emptyBody="No system is approved merely because it exists." columns={[
                             { id: 'id', label: 'Approval', render: (row) => row.publicId },
                             { id: 'system', label: 'System', render: (row) => row.system?.publicId },
-                            { id: 'decision', label: 'Decision', render: (row) => row.decision },
+                            { id: 'decision', label: 'Decision', render: (row) => humanizeLabel(row.decision) },
                             { id: 'maker', label: 'Decision maker', render: (row) => row.decisionMaker },
                         ]} />
                     </Surface>

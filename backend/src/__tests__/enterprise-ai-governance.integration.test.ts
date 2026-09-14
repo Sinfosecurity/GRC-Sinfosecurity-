@@ -151,4 +151,137 @@ describe('supreme AI governance tenant isolation and honesty', () => {
         });
         expect([403, 401]).toContain(approve.status);
     });
+
+    it('links an existing vendor, preserves model versions, and shows only CLEAN evidence', async () => {
+        const vendor = await prisma.vendor.create({
+            data: {
+                organizationId: orgA,
+                name: 'Supreme Investigation',
+                vendorType: 'SAAS',
+                category: 'TECHNOLOGY',
+                tier: 'MEDIUM',
+                status: 'ACTIVE',
+                primaryContact: 'ops@investigation.test',
+                contactEmail: `ops-${suffix}@investigation.test`,
+                servicesProvided: 'Investigation support',
+                residualRiskScore: 42,
+            },
+        });
+        const provider = await request(app).post(`${API}/ai-governance/providers`).set('Authorization', `Bearer ${tokenA}`).send({
+            providerName: 'Recorded model provider',
+            vendorId: vendor.id,
+            modelVersion: 'v1-recorded',
+        });
+        expect(provider.status).toBe(201);
+        expect(provider.body.data.vendorId).toBe(vendor.id);
+        const providerId = provider.body.data.publicId;
+        const attached = await request(app)
+            .post(`${API}/ai-governance/systems/${systemA}/providers/${providerId}`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({ modelVersion: 'v1-recorded', changeReason: 'Initial recorded provider' });
+        expect(attached.status).toBe(200);
+        expect(attached.body.data.currentModel.modelVersion).toBe('v1-recorded');
+        expect(attached.body.data.vendors[0].name).toBe('Supreme Investigation');
+
+        const leakedVendor = await request(app).get(`${API}/ai-governance/vendors/${vendor.id}`).set('Authorization', `Bearer ${tokenB}`);
+        expect([403, 404]).toContain(leakedVendor.status);
+
+        const changed = await request(app)
+            .post(`${API}/ai-governance/systems/${systemA}/versions`)
+            .set('Authorization', `Bearer ${tokenA}`)
+            .send({ modelVersion: 'v2-recorded', changeReason: 'Provider version change for review' });
+        expect(changed.status).toBe(201);
+        expect(changed.body.data.currentModel.modelVersion).toBe('v2-recorded');
+        expect(changed.body.data.priorModel.modelVersion).toBe('v1-recorded');
+        expect(changed.body.data.changeReview.reviewRequired).toBe(true);
+        expect(changed.body.data.changeReview.whatChanged).toMatch(/v1-recorded/);
+        expect(changed.body.data.modelVersions.some((row: { status: string; modelVersion: string }) => row.status === 'SUPERSEDED' && row.modelVersion === 'v1-recorded')).toBe(true);
+
+        const historic = await prisma.aiSystemModel.findFirstOrThrow({
+            where: { organizationId: orgA, systemId: attached.body.data.id, modelVersion: 'v1-recorded' },
+        });
+        expect(historic.effectiveTo).not.toBeNull();
+        expect(historic.status).toBe('SUPERSEDED');
+
+        const controls = await request(app).get(`${API}/scc/controls`).set('Authorization', `Bearer ${tokenA}`);
+        const aig = (controls.body.data || []).find((row: { controlKey: string }) => row.controlKey === 'AIG-01');
+        expect(aig).toBeTruthy();
+        const linked = await request(app).post(`${API}/ai-governance/systems/${systemA}/controls/${aig.id}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(linked.status).toBe(200);
+
+        const clean = await prisma.storedObject.create({
+            data: {
+                organizationId: orgA,
+                ownerType: 'organization',
+                ownerId: orgA,
+                filename: 'sr-clean-evidence.txt',
+                storageKey: `${orgA}/ai/sr-clean-evidence.txt`,
+                contentType: 'text/plain',
+                size: 12,
+                checksum: `ai-clean-${suffix}`,
+                uploadedBy: (await prisma.user.findFirstOrThrow({ where: { organizationId: orgA } })).id,
+                scanStatus: 'CLEAN',
+            },
+        });
+        const pending = await prisma.storedObject.create({
+            data: {
+                organizationId: orgA,
+                ownerType: 'organization',
+                ownerId: orgA,
+                filename: 'pending-not-supporting.txt',
+                storageKey: `${orgA}/ai/pending-not-supporting.txt`,
+                contentType: 'text/plain',
+                size: 12,
+                checksum: `ai-pending-${suffix}`,
+                uploadedBy: (await prisma.user.findFirstOrThrow({ where: { organizationId: orgA } })).id,
+                scanStatus: 'PENDING',
+            },
+        });
+        const support = await request(app).post(`${API}/scc/evidence/links`).set('Authorization', `Bearer ${tokenA}`).send({
+            storedObjectId: clean.id,
+            targetType: 'CONTROL',
+            targetId: aig.id,
+            relationship: 'SUPPORTS',
+            rationale: 'Recorded CLEAN evidence for AIG-01',
+        });
+        expect(support.status).toBe(201);
+        const rejectedPending = await request(app).post(`${API}/scc/evidence/links`).set('Authorization', `Bearer ${tokenA}`).send({
+            storedObjectId: pending.id,
+            targetType: 'CONTROL',
+            targetId: aig.id,
+            relationship: 'SUPPORTS',
+            rationale: 'Pending must not become supporting evidence',
+        });
+        expect(rejectedPending.status).toBe(403);
+
+        const detail = await request(app).get(`${API}/ai-governance/systems/${systemA}`).set('Authorization', `Bearer ${tokenA}`);
+        const workspace = (detail.body.data.controlWorkspace || []).find((row: { controlKey: string }) => row.controlKey === 'AIG-01');
+        expect(workspace.cleanEvidence.some((row: { filename: string }) => row.filename === 'sr-clean-evidence.txt')).toBe(true);
+        expect(JSON.stringify(workspace.cleanEvidence)).not.toContain('pending-not-supporting.txt');
+
+        const nist = await request(app).get(`${API}/ai-governance/readiness/NIST_AI_RMF`).set('Authorization', `Bearer ${tokenA}`);
+        expect(nist.status).toBe(200);
+        expect(nist.body.data.certified).toBe(false);
+        expect(JSON.stringify(nist.body.data)).toMatch(/not certified/i);
+        expect(nist.body.data.areas.map((row: { key: string }) => row.key)).toEqual(expect.arrayContaining(['GOVERN', 'MAP', 'MEASURE', 'MANAGE']));
+
+        const iso = await request(app).get(`${API}/ai-governance/readiness/ISO_42001`).set('Authorization', `Bearer ${tokenA}`);
+        expect(iso.status).toBe(200);
+        expect(iso.body.data.certified).toBe(false);
+        expect(JSON.stringify(iso.body.data)).not.toMatch(/this organization is certified/i);
+
+        const leakedReady = await request(app).get(`${API}/ai-governance/readiness/NIST_AI_RMF`).set('Authorization', `Bearer ${tokenB}`);
+        expect(leakedReady.status).toBe(200);
+        expect(JSON.stringify(leakedReady.body)).not.toContain(systemA);
+
+        const affected = await request(app).get(`${API}/ai-governance/systems/${systemA}/affected`).set('Authorization', `Bearer ${tokenA}`);
+        expect(affected.body.data.humanDecision).toMatch(/no automatic approval/i);
+        expect(affected.body.data.whatChanged.newVersion).toBe('v2-recorded');
+        expect((affected.body.data.vendors || []).some((row: { name: string }) => row.name === 'Supreme Investigation')).toBe(true);
+
+        const providerDetail = await request(app).get(`${API}/ai-governance/providers/${providerId}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(providerDetail.status).toBe(200);
+        expect(providerDetail.body.data.vendor.name).toBe('Supreme Investigation');
+        expect(providerDetail.body.data.monitoring).toMatch(/manual \/ not configured/i);
+    });
 });

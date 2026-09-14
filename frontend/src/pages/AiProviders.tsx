@@ -4,9 +4,11 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
+import { useNavigate } from 'react-router-dom';
 import { aiGovernanceAPI } from '../services/api';
 
 export default function AiProviders() {
+    const navigate = useNavigate();
     const [rows, setRows] = useState<any[]>([]);
     const [name, setName] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -32,10 +34,11 @@ export default function AiProviders() {
                     </Surface>
                     <Surface>
                         <Alert severity="info" sx={{ mb: 2 }}>Availability stays Unknown / Not recorded unless recorded. This is not live model telemetry.</Alert>
-                        <AppTable rows={rows} rowKey={(row) => row.publicId} emptyTitle="No providers" emptyBody="Record a provider reference. Do not invent OpenAI, Anthropic, or other facts." columns={[
+                        <AppTable rows={rows} rowKey={(row) => row.publicId} onRowClick={(row) => navigate(`/ai-governance/providers/${row.publicId}`)} emptyTitle="No providers" emptyBody="Record a provider reference. Do not invent OpenAI, Anthropic, or other facts." columns={[
                             { id: 'id', label: 'Provider', render: (row) => row.publicId },
                             { id: 'name', label: 'Name', render: (row) => row.providerName },
                             { id: 'model', label: 'Model', render: (row) => row.modelFamily || 'Not recorded' },
+                            { id: 'vendor', label: 'Vendor', render: (row) => row.vendor?.name || 'Not recorded' },
                             { id: 'status', label: 'Availability', render: (row) => row.availabilityStatus },
                         ]} />
                     </Surface>

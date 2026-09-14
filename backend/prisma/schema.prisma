@@ -4741,6 +4741,10 @@ model AiSystemModel {
   systemId       String
   provider       AiModelProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
   providerId     String
+  modelVersion   String?
+  priorVersion   String?
+  changeReason   String?
+  status         String          @default("CURRENT")
   effectiveFrom  DateTime        @default(now())
   effectiveTo    DateTime?
   createdAt      DateTime        @default(now())
@@ -4936,6 +4940,10 @@ model AiChange {
   publicId       String
   changeType     String
   summary        String
+  priorVersion   String?
+  newVersion     String?
+  changeReason   String?
+  impact         Json?
   reviewRequired Boolean  @default(true)
   createdAt      DateTime @default(now())
 

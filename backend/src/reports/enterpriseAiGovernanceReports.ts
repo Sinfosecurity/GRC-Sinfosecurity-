@@ -3,7 +3,7 @@ import { createReportPdf } from './reportLayout';
 import { drawBullets, drawKpiRow, drawParagraph, drawProfessionalTable, drawSectionTitle } from './reportPrimitives';
 import { reportId } from './reportTheme';
 import { csvEscape } from '../security/spreadsheetSafe';
-import { honestyCopy, neutralizeSpreadsheetCell } from '../services/enterpriseAiGovernanceEngine';
+import { honestyCopy, humanizeAiLabel, neutralizeSpreadsheetCell } from '../services/enterpriseAiGovernanceEngine';
 import { enterpriseAiGovernanceService } from '../services/enterpriseAiGovernanceService';
 import { isoDate } from './sendDownload';
 import { renderAiBoardPptx as renderPremiumAiBoard } from './aiBoardPptx';
@@ -49,7 +49,7 @@ export async function renderAiPdf(organizationId: string, kind: string) {
                 { key: 'lifecycle', header: 'Lifecycle', width: 90, badge: true },
                 { key: 'class', header: 'Org class', width: 90 },
             ],
-            pack.systems.slice(0, 20).map((row) => ({ id: row.publicId, name: row.name, lifecycle: row.lifecycle, class: row.organizationClass })),
+            pack.systems.slice(0, 20).map((row) => ({ id: row.publicId, name: row.name, lifecycle: humanizeAiLabel(row.lifecycle), class: humanizeAiLabel(row.organizationClass) })),
             'No AI systems',
             'No AI system is recorded.',
         );
@@ -70,8 +70,8 @@ export async function renderAiWorkbook(organizationId: string, format: 'csv' | '
     const rows = pack.systems.map((row) => [
         neutralizeSpreadsheetCell(row.publicId),
         neutralizeSpreadsheetCell(row.name),
-        neutralizeSpreadsheetCell(row.lifecycle),
-        neutralizeSpreadsheetCell(row.organizationClass),
+        neutralizeSpreadsheetCell(humanizeAiLabel(row.lifecycle)),
+        neutralizeSpreadsheetCell(humanizeAiLabel(row.organizationClass)),
         neutralizeSpreadsheetCell(row.businessOwner || 'Unassigned'),
     ]);
     if (format === 'csv') {

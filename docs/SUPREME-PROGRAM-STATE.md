@@ -94,9 +94,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #18 Supreme AI Governance
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
-See `docs/ADR-SUPREME-AI-GOVERNANCE.md` and `docs/private-beta/hosted-ux-qa/supreme-ai/`. #19 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-AI-GOVERNANCE.md` and `docs/private-beta/hosted-ux-qa/supreme-ai/`. Final-closure work (vendor linkage, CLEAN evidence, readiness workspaces, model version change review, enum humanization) is returned for hosted Product Leadership review. #19 is not authorized. #12 remains PARTIAL.
 
 ### #17 Supreme Privacy
 
@@ -392,3 +392,10 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **STATUS CHANGE:** AUTHORIZED / IN PROGRESS -> PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED  
 **SHA:** Implementation `577071e895b360c86a56acf91644d5c80b5bc53c`  
 **EVIDENCE:** Hosted frontend and API both `577071e`. Supreme CI run `34791779508` PASS (350 backend / 158 frontend). Elite Claims walkthrough recorded AI-00001, USE-00001, MDL-00001, AIA-00001, TST-00001, APV-00001, AIN-00001, REG-00001, linked PA-00001 / RISK-00001 / AIG-01. Native PowerPoint rendered 12 unique slides. `/health` remains degraded (MongoDB NOT_CONFIGURED, high heap, preexisting). Cursor does not declare #18 PASS. #12 remains PARTIAL. #19 is not authorized.
+
+### 2026-09-13
+
+**ITEM:** #18 Supreme AI Governance  
+**STATUS CHANGE:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED -> PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED  
+**SHA:** Final-closure implementation on `supreme-risk-transformation` after `577071e895b360c86a56acf91644d5c80b5bc53c`. Hosted SHA will be recorded after staging deploy.  
+**EVIDENCE:** Customer-facing enum humanization, existing-vendor linkage, provider/vendor workspace, CLEAN evidence on AI detail, NIST AI RMF and ISO/IEC 42001 readiness views, first-class model version history, governed change review, and regulatory honesty-test fix. Not PASS. #12 remains PARTIAL. #19 is not authorized. Commercial production remains NO-GO.

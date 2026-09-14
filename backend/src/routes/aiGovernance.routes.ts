@@ -117,15 +117,51 @@ router.get('/providers', requirePermission(PERMISSIONS['ai.read']), async (req: 
     } catch (error) { next(error); }
 });
 
+router.get('/providers/:publicId', requirePermission(PERMISSIONS['ai.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterpriseAiGovernanceService.getProvider(orgId(req), req.params.publicId) });
+    } catch (error) { next(error); }
+});
+
+router.patch('/providers/:publicId', requirePermission(PERMISSIONS['ai.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterpriseAiGovernanceService.updateProvider(orgId(req), req.params.publicId, req.body || {}, actor(req)) });
+    } catch (error) { next(error); }
+});
+
 router.post('/providers', requirePermission(PERMISSIONS['ai.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await enterpriseAiGovernanceService.recordProvider(orgId(req), req.body || {}, actor(req)) });
     } catch (error) { next(error); }
 });
 
+router.get('/controls', requirePermission(PERMISSIONS['ai.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterpriseAiGovernanceService.listAiControls(orgId(req)) });
+    } catch (error) { next(error); }
+});
+
+router.get('/readiness/:frameworkKey', requirePermission(PERMISSIONS['ai.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterpriseAiGovernanceService.readiness(orgId(req), req.params.frameworkKey) });
+    } catch (error) { next(error); }
+});
+
+router.get('/vendors/:vendorId', requirePermission(PERMISSIONS['ai.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await enterpriseAiGovernanceService.vendorLinks(orgId(req), req.params.vendorId) });
+    } catch (error) { next(error); }
+});
+
 router.post('/systems/:publicId/providers/:providerPublicId', requirePermission(PERMISSIONS['ai.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await enterpriseAiGovernanceService.attachProvider(orgId(req), req.params.publicId, req.params.providerPublicId, actor(req)) });
+        res.json({ success: true, data: await enterpriseAiGovernanceService.attachProvider(orgId(req), req.params.publicId, req.params.providerPublicId, actor(req), req.body || {}) });
+    } catch (error) { next(error); }
+});
+
+router.post('/systems/:publicId/versions', requirePermission(PERMISSIONS['ai.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await enterpriseAiGovernanceService.changeVersion(orgId(req), req.params.publicId, req.body || {}, actor(req)) });
     } catch (error) { next(error); }
 });
 

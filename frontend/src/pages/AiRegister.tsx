@@ -6,6 +6,7 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
 import { aiGovernanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function AiRegister() {
     const navigate = useNavigate();
@@ -56,10 +57,10 @@ export default function AiRegister() {
                             columns={[
                                 { id: 'publicId', label: 'System', render: (row) => row.publicId },
                                 { id: 'name', label: 'Name', render: (row) => row.name },
-                                { id: 'lifecycle', label: 'Lifecycle', render: (row) => row.lifecycle },
-                                { id: 'class', label: 'Organization class', render: (row) => row.organizationClass },
+                                { id: 'lifecycle', label: 'Lifecycle', render: (row) => humanizeLabel(row.lifecycle) },
+                                { id: 'class', label: 'Organization class', render: (row) => humanizeLabel(row.organizationClass) },
                                 { id: 'owner', label: 'Owner', render: (row) => row.owner },
-                                { id: 'approval', label: 'Latest approval', render: (row) => row.latestApproval },
+                                { id: 'approval', label: 'Latest approval', render: (row) => humanizeLabel(row.latestApproval) },
                             ]}
                         />
                     </Surface>

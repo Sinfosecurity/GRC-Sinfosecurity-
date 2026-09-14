@@ -5,6 +5,7 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
 import { aiGovernanceAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 const KINDS = ['ACCURACY', 'ROBUSTNESS', 'BIAS_FAIRNESS', 'SECURITY', 'PROMPT_INJECTION', 'DATA_LEAKAGE', 'HALLUCINATION', 'SAFETY', 'RED_TEAM', 'HUMAN_OVERSIGHT', 'PERFORMANCE', 'DRIFT'];
 
@@ -32,9 +33,9 @@ export default function AiTesting() {
                         <Alert severity="info" sx={{ mb: 2 }}>Not tested stays Not tested. Failed tests require attention.</Alert>
                         <Stack component="form" onSubmit={create} direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
                             <TextField label="AI system ID" value={systemPublicId} onChange={(event) => setSystemPublicId(event.target.value)} required />
-                            <TextField select label="Test type" value={kind} onChange={(event) => setKind(event.target.value)}>{KINDS.map((item) => <MenuItem key={item} value={item}>{item}</MenuItem>)}</TextField>
+                            <TextField select label="Test type" value={kind} onChange={(event) => setKind(event.target.value)}>{KINDS.map((item) => <MenuItem key={item} value={item}>{humanizeLabel(item)}</MenuItem>)}</TextField>
                             <TextField select label="Result" value={result} onChange={(event) => setResult(event.target.value)}>
-                                {['PASS', 'FAIL', 'PARTIAL', 'NOT_TESTED', 'NOT_APPLICABLE'].map((item) => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+                                {['PASS', 'FAIL', 'PARTIAL', 'NOT_TESTED', 'NOT_APPLICABLE'].map((item) => <MenuItem key={item} value={item}>{humanizeLabel(item)}</MenuItem>)}
                             </TextField>
                             <Button type="submit" variant="contained">Record test</Button>
                         </Stack>
@@ -43,8 +44,8 @@ export default function AiTesting() {
                         <AppTable rows={rows} rowKey={(row) => row.publicId} emptyTitle="No tests" emptyBody="Record a human evaluation. Nothing is inferred." columns={[
                             { id: 'id', label: 'Test', render: (row) => row.publicId },
                             { id: 'system', label: 'System', render: (row) => row.system?.publicId },
-                            { id: 'kind', label: 'Type', render: (row) => row.kind },
-                            { id: 'result', label: 'Result', render: (row) => row.result },
+                            { id: 'kind', label: 'Type', render: (row) => humanizeLabel(row.kind) },
+                            { id: 'result', label: 'Result', render: (row) => humanizeLabel(row.result) },
                         ]} />
                     </Surface>
                 </Stack>
