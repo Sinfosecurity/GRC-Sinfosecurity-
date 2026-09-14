@@ -1,0 +1,648 @@
+{
+  "checks": [
+    {
+      "name": "dashboard",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "honesty",
+      "result": "PASS",
+      "detail": "Recorded AI inventory is not an approval, not a legal applicability finding, and not a model-performance claim. Human approval is required. Monitoring is manual unless a real sourc"
+    },
+    {
+      "name": "monitoring",
+      "result": "PASS",
+      "detail": "Manual / Not configured"
+    },
+    {
+      "name": "create system",
+      "result": "PASS",
+      "detail": "201 AI-00001"
+    },
+    {
+      "name": "lifecycle proposed",
+      "result": "PASS",
+      "detail": "PROPOSED"
+    },
+    {
+      "name": "no self-approve",
+      "result": "PASS",
+      "detail": "400 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Approved or production state requires a recorded human approval.\", \"statusCode\": 400, \"timestamp\": \"2026-09-14T00:21:32"
+    },
+    {
+      "name": "use case",
+      "result": "PASS",
+      "detail": "201 USE-00001"
+    },
+    {
+      "name": "provider unknown",
+      "result": "PASS",
+      "detail": "201 MDL-00001 Unknown / Not recorded"
+    },
+    {
+      "name": "score",
+      "result": "PASS",
+      "detail": "{\"id\": \"b66d4d89-2c3b-4549-a62d-5fe22bef27be\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"systemId\": \"12579fe3-5283-4e48-9b41-85e0b85f7647\", \"methodologyVersion\": \"supreme-ai-1.0.0\", \"impact\": 4, \"likelih"
+    },
+    {
+      "name": "screening",
+      "result": "PASS",
+      "detail": "Enhanced review may be required because recorded answers include: decisions, insurance. This is not a legal prohibition."
+    },
+    {
+      "name": "test not invented",
+      "result": "PASS",
+      "detail": "TST-00001"
+    },
+    {
+      "name": "approval",
+      "result": "PASS",
+      "detail": "APV-00001"
+    },
+    {
+      "name": "incident",
+      "result": "PASS",
+      "detail": "AIN-00001"
+    },
+    {
+      "name": "regulatory",
+      "result": "PASS",
+      "detail": "REG-00001"
+    },
+    {
+      "name": "privacy link",
+      "result": "PASS",
+      "detail": "200 PA-00001"
+    },
+    {
+      "name": "risk link",
+      "result": "PASS",
+      "detail": "200 RISK-00001"
+    },
+    {
+      "name": "control link",
+      "result": "PASS",
+      "detail": "200 AIG-01"
+    },
+    {
+      "name": "change",
+      "result": "PASS",
+      "detail": "CHG-00002"
+    },
+    {
+      "name": "what is affected",
+      "result": "PASS",
+      "detail": "What do we need to review before this AI continues?"
+    },
+    {
+      "name": "import formula",
+      "result": "PASS",
+      "detail": "{\"success\": true, \"data\": [{\"row\": 1, \"name\": \"'=HYPERLINK(\\\"http://evil\\\")\", \"valid\": true, \"error\": null}]}"
+    },
+    {
+      "name": "report inventory",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report risk",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report approval",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report testing",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report vendor",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report regulatory",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report executive",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "report board",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "board pptx",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "board pptx slides",
+      "result": "PASS",
+      "detail": "12 slides"
+    },
+    {
+      "name": "board pptx cover",
+      "result": "PASS",
+      "detail": "SUPREME AI GOVERNANCE Board Risk Committee report Elite Claims 2026-09-14 \u00b7 Live tenant records only \u00b7 No trend available Prepared for CPO, DPO, General Counsel, CISO, CRO, and the"
+    },
+    {
+      "name": "board honesty",
+      "result": "PASS",
+      "detail": "SUPREME AI GOVERNANCE Board Risk Committee report Elite Claims 2026-09-14 \u00b7 Live tenant records only \u00b7 No trend available Prepared for CPO, DPO, General Counsel, CISO, CRO, and the Board Risk Committee. Recorded AI inven"
+    },
+    {
+      "name": "export csv",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "export xlsx",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "cross-tenant system",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "cross-tenant dashboard",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "dashboard copy",
+      "result": "PASS",
+      "detail": "SUPREME RISK \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nSupreme\n\nThird Party \u00b7 Staging\n\nOVERVIEW\n\nOverview\n\nTHIRD PARTIES\n\nVendors\n"
+    },
+    {
+      "name": "forbidden copy dashboard",
+      "result": "PASS",
+      "detail": "/ai-governance"
+    },
+    {
+      "name": "overflow dashboard",
+      "result": "PASS",
+      "detail": "/ai-governance"
+    },
+    {
+      "name": "forbidden copy register",
+      "result": "PASS",
+      "detail": "/ai-governance/systems"
+    },
+    {
+      "name": "overflow register",
+      "result": "PASS",
+      "detail": "/ai-governance/systems"
+    },
+    {
+      "name": "forbidden copy providers",
+      "result": "PASS",
+      "detail": "/ai-governance/providers"
+    },
+    {
+      "name": "overflow providers",
+      "result": "PASS",
+      "detail": "/ai-governance/providers"
+    },
+    {
+      "name": "forbidden copy assessments",
+      "result": "PASS",
+      "detail": "/ai-governance/assessments"
+    },
+    {
+      "name": "overflow assessments",
+      "result": "PASS",
+      "detail": "/ai-governance/assessments"
+    },
+    {
+      "name": "forbidden copy testing",
+      "result": "PASS",
+      "detail": "/ai-governance/testing"
+    },
+    {
+      "name": "overflow testing",
+      "result": "PASS",
+      "detail": "/ai-governance/testing"
+    },
+    {
+      "name": "forbidden copy approvals",
+      "result": "PASS",
+      "detail": "/ai-governance/approvals"
+    },
+    {
+      "name": "overflow approvals",
+      "result": "PASS",
+      "detail": "/ai-governance/approvals"
+    },
+    {
+      "name": "forbidden copy incidents",
+      "result": "PASS",
+      "detail": "/ai-governance/incidents"
+    },
+    {
+      "name": "overflow incidents",
+      "result": "PASS",
+      "detail": "/ai-governance/incidents"
+    },
+    {
+      "name": "forbidden copy regulatory",
+      "result": "FAIL",
+      "detail": "/ai-governance/regulatory"
+    },
+    {
+      "name": "overflow regulatory",
+      "result": "PASS",
+      "detail": "/ai-governance/regulatory"
+    },
+    {
+      "name": "forbidden copy exceptions",
+      "result": "PASS",
+      "detail": "/ai-governance/exceptions"
+    },
+    {
+      "name": "overflow exceptions",
+      "result": "PASS",
+      "detail": "/ai-governance/exceptions"
+    },
+    {
+      "name": "import preview first",
+      "result": "PASS",
+      "detail": "SUPREME RISK \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nSupreme\n\nThird Party \u00b7 Staging\n\nOVERVIEW\n\nOverview\n\nTHIRD PARTIES\n\nVendors\n"
+    },
+    {
+      "name": "forbidden copy import",
+      "result": "PASS",
+      "detail": "/ai-governance/import"
+    },
+    {
+      "name": "overflow import",
+      "result": "PASS",
+      "detail": "/ai-governance/import"
+    },
+    {
+      "name": "forbidden copy system-detail",
+      "result": "PASS",
+      "detail": "/ai-governance/systems/AI-00001"
+    },
+    {
+      "name": "overflow system-detail",
+      "result": "PASS",
+      "detail": "/ai-governance/systems/AI-00001"
+    },
+    {
+      "name": "forbidden copy use-case",
+      "result": "PASS",
+      "detail": "/ai-governance/use-cases/USE-00001"
+    },
+    {
+      "name": "overflow use-case",
+      "result": "PASS",
+      "detail": "/ai-governance/use-cases/USE-00001"
+    },
+    {
+      "name": "board pptx native render",
+      "result": "PASS",
+      "detail": "Microsoft PowerPoint 12 slides / 12 unique"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-inventory.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-risk.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-approval.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-testing.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-vendor.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-regulatory.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-executive.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-board.pdf",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-Board.pptx",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-Register.csv",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-Register.xlsx",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/dashboard-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/dashboard-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/dashboard-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/dashboard-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/dashboard-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/register-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/register-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/register-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/register-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/register-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/providers-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/providers-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/providers-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/providers-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/providers-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/assessments-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/assessments-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/assessments-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/assessments-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/assessments-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/testing-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/testing-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/testing-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/testing-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/testing-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/approvals-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/approvals-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/approvals-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/approvals-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/approvals-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/incidents-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/incidents-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/incidents-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/incidents-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/incidents-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regulatory-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regulatory-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regulatory-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regulatory-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regulatory-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/exceptions-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/exceptions-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/exceptions-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/exceptions-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/exceptions-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/import-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/import-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/import-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/import-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/import-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-privacy-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-compliance-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-risk-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-graph-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-controls-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-vendors-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-1.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-2.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-3.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-4.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-5.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-6.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-7.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-8.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-9.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-10.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-11.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-12.png"
+  ],
+  "sha": {
+    "api": "577071e895b360c86a56acf91644d5c80b5bc53c",
+    "frontend": "577071e895b360c86a56acf91644d5c80b5bc53c",
+    "healthStatus": 200,
+    "health": {
+      "status": "degraded",
+      "timestamp": "2026-09-14T00:21:30.620Z",
+      "uptime": 611.746666959,
+      "version": "1.0.0",
+      "runtimeMode": "production",
+      "deploymentEnvironment": "staging",
+      "environment": "staging",
+      "gitSha": "577071e895b360c86a56acf91644d5c80b5bc53c",
+      "checks": {
+        "mongodb": {
+          "status": "degraded",
+          "message": "NOT_CONFIGURED",
+          "responseTime": 0
+        },
+        "memory": {
+          "status": "degraded",
+          "message": "High memory usage",
+          "details": {
+            "heapUsedMB": 90,
+            "heapTotalMB": 94,
+            "usagePercent": "95.74"
+          },
+          "responseTime": 0
+        },
+        "circuitBreakers": {
+          "status": "up",
+          "message": "All circuit breakers operational",
+          "details": {
+            "totalBreakers": 0
+          },
+          "responseTime": 0
+        },
+        "storage": {
+          "status": "up",
+          "message": "Object storage s3",
+          "details": {
+            "provider": "s3",
+            "malwareScanning": "PENDING",
+            "malwareProvider": "CONNECTED",
+            "downloadPolicy": {
+              "allowPendingDownloads": false,
+              "allowUnscannedDownloads": false
+            }
+          },
+          "responseTime": 0
+        },
+        "email": {
+          "status": "degraded",
+          "message": "DEGRADED",
+          "responseTime": 0
+        },
+        "stripe": {
+          "status": "up",
+          "message": "Stripe test mode connected",
+          "responseTime": 0
+        },
+        "ai": {
+          "status": "degraded",
+          "message": "NOT_CONFIGURED",
+          "responseTime": 0
+        },
+        "malware": {
+          "status": "up",
+          "message": "CONNECTED",
+          "details": {
+            "downloadPolicy": {
+              "allowPendingDownloads": false,
+              "allowUnscannedDownloads": false
+            }
+          },
+          "responseTime": 0
+        },
+        "redis": {
+          "status": "up",
+          "message": "Redis connection healthy",
+          "responseTime": 1
+        },
+        "postgres": {
+          "status": "up",
+          "message": "PostgreSQL connection healthy",
+          "responseTime": 2
+        }
+      },
+      "memory": {
+        "rss": 218652672,
+        "heapUsed": 94369176,
+        "heapTotal": 98447360
+      }
+    }
+  },
+  "workflow": {
+    "system": "AI-00001",
+    "useCase": "USE-00001",
+    "provider": "MDL-00001",
+    "assessment": "AIA-00001",
+    "test": "TST-00001",
+    "approval": "APV-00001",
+    "incident": "AIN-00001",
+    "regulatory": "REG-00001",
+    "activity": "PA-00001",
+    "risk": "RISK-00001",
+    "control": "AIG-01",
+    "reviewQuestion": "What do we need to review before this AI continues?"
+  },
+  "chain": {
+    "system": {
+      "publicId": "AI-00001",
+      "name": "Claims triage assistant",
+      "lifecycle": "APPROVED"
+    },
+    "useCases": [
+      {
+        "id": "e573f73d-2a63-4e18-bd72-dafbe93f5a78",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "publicId": "USE-00001",
+        "name": "Claims triage",
+        "purpose": "Route incoming claims for human review",
+        "businessProcess": null,
+        "decisionInfluence": "Recommended routing only",
+        "affectedPersons": "Claimants",
+        "dataSummary": null,
+        "owner": null,
+        "jurisdiction": null,
+        "autonomy": "NOT_RECORDED",
+        "organizationClass": "NOT_CLASSIFIED",
+        "approvalStatus": null,
+        "humanOversight": null,
+        "createdAt": "2026-09-14T00:21:32.820Z",
+        "updatedAt": "2026-09-14T00:21:32.820Z"
+      }
+    ],
+    "vendors": [],
+    "models": [
+      {
+        "id": "f3de7a7f-3323-4596-ad24-0cc89e202675",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "publicId": "MDL-00001",
+        "vendorId": null,
+        "providerName": "Recorded model provider",
+        "modelFamily": null,
+        "modelVersion": null,
+        "hosting": null,
+        "deployment": null,
+        "trainingDataAssertion": null,
+        "retentionAssertion": null,
+        "availabilityStatus": "Unknown / Not recorded",
+        "notes": null,
+        "createdAt": "2026-09-14T00:21:33.064Z",
+        "updatedAt": "2026-09-14T00:21:33.064Z"
+      }
+    ],
+    "dataCategories": [],
+    "personalData": true,
+    "jurisdictions": [],
+    "privacyActivities": [
+      {
+        "publicId": "PA-00001",
+        "name": "Claims servicing"
+      }
+    ],
+    "enterpriseRisks": [
+      {
+        "publicId": "RISK-00001",
+        "title": "Privileged access failure",
+        "residualRating": "CRITICAL"
+      }
+    ],
+    "controls": [
+      {
+        "id": "7c80f7ab-bb65-417d-9330-9f044d347033",
+        "title": "AI systems are inventoried before production use",
+        "effectiveness": "NOT_TESTED"
+      }
+    ],
+    "tests": [
+      {
+        "id": "13507296-679b-49d0-92e6-0568d70abf07",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "TST-00001",
+        "kind": "BIAS_FAIRNESS",
+        "method": null,
+        "datasetRef": null,
+        "tester": "Hosted reviewer",
+        "testedAt": "2026-09-14T00:21:35.175Z",
+        "result": "NOT_TESTED",
+        "threshold": null,
+        "notes": null,
+        "evidenceNote": null,
+        "createdAt": "2026-09-14T00:21:35.175Z"
+      }
+    ],
+    "incidents": [
+      {
+        "id": "e6ce27bf-1620-4df1-a53c-8bf993dfce7a",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "AIN-00001",
+        "title": "Incorrect claim-routing suggestion",
+        "severity": "MEDIUM",
+        "impact": null,
+        "status": "OPEN",
+        "owner": null,
+        "decision": null,
+        "closedAt": null,
+        "createdAt": "2026-09-14T00:21:35.875Z",
+        "updatedAt": "2026-09-14T00:21:35.875Z"
+      }
+    ],
+    "approvals": [
+      {
+        "id": "206496ac-b803-4ae1-9101-8dd302493ff0",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "APV-00001",
+        "decision": "APPROVED_WITH_CONDITIONS",
+        "decisionMaker": "Risk Committee",
+        "authority": null,
+        "rationale": "Human review of recorded use, oversight, and untested bias posture.",
+        "conditions": "Do not expand to autonomous claim denial.",
+        "reviewAt": null,
+        "createdAt": "2026-09-14T00:21:35.539Z"
+      }
+    ],
+    "reviewQuestion": "What do we need to review before this AI continues?"
+  },
+  "discrepancies": [],
+  "hostedFrontendSha": "577071e895b360c86a56acf91644d5c80b5bc53c",
+  "hostedApiSha": "577071e895b360c86a56acf91644d5c80b5bc53c"
+}

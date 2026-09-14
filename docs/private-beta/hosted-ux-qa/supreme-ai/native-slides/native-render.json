@@ -1,0 +1,70 @@
+{
+  "engine": "Microsoft PowerPoint",
+  "pptx": "/Users/tahirah-macmini/Documents/Supreme Risk /GRC-Sinfosecurity-/docs/private-beta/hosted-ux-qa/supreme-ai/Supreme-AI-Board.pptx",
+  "pages": 12,
+  "uniqueHashes": 12,
+  "hashes": [
+    {
+      "file": "native-slide-01.png",
+      "sha256": "48fbd83f96d390381544d1af69c63f2b081ba97473926d1e563ea4eec77f3691",
+      "bytes": 52834
+    },
+    {
+      "file": "native-slide-02.png",
+      "sha256": "b1327374d93fd48a39ca5f7ea96334e48a72196c7b8bd40bd53d9145ce2766c0",
+      "bytes": 61387
+    },
+    {
+      "file": "native-slide-03.png",
+      "sha256": "01ca9caac70b1f1376b2cf6c85c8c3756267cd507888070c5a70d7285cdb53cd",
+      "bytes": 51396
+    },
+    {
+      "file": "native-slide-04.png",
+      "sha256": "5f026f32120c1456426752c8f6943f2f9f07250102f38e4bf6e1feabd2ad3c46",
+      "bytes": 58262
+    },
+    {
+      "file": "native-slide-05.png",
+      "sha256": "5454467f5fddeb1f73d049bf2f1e90d32fdff3885de51154a34295b76669224f",
+      "bytes": 50660
+    },
+    {
+      "file": "native-slide-06.png",
+      "sha256": "ff5db92d1623148f5d64ec38d7f1277c9e71463000cfabec6e3a68d8b96151ea",
+      "bytes": 53709
+    },
+    {
+      "file": "native-slide-07.png",
+      "sha256": "a456db7b408aeda997790f7f03551ec0240d70450c09cf433a1fe30539767353",
+      "bytes": 55315
+    },
+    {
+      "file": "native-slide-08.png",
+      "sha256": "c03c2bf4674dbf3b4cf607193e50e0c366cc08906702682fb4f740c819202cde",
+      "bytes": 50164
+    },
+    {
+      "file": "native-slide-09.png",
+      "sha256": "6892e12dcdb32cef197cf87c67d89661a8e799f4bb9796f98b0f50f7085e8a74",
+      "bytes": 48814
+    },
+    {
+      "file": "native-slide-10.png",
+      "sha256": "b21516e88d64fe90b9cff24576731be94b6b87569403889bf7be55b6df8f8312",
+      "bytes": 60013
+    },
+    {
+      "file": "native-slide-11.png",
+      "sha256": "2365e2310955b983ab0e5b785a39fe8043bfbfaf30ac8ffc2683dfff2dcbc0a8",
+      "bytes": 42902
+    },
+    {
+      "file": "native-slide-12.png",
+      "sha256": "32244c3cca9fa4503c11141056d3cb38d7b9cc7fa7791fa5522a10541eb59d5e",
+      "bytes": 53220
+    }
+  ],
+  "reconstruction": "native",
+  "warning": ""
+}
