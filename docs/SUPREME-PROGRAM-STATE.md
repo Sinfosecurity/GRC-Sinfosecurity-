@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #18 Supreme AI Governance
+**CURRENT ITEM:** #12 Automation Closure Phase A review, in parallel with #18 Supreme AI Governance
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED
+**CURRENT ITEM STATUS:** #12 PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED; #18 PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -20,7 +20,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PRIVATE EXTERNAL TESTERS:** NOT AUTHORIZED unless Product Leadership separately approves
 
-**CURRENT VERIFIED SHA:** `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9` (hosted #14 UX closure; not a #14 PASS acceptance SHA). CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`. Architecture SHA `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. Prior program-acceptance snapshot `358eab7ece3e0dbb2f53d494328f7302f1f071d2` remains the last #12 customer-ready attempt and is still not accepted.
+**CURRENT VERIFIED SHA:** `b7f9072efe428b48d286d442e505d647b2aea874` (hosted #12 Automation Closure Phase A implementation; not a #12 PASS acceptance SHA). Prior #14 UX closure `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9` remains independently verified. Architecture SHA `a743c8a00910fac77d9046a27c2f0eb36d13abd2` remains independently verified. Prior program-acceptance snapshot `358eab7ece3e0dbb2f53d494328f7302f1f071d2` remains the last #12 customer-ready attempt and is still not accepted.
 
 **#13 STARTING SHA:** `70e4953e9d9eba13ac8604b721c81216a4e149ad`
 
@@ -36,6 +36,16 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#12 IMPLEMENTATION SHA:** later invitation-delivery work exists on `supreme-risk-transformation`; #12 is not PASS
 
+**#12 PHASE A STARTING SHA:** `5dae4b6c5d7da9f4a872d4f53703166ccebb1dd0`
+
+**#12 PHASE A IMPLEMENTATION SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`
+
+**#12 PHASE A HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34797853693 PASS on `b7f9072`
+
+**#12 PHASE A HOSTED FRONTEND SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`
+
+**#12 PHASE A HOSTED API SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`
+
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
 **MAIN MERGED:** NO
@@ -45,7 +55,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — PARTIAL; invitation inbox / visual acceptance remain; open in parallel with #13
+**#12 STARTED:** YES — PARTIAL; invitation inbox / visual acceptance remain; Automation Closure Phase A is implemented on `b7f9072` and requires hosted Product Leadership review; open in parallel with #13–#18
 **#13 AUTHORIZED:** YES — Product Leadership 2026-09-13; later accepted
 **#14 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#14 STARTING SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`
@@ -143,7 +153,7 @@ Known open #12 issues:
 - commercial production NO-GO
 - hosted Product Leadership acceptance of the Risk Scoring Methodology workspace
 - hosted Reports assessment selector (UX-031): remediations hosted on frontend `7bf040a` / API `8a3d8fc`; Product Leadership re-review required. See `docs/private-beta/hosted-ux-qa/reports-assessment-selector/`
-- Automation Closure Phase A (request → intake → explainable tier → due-diligence plan) is implemented and requires hosted Product Leadership review. Vendor portal / Phase B is not authorized. See `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`
+- Automation Closure Phase A (request → intake → explainable tier → due-diligence plan) is implemented on hosted SHA `b7f9072` and requires Product Leadership review. Vendor portal / Phase B is not authorized. See `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`
 
 RAW JSON SCORING EDITOR: REMOVED  
 RISK METHODOLOGY WORKSPACE: IMPLEMENTED  
@@ -159,21 +169,25 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Product Leadership hosted review of #17 Supreme Privacy. Keep #12 PARTIAL. Do not start #18. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Product Leadership hosted review of #12 Automation Closure Phase A and remaining #12 private-testing items. #18 remains PARTIAL. Keep #12 PARTIAL. Do not start Phase B vendor portal. Do not start #19 or #20. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#17 Supreme Privacy** — Product Leadership final review required. Do not start #18.
+**#12 Automation Closure Phase A** — Product Leadership hosted review required. Do not mark #12 PASS. Do not start Phase B.
 
-**#12** remains PARTIAL / open in parallel.
+**#18 Supreme AI Governance** remains PARTIAL — Product Leadership final review required.
+
+Do not start #19 or #20.
 
 ---
 
 ## DO NOT START
 
-- **#18** or later gates.
+- Phase B vendor portal.
+- **#19** Supreme Intelligence.
+- **#20** Supreme Automation.
 - Production DNS, `main` merge, or production deploy.
 - Live Stripe or commercial sale.
 - External testers without a separate Product Leadership approval.
@@ -205,7 +219,7 @@ Product Leadership hosted review of #17 Supreme Privacy. Keep #12 PARTIAL. Do no
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership hosted review of #17 Supreme Privacy. Hosted evidence is in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Do not declare #17 PASS from this file. #16 is accepted. #12 remains PARTIAL. #18 is not authorized.
+Product Leadership hosted review of #12 Automation Closure Phase A. Hosted evidence is in `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`. Do not declare #12 PASS from this file. #13–#17 are accepted. #18 remains PARTIAL. #19 and #20 are not authorized.
 
 ---
 
@@ -241,8 +255,9 @@ Do not invent percentages.
 | 14 | Shared Control & Evidence Layer | Product Leadership accepted PASS (2026-09-13) |
 | 15 | Supreme Risk | PASS — Product Leadership accepted (2026-09-13) |
 | 16 | Supreme Compliance | PASS — Product Leadership accepted (2026-09-13) |
-| 17 | Supreme Privacy | PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED |
-| 18–38, 40 | Later modules / GTM / packs | NOT STARTED |
+| 17 | Supreme Privacy | PASS — Product Leadership accepted (2026-09-13) |
+| 18 | Supreme AI Governance | PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED |
+| 19–38, 40 | Later modules / GTM / packs | NOT STARTED / NOT AUTHORIZED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
 Marketing preview pages are not implementation.
@@ -254,6 +269,13 @@ Marketing preview pages are not implementation.
 Concise accepted-status history. Do not fabricate unsubstantiated history. Older certification docs used different local numbering; this log uses the **master punch list** numbers.
 
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
+
+### 2026-09-13
+
+**ITEM:** #12 Automation Closure Phase A  
+**STATUS CHANGE:** none — remains PARTIAL; Phase A implementation returned for hosted Product Leadership review  
+**SHA:** implementation `b7f9072efe428b48d286d442e505d647b2aea874` hosted on staging frontend and API  
+**EVIDENCE:** `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`. Vendor portal / Phase B, #19, and #20 were not started. #12 is not PASS.
 
 ### 2026-09-13
 

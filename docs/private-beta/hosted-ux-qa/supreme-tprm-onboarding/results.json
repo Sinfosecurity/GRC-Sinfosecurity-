@@ -1,0 +1,179 @@
+{
+  "checks": [
+    {
+      "name": "vendor-request",
+      "result": "PASS",
+      "detail": "201 VND-2026-0004"
+    },
+    {
+      "name": "public-vendor-id",
+      "result": "PASS",
+      "detail": "VND-2026-0004"
+    },
+    {
+      "name": "duplicate-detection",
+      "result": "PASS",
+      "detail": "200 matches=1"
+    },
+    {
+      "name": "duplicate-block",
+      "result": "PASS",
+      "detail": "409"
+    },
+    {
+      "name": "owner-assignment",
+      "result": "PASS",
+      "detail": "Report Proof"
+    },
+    {
+      "name": "intake-save",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "intake-complete",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "explainable-tier",
+      "result": "PASS",
+      "detail": "Supreme recommends High from the recorded intake score of 19 of 30."
+    },
+    {
+      "name": "hard-floor-or-factors",
+      "result": "PASS",
+      "detail": "factors=10"
+    },
+    {
+      "name": "privacy-trigger",
+      "result": "PASS",
+      "detail": "{'privacy': True, 'aiGovernance': True, 'resilience': True}"
+    },
+    {
+      "name": "ai-trigger",
+      "result": "PASS",
+      "detail": "{'privacy': True, 'aiGovernance': True, 'resilience': True}"
+    },
+    {
+      "name": "analyst-confirm",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "plan-rationale",
+      "result": "PASS",
+      "detail": "7 assessments"
+    },
+    {
+      "name": "plan-confirm",
+      "result": "PASS",
+      "detail": "Ready to send"
+    },
+    {
+      "name": "tenant-isolation",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "history",
+      "result": "PASS",
+      "detail": "9 events"
+    },
+    {
+      "name": "request-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "request-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "request-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "request-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "request-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "workspace-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "workspace-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "workspace-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "workspace-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "workspace-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "tier-review-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "assessment-plan-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "history-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/request-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/request-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/request-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/request-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/request-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/workspace-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/workspace-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/workspace-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/tier-review-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/assessment-plan-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/history-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/request-workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/intake-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/duplicate-dialog-1440.png"
+  ],
+  "sha": {
+    "hostedFrontend": "b7f9072efe428b48d286d442e505d647b2aea874",
+    "hostedApi": "b7f9072efe428b48d286d442e505d647b2aea874",
+    "implementation": "b7f9072efe428b48d286d442e505d647b2aea874",
+    "starting": "5dae4b6c5d7da9f4a872d4f53703166ccebb1dd0",
+    "expected": "b7f9072efe428b48d286d442e505d647b2aea874"
+  },
+  "workflow": {
+    "publicId": "VND-2026-0004",
+    "vendorId": "c264f4ff-2bc1-4816-82e1-91832445f3e6"
+  },
+  "discrepancies": []
+}
