@@ -574,7 +574,7 @@ export default function VendorOnboardingWorkspace() {
                                     {(data.history || [])
                                         .filter((event: any) => historyLayer === 'audit' || event.milestone || MILESTONE_TITLES.has(event.title))
                                         .map((event: any, index: number) => (
-                                            <Stack key={`${event.at}-${event.action || index}`}>
+                                            <Stack key={`${event.at}-${event.title}-${index}`}>
                                                 <Typography variant="subtitle2">{event.title}</Typography>
                                                 <Typography variant="body2">{event.detail}</Typography>
                                                 <Typography variant="caption">{formatShortDate(event.at)}</Typography>

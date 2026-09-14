@@ -796,7 +796,6 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         plan,
         history: history.map((event) => ({
             at: event.timestamp,
-            action: event.action,
             milestone: MILESTONE_ACTIONS.has(event.action),
             title: HISTORY_ACTIONS[event.action] || event.action.replace(/[._]/g, ' '),
             detail: typeof event.metadata === 'object' && event.metadata && 'summary' in event.metadata
