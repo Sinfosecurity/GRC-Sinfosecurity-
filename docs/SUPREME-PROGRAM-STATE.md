@@ -80,7 +80,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PREMIUM EXPERIENCE STARTING SHA:** `10746ea4f76aeccc6ee27cb62e5760910aad53fe`
 
-**PREMIUM EXPERIENCE PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS.
+**PREMIUM EXPERIENCE IMPLEMENTATION SHA:** `380228df5886f32b4214d2de64b0edd3d54a8eb0`
+
+**PREMIUM EXPERIENCE PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS. Not hosted-proved.
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 

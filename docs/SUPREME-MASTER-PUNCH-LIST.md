@@ -752,7 +752,7 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Implementation SHA recorded after commit. Not hosted-proved in the engineering return.
+**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Implementation `380228df5886f32b4214d2de64b0edd3d54a8eb0`. Not hosted-proved in the engineering return.
 
 **EVIDENCE:** `docs/SUPREME-PREMIUM-EXPERIENCE-AUDIT.md`. Visual index: `docs/private-beta/hosted-ux-qa/premium-experience/README.md`.
 
