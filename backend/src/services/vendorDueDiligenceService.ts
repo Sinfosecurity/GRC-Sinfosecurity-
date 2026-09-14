@@ -310,6 +310,9 @@ export async function activateVendorAccess(rawToken: string) {
         await prisma.vendorAssessmentInvitation.update({ where: { id: invitation.id }, data: { status: VendorInvitationStatus.EXPIRED } });
         throw new ApiError(410, 'This invitation has expired.');
     }
+    if (invitation.status !== VendorInvitationStatus.PENDING) {
+        throw new ApiError(410, 'This invitation has already been used. Ask the customer to resend it if you need a new link.');
+    }
     if (invitation.vendor.organization.status === 'SUSPENDED' || invitation.vendor.organization.status === 'CANCELLED') {
         throw new ApiError(403, 'This assessment is not available.');
     }

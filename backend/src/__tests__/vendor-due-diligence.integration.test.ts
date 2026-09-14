@@ -108,7 +108,7 @@ describe('Supreme Third Party onboarding Phase B', () => {
         expect(activated.status).toBe(200);
         vendorToken = activated.body.data.token;
         const reuse = await request(app).post(`${API}/vendor-portal/activate`).send({ token });
-        expect([200, 410]).toContain(reuse.status);
+        expect(reuse.status).toBe(410);
         const leaked = await request(app).get(`${API}/vendors`).set('Authorization', `Bearer ${vendorToken}`);
         expect(leaked.status).toBe(401);
         const other = await request(app).get(`${API}/vendors/onboarding/${publicId}`).set('Authorization', `Bearer ${tokenB}`);

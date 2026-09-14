@@ -1,0 +1,270 @@
+{
+  "checks": [
+    {
+      "name": "phase-a-request",
+      "result": "PASS",
+      "detail": "201 VND-2026-0006"
+    },
+    {
+      "name": "phase-a-ready",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send-due-diligence",
+      "result": "PASS",
+      "detail": "201 {'status': 'Pending', 'emailStatus': 'Queued', 'sentAt': '2026-09-14T03:07:53.007Z', 'expiresAt': '2026-09-28T03:07:52.215Z'}"
+    },
+    {
+      "name": "activation-link",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "email-provider-status",
+      "result": "PASS",
+      "detail": "Queued"
+    },
+    {
+      "name": "tenant-isolation",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "vendor-activate",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "activation-single-use",
+      "result": "FAIL",
+      "detail": "200 on hosted API a5dc8e2 — reuse still minted a session. Follow-up commit returns 410 for non-pending tokens."
+    },
+    {
+      "name": "vendor-plane-boundary",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "vendor-workspace",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "assigned-assessments",
+      "result": "PASS",
+      "detail": "6"
+    },
+    {
+      "name": "attestation-required",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "submit-62c8703b",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"submitted\": true, \"submittedAt\": \"2026-09-14T03:08:01.163Z\", \"organizationName\": \"Elite Claims\", \"draftFindings\": 10}} evidence=[('is_1', 'Ready'), ('is_10', 'Ready'), ('is_3', 'Ready'), ('is_6', 'Ready'), ('is_7', 'Ready')]"
+    },
+    {
+      "name": "attestation-required",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "submit-5c74a700",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"submitted\": true, \"submittedAt\": \"2026-09-14T03:08:03.333Z\", \"organizationName\": \"Elite Claims\", \"draftFindings\": 7}} evidence=[]"
+    },
+    {
+      "name": "attestation-required",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "submit-46a3ee56",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"submitted\": true, \"submittedAt\": \"2026-09-14T03:08:07.646Z\", \"organizationName\": \"Elite Claims\", \"draftFindings\": 5}} evidence=[('bc_1', 'Ready'), ('bc_2', 'Ready'), ('bc_5', 'Ready')]"
+    },
+    {
+      "name": "attestation-required",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "submit-af054447",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"submitted\": true, \"submittedAt\": \"2026-09-14T03:08:09.223Z\", \"organizationName\": \"Elite Claims\", \"draftFindings\": 4}} evidence=[]"
+    },
+    {
+      "name": "attestation-required",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "submit-9910bbda",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"submitted\": true, \"submittedAt\": \"2026-09-14T03:08:10.711Z\", \"organizationName\": \"Elite Claims\", \"draftFindings\": 6}} evidence=[]"
+    },
+    {
+      "name": "attestation-required",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "submit-7457d72a",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"submitted\": true, \"submittedAt\": \"2026-09-14T03:08:14.962Z\", \"organizationName\": \"Elite Claims\", \"draftFindings\": 4}} evidence=[('irsp_1', 'Ready')]"
+    },
+    {
+      "name": "vendor-submit",
+      "result": "PASS",
+      "detail": "at least one assessment submitted"
+    },
+    {
+      "name": "analyst-review",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "draft-findings",
+      "result": "PASS",
+      "detail": "36 findings"
+    },
+    {
+      "name": "finding-confirm",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "finding-adjust",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "finding-dismiss",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "customer-workspace-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "customer-workspace-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "customer-workspace-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "customer-workspace-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "customer-workspace-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer-due-diligence-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "tab-Review",
+      "result": "PASS",
+      "detail": "Recaptured with exact tab name. analyst-review-1440.png and analyst-review-375.png. No overflow."
+    },
+    {
+      "name": "customer-history-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor-landing-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "vendor-landing-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "vendor-landing-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "vendor-landing-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor-landing-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "vendor-questionnaire-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "vendor-questionnaire-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor-unauth-redirect",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-assessment/activate"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-workspace-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-workspace-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-workspace-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-due-diligence-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/analyst-review-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/analyst-review-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/customer-history-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-landing-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-landing-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-landing-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-landing-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-landing-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-questionnaire-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/vendor-questionnaire-1440.png"
+  ],
+  "sha": {
+    "api": "a5dc8e22c59c6eb99f8f47155ee28c78b4033112",
+    "frontend": "2ebb32564a8bd861ee1b8f3e17e65f05227e587f",
+    "apiEnvironment": "staging",
+    "health": "degraded"
+  },
+  "workflow": {
+    "publicId": "VND-2026-0006",
+    "activation": true,
+    "assessments": [
+      "Supreme Information Security",
+      "Supreme Privacy",
+      "Supreme BCDR",
+      "Supreme Fourth Party",
+      "Supreme Cloud",
+      "Supreme Incident Response"
+    ],
+    "emailStatus": "Queued"
+  },
+  "discrepancies": [
+    "Hosted API SHA a5dc8e22c59c6eb99f8f47155ee28c78b4033112 differs from hosted frontend SHA 2ebb32564a8bd861ee1b8f3e17e65f05227e587f. Not silently reconciled.",
+    "Activation token reuse returned 200 on hosted API a5dc8e2. Follow-up commit makes non-pending tokens 410."
+  ]
+}

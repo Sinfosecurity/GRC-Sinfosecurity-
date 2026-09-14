@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #12 Automation Closure Phase B
 
-**CURRENT ITEM STATUS:** #12 PARTIAL / OPEN; Phase A PASS — Product Leadership accepted; Phase B implemented for hosted review; #18 PASS — Product Leadership accepted
+**CURRENT ITEM STATUS:** #12 PARTIAL / OPEN; Phase A PASS — Product Leadership accepted; Phase B hosted for Product Leadership review; #18 PASS — Product Leadership accepted
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -54,6 +54,14 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#12 PHASE B AUTHORIZED:** YES — Product Leadership 2026-09-13, Phase B only
 
+**#12 PHASE B HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34800714986 PASS on `a5dc8e2`
+
+**#12 PHASE B HOSTED FRONTEND SHA:** `2ebb32564a8bd861ee1b8f3e17e65f05227e587f`
+
+**#12 PHASE B HOSTED API SHA:** `a5dc8e22c59c6eb99f8f47155ee28c78b4033112`
+
+**#12 PHASE B PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS.
+
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
 **MAIN MERGED:** NO
@@ -63,7 +71,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#9 STARTED:** YES — hosted closure PASS
 **#10 STARTED:** YES — PASS; Product Leadership authorized #11
 **#11 STARTED:** YES — EVIDENCE RESULT PASS; production ready NO; GO/NO-GO NO-GO
-**#12 STARTED:** YES — PARTIAL; invitation inbox / visual acceptance remain; Automation Closure Phase A is implemented on `b7f9072` and requires hosted Product Leadership review; open in parallel with #13–#18
+**#12 STARTED:** YES — PARTIAL; Phase A accepted; Phase B hosted for Product Leadership review; invitation inbox / visual acceptance remain; open in parallel with accepted #13–#18
 **#13 AUTHORIZED:** YES — Product Leadership 2026-09-13; later accepted
 **#14 AUTHORIZED:** YES — Product Leadership 2026-09-13
 **#14 STARTING SHA:** `c1c9948e3cf8c761345082b1467b348582b3b1af`
