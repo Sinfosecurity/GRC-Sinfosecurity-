@@ -318,7 +318,7 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 **ITEM:** Premium Experience & Brand Closure — Final Focused Acceptance  
 **STATUS CHANGE:** none — remains PARTIAL — Product Leadership final review required  
-**SHA:** hosted product `97d79fffcd38b59527bd1d9f926bb613766de998`  
+**SHA:** hosted product `97d79fffcd38b59527bd1d9f926bb613766de998`; evidence/a11y follow-up `8a6da52dd135bc43b40a08dc229e699171dfe344`  
 **EVIDENCE:** `docs/private-beta/hosted-ux-qa/premium-experience/`. Vendor invitation→submit walked on `VND-2026-0018` (activate 200 / reuse 410 / resend 410 / submit 200 / analyst 200). Invitation email Queued, not Delivered. Evidence scan `unknown`. Report covers say Supreme Governance Platform. Board PPTX grammar verified from OOXML; native PowerPoint PNGs not produced. Hosted axe still FAIL on `97d79ff`. Cursor does not declare Premium PASS. #12 remains PARTIAL. #19 / #20 not authorized.
 
 ### 2026-09-13

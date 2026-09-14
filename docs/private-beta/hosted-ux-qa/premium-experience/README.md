@@ -15,7 +15,7 @@ This folder is hosted proof. It is not Product Leadership acceptance. Premium Pl
 | `d9f9afc` | PageHeader wrap; notification unread-first. Hosted API at that capture was `164dbd2`. |
 | `c3eea10` | Report rebrand to Supreme Governance Platform, board PPTX grammar, notification humanization, Privacy customer language, Home work counts from `/tprm/attention`, skip-link / table keyboard a11y. |
 | `97d79ff` | Download filenames stay on Supreme Governance branding. Hosted frontend and API both this SHA during the vendor re-walk. |
-| Working-tree follow-up | Nav list markup, staging-banner contrast, table-header contrast, Team role labels. Not on hosted `97d79ff`. Do not claim hosted axe PASS from these local edits. |
+| `8a6da52` | Nav list markup, staging-banner contrast, table-header contrast, Team role labels, plus this evidence pack. Not on hosted staging until this SHA deploys. Do not claim hosted axe PASS from `8a6da52` until re-checked on that deploy. |
 
 ## Vendor invitation → submit (P1)
 
