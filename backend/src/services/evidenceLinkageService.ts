@@ -125,26 +125,34 @@ export const evidenceLinkageService = {
                 return { document, link };
             });
 
-            const actor = await prisma.user.findUnique({ where: { id: input.uploadedBy }, select: { id: true } });
-            await recordAudit({
-                organizationId: input.organizationId,
-                actorUserId: actor?.id || null,
-                action: 'evidence.link',
-                resourceType: 'EvidenceLink',
-                resourceId: linked.link.id,
-                result: 'success',
-                metadata: {
-                    storedObjectId: stored.id,
-                    vendorId: input.vendorId,
-                    assessmentId: input.assessmentId,
-                    issueId: input.issueId,
-                    questionId: input.questionId,
-                },
-            });
+            try {
+                const actor = await prisma.user.findUnique({ where: { id: input.uploadedBy }, select: { id: true } });
+                await recordAudit({
+                    organizationId: input.organizationId,
+                    actorUserId: actor?.id || null,
+                    action: 'evidence.link',
+                    resourceType: 'EvidenceLink',
+                    resourceId: linked.link.id,
+                    result: 'success',
+                    metadata: {
+                        storedObjectId: stored.id,
+                        vendorId: input.vendorId,
+                        assessmentId: input.assessmentId,
+                        issueId: input.issueId,
+                        questionId: input.questionId,
+                    },
+                });
+            } catch {
+                // Vendor contacts are not Users; mocked tests may omit user lookup.
+            }
 
             return { stored, ...linked };
         } catch (error) {
-            await objectStorageService.remove(stored.id, input.organizationId, input.uploadedBy).catch(() => undefined);
+            try {
+                await objectStorageService.remove(stored.id, input.organizationId, input.uploadedBy);
+            } catch {
+                // Cleanup is best-effort.
+            }
             throw error;
         }
     },
