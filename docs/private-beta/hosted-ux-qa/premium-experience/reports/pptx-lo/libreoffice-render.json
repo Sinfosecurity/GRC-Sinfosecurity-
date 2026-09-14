@@ -1,0 +1,60 @@
+{
+  "engine": "LibreOffice (Docker minidocks/libreoffice)",
+  "nativePowerPoint": false,
+  "pptx": "/Users/tahirah-macmini/Documents/Supreme Risk /GRC-Sinfosecurity-/docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pptx.pptx",
+  "pages": 10,
+  "uniqueHashes": 10,
+  "hashes": [
+    {
+      "file": "lo-slide-01.png",
+      "sha256": "4d83caaad6efad6d75d877462d3e0e0e05e4502c084a0689e85cb4168994873e",
+      "bytes": 53942
+    },
+    {
+      "file": "lo-slide-02.png",
+      "sha256": "29c88091cf28bc181f87979964b605fccf28075fbf17bb79384056d24ed61bec",
+      "bytes": 40422
+    },
+    {
+      "file": "lo-slide-03.png",
+      "sha256": "c4864b955cc9e34f1a20720744380747cf3426d182a45bcda4e08743ef03210e",
+      "bytes": 47558
+    },
+    {
+      "file": "lo-slide-04.png",
+      "sha256": "2fdb03afcfcbcc4d7785accb20374da0a991cdbac0bf5cc968ba44943b314078",
+      "bytes": 90075
+    },
+    {
+      "file": "lo-slide-05.png",
+      "sha256": "b7920986962815454b88b95192a4de83592b541a87f5970e08d6e9cfd76414bb",
+      "bytes": 24526
+    },
+    {
+      "file": "lo-slide-06.png",
+      "sha256": "cb557533285285c85c3d5c59c577c1a4ae5ed619ce17eb2dea70c30396700035",
+      "bytes": 173488
+    },
+    {
+      "file": "lo-slide-07.png",
+      "sha256": "bc10d704070c45687c6dc0755b1906f938bbf94cbb6bf9e4ce883c2c448c09e9",
+      "bytes": 33963
+    },
+    {
+      "file": "lo-slide-08.png",
+      "sha256": "feb5b345560569fdecdb28fdab5b71fc88f54488f0a5782e2a078d5e820584d1",
+      "bytes": 33212
+    },
+    {
+      "file": "lo-slide-09.png",
+      "sha256": "207cc4612a5ec7568d7ceb8aaf26a2170ca049903c72156614398c1761d0444c",
+      "bytes": 54673
+    },
+    {
+      "file": "lo-slide-10.png",
+      "sha256": "4c31dc50f4b62ded239443aff8a038d80435cc1f38bf336dcae811ee238aa6a5",
+      "bytes": 59253
+    }
+  ],
+  "reconstruction": "libreoffice-impress"
+}

@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership later authorized **#13 Governance Graph** while **#12 remains PARTIAL**.
+**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership accepted #12 on 2026-09-14. Commercial production remains NO-GO.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PARTIAL — Product Leadership accepted Automation Closure Phase A. Phase B vendor-facing due diligence is implemented and hosted for Product Leadership review. Product Leadership authorized Phase C lifecycle closure on 2026-09-14. Phase C is hosted for Product Leadership review on existing models (`VND-2026-0011`). Invitation inbox placement / deliverability remains USER ACTION REQUIRED. Reports assessment selector (UX-031) and remaining visual acceptance stay open. Not PASS. Phase D polish is not started.
+**CURRENT STATUS:** PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). Private-testing release only. Invitation inbox delivery remains Queued ≠ Delivered. Commercial production remains NO-GO.
 
-**CERTIFICATION SHA:** Cursor cannot declare visual PASS. Latest hosted evidence SHA is recorded in `docs/PRIVATE-BETA-CERTIFICATION.md`. Methodology workspace evidence: `docs/RISK-METHODOLOGY-WORKSPACE.md`. Automation Closure Phase A implementation SHA `b7f9072efe428b48d286d442e505d647b2aea874` remains accepted. Phase B product walkthrough used API `a5dc8e22c59c6eb99f8f47155ee28c78b4033112` and frontend `2ebb32564a8bd861ee1b8f3e17e65f05227e587f`. Token single-use was hosted-proved on API `faefbf38a5dcfa16b8986f0f777a55806ea8d7f6`. Phase C hosted API `99bfe89419d064e8ab20317e917b70da22dbd03a` / frontend `7810ac7ab08a5feb1b8ba072b45bbd2a40a3414c`. Not a #12 PASS acceptance SHA.
+**CERTIFICATION SHA:** Product Leadership accepted #12 on 2026-09-14. Product SHA cited at acceptance: `97d79fffcd38b59527bd1d9f926bb613766de998`. Later premium-verification descendant `842e403af4a748502bb8e974fe59d5308a0bc7bd` does not reopen #12.
 
-**EVIDENCE:** False API-unreachable banner, duplicate Supreme templates, evaluation billing block, and hosted report authorization are closed unless new evidence appears. Invitation provider accept is not inbox delivery. Hosted screenshots are in `docs/private-beta/hosted-ux-qa/`. Phase A walkthrough: `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`. Phase B walkthrough: `docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/`. Token closure: `docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/SECURITY-CLOSURE.md`. Phase C walkthrough: `docs/private-beta/hosted-ux-qa/supreme-tprm-phase-c/`. RAW JSON SCORING EDITOR: REMOVED. RISK METHODOLOGY WORKSPACE: IMPLEMENTED. HOSTED PRODUCT LEADERSHIP ACCEPTANCE: PENDING FOR PHASE B AND PHASE C. Cursor cannot declare #12 PASS.
+**EVIDENCE:** Phase A–C walkthroughs remain in `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`, `supreme-tprm-phase-b/`, `supreme-tprm-phase-c/`. Vendor invitation→submit re-walk: `docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/`. Invitation provider accept is not inbox delivery.
 
-**NEXT ACTION:** Product Leadership hosted review of Automation Closure Phase B and Phase C. Phase A is accepted. Phase D polish is not started. Do not start #19 or #20. Do not invite external testers unless separately approved. Do not mark #12 PASS. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 accepted as private testing only. Do not start #19 or #20. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -752,8 +752,8 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Hosted focused-acceptance product `97d79fffcd38b59527bd1d9f926bb613766de998` (documented descendant of `c3eea10` / `d9f9afcde9b276224d943fd2c8370cb7ab5e6627`). Hosted frontend and API `97d79ff` at vendor re-walk. Not Product Leadership accepted.
+**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Hosted final-verification SHA `842e403af4a748502bb8e974fe59d5308a0bc7bd` (descendant of `97d79ff` / `8a6da52` / `54a2025`). Not Product Leadership accepted as Premium Platform PASS.
 
-**EVIDENCE:** `docs/SUPREME-PREMIUM-EXPERIENCE-AUDIT.md`. Hosted visual index: `docs/private-beta/hosted-ux-qa/premium-experience/README.md`. Vendor re-walk: `docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/results.json`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34906530155 PASS on `97d79ff`.
+**EVIDENCE:** `docs/private-beta/hosted-ux-qa/premium-experience/final-verify/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34909432591 PASS on `842e403`.
 
 **NEXT ACTION:** Product Leadership hosted final review. Do not merge `main`. Do not deploy production. Do not start #19 or #20.

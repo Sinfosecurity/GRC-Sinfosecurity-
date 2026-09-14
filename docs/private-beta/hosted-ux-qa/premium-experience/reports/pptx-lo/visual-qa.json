@@ -1,0 +1,18 @@
+{
+  "renderer": "LibreOffice Impress via Docker minidocks/libreoffice, then PyMuPDF page images",
+  "nativePowerPoint": false,
+  "pptx": "docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pptx.pptx",
+  "hostedApiShaAtDownload": "842e403af4a748502bb8e974fe59d5308a0bc7bd",
+  "pages": 10,
+  "uniqueHashes": 10,
+  "allSlidesRender": true,
+  "clipping": false,
+  "overlap": false,
+  "duplicateVisualSlides": false,
+  "branding": "PASS — Supreme Governance Platform · Confidential — Board on every slide",
+  "grammar": "PASS — sits / remain / is past the target date",
+  "charts": "No chart objects in this deck. Heatmap and trend are text substitutes.",
+  "tables": "No table objects in this deck. Lists only.",
+  "decisionText": "PASS — Major Decisions and Recommendations readable",
+  "visualQa": "PARTIAL — trustworthy LibreOffice render of all 10 unique slides; not native Microsoft PowerPoint; no chart/table objects to QA"
+}

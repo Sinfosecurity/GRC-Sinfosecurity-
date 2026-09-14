@@ -1,0 +1,12 @@
+{
+  "publicId": "VND-2026-0021",
+  "assessmentId": "264756fd-48f4-4a4f-9305-58e18dbee271",
+  "apiStatus": "Ready",
+  "presentedStatus": "Ready",
+  "readyShown": false,
+  "frontendSha": "842e403af4a748502bb8e974fe59d5308a0bc7bd",
+  "uiHasReady": true,
+  "uiHasUnavailable": false,
+  "uiHasScanning": false,
+  "uiHasCLEAN": false
+}
