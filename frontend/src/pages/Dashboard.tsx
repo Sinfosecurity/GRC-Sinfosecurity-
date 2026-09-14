@@ -285,7 +285,7 @@ export default function Dashboard() {
                 </Box>
             )}
 
-            <Typography variant="overline" sx={{ display: 'block', mb: 1 }}>What needs attention</Typography>
+            <Typography variant="overline" sx={{ display: 'block', mb: 1, color: 'text.primary' }}>What needs attention</Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
                 <MetricCard label="Critical vendors" value={stats?.criticalVendors ?? '—'} onClick={() => navigate('/vendor-management')} />
                 <MetricCard label="High risk" value={stats?.highRiskVendors ?? '—'} onClick={() => navigate('/vendor-management')} />

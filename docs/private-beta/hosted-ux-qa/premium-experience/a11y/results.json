@@ -1,0 +1,319 @@
+{
+  "checks": [
+    {
+      "name": "axe public-home",
+      "result": "FAIL",
+      "detail": "serious=1 moderate=0 error=False"
+    },
+    {
+      "name": "axe public-login",
+      "result": "FAIL",
+      "detail": "serious=1 moderate=0 error=False"
+    },
+    {
+      "name": "axe home",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe lifecycle",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe risk",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe compliance",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe privacy",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe ai",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe evidence",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe reports",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe administration",
+      "result": "FAIL",
+      "detail": "serious=3 moderate=0 error=False"
+    },
+    {
+      "name": "axe notifications",
+      "result": "FAIL",
+      "detail": "serious=2 moderate=0 error=False"
+    },
+    {
+      "name": "axe vendor-activate",
+      "result": "FAIL",
+      "detail": "serious=1 moderate=0 error=False"
+    }
+  ],
+  "routes": [
+    {
+      "route": "public-home",
+      "path": "/",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 2
+        }
+      ],
+      "passes": 23
+    },
+    {
+      "route": "public-login",
+      "path": "/login",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 2
+        }
+      ],
+      "passes": 24
+    },
+    {
+      "route": "home",
+      "path": "/dashboard",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 3
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 24
+    },
+    {
+      "route": "lifecycle",
+      "path": "/vendor-onboarding",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 20
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 30
+    },
+    {
+      "route": "risk",
+      "path": "/risks",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 2
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 25
+    },
+    {
+      "route": "compliance",
+      "path": "/compliance",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 2
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 26
+    },
+    {
+      "route": "privacy",
+      "path": "/privacy-ops",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 2
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 25
+    },
+    {
+      "route": "ai",
+      "path": "/ai-governance",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 2
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 26
+    },
+    {
+      "route": "evidence",
+      "path": "/documents",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 21
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 30
+    },
+    {
+      "route": "reports",
+      "path": "/reports",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 33
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 27
+    },
+    {
+      "route": "administration",
+      "path": "/user-management",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "aria-input-field-name",
+          "impact": "serious",
+          "help": "ARIA input fields must have an accessible name",
+          "nodes": 3
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 11
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 29
+    },
+    {
+      "route": "notifications",
+      "path": "/notifications",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 52
+        },
+        {
+          "id": "list",
+          "impact": "serious",
+          "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+          "nodes": 1
+        }
+      ],
+      "passes": 23
+    },
+    {
+      "route": "vendor-activate",
+      "path": "/vendor-assessment/activate",
+      "result": "FAIL",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 3
+        }
+      ],
+      "passes": 20
+    }
+  ]
+}

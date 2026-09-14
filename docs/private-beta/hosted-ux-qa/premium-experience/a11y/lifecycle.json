@@ -1,0 +1,17 @@
+{
+  "violations": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 20
+    },
+    {
+      "id": "list",
+      "impact": "serious",
+      "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+      "nodes": 1
+    }
+  ],
+  "passes": 30
+}

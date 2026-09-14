@@ -1,0 +1,191 @@
+{
+  "checks": [
+    {
+      "name": "hosted-api-sha",
+      "result": "PASS",
+      "detail": "97d79fffcd38b59527bd1d9f926bb613766de998"
+    },
+    {
+      "name": "hosted-frontend-sha",
+      "result": "PASS",
+      "detail": "97d79fffcd38b59527bd1d9f926bb613766de998"
+    },
+    {
+      "name": "request-golden",
+      "result": "PASS",
+      "detail": "201 VND-2026-0018"
+    },
+    {
+      "name": "phase-a-golden",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send-due-diligence",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "email-honesty",
+      "result": "PASS",
+      "detail": "Recorded as queued; not claimed Delivered"
+    },
+    {
+      "name": "resend-invalidates-old-token",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "first-activation",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "token-reuse",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "vendor-plane-boundary",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "cross-tenant",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "request-cross",
+      "result": "PASS",
+      "detail": "201 VND-2026-0019"
+    },
+    {
+      "name": "phase-a-cross",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "activate-cross-vendor",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "cross-vendor",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "vendor-landing",
+      "result": "PASS",
+      "detail": "assessments=6"
+    },
+    {
+      "name": "questionnaire-load",
+      "result": "PASS",
+      "detail": "200 questions=10"
+    },
+    {
+      "name": "save-resume",
+      "result": "PASS",
+      "detail": "200/200"
+    },
+    {
+      "name": "evidence-upload",
+      "result": "PASS",
+      "detail": "201 scan=unknown"
+    },
+    {
+      "name": "evidence-ready-state",
+      "result": "PARTIAL",
+      "detail": "internal scan=unknown; customer language Ready/Blocked only"
+    },
+    {
+      "name": "evidence-upload",
+      "result": "PASS",
+      "detail": "201 scan=unknown"
+    },
+    {
+      "name": "evidence-ready-state",
+      "result": "PARTIAL",
+      "detail": "internal scan=unknown; customer language Ready/Blocked only"
+    },
+    {
+      "name": "evidence-upload",
+      "result": "PASS",
+      "detail": "201 scan=unknown"
+    },
+    {
+      "name": "evidence-ready-state",
+      "result": "PARTIAL",
+      "detail": "internal scan=unknown; customer language Ready/Blocked only"
+    },
+    {
+      "name": "evidence-upload",
+      "result": "PASS",
+      "detail": "201 scan=unknown"
+    },
+    {
+      "name": "evidence-ready-state",
+      "result": "PARTIAL",
+      "detail": "internal scan=unknown; customer language Ready/Blocked only"
+    },
+    {
+      "name": "evidence-upload",
+      "result": "PASS",
+      "detail": "201 scan=unknown"
+    },
+    {
+      "name": "evidence-ready-state",
+      "result": "PARTIAL",
+      "detail": "internal scan=unknown; customer language Ready/Blocked only"
+    },
+    {
+      "name": "attestation-submit",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "analyst-review",
+      "result": "PASS",
+      "detail": "200"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/analyst-review-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/vendor-landing-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/vendor-landing-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/vendor-questionnaire-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/vendor-questionnaire-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/vendor-questionnaire-375.png"
+  ],
+  "sha": {
+    "api": "97d79fffcd38b59527bd1d9f926bb613766de998",
+    "frontend": "97d79fffcd38b59527bd1d9f926bb613766de998",
+    "environment": "staging"
+  },
+  "workflow": {
+    "publicId": "VND-2026-0018",
+    "vendorId": "153abef1-880a-42b9-b758-558baad9315f",
+    "assessmentId": "262a714e-3ee0-4b3f-87c5-8752d6672128",
+    "submitted": true,
+    "evidenceReady": false,
+    "idsA": [
+      "262a714e-3ee0-4b3f-87c5-8752d6672128",
+      "dc102b59-9d1b-4b06-b375-3e046e1b3b08",
+      "5734c5a0-ff14-432e-afe4-7df98e8739c2",
+      "6d463fbc-eab3-4113-a635-01a2b009030f",
+      "4078cc68-7784-46f5-93eb-2f3fe7c14a34",
+      "2ca67bf5-eb9b-4598-8316-5034690f0ac7"
+    ]
+  },
+  "email": {
+    "providerAccepted": false,
+    "providerStatus": "Queued",
+    "emailTruth": "Provider accepted or queued the message. This is not inbox delivery.",
+    "humanInbox": false,
+    "spam": "not inspected",
+    "note": "Do not claim Delivered from Queued."
+  },
+  "notes": []
+}

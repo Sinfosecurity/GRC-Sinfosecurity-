@@ -194,6 +194,8 @@ export default function AppTable<T>({
                                             key={column.id}
                                             sx={{
                                                 width: column.width,
+                                                color: 'text.primary',
+                                                fontWeight: 700,
                                                 display: column.hideOnMobile ? { xs: 'none', md: 'table-cell' } : undefined,
                                             }}
                                         >

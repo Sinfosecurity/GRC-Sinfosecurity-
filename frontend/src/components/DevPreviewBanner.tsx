@@ -50,14 +50,14 @@ export default function DevPreviewBanner() {
                 borderBottom: '1px solid rgba(198,164,107,0.35)',
             }}
         >
-            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.8rem' }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.8rem', color: 'inherit' }}>
                 {environmentLabel() === 'PRIVATE_BETA'
                     ? 'SUPREME — PRIVATE BETA / TEST'
                     : environmentLabel() === 'STAGING'
                         ? 'SUPREME — STAGING'
                         : 'SUPREME — DEVELOPMENT PREVIEW'}
             </Typography>
-            <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, fontSize: '0.7rem' }}>
+            <Typography variant="caption" sx={{ display: 'block', fontSize: '0.75rem', color: '#f4efe6' }}>
                 {environmentLabel() === 'PRIVATE_BETA'
                     ? 'Controlled private testing. Not production. Use synthetic data only. This is not an external pentest, SOC 2, or ISO assessment.'
                     : environmentLabel() === 'STAGING'

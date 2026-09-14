@@ -95,7 +95,7 @@ def token_from_url(url: str | None):
 
 def record(name: str, result: str, detail: str):
     RESULTS["checks"].append({"name": name, "result": result, "detail": detail})
-    print(f"{result:7} {name}: {detail}")
+    print(f"{result:7} {name}: {detail}", flush=True)
 
 
 def shot(page, name: str, width: int):
@@ -274,22 +274,25 @@ def main():
                 f"{question['key']}.pdf",
                 b"%PDF-1.4 premium vendor evidence",
             )
-            evidence_state = ((uploaded.get("data") or {}).get("scanStatus") or uploaded.get("scanStatus") or "unknown")
+            payload = uploaded.get("data") or uploaded
+            evidence_state = (
+                payload.get("scanStatus")
+                or (payload.get("storedObject") or {}).get("scanStatus")
+                or (payload.get("evidence") or {}).get("scanStatus")
+                or "unknown"
+            )
             record("evidence-upload", "PASS" if up_status in (200, 201) else "FAIL", f"{up_status} scan={evidence_state}")
-            for _ in range(24):
+            for _ in range(4):
                 _, again = api("GET", f"/api/v1/vendor-portal/assessments/{assessment_id}", vendor_token)
-                ev = ((again.get("data") or {}).get("evidence") or [])
-                if not ev:
-                    ev = [row for row in ((again.get("data") or {}).get("questions") or []) if row.get("key") == question["key"]]
-                states = [str(row.get("scanStatus") or row.get("status") or "") for row in ev]
-                if any(state == "CLEAN" for state in states):
+                blob = json.dumps(again)
+                if '"scanStatus":"CLEAN"' in blob or '"scanStatus": "CLEAN"' in blob:
                     evidence_ready = True
                     evidence_state = "CLEAN"
                     break
-                if any(state in ("INFECTED", "FAILED", "ERROR", "QUARANTINED") for state in states):
-                    evidence_state = next(state for state in states if state)
+                if any(token in blob for token in ('"INFECTED"', '"FAILED"', '"QUARANTINED"')):
+                    evidence_state = "blocked"
                     break
-                time.sleep(5)
+                time.sleep(3)
             record(
                 "evidence-ready-state",
                 "PASS" if evidence_ready else "PARTIAL",

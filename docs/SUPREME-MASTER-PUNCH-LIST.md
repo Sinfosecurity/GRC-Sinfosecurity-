@@ -752,8 +752,8 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Hosted finalization implementation `d9f9afcde9b276224d943fd2c8370cb7ab5e6627` (documented descendant of `380228df5886f32b4214d2de64b0edd3d54a8eb0`). Hosted frontend `d9f9afc`. Hosted API `164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe`. Not Product Leadership accepted.
+**CERTIFICATION SHA:** Starting SHA `10746ea4f76aeccc6ee27cb62e5760910aad53fe`. Hosted focused-acceptance product `97d79fffcd38b59527bd1d9f926bb613766de998` (documented descendant of `c3eea10` / `d9f9afcde9b276224d943fd2c8370cb7ab5e6627`). Hosted frontend and API `97d79ff` at vendor re-walk. Not Product Leadership accepted.
 
-**EVIDENCE:** `docs/SUPREME-PREMIUM-EXPERIENCE-AUDIT.md`. Hosted visual index: `docs/private-beta/hosted-ux-qa/premium-experience/README.md`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34834017464 PASS on `d9f9afc`.
+**EVIDENCE:** `docs/SUPREME-PREMIUM-EXPERIENCE-AUDIT.md`. Hosted visual index: `docs/private-beta/hosted-ux-qa/premium-experience/README.md`. Vendor re-walk: `docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/results.json`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34906530155 PASS on `97d79ff`.
 
 **NEXT ACTION:** Product Leadership hosted final review. Do not merge `main`. Do not deploy production. Do not start #19 or #20.

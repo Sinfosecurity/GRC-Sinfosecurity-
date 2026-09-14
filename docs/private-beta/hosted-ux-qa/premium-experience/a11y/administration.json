@@ -1,0 +1,23 @@
+{
+  "violations": [
+    {
+      "id": "aria-input-field-name",
+      "impact": "serious",
+      "help": "ARIA input fields must have an accessible name",
+      "nodes": 3
+    },
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 11
+    },
+    {
+      "id": "list",
+      "impact": "serious",
+      "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+      "nodes": 1
+    }
+  ],
+  "passes": 29
+}

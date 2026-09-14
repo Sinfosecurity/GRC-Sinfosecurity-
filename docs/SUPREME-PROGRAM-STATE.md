@@ -80,13 +80,13 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PREMIUM EXPERIENCE STARTING SHA:** `10746ea4f76aeccc6ee27cb62e5760910aad53fe`
 
-**PREMIUM EXPERIENCE IMPLEMENTATION SHA:** `d9f9afcde9b276224d943fd2c8370cb7ab5e6627` (documented descendant of `380228df5886f32b4214d2de64b0edd3d54a8eb0`; see hosted QA README for `646e2ee` / `164dbd2` / `d9f9afc`)
+**PREMIUM EXPERIENCE IMPLEMENTATION SHA:** `97d79fffcd38b59527bd1d9f926bb613766de998` (hosted vendor re-walk / report rebrand; documented descendant of `c3eea10` / `d9f9afcde9b276224d943fd2c8370cb7ab5e6627`)
 
-**PREMIUM EXPERIENCE HOSTED FRONTEND SHA:** `d9f9afcde9b276224d943fd2c8370cb7ab5e6627`
+**PREMIUM EXPERIENCE HOSTED FRONTEND SHA:** `97d79fffcd38b59527bd1d9f926bb613766de998`
 
-**PREMIUM EXPERIENCE HOSTED API SHA:** `164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe`
+**PREMIUM EXPERIENCE HOSTED API SHA:** `97d79fffcd38b59527bd1d9f926bb613766de998`
 
-**PREMIUM EXPERIENCE HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34834017464 PASS on `d9f9afc`
+**PREMIUM EXPERIENCE HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34906530155 PASS on `97d79ff`
 
 **PREMIUM EXPERIENCE PROGRAM ACCEPTANCE:** PENDING — Product Leadership hosted final review required. Not PASS.
 
@@ -313,6 +313,13 @@ Marketing preview pages are not implementation.
 Concise accepted-status history. Do not fabricate unsubstantiated history. Older certification docs used different local numbering; this log uses the **master punch list** numbers.
 
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
+
+### 2026-09-14
+
+**ITEM:** Premium Experience & Brand Closure — Final Focused Acceptance  
+**STATUS CHANGE:** none — remains PARTIAL — Product Leadership final review required  
+**SHA:** hosted product `97d79fffcd38b59527bd1d9f926bb613766de998`  
+**EVIDENCE:** `docs/private-beta/hosted-ux-qa/premium-experience/`. Vendor invitation→submit walked on `VND-2026-0018` (activate 200 / reuse 410 / resend 410 / submit 200 / analyst 200). Invitation email Queued, not Delivered. Evidence scan `unknown`. Report covers say Supreme Governance Platform. Board PPTX grammar verified from OOXML; native PowerPoint PNGs not produced. Hosted axe still FAIL on `97d79ff`. Cursor does not declare Premium PASS. #12 remains PARTIAL. #19 / #20 not authorized.
 
 ### 2026-09-13
 

@@ -21,7 +21,7 @@ BASE = os.environ.get("E2E_BASE", "https://supreme-risk-staging.onrender.com")
 API = os.environ.get("E2E_API", "https://supreme-risk-staging-api.onrender.com")
 EMAIL = os.environ.get("E2E_EMAIL", "report-proof-20260913@staging.supremerisk.test")
 PASSWORD = os.environ.get("E2E_PASSWORD", "ReportProof1x")
-AXE_URL = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js"
+AXE_PATH = ROOT / "scripts" / "axe.min.js"
 RESULTS: dict = {
     "checks": [],
     "shots": [],
@@ -136,7 +136,7 @@ def save_report(name: str, status: int, payload: dict):
 
 def run_axe(page, name: str):
     try:
-        page.add_script_tag(url=AXE_URL)
+        page.add_script_tag(path=str(AXE_PATH))
         result = page.evaluate(
             """async () => {
                 const out = await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } });
@@ -268,7 +268,8 @@ def main():
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context(bypass_csp=True)
+        page = context.new_page()
         home_count, home_ms = measure_home(page, token, user)
         RESULTS["performance"]["afterRequests"] = home_count
         RESULTS["performance"]["afterLoadMs"] = home_ms

@@ -1,0 +1,1204 @@
+{
+  "checks": [
+    {
+      "name": "hosted frontend sha",
+      "result": "PASS",
+      "detail": "c3eea10d9b193413d55623c254d3fbceeb1af53e"
+    },
+    {
+      "name": "hosted api sha",
+      "result": "PASS",
+      "detail": "c3eea10d9b193413d55623c254d3fbceeb1af53e"
+    },
+    {
+      "name": "customer login",
+      "result": "PASS",
+      "detail": "ORGANIZATION_ADMIN"
+    },
+    {
+      "name": "report executive",
+      "result": "PASS",
+      "detail": "200 bytes=10656 type=application/pdf"
+    },
+    {
+      "name": "report-brand executive",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report board-pdf",
+      "result": "PASS",
+      "detail": "200 bytes=17765 type=application/pdf"
+    },
+    {
+      "name": "report-brand board-pdf",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report board-pptx",
+      "result": "PASS",
+      "detail": "200 bytes=47431 type=application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    },
+    {
+      "name": "pptx-grammar",
+      "result": "PASS",
+      "detail": "observation grammar present"
+    },
+    {
+      "name": "report findings",
+      "result": "PASS",
+      "detail": "200 bytes=15422 type=application/pdf"
+    },
+    {
+      "name": "report-brand findings",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report risk-board",
+      "result": "PASS",
+      "detail": "200 bytes=6934 type=application/pdf"
+    },
+    {
+      "name": "report-brand risk-board",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report compliance-exec",
+      "result": "PASS",
+      "detail": "200 bytes=5353 type=application/pdf"
+    },
+    {
+      "name": "report-brand compliance-exec",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report privacy-exec",
+      "result": "PASS",
+      "detail": "200 bytes=7700 type=application/pdf"
+    },
+    {
+      "name": "report-brand privacy-exec",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report ai-exec",
+      "result": "PASS",
+      "detail": "200 bytes=4347 type=application/pdf"
+    },
+    {
+      "name": "report-brand ai-exec",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report scorecard",
+      "result": "PASS",
+      "detail": "200 bytes=7583 type=application/pdf"
+    },
+    {
+      "name": "report-brand scorecard",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "report assessment",
+      "result": "PASS",
+      "detail": "200 bytes=7032 type=application/pdf"
+    },
+    {
+      "name": "report-brand assessment",
+      "result": "PASS",
+      "detail": "Supreme Governance Platform present"
+    },
+    {
+      "name": "notification-event-codes-internal",
+      "result": "PASS",
+      "detail": "internal codes still present=69; UI must humanize"
+    },
+    {
+      "name": "home-requests",
+      "result": "PARTIAL",
+      "detail": "count=8 unique=8"
+    },
+    {
+      "name": "home-load-ms",
+      "result": "PASS",
+      "detail": "3069"
+    },
+    {
+      "name": "public-home-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe public-home",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard public-home",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "public-home-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "public-home-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "public-home-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "public-home-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "public-login-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe public-login",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard public-login",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "public-login-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "public-login-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "public-login-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "public-login-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "home-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe home",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard home",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "home-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "home-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "home-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "home-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "lifecycle-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe lifecycle",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard lifecycle",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "lifecycle-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "lifecycle-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "lifecycle-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "lifecycle-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "risk-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe risk",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard risk",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "compliance-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe compliance",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard compliance",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "privacy-customer-language",
+      "result": "PASS",
+      "detail": "CLEAN not visible on Privacy overview"
+    },
+    {
+      "name": "privacy-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe privacy",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard privacy",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "privacy-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "privacy-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "privacy-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "privacy-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "ai-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe ai",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard ai",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "evidence-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe evidence",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard evidence",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "reports-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe reports",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard reports",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "reports-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "reports-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "reports-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "reports-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "administration-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe administration",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard administration",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "notification-language",
+      "result": "PASS",
+      "detail": "no dotted assessment.assigned in body"
+    },
+    {
+      "name": "notifications-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe notifications",
+      "result": "PARTIAL",
+      "detail": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy direc"
+    },
+    {
+      "name": "keyboard notifications",
+      "result": "PASS",
+      "detail": "trap=False first={'tag': 'A', 'name': 'Skip to content', 'id': ''}"
+    },
+    {
+      "name": "notifications-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "notifications-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "notifications-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "notifications-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-login-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-login-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-login-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-login-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-login-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/risk-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/compliance-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/ai-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/administration-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/notifications-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/notifications-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/notifications-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/notifications-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/notifications-1920.png"
+  ],
+  "sha": {
+    "api": "c3eea10d9b193413d55623c254d3fbceeb1af53e",
+    "frontend": "c3eea10d9b193413d55623c254d3fbceeb1af53e",
+    "version": {
+      "gitSha": "c3eea10d9b193413d55623c254d3fbceeb1af53e",
+      "builtAt": "2026-09-14T11:03:38.274Z"
+    }
+  },
+  "reports": [
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/executive.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pdf.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pptx.pptx",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/findings.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/risk-board.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/compliance-exec.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/privacy-exec.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/ai-exec.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/scorecard.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/assessment.pdf"
+  ],
+  "a11y": [
+    {
+      "route": "public-home",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "public-login",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "home",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "lifecycle",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "risk",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "compliance",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "privacy",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "ai",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "evidence",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "reports",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "administration",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    },
+    {
+      "route": "notifications",
+      "error": "Page.add_script_tag: Loading the script 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.3/axe.min.js' violates the following Content Security Policy directive: \"script-src 'self'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+      "result": "PARTIAL"
+    }
+  ],
+  "keyboard": [
+    {
+      "route": "public-home",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Supreme home",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Platform",
+          "id": ""
+        },
+        {
+          "tag": "BUTTON",
+          "name": "Products",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Frameworks",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Trust",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Pricing",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Launch Dashboard",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "public-login",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Supreme home",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Platform",
+          "id": ""
+        },
+        {
+          "tag": "BUTTON",
+          "name": "Products",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Frameworks",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Trust",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Pricing",
+          "id": ""
+        },
+        {
+          "tag": "A",
+          "name": "Launch Dashboard",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "home",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "lifecycle",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "risk",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "compliance",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "privacy",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "ai",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "evidence",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "reports",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "administration",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    },
+    {
+      "route": "notifications",
+      "result": "PASS",
+      "focused": [
+        {
+          "tag": "A",
+          "name": "Skip to content",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Home",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Third Parties",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Onboard",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Assessments",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Findings",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Monitoring",
+          "id": ""
+        },
+        {
+          "tag": "DIV",
+          "name": "Decisions",
+          "id": ""
+        }
+      ],
+      "trap": false
+    }
+  ],
+  "performance": {
+    "homeRequests": 8,
+    "homeUnique": [
+      "https://supreme-risk-staging-api.onrender.com/api/v1/ai-governance/dashboard",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/auth/me",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/compliance/dashboard",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/erm/dashboard",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/organization/current",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/privacy/dashboard",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/tprm/attention",
+      "https://supreme-risk-staging-api.onrender.com/api/v1/vendors/statistics"
+    ],
+    "homeLoadMs": 3069,
+    "role": "ORGANIZATION_ADMIN",
+    "afterRequests": 8,
+    "afterLoadMs": 3069
+  },
+  "personas": [
+    {
+      "persona": "Customer Admin",
+      "primary": "Home attention and Administration",
+      "next": "Review third parties / team"
+    },
+    {
+      "persona": "Business Owner",
+      "primary": "Onboard a third party",
+      "next": "Own vendors"
+    },
+    {
+      "persona": "Vendor Respondent",
+      "primary": "Vendor landing / questionnaire",
+      "next": "Save, upload, attest, submit"
+    },
+    {
+      "persona": "TPRM Analyst",
+      "primary": "Lifecycle review",
+      "next": "Confirm findings"
+    },
+    {
+      "persona": "Executive Approver",
+      "primary": "Decisions and reports",
+      "next": "Open decisions"
+    },
+    {
+      "persona": "Platform Owner",
+      "primary": "Separate admin plane",
+      "next": "Authorized console only"
+    }
+  ],
+  "notes": []
+}

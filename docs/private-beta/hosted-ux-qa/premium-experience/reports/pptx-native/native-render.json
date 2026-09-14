@@ -1,0 +1,9 @@
+{
+  "engine": "Microsoft PowerPoint",
+  "pptx": "docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pptx.pptx",
+  "pages": 0,
+  "uniqueHashes": 0,
+  "hashes": [],
+  "reconstruction": "not-rendered",
+  "warning": "PowerPoint.app is installed. LibreOffice and pdftoppm are not. AppleScript PDF export hung twice in this environment (osascript timeout 120s, process killed after ~55s with no PDF). HTML reconstructions are not accepted. Grammar and brand were verified from OOXML slide XML only. PPTX VISUAL QA remains PARTIAL."
+}

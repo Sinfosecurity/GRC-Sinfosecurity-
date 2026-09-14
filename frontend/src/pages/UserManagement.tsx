@@ -236,6 +236,7 @@ export default function UserManagement() {
                                 <TextField
                                     select
                                     size="small"
+                                    label="Role"
                                     value={row.role}
                                     disabled={row.id === user?.id || busyId === row.id || ['SUPERADMIN', 'PLATFORM_ADMIN', 'PLATFORM_OWNER'].includes(row.role)}
                                     onChange={(e) => changeRole(row.id, e.target.value)}

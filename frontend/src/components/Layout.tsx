@@ -8,7 +8,6 @@ import {
     Drawer,
     IconButton,
     InputBase,
-    List,
     ListItemButton,
     ListItemIcon,
     ListItemText,
@@ -151,7 +150,7 @@ function NavList({
     sections: NavSection[];
 }) {
     return (
-        <List sx={{ px: collapsed ? 0.75 : 1.25, py: 0.5 }} disablePadding>
+        <Box component="div" sx={{ px: collapsed ? 0.75 : 1.25, py: 0.5 }}>
             {sections.map((section) => {
                 const items = section.items.filter((item) => canSeeNav(role, item.permission, permissions));
                 if (items.length === 0) return null;
@@ -197,7 +196,7 @@ function NavList({
                     </Box>
                 );
             })}
-        </List>
+        </Box>
     );
 }
 
