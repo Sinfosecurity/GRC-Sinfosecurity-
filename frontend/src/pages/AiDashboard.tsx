@@ -8,6 +8,7 @@ import QueryState from '../components/QueryState';
 import AppTable from '../components/design/AppTable';
 import { aiGovernanceAPI } from '../services/api';
 import { downloadBinaryResponse } from '../services/download';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function AiDashboard() {
     const navigate = useNavigate();
@@ -68,7 +69,7 @@ export default function AiDashboard() {
                                 emptyBody="No fake alerts. Attention comes from live records only."
                                 onRowClick={(row: any) => navigate(row.href)}
                                 columns={[
-                                    { id: 'type', label: 'Needs attention', render: (row: any) => row.type },
+                                    { id: 'type', label: 'Needs attention', render: (row: any) => humanizeLabel(row.type) },
                                     { id: 'why', label: 'Why', render: (row: any) => row.why },
                                     { id: 'id', label: 'Record', render: (row: any) => row.publicId },
                                 ]}

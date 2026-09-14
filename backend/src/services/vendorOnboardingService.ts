@@ -75,6 +75,23 @@ const HISTORY_ACTIONS: Record<string, string> = {
     'vendor.offboarding_started': 'Offboarding started',
 };
 
+const MILESTONE_ACTIONS = new Set([
+    'vendor.requested',
+    'vendor.intake_completed',
+    'vendor.tier_confirmed',
+    'vendor.tier_overridden',
+    'vendor.plan_confirmed',
+    'vendor.due_diligence_sent',
+    'vendor.assessment_submitted',
+    'vendor.finding_confirmed',
+    'vendor.risk_accepted',
+    'vendor.contract_attested',
+    'vendor.approval_decided',
+    'vendor.activated',
+    'vendor.reassessment_started',
+    'vendor.offboarding_started',
+]);
+
 type Actor = { id: string; role: string; name?: string };
 
 function canRequest(role: string) {
@@ -779,6 +796,8 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         plan,
         history: history.map((event) => ({
             at: event.timestamp,
+            action: event.action,
+            milestone: MILESTONE_ACTIONS.has(event.action),
             title: HISTORY_ACTIONS[event.action] || event.action.replace(/[._]/g, ' '),
             detail: typeof event.metadata === 'object' && event.metadata && 'summary' in event.metadata
                 ? String((event.metadata as { summary?: string }).summary || '')

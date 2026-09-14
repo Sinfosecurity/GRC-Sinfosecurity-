@@ -240,7 +240,7 @@ router.get('/:id/reassessment', async (req: AuthRequest, res: Response, next: Ne
 
 router.post('/:id/reassessment', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await startReassessment(req.user!.organizationId, req.params.id, actor(req)) });
+        res.json({ success: true, data: await startReassessment(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
         next(error);
     }

@@ -460,7 +460,7 @@ export const vendorOnboardingAPI = {
     decideApproval: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/approval`, data),
     activate: (id: string) => api.post(`/vendors/onboarding/${id}/activate`),
     reassessment: (id: string) => api.get(`/vendors/onboarding/${id}/reassessment`),
-    startReassessment: (id: string) => api.post(`/vendors/onboarding/${id}/reassessment`),
+    startReassessment: (id: string, data?: unknown) => api.post(`/vendors/onboarding/${id}/reassessment`, data || {}),
     offboard: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/offboard`, data),
 };
 
@@ -573,6 +573,11 @@ export const healthCheck = async () => {
         }
     }
     throw lastError;
+};
+
+export const notificationAPI = {
+    list: () => api.get('/notifications'),
+    markRead: (id: string) => api.post(`/notifications/${id}/read`),
 };
 
 export default api;

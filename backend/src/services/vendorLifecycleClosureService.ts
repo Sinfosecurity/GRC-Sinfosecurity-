@@ -382,7 +382,9 @@ export async function recommendReassessment(organizationId: string, vendorKey: s
         take: 4,
     });
     const latest = assessments[0];
-    const prior = assessments.find((row) => row.id !== latest?.id);
+    const prior = assessments.find((row) => row.id !== latest?.id && ['COMPLETED', 'PENDING_REVIEW', 'PENDING_APPROVAL'].includes(row.status))
+        || assessments.find((row) => row.id !== latest?.id);
+    const currentStarted = Boolean(latest && prior && latest.id !== prior.id && ['NOT_STARTED', 'IN_PROGRESS', 'OVERDUE'].includes(latest.status));
     const changed = latest && prior
         ? latest.responses.filter((row) => {
             const previous = prior.responses.find((item) => item.questionId === row.questionId);
@@ -391,33 +393,101 @@ export async function recommendReassessment(organizationId: string, vendorKey: s
         : 0;
     const yearAgo = new Date();
     yearAgo.setUTCFullYear(yearAgo.getUTCFullYear() - 1);
-    const expiredEvidence = await prisma.storedObject.count({
-        where: { organizationId, ownerId: vendor.id, uploadedAt: { lt: yearAgo } },
+    const expiredWhere = { organizationId, ownerId: vendor.id, uploadedAt: { lt: yearAgo } };
+    const expiredEvidence = await prisma.storedObject.count({ where: expiredWhere });
+    const expiredEvidenceItems = await prisma.storedObject.findMany({
+        where: expiredWhere,
+        select: { id: true, filename: true, uploadedAt: true, scanStatus: true },
+        take: 25,
+        orderBy: { uploadedAt: 'asc' },
     });
     const unresolved = await openConfirmedFindings(organizationId, vendor.id);
     const plan = vendor.onboarding?.plan as { triggers?: Record<string, boolean> } | null;
-    const recommendation = unresolved.length || expiredEvidence || changed > 3 || plan?.triggers?.privacy || plan?.triggers?.aiGovernance
+    const templateChanged = Boolean(
+        latest && prior && (
+            latest.templateId !== prior.templateId
+            || latest.templateVersion !== prior.templateVersion
+        )
+    );
+    const scopeChanged = Boolean(plan?.triggers?.privacy || plan?.triggers?.aiGovernance);
+    const recommendation = unresolved.length || expiredEvidence || changed > 3 || scopeChanged || templateChanged
         ? 'Full reassessment'
         : changed
             ? 'Targeted reassessment'
             : 'Reconfirm previous answers';
+    const why = recommendation === 'Full reassessment'
+        ? [
+            unresolved.length ? `${unresolved.length} open finding${unresolved.length === 1 ? '' : 's'}` : null,
+            expiredEvidence ? `${expiredEvidence} expired evidence file${expiredEvidence === 1 ? '' : 's'}` : null,
+            changed > 3 ? `${changed} changed answers` : null,
+            scopeChanged ? 'privacy or AI scope is in the plan' : null,
+            templateChanged ? 'the questionnaire template or version changed' : null,
+        ].filter(Boolean).join(', ') || 'Material change requires a full pass of the existing assessment engine.'
+        : recommendation === 'Targeted reassessment'
+            ? `${changed} answer${changed === 1 ? '' : 's'} changed since the previous assessment. Confirm those items and leave unchanged answers for explicit vendor confirmation.`
+            : 'No material change is recorded. Ask the vendor to confirm previous answers and replace any stale evidence.';
+    const previousAnswers = (prior?.responses || []).slice(0, 80).map((row) => {
+        const current = latest && latest.id !== prior.id
+            ? latest.responses.find((item) => item.questionId === row.questionId)
+            : undefined;
+        return {
+            questionId: row.questionId,
+            question: row.questionText,
+            previous: row.response || 'Not answered',
+            current: current ? (current.response || 'Not answered') : (currentStarted ? 'Not started' : null),
+            changed: Boolean(current?.response && row.response && current.response !== row.response),
+        };
+    });
     return {
         recommendation,
+        why,
         changedAnswers: changed,
         expiredEvidence,
         unresolvedFindings: unresolved.length,
         previousAnswersEligible: Boolean(prior),
+        templateChanged,
         newScope: {
             privacy: Boolean(plan?.triggers?.privacy),
             aiGovernance: Boolean(plan?.triggers?.aiGovernance),
         },
+        previousAssessment: prior ? {
+            id: prior.id,
+            name: prior.frameworkUsed || prior.assessmentType,
+            status: prior.status,
+            completedAt: prior.completedAt || prior.submittedAt,
+            templateVersion: prior.templateVersion,
+        } : null,
+        currentAssessment: latest && (!prior || latest.id !== prior.id) ? {
+            id: latest.id,
+            name: latest.frameworkUsed || latest.assessmentType,
+            status: latest.status,
+            started: currentStarted,
+        } : null,
+        previousAnswers,
+        expiredEvidenceItems: expiredEvidenceItems.map((row) => ({
+            id: row.id,
+            filename: row.filename,
+            uploadedAt: row.uploadedAt,
+            scanStatus: row.scanStatus,
+        })),
+        openFindings: unresolved.slice(0, 25).map((row) => ({
+            id: row.id,
+            title: row.title,
+            severity: row.severity,
+            status: row.status,
+        })),
         nextAction: recommendation === 'Reconfirm previous answers'
-            ? 'Ask the vendor to reconfirm unchanged answers and replace expired evidence.'
-            : `Start a ${recommendation.toLowerCase()}.`,
+            ? 'Ask the vendor to reconfirm unchanged answers. Prior answers do not become current truth until they confirm or revise them.'
+            : `Start a ${recommendation.toLowerCase()} in the existing assessment engine. Prior answers stay historical until explicitly confirmed.`,
     };
 }
 
-export async function startReassessment(organizationId: string, vendorKey: string, actor: Actor) {
+export async function startReassessment(
+    organizationId: string,
+    vendorKey: string,
+    actor: Actor,
+    input: { confirmPriorAnswers?: boolean } = {}
+) {
     if (!canReview(actor.role)) throw new ApiError(403, 'Only a risk reviewer can start reassessment.');
     const vendor = await loadVendor(organizationId, vendorKey);
     const recommendation = await recommendReassessment(organizationId, vendorKey, actor);
@@ -425,7 +495,16 @@ export async function startReassessment(organizationId: string, vendorKey: strin
         where: { vendorId: vendor.id },
         data: { stage: VendorOnboardingStage.REASSESSMENT, lastReassessmentAt: new Date() },
     });
-    await history(organizationId, actor.id, vendor.id, 'vendor.reassessment_started', `${actor.name || 'Analyst'} started a ${recommendation.recommendation.toLowerCase()}.`);
+    const confirmNote = input.confirmPriorAnswers
+        ? ' Prior answers will be shown for confirmation and will not become current truth until the vendor confirms or revises them.'
+        : '';
+    await history(
+        organizationId,
+        actor.id,
+        vendor.id,
+        'vendor.reassessment_started',
+        `${actor.name || 'Analyst'} started a ${recommendation.recommendation.toLowerCase()}.${confirmNote}`
+    );
     return { ...await presentLifecycle(organizationId, vendor.id, actor), reassessment: recommendation };
 }
 

@@ -42,6 +42,19 @@ export default function Landing() {
                 </div>
             </section>
 
+            <section id="who" className="mkt-section">
+                <div className="mkt-shell">
+                    <p className="mkt-kicker">Who it is for</p>
+                    <h2 className="mkt-display">Risk, compliance, privacy, and AI leaders who share one operating picture.</h2>
+                    <p className="mkt-lede">
+                        Supreme is for organizations that already have third parties, residual risk,
+                        frameworks, personal data, and AI in production — and need one place to see
+                        what changed, what it affects, and who must decide. It is not only a vendor
+                        questionnaire product.
+                    </p>
+                </div>
+            </section>
+
             <section id="platform" className="mkt-section">
                 <div className="mkt-shell">
                     <p className="mkt-kicker">One platform</p>

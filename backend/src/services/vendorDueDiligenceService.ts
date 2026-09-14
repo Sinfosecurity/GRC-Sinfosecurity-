@@ -21,7 +21,7 @@ import { recordAudit } from './auditEventService';
 import { evidenceLinkageService } from './evidenceLinkageService';
 import { deliverEmail, notifyUser } from './notificationDeliveryService';
 import { hashToken, randomToken } from './passwordService';
-import { publicFrontendUrl } from './publicFrontendUrl';
+import { publicFrontendUrl, vendorInvitationEmailHtml } from './publicFrontendUrl';
 import { scoreAssessmentResponse } from './vendorAssessmentService';
 import { addBusinessDays } from './vendorOnboardingScoring';
 import { getOnboarding } from './vendorOnboardingService';
@@ -212,23 +212,26 @@ export async function sendDueDiligence(organizationId: string, vendorKey: string
     const activationUrl = `${publicFrontendUrl()}/vendor-assessment/activate?token=${rawToken}`;
     const org = await prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } });
     const items = assessments.map((row) => row.frameworkUsed || 'Assessment').join('\n• ');
+    const invitationBody = [
+        `Hello ${firstName(contact.name)},`,
+        '',
+        `${org?.name || 'A customer'} has asked you to complete a due-diligence assessment for ${vendor.name}.`,
+        '',
+        'Requested items:',
+        `• ${items}`,
+        '',
+        `Due: ${dueAt.toISOString().slice(0, 10)}`,
+        '',
+        `Start assessment: ${activationUrl}`,
+        '',
+        'This link expires and can be used once. Provider accepted or queued is not inbox delivery.',
+        'Questions? Reply to this message or contact the requesting organization.',
+    ].join('\n');
     const email = await deliverEmail({
         to: contact.email,
         subject: `${org?.name || 'A customer'} has requested a third-party assessment`,
-        body: [
-            `Hello ${firstName(contact.name)},`,
-            '',
-            `${org?.name || 'A customer'} has asked you to complete a due-diligence assessment for ${vendor.name}.`,
-            '',
-            'Requested items:',
-            `• ${items}`,
-            '',
-            `Due: ${dueAt.toISOString().slice(0, 10)}`,
-            '',
-            `Start assessment: ${activationUrl}`,
-            '',
-            'Questions? Reply to this message or contact the requesting organization.',
-        ].join('\n'),
+        body: invitationBody,
+        html: vendorInvitationEmailHtml(invitationBody, org?.name),
         eventType: 'vendor.assessment_invitation',
         organizationId,
         resourceType: 'VendorAssessmentInvitation',

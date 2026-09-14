@@ -23,6 +23,14 @@ const CUSTOMER_LABELS: Record<string, string> = {
     CLEAN: 'Ready',
     PENDING: 'Scan in progress',
     INFECTED: 'Blocked',
+    FAILED: 'Scan failed',
+    ERROR: 'Scan failed',
+    EXPIRED: 'Expired',
+    EXPIRING: 'Expiring',
+    SUPERSEDED: 'Superseded',
+    REVOKED: 'Revoked',
+    UNDER_REVIEW: 'Under Review',
+    CURRENT: 'Current',
 };
 
 export function humanizeLabel(value?: string | null): string {

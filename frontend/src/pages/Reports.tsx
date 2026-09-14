@@ -40,7 +40,7 @@ const catalog: CatalogItem[] = [
     { id: 'cmp-readiness', name: 'Framework readiness', category: 'Compliance', description: 'Mapped, implemented, tested, and evidence coverage. Not certified or compliant.', formats: ['PDF'], kind: 'operational' },
     { id: 'cmp-gaps', name: 'Framework gap report', category: 'Compliance', description: 'Open gaps from live mappings, tests, evidence, and exceptions.', formats: ['PDF'], kind: 'operational' },
     { id: 'cmp-attestations', name: 'Control attestation report', category: 'Compliance', description: 'Attestation campaigns. An attestation is not a control test.', formats: ['PDF'], kind: 'operational' },
-    { id: 'cmp-evidence', name: 'Evidence coverage report', category: 'Compliance', description: 'CLEAN current evidence coverage. A file is not compliance.', formats: ['PDF'], kind: 'operational' },
+    { id: 'cmp-evidence', name: 'Evidence coverage report', category: 'Compliance', description: 'Ready current evidence coverage. A file is not compliance.', formats: ['PDF'], kind: 'operational' },
     { id: 'cmp-exceptions', name: 'Exceptions report', category: 'Compliance', description: 'Governed exceptions. An exception does not make a control effective.', formats: ['PDF'], kind: 'operational' },
     { id: 'cmp-executive', name: 'Compliance executive summary', category: 'Compliance', description: 'Program posture, readiness, gaps, and attention from live records.', formats: ['PDF'], kind: 'board' },
     { id: 'cmp-board', name: 'Compliance board summary', category: 'Compliance', description: 'Board-facing readiness, gaps, exceptions, and attention. Not certification.', formats: ['PDF', 'PPTX'], kind: 'board' },

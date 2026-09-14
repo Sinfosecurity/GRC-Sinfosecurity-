@@ -340,7 +340,7 @@ export default function Layout() {
                         />
                     </Box>
                     <Tooltip title="Notifications">
-                        <IconButton aria-label="Notifications" sx={{ color: color.navInk }} onClick={() => navigate('/dashboard')}>
+                        <IconButton aria-label="Notifications" sx={{ color: color.navInk }} onClick={() => navigate('/notifications')}>
                             <NotificationsNone />
                         </IconButton>
                     </Tooltip>

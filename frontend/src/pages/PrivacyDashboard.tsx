@@ -8,6 +8,7 @@ import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import { privacyAPI } from '../services/api';
 import { downloadBinaryResponse } from '../services/download';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 type Dashboard = {
     honesty: string;
@@ -88,7 +89,7 @@ export default function PrivacyDashboard() {
                                 {data.attention.map((row) => (
                                     <Box key={`${row.type}-${row.publicId}`} sx={{ cursor: 'pointer' }} onClick={() => navigate(row.href)}>
                                         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-                                            <Typography fontWeight={700}>{row.type}</Typography>
+                                            <Typography fontWeight={700}>{humanizeLabel(row.type)}</Typography>
                                             {row.severity && <StatusBadge tone={row.severity === 'High' || row.severity === 'Critical' ? 'critical' : 'medium'} label={row.severity} />}
                                         </Stack>
                                         <Typography>{row.why}</Typography>

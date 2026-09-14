@@ -7,7 +7,7 @@ import { AuthPlane, CUSTOMER_PLANE, MFA_REQUIRED_ROLES, PLATFORM_PLANE } from '.
 import { hashPassword, hashToken, randomToken, validatePasswordPolicy, verifyPassword } from './passwordService';
 import { recordAudit } from './auditEventService';
 import { notify } from './notificationDeliveryService';
-import { passwordResetEmailBody } from './publicFrontendUrl';
+import { passwordResetEmailBody, passwordResetEmailHtml } from './publicFrontendUrl';
 import { totpMfaService } from './totpMfaService';
 import { ApiError } from '../middleware/errorHandler';
 
@@ -477,8 +477,9 @@ export const authService = {
             userId: user.id,
             eventType: 'auth.password_reset',
             title: 'Password reset requested',
-            body: 'A password reset was requested for this Supreme Risk account.',
+            body: 'A password reset was requested for this Supreme account.',
             emailBody: passwordResetEmailBody(token, process.env, isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE),
+            emailHtml: passwordResetEmailHtml(token, process.env, isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE),
             resourceType: 'User',
             resourceId: user.id,
             emailTo: user.email,

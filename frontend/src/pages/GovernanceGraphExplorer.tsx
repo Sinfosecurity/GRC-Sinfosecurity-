@@ -274,7 +274,7 @@ export default function GovernanceGraphExplorer() {
         <Box sx={{ maxWidth: 1280 }}>
             <PageHeader
                 title="Governance Graph"
-                description="Proven relationships for this organization. Open a record to see how vendors, assessments, evidence, findings, and decisions connect."
+                description="What is affected? Lists and tables come first. Open a record to see how vendors, assessments, evidence, findings, and decisions connect. The visual graph is optional."
             />
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }} useFlexGap flexWrap="wrap">
                 <TextField label="Search" value={q} onChange={(event) => setQ(event.target.value)} sx={{ minWidth: 220, flex: 1 }} />

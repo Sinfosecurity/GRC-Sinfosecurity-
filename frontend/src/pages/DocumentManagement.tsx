@@ -8,6 +8,7 @@ import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
 import { sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 type Stored = {
     id: string;
@@ -116,16 +117,16 @@ export default function DocumentManagement() {
     return (
         <Box sx={{ maxWidth: 1280 }}>
             <PageHeader
-                crumbs={[{ label: 'Third-party risk' }, { label: 'Evidence Library' }]}
+                crumbs={[{ label: 'Governance' }, { label: 'Evidence' }]}
                 title="Evidence Library"
-                description="Upload once. Reuse with an explicit rationale. Only files with a CLEAN malware scan can be treated as usable evidence."
+                description="Evidence once. Govern everywhere. Upload once, reuse with an explicit rationale. Only files that are Ready can be treated as usable evidence."
                 meta={<StatusBadge kind="plain" tone={storageStatus === 'NOT_CONFIGURED' ? 'high' : 'info'} label={storageStatus === 'NOT_CONFIGURED' ? 'Storage not ready' : 'Storage ready'} />}
             />
             <Alert severity="info" sx={{ mb: 2, display: { xs: 'none', md: 'flex' } }}>
                 Linking a file to one control does not prove every mapped requirement. Expired or revoked evidence shows potential governance impact and does not change residual scores.
             </Alert>
             <Typography variant="caption" display="block" sx={{ display: { xs: 'block', md: 'none' }, mb: 2 }}>
-                Reuse a CLEAN file. Linking one control does not prove every mapped requirement.
+                Reuse a Ready file. Linking one control does not prove every mapped requirement.
             </Typography>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
                 <TextField select label="Link upload to vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: { md: 280 }, width: { xs: '100%', md: 'auto' } }}>
@@ -164,7 +165,7 @@ export default function DocumentManagement() {
 
             <Surface>
                 <Typography variant="h5" sx={{ mb: 1 }}>Use existing evidence</Typography>
-                <Typography variant="body2" sx={{ mb: 2 }}>Search CLEAN files already in this organization before asking for another upload.</Typography>
+                <Typography variant="body2" sx={{ mb: 2 }}>Search Ready files already in this organization before asking for another upload. Freshness, source, reuse, and review stay on the same object.</Typography>
                 <Box component="form" onSubmit={linkExisting}>
                     <Stack spacing={1.5} sx={{ mb: 2 }}>
                         <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
@@ -172,7 +173,7 @@ export default function DocumentManagement() {
                                 <MenuItem value="">Select file</MenuItem>
                                 {library.map((row) => (
                                     <MenuItem key={row.id} value={row.id} disabled={!row.usable}>
-                                        {row.filename} · {row.scanStatus} · {row.freshness} · reused {row.reuseCount}
+                                        {row.filename} · {humanizeLabel(row.scanStatus)} · {humanizeLabel(row.freshness)} · reused {row.reuseCount}
                                     </MenuItem>
                                 ))}
                             </TextField>
@@ -201,11 +202,11 @@ export default function DocumentManagement() {
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ my: 2 }}>
                 <TextField select label="Malware status" value={scanFilter} onChange={(e) => setScanFilter(e.target.value)} sx={{ minWidth: { sm: 200 }, width: { xs: '100%', sm: 'auto' } }}>
                     <MenuItem value="">Any scan status</MenuItem>
-                    {['CLEAN', 'PENDING', 'FAILED', 'INFECTED', 'ERROR', 'NOT_CONFIGURED'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
+                    {['CLEAN', 'PENDING', 'FAILED', 'INFECTED', 'ERROR', 'NOT_CONFIGURED'].map((value) => <MenuItem key={value} value={value}>{humanizeLabel(value)}</MenuItem>)}
                 </TextField>
                 <TextField select label="Freshness" value={freshnessFilter} onChange={(e) => setFreshnessFilter(e.target.value)} sx={{ minWidth: { sm: 200 }, width: { xs: '100%', sm: 'auto' } }}>
                     <MenuItem value="">Any freshness</MenuItem>
-                    {['CURRENT', 'EXPIRING', 'EXPIRED', 'SUPERSEDED', 'REVOKED', 'UNDER_REVIEW'].map((value) => <MenuItem key={value} value={value}>{value.replace(/_/g, ' ')}</MenuItem>)}
+                    {['CURRENT', 'EXPIRING', 'EXPIRED', 'SUPERSEDED', 'REVOKED', 'UNDER_REVIEW'].map((value) => <MenuItem key={value} value={value}>{humanizeLabel(value)}</MenuItem>)}
                 </TextField>
             </Stack>
 
@@ -214,7 +215,7 @@ export default function DocumentManagement() {
                 error={error}
                 empty={items.length === 0}
                 emptyTitle="No evidence uploaded"
-                emptyBody="Uploads appear here with classification and malware scan status. Reuse a CLEAN file before asking for another copy."
+                emptyBody="Uploads appear here with source, freshness, reuse, and a customer-safe review state. Reuse a Ready file before asking for another copy."
             >
                 <AppTable
                     rows={items}
@@ -230,10 +231,10 @@ export default function DocumentManagement() {
                             </Box>
                         ) },
                         { id: 'scan', label: 'Scan', sortValue: (row) => row.scanStatus, render: (row) => (
-                            <StatusBadge kind="plain" tone={scanTone(row.scanStatus)} label={row.scanStatus} />
+                            <StatusBadge kind="plain" tone={scanTone(row.scanStatus)} label={humanizeLabel(row.scanStatus)} />
                         ) },
                         { id: 'reuse', label: 'Reuse', hideOnMobile: true, sortValue: (row) => reusable.find((item) => item.id === row.id)?.reuseCount || 0, render: (row) => reusable.find((item) => item.id === row.id)?.reuseCount ?? 0 },
-                        { id: 'fresh', label: 'Freshness', hideOnMobile: true, sortValue: (row) => reusable.find((item) => item.id === row.id)?.freshness || '', render: (row) => reusable.find((item) => item.id === row.id)?.freshness || '—' },
+                        { id: 'fresh', label: 'Freshness', hideOnMobile: true, sortValue: (row) => reusable.find((item) => item.id === row.id)?.freshness || '', render: (row) => humanizeLabel(reusable.find((item) => item.id === row.id)?.freshness) },
                         { id: 'size', label: 'Size', hideOnMobile: true, sortValue: (row) => row.size || 0, render: (row) => row.size ? `${row.size} bytes` : '—' },
                         { id: 'when', label: 'Uploaded', hideOnMobile: true, sortValue: (row) => row.uploadedAt, render: (row) => row.uploadedAt?.slice(0, 10) || '—' },
                     ]}

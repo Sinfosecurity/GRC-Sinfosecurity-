@@ -8,7 +8,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import { color } from '../design/tokens';
 import { useAuth } from '../contexts/AuthContext';
-import { tprmAPI, vendorAPI } from '../services/api';
+import { aiGovernanceAPI, complianceAPI, ermAPI, privacyAPI, tprmAPI, vendorAPI } from '../services/api';
 
 type AttentionItem = {
     id: string;
@@ -56,6 +56,22 @@ function homeForRole(role?: string) {
                 cta: 'Open compliance',
                 href: '/compliance',
                 workspace: { label: 'Gaps', href: '/compliance/gaps' },
+            };
+        case 'PRIVACY_OFFICER':
+        case 'DPO':
+            return {
+                job: 'Rights requests, DPIAs, and processing that still needs a person. Counts come from live Privacy records only.',
+                cta: 'Open privacy',
+                href: '/privacy-ops',
+                workspace: { label: 'Rights', href: '/privacy-ops/rights' },
+            };
+        case 'AI_GOVERNANCE_LEAD':
+        case 'AI_OWNER':
+            return {
+                job: 'AI systems and uses that need review or approval. Nothing is invented from missing inventory.',
+                cta: 'Open AI Governance',
+                href: '/ai-governance',
+                workspace: { label: 'Approvals', href: '/ai-governance/approvals' },
             };
         case 'APPROVER':
             return {
@@ -107,17 +123,27 @@ export default function Dashboard() {
     const [assessments, setAssessments] = useState<Array<{ id: string; status: string; dueDate?: string | null }>>([]);
     const [findings, setFindings] = useState<Array<{ id: string; status: string; targetRemediationDate?: string | null }>>([]);
     const [briefs, setBriefs] = useState<Array<{ id: string; status: string; humanDecision?: string | null }>>([]);
+    const [domain, setDomain] = useState<{
+        risk?: { count?: number; items: AttentionItem[] };
+        compliance?: { count?: number; items: AttentionItem[] };
+        privacy?: { count?: number; items: AttentionItem[] };
+        ai?: { count?: number; items: AttentionItem[] };
+    }>({});
 
     useEffect(() => {
         let cancelled = false;
         (async () => {
             try {
-                const [attention, statistics, assessmentRes, findingRes, briefRes] = await Promise.allSettled([
+                const [attention, statistics, assessmentRes, findingRes, briefRes, riskRes, complianceRes, privacyRes, aiRes] = await Promise.allSettled([
                     tprmAPI.attention(),
                     vendorAPI.getStatistics(),
                     tprmAPI.listAssessments(),
                     tprmAPI.listFindings(),
                     tprmAPI.listBriefs(),
+                    ermAPI.dashboard(),
+                    complianceAPI.dashboard(),
+                    privacyAPI.dashboard(),
+                    aiGovernanceAPI.dashboard(),
                 ]);
                 if (cancelled) return;
                 if (attention.status === 'fulfilled') {
@@ -138,6 +164,56 @@ export default function Dashboard() {
                 if (briefRes.status === 'fulfilled') {
                     setBriefs(briefRes.value.data.data || []);
                 }
+                const nextDomain: typeof domain = {};
+                if (riskRes.status === 'fulfilled') {
+                    const data = riskRes.value.data.data || {};
+                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                        id: `risk-${row.publicId}`,
+                        severity: (row.residualRating === 'CRITICAL' || row.severity === 'CRITICAL' ? 'CRITICAL' : row.residualRating === 'HIGH' || row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                        action: 'Open risk',
+                        title: row.title || 'Enterprise risk needs attention',
+                        detail: (row.reasons || []).join(' · ') || row.appetiteStatus || 'Live enterprise risk record.',
+                        href: `/risks/${row.publicId}`,
+                    }));
+                    nextDomain.risk = { count: data.totals?.outsideAppetite ?? data.totals?.overdueTreatments ?? rows.length, items: rows };
+                }
+                if (complianceRes.status === 'fulfilled') {
+                    const data = complianceRes.value.data.data || {};
+                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                        id: `cmp-${row.publicId || row.href}`,
+                        severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                        action: 'Open compliance',
+                        title: row.why || row.type || 'Compliance needs attention',
+                        detail: [row.framework, row.owner].filter(Boolean).join(' · ') || 'Live compliance record.',
+                        href: row.href || '/compliance',
+                    }));
+                    nextDomain.compliance = { count: data.totals?.openGaps ?? rows.length, items: rows };
+                }
+                if (privacyRes.status === 'fulfilled') {
+                    const data = privacyRes.value.data.data || {};
+                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                        id: `prv-${row.publicId || row.href}`,
+                        severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                        action: 'Open privacy',
+                        title: row.why || row.type || 'Privacy needs attention',
+                        detail: [row.related, row.owner].filter(Boolean).join(' · ') || 'Live privacy record.',
+                        href: row.href || '/privacy-ops',
+                    }));
+                    nextDomain.privacy = { count: data.totals?.openRightsRequests ?? data.totals?.dpiasDue ?? rows.length, items: rows };
+                }
+                if (aiRes.status === 'fulfilled') {
+                    const data = aiRes.value.data.data || {};
+                    const rows = (data.attention || []).slice(0, 4).map((row: any) => ({
+                        id: `ai-${row.publicId || row.href}`,
+                        severity: (row.severity === 'CRITICAL' ? 'CRITICAL' : row.severity === 'HIGH' ? 'HIGH' : 'MEDIUM') as AttentionItem['severity'],
+                        action: 'Open AI',
+                        title: row.why || row.type || 'AI governance needs attention',
+                        detail: row.publicId || 'Live AI governance record.',
+                        href: row.href || '/ai-governance',
+                    }));
+                    nextDomain.ai = { count: data.totals?.awaitingApproval ?? data.totals?.incidentsOpen ?? rows.length, items: rows };
+                }
+                setDomain(nextDomain);
             } catch (err: any) {
                 if (!cancelled) setError(err.message || 'Unable to load the overview.');
             } finally {
@@ -164,7 +240,17 @@ export default function Dashboard() {
         return { dueAssessments, pendingDecisions, overdueFindings };
     }, [assessments, briefs, findings, now]);
 
-    const firstRun = !loading && stats?.totalVendors === 0 && items.length === 0;
+    const rolePrimary = useMemo(() => {
+        if (['RISK_MANAGER', 'MANAGER'].includes(user?.role || '')) return domain.risk?.items || [];
+        if (user?.role === 'COMPLIANCE_OFFICER') return domain.compliance?.items || [];
+        if (['PRIVACY_OFFICER', 'DPO'].includes(user?.role || '')) return domain.privacy?.items || [];
+        if (['AI_GOVERNANCE_LEAD', 'AI_OWNER'].includes(user?.role || '')) return domain.ai?.items || [];
+        if (user?.role === 'APPROVER') return items.filter((row) => /decision|approv/i.test(`${row.title} ${row.action}`)).concat(domain.risk?.items || []).slice(0, 8);
+        return [];
+    }, [user?.role, domain, items]);
+
+    const attention = rolePrimary.length ? [...rolePrimary, ...items.filter((row) => !rolePrimary.some((item) => item.id === row.id))] : items;
+    const firstRun = !loading && stats?.totalVendors === 0 && attention.length === 0 && !domain.risk?.items?.length;
 
     return (
         <Box sx={{ maxWidth: 1280 }}>
@@ -199,6 +285,10 @@ export default function Dashboard() {
                 <MetricCard label="Assessments due" value={work.dueAssessments} onClick={() => navigate('/assessments')} />
                 <MetricCard label="Overdue findings" value={work.overdueFindings} onClick={() => navigate('/findings')} />
                 <MetricCard label="Pending decisions" value={work.pendingDecisions} onClick={() => navigate('/decision-briefs')} />
+                {domain.risk && <MetricCard label="Risk attention" value={domain.risk.count ?? '—'} onClick={() => navigate('/risks')} />}
+                {domain.compliance && <MetricCard label="Compliance gaps" value={domain.compliance.count ?? '—'} onClick={() => navigate('/compliance')} />}
+                {domain.privacy && <MetricCard label="Privacy attention" value={domain.privacy.count ?? '—'} onClick={() => navigate('/privacy-ops')} />}
+                {domain.ai && <MetricCard label="AI attention" value={domain.ai.count ?? '—'} onClick={() => navigate('/ai-governance')} />}
             </Stack>
 
             <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} sx={{ mb: 3 }} alignItems="stretch">
@@ -209,6 +299,10 @@ export default function Dashboard() {
                         <Typography>{work.dueAssessments} assessments due or in progress</Typography>
                         <Typography>{work.pendingDecisions} decisions waiting</Typography>
                         <Typography>{work.overdueFindings} remediations overdue</Typography>
+                        {domain.risk && <Typography>{domain.risk.count ?? 0} enterprise risks needing attention</Typography>}
+                        {domain.compliance && <Typography>{domain.compliance.count ?? 0} compliance items from live records</Typography>}
+                        {domain.privacy && <Typography>{domain.privacy.count ?? 0} privacy items from live records</Typography>}
+                        {domain.ai && <Typography>{domain.ai.count ?? 0} AI items from live records</Typography>}
                     </Stack>
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1.5 }}>
                         <Button variant="contained" onClick={() => navigate(home.href)}>{home.cta}</Button>
@@ -232,13 +326,13 @@ export default function Dashboard() {
             <QueryState
                 loading={loading}
                 error={error}
-                empty={items.length === 0}
+                empty={attention.length === 0}
                 emptyTitle="Nothing needs attention"
-                emptyBody="Supreme will surface reviews, findings, evidence, and monitoring here when they require action. An empty queue can mean the recorded work is current."
+                emptyBody="Supreme will surface reviews, findings, evidence, and monitoring here when they require action. An empty queue can mean the recorded work is current. Product counts appear only when that product returned live records."
                 emptyAction={<Button variant="outlined" onClick={() => navigate(home.href)}>{home.cta}</Button>}
             >
                 <Stack spacing={1}>
-                    {items.map((item) => (
+                    {attention.map((item) => (
                         <Box
                             key={item.id}
                             sx={{

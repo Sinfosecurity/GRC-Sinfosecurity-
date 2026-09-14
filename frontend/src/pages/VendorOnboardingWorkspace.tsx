@@ -52,6 +52,8 @@ export default function VendorOnboardingWorkspace() {
     const [exitNotes, setExitNotes] = useState('');
     const [acknowledgeOutstanding, setAcknowledgeOutstanding] = useState(false);
     const [reassessment, setReassessment] = useState<any>(null);
+    const [confirmPriorAnswers, setConfirmPriorAnswers] = useState(false);
+    const [historyLayer, setHistoryLayer] = useState<'milestones' | 'audit'>('milestones');
 
     const load = () => {
         vendorOnboardingAPI.get(id)
@@ -417,34 +419,49 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 8 && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="h6">Decision required</Typography>
-                                <Typography variant="body2" sx={{ mb: 1.5 }}>Supreme prepared this summary. A person must approve, approve with conditions, or reject.</Typography>
-                                <Fact label="Vendor" value={`${data.publicId || ''} ${data.name}`.trim()} />
-                                <Fact label="Service" value={data.request?.service || data.request?.name} />
+                                <Typography variant="overline">Decision brief</Typography>
+                                <Typography variant="h6">A person must decide</Typography>
+                                <Typography variant="body2" sx={{ mb: 1.5 }}>Supreme prepared this record. Approve, approve with conditions, or reject. Residual risk does not change because a person accepts it.</Typography>
+                                <Fact label="Vendor / service" value={`${data.publicId || ''} ${data.name}${data.request?.servicesProvided ? ` · ${data.request.servicesProvided}` : ''}`.trim()} />
                                 <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
-                                <Fact label="Inherent risk" value={data.tierReview?.inherentRisk != null ? String(data.tierReview.inherentRisk) : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
+                                <Fact label="Inherent risk" value={data.tierReview?.score != null ? `${data.tierReview.score} of ${data.tierReview.maxScore || 30}` : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
                                 <Fact label="Residual risk" value={data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
-                                <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
-                                <Fact label="Accepted risks" value={String(data.lifecycle?.monitoring?.acceptedRisks ?? 0)} />
-                                <Fact label="Contract" value={data.lifecycle?.contractAttestedAt ? 'Attested' : 'Not attested'} />
                                 <Fact label="Business owner" value={data.owner} />
-                                <Fact label="Privacy / AI in scope" value={privacyAiScope(data)} />
+                                <Fact label="Contract posture" value={data.lifecycle?.contractAttestedAt ? 'Required controls attested' : 'Not attested'} />
+                                <Fact label="Privacy / AI context" value={privacyAiScope(data)} />
+                                <Fact label="Conditions already recorded" value={data.lifecycle?.approvalConditions || 'None yet'} />
+                            </Surface>
+                            <Surface>
+                                <Typography variant="subtitle1">Findings and remediation</Typography>
+                                {(data.lifecycle?.findings || []).filter((row: any) => !['CLOSED', 'RISK_ACCEPTED'].includes(row.status)).map((finding: any) => (
+                                    <Typography key={finding.id} variant="body2">{finding.title} · {humanizeLabel(finding.severity)} · {humanizeLabel(finding.status)}{finding.cap ? ` · ${finding.cap}` : ''}</Typography>
+                                ))}
+                                {!(data.lifecycle?.findings || []).some((row: any) => !['CLOSED', 'RISK_ACCEPTED'].includes(row.status)) && <Typography variant="body2">No open findings.</Typography>}
+                            </Surface>
+                            <Surface>
+                                <Typography variant="subtitle1">Accepted risks</Typography>
+                                {(data.lifecycle?.findings || []).filter((row: any) => row.status === 'RISK_ACCEPTED').map((finding: any) => (
+                                    <Typography key={finding.id} variant="body2">{finding.title} · accepted residual remains recorded</Typography>
+                                ))}
+                                {!(data.lifecycle?.findings || []).some((row: any) => row.status === 'RISK_ACCEPTED') && <Typography variant="body2">No accepted risks.</Typography>}
                             </Surface>
                             {data.lifecycle?.approvalDecision && <Alert severity="info">Decision: {humanizeLabel(data.lifecycle.approvalDecision)}{data.lifecycle.approvalConditions ? `. ${data.lifecycle.approvalConditions}` : ''}</Alert>}
                             {data.canReviewTier && (
-                                <Stack spacing={1.5}>
-                                    <TextField select label="Decision" value={approval.decision} onChange={(event) => setApproval({ ...approval, decision: event.target.value })}>
-                                        <MenuItem value="APPROVE">Approve</MenuItem>
-                                        <MenuItem value="APPROVE_WITH_CONDITIONS">Approve with conditions</MenuItem>
-                                        <MenuItem value="REJECT">Reject</MenuItem>
-                                    </TextField>
-                                    <TextField fullWidth multiline minRows={2} label="Conditions" value={approval.conditions} onChange={(event) => setApproval({ ...approval, conditions: event.target.value })} />
-                                    <TextField fullWidth multiline minRows={2} label="Rationale" value={approval.rationale} onChange={(event) => setApproval({ ...approval, rationale: event.target.value })} />
-                                    <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.decideApproval(id, approval))}>Record approval decision</Button>
+                                <Surface>
+                                    <Typography variant="subtitle1" sx={{ mb: 1 }}>Decision required</Typography>
+                                    <Stack spacing={1.5}>
+                                        <TextField fullWidth multiline minRows={2} label="Conditions" value={approval.conditions} onChange={(event) => setApproval({ ...approval, conditions: event.target.value })} helperText="Required when approving with conditions." />
+                                        <TextField fullWidth multiline minRows={2} label="Rationale" value={approval.rationale} onChange={(event) => setApproval({ ...approval, rationale: event.target.value })} />
+                                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap="wrap" useFlexGap>
+                                            <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.decideApproval(id, { ...approval, decision: 'APPROVE' }))}>Approve</Button>
+                                            <Button variant="contained" disabled={saving || !approval.conditions} onClick={() => run(() => vendorOnboardingAPI.decideApproval(id, { ...approval, decision: 'APPROVE_WITH_CONDITIONS' }))}>Approve with conditions</Button>
+                                            <Button color="error" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.decideApproval(id, { ...approval, decision: 'REJECT' }))}>Reject</Button>
+                                        </Stack>
+                                    </Stack>
                                     {['APPROVE', 'APPROVE_WITH_CONDITIONS'].includes(data.lifecycle?.approvalDecision) && data.lifecycle?.vendorStatus !== 'ACTIVE' && (
-                                        <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.activate(id))}>Activate vendor</Button>
+                                        <Button sx={{ mt: 1.5 }} disabled={saving} onClick={() => run(() => vendorOnboardingAPI.activate(id))}>Activate vendor</Button>
                                     )}
-                                </Stack>
+                                </Surface>
                             )}
                         </Stack>
                     )}
@@ -468,19 +485,56 @@ export default function VendorOnboardingWorkspace() {
                                 <Typography variant="h6">Reassessment</Typography>
                                 <Typography variant="body2" sx={{ mb: 1 }}>
                                     {reassessment?.recommendation
-                                        ? `${reassessment.recommendation}. ${reassessment.nextAction || ''}`
-                                        : 'Supreme will recommend a targeted or full reassessment from the previous assessment, expired evidence, and open findings. Previous answers are shown for confirmation, not auto-approved.'}
+                                        ? `${reassessment.recommendation}. ${reassessment.why || reassessment.nextAction || ''}`
+                                        : 'Supreme recommends a targeted or full reassessment from the previous assessment, expired evidence, open findings, and scope or template changes. Previous answers are shown for confirmation and do not become current truth until confirmed or revised.'}
                                 </Typography>
                                 {reassessment && (
                                     <>
+                                        <Fact label="Why this type" value={reassessment.why} />
+                                        <Fact label="Previous assessment" value={reassessment.previousAssessment ? `${reassessment.previousAssessment.name} · ${humanizeLabel(reassessment.previousAssessment.status)}${reassessment.previousAssessment.completedAt ? ` · ${formatShortDate(reassessment.previousAssessment.completedAt)}` : ''}` : 'No prior completed assessment'} />
+                                        <Fact label="Current assessment" value={reassessment.currentAssessment ? `${reassessment.currentAssessment.name} · ${humanizeLabel(reassessment.currentAssessment.status)}` : 'Not started'} />
                                         <Fact label="Changed answers" value={String(reassessment.changedAnswers ?? 0)} />
                                         <Fact label="Expired evidence" value={String(reassessment.expiredEvidence ?? 0)} />
-                                        <Fact label="Unresolved findings" value={String(reassessment.unresolvedFindings ?? 0)} />
-                                        <Fact label="Previous answers available" value={reassessment.previousAnswersEligible ? 'Yes — confirm, do not pre-approve' : 'No prior vendor answers'} />
+                                        <Fact label="Open findings" value={String(reassessment.unresolvedFindings ?? 0)} />
+                                        <Fact label="Template or version change" value={reassessment.templateChanged ? 'Yes — full reassessment' : 'No recorded change'} />
+                                        <Fact label="Scope change" value={[reassessment.newScope?.privacy ? 'Privacy in scope' : null, reassessment.newScope?.aiGovernance ? 'AI in scope' : null].filter(Boolean).join(' · ') || 'No recorded privacy or AI scope change'} />
                                     </>
                                 )}
+                                {(reassessment?.previousAnswers || []).length > 0 && (
+                                    <Stack spacing={0.75} sx={{ mt: 1.5 }}>
+                                        <Typography variant="subtitle2">Previous answers</Typography>
+                                        <Typography variant="caption">Shown for confirmation. They are not current truth until the vendor confirms or revises them.</Typography>
+                                        {reassessment.previousAnswers.slice(0, 12).map((row: any) => (
+                                            <Typography key={row.questionId} variant="body2">
+                                                {row.question}: previously “{row.previous}”{row.current ? ` · current “${row.current}”` : ''}{row.changed ? ' · changed' : ''}
+                                            </Typography>
+                                        ))}
+                                    </Stack>
+                                )}
+                                {(reassessment?.expiredEvidenceItems || []).length > 0 && (
+                                    <Stack spacing={0.5} sx={{ mt: 1.5 }}>
+                                        <Typography variant="subtitle2">Expired evidence</Typography>
+                                        {reassessment.expiredEvidenceItems.map((row: any) => (
+                                            <Typography key={row.id} variant="body2">{row.filename} · uploaded {formatShortDate(row.uploadedAt)} · {humanizeLabel(row.scanStatus)}</Typography>
+                                        ))}
+                                    </Stack>
+                                )}
+                                {(reassessment?.openFindings || []).length > 0 && (
+                                    <Stack spacing={0.5} sx={{ mt: 1.5 }}>
+                                        <Typography variant="subtitle2">Open findings</Typography>
+                                        {reassessment.openFindings.map((row: any) => (
+                                            <Typography key={row.id} variant="body2">{row.title} · {humanizeLabel(row.severity)} · {humanizeLabel(row.status)}</Typography>
+                                        ))}
+                                    </Stack>
+                                )}
                                 {data.canReviewTier && (
-                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.startReassessment(id))}>Start recommended reassessment</Button>
+                                    <Stack spacing={1} sx={{ mt: 1.5 }}>
+                                        <FormControlLabel
+                                            control={<Checkbox checked={confirmPriorAnswers} onChange={(event) => setConfirmPriorAnswers(event.target.checked)} />}
+                                            label="I understand prior answers will be shown for confirmation and will not become current truth until the vendor confirms or revises them."
+                                        />
+                                        <Button disabled={saving || (Boolean(reassessment?.previousAnswersEligible) && !confirmPriorAnswers)} onClick={() => run(() => vendorOnboardingAPI.startReassessment(id, { confirmPriorAnswers }))}>Start recommended reassessment</Button>
+                                    </Stack>
                                 )}
                             </Surface>
                             <Surface>
@@ -503,19 +557,35 @@ export default function VendorOnboardingWorkspace() {
                     )}
 
                     {tab === 10 && (
-                        <Surface>
-                            <Typography variant="h6">History</Typography>
-                            <Stack spacing={1.25} sx={{ mt: 1.5 }}>
-                                {(data.history || []).map((event: any, index: number) => (
-                                    <Stack key={`${event.at}-${index}`}>
-                                        <Typography variant="subtitle2">{event.title}</Typography>
-                                        <Typography variant="body2">{event.detail}</Typography>
-                                        <Typography variant="caption">{formatShortDate(event.at)}</Typography>
-                                    </Stack>
-                                ))}
-                                {!data.history?.length && <Typography>No onboarding history is recorded yet.</Typography>}
-                            </Stack>
-                        </Surface>
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Customer history</Typography>
+                                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                                    The management timeline is the story of this vendor. Audit detail keeps every recorded event. Nothing is deleted.
+                                </Typography>
+                                <Stack direction="row" spacing={1}>
+                                    <Button variant={historyLayer === 'milestones' ? 'contained' : 'outlined'} onClick={() => setHistoryLayer('milestones')}>Management timeline</Button>
+                                    <Button variant={historyLayer === 'audit' ? 'contained' : 'outlined'} onClick={() => setHistoryLayer('audit')}>Audit detail</Button>
+                                </Stack>
+                            </Surface>
+                            <Surface>
+                                <Typography variant="subtitle1">{historyLayer === 'milestones' ? 'Management timeline' : 'Audit detail'}</Typography>
+                                <Stack spacing={1.25} sx={{ mt: 1.5 }}>
+                                    {(data.history || [])
+                                        .filter((event: any) => historyLayer === 'audit' || event.milestone || MILESTONE_TITLES.has(event.title))
+                                        .map((event: any, index: number) => (
+                                            <Stack key={`${event.at}-${event.action || index}`}>
+                                                <Typography variant="subtitle2">{event.title}</Typography>
+                                                <Typography variant="body2">{event.detail}</Typography>
+                                                <Typography variant="caption">{formatShortDate(event.at)}</Typography>
+                                            </Stack>
+                                        ))}
+                                    {!(data.history || []).some((event: any) => historyLayer === 'audit' || event.milestone || MILESTONE_TITLES.has(event.title)) && (
+                                        <Typography>{historyLayer === 'milestones' ? 'No milestones yet. Complete intake to start the story.' : 'No onboarding history is recorded yet.'}</Typography>
+                                    )}
+                                </Stack>
+                            </Surface>
+                        </Stack>
                     )}
                 </Stack>
             )}
@@ -540,6 +610,23 @@ function clauseGroup(key: string) {
     if (key === 'right_to_audit') return 'Assurance';
     return 'Security';
 }
+
+const MILESTONE_TITLES = new Set([
+    'Vendor requested',
+    'Intake completed',
+    'Tier confirmed',
+    'Tier overridden',
+    'Due-diligence plan confirmed',
+    'Due diligence sent',
+    'Vendor submitted assessment',
+    'Finding confirmed',
+    'Risk accepted',
+    'Contract attested',
+    'Approval decided',
+    'Vendor activated',
+    'Reassessment started',
+    'Offboarding started',
+]);
 
 function privacyAiScope(data: any) {
     const triggers = data.plan?.triggers || data.lifecycle?.plan?.triggers || {};

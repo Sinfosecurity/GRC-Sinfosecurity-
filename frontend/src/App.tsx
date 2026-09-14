@@ -10,6 +10,7 @@ import { CircularProgress, Box } from '@mui/material';
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Notifications = lazy(() => import('./pages/Notifications'));
 const RiskManagement = lazy(() => import('./pages/RiskManagement'));
 const ComplianceManagement = lazy(() => import('./pages/ComplianceManagement'));
 const ControlsManagement = lazy(() => import('./pages/ControlsManagement'));
@@ -177,6 +178,7 @@ export default function App() {
                     <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/notifications" element={<Notifications />} />
                     <Route path="risk-management" element={LEGACY_ENABLED ? <RiskManagement /> : <Navigate to="/risks" replace />} />
                     <Route path="legacy/compliance" element={LEGACY_ENABLED ? <ComplianceManagement /> : <LegacyQuarantine />} />
                     <Route path="compliance" element={<ComplianceDashboard />} />

@@ -3,7 +3,7 @@ import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { authService } from './authService';
 import { recordAudit } from './auditEventService';
-import { invitationEmailBody, portalFrontendUrl } from './publicFrontendUrl';
+import { invitationEmailBody, invitationEmailHtml, portalFrontendUrl } from './publicFrontendUrl';
 import { notify } from './notificationDeliveryService';
 
 const TESTER_ROLES = new Set<Role>([
@@ -117,6 +117,7 @@ export const privateTesterService = {
                 title: 'You are invited to Supreme private testing',
                 body: `You were invited to a private-beta organization as ${role}.`,
                 emailBody: invitationEmailBody(role, token),
+                emailHtml: invitationEmailHtml(role, token),
                 resourceType: 'AccountInvitation',
                 resourceId: invitation.id,
                 emailTo: email,

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { environmentLabel } from '../components/DevPreviewBanner';
 import { useEffect, useState } from 'react';
 import { platformAPI } from './api';
+import { color, type as typeface } from '../design/tokens';
 
 const NAV = [
     { to: '/platform', label: 'Overview', end: true },
@@ -44,10 +45,10 @@ export default function PlatformLayout() {
 
     const nav = (
         <>
-            <Typography sx={{ fontFamily: 'Newsreader, serif', fontSize: 22, fontWeight: 600, color: '#e8c9a0' }}>
+            <Typography sx={{ fontFamily: typeface.display, fontSize: 22, fontWeight: 600, color: color.goldSoft }}>
                 Supreme Operations
             </Typography>
-            <Typography variant="caption" sx={{ display: 'block', color: '#c4955c', letterSpacing: '0.12em', mb: 3 }}>
+            <Typography variant="caption" sx={{ display: 'block', color: color.gold, letterSpacing: '0.12em', mb: 3 }}>
                 {staging ? 'SUPREME OPERATIONS — STAGING' : 'INTERNAL CONSOLE'}
             </Typography>
             {NAV.map((item) => (
@@ -65,8 +66,8 @@ export default function PlatformLayout() {
                                 py: 1,
                                 mb: 0.5,
                                 borderRadius: 1,
-                                color: isActive ? '#1b1410' : '#e8d7c3',
-                                bgcolor: isActive ? '#c4955c' : 'transparent',
+                                color: isActive ? color.navy950 : color.navInk,
+                                bgcolor: isActive ? color.gold : 'transparent',
                                 fontSize: 14,
                                 fontWeight: isActive ? 700 : 500,
                             }}
