@@ -198,6 +198,7 @@ describe('Supreme Third Party lifecycle Phase C', () => {
         const recommendation = await request(app).get(`${API}/vendors/onboarding/${publicId}/reassessment`).set('Authorization', `Bearer ${token}`);
         expect(recommendation.status).toBe(200);
         expect(recommendation.body.data.recommendation).toBeTruthy();
+        expect(recommendation.body.data.expiredEvidence).toBe(0);
 
         const offboarded = await request(app).post(`${API}/vendors/onboarding/${publicId}/offboard`).set('Authorization', `Bearer ${token}`).send({
             exitNotes: 'Engagement ended. Retain evidence and history.',

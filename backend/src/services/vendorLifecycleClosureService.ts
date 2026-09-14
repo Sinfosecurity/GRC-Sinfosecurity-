@@ -389,8 +389,10 @@ export async function recommendReassessment(organizationId: string, vendorKey: s
             return previous && previous.response && row.response && previous.response !== row.response;
         }).length
         : 0;
+    const yearAgo = new Date();
+    yearAgo.setUTCFullYear(yearAgo.getUTCFullYear() - 1);
     const expiredEvidence = await prisma.storedObject.count({
-        where: { organizationId, ownerId: vendor.id, uploadedAt: { lt: addBusinessDays(new Date(), -365) } },
+        where: { organizationId, ownerId: vendor.id, uploadedAt: { lt: yearAgo } },
     });
     const unresolved = await openConfirmedFindings(organizationId, vendor.id);
     const plan = vendor.onboarding?.plan as { triggers?: Record<string, boolean> } | null;
