@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** UNNUMBERED — Premium Experience & Brand Closure (parallel to #12)
 
-**CURRENT ITEM STATUS:** Premium Experience PARTIAL — Product Leadership final review required. #12 PARTIAL / OPEN; Phase A PASS; Phase B and Phase C hosted for Product Leadership review. #13–#18 remain as previously recorded. #19 / #20 NOT AUTHORIZED.
+**CURRENT ITEM STATUS:** Premium Experience PARTIAL — Product Leadership final review required. Hosted finalization evidence is in `docs/private-beta/hosted-ux-qa/premium-experience/`. #12 PARTIAL / OPEN; Phase A PASS; Phase B and Phase C hosted for Product Leadership review. #13–#18 remain as previously recorded. #19 / #20 NOT AUTHORIZED.
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -80,9 +80,15 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **PREMIUM EXPERIENCE STARTING SHA:** `10746ea4f76aeccc6ee27cb62e5760910aad53fe`
 
-**PREMIUM EXPERIENCE IMPLEMENTATION SHA:** `380228df5886f32b4214d2de64b0edd3d54a8eb0`
+**PREMIUM EXPERIENCE IMPLEMENTATION SHA:** `d9f9afcde9b276224d943fd2c8370cb7ab5e6627` (documented descendant of `380228df5886f32b4214d2de64b0edd3d54a8eb0`; see hosted QA README for `646e2ee` / `164dbd2` / `d9f9afc`)
 
-**PREMIUM EXPERIENCE PROGRAM ACCEPTANCE:** PENDING — Product Leadership review required. Not PASS. Not hosted-proved.
+**PREMIUM EXPERIENCE HOSTED FRONTEND SHA:** `d9f9afcde9b276224d943fd2c8370cb7ab5e6627`
+
+**PREMIUM EXPERIENCE HOSTED API SHA:** `164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe`
+
+**PREMIUM EXPERIENCE HOSTED CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34834017464 PASS on `d9f9afc`
+
+**PREMIUM EXPERIENCE PROGRAM ACCEPTANCE:** PENDING — Product Leadership hosted final review required. Not PASS.
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 

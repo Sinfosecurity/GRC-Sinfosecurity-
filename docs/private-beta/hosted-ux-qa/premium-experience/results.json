@@ -1,0 +1,1169 @@
+{
+  "checks": [
+    {
+      "name": "hosted frontend sha",
+      "result": "PASS",
+      "detail": "164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe"
+    },
+    {
+      "name": "hosted api sha",
+      "result": "PASS",
+      "detail": "164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe"
+    },
+    {
+      "name": "customer login",
+      "result": "PASS",
+      "detail": "ORGANIZATION_ADMIN"
+    },
+    {
+      "name": "cross-tenant login",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "vendor directory",
+      "result": "PASS",
+      "detail": "200 count=13"
+    },
+    {
+      "name": "tenant isolation vendor get",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "report executive",
+      "result": "PASS",
+      "detail": "200 bytes=10553 type=application/pdf"
+    },
+    {
+      "name": "report board-pdf",
+      "result": "PASS",
+      "detail": "200 bytes=17635 type=application/pdf"
+    },
+    {
+      "name": "report board-pptx",
+      "result": "PASS",
+      "detail": "200 bytes=41729 type=application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    },
+    {
+      "name": "report findings",
+      "result": "PASS",
+      "detail": "200 bytes=15297 type=application/pdf"
+    },
+    {
+      "name": "report risk-board",
+      "result": "PASS",
+      "detail": "200 bytes=6847 type=application/pdf"
+    },
+    {
+      "name": "report compliance-exec",
+      "result": "PASS",
+      "detail": "200 bytes=5049 type=application/pdf"
+    },
+    {
+      "name": "report privacy-exec",
+      "result": "PASS",
+      "detail": "200 bytes=7620 type=application/pdf"
+    },
+    {
+      "name": "report ai-exec",
+      "result": "PASS",
+      "detail": "200 bytes=4295 type=application/pdf"
+    },
+    {
+      "name": "report scorecard",
+      "result": "PASS",
+      "detail": "200 bytes=7496 type=application/pdf"
+    },
+    {
+      "name": "report assessment",
+      "result": "PASS",
+      "detail": "200 bytes=6908 type=application/pdf"
+    },
+    {
+      "name": "reassessment payload",
+      "result": "PASS",
+      "detail": "200 Full reassessment why=privacy or AI scope is in the plan"
+    },
+    {
+      "name": "notifications list",
+      "result": "PASS",
+      "detail": "200 count=67"
+    },
+    {
+      "name": "public public-home",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/"
+    },
+    {
+      "name": "homepage prospect answers",
+      "result": "PASS",
+      "detail": "missing=[]"
+    },
+    {
+      "name": "public-home-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-home",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "public-home-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "public-home-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "public-home-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "public-home-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "public public-connected",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/connected-platform"
+    },
+    {
+      "name": "public-connected-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-connected",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"One Platform \\u2014 Supreme\"}"
+    },
+    {
+      "name": "public public-third-party",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/products/third-party"
+    },
+    {
+      "name": "public-third-party-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-third-party",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme Third Party \\u2014 Third-Party Risk Management\"}"
+    },
+    {
+      "name": "public public-risk",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/products/risk"
+    },
+    {
+      "name": "public-risk-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-risk",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme Risk \\u2014 Enterprise Risk Management\"}"
+    },
+    {
+      "name": "public public-compliance",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/products/compliance"
+    },
+    {
+      "name": "public-compliance-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-compliance",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme Compliance \\u2014 Controls & Frameworks\"}"
+    },
+    {
+      "name": "public public-privacy",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/products/privacy"
+    },
+    {
+      "name": "public-privacy-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-privacy",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme Privacy \\u2014 Privacy Management\"}"
+    },
+    {
+      "name": "public public-ai",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/products/ai-governance"
+    },
+    {
+      "name": "public-ai-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-ai",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme AI Governance\"}"
+    },
+    {
+      "name": "public public-pricing",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/pricing"
+    },
+    {
+      "name": "public-pricing-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-pricing",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme Pricing | Third-Party Risk & Governance Platform\"}"
+    },
+    {
+      "name": "public public-trust",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/trust"
+    },
+    {
+      "name": "public-trust-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-trust",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Trust & Security \\u2014 Supreme\"}"
+    },
+    {
+      "name": "public public-security",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/security"
+    },
+    {
+      "name": "public-security-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-security",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Security \\u2014 Supreme\"}"
+    },
+    {
+      "name": "public public-login",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/login"
+    },
+    {
+      "name": "public-login-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y public-login",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Sign In \\u2014 Supreme\"}"
+    },
+    {
+      "name": "public vendor-activate",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-assessment/activate"
+    },
+    {
+      "name": "vendor-activate-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y vendor-activate",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "vendor-activate-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "vendor-activate-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "vendor-activate-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "vendor-activate-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "public platform-login",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/admin/login"
+    },
+    {
+      "name": "platform-login-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y platform-login",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer home",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/dashboard"
+    },
+    {
+      "name": "home-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y home",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "home-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "home-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "home-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "home-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer notifications",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/notifications"
+    },
+    {
+      "name": "notifications-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y notifications",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer third-parties",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/vendor-management"
+    },
+    {
+      "name": "third-parties-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y third-parties",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer onboard",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/vendor-onboarding"
+    },
+    {
+      "name": "onboard-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y onboard",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer lifecycle",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/vendor-onboarding/VND-2026-0013"
+    },
+    {
+      "name": "lifecycle-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y lifecycle",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "lifecycle-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "lifecycle-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "lifecycle-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "lifecycle-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "lifecycle-approval-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "lifecycle-active-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "lifecycle-history-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "customer assessments",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/assessments"
+    },
+    {
+      "name": "assessments-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y assessments",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer findings",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/findings"
+    },
+    {
+      "name": "findings-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y findings",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer monitoring",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/monitoring"
+    },
+    {
+      "name": "monitoring-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y monitoring",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer risk",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/risks"
+    },
+    {
+      "name": "risk-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y risk",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "risk-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "risk-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "risk-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "risk-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer compliance",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/compliance"
+    },
+    {
+      "name": "compliance-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y compliance",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "compliance-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "compliance-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "compliance-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "compliance-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer privacy",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/privacy-ops"
+    },
+    {
+      "name": "privacy-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y privacy",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "privacy-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "privacy-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "privacy-1024-overflow",
+      "result": "FAIL",
+      "detail": "width 1024 overflow=True"
+    },
+    {
+      "name": "privacy-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer ai",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/ai-governance"
+    },
+    {
+      "name": "ai-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y ai",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "ai-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "ai-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "ai-1024-overflow",
+      "result": "FAIL",
+      "detail": "width 1024 overflow=True"
+    },
+    {
+      "name": "ai-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer controls",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/control-center"
+    },
+    {
+      "name": "controls-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y controls",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer evidence",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/documents"
+    },
+    {
+      "name": "evidence-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y evidence",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "evidence-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "evidence-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "evidence-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "evidence-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer graph",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/governance-graph"
+    },
+    {
+      "name": "graph-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y graph",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "customer reports",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/reports"
+    },
+    {
+      "name": "reports-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y reports",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "reports-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "reports-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "reports-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "reports-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "customer administration",
+      "result": "PASS",
+      "detail": "broken=False url=https://supreme-risk-staging.onrender.com/user-management"
+    },
+    {
+      "name": "administration-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "a11y administration",
+      "result": "PASS",
+      "detail": "{\"unnamedButtons\": 0, \"imagesMissingAlt\": 0, \"title\": \"Supreme \\u2014 Connected Governance Platform\"}"
+    },
+    {
+      "name": "mobile-drawer-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-home-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-connected-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-third-party-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-risk-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-compliance-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-privacy-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-ai-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-pricing-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-trust-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-security-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/public-login-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-activate-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-activate-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-activate-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-activate-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/vendor-activate-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/platform-login-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/home-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/notifications-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/third-parties-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/onboard-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-approval-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-active-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/lifecycle-history-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/assessments-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/findings-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/monitoring-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/risk-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/risk-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/risk-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/risk-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/risk-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/compliance-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/compliance-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/compliance-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/compliance-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/compliance-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/privacy-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/ai-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/ai-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/ai-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/ai-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/ai-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/controls-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/evidence-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/evidence-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/evidence-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/evidence-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/graph-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-375.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-768.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-1024.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports-1920.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/administration-1440.png",
+    "docs/private-beta/hosted-ux-qa/premium-experience/mobile-drawer-375.png"
+  ],
+  "sha": {
+    "api": "164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe",
+    "frontend": "164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe",
+    "healthStatus": 200,
+    "version": {
+      "gitSha": "164dbd22f03c914d6ae2e0e96f9f2cfdcef2a7fe",
+      "builtAt": "2026-09-14T10:24:32.330Z"
+    }
+  },
+  "personas": [
+    {
+      "persona": "Prospect",
+      "identify": "Yes \u2014 homepage states platform, audience, products, and next action",
+      "complete": "Request demo / tour / sign in are visible",
+      "confused": "Must not read TPRM as the whole product",
+      "notes": "See public-home screenshots"
+    },
+    {
+      "persona": "New Customer Admin",
+      "identify": "Home attention plus Administration",
+      "complete": "Can open Third Parties, Team, Reports",
+      "confused": "First-run copy still leads with onboard a third party",
+      "notes": "See home and administration"
+    },
+    {
+      "persona": "Business Owner",
+      "identify": "Role copy exists; live counts remain tenant records",
+      "complete": "Intake and own vendors",
+      "confused": "Home still mixes Third Party counts for every role",
+      "notes": "See home"
+    },
+    {
+      "persona": "Vendor Respondent",
+      "identify": "Activate page is a separate plane",
+      "complete": "Needs a live invitation token to complete",
+      "confused": "No customer nav on activate",
+      "notes": "See vendor-activate"
+    },
+    {
+      "persona": "TPRM Analyst",
+      "identify": "Lifecycle, assessments, findings, monitoring",
+      "complete": "Workspace tabs cover the lifecycle",
+      "confused": "History now has two layers after deploy",
+      "notes": "See lifecycle"
+    },
+    {
+      "persona": "Risk Manager",
+      "identify": "Risk overview uses the same shell",
+      "complete": "Dashboard and register",
+      "confused": "Home now surfaces live ERM attention when the API returns it",
+      "notes": "See risk"
+    },
+    {
+      "persona": "Compliance Manager",
+      "identify": "Compliance overview",
+      "complete": "Gaps and frameworks",
+      "confused": "Same attention pattern",
+      "notes": "See compliance"
+    },
+    {
+      "persona": "Privacy Leader",
+      "identify": "Privacy overview",
+      "complete": "Activities and rights",
+      "confused": "Same shell",
+      "notes": "See privacy"
+    },
+    {
+      "persona": "AI Governance Leader",
+      "identify": "AI overview",
+      "complete": "Register and approvals",
+      "confused": "Same shell",
+      "notes": "See ai"
+    },
+    {
+      "persona": "Executive Approver",
+      "identify": "Decision brief tab and reports",
+      "complete": "Approve / conditions / reject after deploy",
+      "confused": "Must re-check hosted Approval tab",
+      "notes": "See lifecycle-approval"
+    },
+    {
+      "persona": "Platform Owner",
+      "identify": "Admin login is a separate plane",
+      "complete": "Authorized console only",
+      "confused": "Did not authenticate a platform owner in this run unless creds exist",
+      "notes": "See platform-login"
+    }
+  ],
+  "reports": [
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/executive.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pdf.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/board-pptx.pptx",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/findings.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/risk-board.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/compliance-exec.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/privacy-exec.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/ai-exec.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/scorecard.pdf",
+    "docs/private-beta/hosted-ux-qa/premium-experience/reports/assessment.pdf"
+  ],
+  "a11y": [
+    {
+      "route": "public-home",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "public-connected",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "One Platform \u2014 Supreme",
+      "result": "PASS"
+    },
+    {
+      "route": "public-third-party",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme Third Party \u2014 Third-Party Risk Management",
+      "result": "PASS"
+    },
+    {
+      "route": "public-risk",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme Risk \u2014 Enterprise Risk Management",
+      "result": "PASS"
+    },
+    {
+      "route": "public-compliance",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme Compliance \u2014 Controls & Frameworks",
+      "result": "PASS"
+    },
+    {
+      "route": "public-privacy",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme Privacy \u2014 Privacy Management",
+      "result": "PASS"
+    },
+    {
+      "route": "public-ai",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme AI Governance",
+      "result": "PASS"
+    },
+    {
+      "route": "public-pricing",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme Pricing | Third-Party Risk & Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "public-trust",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Trust & Security \u2014 Supreme",
+      "result": "PASS"
+    },
+    {
+      "route": "public-security",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Security \u2014 Supreme",
+      "result": "PASS"
+    },
+    {
+      "route": "public-login",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Sign In \u2014 Supreme",
+      "result": "PASS"
+    },
+    {
+      "route": "vendor-activate",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "platform-login",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "home",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "notifications",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "third-parties",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "onboard",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "lifecycle",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "assessments",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "findings",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "monitoring",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "risk",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "compliance",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "privacy",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "ai",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "controls",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "evidence",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "graph",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "reports",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    },
+    {
+      "route": "administration",
+      "unnamedButtons": 0,
+      "imagesMissingAlt": 0,
+      "title": "Supreme \u2014 Connected Governance Platform",
+      "result": "PASS"
+    }
+  ],
+  "notes": [
+    "executive: 10553 bytes saved for visual inspection",
+    "board-pdf: 17635 bytes saved for visual inspection",
+    "board-pptx: 41729 bytes saved for visual inspection",
+    "findings: 15297 bytes saved for visual inspection",
+    "risk-board: 6847 bytes saved for visual inspection",
+    "compliance-exec: 5049 bytes saved for visual inspection",
+    "privacy-exec: 7620 bytes saved for visual inspection",
+    "ai-exec: 4295 bytes saved for visual inspection",
+    "scorecard: 7496 bytes saved for visual inspection",
+    "assessment: 6908 bytes saved for visual inspection"
+  ]
+}
