@@ -18,32 +18,42 @@
     {
       "name": "create system",
       "result": "PASS",
-      "detail": "201 AI-00001"
+      "detail": "reused AI-00001"
     },
     {
       "name": "lifecycle proposed",
       "result": "PASS",
-      "detail": "PROPOSED"
+      "detail": "APPROVED"
     },
     {
       "name": "no self-approve",
-      "result": "PASS",
-      "detail": "400 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Approved or production state requires a recorded human approval.\", \"statusCode\": 400, \"timestamp\": \"2026-09-14T00:21:32"
+      "result": "FAIL",
+      "detail": "200 {\"success\": true, \"data\": {\"id\": \"12579fe3-5283-4e48-9b41-85e0b85f7647\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"publicId\": \"AI-00001\", \"name\": \"Claims triage as"
     },
     {
       "name": "use case",
       "result": "PASS",
-      "detail": "201 USE-00001"
+      "detail": "201 USE-00002"
+    },
+    {
+      "name": "existing vendor",
+      "result": "PASS",
+      "detail": "Supreme Investigation 2afc74ad-a4e0-4a34-a2c4-40e88af5d376"
     },
     {
       "name": "provider unknown",
       "result": "PASS",
-      "detail": "201 MDL-00001 Unknown / Not recorded"
+      "detail": "201 MDL-00002 Unknown / Not recorded"
+    },
+    {
+      "name": "vendor link",
+      "result": "PASS",
+      "detail": "200 Supreme Investigation"
     },
     {
       "name": "score",
       "result": "PASS",
-      "detail": "{\"id\": \"b66d4d89-2c3b-4549-a62d-5fe22bef27be\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"systemId\": \"12579fe3-5283-4e48-9b41-85e0b85f7647\", \"methodologyVersion\": \"supreme-ai-1.0.0\", \"impact\": 4, \"likelih"
+      "detail": "{\"id\": \"bb8c2627-186a-4028-bd84-8ac972cbb962\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"systemId\": \"12579fe3-5283-4e48-9b41-85e0b85f7647\", \"methodologyVersion\": \"supreme-ai-1.0.0\", \"impact\": 4, \"likelih"
     },
     {
       "name": "screening",
@@ -53,42 +63,62 @@
     {
       "name": "test not invented",
       "result": "PASS",
-      "detail": "TST-00001"
+      "detail": "TST-00002"
     },
     {
       "name": "approval",
       "result": "PASS",
-      "detail": "APV-00001"
+      "detail": "APV-00002"
     },
     {
       "name": "incident",
       "result": "PASS",
-      "detail": "AIN-00001"
+      "detail": "AIN-00002"
     },
     {
       "name": "regulatory",
       "result": "PASS",
-      "detail": "REG-00001"
+      "detail": "REG-00002"
     },
     {
       "name": "privacy link",
-      "result": "PASS",
-      "detail": "200 PA-00001"
+      "result": "FAIL",
+      "detail": "409 PA-00001"
     },
     {
       "name": "risk link",
-      "result": "PASS",
-      "detail": "200 RISK-00001"
+      "result": "FAIL",
+      "detail": "409 RISK-00001"
     },
     {
       "name": "control link",
-      "result": "PASS",
-      "detail": "200 AIG-01"
+      "result": "FAIL",
+      "detail": "409 AIG-01"
     },
     {
-      "name": "change",
+      "name": "clean evidence reuse",
       "result": "PASS",
-      "detail": "CHG-00002"
+      "detail": "201 sr-clean-evidence.txt"
+    },
+    {
+      "name": "model version change",
+      "result": "PASS",
+      "detail": "201 v1-recorded -> v2-recorded"
+    },
+    {
+      "name": "change review",
+      "result": "PASS",
+      "detail": "Review required before this AI continues"
+    },
+    {
+      "name": "nist readiness",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"honesty\": \"readiness and mapping only. this is not certified, compliant, or attested. identifiers and supreme summaries only.\", \"fra"
+    },
+    {
+      "name": "iso readiness",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"honesty\": \"readiness and mapping only. this is not certified, compliant, or attested. identifiers and supreme summaries only.\", \"fra"
     },
     {
       "name": "what is affected",
@@ -201,6 +231,11 @@
       "detail": "/ai-governance/systems"
     },
     {
+      "name": "humanized register",
+      "result": "PASS",
+      "detail": "/ai-governance/systems"
+    },
+    {
       "name": "overflow register",
       "result": "PASS",
       "detail": "/ai-governance/systems"
@@ -231,12 +266,22 @@
       "detail": "/ai-governance/testing"
     },
     {
+      "name": "humanized testing",
+      "result": "PASS",
+      "detail": "/ai-governance/testing"
+    },
+    {
       "name": "overflow testing",
       "result": "PASS",
       "detail": "/ai-governance/testing"
     },
     {
       "name": "forbidden copy approvals",
+      "result": "PASS",
+      "detail": "/ai-governance/approvals"
+    },
+    {
+      "name": "humanized approvals",
       "result": "PASS",
       "detail": "/ai-governance/approvals"
     },
@@ -257,7 +302,12 @@
     },
     {
       "name": "forbidden copy regulatory",
-      "result": "FAIL",
+      "result": "PASS",
+      "detail": "/ai-governance/regulatory"
+    },
+    {
+      "name": "humanized regulatory",
+      "result": "PASS",
       "detail": "/ai-governance/regulatory"
     },
     {
@@ -291,7 +341,42 @@
       "detail": "/ai-governance/import"
     },
     {
+      "name": "forbidden copy controls",
+      "result": "PASS",
+      "detail": "/ai-governance/controls"
+    },
+    {
+      "name": "overflow controls",
+      "result": "PASS",
+      "detail": "/ai-governance/controls"
+    },
+    {
+      "name": "forbidden copy nist",
+      "result": "PASS",
+      "detail": "/ai-governance/readiness/nist-ai-rmf"
+    },
+    {
+      "name": "overflow nist",
+      "result": "PASS",
+      "detail": "/ai-governance/readiness/nist-ai-rmf"
+    },
+    {
+      "name": "forbidden copy iso",
+      "result": "PASS",
+      "detail": "/ai-governance/readiness/iso-42001"
+    },
+    {
+      "name": "overflow iso",
+      "result": "PASS",
+      "detail": "/ai-governance/readiness/iso-42001"
+    },
+    {
       "name": "forbidden copy system-detail",
+      "result": "PASS",
+      "detail": "/ai-governance/systems/AI-00001"
+    },
+    {
+      "name": "humanized system-detail",
       "result": "PASS",
       "detail": "/ai-governance/systems/AI-00001"
     },
@@ -303,12 +388,22 @@
     {
       "name": "forbidden copy use-case",
       "result": "PASS",
-      "detail": "/ai-governance/use-cases/USE-00001"
+      "detail": "/ai-governance/use-cases/USE-00002"
     },
     {
       "name": "overflow use-case",
       "result": "PASS",
-      "detail": "/ai-governance/use-cases/USE-00001"
+      "detail": "/ai-governance/use-cases/USE-00002"
+    },
+    {
+      "name": "forbidden copy provider-detail",
+      "result": "PASS",
+      "detail": "/ai-governance/providers/MDL-00002"
+    },
+    {
+      "name": "overflow provider-detail",
+      "result": "PASS",
+      "detail": "/ai-governance/providers/MDL-00002"
     },
     {
       "name": "board pptx native render",
@@ -378,6 +473,21 @@
     "docs/private-beta/hosted-ux-qa/supreme-ai/import-1024.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/import-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/import-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/controls-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/controls-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/controls-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/controls-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/controls-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/nist-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/nist-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/nist-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/nist-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/nist-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/iso-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/iso-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/iso-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/iso-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/iso-1920.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-375.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-768.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/system-detail-1024.png",
@@ -388,12 +498,19 @@
     "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-1024.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/use-case-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/provider-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/provider-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/provider-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/provider-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/provider-detail-1920.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/regression-privacy-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/regression-compliance-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/regression-risk-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/regression-graph-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/regression-controls-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/regression-vendors-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-reports-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ai/regression-methodology-1440.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-1.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-2.png",
     "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-3.png",
@@ -408,18 +525,18 @@
     "docs/private-beta/hosted-ux-qa/supreme-ai/board-slide-12.png"
   ],
   "sha": {
-    "api": "577071e895b360c86a56acf91644d5c80b5bc53c",
-    "frontend": "577071e895b360c86a56acf91644d5c80b5bc53c",
+    "api": "2810acc6ef1aa36b0390883e53104ddd1e530cdb",
+    "frontend": "2810acc6ef1aa36b0390883e53104ddd1e530cdb",
     "healthStatus": 200,
     "health": {
       "status": "degraded",
-      "timestamp": "2026-09-14T00:21:30.620Z",
-      "uptime": 611.746666959,
+      "timestamp": "2026-09-14T01:21:12.146Z",
+      "uptime": 496.429512068,
       "version": "1.0.0",
       "runtimeMode": "production",
       "deploymentEnvironment": "staging",
       "environment": "staging",
-      "gitSha": "577071e895b360c86a56acf91644d5c80b5bc53c",
+      "gitSha": "2810acc6ef1aa36b0390883e53104ddd1e530cdb",
       "checks": {
         "mongodb": {
           "status": "degraded",
@@ -430,9 +547,9 @@
           "status": "degraded",
           "message": "High memory usage",
           "details": {
-            "heapUsedMB": 90,
-            "heapTotalMB": 94,
-            "usagePercent": "95.74"
+            "heapUsedMB": 82,
+            "heapTotalMB": 85,
+            "usagePercent": "96.47"
           },
           "responseTime": 0
         },
@@ -487,34 +604,38 @@
         "redis": {
           "status": "up",
           "message": "Redis connection healthy",
-          "responseTime": 1
+          "responseTime": 4
         },
         "postgres": {
           "status": "up",
           "message": "PostgreSQL connection healthy",
-          "responseTime": 2
+          "responseTime": 4
         }
       },
       "memory": {
-        "rss": 218652672,
-        "heapUsed": 94369176,
-        "heapTotal": 98447360
+        "rss": 202452992,
+        "heapUsed": 86452928,
+        "heapTotal": 88956928
       }
     }
   },
   "workflow": {
     "system": "AI-00001",
-    "useCase": "USE-00001",
-    "provider": "MDL-00001",
-    "assessment": "AIA-00001",
-    "test": "TST-00001",
-    "approval": "APV-00001",
-    "incident": "AIN-00001",
-    "regulatory": "REG-00001",
+    "useCase": "USE-00002",
+    "provider": "MDL-00002",
+    "assessment": "AIA-00002",
+    "test": "TST-00002",
+    "approval": "APV-00002",
+    "incident": "AIN-00002",
+    "regulatory": "REG-00002",
     "activity": "PA-00001",
     "risk": "RISK-00001",
     "control": "AIG-01",
-    "reviewQuestion": "What do we need to review before this AI continues?"
+    "vendor": "Supreme Investigation",
+    "vendorId": "2afc74ad-a4e0-4a34-a2c4-40e88af5d376",
+    "reviewQuestion": "What do we need to review before this AI continues?",
+    "currentVersion": "v2-recorded",
+    "priorVersion": "v1-recorded"
   },
   "chain": {
     "system": {
@@ -522,46 +643,245 @@
       "name": "Claims triage assistant",
       "lifecycle": "APPROVED"
     },
+    "whatChanged": {
+      "publicId": "CHG-00004",
+      "summary": "MDL-00002 version changed from v1-recorded to v2-recorded. Review required before this AI continues.",
+      "priorVersion": "v1-recorded",
+      "newVersion": "v2-recorded",
+      "changeReason": "Hosted model version change for review"
+    },
     "useCases": [
       {
-        "id": "e573f73d-2a63-4e18-bd72-dafbe93f5a78",
-        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
-        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
         "publicId": "USE-00001",
         "name": "Claims triage",
-        "purpose": "Route incoming claims for human review",
-        "businessProcess": null,
-        "decisionInfluence": "Recommended routing only",
-        "affectedPersons": "Claimants",
-        "dataSummary": null,
-        "owner": null,
-        "jurisdiction": null,
-        "autonomy": "NOT_RECORDED",
-        "organizationClass": "NOT_CLASSIFIED",
-        "approvalStatus": null,
-        "humanOversight": null,
-        "createdAt": "2026-09-14T00:21:32.820Z",
-        "updatedAt": "2026-09-14T00:21:32.820Z"
+        "affectedPersons": "Claimants"
+      },
+      {
+        "publicId": "USE-00002",
+        "name": "Claims triage",
+        "affectedPersons": "Claimants"
       }
     ],
-    "vendors": [],
+    "vendors": [
+      {
+        "id": "2afc74ad-a4e0-4a34-a2c4-40e88af5d376",
+        "name": "Supreme Investigation",
+        "residualRiskScore": 13,
+        "status": "PROPOSED",
+        "tier": "MEDIUM",
+        "dataHandling": "Unknown / Not recorded",
+        "servicesProvided": "Insurance",
+        "assessments": [
+          {
+            "id": "b1a2971f-69f0-4092-a239-1e1be7970300",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "IN_PROGRESS",
+            "score": null,
+            "createdAt": "2026-09-13T05:00:58.804Z"
+          },
+          {
+            "id": "2ce23392-9b67-4ed5-b150-09927d0b709b",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "CANCELLED",
+            "score": null,
+            "createdAt": "2026-09-13T05:00:57.390Z"
+          },
+          {
+            "id": "8ebc09b4-2994-40c8-b476-a607386a75ed",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "CANCELLED",
+            "score": null,
+            "createdAt": "2026-09-13T04:39:25.170Z"
+          },
+          {
+            "id": "663dfd9e-59f9-4392-8e6e-4b4638138232",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "COMPLETED",
+            "score": 90,
+            "createdAt": "2026-09-13T04:32:38.927Z"
+          },
+          {
+            "id": "679605fa-f7bf-4691-b771-c5b840dcc4ec",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "NOT_STARTED",
+            "score": null,
+            "createdAt": "2026-09-13T04:32:37.361Z"
+          },
+          {
+            "id": "82199221-c684-4bf2-8a22-eb6fd062caf9",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "CANCELLED",
+            "score": null,
+            "createdAt": "2026-09-13T04:32:35.836Z"
+          },
+          {
+            "id": "ec6dbe51-0c8d-46e4-8ffc-0781ffa0eec2",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "NOT_STARTED",
+            "score": null,
+            "createdAt": "2026-09-13T04:32:34.351Z"
+          },
+          {
+            "id": "ce159939-e3d1-4a3d-b625-054488986357",
+            "type": "INITIAL_DUE_DILIGENCE",
+            "status": "NOT_STARTED",
+            "score": null,
+            "createdAt": "2026-09-13T04:32:32.977Z"
+          }
+        ],
+        "findings": [
+          {
+            "id": "85f06455-4073-4b2c-8472-fcb24d7f9137",
+            "title": "Private-beta MFA evidence gap",
+            "status": "IN_PROGRESS",
+            "severity": "HIGH"
+          }
+        ],
+        "evidence": [
+          {
+            "filename": "sr-clean-evidence.txt",
+            "scanStatus": "CLEAN",
+            "usable": true
+          },
+          {
+            "filename": "Supreme-Risk-Assessment-Supreme-Investigation-2026-09-13__1_.pdf",
+            "scanStatus": "CLEAN",
+            "usable": true
+          }
+        ],
+        "privacyRole": "PROCESSOR",
+        "transfers": [
+          {
+            "publicId": "XFR-00004",
+            "destination": "IE",
+            "mechanism": "SCC"
+          },
+          {
+            "publicId": "XFR-00002",
+            "destination": "IE",
+            "mechanism": "SCC"
+          },
+          {
+            "publicId": "XFR-00003",
+            "destination": "IE",
+            "mechanism": "SCC"
+          }
+        ]
+      }
+    ],
     "models": [
       {
-        "id": "f3de7a7f-3323-4596-ad24-0cc89e202675",
-        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
-        "publicId": "MDL-00001",
-        "vendorId": null,
+        "id": "eaf701ed-b389-434c-98cb-ae078dd7262c",
+        "providerPublicId": "MDL-00002",
         "providerName": "Recorded model provider",
-        "modelFamily": null,
-        "modelVersion": null,
-        "hosting": null,
-        "deployment": null,
-        "trainingDataAssertion": null,
-        "retentionAssertion": null,
-        "availabilityStatus": "Unknown / Not recorded",
-        "notes": null,
-        "createdAt": "2026-09-14T00:21:33.064Z",
-        "updatedAt": "2026-09-14T00:21:33.064Z"
+        "modelFamily": "Not recorded",
+        "modelVersion": "v2-recorded",
+        "priorVersion": "v1-recorded",
+        "changeReason": "Hosted model version change for review",
+        "effectiveFrom": "2026-09-14T01:21:26.301Z",
+        "effectiveTo": null,
+        "status": "CURRENT",
+        "tests": [],
+        "approvals": [],
+        "risks": [],
+        "evidence": [
+          {
+            "id": "74df0fb2-25be-4cfb-81dc-8dd643dc9fa4",
+            "filename": "sr-clean-evidence.txt",
+            "scanStatus": "CLEAN",
+            "freshness": "CURRENT",
+            "relationship": "SUPPORTS",
+            "uploadedAt": "2026-09-13T05:01:04.082Z",
+            "usable": true,
+            "honesty": "CLEAN evidence is present. Presence is not effectiveness."
+          }
+        ]
+      },
+      {
+        "id": "f6511ac3-3993-449c-a879-7091ca950ff8",
+        "providerPublicId": "MDL-00002",
+        "providerName": "Recorded model provider",
+        "modelFamily": "Not recorded",
+        "modelVersion": "v1-recorded",
+        "priorVersion": "Not recorded",
+        "changeReason": "Initial recorded provider",
+        "effectiveFrom": "2026-09-14T01:21:19.138Z",
+        "effectiveTo": "2026-09-14T01:21:26.294Z",
+        "status": "SUPERSEDED",
+        "tests": [
+          {
+            "publicId": "TST-00002",
+            "kind": "BIAS_FAIRNESS",
+            "result": "NOT_TESTED"
+          }
+        ],
+        "approvals": [
+          {
+            "publicId": "APV-00002",
+            "decision": "APPROVED_WITH_CONDITIONS"
+          }
+        ],
+        "risks": [
+          {
+            "publicId": "AIR-00002",
+            "category": "Hallucination / incorrect output"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "74df0fb2-25be-4cfb-81dc-8dd643dc9fa4",
+            "filename": "sr-clean-evidence.txt",
+            "scanStatus": "CLEAN",
+            "freshness": "CURRENT",
+            "relationship": "SUPPORTS",
+            "uploadedAt": "2026-09-13T05:01:04.082Z",
+            "usable": true,
+            "honesty": "CLEAN evidence is present. Presence is not effectiveness."
+          }
+        ]
+      },
+      {
+        "id": "2bc097e0-96d8-4a29-963b-e19fa0640547",
+        "providerPublicId": "MDL-00001",
+        "providerName": "Recorded model provider",
+        "modelFamily": "Not recorded",
+        "modelVersion": "Not recorded",
+        "priorVersion": "Not recorded",
+        "changeReason": "Not recorded",
+        "effectiveFrom": "2026-09-14T00:21:33.307Z",
+        "effectiveTo": "2026-09-14T01:21:19.131Z",
+        "status": "SUPERSEDED",
+        "tests": [
+          {
+            "publicId": "TST-00001",
+            "kind": "BIAS_FAIRNESS",
+            "result": "NOT_TESTED"
+          }
+        ],
+        "approvals": [
+          {
+            "publicId": "APV-00001",
+            "decision": "APPROVED_WITH_CONDITIONS"
+          }
+        ],
+        "risks": [
+          {
+            "publicId": "AIR-00001",
+            "category": "Hallucination / incorrect output"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "74df0fb2-25be-4cfb-81dc-8dd643dc9fa4",
+            "filename": "sr-clean-evidence.txt",
+            "scanStatus": "CLEAN",
+            "freshness": "CURRENT",
+            "relationship": "SUPPORTS",
+            "uploadedAt": "2026-09-13T05:01:04.082Z",
+            "usable": true,
+            "honesty": "CLEAN evidence is present. Presence is not effectiveness."
+          }
+        ]
       }
     ],
     "dataCategories": [],
@@ -582,9 +902,21 @@
     ],
     "controls": [
       {
-        "id": "7c80f7ab-bb65-417d-9330-9f044d347033",
+        "controlKey": "AIG-01",
         "title": "AI systems are inventoried before production use",
         "effectiveness": "NOT_TESTED"
+      }
+    ],
+    "cleanEvidence": [
+      {
+        "id": "74df0fb2-25be-4cfb-81dc-8dd643dc9fa4",
+        "filename": "sr-clean-evidence.txt",
+        "scanStatus": "CLEAN",
+        "freshness": "CURRENT",
+        "relationship": "SUPPORTS",
+        "uploadedAt": "2026-09-13T05:01:04.082Z",
+        "usable": true,
+        "honesty": "CLEAN evidence is present. Presence is not effectiveness."
       }
     ],
     "tests": [
@@ -604,8 +936,26 @@
         "notes": null,
         "evidenceNote": null,
         "createdAt": "2026-09-14T00:21:35.175Z"
+      },
+      {
+        "id": "b659ba85-9045-4215-8060-525c4821514a",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "TST-00002",
+        "kind": "BIAS_FAIRNESS",
+        "method": null,
+        "datasetRef": null,
+        "tester": "Hosted reviewer",
+        "testedAt": "2026-09-14T01:21:22.274Z",
+        "result": "NOT_TESTED",
+        "threshold": null,
+        "notes": null,
+        "evidenceNote": null,
+        "createdAt": "2026-09-14T01:21:22.275Z"
       }
     ],
+    "testsRequiringRefresh": [],
     "incidents": [
       {
         "id": "e6ce27bf-1620-4df1-a53c-8bf993dfce7a",
@@ -622,9 +972,39 @@
         "closedAt": null,
         "createdAt": "2026-09-14T00:21:35.875Z",
         "updatedAt": "2026-09-14T00:21:35.875Z"
+      },
+      {
+        "id": "1a769825-330c-46d3-927a-8a4a1a7185cd",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "AIN-00002",
+        "title": "Incorrect claim-routing suggestion",
+        "severity": "MEDIUM",
+        "impact": null,
+        "status": "OPEN",
+        "owner": null,
+        "decision": null,
+        "closedAt": null,
+        "createdAt": "2026-09-14T01:21:23.409Z",
+        "updatedAt": "2026-09-14T01:21:23.409Z"
       }
     ],
     "approvals": [
+      {
+        "id": "bfeb9822-5ac0-47ae-a2c2-42352f94aaf7",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "APV-00002",
+        "decision": "APPROVED_WITH_CONDITIONS",
+        "decisionMaker": "Risk Committee",
+        "authority": null,
+        "rationale": "Human review of recorded use, oversight, and untested bias posture.",
+        "conditions": "Do not expand to autonomous claim denial.",
+        "reviewAt": null,
+        "createdAt": "2026-09-14T01:21:22.749Z"
+      },
       {
         "id": "206496ac-b803-4ae1-9101-8dd302493ff0",
         "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
@@ -640,9 +1020,146 @@
         "createdAt": "2026-09-14T00:21:35.539Z"
       }
     ],
-    "reviewQuestion": "What do we need to review before this AI continues?"
+    "approvalsRequiringReview": [
+      {
+        "id": "bfeb9822-5ac0-47ae-a2c2-42352f94aaf7",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "APV-00002",
+        "decision": "APPROVED_WITH_CONDITIONS",
+        "decisionMaker": "Risk Committee",
+        "authority": null,
+        "rationale": "Human review of recorded use, oversight, and untested bias posture.",
+        "conditions": "Do not expand to autonomous claim denial.",
+        "reviewAt": null,
+        "createdAt": "2026-09-14T01:21:22.749Z"
+      },
+      {
+        "id": "206496ac-b803-4ae1-9101-8dd302493ff0",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "systemId": "12579fe3-5283-4e48-9b41-85e0b85f7647",
+        "useCaseId": null,
+        "publicId": "APV-00001",
+        "decision": "APPROVED_WITH_CONDITIONS",
+        "decisionMaker": "Risk Committee",
+        "authority": null,
+        "rationale": "Human review of recorded use, oversight, and untested bias posture.",
+        "conditions": "Do not expand to autonomous claim denial.",
+        "reviewAt": null,
+        "createdAt": "2026-09-14T00:21:35.539Z"
+      }
+    ],
+    "compliance": {
+      "honesty": "Readiness only. Not certified or legally determined.",
+      "nistAiRmf": {
+        "honesty": "Readiness and mapping only. This is not certified, compliant, or attested. Identifiers and Supreme summaries only.",
+        "frameworkKey": "NIST_AI_RMF",
+        "name": "NIST AI Risk Management Framework",
+        "version": "1.0-ref",
+        "areas": [
+          {
+            "key": "MAP",
+            "supremeSummary": "Supreme summary: AI systems, uses, data, and context are inventoried before they are treated as understood.",
+            "mappedControls": 2,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          },
+          {
+            "key": "MEASURE",
+            "supremeSummary": "Supreme summary: tests and evaluations are recorded by humans. Missing tests stay Not tested.",
+            "mappedControls": 1,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          },
+          {
+            "key": "MANAGE",
+            "supremeSummary": "Supreme summary: residual AI risk, incidents, and restrictions are governed by human decisions.",
+            "mappedControls": 2,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          },
+          {
+            "key": "GOVERN",
+            "supremeSummary": "Supreme summary: AI roles, policies, and human authority are assigned and kept current. This is readiness language, not a NIST certification.",
+            "mappedControls": 3,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          }
+        ],
+        "coverage": {
+          "requirementCount": 4,
+          "mapped": 4,
+          "implemented": 0,
+          "tested": 0,
+          "gaps": 4
+        },
+        "compliance": null,
+        "certified": false
+      },
+      "iso42001": {
+        "honesty": "Readiness and mapping only. This is not certified, compliant, or attested. Identifiers and Supreme summaries only.",
+        "frameworkKey": "ISO_42001",
+        "name": "ISO/IEC 42001",
+        "version": "2023-ref",
+        "areas": [
+          {
+            "key": "4",
+            "supremeSummary": "Supreme summary: the organization records the context and scope of its AI management system. Readiness only. Not ISO 42001 certified.",
+            "mappedControls": 2,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          },
+          {
+            "key": "5",
+            "supremeSummary": "Supreme summary: leadership assigns AI accountability and does not treat inventory as approval.",
+            "mappedControls": 2,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          },
+          {
+            "key": "8",
+            "supremeSummary": "Supreme summary: AI operation includes recorded use cases, data, and human oversight.",
+            "mappedControls": 2,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          },
+          {
+            "key": "9",
+            "supremeSummary": "Supreme summary: performance evaluation uses recorded tests. Results are never invented.",
+            "mappedControls": 1,
+            "implementedControls": 0,
+            "testedControls": 0,
+            "gap": true
+          }
+        ],
+        "coverage": {
+          "requirementCount": 4,
+          "mapped": 4,
+          "implemented": 0,
+          "tested": 0,
+          "gaps": 4
+        },
+        "compliance": null,
+        "certified": false
+      }
+    },
+    "reviewRequired": true,
+    "reviewQuestion": "What do we need to review before this AI continues?",
+    "humanDecision": "Review required before this AI continues. No automatic approval."
   },
-  "discrepancies": [],
-  "hostedFrontendSha": "577071e895b360c86a56acf91644d5c80b5bc53c",
-  "hostedApiSha": "577071e895b360c86a56acf91644d5c80b5bc53c"
+  "discrepancies": [
+    "Reuse of AI-00001: PRODUCTION patch returned 200 because a human approval already existed. CI still proves unapproved systems cannot self-approve.",
+    "Privacy / enterprise-risk / AIG-01 POST returned 409 because those links already existed from the prior walkthrough.",
+    "NIST AI RMF and ISO/IEC 42001 readiness show catalog mapping and Supreme summaries. No Supreme Compliance activation is recorded on this tenant, so gaps/exceptions stay empty. Not certified."
+  ],
+  "hostedFrontendSha": "2810acc6ef1aa36b0390883e53104ddd1e530cdb",
+  "hostedApiSha": "2810acc6ef1aa36b0390883e53104ddd1e530cdb"
 }

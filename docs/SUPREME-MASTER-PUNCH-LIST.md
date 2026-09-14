@@ -327,9 +327,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
 
-**CERTIFICATION SHA:** Starting SHA `17c87d5ecf65b34de6233d7d35967b0e854a77c0`. Base implementation `577071e895b360c86a56acf91644d5c80b5bc53c`. Final-closure implementation is on `supreme-risk-transformation` after that SHA. Cursor does not declare #18 PASS.
+**CERTIFICATION SHA:** Starting SHA `17c87d5ecf65b34de6233d7d35967b0e854a77c0`. Base implementation `577071e895b360c86a56acf91644d5c80b5bc53c`. Closure implementation `d5cd67baa0760ff1fb46f2fc42c760266aeb738a`. Hosted frontend and API `2810acc6ef1aa36b0390883e53104ddd1e530cdb`. Cursor does not declare #18 PASS.
 
-**EVIDENCE:** `docs/ADR-SUPREME-AI-GOVERNANCE.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-ai/`. Native PowerPoint 12 unique slides. CI `34791779508` PASS on `577071e`. Final-closure hosted evidence is required before Product Leadership acceptance. `aiProvider` NOT_CONFIGURED remains TPRM assistance, not this product.
+**EVIDENCE:** `docs/ADR-SUPREME-AI-GOVERNANCE.md`. Final-closure walkthrough in `docs/private-beta/hosted-ux-qa/supreme-ai/`. Native PowerPoint 12 unique slides. CI `34795102400` PASS on `2810acc` (352 backend / 160 frontend). `aiProvider` NOT_CONFIGURED remains TPRM assistance, not this product.
 
 **NEXT ACTION:** Product Leadership hosted final review of vendor linkage, CLEAN evidence reuse, NIST AI RMF / ISO 42001 readiness, model version change review, and enum humanization. Do not start #19. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
 
