@@ -103,7 +103,7 @@ describe('report generation and tenant isolation', () => {
             .set('Authorization', `Bearer ${tokenA}`);
         expect(res.status).toBe(200);
         expect(res.headers['content-type']).toMatch(/application\/pdf/);
-        expect(res.headers['content-disposition']).toMatch(/Supreme-Risk-Decision-Brief/);
+        expect(res.headers['content-disposition']).toMatch(/Supreme-Governance-Decision-Brief/);
         expect(res.headers['content-disposition']).toMatch(/\.pdf/);
         const pdf = fileBuffer(res);
         expect(pdf.subarray(0, 4).toString()).toBe('%PDF');

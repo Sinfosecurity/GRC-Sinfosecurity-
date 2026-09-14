@@ -234,12 +234,12 @@ export default function RiskDashboard() {
                 <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} sx={{ mb: 1 }} spacing={1}>
                     <Typography variant="subtitle2">Top residual risks</Typography>
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('profile'), 'Supreme-Risk-Profile.pdf')}>Profile PDF</Button>
-                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('top-risks'), 'Supreme-Risk-Top-Risks.pdf')}>Top risks PDF</Button>
-                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('appetite'), 'Supreme-Risk-Appetite.pdf')}>Appetite PDF</Button>
-                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('treatment'), 'Supreme-Risk-Treatment.pdf')}>Treatment PDF</Button>
-                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('board'), 'Supreme-Risk-Board.pdf')}>Board PDF</Button>
-                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadBoardPptx(), 'Supreme-Risk-Board.pptx')}>Board PPTX</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('profile'), 'Supreme-Governance-Profile.pdf')}>Profile PDF</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('top-risks'), 'Supreme-Governance-Top-Risks.pdf')}>Top risks PDF</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('appetite'), 'Supreme-Governance-Appetite.pdf')}>Appetite PDF</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('treatment'), 'Supreme-Governance-Treatment.pdf')}>Treatment PDF</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadReport('board'), 'Supreme-Governance-Board.pdf')}>Board PDF</Button>
+                        <Button size="small" onClick={async () => downloadBinaryResponse(await ermAPI.downloadBoardPptx(), 'Supreme-Governance-Board.pptx')}>Board PPTX</Button>
                     </Stack>
                 </Stack>
                 {data.topRisks.length === 0 ? (

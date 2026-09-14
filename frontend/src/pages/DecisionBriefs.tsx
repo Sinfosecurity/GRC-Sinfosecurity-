@@ -92,7 +92,7 @@ export default function DecisionBriefs() {
         setDownloadError(null);
         try {
             const response = await tprmAPI.downloadBriefPdf(selected.id);
-            await downloadBinaryResponse(response, 'Supreme-Risk-Decision-Brief.pdf');
+            await downloadBinaryResponse(response, 'Supreme-Governance-Decision-Brief.pdf');
         } catch (err) {
             setDownloadError(downloadErrorMessage(err));
         } finally {

@@ -93,8 +93,8 @@ export default function RiskRegister() {
                 description="Customer-readable IDs, explainable scores, and appetite status from live records."
                 actions={(
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                        <Button variant="outlined" onClick={async () => downloadBinaryResponse(await ermAPI.exportRegister('csv'), 'Supreme-Risk-Register.csv')}>Export CSV</Button>
-                        <Button variant="outlined" onClick={async () => downloadBinaryResponse(await ermAPI.exportRegister('xlsx'), 'Supreme-Risk-Register.xlsx')}>Export XLSX</Button>
+                        <Button variant="outlined" onClick={async () => downloadBinaryResponse(await ermAPI.exportRegister('csv'), 'Supreme-Governance-Register.csv')}>Export CSV</Button>
+                        <Button variant="outlined" onClick={async () => downloadBinaryResponse(await ermAPI.exportRegister('xlsx'), 'Supreme-Governance-Register.xlsx')}>Export XLSX</Button>
                         <Button variant="contained" onClick={() => setOpen(true)}>Record a risk</Button>
                     </Stack>
                 )}

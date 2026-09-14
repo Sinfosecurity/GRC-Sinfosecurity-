@@ -315,7 +315,7 @@ export default function Assessments() {
         setBusy(true);
         try {
             const response = await tprmAPI.downloadAssessmentPdf(selected.id);
-            await downloadBinaryResponse(response, 'Supreme-Risk-Assessment.pdf');
+            await downloadBinaryResponse(response, 'Supreme-Governance-Assessment.pdf');
         } catch (err) {
             setError(downloadErrorMessage(err));
         } finally {
