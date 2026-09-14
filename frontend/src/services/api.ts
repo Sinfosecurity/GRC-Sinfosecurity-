@@ -75,6 +75,13 @@ api.interceptors.response.use(
 
         if (status === 401) {
             const path = window.location.pathname;
+            if (path.startsWith('/vendor-assessment')) {
+                localStorage.removeItem('vendorToken');
+                if (!path.startsWith('/vendor-assessment/activate')) {
+                    window.location.href = '/vendor-assessment/activate';
+                }
+                return Promise.reject(new ApiClientError(message, status, apiCode || error.code, details));
+            }
             const authFlow = path.startsWith('/login') || path.startsWith('/admin/') || path === '/';
             localStorage.removeItem('token');
             localStorage.removeItem('user');
@@ -439,6 +446,35 @@ export const vendorOnboardingAPI = {
         api.post(`/vendors/onboarding/${id}/intake/complete`, { answers, attested }),
     confirmTier: (id: string, data?: unknown) => api.post(`/vendors/onboarding/${id}/tier/confirm`, data || { confirm: true }),
     confirmPlan: (id: string) => api.post(`/vendors/onboarding/${id}/plan/confirm`),
+    saveContact: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/contact`, data),
+    send: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/send`, data),
+    resend: (id: string) => api.post(`/vendors/onboarding/${id}/invitation/resend`),
+    activationLink: (id: string) => api.post(`/vendors/onboarding/${id}/invitation/link`),
+    reviewFinding: (id: string, findingId: string, data: unknown) => api.post(`/vendors/onboarding/${id}/findings/${findingId}/review`, data),
+    requestClarification: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/clarification`, data),
+};
+
+const vendorApi = axios.create({
+    baseURL: API_BASE_URL || '/api/v1',
+    headers: { 'Content-Type': 'application/json' },
+});
+
+vendorApi.interceptors.request.use((config) => {
+    const token = localStorage.getItem('vendorToken');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+export const vendorPortalAPI = {
+    activate: (token: string) => vendorApi.post('/vendor-portal/activate', { token }),
+    workspace: () => vendorApi.get('/vendor-portal/workspace'),
+    assessment: (id: string) => vendorApi.get(`/vendor-portal/assessments/${id}`),
+    saveResponse: (id: string, data: unknown) => vendorApi.patch(`/vendor-portal/assessments/${id}/responses`, data),
+    submit: (id: string, attested: boolean) => vendorApi.post(`/vendor-portal/assessments/${id}/submit`, { attested }),
+    uploadEvidence: (id: string, form: FormData) => vendorApi.post(`/vendor-portal/assessments/${id}/evidence`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+    logout: () => vendorApi.post('/vendor-portal/logout'),
 };
 
 export const vendorAPI = {

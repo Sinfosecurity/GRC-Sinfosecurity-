@@ -16,6 +16,10 @@ vi.mock('../../services/api', () => ({
         completeIntake: vi.fn(),
         confirmTier: vi.fn(),
         confirmPlan: vi.fn(),
+        saveContact: vi.fn(),
+        send: vi.fn(),
+        resend: vi.fn(),
+        reviewFinding: vi.fn(),
     },
 }));
 

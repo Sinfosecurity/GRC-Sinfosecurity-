@@ -8,7 +8,7 @@ export function publicFrontendUrl(env: NodeJS.ProcessEnv = process.env): string 
     return portalFrontendUrl('CUSTOMER', env);
 }
 
-export function portalFrontendUrl(plane: 'CUSTOMER' | 'PLATFORM', env: NodeJS.ProcessEnv = process.env): string {
+export function portalFrontendUrl(plane: 'CUSTOMER' | 'PLATFORM' | 'VENDOR', env: NodeJS.ProcessEnv = process.env): string {
     const hosted = env.NODE_ENV === 'production' || env.APP_ENVIRONMENT === 'staging';
     const candidates = plane === 'PLATFORM'
         ? [env.ADMIN_FRONTEND_URL, env.FRONTEND_BASE_URL, env.FRONTEND_URL, env.CORS_ORIGIN]
@@ -79,7 +79,7 @@ export function invitationEmailHtml(
     return `<p>${withLinks.replace(/\n/g, '<br/>')}</p>`;
 }
 
-export function passwordResetEmailBody(token: string, env: NodeJS.ProcessEnv = process.env, plane: 'CUSTOMER' | 'PLATFORM' = 'CUSTOMER') {
+export function passwordResetEmailBody(token: string, env: NodeJS.ProcessEnv = process.env, plane: 'CUSTOMER' | 'PLATFORM' | 'VENDOR' = 'CUSTOMER') {
     const origin = portalFrontendUrl(plane, env);
     const resetUrl = `${origin}${plane === 'PLATFORM' ? '/admin/reset-password' : '/reset-password'}?token=${token}`;
     return [

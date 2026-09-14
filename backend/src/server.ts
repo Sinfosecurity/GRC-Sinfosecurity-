@@ -57,6 +57,7 @@ import sccRoutes from './routes/scc.routes';
 import ermRoutes from './routes/erm.routes';
 import privacyRoutes from './routes/privacy.routes';
 import aiGovernanceRoutes from './routes/aiGovernance.routes';
+import vendorPortalRoutes from './routes/vendorPortal.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -229,6 +230,7 @@ const API_PREFIX = `/api/${process.env.API_VERSION || 'v1'}`;
 
 const tenantContent = [authenticate, rejectPlatformTenantContent];
 app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/vendor-portal`, vendorPortalRoutes);
 app.use(`${API_PREFIX}/risks`, ...tenantContent, riskRoutes);
 app.use(`${API_PREFIX}/compliance`, ...tenantContent, complianceRoutes);
 app.use(`${API_PREFIX}/controls`, ...tenantContent, controlsRoutes);

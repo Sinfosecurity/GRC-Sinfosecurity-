@@ -177,7 +177,7 @@ describe('Supreme Third Party onboarding Phase A', () => {
             .send({});
         expect(confirmed.status).toBe(200);
         expect(confirmed.body.data.stage).toBe('Ready to send');
-        expect(confirmed.body.data.nextAction).toMatch(/vendor portal is not in this phase/i);
+        expect(confirmed.body.data.nextAction).toMatch(/send due diligence/i);
     });
 
     it('enforces viewer RBAC and tenant isolation', async () => {

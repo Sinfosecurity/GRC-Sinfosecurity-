@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-13
 
-**CURRENT ITEM:** #12 Automation Closure Phase A review, in parallel with #18 Supreme AI Governance
+**CURRENT ITEM:** #12 Automation Closure Phase B
 
-**CURRENT ITEM STATUS:** #12 PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED; #18 PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**CURRENT ITEM STATUS:** #12 PARTIAL / OPEN; Phase A PASS — Product Leadership accepted; Phase B implemented for hosted review; #18 PASS — Product Leadership accepted
 
 **#12:** PARTIAL / OPEN IN PARALLEL
 
@@ -47,6 +47,12 @@ This file records **program acceptance**. Engineering may return hosted evidence
 **#12 PHASE A HOSTED API SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`
 
 **#12 PHASE A DOCUMENTATION SHA:** `9d52d49d83990677b7ac538b00ccf5bf8acdb454`
+
+**#12 PHASE A PROGRAM ACCEPTANCE:** PASS — Product Leadership accepted (2026-09-13)
+
+**#12 PHASE B STARTING SHA:** `e889bd5167bc1598854a65cfc935026615b1cef4`
+
+**#12 PHASE B AUTHORIZED:** YES — Product Leadership 2026-09-13, Phase B only
 
 **CURRENT BRANCH:** `supreme-risk-transformation`
 
@@ -107,9 +113,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ### #18 Supreme AI Governance
 
-**STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**STATUS:** PASS — Product Leadership accepted (2026-09-13)
 
-See `docs/ADR-SUPREME-AI-GOVERNANCE.md` and `docs/private-beta/hosted-ux-qa/supreme-ai/`. Final-closure work (vendor linkage, CLEAN evidence, readiness workspaces, model version change review, enum humanization) is returned for hosted Product Leadership review. #19 is not authorized. #12 remains PARTIAL.
+See `docs/ADR-SUPREME-AI-GOVERNANCE.md` and `docs/private-beta/hosted-ux-qa/supreme-ai/`. #19 is not authorized. #12 remains PARTIAL.
 
 ### #17 Supreme Privacy
 
@@ -155,7 +161,7 @@ Known open #12 issues:
 - commercial production NO-GO
 - hosted Product Leadership acceptance of the Risk Scoring Methodology workspace
 - hosted Reports assessment selector (UX-031): remediations hosted on frontend `7bf040a` / API `8a3d8fc`; Product Leadership re-review required. See `docs/private-beta/hosted-ux-qa/reports-assessment-selector/`
-- Automation Closure Phase A (request → intake → explainable tier → due-diligence plan) is implemented on hosted SHA `b7f9072` and requires Product Leadership review. Vendor portal / Phase B is not authorized. See `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`
+- Automation Closure Phase A accepted. Phase B vendor-facing due diligence is implemented for hosted Product Leadership review. Phase C is not authorized. See `docs/ADR-TPRM-VENDOR-ACCESS.md` and `docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/`
 
 RAW JSON SCORING EDITOR: REMOVED  
 RISK METHODOLOGY WORKSPACE: IMPLEMENTED  
@@ -171,15 +177,15 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Product Leadership hosted review of #12 Automation Closure Phase A and remaining #12 private-testing items. #18 remains PARTIAL. Keep #12 PARTIAL. Do not start Phase B vendor portal. Do not start #19 or #20. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Product Leadership hosted review of #12 Automation Closure Phase B. Phase A and #18 are accepted. Keep #12 PARTIAL. Do not start Phase C. Do not start #19 or #20. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#12 Automation Closure Phase A** — Product Leadership hosted review required. Do not mark #12 PASS. Do not start Phase B.
+**#12 Automation Closure Phase B** — Product Leadership hosted review required. Do not mark #12 PASS. Do not start Phase C.
 
-**#18 Supreme AI Governance** remains PARTIAL — Product Leadership final review required.
+**#18 Supreme AI Governance** is accepted.
 
 Do not start #19 or #20.
 
@@ -187,7 +193,7 @@ Do not start #19 or #20.
 
 ## DO NOT START
 
-- Phase B vendor portal.
+- Phase C remediation / risk acceptance / activation orchestration.
 - **#19** Supreme Intelligence.
 - **#20** Supreme Automation.
 - Production DNS, `main` merge, or production deploy.
@@ -221,7 +227,7 @@ Do not start #19 or #20.
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership hosted review of #12 Automation Closure Phase A. Hosted evidence is in `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`. Do not declare #12 PASS from this file. #13–#17 are accepted. #18 remains PARTIAL. #19 and #20 are not authorized.
+Product Leadership hosted review of #12 Automation Closure Phase B. Hosted evidence is in `docs/private-beta/hosted-ux-qa/supreme-tprm-phase-b/`. Do not declare #12 PASS from this file. #13–#18 are accepted. Phase A is accepted. #19 and #20 are not authorized.
 
 ---
 
@@ -258,7 +264,7 @@ Do not invent percentages.
 | 15 | Supreme Risk | PASS — Product Leadership accepted (2026-09-13) |
 | 16 | Supreme Compliance | PASS — Product Leadership accepted (2026-09-13) |
 | 17 | Supreme Privacy | PASS — Product Leadership accepted (2026-09-13) |
-| 18 | Supreme AI Governance | PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED |
+| 18 | Supreme AI Governance | PASS — Product Leadership accepted (2026-09-13) |
 | 19–38, 40 | Later modules / GTM / packs | NOT STARTED / NOT AUTHORIZED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -271,6 +277,25 @@ Marketing preview pages are not implementation.
 Concise accepted-status history. Do not fabricate unsubstantiated history. Older certification docs used different local numbering; this log uses the **master punch list** numbers.
 
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
+
+### 2026-09-13
+
+**ITEM:** #12 Automation Closure Phase B  
+**STATUS CHANGE:** authorized / implemented for review; #12 remains PARTIAL  
+**SHA:** starting `e889bd5167bc1598854a65cfc935026615b1cef4`  
+**EVIDENCE:** `docs/ADR-TPRM-VENDOR-ACCESS.md`. Phase C, #19, and #20 were not started.
+
+### 2026-09-13
+
+**ITEM:** #12 Automation Closure Phase A  
+**STATUS CHANGE:** PARTIAL review -> PASS — Product Leadership accepted Phase A only  
+**SHA:** `b7f9072efe428b48d286d442e505d647b2aea874`
+
+### 2026-09-13
+
+**ITEM:** #18 Supreme AI Governance  
+**STATUS CHANGE:** PARTIAL -> PASS — Product Leadership accepted  
+**SHA:** hosted closure `2810acc6ef1aa36b0390883e53104ddd1e530cdb`
 
 ### 2026-09-13
 

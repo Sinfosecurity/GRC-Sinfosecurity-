@@ -25,6 +25,10 @@ const STAGE_LABEL: Record<VendorOnboardingStage, string> = {
     TIER_REVIEW: 'Tier review',
     DUE_DILIGENCE_PLAN: 'Due diligence',
     READY_TO_SEND: 'Ready to send',
+    AWAITING_VENDOR: 'Awaiting vendor',
+    VENDOR_IN_PROGRESS: 'Vendor in progress',
+    SUBMITTED: 'Submitted',
+    UNDER_REVIEW: 'Under review',
 };
 
 const TIER_LABEL: Record<VendorTier, string> = {
@@ -45,6 +49,14 @@ const HISTORY_ACTIONS: Record<string, string> = {
     'vendor.tier_overridden': 'Tier overridden',
     'vendor.plan_generated': 'Due-diligence plan generated',
     'vendor.plan_confirmed': 'Due-diligence plan confirmed',
+    'vendor.due_diligence_sent': 'Due diligence sent',
+    'vendor.access_activated': 'Vendor started assessment',
+    'vendor.assessment_submitted': 'Vendor submitted assessment',
+    'vendor.draft_findings_generated': 'Draft findings generated',
+    'vendor.finding_confirmed': 'Finding confirmed',
+    'vendor.finding_adjusted': 'Finding adjusted',
+    'vendor.finding_dismissed': 'Finding dismissed',
+    'vendor.clarification_requested': 'Clarification requested',
 };
 
 type Actor = { id: string; role: string; name?: string };
@@ -309,7 +321,7 @@ export async function createOnboardingRequest(organizationId: string, actor: Act
 
 export async function listOnboardings(organizationId: string) {
     const rows = await prisma.vendorOnboarding.findMany({
-        where: { organizationId, stage: { not: VendorOnboardingStage.READY_TO_SEND } },
+        where: { organizationId },
         include: { vendor: true },
         orderBy: { updatedAt: 'desc' },
         take: 100,
@@ -357,7 +369,15 @@ function nextAction(stage: VendorOnboardingStage) {
         case VendorOnboardingStage.DUE_DILIGENCE_PLAN:
             return 'Confirm due-diligence plan';
         case VendorOnboardingStage.READY_TO_SEND:
-            return 'Ready to send — vendor portal is not in this phase';
+            return 'Send due diligence to the vendor contact';
+        case VendorOnboardingStage.AWAITING_VENDOR:
+            return 'Waiting for the vendor to start';
+        case VendorOnboardingStage.VENDOR_IN_PROGRESS:
+            return 'Vendor is completing assigned assessments';
+        case VendorOnboardingStage.SUBMITTED:
+            return 'Review the vendor submission';
+        case VendorOnboardingStage.UNDER_REVIEW:
+            return 'Confirm or dismiss draft findings';
         default:
             return 'Review onboarding';
     }
@@ -560,7 +580,7 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
         },
     });
     await writeHistory(organizationId, actor.id, 'vendor.plan_confirmed', vendor.id, {
-        summary: 'Due-diligence plan confirmed. Ready to send — vendor portal is not in this phase.',
+        summary: 'Due-diligence plan confirmed. Ready to send to the vendor contact.',
     });
     return presentOnboarding(organizationId, vendor.id, actor);
 }

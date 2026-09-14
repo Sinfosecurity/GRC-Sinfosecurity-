@@ -77,10 +77,15 @@ export async function authenticate(
             role: string;
             organizationId?: string;
             plane?: string;
+            kind?: string;
             mfa?: boolean;
             enroll?: boolean;
             iat?: number;
         };
+
+        if (decoded.plane === 'VENDOR' || decoded.kind === 'vendor_session') {
+            throw new ApiError(401, 'Invalid or expired token');
+        }
 
         const userId = decoded.userId || decoded.id;
         if (!userId) {

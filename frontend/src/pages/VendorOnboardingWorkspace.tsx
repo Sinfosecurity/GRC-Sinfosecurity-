@@ -14,7 +14,7 @@ const STEPS = ['Request', 'Intake', 'Tier Review', 'Due Diligence'];
 function stageIndex(stage?: string) {
     if (stage === 'Intake') return 1;
     if (stage === 'Tier review') return 2;
-    if (stage === 'Due diligence' || stage === 'Ready to send') return 3;
+    if (['Due diligence', 'Ready to send', 'Awaiting vendor', 'Vendor in progress', 'Submitted', 'Under review'].includes(String(stage))) return 3;
     return 0;
 }
 
@@ -28,6 +28,7 @@ export default function VendorOnboardingWorkspace() {
     const [attested, setAttested] = useState(false);
     const [overrideTier, setOverrideTier] = useState('');
     const [overrideReason, setOverrideReason] = useState('');
+    const [contact, setContact] = useState({ name: '', email: '', title: '', phone: '' });
     const [saving, setSaving] = useState(false);
 
     const load = () => {
@@ -35,6 +36,14 @@ export default function VendorOnboardingWorkspace() {
             .then((response) => {
                 setData(response.data.data);
                 setTab(stageIndex(response.data.data.stage));
+                if (response.data.data.contact) {
+                    setContact({
+                        name: response.data.data.contact.name || '',
+                        email: response.data.data.contact.email || '',
+                        title: response.data.data.contact.title || '',
+                        phone: response.data.data.contact.phone || '',
+                    });
+                }
                 const next: Record<string, string> = {};
                 for (const section of response.data.data.intake?.sections || []) {
                     for (const question of section.questions || []) next[question.key] = question.response || '';
@@ -84,10 +93,11 @@ export default function VendorOnboardingWorkspace() {
                     <PageHeader
                         crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Onboard', to: '/vendor-onboarding' }, { label: data.publicId || data.name }]}
                         title={`${data.publicId || 'Vendor'}  ${data.name}`}
-                        description={`${data.stage} · ${data.owner} · Next: ${data.nextAction}`}
+                        description={`${data.workflowStatus || data.stage} · ${data.nextActionOwner || data.owner} · Next: ${data.nextAction}`}
                         meta={
                             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                <StatusBadge kind="plain" label={data.stage} />
+                                <StatusBadge kind="plain" label={data.workflowStatus || data.stage} />
+                                <StatusBadge kind="plain" label={data.nextActionOwner ? `Owner: ${data.nextActionOwner}` : data.owner} />
                                 <StatusBadge kind="plain" label={data.overdue ? 'Overdue' : formatShortDate(data.dueDate)} tone={data.overdue ? 'critical' : 'info'} />
                             </Stack>
                         }
@@ -99,6 +109,8 @@ export default function VendorOnboardingWorkspace() {
                         <Tab label="Intake" />
                         <Tab label="Tier Review" />
                         <Tab label="Assessment Plan" />
+                        <Tab label="Due Diligence" />
+                        <Tab label="Review" />
                         <Tab label="History" />
                     </Tabs>
 
@@ -224,13 +236,73 @@ export default function VendorOnboardingWorkspace() {
                             {data.canReviewTier && data.stageKey === 'DUE_DILIGENCE_PLAN' && (
                                 <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}>Confirm plan · Ready to send</Button>
                             )}
-                            {data.stageKey === 'READY_TO_SEND' && <Alert severity="success">Plan confirmed. Ready to send — the vendor portal is not part of this phase.</Alert>}
+                            {data.stageKey === 'READY_TO_SEND' && <Alert severity="success">Plan confirmed. Choose the vendor contact and send due diligence.</Alert>}
                             {data.plan?.triggers?.privacy && <Button onClick={() => navigate(`/privacy-ops/vendors/${data.id}`)}>Open privacy</Button>}
                             {data.plan?.triggers?.aiGovernance && <Button onClick={() => navigate('/ai-governance')}>Open AI Governance</Button>}
                         </Stack>
                     )}
 
                     {tab === 4 && (
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Send due diligence</Typography>
+                                <Typography variant="body2">Supreme prepares the invitation. You authorize sending it to the vendor contact.</Typography>
+                            </Surface>
+                            {data.invitation && (
+                                <Alert severity="info">Invitation {data.invitation.status}. Email {data.invitation.emailStatus}.</Alert>
+                            )}
+                            <Surface>
+                                <Stack spacing={1.5} component="form" onSubmit={(event) => { event.preventDefault(); run(() => vendorOnboardingAPI.send(id, contact)); }}>
+                                    <TextField required label="Primary assessment contact" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} />
+                                    <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
+                                    <TextField label="Title / role" value={contact.title} onChange={(event) => setContact({ ...contact, title: event.target.value })} />
+                                    <TextField label="Phone" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} />
+                                    {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && (
+                                        <Button type="submit" variant="contained" disabled={saving}>Send due diligence</Button>
+                                    )}
+                                </Stack>
+                            </Surface>
+                            {(data.vendorAssessments || []).map((item: any) => (
+                                <Surface key={item.id}>
+                                    <Typography variant="subtitle1">{item.name}</Typography>
+                                    <Typography>{item.status} · {item.answered} / {item.total} answered</Typography>
+                                </Surface>
+                            ))}
+                            {data.canReviewTier && data.invitation && (
+                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.resend(id))}>Resend invitation</Button>
+                            )}
+                        </Stack>
+                    )}
+
+                    {tab === 5 && (
+                        <Stack spacing={1.5}>
+                            <Surface>
+                                <Typography variant="h6">Exception-focused review</Typography>
+                                <Typography variant="body2">
+                                    {(data.review?.questionsAnswered || 0)} answers recorded · {data.review?.satisfactory || 0} satisfactory · {data.review?.needClarification || 0} need clarification · {data.review?.potentialFindings || 0} potential findings
+                                </Typography>
+                            </Surface>
+                            {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
+                            {data.plan?.triggers?.aiGovernance && <Alert severity="info">AI Governance review may be required</Alert>}
+                            {(data.review?.items || []).map((item: any) => (
+                                <Surface key={`${item.assessmentId}-${item.questionId}`}>
+                                    <Typography variant="subtitle2">{item.question}</Typography>
+                                    <Typography>Answer: {item.response}</Typography>
+                                    <Typography variant="body2">Why: {item.reason}{item.score != null ? ` · Score ${item.score}` : ''}</Typography>
+                                    {item.findingId && data.canReviewTier && item.reviewState === 'DRAFT' && (
+                                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1 }}>
+                                            <Button onClick={() => run(() => vendorOnboardingAPI.reviewFinding(id, item.findingId, { action: 'confirm' }))}>Confirm</Button>
+                                            <Button onClick={() => run(() => vendorOnboardingAPI.reviewFinding(id, item.findingId, { action: 'adjust', severity: 'HIGH', reason: 'Confirmed at high severity after review.' }))}>Adjust to High</Button>
+                                            <Button onClick={() => run(() => vendorOnboardingAPI.reviewFinding(id, item.findingId, { action: 'dismiss', reason: 'Accepted as documented and not a finding.' }))}>Dismiss</Button>
+                                        </Stack>
+                                    )}
+                                </Surface>
+                            ))}
+                            {!data.review?.items?.length && <Typography>No exceptions require review yet.</Typography>}
+                        </Stack>
+                    )}
+
+                    {tab === 6 && (
                         <Surface>
                             <Typography variant="h6">History</Typography>
                             <Stack spacing={1.25} sx={{ mt: 1.5 }}>

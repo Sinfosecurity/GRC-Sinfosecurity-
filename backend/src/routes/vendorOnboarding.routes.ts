@@ -7,11 +7,20 @@ import {
     confirmTier,
     createOnboardingRequest,
     findDuplicateVendors,
-    getOnboarding,
     listOnboardings,
     listOwnerDirectory,
     saveIntake,
 } from '../services/vendorOnboardingService';
+import {
+    activationLink,
+    presentDueDiligence,
+    requestClarification,
+    resendInvitation,
+    reviewFinding,
+    sendDueDiligence,
+    upsertAssessmentContact,
+} from '../services/vendorDueDiligenceService';
+import { IssueSeverity } from '@prisma/client';
 
 const router = Router();
 
@@ -57,7 +66,7 @@ router.post('/', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Resp
 
 router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await getOnboarding(req.user!.organizationId, req.params.id, actor(req)) });
+        res.json({ success: true, data: await presentDueDiligence(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
         next(error);
     }
@@ -100,6 +109,68 @@ router.post('/:id/tier/confirm', authorize(...REVIEW_ROLES), async (req: AuthReq
 router.post('/:id/plan/confirm', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await confirmPlan(req.user!.organizationId, req.params.id, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/contact', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await upsertAssessmentContact(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/send', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const data = await sendDueDiligence(req.user!.organizationId, req.params.id, actor(req), req.body || {});
+        res.status(201).json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/invitation/resend', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await resendInvitation(req.user!.organizationId, req.params.id, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/invitation/link', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await activationLink(req.user!.organizationId, req.params.id, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/findings/:findingId/review', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await reviewFinding(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, {
+                action: req.body?.action,
+                severity: req.body?.severity as IssueSeverity | undefined,
+                reason: req.body?.reason,
+            }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/clarification', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await requestClarification(req.user!.organizationId, req.params.id, actor(req), {
+                assessmentId: String(req.body?.assessmentId || ''),
+                questionKeys: Array.isArray(req.body?.questionKeys) ? req.body.questionKeys : [],
+            }),
+        });
     } catch (error) {
         next(error);
     }

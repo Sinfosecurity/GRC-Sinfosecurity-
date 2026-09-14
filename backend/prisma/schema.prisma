@@ -166,6 +166,8 @@ model Organization {
   compliance                  ComplianceFramework[]
   vendors                     Vendor[]
   vendorOnboardings           VendorOnboarding[]
+  vendorAssessmentInvitations VendorAssessmentInvitation[]
+  vendorPortalSessions        VendorPortalSession[]
   vendorAssessments           VendorAssessment[]
   vendorContracts             VendorContract[]
   vendorIssues                VendorIssue[]
@@ -583,6 +585,8 @@ model Vendor {
   issues                VendorIssue[]
   documents             VendorDocument[]
   contacts              VendorContact[]
+  assessmentInvitations VendorAssessmentInvitation[]
+  portalSessions        VendorPortalSession[]
   monitoringRecords     VendorMonitoring[]
   reviews               VendorReview[]
   
@@ -625,6 +629,10 @@ enum VendorOnboardingStage {
   TIER_REVIEW
   DUE_DILIGENCE_PLAN
   READY_TO_SEND
+  AWAITING_VENDOR
+  VENDOR_IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
 }
 
 model VendorOnboarding {
@@ -653,6 +661,13 @@ model VendorOnboarding {
   plan                  Json?
   planConfirmedAt       DateTime?
   planConfirmedBy       String?
+  assessmentContactId   String?
+  invitationId          String?
+  dueDiligenceDueAt     DateTime?
+  dueDiligenceSentAt    DateTime?
+  dueDiligenceSentBy    String?
+  vendorActivatedAt     DateTime?
+  vendorSubmittedAt     DateTime?
   lastReminderAt        DateTime?
   reminderCount         Int                    @default(0)
   createdAt             DateTime               @default(now())
@@ -662,6 +677,7 @@ model VendorOnboarding {
   @@index([organizationId, stage])
   @@index([intakeDueAt])
   @@index([tierReviewDueAt])
+  @@index([dueDiligenceDueAt])
 }
 
 enum VendorType {
@@ -725,19 +741,24 @@ enum CriticalityLevel {
 
 // Vendor Contacts
 model VendorContact {
-  id                String   @id @default(uuid())
-  vendor            Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  vendorId          String
-  name              String
-  title             String?
-  email             String
-  phone             String?
-  role              ContactRole
-  isPrimary         Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
+  id                   String   @id @default(uuid())
+  vendor               Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId             String
+  name                 String
+  title                String?
+  email                String
+  phone                String?
+  role                 ContactRole
+  isPrimary            Boolean  @default(false)
+  isAssessmentContact  Boolean  @default(false)
+  lastActivatedAt      DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  invitations          VendorAssessmentInvitation[]
+  portalSessions       VendorPortalSession[]
+
   @@index([vendorId])
+  @@index([vendorId, email])
 }
 
 enum ContactRole {
@@ -749,6 +770,64 @@ enum ContactRole {
   LEGAL
   DPO
   OTHER
+}
+
+enum VendorInvitationStatus {
+  PENDING
+  ACTIVATED
+  EXPIRED
+  REVOKED
+  COMPLETED
+}
+
+model VendorAssessmentInvitation {
+  id                  String                 @id @default(uuid())
+  organization        Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId      String
+  vendor              Vendor                 @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId            String
+  contact             VendorContact          @relation(fields: [vendorContactId], references: [id], onDelete: Cascade)
+  vendorContactId     String
+  tokenHash           String                 @unique
+  status              VendorInvitationStatus @default(PENDING)
+  expiresAt           DateTime
+  activatedAt         DateTime?
+  revokedAt           DateTime?
+  createdBy           String
+  emailProvider       String?
+  providerMessageId   String?
+  emailDeliveryStatus String?
+  emailSentAt         DateTime?
+  emailDeliveredAt    DateTime?
+  emailFailedAt       DateTime?
+  emailLastError      String?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  sessions            VendorPortalSession[]
+
+  @@index([organizationId, vendorId])
+  @@index([vendorContactId])
+  @@index([providerMessageId])
+}
+
+model VendorPortalSession {
+  id               String                      @id @default(uuid())
+  organization     Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId   String
+  vendor           Vendor                      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId         String
+  contact          VendorContact               @relation(fields: [vendorContactId], references: [id], onDelete: Cascade)
+  vendorContactId  String
+  invitation       VendorAssessmentInvitation? @relation(fields: [invitationId], references: [id])
+  invitationId     String?
+  tokenHash        String                      @unique
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  lastSeenAt       DateTime                    @default(now())
+  createdAt        DateTime                    @default(now())
+
+  @@index([organizationId, vendorId])
+  @@index([vendorContactId])
 }
 
 // Vendor Risk Assessments
@@ -783,11 +862,19 @@ model VendorAssessment {
   
   // Workflow
   assignedTo            String?
+  assignedContactId     String?
   reviewer              String?
   approver              String?
   dueDate               DateTime?
   completedAt           DateTime?
   approvedAt            DateTime?
+  submittedAt           DateTime?
+  respondentPlane       String              @default("CUSTOMER")
+  attestationStatement  String?
+  attestationVersion    String?
+  attestedByName        String?
+  attestedAt            DateTime?
+  clarificationQuestionIds Json?
   
   // Evidence
   evidenceCollected     Boolean             @default(false)
@@ -808,6 +895,8 @@ model VendorAssessment {
   @@index([vendorId, status])
   @@index([organizationId, dueDate])
   @@index([assignedTo])
+  @@index([assignedContactId])
+  @@index([organizationId, respondentPlane])
 }
 
 enum AssessmentType {
@@ -1039,6 +1128,15 @@ model VendorIssue {
   closedAt              DateTime?
   closedBy              String?
   closureNotes          String?
+
+  assessmentId          String?
+  questionId            String?
+  reviewState           IssueReviewState    @default(CONFIRMED)
+  draftRuleCode         String?
+  dismissReason         String?
+  dismissedBy           String?
+  dismissedAt           DateTime?
+  severityAdjustReason  String?
   
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
@@ -1052,6 +1150,8 @@ model VendorIssue {
   @@index([status])
   @@index([severity])
   @@index([targetRemediationDate])
+  @@index([reviewState])
+  @@index([assessmentId])
 }
 
 enum VendorIssueType {
@@ -1105,6 +1205,12 @@ enum VendorIssueStatus {
   CLOSED
   RISK_ACCEPTED
   ESCALATED
+}
+
+enum IssueReviewState {
+  DRAFT
+  CONFIRMED
+  DISMISSED
 }
 
 // Vendor Documents & Evidence

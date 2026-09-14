@@ -1,7 +1,8 @@
-export type AuthPlane = 'CUSTOMER' | 'PLATFORM';
+export type AuthPlane = 'CUSTOMER' | 'PLATFORM' | 'VENDOR';
 
 export const CUSTOMER_PLANE: AuthPlane = 'CUSTOMER';
 export const PLATFORM_PLANE: AuthPlane = 'PLATFORM';
+export const VENDOR_PLANE: AuthPlane = 'VENDOR';
 
 export const MFA_REQUIRED_ROLES = new Set([
     'PLATFORM_OWNER',
@@ -14,7 +15,9 @@ export const MFA_REQUIRED_ROLES = new Set([
 ]);
 
 export function parsePlane(value: unknown): AuthPlane {
-    return value === PLATFORM_PLANE ? PLATFORM_PLANE : CUSTOMER_PLANE;
+    if (value === PLATFORM_PLANE) return PLATFORM_PLANE;
+    if (value === VENDOR_PLANE) return VENDOR_PLANE;
+    return CUSTOMER_PLANE;
 }
 
 export function requestedPlane(body: { plane?: unknown; portal?: unknown } | undefined): AuthPlane {

@@ -125,9 +125,10 @@ export const evidenceLinkageService = {
                 return { document, link };
             });
 
+            const actor = await prisma.user.findUnique({ where: { id: input.uploadedBy }, select: { id: true } });
             await recordAudit({
                 organizationId: input.organizationId,
-                actorUserId: input.uploadedBy,
+                actorUserId: actor?.id || null,
                 action: 'evidence.link',
                 resourceType: 'EvidenceLink',
                 resourceId: linked.link.id,

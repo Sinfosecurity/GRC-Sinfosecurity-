@@ -37,6 +37,11 @@ export async function applyProviderDeliveryEvent(input: {
             where: { providerMessageId: input.providerMessageId },
         })
         : null;
+    const vendorInvitation = !invitation && input.providerMessageId
+        ? await prisma.vendorAssessmentInvitation.findFirst({
+            where: { providerMessageId: input.providerMessageId },
+        })
+        : null;
 
     await prisma.emailDeliveryEvent.create({
         data: {
@@ -46,9 +51,9 @@ export async function applyProviderDeliveryEvent(input: {
             eventType: input.eventType,
             deliveryStatus,
             recipientMask: input.recipient ? maskEmail(input.recipient) : invitation ? maskEmail(invitation.email) : undefined,
-            resourceType: invitation ? 'AccountInvitation' : undefined,
-            resourceId: invitation?.id,
-            organizationId: invitation?.organizationId,
+            resourceType: invitation ? 'AccountInvitation' : vendorInvitation ? 'VendorAssessmentInvitation' : undefined,
+            resourceId: invitation?.id || vendorInvitation?.id,
+            organizationId: invitation?.organizationId || vendorInvitation?.organizationId,
             lastError: input.lastError || undefined,
         },
     });
@@ -62,6 +67,18 @@ export async function applyProviderDeliveryEvent(input: {
                 emailDeliveredAt: deliveryStatus === 'DELIVERED' ? now : invitation.emailDeliveredAt,
                 emailFailedAt: ['BOUNCED', 'FAILED', 'COMPLAINED', 'REJECTED'].includes(deliveryStatus) ? now : invitation.emailFailedAt,
                 emailLastError: input.lastError || invitation.emailLastError,
+            },
+        });
+    }
+    if (vendorInvitation) {
+        const now = new Date();
+        await prisma.vendorAssessmentInvitation.update({
+            where: { id: vendorInvitation.id },
+            data: {
+                emailDeliveryStatus: deliveryStatus,
+                emailDeliveredAt: deliveryStatus === 'DELIVERED' ? now : vendorInvitation.emailDeliveredAt,
+                emailFailedAt: ['BOUNCED', 'FAILED', 'COMPLAINED', 'REJECTED'].includes(deliveryStatus) ? now : vendorInvitation.emailFailedAt,
+                emailLastError: input.lastError || vendorInvitation.emailLastError,
             },
         });
     }

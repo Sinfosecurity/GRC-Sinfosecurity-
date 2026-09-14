@@ -31,6 +31,23 @@ export interface AssessmentTemplate {
     }[];
 }
 
+export function scoreAssessmentResponse(response: string): number | null {
+    const lower = response.trim().toLowerCase();
+    if (lower === 'not applicable' || lower === 'n/a' || lower.startsWith('not applicable')) {
+        return null;
+    }
+    if (lower.startsWith('yes') || lower.includes('no exceptions') || lower.includes('type ii')) {
+        return 9;
+    }
+    if (lower.startsWith('partial') || lower.startsWith('in progress') || lower.includes('outdated') || lower.includes('bridge')) {
+        return 5;
+    }
+    if (lower.startsWith('no') || lower === 'unknown' || lower.startsWith('qualified')) {
+        return 2;
+    }
+    return 5;
+}
+
 export interface CreateAssessmentInput {
     vendorId: string;
     organizationId: string;
@@ -502,20 +519,7 @@ class VendorAssessmentService {
      * Calculate response score based on answer
      */
     private calculateResponseScore(response: string): number | null {
-        const lower = response.trim().toLowerCase();
-        if (lower === 'not applicable' || lower === 'n/a' || lower.startsWith('not applicable')) {
-            return null;
-        }
-        if (lower.startsWith('yes') || lower.includes('no exceptions') || lower.includes('type ii')) {
-            return 9;
-        }
-        if (lower.startsWith('partial') || lower.startsWith('in progress') || lower.includes('outdated') || lower.includes('bridge')) {
-            return 5;
-        }
-        if (lower.startsWith('no') || lower === 'unknown' || lower.startsWith('qualified')) {
-            return 2;
-        }
-        return 5;
+        return scoreAssessmentResponse(response);
     }
 
     /**

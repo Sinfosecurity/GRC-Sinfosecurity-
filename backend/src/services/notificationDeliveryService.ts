@@ -375,7 +375,9 @@ export async function scanDueNotifications(now = new Date()) {
     }
 
     const { scanOnboardingAttention } = await import('./vendorOnboardingService');
+    const { scanVendorDueDiligenceAttention } = await import('./vendorDueDiligenceService');
     await scanOnboardingAttention(now);
+    await scanVendorDueDiligenceAttention(now);
 
     return sent;
 }

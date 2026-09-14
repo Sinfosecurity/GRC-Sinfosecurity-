@@ -29,6 +29,9 @@ const Reports = lazy(() => import('./pages/Reports'));
 const VendorManagement = lazy(() => import('./pages/VendorManagement'));
 const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
 const VendorOnboardingWorkspace = lazy(() => import('./pages/VendorOnboardingWorkspace'));
+const VendorAssessmentActivate = lazy(() => import('./pages/VendorAssessmentActivate'));
+const VendorAssessmentPortal = lazy(() => import('./pages/VendorAssessmentPortal'));
+const VendorAssessmentQuestionnaire = lazy(() => import('./pages/VendorAssessmentQuestionnaire'));
 const SOCReports = lazy(() => import('./pages/SOCReports'));
 const OnboardingWizard = lazy(() => import('./pages/OnboardingWizard'));
 const ISO27001 = lazy(() => import('./pages/ISO27001'));
@@ -152,6 +155,9 @@ export default function App() {
                     <Route path="/security" element={<SecurityOverview />} />
                     <Route path="/subprocessors" element={<LegalDraft />} />
                     <Route path="/status" element={<PublicStatus />} />
+                    <Route path="/vendor-assessment/activate" element={<VendorAssessmentActivate />} />
+                    <Route path="/vendor-assessment" element={<VendorAssessmentPortal />} />
+                    <Route path="/vendor-assessment/:assessmentId" element={<VendorAssessmentQuestionnaire />} />
                     <Route path="/products/third-party" element={<ThirdPartyProduct />} />
                     <Route path="/products/:slug" element={<MarketingPlaceholder />} />
                     <Route path="/login" element={<Login />} />

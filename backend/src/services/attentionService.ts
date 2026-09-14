@@ -23,23 +23,30 @@ export const attentionService = {
         const onboarding = await prisma.vendorOnboarding.findMany({
             where: {
                 organizationId,
-                stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN] },
+                stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN, VendorOnboardingStage.READY_TO_SEND, VendorOnboardingStage.AWAITING_VENDOR, VendorOnboardingStage.VENDOR_IN_PROGRESS, VendorOnboardingStage.SUBMITTED, VendorOnboardingStage.UNDER_REVIEW] },
             },
             include: { vendor: { select: { id: true, name: true, publicId: true } } },
             take: 25,
         });
         for (const row of onboarding) {
-            const due = row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt;
+            const due = row.dueDiligenceDueAt || (row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt);
             const overdue = Boolean(due && due < now);
+            const action = row.stage === VendorOnboardingStage.INTAKE
+                ? 'COMPLETE INTAKE'
+                : row.stage === VendorOnboardingStage.TIER_REVIEW
+                    ? 'CONFIRM TIER'
+                    : row.stage === VendorOnboardingStage.DUE_DILIGENCE_PLAN
+                        ? 'CONFIRM PLAN'
+                        : row.stage === VendorOnboardingStage.READY_TO_SEND
+                            ? 'SEND DUE DILIGENCE'
+                            : row.stage === VendorOnboardingStage.SUBMITTED || row.stage === VendorOnboardingStage.UNDER_REVIEW
+                                ? 'REVIEW SUBMISSION'
+                                : 'VENDOR DUE DILIGENCE';
             items.push({
                 id: `onboarding-${row.vendorId}`,
                 severity: overdue ? 'HIGH' : 'MEDIUM',
-                action: row.stage === VendorOnboardingStage.INTAKE ? 'COMPLETE INTAKE' : row.stage === VendorOnboardingStage.TIER_REVIEW ? 'CONFIRM TIER' : 'CONFIRM PLAN',
-                title: row.stage === VendorOnboardingStage.INTAKE
-                    ? `Complete vendor intake for ${row.vendor.name}`
-                    : row.stage === VendorOnboardingStage.TIER_REVIEW
-                        ? `Confirm recommended tier for ${row.vendor.name}`
-                        : `Confirm due-diligence plan for ${row.vendor.name}`,
+                action,
+                title: `${row.vendor.name} · ${row.stage.replace(/_/g, ' ').toLowerCase()}`,
                 detail: `${row.vendor.publicId || 'Vendor'} · due ${due ? due.toISOString().slice(0, 10) : 'not set'}${overdue ? ' · overdue' : ''}.`,
                 vendorId: row.vendorId,
                 vendorName: row.vendor.name,
