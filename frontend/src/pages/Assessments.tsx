@@ -148,7 +148,8 @@ export default function Assessments() {
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
-    const [saveState, setSaveState] = useState('Answers save when you change them.');
+    const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
+    const [draft, setDraft] = useState('');
 
     const load = async () => {
         setLoading(true);
@@ -271,18 +272,36 @@ export default function Assessments() {
         }
     };
 
-    const answer = async (questionId: string, response: string) => {
-        if (!selected) return;
+    const persist = async (questionId: string, response: string) => {
+        if (!selected || selected.status === 'COMPLETED') return false;
+        const trimmed = response.trim();
+        if (!trimmed) {
+            setSaveState('Enter an answer before this question can be saved.');
+            return false;
+        }
+        const already = (selected.responses || []).find((row) => row.questionId === questionId)?.response || '';
+        if (already === trimmed) return true;
         setSaveState('Saving…');
         try {
-            const updated = await tprmAPI.submitAssessmentResponse(selected.vendorId, selected.id, { questionId, response });
+            const updated = await tprmAPI.submitAssessmentResponse(selected.vendorId, selected.id, { questionId, response: trimmed });
             setSelected(updated.data.data);
             setSaveState('Saved.');
+            return true;
         } catch (err: any) {
             setSaveState('Not saved. Your last change was not recorded.');
             setError(customerError(err));
+            return false;
         }
     };
+
+    useEffect(() => {
+        if (!selected || !currentQuestion) {
+            setDraft('');
+            return;
+        }
+        const saved = (selected.responses || []).find((row) => row.questionId === currentQuestion.questionKey)?.response || '';
+        setDraft(saved);
+    }, [selected?.id, currentQuestion?.questionKey]);
 
     const complete = async () => {
         if (!selected) return;
@@ -402,9 +421,15 @@ export default function Assessments() {
                                         fullWidth
                                         multiline={options.length === 0}
                                         minRows={options.length === 0 ? 3 : undefined}
-                                        value={response?.response || ''}
+                                        value={draft}
                                         disabled={selected.status === 'COMPLETED'}
-                                        onChange={(e) => answer(currentQuestion.questionKey, e.target.value)}
+                                        onChange={(e) => {
+                                            setDraft(e.target.value);
+                                            if (options.length > 0) void persist(currentQuestion.questionKey, e.target.value);
+                                        }}
+                                        onBlur={() => {
+                                            if (options.length === 0) void persist(currentQuestion.questionKey, draft);
+                                        }}
                                         label="Answer"
                                     >
                                         {options.map((option) => (
@@ -442,7 +467,11 @@ export default function Assessments() {
                                         <Button
                                             variant="contained"
                                             disabled={sectionIndex >= sections.length - 1 && questionIndex >= sectionQuestions.length - 1}
-                                            onClick={() => {
+                                            onClick={async () => {
+                                                if (draft.trim()) {
+                                                    const saved = await persist(currentQuestion.questionKey, draft);
+                                                    if (!saved) return;
+                                                }
                                                 if (questionIndex < sectionQuestions.length - 1) setQuestionIndex((value) => value + 1);
                                                 else {
                                                     setSectionIndex((value) => value + 1);
