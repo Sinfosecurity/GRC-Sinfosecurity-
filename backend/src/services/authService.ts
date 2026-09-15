@@ -64,6 +64,7 @@ function signAccessToken(user: {
     email: string;
     role: string;
     organizationId: string;
+    sessionEpoch?: number;
 }, options: { plane: AuthPlane; mfaSatisfied?: boolean; enrollOnly?: boolean }): string {
     const env = getEnv();
     const expiresIn = options.enrollOnly
@@ -82,6 +83,7 @@ function signAccessToken(user: {
             plane: options.plane,
             mfa: options.mfaSatisfied === true,
             enroll: options.enrollOnly === true,
+            epoch: user.sessionEpoch || 0,
         },
         env.jwtSecret,
         signOptions
@@ -209,6 +211,13 @@ export const authService = {
         }
 
         const plane = meta?.plane || CUSTOMER_PLANE;
+        if (plane === CUSTOMER_PLANE) {
+            const { identityService } = await import('../identity/service');
+            const policy = await identityService.passwordLoginAllowed(user);
+            if (!policy.allowed) {
+                throw new ApiError(401, 'Use Company SSO to continue.');
+            }
+        }
         const staff = isPlatformStaffRole(user.role) || MFA_REQUIRED_ROLES.has(user.role);
 
         if (plane === PLATFORM_PLANE && !staff) {
@@ -698,6 +707,30 @@ export const authService = {
                 refreshToken: undefined,
             };
         }
+        return issueSession(user, CUSTOMER_PLANE, false);
+    },
+
+    async completeFederatedSession(userId: string) {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { organization: true },
+        });
+        if (!user || user.status !== UserAccountStatus.ACTIVE) {
+            throw new ApiError(401, GENERIC_AUTH_ERROR);
+        }
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { lastLogin: new Date(), lastSsoAt: new Date() },
+        });
+        await recordAudit({
+            organizationId: user.organizationId,
+            actorUserId: user.id,
+            action: 'auth.login',
+            resourceType: 'User',
+            resourceId: user.id,
+            result: 'success',
+            metadata: { method: 'sso' },
+        });
         return issueSession(user, CUSTOMER_PLANE, false);
     },
 

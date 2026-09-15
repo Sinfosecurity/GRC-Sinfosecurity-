@@ -60,6 +60,9 @@ import aiGovernanceRoutes from './routes/aiGovernance.routes';
 import intelligenceRoutes from './routes/intelligence.routes';
 import automationRoutes from './routes/automation.routes';
 import vendorPortalRoutes from './routes/vendorPortal.routes';
+import identityRoutes from './routes/identity.routes';
+import ssoRoutes from './routes/sso.routes';
+import scimRoutes from './routes/scim.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -231,7 +234,11 @@ app.get('/health/live', livenessCheckHandler); // Kubernetes liveness probe
 const API_PREFIX = `/api/${process.env.API_VERSION || 'v1'}`;
 
 const tenantContent = [authenticate, rejectPlatformTenantContent];
+app.use(`${API_PREFIX}/auth/sso`, ssoRoutes);
 app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/identity`, ...tenantContent, identityRoutes);
+app.use('/scim/v2', scimRoutes);
+app.use(`${API_PREFIX}/scim/v2`, scimRoutes);
 app.use(`${API_PREFIX}/vendor-portal`, vendorPortalRoutes);
 app.use(`${API_PREFIX}/risks`, ...tenantContent, riskRoutes);
 app.use(`${API_PREFIX}/compliance`, ...tenantContent, complianceRoutes);

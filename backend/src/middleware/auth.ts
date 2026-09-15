@@ -81,6 +81,7 @@ export async function authenticate(
             mfa?: boolean;
             enroll?: boolean;
             iat?: number;
+            epoch?: number;
         };
 
         if (decoded.plane === 'VENDOR' || decoded.kind === 'vendor_session') {
@@ -103,6 +104,10 @@ export async function authenticate(
 
         if (user.organization.status === 'SUSPENDED' || user.organization.status === 'CANCELLED') {
             throw new ApiError(403, 'Organization is not active');
+        }
+
+        if ((decoded.epoch ?? 0) !== (user.sessionEpoch || 0)) {
+            throw new ApiError(401, 'Invalid or expired token');
         }
 
         if (user.passwordChangedAt && typeof decoded.iat === 'number') {

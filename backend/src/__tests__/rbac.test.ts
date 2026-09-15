@@ -17,6 +17,10 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['approval.decide'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['risk.accept'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['user.manage'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['identity.manage'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['identity.manage'])).toBe(false);
+        expect(hasPermission('APPROVER', PERMISSIONS['identity.manage'])).toBe(false);
+        expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['identity.manage'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['billing.manage'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['vendor.read'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['governanceGraph.read'])).toBe(true);

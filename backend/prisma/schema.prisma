@@ -33,6 +33,9 @@ model User {
   mfaEnrolledAt     DateTime?
   lastMfaVerifiedAt DateTime?
   mfaLastCounter    Int?
+  sessionEpoch          Int       @default(0)
+  provisioningSource    String?
+  lastSsoAt             DateTime?
 
   risks               Risk[]
   incidents           Incident[]
@@ -52,6 +55,10 @@ model User {
   mfaRecoveryCodes        MfaRecoveryCode[]
   privilegeElevations     PrivilegeElevation[]
   authChallenges          AuthChallenge[]
+  identityAccounts        IdentityExternalAccount[]
+  identityBreakGlassGrants IdentityBreakGlassGrant[]
+  recoveredIdentityProviders IdentityProvider[] @relation("IdentityRecoveryAdmin")
+  scimGroupMembers        ScimGroupMember[]
 
   @@index([email])
   @@index([organizationId])
@@ -199,6 +206,16 @@ model Organization {
   businessProcessMappings     BusinessProcessVendorMapping[]
   vendorBAAs                  VendorBAA[]
   vendorISOControlMappings    VendorISOControlMapping[]
+  identityProviders           IdentityProvider[]
+  identityDomains             IdentityDomain[]
+  identityRoleMappings        IdentityRoleMapping[]
+  identityExternalAccounts    IdentityExternalAccount[]
+  identityLoginStates         SsoLoginState[]
+  identityReplayRecords       SsoReplayRecord[]
+  scimTokens                  ScimToken[]
+  scimGroups                  ScimGroup[]
+  scimGroupMembers            ScimGroupMember[]
+  identityBreakGlassGrants    IdentityBreakGlassGrant[]
 
   @@index([slug])
   @@index([status])
@@ -5488,4 +5505,218 @@ model AutomationCounter {
   next           Int    @default(1)
 
   @@id([organizationId, kind])
+}
+
+enum IdentityProtocol {
+  SAML
+  OIDC
+}
+
+enum IdentityProviderStatus {
+  DRAFT
+  CONFIGURED
+  TESTED
+  ENABLED
+  DISABLED
+}
+
+enum SsoEnforcement {
+  OPTIONAL
+  REQUIRED
+}
+
+enum DomainVerificationStatus {
+  PENDING
+  VERIFIED
+}
+
+model IdentityProvider {
+  id                    String                 @id @default(uuid())
+  publicId              String                 @unique
+  organization          Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  displayName           String
+  protocol              IdentityProtocol
+  status                IdentityProviderStatus @default(DRAFT)
+  ssoEnforcement        SsoEnforcement         @default(OPTIONAL)
+  jitEnabled            Boolean                @default(false)
+  passwordLoginAllowed  Boolean                @default(true)
+  defaultRole           Role                   @default(VIEWER)
+  recoveryUser          User?                  @relation("IdentityRecoveryAdmin", fields: [recoveryUserId], references: [id])
+  recoveryUserId        String?
+  lastTestedAt          DateTime?
+  lastTestResult        String?
+  lastSsoAt             DateTime?
+  lastScimAt            DateTime?
+  enabledAt             DateTime?
+  idpEntityId           String?
+  ssoUrl                String?
+  idpCertificate        String?
+  spEntityId            String?
+  nameIdFormat          String?
+  emailAttribute        String                 @default("email")
+  firstNameAttribute    String                 @default("firstName")
+  lastNameAttribute     String                 @default("lastName")
+  groupsAttribute       String                 @default("groups")
+  issuer                String?
+  authorizationEndpoint String?
+  tokenEndpoint         String?
+  jwksUri               String?
+  clientId              String?
+  clientSecretEnc       String?
+  scopes                String                 @default("openid email profile")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  domains          IdentityDomain[]
+  mappings         IdentityRoleMapping[]
+  externalAccounts IdentityExternalAccount[]
+  loginStates      SsoLoginState[]
+  replayRecords    SsoReplayRecord[]
+  scimTokens       ScimToken[]
+  scimGroups       ScimGroup[]
+
+  @@index([organizationId, status])
+}
+
+model IdentityDomain {
+  id                   String                   @id @default(uuid())
+  organization         Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  provider             IdentityProvider?        @relation(fields: [providerId], references: [id])
+  providerId           String?
+  domain               String                   @unique
+  status               DomainVerificationStatus @default(PENDING)
+  verificationTokenHash String?
+  verifiedAt           DateTime?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  @@index([organizationId])
+}
+
+model IdentityRoleMapping {
+  id             String           @id @default(uuid())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  provider       IdentityProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId     String
+  idpGroup       String
+  supremeRole    Role
+  createdAt      DateTime         @default(now())
+
+  @@unique([providerId, idpGroup])
+  @@index([organizationId])
+}
+
+model IdentityExternalAccount {
+  id             String           @id @default(uuid())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  provider       IdentityProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId     String
+  issuer         String
+  subject        String
+  emailAtLink    String
+  createdAt      DateTime         @default(now())
+  lastLoginAt    DateTime?
+
+  @@unique([issuer, subject])
+  @@unique([userId, providerId])
+  @@index([organizationId])
+}
+
+model SsoLoginState {
+  id             String           @id @default(uuid())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  provider       IdentityProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId     String
+  state          String           @unique
+  nonce          String?
+  codeVerifier   String?
+  requestId      String?
+  purpose        String
+  actorUserId    String?
+  redirectTo     String?
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime         @default(now())
+
+  @@index([organizationId, expiresAt])
+}
+
+model SsoReplayRecord {
+  id             String           @id @default(uuid())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  provider       IdentityProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId     String
+  assertionId    String
+  expiresAt      DateTime
+  createdAt      DateTime         @default(now())
+
+  @@unique([providerId, assertionId])
+  @@index([expiresAt])
+}
+
+model ScimToken {
+  id             String            @id @default(uuid())
+  publicId       String            @unique
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  provider       IdentityProvider? @relation(fields: [providerId], references: [id])
+  providerId     String?
+  label          String
+  tokenHash      String            @unique
+  createdAt      DateTime          @default(now())
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+
+  @@index([organizationId, revokedAt])
+}
+
+model ScimGroup {
+  id             String           @id @default(uuid())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  provider       IdentityProvider? @relation(fields: [providerId], references: [id])
+  providerId     String?
+  externalId     String
+  displayName    String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  members        ScimGroupMember[]
+
+  @@unique([organizationId, externalId])
+}
+
+model ScimGroupMember {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  group          ScimGroup    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId        String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+
+  @@unique([groupId, userId])
+  @@index([organizationId])
+}
+
+model IdentityBreakGlassGrant {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  reason         String
+  expiresAt      DateTime
+  usedAt         DateTime?
+  createdById    String
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, userId, expiresAt])
 }

@@ -8,13 +8,13 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-15
 
-**CURRENT ITEM:** #12 Supreme Third Party — Workbook / Lifecycle Reconciliation + Premium Transactional Email Closure
+**CURRENT ITEM:** #21 Enterprise Identity — SSO / SCIM / JIT
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Starting SHA `2904038f5607a3ed791eb9c2162fab6f70effafa`. Lifecycle `c7fc99527bfaf2a8f096168fad59890120b7b33d`. Email `e6fd30c794058767e6a7698ff3b47766ef7c8156`. Hosted API / CI `e250493c7dba98d882701acd83907f8cfaff1886`. Hosted frontend `980f717d19d527acc9567eb330c03a540841e4b4`. Hosted golden vendor `VND-2026-0013`. Hosted email previews captured; Gmail/Outlook/Apple Mail not tested. Cursor does not declare #12 PASS.
+**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Cursor does not declare #21 PASS. #22 is not authorized.
 
-**#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED (workbook / lifecycle reconciliation)
+**#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED (workbook / lifecycle reconciliation). Starting SHA `2904038f5607a3ed791eb9c2162fab6f70effafa`. Lifecycle `c7fc99527bfaf2a8f096168fad59890120b7b33d`. Email `e6fd30c794058767e6a7698ff3b47766ef7c8156`. Hosted API / CI `e250493c7dba98d882701acd83907f8cfaff1886`. Hosted frontend `980f717d19d527acc9567eb330c03a540841e4b4`. Hosted golden vendor `VND-2026-0013`. Hosted email previews captured; Gmail/Outlook/Apple Mail not tested. Cursor does not declare #12 PASS. Do not alter leftover #12 working-tree files.
 
-**#20:** PARTIAL — PAUSED PENDING #12 RECONCILIATION ACCEPTANCE
+**#20:** PASS — Product Leadership accepted.
 
 **#13:** Product Leadership accepted (2026-09-13)
 

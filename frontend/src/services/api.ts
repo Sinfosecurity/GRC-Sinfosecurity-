@@ -118,6 +118,28 @@ export const authAPI = {
         api.post('/auth/change-password', { currentPassword, newPassword }),
     activate: (data: { token: string; password: string; firstName: string; lastName: string }) =>
         api.post('/auth/activate', data),
+    discoverSso: (email: string) => api.post('/auth/sso/discover', { email }),
+    exchangeSso: (code: string) => api.post('/auth/sso/exchange', { code }),
+};
+
+export const identityAPI = {
+    overview: () => api.get('/identity/overview'),
+    providers: () => api.get('/identity/providers'),
+    createProvider: (data: unknown) => api.post('/identity/providers', data),
+    updateProvider: (id: string, data: unknown) => api.patch(`/identity/providers/${id}`, data),
+    discoverOidc: (id: string, issuer: string) => api.post(`/identity/providers/${id}/discover-oidc`, { issuer }),
+    enableProvider: (id: string, enabled: boolean) => api.post(`/identity/providers/${id}/enable`, { enabled }),
+    setPolicy: (id: string, data: unknown) => api.post(`/identity/providers/${id}/policy`, data),
+    mappings: (id: string, mappings: unknown) => api.put(`/identity/providers/${id}/mappings`, { mappings }),
+    testProvider: (id: string) => api.post(`/identity/providers/${id}/test`),
+    startDomain: (data: unknown) => api.post('/identity/domains', data),
+    verifyDomain: (id: string, token?: string) => api.post(`/identity/domains/${id}/verify`, { token }),
+    scimTokens: () => api.get('/identity/scim/tokens'),
+    createScimToken: (data: unknown) => api.post('/identity/scim/tokens', data),
+    rotateScimToken: (id: string) => api.post(`/identity/scim/tokens/${id}/rotate`),
+    revokeScimToken: (id: string) => api.post(`/identity/scim/tokens/${id}/revoke`),
+    activity: () => api.get('/identity/activity'),
+    breakGlass: (data: unknown) => api.post('/identity/break-glass', data),
 };
 
 export const risksAPI = {

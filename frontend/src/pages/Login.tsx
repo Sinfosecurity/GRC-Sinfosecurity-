@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { environmentLabel } from '../components/DevPreviewBanner';
 import MarketingLayout from '../marketing/MarketingLayout';
+import { authAPI } from '../services/api';
 
 export default function Login() {
     const { login } = useAuth();
@@ -11,10 +12,32 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [sso, setSso] = useState<{ publicId: string; continueLabel: string } | null>(null);
+    const [checked, setChecked] = useState(false);
+
+    const checkSso = async () => {
+        setError('');
+        setLoading(true);
+        try {
+            const response = await authAPI.discoverSso(email);
+            const data = response.data.data || {};
+            setChecked(true);
+            setSso(data.ssoAvailable ? { publicId: data.publicId, continueLabel: data.continueLabel } : null);
+        } catch {
+            setChecked(true);
+            setSso(null);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         setError('');
+        if (!checked) {
+            await checkSso();
+            return;
+        }
         setLoading(true);
         try {
             const result = await login(email, password, 'CUSTOMER');
@@ -64,6 +87,12 @@ export default function Login() {
                                     required
                                 />
                             </div>
+                            {checked && sso && (
+                                <a className="mkt-btn mkt-btn-gold" href={`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:4000/api/v1' : '/api/v1')}/auth/sso/start/${sso.publicId}`}>
+                                    {sso.continueLabel || 'Continue with Company SSO'}
+                                </a>
+                            )}
+                            {checked && (
                             <div className="mkt-field">
                                 <label htmlFor="password">Password</label>
                                 <input
@@ -73,12 +102,13 @@ export default function Login() {
                                     autoComplete="current-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    required
+                                    required={!sso}
                                 />
                             </div>
+                            )}
                             {error && <p role="alert">{error}</p>}
                             <button className="mkt-btn mkt-btn-gold" type="submit" disabled={loading}>
-                                {loading ? 'Signing in…' : 'Sign in'}
+                                {loading ? 'Continuing…' : checked ? 'Sign in' : 'Continue'}
                             </button>
                             <div className="mkt-legal" style={{ marginTop: 8, paddingTop: 8, border: 0 }}>
                                 <Link to="/forgot-password">Forgot password</Link>

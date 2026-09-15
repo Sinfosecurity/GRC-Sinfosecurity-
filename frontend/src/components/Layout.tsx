@@ -42,6 +42,7 @@ import {
     ReportProblemOutlined,
     Search,
     SettingsOutlined,
+    VpnKeyOutlined,
 } from '@mui/icons-material';
 import { color } from '../design/tokens';
 import { canSeeNav, type NavPermission } from '../security/navAccess';
@@ -136,6 +137,7 @@ const menuSections: NavSection[] = [
         title: 'Administration',
         items: [
             { text: 'Team', path: '/user-management', icon: <PeopleOutlined fontSize="small" />, permission: 'user.manage' },
+            { text: 'Identity & Access', path: '/settings/identity', icon: <VpnKeyOutlined fontSize="small" />, permission: 'identity.manage' },
             { text: 'Assessment Library', path: '/questionnaires', icon: <QuizOutlined fontSize="small" />, permission: 'questionnaire.manage' },
             { text: 'Integrations', path: '/integrations', icon: <ExtensionOutlined fontSize="small" />, permission: 'integration.manage' },
             { text: 'Billing', path: '/billing', icon: <CreditCardOutlined fontSize="small" />, permission: 'billing.manage' },

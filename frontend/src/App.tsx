@@ -38,6 +38,8 @@ const OnboardingWizard = lazy(() => import('./pages/OnboardingWizard'));
 const ISO27001 = lazy(() => import('./pages/ISO27001'));
 const TISAX = lazy(() => import('./pages/TISAX'));
 const Settings = lazy(() => import('./pages/Settings'));
+const IdentityAccess = lazy(() => import('./pages/IdentityAccess'));
+const SsoComplete = lazy(() => import('./pages/SsoComplete'));
 const LegacyQuarantine = lazy(() => import('./pages/LegacyQuarantine'));
 
 const LEGACY_ENABLED = import.meta.env.VITE_ENABLE_LEGACY_GRC === 'true';
@@ -173,6 +175,7 @@ export default function App() {
                     <Route path="/products/third-party" element={<ThirdPartyProduct />} />
                     <Route path="/products/:slug" element={<ProductStory />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/login/sso/complete" element={<SsoComplete />} />
                     <Route path="/admin/login" element={<AdminLogin />} />
                     <Route path="/admin/mfa" element={<AdminMfaChallenge />} />
                     <Route path="/admin/mfa/enroll" element={<AdminMfaEnroll />} />
@@ -244,6 +247,7 @@ export default function App() {
                     <Route path="activity-log" element={<ActivityLog />} />
                     <Route path="user-management" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><UserManagement /></ProtectedRoute>} />
                     <Route path="organization-settings" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><OrganizationSettings /></ProtectedRoute>} />
+                    <Route path="settings/identity" element={<ProtectedRoute allowedRoles={['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN']}><IdentityAccess /></ProtectedRoute>} />
                     <Route path="analytics" element={LEGACY_ENABLED ? <Analytics /> : <LegacyQuarantine />} />
                     <Route path="tasks" element={LEGACY_ENABLED ? <Tasks /> : <LegacyQuarantine />} />
                     <Route path="workflows" element={LEGACY_ENABLED ? <WorkflowBuilder /> : <LegacyQuarantine />} />

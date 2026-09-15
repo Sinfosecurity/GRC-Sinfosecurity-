@@ -23,6 +23,12 @@ const SENSITIVE_KEYS = [
     'stripe',
     'card',
     'payment',
+    'assertion',
+    'samlresponse',
+    'idtoken',
+    'clientsecret',
+    'scimtoken',
+    'codeverifier',
 ];
 
 export type AuditInput = {

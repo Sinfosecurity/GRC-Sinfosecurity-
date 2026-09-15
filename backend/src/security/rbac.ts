@@ -39,6 +39,7 @@ export const PERMISSIONS = {
     'report.export': 'report.export',
     'organization.manage': 'organization.manage',
     'user.manage': 'user.manage',
+    'identity.manage': 'identity.manage',
     'billing.manage': 'billing.manage',
     'integration.manage': 'integration.manage',
     'audit.read': 'audit.read',

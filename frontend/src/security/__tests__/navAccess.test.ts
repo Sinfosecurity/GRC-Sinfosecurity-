@@ -12,12 +12,15 @@ describe('canSeeNav', () => {
         expect(canSeeNav('VIEWER', 'ai.read')).toBe(true);
         expect(canSeeNav('VIEWER', 'automation.read')).toBe(true);
         expect(canSeeNav('VIEWER', 'user.manage')).toBe(false);
+        expect(canSeeNav('VIEWER', 'identity.manage')).toBe(false);
+        expect(canSeeNav('ASSESSOR', 'identity.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'billing.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'platform')).toBe(false);
     });
 
     it('shows tenant administration to organization admins only', () => {
         expect(canSeeNav('ORGANIZATION_ADMIN', 'user.manage')).toBe(true);
+        expect(canSeeNav('ORGANIZATION_ADMIN', 'identity.manage')).toBe(true);
         expect(canSeeNav('ORGANIZATION_ADMIN', 'billing.manage')).toBe(true);
         expect(canSeeNav('ASSESSOR', 'user.manage')).toBe(false);
         expect(canSeeNav('RISK_MANAGER', 'questionnaire.manage')).toBe(true);

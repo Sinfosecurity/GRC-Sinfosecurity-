@@ -220,6 +220,7 @@ export const identityUserService = {
             data: {
                 status: disabled ? UserAccountStatus.DISABLED : UserAccountStatus.ACTIVE,
                 disabledAt: disabled ? new Date() : null,
+                sessionEpoch: disabled ? { increment: 1 } : undefined,
             },
         });
         await recordAudit({

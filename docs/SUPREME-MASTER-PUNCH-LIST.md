@@ -221,9 +221,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CERTIFICATION SHA:** Starting `2904038f5607a3ed791eb9c2162fab6f70effafa`. Lifecycle `c7fc99527bfaf2a8f096168fad59890120b7b33d`. Email remainder `e6fd30c794058767e6a7698ff3b47766ef7c8156`. Hosted API / CI tip `e250493c7dba98d882701acd83907f8cfaff1886`. Hosted frontend `980f717d19d527acc9567eb330c03a540841e4b4`. These are not the same SHA.
 
-**EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. Hosted email proof `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Real inbox not tested. Copy link is not email sent. Phase C reused on the same vendor. #20 remains paused.
+**EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. Hosted email proof `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Real inbox not tested. Copy link is not email sent. Phase C reused on the same vendor.
 
-**NEXT ACTION:** Product Leadership hosted review of the workbook / lifecycle reconciliation evidence. Do not resume #20. Do not start #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS.
+**NEXT ACTION:** Product Leadership hosted review of the workbook / lifecycle reconciliation evidence. Do not alter leftover #12 working-tree files. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #20 is accepted. #21 is the current authorized item.
 
 ---
 
@@ -349,7 +349,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** ADR `docs/ADR-SUPREME-INTELLIGENCE.md`. Final closure `docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/`. CI `34914149569` PASS on `9ee8529`. Public catalog remains Roadmap.
 
-**NEXT ACTION:** Keep #19 accepted. #20 is the current authorized item. Do not start #21. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #19 accepted. #20 is accepted. #21 is the current authorized item. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -361,13 +361,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Versioned automations; no silent residual-risk writes; processors are real or honestly absent.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Not PASS.
+**CURRENT STATUS:** PASS — Product Leadership accepted.
 
 **CERTIFICATION SHA:** Starting SHA `75e743b37a4fd75af10e7f82e87e0790c3dc8ed2`. Closure implementation `64b9cd93e29c362ec94438f4b5d836e93e9be8f4`. Hosted frontend and API `64b9cd93e29c362ec94438f4b5d836e93e9be8f4`.
 
-**EVIDENCE:** ADR `docs/ADR-SUPREME-AUTOMATION.md` (Intelligence contract addendum). Hosted closure `docs/private-beta/hosted-ux-qa/supreme-automation/`. Final PL walk `FINAL-EVIDENCE.md` (`INT-00017` → `RUN-00008`). CI `34920539882` PASS on `64b9cd9` (399 backend / 173 frontend). Public catalog remains Roadmap. Cursor does not declare #20 PASS.
+**EVIDENCE:** ADR `docs/ADR-SUPREME-AUTOMATION.md` (Intelligence contract addendum). Hosted closure `docs/private-beta/hosted-ux-qa/supreme-automation/`. Final PL walk `FINAL-EVIDENCE.md` (`INT-00017` → `RUN-00008`). CI `34920539882` PASS on `64b9cd9` (399 backend / 173 frontend). Public catalog remains Roadmap.
 
-**NEXT ACTION:** PAUSED pending #12 reconciliation acceptance. Do not add generic Automation features. Do not change #19 priority rules. Do not start #21. Do not merge `main` or deploy commercial production. Do not declare #20 PASS.
+**NEXT ACTION:** Keep accepted. Do not add generic Automation features. Do not change #19 priority rules. Do not merge `main` or deploy commercial production. #21 is the current authorized item.
 
 ---
 
@@ -379,13 +379,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Corporate IdP on the admin plane; customer SSO/SCIM as designed. Coming Soon remains truthful until then.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Not PASS.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation and hosted SHAs recorded after CI.
 
-**EVIDENCE:** ADR defers SAML/OIDC/SCIM. Local password + MFA is not SSO.
+**EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Extends accepted identity/admin ADR. One User / Organization / role / session plane. Live Entra/Okta/Google not claimed unless hosted-proved. Cursor does not declare #21 PASS.
 
-**NEXT ACTION:** Not authorized. Do not invent a parallel identity store.
+**NEXT ACTION:** Product Leadership hosted review. Do not start #22. Do not merge `main` or deploy commercial production. Do not alter #12 uncommitted leftovers.
 
 ---
 
