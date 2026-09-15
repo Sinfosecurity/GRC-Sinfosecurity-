@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
     Alert,
@@ -10,7 +10,6 @@ import {
     DialogTitle,
     InputAdornment,
     LinearProgress,
-    MenuItem,
     Stack,
     Tab,
     Tabs,
@@ -26,6 +25,7 @@ import WorkflowStepper from '../components/design/WorkflowStepper';
 import TemplateCard from '../components/design/TemplateCard';
 import { color } from '../design/tokens';
 import { tprmAPI, vendorAPI } from '../services/api';
+import AssessmentAnswerInput from '../components/AssessmentAnswerInput';
 import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 
@@ -34,6 +34,7 @@ type TemplateQuestion = {
     questionKey: string;
     questionText: string;
     options?: string[] | null;
+    questionType?: string | null;
     evidenceRequired: boolean;
     category?: string;
     conditionalOnKey?: string | null;
@@ -149,7 +150,8 @@ export default function Assessments() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
-    const [draft, setDraft] = useState('');
+    const draftRef = useRef('');
+    const focusedQuestionKeyRef = useRef<string | null>(null);
 
     const load = async () => {
         setLoading(true);
@@ -198,7 +200,22 @@ export default function Assessments() {
     const sections = Array.from(new Set(visible.map((item) => item.sectionTitle)));
     const currentSection = sections[sectionIndex] || sections[0];
     const sectionQuestions = visible.filter((item) => item.sectionTitle === currentSection);
-    const currentQuestion = sectionQuestions[questionIndex] || sectionQuestions[0];
+    const indexedQuestion = questionIndex >= 0 && questionIndex < sectionQuestions.length
+        ? sectionQuestions[questionIndex]
+        : undefined;
+    const currentQuestion = indexedQuestion
+        || sectionQuestions.find((item) => item.questionKey === focusedQuestionKeyRef.current)
+        || sectionQuestions[0];
+    if (currentQuestion) focusedQuestionKeyRef.current = currentQuestion.questionKey;
+
+    useEffect(() => {
+        if (!selected || !currentQuestion) {
+            draftRef.current = '';
+            return;
+        }
+        draftRef.current = (selected.responses || []).find((row) => row.questionId === currentQuestion.questionKey)?.response || '';
+    }, [selected?.id, currentQuestion?.questionKey]);
+
     const answered = visible.filter((item) => answers[item.questionKey]).length;
     const evidenceDue = visible.filter((item) => item.evidenceRequired && !(selected?.responses || []).find((row) => row.questionId === item.questionKey)?.hasEvidence).length;
     const progress = visible.length ? Math.round((answered / visible.length) * 100) : 0;
@@ -285,6 +302,7 @@ export default function Assessments() {
         try {
             const updated = await tprmAPI.submitAssessmentResponse(selected.vendorId, selected.id, { questionId, response: trimmed });
             setSelected(updated.data.data);
+            setError(null);
             setSaveState('Saved.');
             return true;
         } catch (err: any) {
@@ -293,15 +311,6 @@ export default function Assessments() {
             return false;
         }
     };
-
-    useEffect(() => {
-        if (!selected || !currentQuestion) {
-            setDraft('');
-            return;
-        }
-        const saved = (selected.responses || []).find((row) => row.questionId === currentQuestion.questionKey)?.response || '';
-        setDraft(saved);
-    }, [selected?.id, currentQuestion?.questionKey]);
 
     const complete = async () => {
         if (!selected) return;
@@ -416,26 +425,15 @@ export default function Assessments() {
                                             {guidance.join('\n').replace(/^Guidance:\s*/i, '')}
                                         </Typography>
                                     )}
-                                    <TextField
-                                        select={options.length > 0}
-                                        fullWidth
-                                        multiline={options.length === 0}
-                                        minRows={options.length === 0 ? 3 : undefined}
-                                        value={draft}
+                                    <AssessmentAnswerInput
+                                        questionKey={currentQuestion.questionKey}
+                                        savedValue={response?.response || ''}
+                                        options={options}
+                                        questionType={currentQuestion.questionType}
                                         disabled={selected.status === 'COMPLETED'}
-                                        onChange={(e) => {
-                                            setDraft(e.target.value);
-                                            if (options.length > 0) void persist(currentQuestion.questionKey, e.target.value);
-                                        }}
-                                        onBlur={() => {
-                                            if (options.length === 0) void persist(currentQuestion.questionKey, draft);
-                                        }}
-                                        label="Answer"
-                                    >
-                                        {options.map((option) => (
-                                            <MenuItem key={option} value={option}>{option}</MenuItem>
-                                        ))}
-                                    </TextField>
+                                        onDraftChange={(value) => { draftRef.current = value; }}
+                                        onSave={(value) => { void persist(currentQuestion.questionKey, value); }}
+                                    />
                                     {currentQuestion.evidenceRequired && selected.status !== 'COMPLETED' && (
                                         <Button component="label" sx={{ mt: 1.5 }}>
                                             Request / attach evidence
@@ -468,8 +466,8 @@ export default function Assessments() {
                                             variant="contained"
                                             disabled={sectionIndex >= sections.length - 1 && questionIndex >= sectionQuestions.length - 1}
                                             onClick={async () => {
-                                                if (draft.trim()) {
-                                                    const saved = await persist(currentQuestion.questionKey, draft);
+                                                if (draftRef.current.trim()) {
+                                                    const saved = await persist(currentQuestion.questionKey, draftRef.current);
                                                     if (!saved) return;
                                                 }
                                                 if (questionIndex < sectionQuestions.length - 1) setQuestionIndex((value) => value + 1);
