@@ -1,0 +1,649 @@
+{
+  "checks": [
+    {
+      "name": "hosted-frontend",
+      "result": "PASS",
+      "detail": "569cf4f4c6192e9710ee29d16d26172fbc516dbd"
+    },
+    {
+      "name": "hosted-api",
+      "result": "PASS",
+      "detail": "569cf4f4c6192e9710ee29d16d26172fbc516dbd"
+    },
+    {
+      "name": "other-tenant",
+      "result": "FAIL",
+      "detail": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e"
+    },
+    {
+      "name": "seed-vendor",
+      "result": "PASS",
+      "detail": "201 dfb6add0-f9eb-4702-a7c9-276a60844d3c"
+    },
+    {
+      "name": "seed-finding",
+      "result": "PASS",
+      "detail": "201 7ce601cc-ed6b-4f7e-901d-7162a4000439"
+    },
+    {
+      "name": "seed-decision-brief",
+      "result": "PASS",
+      "detail": "201 d22421d8-f1a8-4643-9127-a5deda96b23d"
+    },
+    {
+      "name": "workspace",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "honesty",
+      "result": "PASS",
+      "detail": "Supreme Intelligence interprets recorded Supreme facts. It does not approve, reject, score, close, or legally determine anything. Facts, derived intelligence, a"
+    },
+    {
+      "name": "external-not-configured",
+      "result": "PASS",
+      "detail": "{\"status\": \"NOT_CONFIGURED\", \"message\": \"External intelligence not configured\"}"
+    },
+    {
+      "name": "period-honesty",
+      "result": "PASS",
+      "detail": "{\"available\": false, \"label\": \"Trend not yet established\", \"current\": {\"highCriticalFindingsOpened\": 1, \"outsideAppetiteRisks\": 0, \"expiredEvidence\": 0, \"openComplianceGaps\": 0}, \"previous\": null}"
+    },
+    {
+      "name": "priority-item",
+      "result": "PASS",
+      "detail": "{\"publicId\": \"INT-00001\", \"groupingKey\": \"finding-open:7ce601cc-ed6b-4f7e-901d-7162a4000439\", \"ruleId\": \"finding.open_high_critical\", \"ruleVersion\": \"supreme-intelligence-1.0.0\", \"domain\": \"THIRD_PARTY\", \"changeType\": \"FINDING_OPENED\", \"pri"
+    },
+    {
+      "name": "detail",
+      "result": "PASS",
+      "detail": "200 INT-00001"
+    },
+    {
+      "name": "provenance",
+      "result": "PASS",
+      "detail": "finding.open_high_critical Supreme Third Party 7ce601cc-ed6b-4f7e-901d-7162a4000439"
+    },
+    {
+      "name": "why-it-matters",
+      "result": "PASS",
+      "detail": "Severity: CRITICAL. Vendor tier: CRITICAL."
+    },
+    {
+      "name": "next-review",
+      "result": "PASS",
+      "detail": "Review the finding and remediation before the next vendor decision."
+    },
+    {
+      "name": "source-links",
+      "result": "PASS",
+      "detail": "[{\"href\": \"/findings\", \"label\": \"Open finding\"}, {\"href\": \"/vendor-management/dfb6add0-f9eb-4702-a7c9-276a60844d3c\", \"label\": \"Open vendor\"}]"
+    },
+    {
+      "name": "cross-tenant-item",
+      "result": "FAIL",
+      "detail": "200 {\"success\": true, \"data\": {\"publicId\": \"INT-00001\", \"groupingKey\": \"finding-open:7ce601cc-ed6b-4f7e-901d-7162a4000439\", \"ruleId\": \"finding.open_high_critical\", "
+    },
+    {
+      "name": "cross-tenant-workspace",
+      "result": "FAIL",
+      "detail": "200 leaked=True"
+    },
+    {
+      "name": "forged-org",
+      "result": "FAIL",
+      "detail": "200 {\"success\": true, \"data\": {\"honesty\": \"Supreme Intelligence interprets recorded Supreme facts. It does not approve, reject, score, close, or legally determine a"
+    },
+    {
+      "name": "search-filter",
+      "result": "PASS",
+      "detail": "200 count=1"
+    },
+    {
+      "name": "ai-narrative",
+      "result": "PASS",
+      "detail": "{\"status\": \"NOT_CONFIGURED\", \"authority\": \"AI-GENERATED NARRATIVE\", \"text\": null, \"message\": \"AI narrative is not configured. Deterministic intelligence remains available.\"}"
+    },
+    {
+      "name": "external-endpoint",
+      "result": "PASS",
+      "detail": "{\"status\": \"NOT_CONFIGURED\", \"message\": \"External intelligence not configured\"}"
+    },
+    {
+      "name": "acknowledge",
+      "result": "PASS",
+      "detail": "200 ACKNOWLEDGED"
+    },
+    {
+      "name": "ack-does-not-close-finding",
+      "result": "PASS",
+      "detail": "[{\"id\": \"7ce601cc-ed6b-4f7e-901d-7162a4000439\", \"vendorId\": \"dfb6add0-f9eb-4702-a7c9-276a60844d3c\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"title\": \"MFA evidence is not current\", \"d"
+    },
+    {
+      "name": "close-finding",
+      "result": "PASS",
+      "detail": "200 {\"message\": \"Issue closed successfully\"}"
+    },
+    {
+      "name": "stale-resolved",
+      "result": "PASS",
+      "detail": "current=0 lifecycle=RESOLVED_BY_SOURCE currentFlag=False"
+    },
+    {
+      "name": "positive-movement",
+      "result": "PASS",
+      "detail": "[{\"publicId\": \"INT-00003\", \"groupingKey\": \"finding-closed:7ce601cc-ed6b-4f7e-901d-7162a4000439\", \"ruleId\": \"finding.closed_high_critical\", \"ruleVersion\": \"supreme-intelligence-1.0.0\", \"domain\": \"THIRD"
+    },
+    {
+      "name": "history-preserved",
+      "result": "PASS",
+      "detail": "[{\"eventType\": \"generated\", \"summary\": \"INT-00001 generated from finding.open_high_critical supreme-intelligence-1.0.0\", \"createdAt\": \"2026-09-15T00:25:32.866Z\"}, {\"eventType\": \"acknowledged\", \"summary\": \"INT-00001 marked acknowledged\", \"cr"
+    },
+    {
+      "name": "intelligence-brief-pdf",
+      "result": "PASS",
+      "detail": "200 bytes=4128 type=application/pdf"
+    },
+    {
+      "name": "home-teaser",
+      "result": "PASS",
+      "detail": "{\"honesty\": \"Supreme Intelligence interprets recorded Supreme facts. It does not approve, reject, score, close, or legally determine anything. Facts, derived intelligence, and AI narrative are labeled"
+    },
+    {
+      "name": "executive",
+      "result": "PASS",
+      "detail": "exec=2 period=Trend not yet established"
+    },
+    {
+      "name": "axe home",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "keyboard home",
+      "result": "PASS",
+      "detail": "trap=False"
+    },
+    {
+      "name": "home-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe intelligence-home",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "keyboard intelligence-home",
+      "result": "PASS",
+      "detail": "trap=False"
+    },
+    {
+      "name": "intelligence-home-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe intelligence-changes",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "keyboard intelligence-changes",
+      "result": "PASS",
+      "detail": "trap=False"
+    },
+    {
+      "name": "intelligence-changes-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe intelligence-executive",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "keyboard intelligence-executive",
+      "result": "PASS",
+      "detail": "trap=False"
+    },
+    {
+      "name": "axe intelligence-detail",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "keyboard intelligence-detail",
+      "result": "PASS",
+      "detail": "trap=False"
+    },
+    {
+      "name": "intelligence-detail-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    }
+  ],
+  "routes": [
+    {
+      "route": "home",
+      "path": "/dashboard",
+      "result": "PASS",
+      "violations": [],
+      "passes": 24
+    },
+    {
+      "route": "intelligence-home",
+      "path": "/intelligence",
+      "result": "PASS",
+      "violations": [],
+      "passes": 27
+    },
+    {
+      "route": "intelligence-changes",
+      "path": "/intelligence/changes",
+      "result": "PASS",
+      "violations": [],
+      "passes": 29
+    },
+    {
+      "route": "intelligence-executive",
+      "path": "/intelligence/executive",
+      "result": "PASS",
+      "violations": [],
+      "passes": 27
+    },
+    {
+      "route": "intelligence-detail",
+      "path": "/intelligence/INT-00001",
+      "result": "PASS",
+      "violations": [],
+      "passes": 27
+    }
+  ],
+  "keyboard": [
+    {
+      "route": "home",
+      "trap": false,
+      "first": {
+        "tag": "A",
+        "name": "Skip to content"
+      }
+    },
+    {
+      "route": "intelligence-home",
+      "trap": false,
+      "first": {
+        "tag": "A",
+        "name": "Skip to content"
+      }
+    },
+    {
+      "route": "intelligence-changes",
+      "trap": false,
+      "first": {
+        "tag": "A",
+        "name": "Skip to content"
+      }
+    },
+    {
+      "route": "intelligence-executive",
+      "trap": false,
+      "first": {
+        "tag": "A",
+        "name": "Skip to content"
+      }
+    },
+    {
+      "route": "intelligence-detail",
+      "trap": false,
+      "first": {
+        "tag": "A",
+        "name": "Skip to content"
+      }
+    }
+  ],
+  "viewports": [
+    {
+      "route": "home",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "route": "home",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "route": "home",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "route": "home",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "route": "home",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-home",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-home",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-home",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-home",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-home",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-changes",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-changes",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-changes",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-changes",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-changes",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-detail",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-detail",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-detail",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-detail",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "route": "intelligence-detail",
+      "width": 1920,
+      "overflow": false
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/home-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/home-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/home-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-home-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-home-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-home-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-changes-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-changes-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-changes-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-changes-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-changes-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-changes-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-executive-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/intelligence-detail-1920.png"
+  ],
+  "sha": {
+    "api": "569cf4f4c6192e9710ee29d16d26172fbc516dbd",
+    "frontend": "569cf4f4c6192e9710ee29d16d26172fbc516dbd"
+  },
+  "journey": {
+    "seed": {
+      "vendorId": "dfb6add0-f9eb-4702-a7c9-276a60844d3c",
+      "vendorPublicId": "VND-2026-0001",
+      "vendorName": "Northwind Claims Review 1789431930",
+      "findingId": "7ce601cc-ed6b-4f7e-901d-7162a4000439",
+      "findingTitle": "MFA evidence is not current",
+      "briefId": "d22421d8-f1a8-4643-9127-a5deda96b23d",
+      "owner": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22"
+    },
+    "org": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+    "otherOrg": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+    "publicId": "INT-00001",
+    "positive": [
+      {
+        "publicId": "INT-00003",
+        "groupingKey": "finding-closed:7ce601cc-ed6b-4f7e-901d-7162a4000439",
+        "ruleId": "finding.closed_high_critical",
+        "ruleVersion": "supreme-intelligence-1.0.0",
+        "domain": "THIRD_PARTY",
+        "changeType": "FINDING_CLOSED",
+        "priority": "POSITIVE",
+        "priorityLabel": "Positive movement",
+        "polarity": "POSITIVE",
+        "lifecycle": "NEW",
+        "title": "Critical finding closed",
+        "summary": "MFA evidence is not current is recorded as closed for Northwind Claims Review 1789431930.",
+        "whatHappened": "MFA evidence is not current is recorded as closed for Northwind Claims Review 1789431930.",
+        "whyItMatters": "Recorded remediation closed a high-severity finding. This is not an approval that the vendor is safe.",
+        "reviewGuidance": "Confirm residual evidence still supports the next vendor decision.",
+        "ownerLabel": "Northwind Claims Review 1789431930",
+        "sourceProduct": "Supreme Third Party",
+        "sourceModel": "VendorIssue",
+        "sourceId": "7ce601cc-ed6b-4f7e-901d-7162a4000439",
+        "sourcePublicId": null,
+        "sourceTimestamp": "2026-09-15T00:25:36.449Z",
+        "generatedAt": "2026-09-15T00:25:37.273Z",
+        "resolvedAt": null,
+        "fingerprint": "8ba8580cdee75d182ffba80123fa3fb6cbb3cb8b2e7c16e14e1d1195156a7c32",
+        "facts": [
+          {
+            "kind": "FACT",
+            "label": "Finding",
+            "value": "MFA evidence is not current"
+          },
+          {
+            "kind": "FACT",
+            "label": "Severity",
+            "value": "CRITICAL"
+          },
+          {
+            "kind": "FACT",
+            "label": "Status",
+            "value": "CLOSED"
+          },
+          {
+            "kind": "FACT",
+            "label": "Closed",
+            "value": "2026-09-15T00:25:36.449Z"
+          }
+        ],
+        "affected": {
+          "counts": {
+            "vendors": 1,
+            "findings": 1
+          },
+          "objects": [
+            {
+              "id": "7ce601cc-ed6b-4f7e-901d-7162a4000439",
+              "href": "/findings",
+              "type": "Finding",
+              "label": "MFA evidence is not current"
+            }
+          ]
+        },
+        "links": [
+          {
+            "href": "/findings",
+            "label": "Open finding"
+          }
+        ],
+        "current": true,
+        "authority": {
+          "facts": "FACT",
+          "explanation": "DERIVED INTELLIGENCE",
+          "narrative": "AI-GENERATED NARRATIVE"
+        },
+        "href": "/intelligence/INT-00003"
+      }
+    ],
+    "item": {
+      "publicId": "INT-00001",
+      "title": "Critical finding is open",
+      "lifecycleAfterClose": "RESOLVED_BY_SOURCE",
+      "affected": {
+        "counts": {
+          "vendors": 1,
+          "findings": 1
+        },
+        "objects": [
+          {
+            "id": "7ce601cc-ed6b-4f7e-901d-7162a4000439",
+            "href": "/findings",
+            "type": "Finding",
+            "label": "MFA evidence is not current"
+          },
+          {
+            "id": "dfb6add0-f9eb-4702-a7c9-276a60844d3c",
+            "href": "/vendor-management/dfb6add0-f9eb-4702-a7c9-276a60844d3c",
+            "type": "Vendor",
+            "label": "Northwind Claims Review 1789431930"
+          }
+        ]
+      },
+      "graph": {
+        "relatedCounts": {},
+        "truncated": false,
+        "human": [],
+        "message": "No recorded graph relationships for this source."
+      },
+      "why": "Severity: CRITICAL. Vendor tier: CRITICAL."
+    }
+  },
+  "pdf": {
+    "status": 200,
+    "bytes": 4128,
+    "contentType": "application/pdf"
+  }
+}

@@ -1,0 +1,532 @@
+{
+  "orgA": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+  "crossReport": 200,
+  "graphSummary": {
+    "success": true,
+    "data": {
+      "nodeCount": 102,
+      "relationshipCount": 94,
+      "activeRelationshipCount": 94,
+      "nodeCounts": {
+        "CONTROL": 37,
+        "FRAMEWORK": 11,
+        "REQUIREMENT": 54
+      },
+      "relationshipCounts": {
+        "SATISFIED_BY": 94
+      },
+      "provenanceCounts": {
+        "SYSTEM": 94
+      },
+      "orphanNodes": [
+        {
+          "id": "e2aca91c-8706-4b16-91f0-a7025fec9d4a",
+          "nodeType": "CONTROL"
+        },
+        {
+          "id": "bdd0a333-b3a4-4d61-b78d-c4c12da4a3c1",
+          "nodeType": "CONTROL"
+        },
+        {
+          "id": "89229a5b-c895-4701-9545-baf6f32cb6c8",
+          "nodeType": "CONTROL"
+        },
+        {
+          "id": "bf028270-bac5-4566-a40f-46be79f593ab",
+          "nodeType": "CONTROL"
+        },
+        {
+          "id": "a2944303-3363-45f9-be4d-49f35f6e7f8a",
+          "nodeType": "CONTROL"
+        },
+        {
+          "id": "b49dfa67-6add-4f45-8ef1-2a325b1868da",
+          "nodeType": "CONTROL"
+        },
+        {
+          "id": "41a20a6f-2c13-43ff-9baf-d25ce1f2ed52",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "5f04a6a8-4e1b-43c2-a0e6-6625cd0c322a",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "f5fe7cde-d0e5-4dd9-adfb-b059bc3c56f8",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "f4d31dd3-a352-462b-9530-ff36d4cf0a5e",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "f7c2dded-6d27-4384-9a6c-105a46230e38",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "67fdd062-696d-4605-b69d-6965d37e416a",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "2629349b-9006-428b-aad5-0a481e4ea3f7",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "ed4ddeda-02cf-4598-9526-d74fadaabc45",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "3b772ec9-00b2-4a54-bab7-8d5a6a89c4d5",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "451ee8a8-7609-4c5b-ac1b-d896b4f9ec88",
+          "nodeType": "FRAMEWORK"
+        },
+        {
+          "id": "b25d41e3-cb7c-4e4a-a811-9523cb10a2a6",
+          "nodeType": "FRAMEWORK"
+        }
+      ],
+      "recentChanges": [
+        {
+          "id": "039f2cf7-9a00-449e-b51e-4dc0372d03f1",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.091Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.091Z",
+          "fromNode": {
+            "id": "a72e628e-ab8c-499e-803e-8a596bed8a08",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "7124e8e6-626f-40c0-93df-c888ee89ca25",
+            "displayLabel": "NIST_CSF GV.RR",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.611Z",
+            "updatedAt": "2026-09-15T00:04:35.611Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "c4c32e83-4b40-42e4-b629-63dc89350b6a",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "f2e2544b-5483-4a1d-925b-7c82a3e6d1f4",
+            "displayLabel": "GOV-01 Governance roles and accountability",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:34.716Z",
+            "updatedAt": "2026-09-15T00:04:34.716Z",
+            "recordHref": "/control-center/f2e2544b-5483-4a1d-925b-7c82a3e6d1f4"
+          }
+        },
+        {
+          "id": "a15b667d-8824-4056-b3a1-9ccfa1a68755",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.083Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.083Z",
+          "fromNode": {
+            "id": "1633902a-931a-40f2-856d-4513f31027c2",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "ff57e47e-84d4-4d67-8c0b-fb13b29c5920",
+            "displayLabel": "ISO_42001 9",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.922Z",
+            "updatedAt": "2026-09-15T00:04:35.922Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "880d0f8b-71dc-4c0e-a1bd-0d06b9670e68",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "3b6b4c61-2ef2-4c82-b2dd-48a3fdaa40fd",
+            "displayLabel": "AIG-03 AI tests are recorded by a human, not invented",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.445Z",
+            "updatedAt": "2026-09-15T00:04:35.445Z",
+            "recordHref": "/control-center/3b6b4c61-2ef2-4c82-b2dd-48a3fdaa40fd"
+          }
+        },
+        {
+          "id": "3ae2c4e3-00f9-443d-ae7a-6ac9245cca2a",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.074Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.074Z",
+          "fromNode": {
+            "id": "1cbd7fe8-ad0a-4dc2-9f46-158fd2f45e0c",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "bd16a2e2-7dda-4185-9c4d-b83db1d2619b",
+            "displayLabel": "ISO_42001 8",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.918Z",
+            "updatedAt": "2026-09-15T00:04:35.918Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "6f66ec71-0cfb-4ac8-9ec4-368aa8e75deb",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "92bebcec-5270-49c3-9f5d-f0beccb4eb42",
+            "displayLabel": "AIG-01 AI systems are inventoried before production use",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.369Z",
+            "updatedAt": "2026-09-15T00:04:35.369Z",
+            "recordHref": "/control-center/92bebcec-5270-49c3-9f5d-f0beccb4eb42"
+          }
+        },
+        {
+          "id": "e8422b1a-4299-4987-9413-bfb85493d5a3",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.064Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.065Z",
+          "fromNode": {
+            "id": "1cbd7fe8-ad0a-4dc2-9f46-158fd2f45e0c",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "bd16a2e2-7dda-4185-9c4d-b83db1d2619b",
+            "displayLabel": "ISO_42001 8",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.918Z",
+            "updatedAt": "2026-09-15T00:04:35.918Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "32d1704c-66f8-4096-bf2a-a3e186203f1c",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "13712efb-a145-4995-a61d-1ee6fc8ed4be",
+            "displayLabel": "AIG-02 Human oversight is recorded for material AI uses",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.422Z",
+            "updatedAt": "2026-09-15T00:04:35.422Z",
+            "recordHref": "/control-center/13712efb-a145-4995-a61d-1ee6fc8ed4be"
+          }
+        },
+        {
+          "id": "1fdaf7c2-69a5-41b6-b106-ba45952b4263",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.038Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.038Z",
+          "fromNode": {
+            "id": "6ceb577f-28c7-4bdb-a105-f874926f869e",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "098bbc81-ea9e-43af-8e2a-a9e81a79d635",
+            "displayLabel": "ISO_42001 5",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.909Z",
+            "updatedAt": "2026-09-15T00:04:35.909Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "32d1704c-66f8-4096-bf2a-a3e186203f1c",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "13712efb-a145-4995-a61d-1ee6fc8ed4be",
+            "displayLabel": "AIG-02 Human oversight is recorded for material AI uses",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.422Z",
+            "updatedAt": "2026-09-15T00:04:35.422Z",
+            "recordHref": "/control-center/13712efb-a145-4995-a61d-1ee6fc8ed4be"
+          }
+        },
+        {
+          "id": "e9ff8f57-59ec-473f-85cd-0b578935a354",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.029Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.029Z",
+          "fromNode": {
+            "id": "6ceb577f-28c7-4bdb-a105-f874926f869e",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "098bbc81-ea9e-43af-8e2a-a9e81a79d635",
+            "displayLabel": "ISO_42001 5",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.909Z",
+            "updatedAt": "2026-09-15T00:04:35.909Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "550ccc95-0f71-4024-8be3-a5b7b5faae9b",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "f47c23ee-c67a-4164-9cdf-000273cd3b00",
+            "displayLabel": "AIG-04 AI approval is a human decision",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.465Z",
+            "updatedAt": "2026-09-15T00:04:35.465Z",
+            "recordHref": "/control-center/f47c23ee-c67a-4164-9cdf-000273cd3b00"
+          }
+        },
+        {
+          "id": "b52fbeac-006a-4c2e-9b85-34128adc7812",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.018Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.019Z",
+          "fromNode": {
+            "id": "9ae7b9cf-ac4b-4e0c-9702-1fbcbc16e112",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "67b94039-369f-4578-8e28-23be655e8878",
+            "displayLabel": "ISO_42001 4",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.904Z",
+            "updatedAt": "2026-09-15T00:04:35.904Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "c4c32e83-4b40-42e4-b629-63dc89350b6a",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "f2e2544b-5483-4a1d-925b-7c82a3e6d1f4",
+            "displayLabel": "GOV-01 Governance roles and accountability",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:34.716Z",
+            "updatedAt": "2026-09-15T00:04:34.716Z",
+            "recordHref": "/control-center/f2e2544b-5483-4a1d-925b-7c82a3e6d1f4"
+          }
+        },
+        {
+          "id": "5ceffbda-c4e1-4229-830d-4eb38c9d4747",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.009Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.010Z",
+          "fromNode": {
+            "id": "9ae7b9cf-ac4b-4e0c-9702-1fbcbc16e112",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "67b94039-369f-4578-8e28-23be655e8878",
+            "displayLabel": "ISO_42001 4",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.904Z",
+            "updatedAt": "2026-09-15T00:04:35.904Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "6f66ec71-0cfb-4ac8-9ec4-368aa8e75deb",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "92bebcec-5270-49c3-9f5d-f0beccb4eb42",
+            "displayLabel": "AIG-01 AI systems are inventoried before production use",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.369Z",
+            "updatedAt": "2026-09-15T00:04:35.369Z",
+            "recordHref": "/control-center/92bebcec-5270-49c3-9f5d-f0beccb4eb42"
+          }
+        },
+        {
+          "id": "9d0684b1-d001-4cab-ae24-707febb1709f",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:37.000Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:37.000Z",
+          "fromNode": {
+            "id": "79a6512e-55e1-4a8d-94ac-716b86b6af60",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "a06b0488-2122-405e-829d-7597c77a3b1a",
+            "displayLabel": "NIST_AI_RMF MANAGE",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.894Z",
+            "updatedAt": "2026-09-15T00:04:35.894Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "71c8ea66-2fcd-43bc-9377-a978735da96d",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "9e58b059-6842-437a-a980-74148ab9e619",
+            "displayLabel": "RSK-02 Human decision required for risk acceptance",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:34.909Z",
+            "updatedAt": "2026-09-15T00:04:34.909Z",
+            "recordHref": "/control-center/9e58b059-6842-437a-a980-74148ab9e619"
+          }
+        },
+        {
+          "id": "dbf30daf-34fc-4474-ae5f-77501430ade5",
+          "relationshipType": "SATISFIED_BY",
+          "provenance": "SYSTEM",
+          "authority": "AUTHORITATIVE",
+          "isDerived": true,
+          "validFrom": "2026-09-15T00:04:36.991Z",
+          "validTo": null,
+          "archivedAt": null,
+          "createdAt": "2026-09-15T00:04:36.991Z",
+          "fromNode": {
+            "id": "79a6512e-55e1-4a8d-94ac-716b86b6af60",
+            "organizationScoped": true,
+            "nodeType": "REQUIREMENT",
+            "sourceModel": "FrameworkRequirement",
+            "sourceId": "a06b0488-2122-405e-829d-7597c77a3b1a",
+            "displayLabel": "NIST_AI_RMF MANAGE",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.894Z",
+            "updatedAt": "2026-09-15T00:04:35.894Z",
+            "recordHref": "/framework-coverage"
+          },
+          "toNode": {
+            "id": "550ccc95-0f71-4024-8be3-a5b7b5faae9b",
+            "organizationScoped": true,
+            "nodeType": "CONTROL",
+            "sourceModel": "OrganizationControl",
+            "sourceId": "f47c23ee-c67a-4164-9cdf-000273cd3b00",
+            "displayLabel": "AIG-04 AI approval is a human decision",
+            "status": "ACTIVE",
+            "archivedAt": null,
+            "createdAt": "2026-09-15T00:04:35.465Z",
+            "updatedAt": "2026-09-15T00:04:35.465Z",
+            "recordHref": "/control-center/f47c23ee-c67a-4164-9cdf-000273cd3b00"
+          }
+        }
+      ]
+    }
+  },
+  "items": [
+    [
+      "INT-00003",
+      "Critical finding closed",
+      "NEW",
+      true
+    ],
+    [
+      "INT-00002",
+      "Decision needs a person",
+      "NEW",
+      true
+    ],
+    [
+      "INT-00001",
+      "Critical finding is open",
+      "RESOLVED_BY_SOURCE",
+      false
+    ]
+  ],
+  "graphs": {
+    "INT-00003": {
+      "relatedCounts": {},
+      "truncated": false,
+      "human": [],
+      "message": "No recorded graph relationships for this source."
+    },
+    "INT-00002": {
+      "relatedCounts": {},
+      "truncated": false,
+      "human": [],
+      "message": "No recorded graph relationships for this source."
+    },
+    "INT-00001": {
+      "relatedCounts": {},
+      "truncated": false,
+      "human": [],
+      "message": "No recorded graph relationships for this source."
+    }
+  },
+  "invite": {
+    "success": true,
+    "data": {
+      "invitation": {
+        "id": "1e026f62-3ddc-48ac-98a6-60a49dca3b0c",
+        "email": "intel-viewer-1789432034@elite.example",
+        "role": "VIEWER",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "invitedById": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+        "tokenHash": "9a1b195cd3e4946ea6b7e77297fec033ad7ca3af04b23ab2de1534ea001643cc",
+        "status": "PENDING",
+        "expiresAt": "2026-09-22T00:27:16.768Z",
+        "acceptedAt": null,
+        "createdAt": "2026-09-15T00:27:16.769Z",
+        "emailProvider": null,
+        "providerMessageId": null,
+        "emailDeliveryStatus": null,
+        "emailSentAt": null,
+        "emailDeliveredAt": null,
+        "emailFailedAt": null,
+        "emailLastError": null
+      },
+      "emailStatus": "ACCEPTED",
+      "delivery": "sent"
+    }
+  },
+  "viewer": {}
+}
