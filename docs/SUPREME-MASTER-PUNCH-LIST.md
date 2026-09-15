@@ -345,9 +345,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Not PASS.
 
-**CERTIFICATION SHA:** Starting SHA `d3a381172e1a32283a123ccf3c5184a5342201af`. Implementation / hosted frontend / hosted API `569cf4f4c6192e9710ee29d16d26172fbc516dbd`.
+**CERTIFICATION SHA:** Starting SHA `d3a381172e1a32283a123ccf3c5184a5342201af`. Closure implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`. Hosted API `9ee8529d806f17fdef6f736fb179cd8fc8e89327`. Hosted frontend `e743d69726d0d7aa63dd06281caa4383d4565652` (no frontend product change on the closure SHA). Prior hosted walk `569cf4f4c6192e9710ee29d16d26172fbc516dbd`.
 
-**EVIDENCE:** ADR `docs/ADR-SUPREME-INTELLIGENCE.md`. Hosted golden journey `docs/private-beta/hosted-ux-qa/supreme-intelligence/`. CI `34912776460` PASS on `569cf4f` (381 backend / 166 frontend). Public catalog remains Roadmap. Cursor does not declare #19 PASS.
+**EVIDENCE:** ADR `docs/ADR-SUPREME-INTELLIGENCE.md`. Final closure `docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/`. CI `34914149569` PASS on `9ee8529` (383 backend / 166 frontend). Public catalog remains Roadmap. Cursor does not declare #19 PASS.
 
 **NEXT ACTION:** Product Leadership hosted review of #19. Do not start #20. Do not merge `main` or deploy commercial production. Do not declare #19 PASS.
 

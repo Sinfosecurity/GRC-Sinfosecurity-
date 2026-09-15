@@ -1,0 +1,172 @@
+{
+  "checks": [
+    {
+      "name": "axe intelligence-home",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "intelligence-home-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-home-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe intelligence-changes",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "intelligence-changes-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-changes-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe intelligence-executive",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "intelligence-executive-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-executive-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-executive-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-executive-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-executive-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe intelligence-detail",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "intelligence-detail-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-detail-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    }
+  ],
+  "routes": [
+    {
+      "route": "intelligence-home",
+      "path": "/intelligence",
+      "result": "PASS",
+      "violations": []
+    },
+    {
+      "route": "intelligence-changes",
+      "path": "/intelligence/changes",
+      "result": "PASS",
+      "violations": []
+    },
+    {
+      "route": "intelligence-executive",
+      "path": "/intelligence/executive",
+      "result": "PASS",
+      "violations": []
+    },
+    {
+      "route": "intelligence-detail",
+      "path": "/intelligence/INT-00005",
+      "result": "PASS",
+      "violations": []
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-home-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-home-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-home-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-changes-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-changes-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-changes-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-changes-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-changes-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-executive-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-executive-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-executive-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-executive-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-executive-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/intelligence-detail-1920.png"
+  ]
+}
