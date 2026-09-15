@@ -37,10 +37,10 @@ interface Vendor {
     category: string;
     tier: 'Critical' | 'High' | 'Medium' | 'Low';
     status: string;
-    riskScore: number;
+    riskScore: number | null;
     residualRiskScore?: number | null;
     inherentRiskScore?: number | null;
-    complianceScore: number;
+    complianceScore: number | null;
     lastAssessment: string;
     nextReview: string;
     contactEmail: string;
@@ -155,10 +155,10 @@ export default function VendorManagement() {
                     category: v.category,
                     tier: displayTier(v.tier) as Vendor['tier'],
                     status: v.status,
-                    riskScore: v.residualRiskScore ?? v.inherentRiskScore ?? 0,
+                    riskScore: v.residualRiskScore ?? null,
                     residualRiskScore: v.residualRiskScore ?? null,
                     inherentRiskScore: v.inherentRiskScore ?? null,
-                    complianceScore: 100 - (v.residualRiskScore ?? v.inherentRiskScore ?? 0),
+                    complianceScore: v.residualRiskScore != null ? 100 - v.residualRiskScore : null,
                     lastAssessment: v.lastAssessmentDate ? new Date(v.lastAssessmentDate).toISOString().split('T')[0] : 'N/A',
                     nextReview: v.nextReviewDate ? new Date(v.nextReviewDate).toISOString().split('T')[0] : 'N/A',
                     contactEmail: v.contactEmail || v.primaryContact || 'N/A',
@@ -329,7 +329,7 @@ export default function VendorManagement() {
                         ) },
                         { id: 'category', label: 'Category', hideOnMobile: true, sortValue: (row) => row.category, render: (row) => (categories.find((item) => item.value === row.category)?.label || row.category.replace(/_/g, ' ').toLowerCase()) },
                         { id: 'tier', label: 'Tier', sortValue: (row) => row.tier, render: (row) => <StatusBadge value={row.tier} kind="severity" /> },
-                        { id: 'risk', label: 'Inherent risk', hideOnMobile: true, sortValue: (row) => row.riskScore, render: (row) => `${row.riskScore}` },
+                        { id: 'risk', label: 'Residual risk', hideOnMobile: true, sortValue: (row) => row.residualRiskScore ?? -1, render: (row) => row.residualRiskScore != null ? `${row.residualRiskScore}` : 'Not scored' },
                         { id: 'assessment', label: 'Assessment', sortValue: (row) => row.assessmentStatus, render: (row) => (
                             <StatusBadge kind="plain" tone={row.assessmentStatus === 'Overdue' ? 'critical' : row.assessmentStatus === 'Completed' ? 'success' : 'high'} label={row.assessmentStatus} />
                         ) },
@@ -457,7 +457,10 @@ export default function VendorManagement() {
                         )}
                         {detailTab === 1 && (
                             <Stack spacing={1.5}>
-                                <MetricCard label="Inherent / recorded score" value={`${selectedVendor.riskScore}`} />
+                                <MetricCard label="Residual risk" value={selectedVendor.residualRiskScore != null ? `${selectedVendor.residualRiskScore}` : 'Not scored'} />
+                                {selectedVendor.inherentRiskScore != null && (
+                                    <Typography variant="body2">Inherent risk {selectedVendor.inherentRiskScore} is intake exposure, not the register posture.</Typography>
+                                )}
                                 {riskExplanationError && <Alert severity="error">{riskExplanationError}</Alert>}
                                 {!riskExplanationError && !riskExplanation && <Typography variant="body2">Loading risk explanation…</Typography>}
                                 {riskExplanation?.latest ? (
