@@ -1,0 +1,1110 @@
+{
+  "wantSha": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+  "steps": [
+    {
+      "name": "sha.poll",
+      "status": 200,
+      "ms": null,
+      "payload": {
+        "api": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+        "frontend": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+        "health": {
+          "status": "degraded",
+          "gitSha": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+          "checks": {
+            "mongodb": {
+              "status": "degraded",
+              "message": "NOT_CONFIGURED",
+              "responseTime": 0
+            },
+            "memory": {
+              "status": "up",
+              "message": "Memory usage normal",
+              "details": {
+                "heapUsedMB": 85,
+                "heapTotalMB": 101,
+                "usagePercent": "84.16"
+              },
+              "responseTime": 0
+            },
+            "circuitBreakers": {
+              "status": "up",
+              "message": "All circuit breakers operational",
+              "details": {
+                "totalBreakers": 0
+              },
+              "responseTime": 0
+            },
+            "storage": {
+              "status": "up",
+              "message": "Object storage s3",
+              "details": {
+                "provider": "s3",
+                "malwareScanning": "PENDING",
+                "malwareProvider": "CONNECTED",
+                "downloadPolicy": {
+                  "allowPendingDownloads": false,
+                  "allowUnscannedDownloads": false
+                }
+              },
+              "responseTime": 0
+            },
+            "email": {
+              "status": "degraded",
+              "message": "DEGRADED",
+              "responseTime": 0
+            },
+            "stripe": {
+              "status": "up",
+              "message": "Stripe test mode connected",
+              "responseTime": 0
+            },
+            "ai": {
+              "status": "degraded",
+              "message": "NOT_CONFIGURED",
+              "responseTime": 1
+            },
+            "malware": {
+              "status": "up",
+              "message": "CONNECTED",
+              "details": {
+                "downloadPolicy": {
+                  "allowPendingDownloads": false,
+                  "allowUnscannedDownloads": false
+                }
+              },
+              "responseTime": 1
+            },
+            "automation": {
+              "status": "up",
+              "message": "Automation queue connected",
+              "responseTime": 1
+            },
+            "redis": {
+              "status": "up",
+              "message": "Redis connection healthy",
+              "responseTime": 1
+            },
+            "postgres": {
+              "status": "up",
+              "message": "PostgreSQL connection healthy",
+              "responseTime": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "login",
+      "status": 200,
+      "ms": 588,
+      "payload": {
+        "user": "sales@eliteadjustersny.com"
+      }
+    },
+    {
+      "name": "timing.home",
+      "status": 200,
+      "ms": 414,
+      "payload": {
+        "count": null
+      }
+    },
+    {
+      "name": "timing.list",
+      "status": 200,
+      "ms": 212,
+      "payload": {
+        "count": 7
+      }
+    },
+    {
+      "name": "timing.runs",
+      "status": 200,
+      "ms": 397,
+      "payload": {
+        "count": 3
+      }
+    },
+    {
+      "name": "timing.templates",
+      "status": 200,
+      "ms": 227,
+      "payload": {
+        "count": 11
+      }
+    },
+    {
+      "name": "scheduled.checks",
+      "status": "CONNECTED",
+      "ms": null,
+      "payload": {
+        "status": "CONNECTED",
+        "message": "Scheduled checks are connected. Delivery is at-least-once. Successful execution is not simulated."
+      }
+    },
+    {
+      "name": "active.intelligence-critical-attention",
+      "status": "ACTIVE",
+      "ms": null,
+      "payload": "AUT-00004"
+    },
+    {
+      "name": "publish.compliance-gap-opened",
+      "status": 200,
+      "ms": null,
+      "payload": "AUT-00005"
+    },
+    {
+      "name": "active.privacy-deadline-reminder",
+      "status": "ACTIVE",
+      "ms": null,
+      "payload": "AUT-00006"
+    },
+    {
+      "name": "active.ai-review-due",
+      "status": "ACTIVE",
+      "ms": null,
+      "payload": "AUT-00007"
+    },
+    {
+      "name": "catalog.has.compliance-gap-opened",
+      "status": "Compliance gap opened",
+      "ms": null,
+      "payload": null
+    },
+    {
+      "name": "vendor",
+      "status": 200,
+      "ms": null,
+      "payload": {
+        "id": "dfb6add0-f9eb-4702-a7c9-276a60844d3c",
+        "name": "Northwind Claims Review 1789431930"
+      }
+    },
+    {
+      "name": "finding.create",
+      "status": 201,
+      "ms": null,
+      "payload": {
+        "id": "6c409ef2-51c3-42d6-823e-081d53e52277",
+        "status": "OPEN"
+      }
+    },
+    {
+      "name": "intelligence.generate",
+      "status": 200,
+      "ms": 1440,
+      "payload": {
+        "publicId": "INT-00011",
+        "priority": "CRITICAL_ATTENTION",
+        "current": true,
+        "ruleId": "finding.open_high_critical",
+        "sourceId": "6c409ef2-51c3-42d6-823e-081d53e52277",
+        "why": "Severity: CRITICAL. Vendor tier: CRITICAL."
+      }
+    },
+    {
+      "name": "intelligence.run",
+      "status": 1,
+      "ms": 277,
+      "payload": {
+        "publicId": "RUN-00004",
+        "automationPublicId": "AUT-00004",
+        "automationName": "Intelligence Critical Attention",
+        "version": 1,
+        "status": "SUCCEEDED",
+        "triggerEvent": "intelligence.critical_attention",
+        "sourceModel": "IntelligenceItem",
+        "sourceId": "dcc718bf-35c3-41ee-b103-3d06be8f6416",
+        "sourcePublicId": "INT-00011",
+        "preview": false,
+        "humanApprovalRequired": true,
+        "nextActorLabel": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+        "timezoneUsed": "America/New_York",
+        "retryCount": 0,
+        "startedAt": "2026-09-15T02:19:34.969Z",
+        "completedAt": "2026-09-15T02:19:35.290Z",
+        "durationMs": 321,
+        "whatTriggered": "intelligence.critical_attention",
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "intelligence.priority",
+            "reason": "Equals CRITICAL_ATTENTION.",
+            "matched": true,
+            "observed": "CRITICAL_ATTENTION"
+          }
+        ],
+        "whatSupremeDid": [
+          "CREATE_REVIEW_REQUEST",
+          "NOTIFY_OWNER"
+        ],
+        "whatSupremeDidNotDo": [
+          "Accept risk",
+          "Approve vendor",
+          "Close finding",
+          "Declare compliance",
+          "Approve AI",
+          "Change residual risk",
+          "Make a legal conclusion"
+        ],
+        "whoNeedsToAct": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+        "whatFailed": [],
+        "willRetry": false,
+        "href": "/automation/runs/RUN-00004",
+        "workItems": [
+          {
+            "publicId": "WRK-00005",
+            "title": "Intelligence Critical Attention: Critical finding is open",
+            "kind": "REVIEW",
+            "status": "OPEN",
+            "dueAt": "2026-09-20T02:19:35.268Z",
+            "sourceHref": "/intelligence/INT-00011",
+            "humanRequired": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "run.detail",
+      "status": 200,
+      "ms": 354,
+      "payload": {
+        "publicId": "RUN-00004",
+        "automationPublicId": "AUT-00004",
+        "automationName": "Intelligence Critical Attention",
+        "version": 1,
+        "status": "SUCCEEDED",
+        "triggerEvent": "intelligence.critical_attention",
+        "sourceModel": "IntelligenceItem",
+        "sourceId": "dcc718bf-35c3-41ee-b103-3d06be8f6416",
+        "sourcePublicId": "INT-00011",
+        "preview": false,
+        "humanApprovalRequired": true,
+        "nextActorLabel": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+        "timezoneUsed": "America/New_York",
+        "retryCount": 0,
+        "startedAt": "2026-09-15T02:19:34.969Z",
+        "completedAt": "2026-09-15T02:19:35.290Z",
+        "durationMs": 321,
+        "whatTriggered": "intelligence.critical_attention",
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "intelligence.priority",
+            "reason": "Equals CRITICAL_ATTENTION.",
+            "matched": true,
+            "observed": "CRITICAL_ATTENTION"
+          }
+        ],
+        "whatSupremeDid": [
+          "CREATE_REVIEW_REQUEST",
+          "NOTIFY_OWNER"
+        ],
+        "whatSupremeDidNotDo": [
+          "Accept risk",
+          "Approve vendor",
+          "Close finding",
+          "Declare compliance",
+          "Approve AI",
+          "Change residual risk",
+          "Make a legal conclusion"
+        ],
+        "whoNeedsToAct": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+        "whatFailed": [],
+        "willRetry": false,
+        "href": "/automation/runs/RUN-00004",
+        "workItems": [
+          {
+            "publicId": "WRK-00005",
+            "title": "Intelligence Critical Attention: Critical finding is open",
+            "kind": "REVIEW",
+            "status": "OPEN",
+            "dueAt": "2026-09-20T02:19:35.268Z",
+            "sourceHref": "/intelligence/INT-00011",
+            "humanRequired": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "work.item",
+      "status": 200,
+      "ms": null,
+      "payload": {
+        "publicId": "WRK-00005",
+        "title": "Intelligence Critical Attention: Critical finding is open",
+        "kind": "REVIEW",
+        "status": "OPEN",
+        "dueAt": "2026-09-20T02:19:35.268Z",
+        "sourceHref": "/intelligence/INT-00011",
+        "humanRequired": true,
+        "href": "/automation/runs/RUN-00004"
+      }
+    },
+    {
+      "name": "idempotency.second-generate",
+      "status": 1,
+      "ms": null,
+      "payload": {
+        "duplicateRun": false
+      }
+    },
+    {
+      "name": "finding.still-open",
+      "status": "OPEN",
+      "ms": null,
+      "payload": null
+    },
+    {
+      "name": "human.close",
+      "status": 200,
+      "ms": null,
+      "payload": {
+        "id": "6c409ef2-51c3-42d6-823e-081d53e52277",
+        "vendorId": "dfb6add0-f9eb-4702-a7c9-276a60844d3c",
+        "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+        "title": "Critical Attention closure finding",
+        "description": "Real finding so Intelligence can generate Critical Attention.",
+        "issueType": "AUDIT_FINDING",
+        "severity": "CRITICAL",
+        "priority": "URGENT",
+        "source": "INTERNAL_ASSESSMENT",
+        "identifiedDate": "2026-09-15T02:19:33.195Z",
+        "identifiedBy": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+        "category": "Security",
+        "riskRating": null,
+        "impactDescription": null,
+        "status": "CLOSED",
+        "assignedTo": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+        "correctiveActionPlan": null,
+        "targetRemediationDate": null,
+        "actualRemediationDate": null,
+        "validationRequired": false,
+        "validatedBy": null,
+        "validatedAt": null,
+        "validationNotes": null,
+        "evidenceUrl": null,
+        "closureEvidence": null,
+        "closedAt": "2026-09-15T02:19:37.307Z",
+        "closedBy": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+        "closureNotes": "Human closed the authoritative finding.",
+        "assessmentId": null,
+        "questionId": null,
+        "reviewState": "CONFIRMED",
+        "draftRuleCode": null,
+        "dismissReason": null,
+        "dismissedBy": null,
+        "dismissedAt": null,
+        "severityAdjustReason": null,
+        "createdAt": "2026-09-15T02:19:33.196Z",
+        "updatedAt": "2026-09-15T02:19:37.307Z",
+        "vendor": {
+          "id": "dfb6add0-f9eb-4702-a7c9-276a60844d3c",
+          "publicId": "VND-2026-0001",
+          "name": "Northwind Claims Review 1789431930",
+          "legalName": null,
+          "vendorType": "PROFESSIONAL_SERVICES",
+          "category": "OTHER",
+          "tier": "CRITICAL",
+          "status": "PROPOSED",
+          "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+          "primaryContact": "Pat Lee",
+          "contactEmail": "northwind-1789431930@example.test",
+          "contactPhone": null,
+          "website": null,
+          "domain": null,
+          "country": null,
+          "inherentRiskScore": 88,
+          "residualRiskScore": 51,
+          "criticalityLevel": "CRITICAL",
+          "businessOwner": null,
+          "relationshipOwner": null,
+          "requesterUserId": null,
+          "businessOwnerUserId": null,
+          "relationshipOwnerUserId": null,
+          "businessUnit": null,
+          "estimatedAnnualSpend": null,
+          "targetStartDate": null,
+          "servicesProvided": "Independent claims review and AI-assisted document classification",
+          "contractValue": null,
+          "currency": "USD",
+          "dataTypesAccessed": [
+            "Personal data",
+            "Claims files"
+          ],
+          "geographicFootprint": [
+            "United States"
+          ],
+          "regulatoryScope": [
+            "NYDFS"
+          ],
+          "hasSubcontractors": false,
+          "fourthParties": null,
+          "onboardedAt": null,
+          "lastReviewDate": "2026-09-15T01:03:06.668Z",
+          "nextReviewDate": "2026-12-15T00:25:30.831Z",
+          "terminatedAt": null,
+          "createdAt": "2026-09-15T00:25:30.835Z",
+          "updatedAt": "2026-09-15T01:03:06.669Z"
+        }
+      }
+    },
+    {
+      "name": "intelligence.reconcile",
+      "status": 200,
+      "ms": null,
+      "payload": {
+        "lifecycle": "RESOLVED_BY_SOURCE",
+        "current": false,
+        "positive": [
+          "INT-00014",
+          "INT-00008",
+          "INT-00007",
+          "INT-00006",
+          "INT-00003"
+        ]
+      }
+    },
+    {
+      "name": "run.historical",
+      "status": "SUCCEEDED",
+      "ms": null,
+      "payload": {
+        "publicId": "RUN-00004",
+        "automationPublicId": "AUT-00004",
+        "automationName": "Intelligence Critical Attention",
+        "version": 1,
+        "status": "SUCCEEDED",
+        "triggerEvent": "intelligence.critical_attention",
+        "sourceModel": "IntelligenceItem",
+        "sourceId": "dcc718bf-35c3-41ee-b103-3d06be8f6416",
+        "sourcePublicId": "INT-00011",
+        "preview": false,
+        "humanApprovalRequired": true,
+        "nextActorLabel": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+        "timezoneUsed": "America/New_York",
+        "retryCount": 0,
+        "startedAt": "2026-09-15T02:19:34.969Z",
+        "completedAt": "2026-09-15T02:19:35.290Z",
+        "durationMs": 321,
+        "whatTriggered": "intelligence.critical_attention",
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "intelligence.priority",
+            "reason": "Equals CRITICAL_ATTENTION.",
+            "matched": true,
+            "observed": "CRITICAL_ATTENTION"
+          }
+        ],
+        "whatSupremeDid": [
+          "CREATE_REVIEW_REQUEST",
+          "NOTIFY_OWNER"
+        ],
+        "whatSupremeDidNotDo": [
+          "Accept risk",
+          "Approve vendor",
+          "Close finding",
+          "Declare compliance",
+          "Approve AI",
+          "Change residual risk",
+          "Make a legal conclusion"
+        ],
+        "whoNeedsToAct": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+        "whatFailed": [],
+        "willRetry": false,
+        "href": "/automation/runs/RUN-00004",
+        "workItems": [
+          {
+            "publicId": "WRK-00005",
+            "title": "Intelligence Critical Attention: Critical finding is open",
+            "kind": "REVIEW",
+            "status": "OPEN",
+            "dueAt": "2026-09-20T02:19:35.268Z",
+            "sourceHref": "/intelligence/INT-00011",
+            "humanRequired": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "preview",
+      "status": 200,
+      "ms": 185,
+      "payload": {
+        "label": "PREVIEW \u2014 NO ACTIONS EXECUTED",
+        "preview": true,
+        "writes": false,
+        "wouldTrigger": true,
+        "conditionsMatched": false,
+        "conditions": [
+          {
+            "field": "intelligence.priority",
+            "matched": false,
+            "reason": "Does not equal CRITICAL_ATTENTION."
+          }
+        ],
+        "actionsThatWouldRun": [],
+        "humanApprovalRequired": true,
+        "humanBoundary": {
+          "label": "Required on the authoritative Risk, Control, or Finding record \u2014 not on the Intelligence item",
+          "before": "source_decision",
+          "required": true
+        },
+        "timezoneUsed": "America/New_York",
+        "source": {
+          "model": "IntelligenceItem",
+          "id": "6c409ef2-51c3-42d6-823e-081d53e52277"
+        }
+      }
+    },
+    {
+      "name": "compliance.gap",
+      "status": 201,
+      "ms": null,
+      "payload": {
+        "publicId": "GAP-00001",
+        "status": "OPEN"
+      }
+    },
+    {
+      "name": "compliance.run",
+      "status": 1,
+      "ms": null,
+      "payload": {
+        "publicId": "RUN-00005",
+        "automationPublicId": "AUT-00005",
+        "automationName": "Compliance gap opened",
+        "version": 1,
+        "status": "SUCCEEDED",
+        "triggerEvent": "compliance.gap.opened",
+        "sourceModel": "ComplianceGap",
+        "sourceId": "e7d39221-e3df-43ed-8e84-737f038cb6db",
+        "sourcePublicId": "GAP-00001",
+        "preview": false,
+        "humanApprovalRequired": true,
+        "nextActorLabel": "Required before a requirement is marked compliant",
+        "timezoneUsed": "UTC",
+        "retryCount": 0,
+        "startedAt": "2026-09-15T02:19:39.623Z",
+        "completedAt": "2026-09-15T02:19:40.641Z",
+        "durationMs": 1018,
+        "whatTriggered": "compliance.gap.opened",
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "owner.exists",
+            "reason": "Condition is true.",
+            "matched": true,
+            "observed": true
+          }
+        ],
+        "whatSupremeDid": [
+          "CREATE_REVIEW_REQUEST",
+          "NOTIFY_OWNER"
+        ],
+        "whatSupremeDidNotDo": [
+          "Accept risk",
+          "Approve vendor",
+          "Close finding",
+          "Declare compliance",
+          "Approve AI",
+          "Change residual risk",
+          "Make a legal conclusion"
+        ],
+        "whoNeedsToAct": "Required before a requirement is marked compliant",
+        "whatFailed": [],
+        "willRetry": false,
+        "href": "/automation/runs/RUN-00005",
+        "workItems": [
+          {
+            "publicId": "WRK-00006",
+            "title": "Compliance gap opened: Automation closure compliance gap",
+            "kind": "REVIEW",
+            "status": "OPEN",
+            "dueAt": "2026-09-22T02:19:39.640Z",
+            "sourceHref": "/compliance/gaps",
+            "humanRequired": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "privacy.rights",
+      "status": 201,
+      "ms": null,
+      "payload": {
+        "publicId": "DSR-00001",
+        "status": "Received"
+      }
+    },
+    {
+      "name": "privacy.run",
+      "status": 1,
+      "ms": null,
+      "payload": {
+        "publicId": "RUN-00006",
+        "automationPublicId": "AUT-00006",
+        "automationName": "Privacy deadline reminder",
+        "version": 1,
+        "status": "SUCCEEDED",
+        "triggerEvent": "privacy.deadline.approaching",
+        "sourceModel": "PrivacyRightsRequest",
+        "sourceId": "a4f3cf6f-1fdf-4ea7-8580-2b36c4dd600d",
+        "sourcePublicId": "DSR-00001",
+        "preview": false,
+        "humanApprovalRequired": true,
+        "nextActorLabel": "Required before a privacy request is closed or a transfer is declared valid",
+        "timezoneUsed": "UTC",
+        "retryCount": 0,
+        "startedAt": "2026-09-15T02:19:41.739Z",
+        "completedAt": "2026-09-15T02:19:42.555Z",
+        "durationMs": 816,
+        "whatTriggered": "privacy.deadline.approaching",
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "owner.exists",
+            "reason": "Condition is true.",
+            "matched": true,
+            "observed": true
+          }
+        ],
+        "whatSupremeDid": [
+          "CREATE_REMINDER",
+          "NOTIFY_OWNER"
+        ],
+        "whatSupremeDidNotDo": [
+          "Accept risk",
+          "Approve vendor",
+          "Close finding",
+          "Declare compliance",
+          "Approve AI",
+          "Change residual risk",
+          "Make a legal conclusion"
+        ],
+        "whoNeedsToAct": "Required before a privacy request is closed or a transfer is declared valid",
+        "whatFailed": [],
+        "willRetry": false,
+        "href": "/automation/runs/RUN-00006",
+        "workItems": [
+          {
+            "publicId": "WRK-00007",
+            "title": "Privacy deadline reminder: DSR-00001",
+            "kind": "REMINDER",
+            "status": "OPEN",
+            "dueAt": "2026-09-18T02:19:41.750Z",
+            "sourceHref": "/privacy-ops/rights",
+            "humanRequired": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "ai.system",
+      "status": 201,
+      "ms": null,
+      "payload": {
+        "publicId": "AI-00001",
+        "lifecycle": "PROPOSED"
+      }
+    },
+    {
+      "name": "ai.reviewAt",
+      "status": 200,
+      "ms": null,
+      "payload": {
+        "publicId": "AI-00001",
+        "lifecycle": "PROPOSED"
+      }
+    },
+    {
+      "name": "ai.run",
+      "status": 1,
+      "ms": null,
+      "payload": {
+        "publicId": "RUN-00007",
+        "automationPublicId": "AUT-00007",
+        "automationName": "AI review due",
+        "version": 1,
+        "status": "SUCCEEDED",
+        "triggerEvent": "ai.approval.due",
+        "sourceModel": "AiSystem",
+        "sourceId": "604af4e1-6e0d-42c2-8d2b-3dab5eae13a2",
+        "sourcePublicId": "AI-00001",
+        "preview": false,
+        "humanApprovalRequired": true,
+        "nextActorLabel": "Required before an AI system is approved or restricted",
+        "timezoneUsed": "UTC",
+        "retryCount": 0,
+        "startedAt": "2026-09-15T02:19:45.315Z",
+        "completedAt": "2026-09-15T02:19:45.368Z",
+        "durationMs": 53,
+        "whatTriggered": "ai.approval.due",
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "owner.exists",
+            "reason": "Condition is true.",
+            "matched": true,
+            "observed": true
+          }
+        ],
+        "whatSupremeDid": [
+          "CREATE_REVIEW_REQUEST",
+          "NOTIFY_OWNER"
+        ],
+        "whatSupremeDidNotDo": [
+          "Accept risk",
+          "Approve vendor",
+          "Close finding",
+          "Declare compliance",
+          "Approve AI",
+          "Change residual risk",
+          "Make a legal conclusion"
+        ],
+        "whoNeedsToAct": "Required before an AI system is approved or restricted",
+        "whatFailed": [],
+        "willRetry": false,
+        "href": "/automation/runs/RUN-00007",
+        "workItems": [
+          {
+            "publicId": "WRK-00008",
+            "title": "AI review due: Automation closure review model",
+            "kind": "REVIEW",
+            "status": "OPEN",
+            "dueAt": "2026-09-29T02:19:45.324Z",
+            "sourceHref": "/ai-governance",
+            "humanRequired": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "other.signup",
+      "status": 201,
+      "ms": null,
+      "payload": {
+        "org": "446de21f-0e95-4778-87bb-517c0872d787"
+      }
+    },
+    {
+      "name": "cross-tenant.run",
+      "status": 404,
+      "ms": null,
+      "payload": {
+        "success": false,
+        "error": {
+          "type": "ApiError",
+          "message": "Execution not found",
+          "statusCode": 404,
+          "timestamp": "2026-09-15T02:19:46.508Z",
+          "requestId": "00d3ce3a-049b-4588-8904-2b32963838d4"
+        }
+      }
+    },
+    {
+      "name": "cross-tenant.work",
+      "status": 404,
+      "ms": null,
+      "payload": {
+        "success": false,
+        "error": {
+          "type": "ApiError",
+          "message": "Work item not found",
+          "statusCode": 404,
+          "timestamp": "2026-09-15T02:19:46.715Z",
+          "requestId": "15b14a47-99a5-4227-ab4c-93c9f9a33b02"
+        }
+      }
+    },
+    {
+      "name": "forged.org",
+      "status": 403,
+      "ms": null,
+      "payload": {
+        "success": false,
+        "error": {
+          "type": "ApiError",
+          "message": "Cannot act on another organization",
+          "statusCode": 403,
+          "timestamp": "2026-09-15T02:19:46.916Z",
+          "requestId": "9264b220-af94-47c2-8425-6f57e2cba241"
+        }
+      }
+    },
+    {
+      "name": "cross-tenant.leak",
+      "status": false,
+      "ms": null,
+      "payload": {
+        "status": 200,
+        "count": 0
+      }
+    },
+    {
+      "name": "viewer.invite",
+      "status": 201,
+      "ms": null,
+      "payload": {
+        "invitation": {
+          "id": "c94bf4c1-e876-433f-a473-2c1ac8bd31d0",
+          "email": "auto-viewer-1789438787@eliteadjustersny.com",
+          "role": "VIEWER",
+          "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+          "invitedById": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+          "tokenHash": "[redacted]",
+          "status": "PENDING",
+          "expiresAt": "2026-09-22T02:19:47.336Z",
+          "acceptedAt": null,
+          "createdAt": "2026-09-15T02:19:47.337Z",
+          "emailProvider": null,
+          "providerMessageId": null,
+          "emailDeliveryStatus": null,
+          "emailSentAt": null,
+          "emailDeliveredAt": null,
+          "emailFailedAt": null,
+          "emailLastError": null
+        },
+        "emailStatus": "ACCEPTED",
+        "delivery": "sent"
+      }
+    },
+    {
+      "name": "axe.home",
+      "status": "PASS",
+      "ms": null,
+      "payload": {
+        "serious": 0,
+        "error": null
+      }
+    },
+    {
+      "name": "axe.detail",
+      "status": "PASS",
+      "ms": null,
+      "payload": {
+        "serious": 0,
+        "error": null
+      }
+    },
+    {
+      "name": "axe.run",
+      "status": "PASS",
+      "ms": null,
+      "payload": {
+        "serious": 0,
+        "error": null
+      }
+    },
+    {
+      "name": "axe.templates",
+      "status": "PASS",
+      "ms": null,
+      "payload": {
+        "serious": 0,
+        "error": null
+      }
+    },
+    {
+      "name": "axe.builder",
+      "status": "PASS",
+      "ms": null,
+      "payload": {
+        "serious": 0,
+        "error": null
+      }
+    },
+    {
+      "name": "keyboard.builder",
+      "status": "PASS",
+      "ms": null,
+      "payload": [
+        "A:",
+        "DIV:",
+        "DIV:",
+        "DIV:",
+        "DIV:",
+        "DIV:",
+        "DIV:",
+        "DIV:"
+      ]
+    }
+  ],
+  "timings": {
+    "home": 414,
+    "list": 212,
+    "runs": 277,
+    "templates": 227,
+    "intelligence.workspace": 1440,
+    "run.detail": 354,
+    "preview": 185
+  },
+  "axe": [
+    {
+      "route": "home",
+      "path": "/automation",
+      "serious": 0,
+      "violations": [],
+      "error": null
+    },
+    {
+      "route": "detail",
+      "path": "/automation/AUT-00004",
+      "serious": 0,
+      "violations": [],
+      "error": null
+    },
+    {
+      "route": "run",
+      "path": "/automation/runs/RUN-00004",
+      "serious": 0,
+      "violations": [],
+      "error": null
+    },
+    {
+      "route": "templates",
+      "path": "/automation/templates",
+      "serious": 0,
+      "violations": [],
+      "error": null
+    },
+    {
+      "route": "builder",
+      "path": "/automation/new",
+      "serious": 0,
+      "violations": [],
+      "error": null
+    }
+  ],
+  "screenshots": [
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-detail-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-run-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-templates-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-builder-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-home-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-detail-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-run-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-templates-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-builder-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-home-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-detail-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-run-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-templates-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-builder-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-detail-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-run-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-templates-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-builder-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-home-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-detail-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-run-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-templates-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-automation/closure-builder-1920.png"
+  ],
+  "hostedFrontendSha": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+  "hostedApiSha": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+  "health": {
+    "status": "degraded",
+    "timestamp": "2026-09-15T02:19:29.614Z",
+    "uptime": 74.950330244,
+    "version": "1.0.0",
+    "runtimeMode": "production",
+    "deploymentEnvironment": "staging",
+    "environment": "staging",
+    "gitSha": "64b9cd93e29c362ec94438f4b5d836e93e9be8f4",
+    "checks": {
+      "mongodb": {
+        "status": "degraded",
+        "message": "NOT_CONFIGURED",
+        "responseTime": 0
+      },
+      "memory": {
+        "status": "up",
+        "message": "Memory usage normal",
+        "details": {
+          "heapUsedMB": 85,
+          "heapTotalMB": 101,
+          "usagePercent": "84.16"
+        },
+        "responseTime": 0
+      },
+      "circuitBreakers": {
+        "status": "up",
+        "message": "All circuit breakers operational",
+        "details": {
+          "totalBreakers": 0
+        },
+        "responseTime": 0
+      },
+      "storage": {
+        "status": "up",
+        "message": "Object storage s3",
+        "details": {
+          "provider": "s3",
+          "malwareScanning": "PENDING",
+          "malwareProvider": "CONNECTED",
+          "downloadPolicy": {
+            "allowPendingDownloads": false,
+            "allowUnscannedDownloads": false
+          }
+        },
+        "responseTime": 0
+      },
+      "email": {
+        "status": "degraded",
+        "message": "DEGRADED",
+        "responseTime": 0
+      },
+      "stripe": {
+        "status": "up",
+        "message": "Stripe test mode connected",
+        "responseTime": 0
+      },
+      "ai": {
+        "status": "degraded",
+        "message": "NOT_CONFIGURED",
+        "responseTime": 1
+      },
+      "malware": {
+        "status": "up",
+        "message": "CONNECTED",
+        "details": {
+          "downloadPolicy": {
+            "allowPendingDownloads": false,
+            "allowUnscannedDownloads": false
+          }
+        },
+        "responseTime": 1
+      },
+      "automation": {
+        "status": "up",
+        "message": "Automation queue connected",
+        "responseTime": 1
+      },
+      "redis": {
+        "status": "up",
+        "message": "Redis connection healthy",
+        "responseTime": 1
+      },
+      "postgres": {
+        "status": "up",
+        "message": "PostgreSQL connection healthy",
+        "responseTime": 2
+      }
+    },
+    "memory": {
+      "rss": 215162880,
+      "heapUsed": 89217896,
+      "heapTotal": 105492480
+    }
+  },
+  "scheduledChecks": {
+    "status": "CONNECTED",
+    "message": "Scheduled checks are connected. Delivery is at-least-once. Successful execution is not simulated."
+  }
+}
