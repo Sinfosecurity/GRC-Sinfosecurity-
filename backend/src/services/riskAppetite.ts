@@ -8,6 +8,7 @@
 
 import logger from '../config/logger';
 import { prisma } from '../config/database';
+import { requireAppetiteBreachForOrganization } from '../security/tenantOwnership';
 
 interface CreateRiskAppetiteInput {
     organizationId: string;
@@ -341,12 +342,14 @@ class RiskAppetiteService {
      * Resolve a breach
      */
     async resolveBreach(
+        organizationId: string,
         breachId: string,
         mitigationPlan: string,
         mitigationOwner: string,
         resolutionNotes?: string
     ) {
         logger.info(`Resolving risk appetite breach ${breachId}`);
+        await requireAppetiteBreachForOrganization(organizationId, breachId);
 
         const breach = await prisma.riskAppetiteBreach.update({
             where: { id: breachId },

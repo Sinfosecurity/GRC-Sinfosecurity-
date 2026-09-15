@@ -360,6 +360,7 @@ router.post('/breaches/:breachId/resolve',
     async (req: any, res) => {
         try {
             const breach = await riskAppetiteService.resolveBreach(
+                req.user.organizationId,
                 req.params.breachId,
                 req.body.mitigationPlan,
                 req.body.mitigationOwner,

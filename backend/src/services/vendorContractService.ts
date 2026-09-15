@@ -6,6 +6,8 @@ import logger from '../config/logger';
 
 import { ContractStatus, ContractType, Prisma, SLAMetricType, SLAStatus, VendorContract, VendorIssueStatus } from '@prisma/client';
 import { prisma } from '../config/database';
+import { ApiError } from '../middleware/errorHandler';
+import { omitForeignParent, requireContractForOrganization, requireVendorForOrganization } from '../security/tenantOwnership';
 
 export interface CreateContractInput {
     vendorId: string;
@@ -40,6 +42,7 @@ class VendorContractService {
      * Create new contract
      */
     async createContract(data: CreateContractInput): Promise<VendorContract> {
+        await requireVendorForOrganization(data.organizationId, data.vendorId);
         const contract = await prisma.vendorContract.create({
             data: {
                 ...data,
@@ -62,7 +65,7 @@ class VendorContractService {
      * Get contract by ID
      */
     async getContractById(contractId: string, organizationId: string) {
-        return await prisma.vendorContract.findFirst({
+        const contract = await prisma.vendorContract.findFirst({
             where: {
                 id: contractId,
                 organizationId,
@@ -74,6 +77,11 @@ class VendorContractService {
                 },
             },
         });
+        if (!contract) return contract;
+        return {
+            ...contract,
+            vendor: omitForeignParent(organizationId, contract.vendor),
+        };
     }
 
     /**
@@ -178,6 +186,7 @@ class VendorContractService {
      * Track SLA metric
      */
     async trackSLAMetric(data: {
+        organizationId: string;
         contractId: string;
         metricName: string;
         metricType: string;
@@ -189,6 +198,7 @@ class VendorContractService {
         periodEnd: Date;
         notes?: string;
     }) {
+        await requireContractForOrganization(data.organizationId, data.contractId);
         const status: SLAStatus = data.actual >= data.target ? SLAStatus.MET : SLAStatus.BREACHED;
 
         const slaData: Prisma.SLATrackingUncheckedCreateInput = {
@@ -212,8 +222,8 @@ class VendorContractService {
 
         // If SLA breached, create vendor issue
         if (status === 'BREACHED') {
-            const contract = await prisma.vendorContract.findUnique({
-                where: { id: data.contractId },
+            const contract = await prisma.vendorContract.findFirst({
+                where: { id: data.contractId, organizationId: data.organizationId },
                 include: { vendor: true },
             });
 
@@ -306,13 +316,13 @@ class VendorContractService {
     /**
      * Analyze contract risk clauses
      */
-    async analyzeContractRisk(contractId: string) {
-        const contract = await prisma.vendorContract.findUnique({
-            where: { id: contractId },
+    async analyzeContractRisk(contractId: string, organizationId: string) {
+        const contract = await prisma.vendorContract.findFirst({
+            where: { id: contractId, organizationId },
         });
 
         if (!contract) {
-            throw new Error('Contract not found');
+            throw new ApiError(404, 'Contract not found');
         }
 
         const risks: any[] = [];

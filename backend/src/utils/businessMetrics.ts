@@ -310,8 +310,9 @@ export class BusinessMetricsCollector {
     /**
      * Get current metrics summary
      */
-    async getMetricsSummary() {
+    async getMetricsSummary(organizationId: string) {
         try {
+            const tenant = { organizationId };
             const [
                 totalVendors,
                 totalAssessments,
@@ -319,11 +320,11 @@ export class BusinessMetricsCollector {
                 totalControls,
                 totalIncidents,
             ] = await Promise.all([
-                prisma.vendor.count(),
-                prisma.vendorAssessment.count(),
-                prisma.risk.count(),
-                prisma.control.count(),
-                prisma.incident.count(),
+                prisma.vendor.count({ where: tenant }),
+                prisma.vendorAssessment.count({ where: tenant }),
+                prisma.risk.count({ where: tenant }),
+                prisma.control.count({ where: tenant }),
+                prisma.incident.count({ where: tenant }),
             ]);
 
             return {

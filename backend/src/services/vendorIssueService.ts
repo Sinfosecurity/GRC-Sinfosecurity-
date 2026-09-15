@@ -13,6 +13,7 @@ import {
     findingClosedEmail,
     remediationRequestedEmail,
 } from './transactionalEmail';
+import { omitForeignParent, requireAssessmentForOrganization, requireVendorForOrganization } from '../security/tenantOwnership';
 
 export interface CreateVendorIssueInput {
     vendorId: string;
@@ -29,6 +30,7 @@ export interface CreateVendorIssueInput {
     impactDescription?: string;
     assignedTo?: string;
     targetRemediationDate?: Date;
+    assessmentId?: string;
 }
 
 class VendorIssueService {
@@ -36,6 +38,10 @@ class VendorIssueService {
      * Create vendor issue
      */
     async createIssue(data: CreateVendorIssueInput): Promise<VendorIssue> {
+        await requireVendorForOrganization(data.organizationId, data.vendorId);
+        if (data.assessmentId) {
+            await requireAssessmentForOrganization(data.organizationId, data.assessmentId, data.vendorId);
+        }
         const createData: Prisma.VendorIssueUncheckedCreateInput = {
             vendorId: data.vendorId,
             organizationId: data.organizationId,
@@ -51,6 +57,7 @@ class VendorIssueService {
             impactDescription: data.impactDescription,
             assignedTo: data.assignedTo,
             targetRemediationDate: data.targetRemediationDate,
+            assessmentId: data.assessmentId,
             status: VendorIssueStatus.OPEN,
             identifiedDate: new Date(),
         };
@@ -109,7 +116,7 @@ class VendorIssueService {
      * Get issue by ID
      */
     async getIssueById(issueId: string, organizationId: string) {
-        return await prisma.vendorIssue.findFirst({
+        const issue = await prisma.vendorIssue.findFirst({
             where: {
                 id: issueId,
                 organizationId,
@@ -118,6 +125,11 @@ class VendorIssueService {
                 vendor: true,
             },
         });
+        if (!issue) return issue;
+        return {
+            ...issue,
+            vendor: omitForeignParent(organizationId, issue.vendor),
+        };
     }
 
     /**
@@ -128,6 +140,7 @@ class VendorIssueService {
         organizationId: string,
         status?: VendorIssueStatus
     ) {
+        await requireVendorForOrganization(organizationId, vendorId);
         return await prisma.vendorIssue.findMany({
             where: {
                 vendorId,
@@ -142,17 +155,24 @@ class VendorIssueService {
     }
 
     async listOrganizationIssues(organizationId: string, filters?: { status?: VendorIssueStatus; severity?: IssueSeverity; vendorId?: string }) {
-        return prisma.vendorIssue.findMany({
+        if (filters?.vendorId) {
+            await requireVendorForOrganization(organizationId, filters.vendorId);
+        }
+        const rows = await prisma.vendorIssue.findMany({
             where: {
                 organizationId,
                 ...(filters?.status ? { status: filters.status } : {}),
                 ...(filters?.severity ? { severity: filters.severity } : {}),
                 ...(filters?.vendorId ? { vendorId: filters.vendorId } : {}),
             },
-            include: { vendor: { select: { id: true, name: true, tier: true } } },
+            include: { vendor: { select: { id: true, name: true, tier: true, organizationId: true } } },
             orderBy: [{ severity: 'desc' }, { identifiedDate: 'desc' }],
             take: 300,
         });
+        return rows.map((row) => ({
+            ...row,
+            vendor: omitForeignParent(organizationId, row.vendor),
+        }));
     }
 
     /**

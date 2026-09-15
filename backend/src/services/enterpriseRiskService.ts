@@ -13,6 +13,7 @@ import {
 } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import { requireBusinessUnitForOrganization } from '../security/tenantOwnership';
 import { recordAudit } from './auditEventService';
 
 function audit(input: Omit<Parameters<typeof recordAudit>[0], 'result'>) {
@@ -384,6 +385,9 @@ export const enterpriseRiskService = {
         dimensions?: Array<{ dimension: string; rating: number }>;
     }) {
         if (!input.title?.trim()) throw new ApiError(400, 'A risk title is required');
+        if (input.businessUnitId) {
+            await requireBusinessUnitForOrganization(organizationId, input.businessUnitId);
+        }
         await ensureMethodology(organizationId);
         const publicId = await nextId(organizationId, 'RISK');
         const scored = calculateEnterpriseRisk({
@@ -441,6 +445,12 @@ export const enterpriseRiskService = {
         if (typeof input.trend === 'string') data.trend = input.trend as never;
         if (typeof input.treatmentStrategy === 'string') data.treatmentStrategy = input.treatmentStrategy as EnterpriseTreatmentStrategy;
         if (typeof input.reviewDate === 'string') data.reviewDate = new Date(input.reviewDate);
+        if (typeof input.businessUnitId === 'string') {
+            await requireBusinessUnitForOrganization(organizationId, input.businessUnitId);
+            data.businessUnit = { connect: { id: input.businessUnitId } };
+        } else if (input.businessUnitId === null) {
+            data.businessUnit = { disconnect: true };
+        }
         const updated = await prisma.enterpriseRisk.update({ where: { id: current.id }, data });
         if (input.likelihood || input.impact) {
             await scoreRisk(organizationId, current.id, 'Inputs changed', actorUserId);
@@ -758,6 +768,9 @@ export const enterpriseRiskService = {
         businessUnitId?: string;
         statement?: string;
     }) {
+        if (input.businessUnitId) {
+            await requireBusinessUnitForOrganization(organizationId, input.businessUnitId);
+        }
         const row = await prisma.enterpriseRiskAppetite.create({
             data: {
                 organizationId,

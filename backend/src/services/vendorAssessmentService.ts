@@ -10,6 +10,7 @@ import logger from '../config/logger';
 import { getActiveTemplate, getTemplateById } from './questionnaireService';
 import { ApiError } from '../middleware/errorHandler';
 import { calculateVendorRiskAt, RISK_SCORE_VERSION } from './deterministicRiskEngine';
+import { omitForeignParent, requireVendorForOrganization } from '../security/tenantOwnership';
 
 export interface QuestionTemplate {
     id: string;
@@ -75,6 +76,7 @@ class VendorAssessmentService {
      * Create a new vendor assessment
      */
     async createAssessment(data: CreateAssessmentInput): Promise<VendorAssessment> {
+        await requireVendorForOrganization(data.organizationId, data.vendorId);
         const { templateId, ...rest } = data;
         const template = templateId
             ? await getTemplateById(data.organizationId, templateId)
@@ -126,7 +128,7 @@ class VendorAssessmentService {
      * Get assessment by ID with all responses
      */
     async getAssessmentById(assessmentId: string, organizationId: string) {
-        return await prisma.vendorAssessment.findFirst({
+        const assessment = await prisma.vendorAssessment.findFirst({
             where: {
                 id: assessmentId,
                 organizationId,
@@ -141,12 +143,18 @@ class VendorAssessmentService {
                 },
             },
         });
+        if (!assessment) return assessment;
+        return {
+            ...assessment,
+            vendor: omitForeignParent(organizationId, assessment.vendor),
+        };
     }
 
     /**
      * List assessments for a vendor
      */
     async listVendorAssessments(vendorId: string, organizationId: string) {
+        await requireVendorForOrganization(organizationId, vendorId);
         const rows = await prisma.vendorAssessment.findMany({
             where: {
                 vendorId,
@@ -170,12 +178,15 @@ class VendorAssessmentService {
             where: { organizationId },
             orderBy: { createdAt: 'desc' },
             include: {
-                vendor: { select: { id: true, name: true, tier: true } },
+                vendor: { select: { id: true, name: true, tier: true, organizationId: true } },
                 _count: { select: { responses: true, evidence: true } },
             },
             take: 200,
         });
-        return this.withTemplateLabels(rows);
+        return this.withTemplateLabels(rows.map((row) => ({
+            ...row,
+            vendor: omitForeignParent(organizationId, row.vendor),
+        })));
     }
 
     private async withTemplateLabels<T extends { templateId?: string | null; templateVersion?: string | null }>(rows: T[]) {

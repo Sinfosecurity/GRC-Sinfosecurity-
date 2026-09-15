@@ -5,6 +5,8 @@
 
 import { prisma } from '../config/database';
 import logger from '../config/logger';
+import { ApiError } from '../middleware/errorHandler';
+import { requireVendorForOrganization } from '../security/tenantOwnership';
 
 class VendorRiskHistoryService {
     /**
@@ -17,23 +19,26 @@ class VendorRiskHistoryService {
         changedBy?: string
     ) {
         try {
-            // Get current vendor state
-            const vendor = await prisma.vendor.findUnique({
-                where: { id: vendorId },
+            await requireVendorForOrganization(organizationId, vendorId);
+            const vendor = await prisma.vendor.findFirst({
+                where: { id: vendorId, organizationId },
                 include: {
                     issues: {
                         where: {
+                            organizationId,
                             status: { in: ['OPEN', 'IN_PROGRESS'] },
                         },
                     },
                     monitoringRecords: {
                         where: {
+                            organizationId,
                             requiresAction: true,
                             resolvedAt: null,
                         },
                     },
                     contracts: {
                         where: {
+                            organizationId,
                             status: 'ACTIVE',
                         },
                     },
@@ -41,7 +46,7 @@ class VendorRiskHistoryService {
             });
 
             if (!vendor) {
-                throw new Error('Vendor not found');
+                throw new ApiError(404, 'Vendor not found');
             }
 
             // Count issues and alerts
@@ -79,7 +84,7 @@ class VendorRiskHistoryService {
             });
         } catch (error: any) {
             logger.error('Failed to record risk snapshot', { error: error.message, vendorId });
-            // Don't throw - this is a background operation
+            if (error instanceof ApiError) throw error;
         }
     }
 
@@ -88,6 +93,7 @@ class VendorRiskHistoryService {
      */
     async getVendorRiskTrend(vendorId: string, organizationId: string, months: number = 12) {
         try {
+            await requireVendorForOrganization(organizationId, vendorId);
             const startDate = new Date();
             startDate.setMonth(startDate.getMonth() - months);
 

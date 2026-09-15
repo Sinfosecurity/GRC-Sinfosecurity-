@@ -294,6 +294,7 @@ router.post('/vendors/:vendorId/findings', requirePermission(PERMISSIONS['findin
             category: req.body.category || 'Security',
             assignedTo: req.body.assignedTo,
             targetRemediationDate: req.body.targetRemediationDate ? new Date(req.body.targetRemediationDate) : undefined,
+            assessmentId: typeof req.body.assessmentId === 'string' ? req.body.assessmentId : undefined,
         });
         res.status(201).json({ success: true, data });
     } catch (error) {

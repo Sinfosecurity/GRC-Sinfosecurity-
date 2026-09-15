@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express';
 import continuousMonitoringService from '../services/continuousMonitoringService';
-import { authenticate } from '../middleware/auth';
+import { authenticate, AuthRequest } from '../middleware/auth';
 import { monitoringService } from '../utils/monitoring';
 import { errorTracker } from '../utils/errorTracking';
 import { performanceReporter } from '../utils/performanceMonitoring';
 import { alertManager } from '../utils/alerting';
 import { businessMetricsCollector } from '../utils/businessMetrics';
 import { asyncHandler } from '../middleware/errorHandler';
+import { requireTenant } from '../security/tenant';
 import logger from '../config/logger';
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const router = express.Router();
  * Get comprehensive monitoring dashboard data
  */
 router.get('/dashboard', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = requireTenant((req as AuthRequest).user);
     const [
         performanceReport,
         errorStats,
@@ -25,7 +27,7 @@ router.get('/dashboard', authenticate, asyncHandler(async (req: Request, res: Re
         performanceReporter.generateReport(),
         errorTracker.getStatistics(),
         alertManager.getStatistics(),
-        businessMetricsCollector.getMetricsSummary(),
+        businessMetricsCollector.getMetricsSummary(organizationId),
     ]);
 
     res.json({
@@ -86,7 +88,8 @@ router.post('/alerts/:alertId/resolve', authenticate, asyncHandler(async (req: R
  * Get business metrics summary
  */
 router.get('/business', authenticate, asyncHandler(async (req: Request, res: Response) => {
-    const summary = await businessMetricsCollector.getMetricsSummary();
+    const organizationId = requireTenant((req as AuthRequest).user);
+    const summary = await businessMetricsCollector.getMetricsSummary(organizationId);
     res.json(summary);
 }));
 

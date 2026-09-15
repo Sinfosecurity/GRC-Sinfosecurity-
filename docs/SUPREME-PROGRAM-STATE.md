@@ -8,9 +8,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-15
 
-**CURRENT ITEM:** #21 Enterprise Identity — SSO / SCIM / JIT
+**CURRENT ITEM:** Independent Review Remediation Sprint 1 — Tenant Isolation (C-2 / H-1). #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS. #22 is not authorized.
+**CURRENT ITEM STATUS:** ENGINEERING IMPLEMENTED — PRODUCT LEADERSHIP REVIEW REQUIRED. Starting SHA `a051d04268b58bf57f83d9b53b4b8c62bf284ff5`. Cursor reports FIX IMPLEMENTED, not C-2/H-1 CLOSED. C-1 and H-2–H-7 remain out of scope. Next remediation sprint is not authorized. #21 remains PAUSED. #22 is not authorized.
+
+**#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 
 **#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED (workbook / lifecycle reconciliation). Starting SHA `2904038f5607a3ed791eb9c2162fab6f70effafa`. Lifecycle `c7fc99527bfaf2a8f096168fad59890120b7b33d`. Email `e6fd30c794058767e6a7698ff3b47766ef7c8156`. Hosted API / CI `e250493c7dba98d882701acd83907f8cfaff1886`. Hosted frontend `980f717d19d527acc9567eb330c03a540841e4b4`. Hosted golden vendor `VND-2026-0013`. Hosted email previews captured; Gmail/Outlook/Apple Mail not tested. Cursor does not declare #12 PASS. Do not alter leftover #12 working-tree files.
 

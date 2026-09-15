@@ -274,7 +274,7 @@ router.post('/:id/offboard', authorize('ADMIN'), validateUUID('id'), async (req:
         );
         res.json({ message: 'Vendor offboarded successfully' });
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 
@@ -294,7 +294,7 @@ router.get('/:id/assessments', async (req: any, res) => {
         );
         res.json(assessments);
     } catch (error: any) {
-        res.status(500).json(publicServerErrorPayload(error));
+        res.status(error.statusCode || 500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -312,7 +312,7 @@ router.post('/:id/assessments', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_M
 
         res.status(201).json(assessment);
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 
@@ -564,13 +564,14 @@ router.get('/contracts/expiring', async (req: any, res) => {
 router.post('/contracts/:contractId/sla', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('contractId'), validateBody(RecordSLAIncidentSchema), async (req: any, res) => {
     try {
         const slaRecord = await vendorContractService.trackSLAMetric({
-            contractId: req.params.contractId,
             ...req.body,
+            organizationId: req.user.organizationId,
+            contractId: req.params.contractId,
         });
 
         res.status(201).json(slaRecord);
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 
@@ -580,10 +581,10 @@ router.post('/contracts/:contractId/sla', authorize('ADMIN', 'COMPLIANCE_OFFICER
  */
 router.get('/contracts/:contractId/risk-analysis', async (req: any, res) => {
     try {
-        const analysis = await vendorContractService.analyzeContractRisk(req.params.contractId);
+        const analysis = await vendorContractService.analyzeContractRisk(req.params.contractId, req.user.organizationId);
         res.json(analysis);
     } catch (error: any) {
-        res.status(500).json(publicServerErrorPayload(error));
+        res.status(error.statusCode || 500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -623,7 +624,7 @@ router.get('/:id/issues', async (req: any, res) => {
         );
         res.json(issues);
     } catch (error: any) {
-        res.status(500).json(publicServerErrorPayload(error));
+        res.status(error.statusCode || 500).json(publicServerErrorPayload(error));
     }
 });
 
@@ -642,7 +643,7 @@ router.post('/:id/issues', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGE
 
         res.status(201).json(issue);
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        res.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 

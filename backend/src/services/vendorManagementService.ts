@@ -148,26 +148,29 @@ class VendorManagementService {
                 },
                 include: {
                     assessments: {
+                        where: { organizationId },
                         orderBy: { createdAt: 'desc' },
                         take: 5,
                     },
                     contracts: {
-                        where: { status: 'ACTIVE' },
+                        where: { status: 'ACTIVE', organizationId },
                     },
                     issues: {
-                        where: { status: { in: ['OPEN', 'IN_PROGRESS'] } },
+                        where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, organizationId },
                     },
                     documents: {
+                        where: { organizationId },
                         orderBy: { uploadedAt: 'desc' },
                         take: 10,
                     },
                     contacts: true,
                     monitoringRecords: {
-                        where: { requiresAction: true },
+                        where: { requiresAction: true, organizationId },
                         orderBy: { detectedAt: 'desc' },
                         take: 5,
                     },
                     reviews: {
+                        where: { organizationId },
                         orderBy: { reviewDate: 'desc' },
                         take: 3,
                     },
@@ -239,15 +242,16 @@ class VendorManagementService {
                 ],
                 include: {
                     assessments: {
+                        where: { organizationId },
                         orderBy: { createdAt: 'desc' },
                         take: 1,
                         select: { status: true, dueDate: true, completedAt: true },
                     },
                     _count: {
                         select: {
-                            assessments: true,
-                            issues: { where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } },
-                            contracts: { where: { status: 'ACTIVE' } },
+                            assessments: { where: { organizationId } },
+                            issues: { where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, organizationId } },
+                            contracts: { where: { status: 'ACTIVE', organizationId } },
                         },
                     },
                 },
@@ -632,12 +636,18 @@ class VendorManagementService {
         }
     ) {
         try {
-            // Use transaction to ensure atomicity
+            const existing = await prisma.vendor.findFirst({
+                where: { id: vendorId, organizationId },
+                select: { id: true },
+            });
+            if (!existing) {
+                throw new NotFoundError('Vendor', vendorId);
+            }
             await prisma.$transaction(async (tx) => {
-                // Check for open issues
                 const openIssues = await tx.vendorIssue.count({
                     where: {
                         vendorId,
+                        organizationId,
                         status: { in: ['OPEN', 'IN_PROGRESS'] },
                     },
                 });
@@ -688,7 +698,9 @@ class VendorManagementService {
             logger.info('Vendor offboarded successfully', { vendorId, organizationId });
         } catch (error: any) {
             logger.error('Failed to offboard vendor', { error: error.message, vendorId });
-            throw error instanceof BusinessLogicError ? error : handlePrismaError(error);
+            throw error instanceof BusinessLogicError || error instanceof NotFoundError
+                ? error
+                : handlePrismaError(error);
         }
     }
 }
