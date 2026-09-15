@@ -44,7 +44,7 @@ This is one Third Party product. Phase C was reused. No second TPRM model was cr
 - Unknown on privileged access returned 400: “Unknown cannot remain on a required scoping fact. Will the vendor have administrative or privileged access…” Ready to Send then 409 until intake completed.
 - All 8 workbook packs recommended. Baseline always required. Customize without rationale 400; customize with rationale recorded.
 - Copy secure link: deliveryMethod LINK, emailStatus “Not emailed”, emailTruth “not email delivery.” First activation 200, reuse 410, prior token after recopy 410.
-- Send email on `VND-2026-0014`: Email queued. Provider accepted/queued. Queued ≠ Delivered. Real inbox not tested.
+- Send email on `VND-2026-0014`: Email queued. Provider accepted/queued. Queued ≠ Delivered. Real inbox not tested. Hosted template proof: `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`.
 - Vendor residual `supreme-risk-1.1.0`: 28 before submit, 100 after submit. Assessment control-gap 40.6% High. Register residual 100 matches workspace. Risk acceptance left residual at 100.
 - Finding `556e091c-9aeb-4d4f-aae8-9beecc83370f` confirmed, remediated, closed only after CLEAN evidence. Contract renewal 2028-02-08. Approve with conditions. Active. Reassessment started; 9 historical assessment rows preserved.
 

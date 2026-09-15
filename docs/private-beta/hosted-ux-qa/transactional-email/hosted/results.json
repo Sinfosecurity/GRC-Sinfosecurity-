@@ -1,0 +1,764 @@
+{
+  "checks": [
+    {
+      "name": "hosted-api-sha",
+      "result": "PASS",
+      "detail": "e250493c7dba98d882701acd83907f8cfaff1886"
+    },
+    {
+      "name": "hosted-frontend-sha",
+      "result": "PARTIAL",
+      "detail": "980f717d19d527acc9567eb330c03a540841e4b4"
+    },
+    {
+      "name": "password-reset-no-enumeration",
+      "result": "PASS",
+      "detail": "200/200 {\"success\": true, \"data\": {\"message\": \"If an account exists, a reset email will be sent.\"}} {\"success\": true, \"data\": {\"message\": \"If an account exists, a reset email will be sent.\"}}"
+    },
+    {
+      "name": "password-reset-no-raw-token",
+      "result": "PASS",
+      "detail": "{\"success\": true, \"data\": {\"message\": \"If an account exists, a reset email will be sent.\"}}"
+    },
+    {
+      "name": "email-previews",
+      "result": "PASS",
+      "detail": "200 sent=False"
+    },
+    {
+      "name": "email-inventory-count",
+      "result": "PASS",
+      "detail": "31"
+    },
+    {
+      "name": "preview-vendor.intake_assigned",
+      "result": "PASS",
+      "detail": "vendor.intake_assigned"
+    },
+    {
+      "name": "plain-text-vendor.intake_assigned",
+      "result": "PASS",
+      "detail": "Vendor onboarding requires your input\n\nJordan Requester has requested onboarding. Complete the internal intake so Suprem"
+    },
+    {
+      "name": "from-vendor.intake_assigned",
+      "result": "PASS",
+      "detail": "Supreme"
+    },
+    {
+      "name": "cta-vendor.intake_assigned",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-vendor.intake_assigned",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-vendor.intake_assigned",
+      "result": "PASS",
+      "detail": "missing=none subject=Action required: Complete vendor intake for Acme Cloud"
+    },
+    {
+      "name": "preview-vendor.invitation",
+      "result": "PASS",
+      "detail": "vendor.invitation"
+    },
+    {
+      "name": "plain-text-vendor.invitation",
+      "result": "PASS",
+      "detail": "Northwind Insurance has requested your participation\n\nHello Casey,\nNorthwind Insurance has invited your organization to "
+    },
+    {
+      "name": "from-vendor.invitation",
+      "result": "PASS",
+      "detail": "Northwind Insurance via Supreme"
+    },
+    {
+      "name": "cta-vendor.invitation",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-vendor.invitation",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-vendor.invitation",
+      "result": "PASS",
+      "detail": "missing=none subject=Action required: Complete your due diligence for Northwind Insurance"
+    },
+    {
+      "name": "preview-vendor.invitation_reminder",
+      "result": "PASS",
+      "detail": "vendor.invitation_reminder"
+    },
+    {
+      "name": "plain-text-vendor.invitation_reminder",
+      "result": "PASS",
+      "detail": "Your due diligence for Northwind Insurance is due soon\n\nHello Casey,\nNorthwind Insurance has invited your organization t"
+    },
+    {
+      "name": "from-vendor.invitation_reminder",
+      "result": "PASS",
+      "detail": "Northwind Insurance via Supreme"
+    },
+    {
+      "name": "cta-vendor.invitation_reminder",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-vendor.invitation_reminder",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-vendor.invitation_reminder",
+      "result": "PARTIAL",
+      "detail": "missing=['what next'] subject=Reminder: Your due diligence for Northwind Insurance is due September 22, 2026"
+    },
+    {
+      "name": "preview-vendor.clarification_requested",
+      "result": "PASS",
+      "detail": "vendor.clarification_requested"
+    },
+    {
+      "name": "plain-text-vendor.clarification_requested",
+      "result": "PASS",
+      "detail": "Northwind Insurance has asked for clarification\n\nHello Casey,\nNorthwind Insurance reviewed your submission and asked for"
+    },
+    {
+      "name": "from-vendor.clarification_requested",
+      "result": "PASS",
+      "detail": "Northwind Insurance via Supreme"
+    },
+    {
+      "name": "cta-vendor.clarification_requested",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-vendor.clarification_requested",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-vendor.clarification_requested",
+      "result": "PARTIAL",
+      "detail": "missing=['when due', 'what next'] subject=Action required: Clarification requested by Northwind Insurance"
+    },
+    {
+      "name": "preview-vendor.assessment_submitted",
+      "result": "PASS",
+      "detail": "vendor.assessment_submitted"
+    },
+    {
+      "name": "plain-text-vendor.assessment_submitted",
+      "result": "PASS",
+      "detail": "A vendor submission is ready for review\n\nAcme Cloud submitted Information Security Assessment. Review exceptions before "
+    },
+    {
+      "name": "from-vendor.assessment_submitted",
+      "result": "PASS",
+      "detail": "Supreme"
+    },
+    {
+      "name": "cta-vendor.assessment_submitted",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-vendor.assessment_submitted",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-vendor.assessment_submitted",
+      "result": "PASS",
+      "detail": "missing=none subject=Review required: Acme Cloud submitted due diligence"
+    },
+    {
+      "name": "preview-vendor.approval_required",
+      "result": "PASS",
+      "detail": "vendor.approval_required"
+    },
+    {
+      "name": "plain-text-vendor.approval_required",
+      "result": "PASS",
+      "detail": "A decision is required\n\nReview Acme Cloud inside Supreme. Approve, approve with conditions, or reject. This email does n"
+    },
+    {
+      "name": "from-vendor.approval_required",
+      "result": "PASS",
+      "detail": "Supreme"
+    },
+    {
+      "name": "cta-vendor.approval_required",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-vendor.approval_required",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-vendor.approval_required",
+      "result": "PASS",
+      "detail": "missing=none subject=Decision required: Review Acme Cloud for approval"
+    },
+    {
+      "name": "preview-automation.work",
+      "result": "PASS",
+      "detail": "automation.work"
+    },
+    {
+      "name": "plain-text-automation.work",
+      "result": "PASS",
+      "detail": "Work needs a person\n\nSupreme identified a vendor finding that is overdue.\n\nWork: Vendor finding needs review\nSource: Ven"
+    },
+    {
+      "name": "from-automation.work",
+      "result": "PASS",
+      "detail": "Supreme"
+    },
+    {
+      "name": "cta-automation.work",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-automation.work",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-automation.work",
+      "result": "PARTIAL",
+      "detail": "missing=['what next'] subject=Action required: Vendor finding needs review"
+    },
+    {
+      "name": "preview-auth.password_reset",
+      "result": "PASS",
+      "detail": "auth.password_reset"
+    },
+    {
+      "name": "plain-text-auth.password_reset",
+      "result": "PASS",
+      "detail": "Reset your Supreme password\n\nA password reset was requested for this Supreme account. Use the single-use link below. It "
+    },
+    {
+      "name": "from-auth.password_reset",
+      "result": "PASS",
+      "detail": "Supreme"
+    },
+    {
+      "name": "cta-auth.password_reset",
+      "result": "PASS",
+      "detail": "cta present; tokens redacted in capture"
+    },
+    {
+      "name": "no-live-token-auth.password_reset",
+      "result": "PASS",
+      "detail": "fixture token only"
+    },
+    {
+      "name": "quality-auth.password_reset",
+      "result": "PASS",
+      "detail": "missing=none subject=Action required: Reset your Supreme password"
+    },
+    {
+      "name": "platform-brand",
+      "result": "PASS",
+      "detail": "Supreme Action required: Complete vendor intake for Acme Cloud Northwind Insurance via Supreme Action required: Complete your due diligence for Northwind Insurance Northwind Insura"
+    },
+    {
+      "name": "via-supreme",
+      "result": "PASS",
+      "detail": "['Supreme', 'Northwind Insurance via Supreme', 'Northwind Insurance via Supreme', 'Northwind Insurance via Supreme', 'Supreme', 'Supreme', 'Supreme', 'Supreme']"
+    },
+    {
+      "name": "queued-not-delivered-copy",
+      "result": "PARTIAL",
+      "detail": "preview set does not include invitation-sent-internal"
+    },
+    {
+      "name": "vendor.intake_assigned-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor.intake_assigned-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-vendor.intake_assigned",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "vendor.invitation-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor.invitation-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-vendor.invitation",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "vendor.invitation_reminder-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor.invitation_reminder-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-vendor.invitation_reminder",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "vendor.clarification_requested-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor.clarification_requested-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-vendor.clarification_requested",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "vendor.assessment_submitted-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor.assessment_submitted-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-vendor.assessment_submitted",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "vendor.approval_required-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor.approval_required-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-vendor.approval_required",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "automation.work-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "automation.work-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-automation.work",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "auth.password_reset-desktop-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "auth.password_reset-mobile-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "axe-auth.password_reset",
+      "result": "FAIL",
+      "detail": "['color-contrast']"
+    },
+    {
+      "name": "regression-lifecycle",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-onboarding"
+    },
+    {
+      "name": "regression-graph",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/governance-graph"
+    },
+    {
+      "name": "regression-shared-controls",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/control-center"
+    },
+    {
+      "name": "regression-risk",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/risks"
+    },
+    {
+      "name": "regression-compliance",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/compliance"
+    },
+    {
+      "name": "regression-privacy",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/privacy-ops"
+    },
+    {
+      "name": "regression-ai",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/ai-governance"
+    },
+    {
+      "name": "regression-intelligence",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/intelligence"
+    },
+    {
+      "name": "regression-evidence",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/documents"
+    },
+    {
+      "name": "regression-premium-home",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/dashboard"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-intake_assigned-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-intake_assigned-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-invitation-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-invitation-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-invitation_reminder-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-invitation_reminder-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-clarification_requested-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-clarification_requested-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-assessment_submitted-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-assessment_submitted-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-approval_required-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-approval_required-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/automation-work-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/automation-work-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/auth-password_reset-desktop.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/auth-password_reset-mobile.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-lifecycle.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-graph.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-shared-controls.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-risk.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-compliance.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-privacy.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-ai.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-intelligence.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-evidence.png",
+    "docs/private-beta/hosted-ux-qa/transactional-email/hosted/regression-premium-home.png"
+  ],
+  "previews": [
+    {
+      "templateKey": "vendor.intake_assigned",
+      "subject": "Action required: Complete vendor intake for Acme Cloud",
+      "fromName": "Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-intake_assigned.html"
+    },
+    {
+      "templateKey": "vendor.invitation",
+      "subject": "Action required: Complete your due diligence for Northwind Insurance",
+      "fromName": "Northwind Insurance via Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-invitation.html"
+    },
+    {
+      "templateKey": "vendor.invitation_reminder",
+      "subject": "Reminder: Your due diligence for Northwind Insurance is due September 22, 2026",
+      "fromName": "Northwind Insurance via Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-invitation_reminder.html"
+    },
+    {
+      "templateKey": "vendor.clarification_requested",
+      "subject": "Action required: Clarification requested by Northwind Insurance",
+      "fromName": "Northwind Insurance via Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-clarification_requested.html"
+    },
+    {
+      "templateKey": "vendor.assessment_submitted",
+      "subject": "Review required: Acme Cloud submitted due diligence",
+      "fromName": "Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-assessment_submitted.html"
+    },
+    {
+      "templateKey": "vendor.approval_required",
+      "subject": "Decision required: Review Acme Cloud for approval",
+      "fromName": "Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/vendor-approval_required.html"
+    },
+    {
+      "templateKey": "automation.work",
+      "subject": "Action required: Vendor finding needs review",
+      "fromName": "Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/automation-work.html"
+    },
+    {
+      "templateKey": "auth.password_reset",
+      "subject": "Action required: Reset your Supreme password",
+      "fromName": "Supreme",
+      "htmlFile": "docs/private-beta/hosted-ux-qa/transactional-email/hosted/auth-password_reset.html"
+    }
+  ],
+  "sha": {
+    "api": "e250493c7dba98d882701acd83907f8cfaff1886",
+    "frontend": "980f717d19d527acc9567eb330c03a540841e4b4",
+    "required": "e250493c7dba98d882701acd83907f8cfaff1886"
+  },
+  "quality": [
+    {
+      "templateKey": "vendor.intake_assigned",
+      "result": "PASS",
+      "missing": [],
+      "subject": "Action required: Complete vendor intake for Acme Cloud",
+      "fromName": "Supreme"
+    },
+    {
+      "templateKey": "vendor.invitation",
+      "result": "PASS",
+      "missing": [],
+      "subject": "Action required: Complete your due diligence for Northwind Insurance",
+      "fromName": "Northwind Insurance via Supreme"
+    },
+    {
+      "templateKey": "vendor.invitation_reminder",
+      "result": "PARTIAL",
+      "missing": [
+        "what next"
+      ],
+      "subject": "Reminder: Your due diligence for Northwind Insurance is due September 22, 2026",
+      "fromName": "Northwind Insurance via Supreme"
+    },
+    {
+      "templateKey": "vendor.clarification_requested",
+      "result": "PARTIAL",
+      "missing": [
+        "when due",
+        "what next"
+      ],
+      "subject": "Action required: Clarification requested by Northwind Insurance",
+      "fromName": "Northwind Insurance via Supreme"
+    },
+    {
+      "templateKey": "vendor.assessment_submitted",
+      "result": "PASS",
+      "missing": [],
+      "subject": "Review required: Acme Cloud submitted due diligence",
+      "fromName": "Supreme"
+    },
+    {
+      "templateKey": "vendor.approval_required",
+      "result": "PASS",
+      "missing": [],
+      "subject": "Decision required: Review Acme Cloud for approval",
+      "fromName": "Supreme"
+    },
+    {
+      "templateKey": "automation.work",
+      "result": "PARTIAL",
+      "missing": [
+        "what next"
+      ],
+      "subject": "Action required: Vendor finding needs review",
+      "fromName": "Supreme"
+    },
+    {
+      "templateKey": "auth.password_reset",
+      "result": "PASS",
+      "missing": [],
+      "subject": "Action required: Reset your Supreme password",
+      "fromName": "Supreme"
+    }
+  ],
+  "inventory": [
+    {
+      "key": "vendor.intake_assigned",
+      "name": "Internal vendor intake assignment",
+      "present": true
+    },
+    {
+      "key": "vendor.tier_review",
+      "name": "Analyst tier confirmation",
+      "present": true
+    },
+    {
+      "key": "vendor.invitation",
+      "name": "Vendor due-diligence invitation",
+      "present": true
+    },
+    {
+      "key": "vendor.invitation_reminder",
+      "name": "Vendor invitation reminder / resend",
+      "present": true
+    },
+    {
+      "key": "vendor.invitation_sent_internal",
+      "name": "Internal notice that invitation email was sent",
+      "present": true
+    },
+    {
+      "key": "vendor.clarification_requested",
+      "name": "Clarification requested",
+      "present": true
+    },
+    {
+      "key": "vendor.assessment_submitted",
+      "name": "Assessment submitted for review",
+      "present": true
+    },
+    {
+      "key": "vendor.assessment_overdue",
+      "name": "Vendor assessment overdue",
+      "present": true
+    },
+    {
+      "key": "vendor.approval_required",
+      "name": "Approval / decision required",
+      "present": true
+    },
+    {
+      "key": "vendor.activated",
+      "name": "Vendor approved / activated",
+      "present": true
+    },
+    {
+      "key": "vendor.remediation_requested_internal",
+      "name": "Internal remediation requested",
+      "present": true
+    },
+    {
+      "key": "vendor.remediation_requested_vendor",
+      "name": "Vendor-facing remediation request",
+      "present": true
+    },
+    {
+      "key": "vendor.remediation_due_soon",
+      "name": "Remediation due soon",
+      "present": true
+    },
+    {
+      "key": "vendor.remediation_overdue",
+      "name": "Remediation overdue",
+      "present": true
+    },
+    {
+      "key": "vendor.assessment_due_soon",
+      "name": "Assessment due soon",
+      "present": true
+    },
+    {
+      "key": "vendor.finding_assigned",
+      "name": "Finding assigned",
+      "present": true
+    },
+    {
+      "key": "vendor.finding_closed",
+      "name": "Finding closed after validation",
+      "present": true
+    },
+    {
+      "key": "vendor.risk_acceptance_review",
+      "name": "Dedicated risk-acceptance review request",
+      "present": false
+    },
+    {
+      "key": "vendor.reassessment",
+      "name": "Dedicated reassessment invitation",
+      "present": false
+    },
+    {
+      "key": "compliance.attestation_assigned",
+      "name": "Compliance attestation assigned",
+      "present": true
+    },
+    {
+      "key": "automation.work",
+      "name": "Automation-created work / reminder",
+      "present": true
+    },
+    {
+      "key": "account.invitation",
+      "name": "Account activation invitation",
+      "present": true
+    },
+    {
+      "key": "auth.password_reset",
+      "name": "Password reset",
+      "present": true
+    },
+    {
+      "key": "ops.alert",
+      "name": "Administrative / security / evidence scan alert",
+      "present": true
+    },
+    {
+      "key": "legacy.high_risk_incident",
+      "name": "High-risk incident (legacy notification service)",
+      "present": true
+    },
+    {
+      "key": "legacy.compliance_deadline",
+      "name": "Compliance deadline (legacy notification service)",
+      "present": true
+    },
+    {
+      "key": "legacy.assessment_overdue",
+      "name": "Assessment overdue (legacy notification service)",
+      "present": true
+    },
+    {
+      "key": "legacy.control_failure",
+      "name": "Control failure (legacy notification service)",
+      "present": true
+    },
+    {
+      "key": "privacy.deadline",
+      "name": "Dedicated privacy deadline email",
+      "present": false
+    },
+    {
+      "key": "ai.approval",
+      "name": "Dedicated AI Governance approval email",
+      "present": false
+    },
+    {
+      "key": "intelligence.attention",
+      "name": "Dedicated Intelligence attention email",
+      "present": false
+    }
+  ]
+}

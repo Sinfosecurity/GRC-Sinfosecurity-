@@ -3,7 +3,7 @@
 **Item:** Premium Transactional Email Experience inside #12 Third Party lifecycle reconciliation  
 **Scope:** Email templates, brand, and delivery truth only. Application pages were not redesigned.  
 **#20:** no functional expansion. **#21:** not authorized.  
-**Hosted proof:** not captured in this sprint. Local fixtures and `GET /api/system/email-previews` are not hosted inbox proof. Do not treat this file as hosted PASS.
+**Hosted proof:** captured 2026-09-15 from staging `GET /api/v1/system/email-previews` (`sent=false`) on API `e250493` / frontend `980f717`. See `hosted/`. That is hosted template proof, not Gmail/Outlook/Apple Mail inbox proof. Do not treat this file as #12 PASS.
 
 ## Shared design system
 
@@ -77,12 +77,12 @@ Local fixture HTML/text (non-sensitive example data) is under `previews/`. Previ
 
 ## Hosted evidence index
 
-Pending staging capture of:
+Captured under `hosted/` from the staging preview endpoint. Preview tokens redacted. Real inbox, spam placement, and provider Delivered were not observed. Staging email health was DEGRADED.
 
-1. Internal vendor-intake assignment
-2. Vendor due-diligence invitation
-3. Assessment / remediation / review
-4. Approval / decision
-5. Automation work notification if a published automation fires
+1. Internal vendor-intake assignment — `hosted/vendor-intake_assigned-*`
+2. Vendor due-diligence invitation — `hosted/vendor-invitation-*`
+3. Reminder / clarification / submitted review — `hosted/vendor-invitation_reminder-*`, `hosted/vendor-clarification_requested-*`, `hosted/vendor-assessment_submitted-*`
+4. Approval / decision — `hosted/vendor-approval_required-*`
+5. Automation work template only — `hosted/automation-work-*`. #20 was not resumed. No new automation run was fired.
 
 Do not paste activation tokens in screenshots.

@@ -217,11 +217,11 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Prior private-testing acceptance (2026-09-14, SHA `97d79fffcd38b59527bd1d9f926bb613766de998`) remains historical. Hosted reconciliation walk recorded 2026-09-15 on Elite Claims `VND-2026-0013`. Cursor does not declare #12 PASS.
+**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Prior private-testing acceptance (2026-09-14, SHA `97d79fffcd38b59527bd1d9f926bb613766de998`) remains historical. Hosted reconciliation walk recorded 2026-09-15 on Elite Claims `VND-2026-0013`. Hosted email preview proof recorded the same day. Cursor does not declare #12 PASS.
 
 **CERTIFICATION SHA:** Starting `2904038f5607a3ed791eb9c2162fab6f70effafa`. Lifecycle `c7fc99527bfaf2a8f096168fad59890120b7b33d`. Email remainder `e6fd30c794058767e6a7698ff3b47766ef7c8156`. Hosted API / CI tip `e250493c7dba98d882701acd83907f8cfaff1886`. Hosted frontend `980f717d19d527acc9567eb330c03a540841e4b4`. These are not the same SHA.
 
-**EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Copy link is not email sent. Phase C reused on the same vendor. #20 remains paused.
+**EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. Hosted email proof `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Real inbox not tested. Copy link is not email sent. Phase C reused on the same vendor. #20 remains paused.
 
 **NEXT ACTION:** Product Leadership hosted review of the workbook / lifecycle reconciliation evidence. Do not resume #20. Do not start #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS.
 

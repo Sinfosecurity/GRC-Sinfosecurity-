@@ -1,0 +1,15 @@
+Your due diligence for Northwind Insurance is due soon
+
+Hello Casey,
+Northwind Insurance has invited your organization to complete a third-party due-diligence assessment through Supreme. Once you start, you can complete assigned questionnaires, save and resume, upload supporting evidence, and submit your response.
+
+Organization: Acme Cloud
+Requested by: Northwind Insurance
+Due date: September 22, 2026
+
+Continue assessment:
+https://example.test/vendor-assessment/activate?token=REDACTED
+
+This secure invitation is intended for the named recipient and can be used once. It expires if it is not used in time. If you were not expecting this request, contact your customer.
+
+Supreme Governance Platform · Secure third-party assessment portal

@@ -1,0 +1,21 @@
+Vendor onboarding requires your input
+
+Jordan Requester has requested onboarding. Complete the internal intake so Supreme can calculate inherent risk and recommend the due-diligence package.
+
+Vendor: Acme Cloud
+Vendor ID: VND-2026-0042
+Assigned role: Business Owner
+Due date: September 22, 2026
+
+Complete vendor intake:
+https://example.test/vendor-onboarding/VND-2026-0042
+
+What happens next
+1. Supreme evaluates inherent risk.
+2. Supreme recommends the vendor tier and due-diligence package.
+3. An analyst confirms the recommendation.
+4. The vendor can then be invited to complete due diligence.
+
+If you were not expecting this assignment, contact the requester inside Supreme.
+
+Supreme Governance Platform
