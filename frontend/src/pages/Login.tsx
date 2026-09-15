@@ -87,12 +87,11 @@ export default function Login() {
                                     required
                                 />
                             </div>
-                            {checked && sso && (
+                            {sso && (
                                 <a className="mkt-btn mkt-btn-gold" href={`${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:4000/api/v1' : '/api/v1')}/auth/sso/start/${sso.publicId}`}>
                                     {sso.continueLabel || 'Continue with Company SSO'}
                                 </a>
                             )}
-                            {checked && (
                             <div className="mkt-field">
                                 <label htmlFor="password">Password</label>
                                 <input
@@ -105,7 +104,6 @@ export default function Login() {
                                     required={!sso}
                                 />
                             </div>
-                            )}
                             {error && <p role="alert">{error}</p>}
                             <button className="mkt-btn mkt-btn-gold" type="submit" disabled={loading}>
                                 {loading ? 'Continuing…' : checked ? 'Sign in' : 'Continue'}
