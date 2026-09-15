@@ -399,16 +399,16 @@ export const supremeAutomationService = {
         const host = process.env.REDIS_HOST;
         const url = process.env.REDIS_URL;
         if (!host && !url && process.env.NODE_ENV !== 'production') {
-            return { status: 'NOT_CONFIGURED', message: 'Scheduled queue is not configured. Event-driven runs still execute in process. Successful execution is not simulated.' };
+            return { status: 'NOT_CONFIGURED', message: 'Scheduled checks are not configured. Event-driven runs still execute. Successful execution is not simulated.' };
         }
         try {
             const { redisClient } = await import('../config/database');
             if (!redisClient) {
-                return { status: 'NOT_CONFIGURED', message: 'Queue worker is not connected. Event-driven runs still execute in process.' };
+                return { status: 'NOT_CONFIGURED', message: 'Scheduled checks are not connected. Event-driven runs still execute.' };
             }
-            return { status: 'CONNECTED', message: 'Queue connected. Scheduled scans use the existing Redis worker. Delivery is at-least-once.' };
+            return { status: 'CONNECTED', message: 'Scheduled checks are connected. Delivery is at-least-once. Successful execution is not simulated.' };
         } catch {
-            return { status: 'DEGRADED', message: 'Queue status could not be confirmed. Event-driven runs still execute in process.' };
+            return { status: 'DEGRADED', message: 'Scheduled-check status could not be confirmed. Event-driven runs still execute.' };
         }
     },
 

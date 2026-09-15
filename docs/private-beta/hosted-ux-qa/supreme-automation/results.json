@@ -1,0 +1,310 @@
+{
+  "startingSha": "75e743b37a4fd75af10e7f82e87e0790c3dc8ed2",
+  "implementationSha": "7a5548eb4bd881562eadf64d801bff77a5d1d7b5",
+  "org": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+  "steps": [
+    {
+      "name": "publish:high-finding-remediation-follow-up",
+      "status": "ACTIVE",
+      "payload": {
+        "publicId": "AUT-00001",
+        "human": {
+          "label": "Required before the finding is closed or residual risk is changed",
+          "before": "finding_closure",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "publish:failed-control-test-review",
+      "status": "ACTIVE",
+      "payload": {
+        "publicId": "AUT-00002",
+        "human": {
+          "label": "Required before control effectiveness or compliance is declared",
+          "before": "control_effectiveness",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "publish:risk-acceptance-expiry",
+      "status": "ACTIVE",
+      "payload": {
+        "publicId": "AUT-00003",
+        "human": {
+          "label": "Required before risk is accepted, renewed, or residual score is changed",
+          "before": "risk_acceptance",
+          "required": true
+        }
+      }
+    },
+    {
+      "name": "finding.created",
+      "status": "OPEN",
+      "payload": {
+        "id": "41669f12-704d-41e8-bc01-a2ddb6c0d68c",
+        "severity": "HIGH"
+      }
+    },
+    {
+      "name": "preview",
+      "status": "PREVIEW \u2014 NO ACTIONS EXECUTED",
+      "payload": {
+        "label": "PREVIEW \u2014 NO ACTIONS EXECUTED",
+        "preview": true,
+        "writes": false,
+        "wouldTrigger": true,
+        "conditionsMatched": true,
+        "conditions": [
+          {
+            "field": "finding.severity",
+            "matched": true,
+            "observed": "HIGH",
+            "reason": "In HIGH, CRITICAL."
+          }
+        ],
+        "actionsThatWouldRun": [
+          "CREATE_REVIEW_REQUEST",
+          "NOTIFY_OWNER",
+          "CREATE_REMINDER"
+        ],
+        "humanApprovalRequired": true,
+        "humanBoundary": {
+          "label": "Required before the finding is closed or residual risk is changed",
+          "before": "finding_closure",
+          "required": true
+        },
+        "timezoneUsed": "America/New_York",
+        "source": {
+          "model": "VendorIssue",
+          "id": "41669f12-704d-41e8-bc01-a2ddb6c0d68c",
+          "href": "/findings"
+        }
+      }
+    },
+    {
+      "name": "scan1",
+      "status": 200,
+      "payload": {
+        "scanned": 1,
+        "runs": 1
+      }
+    },
+    {
+      "name": "finding.runs.after-scan1",
+      "status": 1,
+      "payload": [
+        {
+          "publicId": "RUN-00001",
+          "automationPublicId": "AUT-00001",
+          "automationName": "High finding remediation follow-up",
+          "version": 1,
+          "status": "SUCCEEDED",
+          "triggerEvent": "finding.overdue",
+          "sourceModel": "VendorIssue",
+          "sourceId": "41669f12-704d-41e8-bc01-a2ddb6c0d68c",
+          "sourcePublicId": null,
+          "preview": false,
+          "humanApprovalRequired": true,
+          "nextActorLabel": "Required before the finding is closed or residual risk is changed",
+          "timezoneUsed": "America/New_York",
+          "retryCount": 0,
+          "startedAt": "2026-09-15T02:01:58.930Z",
+          "completedAt": "2026-09-15T02:02:00.669Z",
+          "durationMs": 1739,
+          "whatTriggered": "finding.overdue",
+          "conditionsMatched": true,
+          "conditions": [
+            {
+              "field": "finding.severity",
+              "reason": "In HIGH, CRITICAL.",
+              "matched": true,
+              "observed": "HIGH"
+            }
+          ],
+          "whatSupremeDid": [
+            "CREATE_REVIEW_REQUEST",
+            "NOTIFY_OWNER",
+            "CREATE_REMINDER"
+          ],
+          "whatSupremeDidNotDo": [
+            "Accept risk",
+            "Approve vendor",
+            "Close finding",
+            "Declare compliance",
+            "Approve AI",
+            "Change residual risk"
+          ],
+          "whoNeedsToAct": "Required before the finding is closed or residual risk is changed",
+          "whatFailed": [],
+          "willRetry": false,
+          "href": "/automation/runs/RUN-00001",
+          "workItems": [
+            {
+              "publicId": "WRK-00001",
+              "title": "High finding remediation follow-up: Automation golden finding overdue",
+              "kind": "REVIEW",
+              "status": "OPEN",
+              "dueAt": "2026-09-22T02:01:58.943Z",
+              "sourceHref": "/findings",
+              "humanRequired": true
+            },
+            {
+              "publicId": "WRK-00002",
+              "title": "High finding remediation follow-up: Automation golden finding overdue",
+              "kind": "REMINDER",
+              "status": "OPEN",
+              "dueAt": "2026-09-22T02:01:59.657Z",
+              "sourceHref": "/findings",
+              "humanRequired": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "finding.runs.after-scan2",
+      "status": 1,
+      "payload": {
+        "duplicateSuppressedExpected": true
+      }
+    },
+    {
+      "name": "control.test.fail",
+      "status": 201,
+      "payload": {
+        "id": "ad163c40-b939-4987-b9f5-a867af4f649c",
+        "result": "FAIL",
+        "error": null
+      }
+    },
+    {
+      "name": "risk.acceptance",
+      "status": 201,
+      "payload": {
+        "decision": {
+          "id": "30e9b5a5-8fed-498c-a123-5ec174f45d5e",
+          "organizationId": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e",
+          "riskId": "905243a8-eeee-4598-9e43-3ecfeb6bd40a",
+          "decision": "ACCEPT",
+          "status": "APPROVED",
+          "decisionMakerUserId": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+          "authority": "Risk Manager review required",
+          "rationale": "Hosted #20 proof only. Automation must not renew this acceptance.",
+          "conditions": null,
+          "approvedAt": "2026-09-15T02:02:02.100Z",
+          "expiresAt": "2026-09-22T02:02:01.743Z",
+          "evidenceObjectIds": null,
+          "createdAt": "2026-09-15T02:02:02.101Z"
+        },
+        "residualScore": 12,
+        "residualUnchanged": true
+      }
+    },
+    {
+      "name": "runs.total",
+      "status": 3,
+      "payload": [
+        {
+          "publicId": "RUN-00003",
+          "trigger": "risk.acceptance.expiring",
+          "status": "SUCCEEDED",
+          "human": true,
+          "did": [
+            "CREATE_DECISION_PACKAGE",
+            "NOTIFY_OWNER"
+          ],
+          "didNot": [
+            "Accept risk",
+            "Approve vendor",
+            "Close finding",
+            "Declare compliance"
+          ]
+        },
+        {
+          "publicId": "RUN-00002",
+          "trigger": "control.test.failed",
+          "status": "SUCCEEDED",
+          "human": true,
+          "did": [
+            "CREATE_REVIEW_REQUEST",
+            "NOTIFY_OWNER"
+          ],
+          "didNot": [
+            "Accept risk",
+            "Approve vendor",
+            "Close finding",
+            "Declare compliance"
+          ]
+        },
+        {
+          "publicId": "RUN-00001",
+          "trigger": "finding.overdue",
+          "status": "SUCCEEDED",
+          "human": true,
+          "did": [
+            "CREATE_REVIEW_REQUEST",
+            "NOTIFY_OWNER",
+            "CREATE_REMINDER"
+          ],
+          "didNot": [
+            "Accept risk",
+            "Approve vendor",
+            "Close finding",
+            "Declare compliance"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "finding.still-open",
+      "status": "OPEN",
+      "payload": {
+        "id": "41669f12-704d-41e8-bc01-a2ddb6c0d68c"
+      }
+    },
+    {
+      "name": "finding.human-close",
+      "status": 200,
+      "payload": "CLOSED"
+    },
+    {
+      "name": "other-tenant-signup",
+      "status": 201,
+      "payload": {
+        "org": "919ce260-f98a-4fa0-a2a0-7bb5fdd80acb"
+      }
+    },
+    {
+      "name": "cross-tenant-automation",
+      "status": 404,
+      "payload": {
+        "type": "ApiError",
+        "message": "Automation not found",
+        "statusCode": 404,
+        "timestamp": "2026-09-15T02:02:05.218Z",
+        "requestId": "bd0556ef-f1fd-4a7d-81c0-dba4e8b33bee"
+      }
+    },
+    {
+      "name": "forged-org",
+      "status": 403,
+      "payload": {
+        "type": "ApiError",
+        "message": "Cannot act on another organization",
+        "statusCode": 403,
+        "timestamp": "2026-09-15T02:02:05.413Z",
+        "requestId": "3d83581f-d2fc-4afb-ade1-ec56af604f88"
+      }
+    },
+    {
+      "name": "cross-tenant-executions-leak",
+      "status": false,
+      "payload": {
+        "status": 200,
+        "count": 0
+      }
+    }
+  ]
+}
