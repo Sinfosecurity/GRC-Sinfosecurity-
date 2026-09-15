@@ -163,3 +163,7 @@ That file must not contain connection strings, password hashes, tokens, or objec
 ## Hosted PostgreSQL lifecycle risk
 
 `supreme-risk-staging-pg` is a **free** Render database previously recorded as expiring **2026-10-12T05:47:40Z**. It is not acceptable for production. Do not purchase or upgrade without approval.
+
+## #19 Supreme Intelligence
+
+`IntelligenceItem`, `IntelligenceHistory`, and `IntelligenceCounter` are listed in `AUTHORITATIVE_TABLES` because they hold operational lifecycle and historical reasoning. They remain derived: if those rows are lost, regenerate from live source tables. Source vendors, risks, findings, controls, evidence metadata, compliance, privacy, and AI records stay authoritative. Evidence bodies are never stored on intelligence rows.

@@ -94,6 +94,9 @@ export const reportLimiter = createCategoryLimiter('report');
 /** Interactive governance-graph reads. Separate from PDF report generation. */
 export const graphLimiter = createCategoryLimiter('graph');
 
+/** Intelligence browsing. Same class as graph, not the report-generation limit. */
+export const intelligenceLimiter = createCategoryLimiter('intelligence');
+
 export const billingLimiter = createCategoryLimiter('billing');
 
 export const adminLimiter = createCategoryLimiter('admin');

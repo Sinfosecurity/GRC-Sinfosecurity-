@@ -103,6 +103,9 @@ export const AUTHORITATIVE_TABLES = [
     'AiEnterpriseRiskLink',
     'AiHistory',
     'AiCounter',
+    'IntelligenceItem',
+    'IntelligenceHistory',
+    'IntelligenceCounter',
 ] as const;
 
 export type RecoveryManifest = {

@@ -9,6 +9,9 @@ describe('RBAC', () => {
     });
 
     it('denies sensitive actions to viewers', () => {
+        expect(hasPermission('VIEWER', PERMISSIONS['intelligence.read'])).toBe(true);
+        expect(hasPermission('VIEWER', PERMISSIONS['intelligence.acknowledge'])).toBe(false);
+        expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['intelligence.acknowledge'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['approval.decide'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['risk.accept'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['user.manage'])).toBe(false);

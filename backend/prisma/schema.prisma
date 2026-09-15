@@ -159,6 +159,8 @@ model Organization {
   aiUseCases                  AiUseCase[]
   aiModelProviders            AiModelProvider[]
   aiHistory                   AiHistory[]
+  intelligenceItems           IntelligenceItem[]
+  intelligenceHistory         IntelligenceHistory[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -5209,6 +5211,105 @@ model AiHistory {
 }
 
 model AiCounter {
+  organizationId String
+  kind           String
+  next           Int    @default(1)
+
+  @@id([organizationId, kind])
+}
+
+enum IntelligencePriority {
+  CRITICAL_ATTENTION
+  HIGH_ATTENTION
+  REVIEW
+  POSITIVE
+}
+
+enum IntelligenceLifecycle {
+  NEW
+  ACKNOWLEDGED
+  UNDER_REVIEW
+  RESOLVED_BY_SOURCE
+  SUPERSEDED
+}
+
+enum IntelligenceDomain {
+  THIRD_PARTY
+  RISK
+  CONTROL
+  EVIDENCE
+  COMPLIANCE
+  PRIVACY
+  AI_GOVERNANCE
+  DECISION
+  CROSS_PLATFORM
+}
+
+enum IntelligencePolarity {
+  NEGATIVE
+  POSITIVE
+}
+
+model IntelligenceItem {
+  id                 String                 @id @default(uuid())
+  organization       Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  publicId           String
+  groupingKey        String
+  ruleId             String
+  ruleVersion        String
+  domain             IntelligenceDomain
+  changeType         String
+  priority           IntelligencePriority
+  polarity           IntelligencePolarity
+  lifecycle          IntelligenceLifecycle  @default(NEW)
+  title              String
+  summary            String
+  whyItMatters       String
+  reviewGuidance     String
+  ownerLabel         String?
+  ownerUserId        String?
+  sourceProduct      String
+  sourceModel        String
+  sourceId           String
+  sourcePublicId     String?
+  sourceTimestamp    DateTime
+  generatedAt        DateTime               @default(now())
+  resolvedAt         DateTime?
+  supersededById     String?
+  fingerprint        String
+  facts              Json
+  affected           Json
+  links              Json
+  roleAudience       String[]
+  requiredPermissions String[]
+  current            Boolean                @default(true)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@unique([organizationId, groupingKey, ruleId])
+  @@index([organizationId, current, priority])
+  @@index([organizationId, domain, current])
+  @@index([organizationId, lifecycle])
+  @@index([organizationId, sourceModel, sourceId])
+}
+
+model IntelligenceHistory {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  itemId         String
+  eventType      String
+  summary        String
+  actorUserId    String?
+  payload        Json?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, itemId, createdAt])
+}
+
+model IntelligenceCounter {
   organizationId String
   kind           String
   next           Int    @default(1)

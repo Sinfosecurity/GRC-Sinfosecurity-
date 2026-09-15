@@ -8,7 +8,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import { color } from '../design/tokens';
 import { useAuth } from '../contexts/AuthContext';
-import { aiGovernanceAPI, complianceAPI, ermAPI, privacyAPI, tprmAPI, vendorAPI } from '../services/api';
+import { aiGovernanceAPI, complianceAPI, ermAPI, intelligenceAPI, privacyAPI, tprmAPI, vendorAPI } from '../services/api';
 
 type AttentionItem = {
     id: string;
@@ -150,6 +150,7 @@ export default function Dashboard() {
         privacy?: { count?: number; items: AttentionItem[] };
         ai?: { count?: number; items: AttentionItem[] };
     }>({});
+    const [intelligence, setIntelligence] = useState<Array<{ publicId: string; title: string; whyItMatters: string; href: string; priorityLabel?: string }>>([]);
 
     useEffect(() => {
         let cancelled = false;
@@ -162,9 +163,10 @@ export default function Dashboard() {
                     if (key === 'privacy') return privacyAPI.dashboard();
                     return aiGovernanceAPI.dashboard();
                 });
-                const [attention, statistics, ...domainSettled] = await Promise.allSettled([
+                const [attention, statistics, teaser, ...domainSettled] = await Promise.allSettled([
                     tprmAPI.attention(),
                     vendorAPI.getStatistics(),
+                    intelligenceAPI.teaser(),
                     ...domainCalls,
                 ]);
                 if (cancelled) return;
@@ -184,6 +186,9 @@ export default function Dashboard() {
                 if (statistics.status === 'fulfilled') {
                     const body = statistics.value.data;
                     setStats(body.summary || body);
+                }
+                if (teaser.status === 'fulfilled') {
+                    setIntelligence(teaser.value.data.data?.items || []);
                 }
                 const nextDomain: typeof domain = {};
                 wanted.forEach((key, index) => {
@@ -329,7 +334,24 @@ export default function Dashboard() {
                 </Surface>
             </Stack>
 
-            <Typography variant="h5" sx={{ mb: 1.5 }}>Needs attention</Typography>
+            {intelligence.length > 0 && (
+                <Surface>
+                    <Typography variant="h5">Top Intelligence</Typography>
+                    <Typography variant="body2" sx={{ mb: 1.5 }}>Material change across Supreme. This is not your work queue.</Typography>
+                    <Stack spacing={1} sx={{ mb: 1.5 }}>
+                        {intelligence.map((row) => (
+                            <Box key={row.publicId}>
+                                <Typography variant="subtitle1">{row.title}</Typography>
+                                <Typography variant="body2">{row.whyItMatters}</Typography>
+                                <Button onClick={() => navigate(row.href)} sx={{ mt: 0.5 }}>Open intelligence</Button>
+                            </Box>
+                        ))}
+                    </Stack>
+                    <Button onClick={() => navigate('/intelligence')}>Open Intelligence</Button>
+                </Surface>
+            )}
+
+            <Typography variant="h5" sx={{ mb: 1.5, mt: intelligence.length ? 3 : 0 }}>Needs attention</Typography>
             <QueryState
                 loading={loading}
                 error={error}

@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** Phase A–C walkthroughs remain in `docs/private-beta/hosted-ux-qa/supreme-tprm-onboarding/`, `supreme-tprm-phase-b/`, `supreme-tprm-phase-c/`. Vendor invitation→submit re-walk: `docs/private-beta/hosted-ux-qa/premium-experience/vendor-rewalk/`. Invitation provider accept is not inbox delivery.
 
-**NEXT ACTION:** Keep #12 accepted as private testing only. Do not start #19 or #20. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 accepted as private testing only. #19 is the current authorized item. Do not start #20. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -325,13 +325,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** AI system register, human-authoritative decisions, no fake model scores.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED
+**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13)
 
-**CERTIFICATION SHA:** Starting SHA `17c87d5ecf65b34de6233d7d35967b0e854a77c0`. Base implementation `577071e895b360c86a56acf91644d5c80b5bc53c`. Closure implementation `d5cd67baa0760ff1fb46f2fc42c760266aeb738a`. Hosted frontend and API `2810acc6ef1aa36b0390883e53104ddd1e530cdb`. Cursor does not declare #18 PASS.
+**CERTIFICATION SHA:** Starting SHA `17c87d5ecf65b34de6233d7d35967b0e854a77c0`. Base implementation `577071e895b360c86a56acf91644d5c80b5bc53c`. Closure implementation `d5cd67baa0760ff1fb46f2fc42c760266aeb738a`. Hosted frontend and API `2810acc6ef1aa36b0390883e53104ddd1e530cdb`.
 
-**EVIDENCE:** `docs/ADR-SUPREME-AI-GOVERNANCE.md`. Final-closure walkthrough in `docs/private-beta/hosted-ux-qa/supreme-ai/`. Native PowerPoint 12 unique slides. CI `34795102400` PASS on `2810acc` (352 backend / 160 frontend). `aiProvider` NOT_CONFIGURED remains TPRM assistance, not this product.
+**EVIDENCE:** `docs/ADR-SUPREME-AI-GOVERNANCE.md`. Final-closure walkthrough in `docs/private-beta/hosted-ux-qa/supreme-ai/`. Native PowerPoint 12 unique slides. CI `34795102400` PASS on `2810acc`. `aiProvider` NOT_CONFIGURED remains TPRM assistance, not this product.
 
-**NEXT ACTION:** Product Leadership hosted final review of vendor linkage, CLEAN evidence reuse, NIST AI RMF / ISO 42001 readiness, model version change review, and enum humanization. Do not start #19. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep closed unless a later gate finds a regression. #19 is authorized. Do not start #20. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -343,13 +343,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Truthful rollups only. No simulated threat feed.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** AUTHORIZED — IN PROGRESS. Product Leadership authorized #19 only on 2026-09-14. Not PASS.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Starting SHA `d3a381172e1a32283a123ccf3c5184a5342201af`
 
-**EVIDENCE:** Dashboard/analytics pages for TPRM are not this product.
+**EVIDENCE:** ADR `docs/ADR-SUPREME-INTELLIGENCE.md`. Dashboard/analytics pages for TPRM are not this product. Cursor does not declare #19 PASS.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Host on `supreme-risk-transformation` for Product Leadership review. Do not start #20. Do not merge `main` or deploy commercial production. Do not declare #19 PASS.
 
 ---
 

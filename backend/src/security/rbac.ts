@@ -88,6 +88,9 @@ export const PERMISSIONS = {
     'ai.retire': 'ai.retire',
     'ai.regulatoryReview': 'ai.regulatoryReview',
     'ai.report': 'ai.report',
+    'intelligence.read': 'intelligence.read',
+    'intelligence.acknowledge': 'intelligence.acknowledge',
+    'intelligence.report': 'intelligence.report',
     'platform.overview': 'platform.overview',
     'platform.organizations.read': 'platform.organizations.read',
     'platform.support.read': 'platform.support.read',
@@ -178,6 +181,7 @@ const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['privacy.read'],
     PERMISSIONS['rightsRequest.read'],
     PERMISSIONS['ai.read'],
+    PERMISSIONS['intelligence.read'],
 ];
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
@@ -250,6 +254,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['ai.retire'],
         PERMISSIONS['ai.regulatoryReview'],
         PERMISSIONS['ai.report'],
+        PERMISSIONS['intelligence.acknowledge'],
+        PERMISSIONS['intelligence.report'],
     ],
     ASSESSOR: [
         ...READ_PORTFOLIO,
@@ -277,6 +283,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['ai.assess'],
         PERMISSIONS['ai.test'],
         PERMISSIONS['ai.report'],
+        PERMISSIONS['intelligence.acknowledge'],
+        PERMISSIONS['intelligence.report'],
     ],
     APPROVER: [
         ...READ_PORTFOLIO,
@@ -298,6 +306,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['ai.retire'],
         PERMISSIONS['ai.regulatoryReview'],
         PERMISSIONS['ai.report'],
+        PERMISSIONS['intelligence.acknowledge'],
+        PERMISSIONS['intelligence.report'],
     ],
     BUSINESS_OWNER: [
         ...READ_PORTFOLIO,
@@ -314,6 +324,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['compliance.report'],
         PERMISSIONS['privacy.report'],
         PERMISSIONS['ai.report'],
+        PERMISSIONS['intelligence.report'],
     ],
     VIEWER: READ_PORTFOLIO,
 };

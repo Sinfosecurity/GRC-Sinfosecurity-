@@ -32,6 +32,7 @@ import {
     WarningAmberOutlined,
     HistoryOutlined,
     HubOutlined,
+    InsightsOutlined,
     Menu as MenuIcon,
     MonitorHeartOutlined,
     NotificationsNone,
@@ -98,6 +99,14 @@ const menuSections: NavSection[] = [
             { text: 'Systems', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
             { text: 'Approvals', path: '/ai-governance/approvals', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
             { text: 'Testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
+        ],
+    },
+    {
+        title: 'Intelligence',
+        items: [
+            { text: 'Overview', path: '/intelligence', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
+            { text: 'What changed', path: '/intelligence/changes', icon: <HistoryOutlined fontSize="small" />, permission: 'intelligence.read' },
+            { text: 'Executive', path: '/intelligence/executive', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
         ],
     },
     {

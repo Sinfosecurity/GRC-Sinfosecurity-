@@ -255,6 +255,19 @@ export const aiGovernanceAPI = {
     downloadBoardPptx: () => api.get('/ai-governance/reports/board.pptx', { responseType: 'blob' }),
 };
 
+export const intelligenceAPI = {
+    catalog: () => api.get('/intelligence/catalog'),
+    workspace: () => api.get('/intelligence/workspace'),
+    teaser: () => api.get('/intelligence/teaser'),
+    items: (params?: unknown) => api.get('/intelligence/items', { params }),
+    item: (publicId: string) => api.get(`/intelligence/items/${publicId}`),
+    acknowledge: (publicId: string, data?: unknown) => api.post(`/intelligence/items/${publicId}/acknowledge`, data || {}),
+    narrative: (publicId: string) => api.get(`/intelligence/items/${publicId}/narrative`),
+    executive: () => api.get('/intelligence/executive'),
+    external: () => api.get('/intelligence/external'),
+    downloadReport: (kind = 'brief') => api.get(`/intelligence/reports/${kind}.pdf`, { responseType: 'blob' }),
+};
+
 export const controlsAPI = {
     getAll: () => api.get('/controls'),
     create: (data: unknown) => api.post('/controls', data),

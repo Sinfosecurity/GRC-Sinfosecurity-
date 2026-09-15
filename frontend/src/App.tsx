@@ -115,6 +115,10 @@ const AiIncidents = lazy(() => import('./pages/AiIncidents'));
 const AiRegulatory = lazy(() => import('./pages/AiRegulatory'));
 const AiExceptions = lazy(() => import('./pages/AiExceptions'));
 const AiImport = lazy(() => import('./pages/AiImport'));
+const IntelligenceDashboard = lazy(() => import('./pages/IntelligenceDashboard'));
+const IntelligenceChanges = lazy(() => import('./pages/IntelligenceChanges'));
+const IntelligenceExecutive = lazy(() => import('./pages/IntelligenceExecutive'));
+const IntelligenceDetail = lazy(() => import('./pages/IntelligenceDetail'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -218,6 +222,10 @@ export default function App() {
                     <Route path="ai-governance/regulatory" element={<AiRegulatory />} />
                     <Route path="ai-governance/exceptions" element={<AiExceptions />} />
                     <Route path="ai-governance/import" element={<AiImport />} />
+                    <Route path="intelligence" element={<IntelligenceDashboard />} />
+                    <Route path="intelligence/changes" element={<IntelligenceChanges />} />
+                    <Route path="intelligence/executive" element={<IntelligenceExecutive />} />
+                    <Route path="intelligence/:publicId" element={<IntelligenceDetail />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

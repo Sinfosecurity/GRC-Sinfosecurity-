@@ -86,3 +86,20 @@ Conceptual benchmark only against OneTrust AI Governance, ServiceNow AI Control 
 | UX | `/ai-governance` workspaces, human IDs | Dense IRM / AI GRC suites | Implemented for Product Leadership review | `/ai-governance` |
 
 Supreme can differentiate where evidence exists: human authority, explainable scoring, honest regulatory language, Governance Graph impact, and reuse of Vendor / Risk / Privacy / Compliance / Evidence records. It does not claim model-ops telemetry parity with ModelOp/watsonx or legal-content parity with OneTrust.
+
+## Supreme Intelligence capabilities (#19)
+
+Conceptual benchmark only against OneTrust Insights / reporting, ServiceNow IRM performance analytics, Archer dashboards, AuditBoard cross-product views, and LogicGate reporting. This is not a claim of superiority.
+
+| Capability category | Supreme equivalent | Market category | Current status | Evidence |
+|---|---|---|---|---|
+| Cross-domain intelligence | Derived `IntelligenceItem` from live TPRM / Risk / Control / Evidence / Compliance / Privacy / AI records | OneTrust / ServiceNow / Archer | Implemented as interpretation, not a second database | `/intelligence`, ADR-SUPREME-INTELLIGENCE |
+| Explainability | Facts, derived intelligence, and optional AI narrative labeled separately | ServiceNow / Archer scorecards | Implemented. No invented percentages | Item detail + engine tests |
+| Graph impact | Reuses #13 bounded impact | Limited elsewhere | Implemented from real edges only | `governanceGraphService.impact` |
+| Evidence reuse | Reads `EvidenceGovernanceLink` freshness / scan; never copies file bodies | OneTrust / AuditBoard | Implemented. Expired file → one item, many affected objects | Dedup rule `evidence.unusable` |
+| Human authority | Acknowledge / review only; actions stay in source products | LogicGate / ServiceNow workflows | Implemented. Acknowledge does not close findings | `/intelligence/items/:id/acknowledge` |
+| Executive usability | `/intelligence/executive` + Intelligence Brief PDF | OneTrust / Archer board packs | Implemented as web + PDF. PPTX not shipped | `/intelligence/reports/brief.pdf` |
+| Workflow simplicity | Review guidance, not automation | ServiceNow / LogicGate | Implemented. #20 automation is not this product | ADR automation boundary |
+| External threat / news feed | Honest not configured | OneTrust / ServiceNow intel add-ons | Not configured. No simulated feed | `/intelligence/external` |
+
+Supreme can differentiate where evidence exists: one derived plane over the Governance Graph, labeled authority, and a refusal to simulate threat intelligence. It does not claim ServiceNow Performance Analytics depth or OneTrust content-pack breadth.
