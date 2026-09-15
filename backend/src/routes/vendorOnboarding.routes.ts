@@ -13,6 +13,7 @@ import {
 } from '../services/vendorOnboardingService';
 import {
     activationLink,
+    markInvitationShared,
     requestClarification,
     resendInvitation,
     reviewFinding,
@@ -120,7 +121,14 @@ router.post('/:id/tier/confirm', authorize(...REVIEW_ROLES), async (req: AuthReq
 
 router.post('/:id/plan/confirm', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await confirmPlan(req.user!.organizationId, req.params.id, actor(req)) });
+        res.json({
+            success: true,
+            data: await confirmPlan(req.user!.organizationId, req.params.id, actor(req), {
+                includeKeys: Array.isArray(req.body?.includeKeys) ? req.body.includeKeys : undefined,
+                excludeKeys: Array.isArray(req.body?.excludeKeys) ? req.body.excludeKeys : undefined,
+                reason: req.body?.reason,
+            }),
+        });
     } catch (error) {
         next(error);
     }
@@ -153,7 +161,15 @@ router.post('/:id/invitation/resend', authorize(...REVIEW_ROLES), async (req: Au
 
 router.post('/:id/invitation/link', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await activationLink(req.user!.organizationId, req.params.id, actor(req)) });
+        res.json({ success: true, data: await activationLink(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/invitation/shared', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await markInvitationShared(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
         next(error);
     }

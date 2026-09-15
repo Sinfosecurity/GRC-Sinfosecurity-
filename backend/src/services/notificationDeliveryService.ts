@@ -11,6 +11,12 @@ import {
     selectedEmailProvider,
 } from './emailProvider';
 import { getResendEmail, sendResendEmail } from './resendClient';
+import {
+    assessmentDueSoonEmail,
+    customerAppUrl,
+    genericOperationalEmail,
+    remediationDueEmail,
+} from './transactionalEmail';
 
 export type NotificationEvent =
     | 'assessment.assigned'
@@ -76,6 +82,7 @@ export async function deliverEmail(input: {
     subject: string;
     body: string;
     html?: string;
+    fromName?: string;
     eventType?: string;
     organizationId?: string;
     resourceType?: string;
@@ -96,12 +103,19 @@ export async function deliverEmail(input: {
             throw new Error(`${provider}_FROM_EMAIL is not configured`);
         }
         let messageId: string | undefined;
+        const rendered = input.html
+            ? { html: input.html, text: input.body, fromName: input.fromName }
+            : genericOperationalEmail({ subject: input.subject, body: input.body });
+        const html = input.html || rendered.html;
+        const body = input.body || rendered.text;
+        const fromName = input.fromName || ('fromName' in rendered ? rendered.fromName : emailFromName());
         if (provider === 'RESEND') {
             const sent = await sendResendEmail({
                 to: input.to,
                 subject: input.subject,
-                body: input.body,
-                html: input.html,
+                body,
+                html,
+                fromName,
                 tags: [
                     input.eventType ? { name: 'event', value: input.eventType.replace(/[^a-z0-9_]/gi, '_') } : undefined,
                     input.resourceId ? { name: 'resource', value: input.resourceId } : undefined,
@@ -126,13 +140,13 @@ export async function deliverEmail(input: {
                     personalizations: [{ to: [{ email: input.to }] }],
                     from: {
                         email: fromEmail,
-                        name: emailFromName(process.env, provider),
+                        name: fromName,
                     },
                     reply_to: replyTo ? { email: replyTo } : undefined,
                     subject: input.subject,
                     content: [
-                        { type: 'text/plain', value: input.body },
-                        input.html ? { type: 'text/html', value: input.html } : undefined,
+                        { type: 'text/plain', value: body },
+                        html ? { type: 'text/html', value: html } : undefined,
                     ].filter(Boolean),
                 }),
             });
@@ -144,7 +158,9 @@ export async function deliverEmail(input: {
             const sent = await sendSmtpMail({
                 to: input.to,
                 subject: input.subject,
-                body: input.body,
+                body,
+                html,
+                fromName,
             });
             messageId = sent.messageId;
         }
@@ -204,6 +220,7 @@ export async function notify(input: {
     emailTo?: string;
     emailBody?: string;
     emailHtml?: string;
+    fromName?: string;
 }) {
     const pref = await prisma.notificationPreference.findUnique({
         where: { userId_eventType: { userId: input.userId, eventType: input.eventType } },
@@ -238,6 +255,7 @@ export async function notify(input: {
             subject: input.title,
             body: input.emailBody || input.body,
             html: input.emailHtml,
+            fromName: input.fromName,
             eventType: input.eventType,
             organizationId: input.organizationId,
             resourceType: input.resourceType,
@@ -257,6 +275,9 @@ export async function notifyUser(input: {
     body: string;
     resourceType?: string;
     resourceId?: string;
+    emailBody?: string;
+    emailHtml?: string;
+    fromName?: string;
 }) {
     if (!input.userId) {
         return { inApp: false, email: 'SKIPPED' as const };
@@ -270,6 +291,9 @@ export async function notifyUser(input: {
             ...input,
             userId: input.userId,
             emailTo: user?.email,
+            emailBody: input.emailBody,
+            emailHtml: input.emailHtml,
+            fromName: input.fromName,
         });
     } catch (error) {
         logger.error('Notification delivery failed; business record unchanged', {
@@ -305,7 +329,15 @@ export async function scanDueNotifications(now = new Date()) {
             assignedTo: { not: null },
             dueDate: { not: null },
         },
-        select: { id: true, organizationId: true, assignedTo: true, dueDate: true, assessmentType: true, status: true },
+        select: {
+            id: true,
+            organizationId: true,
+            assignedTo: true,
+            dueDate: true,
+            assessmentType: true,
+            status: true,
+            vendor: { select: { name: true, publicId: true } },
+        },
     });
 
     for (const assessment of openAssessments) {
@@ -322,12 +354,23 @@ export async function scanDueNotifications(now = new Date()) {
             },
         });
         if (already) continue;
+        const dueMail = assessmentDueSoonEmail({
+            vendorName: assessment.vendor?.name || 'Vendor',
+            publicId: assessment.vendor?.publicId,
+            assessmentName: assessment.assessmentType,
+            dueAt: assessment.dueDate,
+            overdue,
+            ctaUrl: customerAppUrl(assessment.vendor?.publicId ? `/vendor-onboarding/${assessment.vendor.publicId}` : '/assessments'),
+        });
         await notifyUser({
             organizationId: assessment.organizationId,
             userId: assessment.assignedTo,
             eventType,
-            title: overdue ? 'Assessment overdue' : 'Assessment due soon',
-            body: `${assessment.assessmentType} assessment is ${overdue ? 'overdue' : 'due soon'}.`,
+            title: dueMail.subject,
+            body: dueMail.text,
+            emailBody: dueMail.text,
+            emailHtml: dueMail.html,
+            fromName: dueMail.fromName,
             resourceType: 'VendorAssessment',
             resourceId: assessment.id,
         });
@@ -346,6 +389,7 @@ export async function scanDueNotifications(now = new Date()) {
             assignedTo: true,
             targetRemediationDate: true,
             title: true,
+            vendor: { select: { name: true } },
         },
     });
 
@@ -363,12 +407,22 @@ export async function scanDueNotifications(now = new Date()) {
             },
         });
         if (already) continue;
+        const remMail = remediationDueEmail({
+            title: finding.title,
+            vendorName: finding.vendor?.name,
+            dueAt: finding.targetRemediationDate,
+            overdue,
+            ctaUrl: customerAppUrl('/findings'),
+        });
         await notifyUser({
             organizationId: finding.organizationId,
             userId: finding.assignedTo,
             eventType,
-            title: overdue ? 'Remediation overdue' : 'Remediation due soon',
-            body: `${finding.title} is ${overdue ? 'overdue' : 'due soon'}.`,
+            title: remMail.subject,
+            body: remMail.text,
+            emailBody: remMail.text,
+            emailHtml: remMail.html,
+            fromName: remMail.fromName,
             resourceType: 'VendorIssue',
             resourceId: finding.id,
         });

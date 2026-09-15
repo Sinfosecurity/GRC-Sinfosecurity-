@@ -5,12 +5,14 @@ import { canonicalizeRole } from '../security/rbac';
 import { recordAudit } from './auditEventService';
 import { explainableRiskService } from './explainableRiskService';
 import { notifyUser, type NotificationEvent } from './notificationDeliveryService';
+import { customerAppUrl, tierReviewEmail, vendorIntakeAssignedEmail } from './transactionalEmail';
 import { getLibraryTemplateByKey, recommendAssessments } from './questionnaireLibrary';
 import vendorAssessmentService from './vendorAssessmentService';
 import {
     addBusinessDays,
     extractVendorDomain,
     formatVendorPublicId,
+    missingCanonicalIntake,
     namesLikelyDuplicate,
     recommendTierFromIntake,
     type IntakeAnswer,
@@ -56,7 +58,10 @@ const HISTORY_ACTIONS: Record<string, string> = {
     'vendor.tier_overridden': 'Tier overridden',
     'vendor.plan_generated': 'Due-diligence plan generated',
     'vendor.plan_confirmed': 'Due-diligence plan confirmed',
+    'vendor.plan_customized': 'Due-diligence package customized',
     'vendor.due_diligence_sent': 'Due diligence sent',
+    'vendor.secure_link_copied': 'Secure invitation link copied',
+    'vendor.secure_link_marked_shared': 'Secure invitation marked as shared',
     'vendor.access_activated': 'Vendor started assessment',
     'vendor.assessment_submitted': 'Vendor submitted assessment',
     'vendor.draft_findings_generated': 'Draft findings generated',
@@ -81,7 +86,9 @@ const MILESTONE_ACTIONS = new Set([
     'vendor.tier_confirmed',
     'vendor.tier_overridden',
     'vendor.plan_confirmed',
+    'vendor.plan_customized',
     'vendor.due_diligence_sent',
+    'vendor.secure_link_copied',
     'vendor.assessment_submitted',
     'vendor.finding_confirmed',
     'vendor.risk_accepted',
@@ -190,7 +197,15 @@ async function writeHistory(organizationId: string, actorUserId: string | null, 
     });
 }
 
-async function notify(organizationId: string, userId: string | null | undefined, eventType: NotificationEvent, title: string, body: string, vendorId: string) {
+async function notify(
+    organizationId: string,
+    userId: string | null | undefined,
+    eventType: NotificationEvent,
+    title: string,
+    body: string,
+    vendorId: string,
+    email?: { emailBody?: string; emailHtml?: string; fromName?: string }
+) {
     if (!userId) return;
     await notifyUser({
         organizationId,
@@ -200,6 +215,9 @@ async function notify(organizationId: string, userId: string | null | undefined,
         body,
         resourceType: 'VendorOnboarding',
         resourceId: vendorId,
+        emailBody: email?.emailBody,
+        emailHtml: email?.emailHtml,
+        fromName: email?.fromName,
     });
 }
 
@@ -340,13 +358,21 @@ export async function createOnboardingRequest(organizationId: string, actor: Act
             ownerName: owner.name,
             summary: `${owner.name} was named business owner.`,
         });
+        const intakeMail = vendorIntakeAssignedEmail({
+            vendorName: name,
+            publicId,
+            requesterName: actor.name || 'A colleague',
+            dueAt: intakeDueAt,
+            ctaUrl: customerAppUrl(`/vendor-onboarding/${publicId}`),
+        });
         await notify(
             organizationId,
             owner.userId,
             'assessment.assigned',
-            `Complete vendor intake — ${name}`,
-            `${actor.name || 'A colleague'} requested onboarding of ${name} (${publicId}) and named you as the business owner. Complete intake by ${intakeDueAt.toISOString().slice(0, 10)}.`,
+            intakeMail.subject,
+            intakeMail.text,
             vendor.id,
+            { emailBody: intakeMail.text, emailHtml: intakeMail.html, fromName: intakeMail.fromName },
         );
     }
     return presentOnboarding(organizationId, vendor.id, actor);
@@ -489,10 +515,12 @@ async function completeIntake(organizationId: string, vendorId: string, actor: A
     const vendor = await loadWorkspace(organizationId, vendorId);
     const assessment = await vendorAssessmentService.getAssessmentById(vendor.onboarding!.intakeAssessmentId!, organizationId);
     const answers = (assessment?.responses || []).map((row) => ({ questionKey: row.questionId, response: row.response }));
-    const required = ['ir_data', 'ir_access', 'ir_availability', 'ir_ai'];
-    const missing = required.filter((key) => !answers.some((row) => row.questionKey === key && row.response));
-    if (missing.length) throw new ApiError(400, 'Complete the inherent-risk questions before submitting intake.');
+    const missing = missingCanonicalIntake(answers);
+    if (missing.length) throw new ApiError(400, `Complete the inherent-risk questions before submitting intake. Still needed: ${missing.map((key) => key.toUpperCase().replace('_', '-')).join(', ')}.`);
     const result = recommendTierFromIntake(answers);
+    if (result.packs.unresolved.length) {
+        throw new ApiError(400, `Unknown cannot remain on a required scoping fact. ${result.packs.unresolved.map((row) => row.question).join(' ')}`);
+    }
     const tierReviewDueAt = addBusinessDays(new Date(), TIER_REVIEW_SLA_DAYS);
     await prisma.vendor.update({
         where: { id: vendor.id },
@@ -537,13 +565,21 @@ async function completeIntake(organizationId: string, vendorId: string, actor: A
     });
     const analysts = await orgAnalysts(organizationId);
     for (const analyst of analysts) {
+        const tierMail = tierReviewEmail({
+            vendorName: vendor.name,
+            publicId: vendor.publicId,
+            recommendedTier: TIER_LABEL[result.recommendedTier],
+            dueAt: tierReviewDueAt,
+            ctaUrl: customerAppUrl(`/vendor-onboarding/${vendor.publicId}`),
+        });
         await notify(
             organizationId,
             analyst.id,
             'approval.requested',
-            `Confirm tier — ${vendor.name}`,
-            `${vendor.publicId}: Supreme recommends ${TIER_LABEL[result.recommendedTier]}. Confirm or override by ${tierReviewDueAt.toISOString().slice(0, 10)}.`,
+            tierMail.subject,
+            tierMail.text,
             vendor.id,
+            { emailBody: tierMail.text, emailHtml: tierMail.html, fromName: tierMail.fromName },
         );
     }
     return presentOnboarding(organizationId, vendor.id, actor);
@@ -595,15 +631,22 @@ export async function confirmTier(organizationId: string, vendorKey: string, act
     return presentOnboarding(organizationId, vendor.id, actor);
 }
 
-export async function confirmPlan(organizationId: string, vendorKey: string, actor: Actor) {
+export async function confirmPlan(organizationId: string, vendorKey: string, actor: Actor, input: {
+    includeKeys?: string[];
+    excludeKeys?: string[];
+    reason?: string;
+} = {}) {
     if (!canReviewTier(actor.role)) throw new ApiError(403, 'Only a risk reviewer can confirm the due-diligence plan.');
     const vendor = await loadWorkspace(organizationId, vendorKey);
     if (vendor.onboarding?.stage !== VendorOnboardingStage.DUE_DILIGENCE_PLAN) {
         throw new ApiError(409, 'The due-diligence plan is not waiting for confirmation.');
     }
     const confirmedTier = vendor.onboarding.confirmedTier || vendor.tier;
-    const plan = await buildPlan(organizationId, vendor.id, confirmedTier);
-    for (const item of plan.assessments.filter((row) => row.key !== 'inherent-risk' && (row.requirement === 'Required' || row.requirement === 'Recommended'))) {
+    const plan = await buildPlan(organizationId, vendor.id, confirmedTier, input);
+    if (plan.unresolved?.length) {
+        throw new ApiError(409, `Unresolved scope questions must be completed before Ready to Send. ${plan.unresolved.map((row: { question: string }) => row.question).join(' ')}`);
+    }
+    for (const item of plan.assessments.filter((row: any) => row.key !== 'inherent-risk' && (row.requirement === 'Required' || row.requirement === 'Recommended'))) {
         if (!item.templateId) continue;
         try {
             await vendorAssessmentService.createAssessment({
@@ -617,6 +660,7 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
             if (!(error instanceof ApiError) || error.statusCode !== 409) throw error;
         }
     }
+    const customized = Boolean(input.includeKeys?.length || input.excludeKeys?.length);
     await prisma.vendorOnboarding.update({
         where: { vendorId: vendor.id },
         data: {
@@ -626,8 +670,13 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
             planConfirmedBy: actor.id,
         },
     });
-    await writeHistory(organizationId, actor.id, 'vendor.plan_confirmed', vendor.id, {
-        summary: 'Due-diligence plan confirmed. Ready to send to the vendor contact.',
+    await writeHistory(organizationId, actor.id, customized ? 'vendor.plan_customized' : 'vendor.plan_confirmed', vendor.id, {
+        summary: customized
+            ? `Due-diligence package customized. ${String(input.reason || '').trim()}`
+            : 'Due-diligence package confirmed. Ready to send to the vendor contact.',
+        reason: input.reason || null,
+        includeKeys: input.includeKeys || [],
+        excludeKeys: input.excludeKeys || [],
     });
     return presentOnboarding(organizationId, vendor.id, actor);
 }
@@ -661,7 +710,12 @@ async function reusableEvidence(organizationId: string, vendorId: string) {
     ];
 }
 
-async function buildPlan(organizationId: string, vendorId: string, tier: VendorTier) {
+async function buildPlan(organizationId: string, vendorId: string, tier: VendorTier, customization: {
+    includeKeys?: string[];
+    excludeKeys?: string[];
+    reason?: string;
+    actorName?: string;
+} = {}) {
     const onboarding = await prisma.vendorOnboarding.findFirst({ where: { vendorId, organizationId } });
     const factors = Array.isArray(onboarding?.recommendedFactors) ? onboarding?.recommendedFactors : [];
     const answers = await prisma.assessmentResponse.findMany({
@@ -669,14 +723,33 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
         select: { questionId: true, response: true },
     });
     const result = recommendTierFromIntake(answers.map((row) => ({ questionKey: row.questionId, response: row.response })));
-    const recommendation = await recommendAssessments(organizationId, vendorId, result.signals, tier);
+    const recommendedKeys = result.packs.required.map((row) => row.templateKey);
+    const extraKeys = result.packs.recommended.map((row) => row.templateKey);
+    const exclude = new Set(customization.excludeKeys || []);
+    const include = new Set([...(customization.includeKeys || []), ...recommendedKeys.filter((key) => !exclude.has(key))]);
+    const customized = Boolean(customization.includeKeys?.length || customization.excludeKeys?.length);
+    if (customized && !String(customization.reason || '').trim()) {
+        throw new ApiError(400, 'Customizing the recommended package requires a reason.');
+    }
+    const packReasons: Record<string, string[]> = {};
+    for (const pack of [...result.packs.required, ...result.packs.recommended]) {
+        packReasons[pack.templateKey] = pack.why;
+    }
+    const recommendation = await recommendAssessments(organizationId, vendorId, {
+        ...result.signals,
+        requiredTemplateKeys: [...include],
+        recommendedTemplateKeys: extraKeys.filter((key) => !exclude.has(key) && !include.has(key)),
+        packReasons,
+    }, tier);
     const evidence = await reusableEvidence(organizationId, vendorId);
     const assessments = [...recommendation.required, ...recommendation.recommended].map((item: any) => ({
         templateId: item.id,
         key: item.key,
         name: item.name,
+        packName: result.packs.required.concat(result.packs.recommended).find((row) => row.templateKey === item.key)?.name || item.name,
         requirement: item.key === 'inherent-risk' ? 'Completed' : item.requirement || 'Recommended',
         rationale: item.reason,
+        why: packReasons[item.key] || [item.reason],
         expectedEvidence: item.expectedEvidence,
         reusableEvidence: evidence,
         framework: item.framework,
@@ -685,6 +758,17 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
     }));
     return {
         rationale: recommendation.rationale,
+        package: {
+            required: result.packs.required,
+            recommended: result.packs.recommended,
+        },
+        unresolved: result.packs.unresolved,
+        override: customized ? {
+            reason: String(customization.reason).trim(),
+            includeKeys: customization.includeKeys || [],
+            excludeKeys: customization.excludeKeys || [],
+            at: new Date().toISOString(),
+        } : null,
         assessments,
         triggers: {
             privacy: result.signals.personalData,
@@ -786,8 +870,8 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
             recommendedTierKey: vendor.onboarding.recommendedTier,
             confirmedTier: vendor.onboarding.confirmedTier ? TIER_LABEL[vendor.onboarding.confirmedTier] : null,
             score: vendor.onboarding.recommendedScore,
-            maxScore: 30,
-            explanation: `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from the recorded intake score of ${vendor.onboarding.recommendedScore} of 30` : ''}.`,
+            maxScore: 60,
+            explanation: `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from the recorded intake score of ${vendor.onboarding.recommendedScore} of 60` : ''}.`,
             factors: vendor.onboarding.recommendedFactors,
             hardFloors: vendor.onboarding.hardFloors,
             overrideReason: vendor.onboarding.overrideReason,
@@ -823,13 +907,21 @@ export async function scanOnboardingAttention(now = new Date()) {
         });
         if (already) continue;
         if (row.stage === VendorOnboardingStage.INTAKE && row.vendor.businessOwnerUserId) {
+            const overdueMail = vendorIntakeAssignedEmail({
+                vendorName: row.vendor.name,
+                publicId: row.vendor.publicId,
+                requesterName: 'Supreme',
+                dueAt: row.intakeDueAt,
+                ctaUrl: customerAppUrl(`/vendor-onboarding/${row.vendor.publicId}`),
+            });
             await notify(
                 row.organizationId,
                 row.vendor.businessOwnerUserId,
                 'assessment.overdue',
-                `Intake overdue — ${row.vendor.name}`,
-                `${row.vendor.publicId} intake is overdue. Complete vendor intake so Supreme can recommend a tier.`,
+                `Action required: Vendor intake is overdue — ${row.vendor.name}`,
+                overdueMail.text,
                 row.vendorId,
+                { emailBody: overdueMail.text, emailHtml: overdueMail.html, fromName: overdueMail.fromName },
             );
             const analysts = await orgAnalysts(row.organizationId);
             for (const analyst of analysts.slice(0, 5)) {
@@ -837,22 +929,31 @@ export async function scanOnboardingAttention(now = new Date()) {
                     row.organizationId,
                     analyst.id,
                     'assessment.overdue',
-                    `Escalate intake — ${row.vendor.name}`,
-                    `${row.vendor.publicId} intake is overdue.`,
+                    `Action required: Vendor intake is overdue — ${row.vendor.name}`,
+                    overdueMail.text,
                     row.vendorId,
+                    { emailBody: overdueMail.text, emailHtml: overdueMail.html, fromName: overdueMail.fromName },
                 );
             }
         }
         if (row.stage === VendorOnboardingStage.TIER_REVIEW) {
+            const overdueTier = tierReviewEmail({
+                vendorName: row.vendor.name,
+                publicId: row.vendor.publicId,
+                recommendedTier: row.recommendedTier || 'MEDIUM',
+                dueAt: row.tierReviewDueAt,
+                ctaUrl: customerAppUrl(`/vendor-onboarding/${row.vendor.publicId}`),
+            });
             const analysts = await orgAnalysts(row.organizationId);
             for (const analyst of analysts.slice(0, 8)) {
                 await notify(
                     row.organizationId,
                     analyst.id,
                     'approval.requested',
-                    `Tier review overdue — ${row.vendor.name}`,
-                    `${row.vendor.publicId} is waiting for tier confirmation.`,
+                    `Action required: Tier review is overdue — ${row.vendor.name}`,
+                    overdueTier.text,
                     row.vendorId,
+                    { emailBody: overdueTier.text, emailHtml: overdueTier.html, fromName: overdueTier.fromName },
                 );
             }
         }

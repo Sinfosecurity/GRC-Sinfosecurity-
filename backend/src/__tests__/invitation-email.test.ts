@@ -66,7 +66,7 @@ describe('invitation email activation links', () => {
                 eventType: 'user.invitation',
                 emailTo: 'invitee@org-a.test',
                 body: expect.not.stringContaining('opaque-invite-token'),
-                title: "You're invited to Supreme",
+                title: 'Action required: Activate your Supreme account',
                 emailBody: expect.stringMatching(
                     /https:\/\/supreme-risk-staging\.onrender\.com\/activate\?token=opaque-invite-token/
                 ),

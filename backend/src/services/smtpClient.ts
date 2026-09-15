@@ -1,6 +1,7 @@
 import net from 'net';
 import tls from 'tls';
 import { sanitizeHeaderValue } from '../security/headerSanitize';
+import { emailFromName } from './emailProvider';
 
 export type SmtpDelivery = {
     messageId?: string;
@@ -157,15 +158,19 @@ export async function verifySmtpConnection(env: NodeJS.ProcessEnv = process.env)
     }
 }
 
+function smtpBody(value: string) {
+    return value.replace(/\r?\n\./g, '\n..');
+}
+
 export async function sendSmtpMail(
-    input: { to: string; subject: string; body: string },
+    input: { to: string; subject: string; body: string; html?: string; fromName?: string },
     env: NodeJS.ProcessEnv = process.env
 ): Promise<SmtpDelivery> {
     const fromEmail = env.SMTP_FROM_EMAIL || env.SENDGRID_FROM_EMAIL;
     if (!fromEmail) {
         throw new Error('SMTP_FROM_EMAIL is not configured');
     }
-    const fromName = env.SMTP_FROM_NAME || env.SENDGRID_FROM_NAME || 'Supreme';
+    const fromName = input.fromName || emailFromName(env, 'SMTP');
     const socket = await openSession(env);
     try {
         await authenticate(socket, env);
@@ -176,9 +181,23 @@ export async function sendSmtpMail(
         write(socket, `To: ${sanitizeHeaderValue(input.to)}`);
         write(socket, `Subject: ${sanitizeHeaderValue(input.subject)}`);
         write(socket, 'MIME-Version: 1.0');
-        write(socket, 'Content-Type: text/plain; charset=utf-8');
-        write(socket, '');
-        write(socket, input.body.replace(/\r?\n\./g, '\n..'));
+        if (input.html) {
+            write(socket, 'Content-Type: multipart/alternative; boundary="supreme-tx"');
+            write(socket, '');
+            write(socket, '--supreme-tx');
+            write(socket, 'Content-Type: text/plain; charset=utf-8');
+            write(socket, '');
+            write(socket, smtpBody(input.body));
+            write(socket, '--supreme-tx');
+            write(socket, 'Content-Type: text/html; charset=utf-8');
+            write(socket, '');
+            write(socket, smtpBody(input.html));
+            write(socket, '--supreme-tx--');
+        } else {
+            write(socket, 'Content-Type: text/plain; charset=utf-8');
+            write(socket, '');
+            write(socket, smtpBody(input.body));
+        }
         const queued = await expect(socket, [250], '.');
         await expect(socket, [221], 'QUIT');
         const idMatch = queued.text.match(/<([^>]+)>/);

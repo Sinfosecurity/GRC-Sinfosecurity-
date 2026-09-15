@@ -38,6 +38,8 @@ interface Vendor {
     tier: 'Critical' | 'High' | 'Medium' | 'Low';
     status: string;
     riskScore: number;
+    residualRiskScore?: number | null;
+    inherentRiskScore?: number | null;
     complianceScore: number;
     lastAssessment: string;
     nextReview: string;
@@ -153,8 +155,10 @@ export default function VendorManagement() {
                     category: v.category,
                     tier: displayTier(v.tier) as Vendor['tier'],
                     status: v.status,
-                    riskScore: v.inherentRiskScore || 0,
-                    complianceScore: 100 - (v.inherentRiskScore || 0),
+                    riskScore: v.residualRiskScore ?? v.inherentRiskScore ?? 0,
+                    residualRiskScore: v.residualRiskScore ?? null,
+                    inherentRiskScore: v.inherentRiskScore ?? null,
+                    complianceScore: 100 - (v.residualRiskScore ?? v.inherentRiskScore ?? 0),
                     lastAssessment: v.lastAssessmentDate ? new Date(v.lastAssessmentDate).toISOString().split('T')[0] : 'N/A',
                     nextReview: v.nextReviewDate ? new Date(v.nextReviewDate).toISOString().split('T')[0] : 'N/A',
                     contactEmail: v.contactEmail || v.primaryContact || 'N/A',

@@ -67,13 +67,13 @@ export function emailFromAddress(env: NodeJS.ProcessEnv = process.env, provider 
 }
 
 export function emailFromName(env: NodeJS.ProcessEnv = process.env, provider = selectedEmailProvider(env)) {
-    if (provider === 'RESEND') {
-        return String(env.RESEND_FROM_NAME || env.SMTP_FROM_NAME || env.SENDGRID_FROM_NAME || 'Supreme Risk').trim();
-    }
-    if (provider === 'SENDGRID') {
-        return String(env.SENDGRID_FROM_NAME || env.RESEND_FROM_NAME || env.SMTP_FROM_NAME || 'Supreme Risk').trim();
-    }
-    return String(env.SMTP_FROM_NAME || env.RESEND_FROM_NAME || env.SENDGRID_FROM_NAME || 'Supreme Risk').trim();
+    const raw = provider === 'RESEND'
+        ? String(env.RESEND_FROM_NAME || env.SMTP_FROM_NAME || env.SENDGRID_FROM_NAME || '').trim()
+        : provider === 'SENDGRID'
+            ? String(env.SENDGRID_FROM_NAME || env.RESEND_FROM_NAME || env.SMTP_FROM_NAME || '').trim()
+            : String(env.SMTP_FROM_NAME || env.RESEND_FROM_NAME || env.SENDGRID_FROM_NAME || '').trim();
+    if (!raw || /^supreme risk$/i.test(raw)) return 'Supreme';
+    return raw;
 }
 
 export function emailReplyTo(env: NodeJS.ProcessEnv = process.env) {

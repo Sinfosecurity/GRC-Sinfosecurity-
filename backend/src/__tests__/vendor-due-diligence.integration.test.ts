@@ -3,6 +3,7 @@ import { AssessmentStatus, Role, ScanStatus } from '@prisma/client';
 import { app } from '../server';
 import { prisma } from '../config/database';
 import { hashToken } from '../services/passwordService';
+import { canonicalIntakeAnswers } from './helpers/canonicalIntake';
 
 jest.setTimeout(90000);
 
@@ -21,19 +22,7 @@ async function completePhaseA(token: string, ownerId: string, suffix: string) {
     });
     expect(created.status).toBe(201);
     const publicId = created.body.data.publicId;
-    const answers = [
-        { questionKey: 'ir_eng_what', response: 'Process payroll' },
-        { questionKey: 'ir_data', response: 'Personal data' },
-        { questionKey: 'ir_volume', response: '10,000 to 100,000' },
-        { questionKey: 'ir_access', response: 'Read-write' },
-        { questionKey: 'ir_onsite', response: 'No' },
-        { questionKey: 'ir_geo', response: 'Same region' },
-        { questionKey: 'ir_regulated', response: 'Yes' },
-        { questionKey: 'ir_fourth', response: 'Yes' },
-        { questionKey: 'ir_availability', response: 'Within 1 day / severe' },
-        { questionKey: 'ir_spend', response: 'More than $250k' },
-        { questionKey: 'ir_ai', response: 'Yes' },
-    ];
+    const answers = canonicalIntakeAnswers();
     await request(app).post(`${API}/vendors/onboarding/${publicId}/intake/complete`).set('Authorization', `Bearer ${token}`).send({ answers, attested: true });
     await request(app).post(`${API}/vendors/onboarding/${publicId}/tier/confirm`).set('Authorization', `Bearer ${token}`).send({ confirm: true });
     const plan = await request(app).post(`${API}/vendors/onboarding/${publicId}/plan/confirm`).set('Authorization', `Bearer ${token}`).send({});
@@ -90,7 +79,7 @@ describe('Supreme Third Party onboarding Phase B', () => {
             title: 'Security lead',
         });
         expect(sent.status).toBe(201);
-        expect(sent.body.data.invitation.status).toBe('Pending');
+        expect(['Pending', 'Invitation prepared', 'Email queued']).toContain(sent.body.data.invitation.status);
         expect(sent.body.data.activationUrl).toBeTruthy();
         expect(sent.body.data.activationUrl).toContain('/vendor-assessment/activate');
         const users = await prisma.user.findMany({ where: { email: `casey-${suffix}@vendor.test` } });
@@ -98,6 +87,19 @@ describe('Supreme Third Party onboarding Phase B', () => {
         const invitation = await prisma.vendorAssessmentInvitation.findFirst({ where: { vendorId } });
         expect(invitation?.tokenHash).toBe(hashToken(new URL(sent.body.data.activationUrl).searchParams.get('token') || ''));
         assessmentId = sent.body.data.vendorAssessments[0].id;
+
+        const copied = await request(app).post(`${API}/vendors/onboarding/${publicId}/invitation/link`).set('Authorization', `Bearer ${tokenA}`).send({
+            name: 'Casey Contact',
+            email: `casey-${suffix}@vendor.test`,
+        });
+        expect(copied.status).toBe(200);
+        expect(copied.body.data.activationUrl).toBeTruthy();
+        expect(copied.body.data.invitation.deliveryMethod).toBe('LINK');
+        expect(copied.body.data.invitation.emailTruth).toMatch(/not email delivery/i);
+        expect(JSON.stringify(copied.body.data)).not.toMatch(/Due diligence sent to Casey Contact/);
+        const shared = await request(app).post(`${API}/vendors/onboarding/${publicId}/invitation/shared`).set('Authorization', `Bearer ${tokenA}`).send({});
+        expect(shared.status).toBe(200);
+        expect(shared.body.data.invitation.emailTruth).toMatch(/not email delivery/i);
     });
 
     it('activates a bounded vendor session and blocks customer APIs', async () => {

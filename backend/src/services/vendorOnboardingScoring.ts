@@ -29,7 +29,34 @@ export type IntakeSignals = {
     criticalDependency: boolean;
     regulatedProcess: boolean;
     geographicExposure: boolean;
+    softwareOrApi: boolean;
+    cloudHosted: boolean;
+    physicalDelivery: boolean;
     dataTypes: string[];
+};
+
+export type ScopeFact = {
+    code: string;
+    packKey: string;
+    packName: string;
+    question: string;
+    answer: string;
+    resolved: boolean;
+};
+
+export type DueDiligencePack = {
+    key: string;
+    name: string;
+    templateKey: string;
+    requirement: 'Required' | 'Recommended';
+    why: string[];
+};
+
+export type PackRecommendation = {
+    required: DueDiligencePack[];
+    recommended: DueDiligencePack[];
+    unresolved: ScopeFact[];
+    selectedKeys: string[];
 };
 
 export type InherentTierResult = {
@@ -41,71 +68,86 @@ export type InherentTierResult = {
     hardFloors: HardFloor[];
     signals: IntakeSignals;
     explanation: string;
+    unresolved: ScopeFact[];
+    packs: PackRecommendation;
 };
 
-const DATA_POINTS: Record<string, number> = {
-    none: 0,
-    'internal only': 1,
-    confidential: 2,
-    'personal data': 3,
-    pii: 3,
-    'sensitive personal or payment data': 5,
-    'highly sensitive': 5,
-    phi: 5,
-    'cardholder (pci)': 5,
-    cardholder: 5,
-    pci: 5,
-};
+export const IR_RATING = ['High', 'Moderate', 'Low', 'Unknown'] as const;
+export const CANONICAL_IR_KEYS = [
+    'ir_01', 'ir_02', 'ir_03', 'ir_04', 'ir_05', 'ir_06', 'ir_07',
+    'ir_08', 'ir_09', 'ir_10', 'ir_11', 'ir_12', 'ir_13', 'ir_14', 'ir_15',
+] as const;
 
-const VOLUME_POINTS: Record<string, number> = {
-    '<1k': 0,
-    'fewer than 1,000': 0,
-    '1k–10k': 1,
-    '1,000 to 10,000': 1,
-    '10k–100k': 2,
-    '10,000 to 100,000': 2,
-    '>100k': 3,
-    'more than 100,000': 3,
-};
+export const WORKBOOK_PACKS = [
+    { key: 'baseline', name: 'Baseline', templateKey: 'information-security' },
+    { key: 'personal-sensitive-data', name: 'Personal and Sensitive Data', templateKey: 'privacy' },
+    { key: 'software-api', name: 'Software and API', templateKey: 'software-api' },
+    { key: 'cloud-hosting', name: 'Cloud Hosting', templateKey: 'cloud-saas' },
+    { key: 'privileged-network', name: 'Privileged and Network Access', templateKey: 'identity' },
+    { key: 'critical-operations', name: 'Critical Operations', templateKey: 'bcdr' },
+    { key: 'regulated-service', name: 'Regulated Service', templateKey: 'regulatory' },
+    { key: 'physical-delivery', name: 'Physical Delivery', templateKey: 'physical-delivery' },
+] as const;
 
-const ACCESS_POINTS: Record<string, number> = {
-    no: 0,
-    'read-only api': 2,
-    'read-write': 3,
-    'privileged or network access': 4,
-    privileged: 4,
-};
-
-const AVAIL_POINTS: Record<string, number> = {
-    negligible: 0,
-    '1 month': 1,
-    minor: 1,
-    '1 week': 3,
-    significant: 3,
-    '1 day': 4,
+const RATING_POINTS: Record<string, number> = {
+    high: 4,
+    critical: 4,
     severe: 4,
+    moderate: 3,
+    medium: 3,
+    significant: 3,
+    low: 1,
+    negligible: 1,
+    no: 1,
+    yes: 4,
+};
+
+const DATA_RATING: Record<string, string> = {
+    none: 'Low',
+    'internal only': 'Low',
+    confidential: 'High',
+    'personal data': 'High',
+    pii: 'High',
+    'phi / highly sensitive': 'High',
+    'cardholder (pci)': 'High',
+    cardholder: 'High',
 };
 
 function norm(value?: string | null) {
     return String(value || '').trim().toLowerCase();
 }
 
-function lookup(table: Record<string, number>, value?: string | null, fallback = 0) {
-    const key = norm(value);
-    if (!key) return fallback;
-    if (table[key] !== undefined) return table[key];
-    const hit = Object.keys(table).find((entry) => key.includes(entry));
-    return hit ? table[hit] : fallback;
-}
-
-function yes(value?: string | null) {
-    const key = norm(value);
-    return key === 'yes' || key.startsWith('yes ') || key === 'unknown';
-}
-
 function answer(answers: IntakeAnswer[], ...keys: string[]) {
     const found = answers.find((row) => keys.includes(row.questionKey));
     return found?.response || '';
+}
+
+function ratingOf(value?: string | null): 'High' | 'Moderate' | 'Low' | 'Unknown' | '' {
+    const key = norm(value);
+    if (!key || key === 'not recorded') return '';
+    if (key === 'unknown' || key === 'not yet known' || key === 'not answered') return 'Unknown';
+    if (RATING_POINTS[key] === 4 || key.startsWith('yes') || /high|severe|within 1 day|privileged|cardholder|phi|personal|confidential/.test(key)) {
+        if (/low|no\b|none|domestic|negligible|under/.test(key) && !/high/.test(key)) return 'Low';
+        return 'High';
+    }
+    if (RATING_POINTS[key] === 3 || /moderate|medium|significant|1 week|same region|read-write|1,000 to 10,000|10,000/.test(key)) return 'Moderate';
+    if (RATING_POINTS[key] === 1 || /low|no\b|none|domestic|negligible|fewer than|read-only/.test(key)) return 'Low';
+    return 'Unknown';
+}
+
+function pointsFor(rating: string) {
+    if (rating === 'High') return 4;
+    if (rating === 'Moderate') return 3;
+    if (rating === 'Low') return 1;
+    return 0;
+}
+
+function isUnknown(rating: string) {
+    return rating === 'Unknown' || rating === '';
+}
+
+function affirmative(rating: string) {
+    return rating === 'High' || rating === 'Moderate';
 }
 
 export function addBusinessDays(from: Date, days: number) {
@@ -151,46 +193,199 @@ export function formatVendorPublicId(year: number, sequence: number) {
     return `VND-${year}-${String(sequence).padStart(4, '0')}`;
 }
 
+function irRating(answers: IntakeAnswer[], key: string, aliases: string[], inferred?: string) {
+    const direct = answer(answers, key, ...aliases);
+    if (direct) return { rating: ratingOf(direct), raw: direct };
+    if (inferred) return { rating: ratingOf(inferred), raw: inferred };
+    return { rating: '', raw: '' };
+}
+
+function dataType(answers: IntakeAnswer[]) {
+    return answer(answers, 'ir_eng_data', 'ir_data', 'ir_5');
+}
+
+function category(answers: IntakeAnswer[]) {
+    return answer(answers, 'ir_eng_category');
+}
+
+function physical(answers: IntakeAnswer[]) {
+    return answer(answers, 'ir_physical', 'ir_onsite');
+}
+
+export function recommendDueDiligencePacks(answers: IntakeAnswer[], signals: IntakeSignals): PackRecommendation {
+    const facts: ScopeFact[] = [];
+    const why: Record<string, string[]> = { baseline: ['All vendors receive the Baseline pack.'] };
+
+    const add = (packKey: string, fact: string) => {
+        why[packKey] = [...(why[packKey] || []), fact];
+    };
+
+    const ir01 = irRating(answers, 'ir_01', ['ir_availability', 'ir_2']);
+    const ir02 = irRating(answers, 'ir_02', ['ir_data', 'ir_5'], DATA_RATING[norm(dataType(answers))] || dataType(answers));
+    const ir04 = irRating(answers, 'ir_04', ['ir_access', 'ir_6', 'ir_7']);
+    const ir05 = irRating(answers, 'ir_05', ['ir_access', 'ir_6', 'ir_7']);
+    const ir08 = irRating(answers, 'ir_08', ['ir_regulated', 'ir_8', 'ir_1']);
+    const cat = category(answers);
+    const phys = physical(answers);
+    const data = dataType(answers);
+
+    const record = (code: string, packKey: string, packName: string, question: string, rating: string, raw: string) => {
+        facts.push({
+            code,
+            packKey,
+            packName,
+            question,
+            answer: raw || rating || 'Unknown',
+            resolved: !isUnknown(rating),
+        });
+    };
+
+    record('IR-01', 'critical-operations', 'Critical Operations', 'Would an outage materially disrupt critical operations or customer commitments?', ir01.rating, ir01.raw);
+    record('IR-02', 'personal-sensitive-data', 'Personal and Sensitive Data', 'Will the vendor store or process confidential, regulated, authentication, payment, or health information?', ir02.rating, ir02.raw || data);
+    record('IR-04', 'privileged-network', 'Privileged and Network Access', 'Will the vendor have administrative or privileged access to systems, networks, or cloud environments?', ir04.rating, ir04.raw);
+    record('IR-05', 'privileged-network', 'Privileged and Network Access', 'Will the service connect directly to production systems or trusted networks?', ir05.rating, ir05.raw);
+    record('IR-08', 'regulated-service', 'Regulated Service', 'Could the service affect compliance with a law, regulation, license, or supervisory commitment?', ir08.rating, ir08.raw);
+    record('SCOPE-CATEGORY', 'cloud-hosting', 'Cloud Hosting', 'What is the service category?', ratingOf(cat) === '' ? (cat ? 'Low' : 'Unknown') : ratingOf(cat), cat);
+    record('SCOPE-SOFTWARE', 'software-api', 'Software and API', 'What is the service category?', cat ? 'Low' : 'Unknown', cat);
+    record('SCOPE-PHYSICAL', 'physical-delivery', 'Physical Delivery', 'Does the service depend on vendor facilities, physical records, on-site access, or physical media?', ratingOf(phys), phys);
+
+    if (affirmative(ir02.rating) || /confidential|personal|phi|cardholder|regulated|payment|health/i.test(data)) {
+        add('personal-sensitive-data', `Sensitive data fact: ${ir02.raw || data || ir02.rating}.`);
+    }
+    if (/saas|software|application|api/i.test(cat) || signals.softwareOrApi) {
+        add('software-api', `Service category is ${cat || 'software / API / hosted application'}.`);
+    }
+    if (/saas|host|cloud|platform/i.test(cat) || signals.cloudHosted) {
+        add('cloud-hosting', `Service category is ${cat || 'cloud or vendor-hosted'}.`);
+    }
+    if (affirmative(ir04.rating) || signals.privilegedAccess || /privileged|admin|remote|network/i.test(ir04.raw)) {
+        add('privileged-network', `Privileged access fact: ${ir04.raw || ir04.rating}.`);
+    }
+    if (affirmative(ir05.rating) || signals.systemAccess || /production|trusted|read-write|network/i.test(ir05.raw)) {
+        add('privileged-network', `System integration fact: ${ir05.raw || ir05.rating}.`);
+    }
+    if (affirmative(ir01.rating) || signals.criticalDependency) {
+        add('critical-operations', `Service criticality fact: ${ir01.raw || ir01.rating}.`);
+    }
+    if (affirmative(ir08.rating) || signals.regulatedProcess || /yes|regulated/i.test(ir08.raw)) {
+        add('regulated-service', `Regulatory impact fact: ${ir08.raw || ir08.rating}.`);
+    }
+    if (affirmative(ratingOf(phys)) || signals.physicalDelivery || /yes|on.?site|facilit|physical/i.test(phys)) {
+        add('physical-delivery', `Physical delivery fact: ${phys || ratingOf(phys)}.`);
+    }
+
+    const unresolved = facts.filter((fact) => {
+        if (fact.resolved) return false;
+        if (fact.packKey === 'cloud-hosting' || fact.packKey === 'software-api') return !cat;
+        if (fact.packKey === 'physical-delivery') return isUnknown(ratingOf(phys));
+        return true;
+    }).filter((fact, index, rows) => rows.findIndex((row) => row.code === fact.code) === index);
+
+    const required: DueDiligencePack[] = [{
+        key: 'baseline',
+        name: 'Baseline',
+        templateKey: 'information-security',
+        requirement: 'Required',
+        why: why.baseline,
+    }];
+    const recommended: DueDiligencePack[] = [];
+    for (const pack of WORKBOOK_PACKS) {
+        if (pack.key === 'baseline') continue;
+        if (!why[pack.key]?.length) continue;
+        required.push({
+            key: pack.key,
+            name: pack.name,
+            templateKey: pack.templateKey,
+            requirement: 'Required',
+            why: why[pack.key],
+        });
+    }
+    if (signals.fourthParty) {
+        recommended.push({
+            key: 'fourth-party',
+            name: 'Fourth-Party / Subcontractor',
+            templateKey: 'fourth-party',
+            requirement: 'Recommended',
+            why: ['Subcontracting was recorded. This is additional scope, not a workbook eighth pack.'],
+        });
+    }
+    if (signals.aiInvolved) {
+        recommended.push({
+            key: 'incident',
+            name: 'Incident Response',
+            templateKey: 'incident',
+            requirement: 'Recommended',
+            why: ['AI processing of organization data was recorded.'],
+        });
+    }
+
+    return {
+        required,
+        recommended,
+        unresolved,
+        selectedKeys: [...required, ...recommended].map((row) => row.templateKey),
+    };
+}
+
 export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierResult {
-    const data = answer(answers, 'ir_data', 'ir_5');
-    const volume = answer(answers, 'ir_volume');
-    const access = answer(answers, 'ir_access', 'ir_6', 'ir_7');
-    const onsite = answer(answers, 'ir_onsite');
-    const geo = answer(answers, 'ir_geo');
-    const regulated = answer(answers, 'ir_regulated', 'ir_8', 'ir_1');
-    const fourth = answer(answers, 'ir_fourth', 'ir_3');
-    const availability = answer(answers, 'ir_availability', 'ir_2');
+    const data = dataType(answers);
     const spend = answer(answers, 'ir_spend');
-    const ai = answer(answers, 'ir_ai');
+    const ratings = {
+        ir_01: irRating(answers, 'ir_01', ['ir_availability', 'ir_2']),
+        ir_02: irRating(answers, 'ir_02', ['ir_data', 'ir_5'], DATA_RATING[norm(data)] || data),
+        ir_03: irRating(answers, 'ir_03', ['ir_volume']),
+        ir_04: irRating(answers, 'ir_04', ['ir_access', 'ir_6', 'ir_7']),
+        ir_05: irRating(answers, 'ir_05', ['ir_access', 'ir_6', 'ir_7']),
+        ir_06: irRating(answers, 'ir_06', ['ir_1', 'ir_regulated']),
+        ir_07: irRating(answers, 'ir_07', []),
+        ir_08: irRating(answers, 'ir_08', ['ir_regulated', 'ir_8', 'ir_1']),
+        ir_09: irRating(answers, 'ir_09', ['ir_geo']),
+        ir_10: irRating(answers, 'ir_10', ['ir_fourth', 'ir_3']),
+        ir_11: irRating(answers, 'ir_11', []),
+        ir_12: irRating(answers, 'ir_12', ['ir_availability', 'ir_2']),
+        ir_13: irRating(answers, 'ir_13', ['ir_ai']),
+        ir_14: irRating(answers, 'ir_14', []),
+        ir_15: irRating(answers, 'ir_15', []),
+    };
 
-    const dataPoints = lookup(DATA_POINTS, data);
-    const volumePoints = lookup(VOLUME_POINTS, volume);
-    const accessPoints = lookup(ACCESS_POINTS, access);
-    const onsitePoints = /yes/i.test(onsite) ? 2 : 0;
-    const geoPoints = /outside/i.test(geo) ? 3 : /same region/i.test(geo) ? 1 : 0;
-    const regulatedPoints = /yes|customer-facing|regulated/i.test(regulated) ? 3 : 0;
-    const fourthPoints = /yes/i.test(fourth) ? 2 : /unknown/i.test(fourth) ? 1 : 0;
-    const availabilityPoints = lookup(AVAIL_POINTS, availability);
-    const spendPoints = />\s*\$?250k|more than \$250/i.test(spend) ? 2 : /25k|\$25/i.test(spend) ? 1 : 0;
-    const aiPoints = yes(ai) && !/^no\b/i.test(norm(ai)) ? 2 : 0;
+    const labels: Record<string, string> = {
+        ir_01: 'Service criticality',
+        ir_02: 'Sensitive data',
+        ir_03: 'Data volume',
+        ir_04: 'Privileged access',
+        ir_05: 'System integration',
+        ir_06: 'Customer-facing',
+        ir_07: 'Financial impact',
+        ir_08: 'Regulatory impact',
+        ir_09: 'Geographic exposure',
+        ir_10: 'Subcontracting',
+        ir_11: 'Concentration',
+        ir_12: 'Operational dependency',
+        ir_13: 'Artificial intelligence',
+        ir_14: 'Public exposure',
+        ir_15: 'Brand impact',
+    };
 
-    const factors: TierFactor[] = [
-        { code: 'sensitive_data', label: 'Sensitive data', points: dataPoints, rationale: data || 'No data type recorded.' },
-        { code: 'data_volume', label: 'Individuals or records affected', points: volumePoints, rationale: volume || 'Volume not recorded.' },
-        { code: 'privileged_access', label: 'System or privileged access', points: accessPoints, rationale: access || 'Access not recorded.' },
-        { code: 'onsite_access', label: 'Onsite or device access', points: onsitePoints, rationale: onsite || 'Onsite access not recorded.' },
-        { code: 'geographic_exposure', label: 'Geographic exposure', points: geoPoints, rationale: geo || 'Location not recorded.' },
-        { code: 'regulated_process', label: 'Customer-facing or regulated process', points: regulatedPoints, rationale: regulated || 'Regulatory exposure not recorded.' },
-        { code: 'fourth_party', label: 'Fourth-party use', points: fourthPoints, rationale: fourth || 'Subcontractor use not recorded.' },
-        { code: 'business_criticality', label: 'Business availability impact', points: availabilityPoints, rationale: availability || 'Availability impact not recorded.' },
-        { code: 'annual_spend', label: 'Annual spend', points: spendPoints, rationale: spend || 'Spend not recorded.' },
-        { code: 'ai_processing', label: 'AI processing', points: aiPoints, rationale: ai || 'AI involvement not recorded.' },
-    ];
+    const factors: TierFactor[] = CANONICAL_IR_KEYS.map((key) => {
+        const item = ratings[key];
+        return {
+            code: key.toUpperCase().replace('_', '-'),
+            label: labels[key],
+            points: pointsFor(item.rating),
+            rationale: item.raw ? `${item.rating || 'Recorded'}: ${item.raw}` : item.rating || 'Not recorded.',
+        };
+    });
+    factors.push({
+        code: 'annual_spend',
+        label: 'Estimated annual spend',
+        points: 0,
+        rationale: spend ? `${spend} (commercial context only; not scored)` : 'Spend not recorded. Commercial context only; not scored.',
+    });
 
     const score = factors.reduce((sum, factor) => sum + factor.points, 0);
     const cardholder = /cardholder|pci/i.test(data);
-    const phi = /\bphi\b|highly sensitive|sensitive personal/i.test(data);
-    const privilegedAccess = accessPoints >= 4 || /privileged/i.test(access);
+    const phi = /\bphi\b|highly sensitive|health/i.test(data);
+    const privilegedAccess = ratings.ir_04.rating === 'High' || /privileged|admin/i.test(ratings.ir_04.raw);
     const hardFloors: HardFloor[] = [
         {
             code: 'privileged_access',
@@ -213,41 +408,95 @@ export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierRe
     ];
 
     let recommendedTier: VendorTier = VendorTier.LOW;
-    if (score >= 8) recommendedTier = VendorTier.MEDIUM;
-    if (score >= 14) recommendedTier = VendorTier.HIGH;
-    if (score >= 20) recommendedTier = VendorTier.CRITICAL;
+    if (score >= 16) recommendedTier = VendorTier.MEDIUM;
+    if (score >= 28) recommendedTier = VendorTier.HIGH;
+    if (score >= 40) recommendedTier = VendorTier.CRITICAL;
     if (hardFloors.some((floor) => floor.applies)) recommendedTier = VendorTier.CRITICAL;
 
-    const inherentRisk = Math.min(100, Math.max(hardFloors.some((floor) => floor.applies) ? 80 : 0, Math.round((score / 30) * 100)));
+    const inherentRisk = Math.min(100, Math.max(hardFloors.some((floor) => floor.applies) ? 80 : 0, Math.round((score / 60) * 100)));
     const appliedFloors = hardFloors.filter((floor) => floor.applies).map((floor) => floor.label);
     const explanation = appliedFloors.length
-        ? `Supreme recommends ${recommendedTier.toLowerCase()} because a minimum floor applies: ${appliedFloors.join(', ')}. Intake score ${score} of 30.`
-        : `Supreme recommends ${recommendedTier.toLowerCase()} from the recorded intake score of ${score} of 30.`;
+        ? `Supreme recommends ${recommendedTier.toLowerCase()} because a minimum floor applies: ${appliedFloors.join(', ')}. Intake score ${score} of 60.`
+        : `Supreme recommends ${recommendedTier.toLowerCase()} from the recorded intake score of ${score} of 60.`;
 
+    const cat = category(answers);
+    const phys = physical(answers);
     const signals: IntakeSignals = {
-        personalData: /personal|pii|phi|cardholder|payment/i.test(data),
-        sensitiveData: /phi|cardholder|pci|highly sensitive|sensitive personal/i.test(data),
+        personalData: affirmative(ratings.ir_02.rating) || /personal|pii|phi|cardholder|payment|confidential/i.test(data),
+        sensitiveData: /phi|cardholder|pci|highly sensitive|health|authentication/i.test(data) || ratings.ir_02.rating === 'High',
         cardholder,
         phi,
         privilegedAccess,
-        systemAccess: accessPoints >= 2 || /api|sso|network|privileged|read-write/i.test(access),
-        onsiteAccess: /yes/i.test(onsite),
-        fourthParty: /yes/i.test(fourth),
-        aiInvolved: yes(ai) && !/^no\b/i.test(norm(ai)),
-        criticalDependency: availabilityPoints >= 3 || /1 day|1 week|severe|significant/i.test(availability),
-        regulatedProcess: regulatedPoints > 0,
-        geographicExposure: geoPoints > 0,
+        systemAccess: affirmative(ratings.ir_05.rating) || /api|sso|network|privileged|read-write|production/i.test(ratings.ir_05.raw),
+        onsiteAccess: /yes/i.test(phys),
+        fourthParty: affirmative(ratings.ir_10.rating) || /yes/i.test(ratings.ir_10.raw),
+        aiInvolved: affirmative(ratings.ir_13.rating) || (/yes/i.test(ratings.ir_13.raw) && !/^no\b/i.test(norm(ratings.ir_13.raw))),
+        criticalDependency: affirmative(ratings.ir_01.rating) || /1 day|1 week|severe|significant/i.test(ratings.ir_01.raw),
+        regulatedProcess: affirmative(ratings.ir_08.rating) || /yes|regulated/i.test(ratings.ir_08.raw),
+        geographicExposure: affirmative(ratings.ir_09.rating) || /outside|complex|higher-risk/i.test(ratings.ir_09.raw),
+        softwareOrApi: /saas|software|application|api/i.test(cat),
+        cloudHosted: /saas|host|cloud|platform/i.test(cat),
+        physicalDelivery: /yes|on.?site|facilit|physical/i.test(phys),
         dataTypes: [data].filter(Boolean),
     };
+    const packs = recommendDueDiligencePacks(answers, signals);
 
     return {
         score,
-        maxScore: 30,
+        maxScore: 60,
         inherentRisk,
         recommendedTier,
         factors,
         hardFloors,
         signals,
         explanation,
+        unresolved: packs.unresolved,
+        packs,
+    };
+}
+
+export function missingCanonicalIntake(answers: IntakeAnswer[]) {
+    return CANONICAL_IR_KEYS.filter((key) => {
+        const aliases = {
+            ir_01: ['ir_availability', 'ir_2'],
+            ir_02: ['ir_data', 'ir_5'],
+            ir_03: ['ir_volume'],
+            ir_04: ['ir_access', 'ir_6', 'ir_7'],
+            ir_05: ['ir_access', 'ir_6', 'ir_7'],
+            ir_06: ['ir_1', 'ir_regulated'],
+            ir_07: [] as string[],
+            ir_08: ['ir_regulated', 'ir_8', 'ir_1'],
+            ir_09: ['ir_geo'],
+            ir_10: ['ir_fourth', 'ir_3'],
+            ir_11: [] as string[],
+            ir_12: ['ir_availability', 'ir_2'],
+            ir_13: ['ir_ai'],
+            ir_14: [] as string[],
+            ir_15: [] as string[],
+        }[key];
+        const item = irRating(answers, key, aliases || []);
+        return !item.raw && !item.rating;
+    });
+}
+
+export function workbookControlGap(rows: Array<{ weight?: number | null; response?: string | null }>) {
+    let risk = 0;
+    let max = 0;
+    for (const row of rows) {
+        const weight = Number(row.weight || 0) || 0;
+        const value = norm(row.response);
+        if (!value || value === 'not answered' || value === 'unknown') continue;
+        if (value === 'n/a' || value === 'not applicable' || value.startsWith('not applicable')) continue;
+        max += 4 * weight;
+        if (value.startsWith('partial') || value.startsWith('in progress')) risk += 2 * weight;
+        else if (value.startsWith('no') || value.startsWith('qualified')) risk += 4 * weight;
+    }
+    if (!max) return { percent: null as number | null, band: 'Not rated' as const, formula: 'Workbook residual % = (Partial×2 + No×4) / (4 × applicable weights). Not Answered excluded. N/A adds 0.' };
+    const percent = Math.round((risk / max) * 1000) / 10;
+    const band = percent < 15 ? 'Low' : percent < 35 ? 'Moderate' : percent < 60 ? 'High' : 'Critical';
+    return {
+        percent,
+        band: band as 'Low' | 'Moderate' | 'High' | 'Critical',
+        formula: 'Workbook residual % = (Partial×2 + No×4) / (4 × applicable weights). Not Answered excluded. N/A adds 0.',
     };
 }

@@ -3,6 +3,7 @@ import { Role } from '@prisma/client';
 import { app } from '../server';
 import { prisma } from '../config/database';
 import { scanOnboardingAttention } from '../services/vendorOnboardingService';
+import { canonicalIntakeAnswers } from './helpers/canonicalIntake';
 
 jest.setTimeout(60000);
 
@@ -119,29 +120,18 @@ describe('Supreme Third Party onboarding Phase A', () => {
             .send({
                 answers: [
                     { questionKey: 'ir_eng_what', response: 'Process payroll' },
-                    { questionKey: 'ir_data', response: 'Personal data' },
+                    { questionKey: 'ir_02', response: 'High' },
                 ],
             });
         expect(saved.status).toBe(200);
-        expect(saved.body.data.intake.sections.flatMap((section: { questions: Array<{ key: string; response: string }> }) => section.questions).find((row: { key: string }) => row.key === 'ir_data').response).toBe('Personal data');
+        expect(saved.body.data.intake.sections.flatMap((section: { questions: Array<{ key: string; response: string }> }) => section.questions).find((row: { key: string }) => row.key === 'ir_02').response).toBe('High');
 
         const completed = await request(app)
             .post(`${API}/vendors/onboarding/${publicId}/intake/complete`)
             .set('Authorization', `Bearer ${tokenA}`)
             .send({
                 attested: true,
-                answers: [
-                    { questionKey: 'ir_data', response: 'Personal data' },
-                    { questionKey: 'ir_volume', response: '10,000 to 100,000' },
-                    { questionKey: 'ir_access', response: 'Read-write' },
-                    { questionKey: 'ir_onsite', response: 'No' },
-                    { questionKey: 'ir_geo', response: 'Same region' },
-                    { questionKey: 'ir_regulated', response: 'Yes' },
-                    { questionKey: 'ir_fourth', response: 'Yes' },
-                    { questionKey: 'ir_availability', response: 'Within 1 day / severe' },
-                    { questionKey: 'ir_spend', response: 'More than $250k' },
-                    { questionKey: 'ir_ai', response: 'Yes' },
-                ],
+                answers: canonicalIntakeAnswers(),
             });
         expect(completed.status).toBe(200);
         expect(completed.body.data.stage).toBe('Tier review');

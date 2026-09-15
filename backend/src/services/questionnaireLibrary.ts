@@ -32,6 +32,7 @@ export type LibraryTemplate = {
 
 const YN = ['Yes', 'Partial', 'No', 'Not applicable', 'Unknown'];
 const YN_DOC = ['Yes — current document available', 'Yes — document exists but outdated', 'In progress', 'No', 'Not applicable'];
+const IR_RATING = ['High', 'Moderate', 'Low', 'Unknown'];
 
 function q(
     id: string,
@@ -48,16 +49,18 @@ export const SUPREME_LIBRARY: LibraryTemplate[] = [
         key: 'inherent-risk',
         name: 'Inherent Risk Questionnaire',
         framework: 'Supreme Inherent Risk',
-        version: '2.0.0',
-        purpose: 'Internal intake and inherent exposure before due diligence is scoped. Completed by the business owner, not the vendor.',
+        version: '3.0.0',
+        purpose: 'Internal intake and inherent exposure before due diligence is scoped. Completed by the business owner, not the vendor. Canonical IR-01 to IR-15 from the approved Vendor Risk Assessment Workbook.',
         sections: [
             {
                 title: 'Engagement details',
                 questions: [
                     q('ir_eng_what', 'What will this third party do for the organization?', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'Describe the service or product in business language.' }),
-                    q('ir_eng_category', 'What is the service category?', 'Engagement', ['SaaS', 'Professional services', 'Hosting or cloud', 'Staffing', 'Hardware', 'Payment or financial operations', 'Other'], { weight: 0 }),
-                    q('ir_availability', 'If this vendor became unavailable, how quickly would the organization feel it?', 'Business continuity', ['Negligible', 'After 1 month / minor', 'After 1 week / significant', 'Within 1 day / severe'], { weight: 10 }),
+                    q('ir_eng_category', 'What is the service category?', 'Engagement', ['SaaS', 'Professional services', 'Hosting or cloud', 'Staffing', 'Hardware', 'Payment or financial operations', 'Software or API', 'Other'], { weight: 0, guidance: 'Used to derive Cloud Hosting and Software and API packs. Unknown is not allowed at Ready to Send.' }),
+                    q('ir_eng_data', 'What types of organization data will the vendor access, store, or process?', 'Engagement', ['None', 'Internal only', 'Confidential', 'Personal data', 'PHI / highly sensitive', 'Cardholder (PCI)'], { weight: 0, guidance: 'Commercial and floor context. Hard floors apply for PHI and cardholder data.' }),
+                    q('ir_physical', 'Does the service depend on vendor facilities, physical records, on-site access, or physical protection of systems or media?', 'Engagement', ['No', 'Yes', 'Unknown'], { weight: 0, guidance: 'Workbook Physical Delivery pack trigger. Not a sixteenth inherent-risk score factor.' }),
                     q('ir_eng_contract', 'What contract type or term is expected?', 'Engagement', ['Master services agreement', 'Statement of work', 'Subscription', 'Purchase order only', 'Not yet known'], { weight: 0 }),
+                    q('ir_spend', 'What is the estimated annual spend?', 'Engagement', ['Under $25k', '$25k–$250k', 'More than $250k'], { weight: 0, guidance: 'Commercial context only. Not part of inherent-risk scoring.' }),
                     q('ir_eng_contact', 'Who is the primary vendor contact?', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
                     q('ir_eng_security', 'Who is the vendor security or privacy contact, if known?', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
                 ],
@@ -65,16 +68,21 @@ export const SUPREME_LIBRARY: LibraryTemplate[] = [
             {
                 title: 'Inherent risk',
                 questions: [
-                    q('ir_data', 'What types of organization data will the vendor access, store, or process?', 'Privacy', ['None', 'Internal only', 'Confidential', 'Personal data', 'PHI / highly sensitive', 'Cardholder (PCI)'], { weight: 10 }),
-                    q('ir_volume', 'About how many records or individuals are affected?', 'Privacy', ['Fewer than 1,000', '1,000 to 10,000', '10,000 to 100,000', 'More than 100,000'], { weight: 8 }),
-                    q('ir_access', 'Will the vendor connect to organization systems (API, SSO, network, or privileged access)?', 'Identity/access', ['No', 'Read-only API', 'Read-write', 'Privileged or network access'], { weight: 10 }),
-                    q('ir_onsite', 'Will the vendor’s staff work on site or use organization devices?', 'Physical security', ['No', 'Yes'], { weight: 6 }),
-                    q('ir_geo', 'Where will data be stored or processed?', 'Privacy', ['Domestic only', 'Same region', 'Outside region'], { weight: 8 }),
-                    q('ir_regulated', 'Is this service customer-facing or does it affect a regulated process?', 'Compliance', ['No', 'Yes'], { weight: 8 }),
-                    q('ir_fourth', 'Does the vendor rely on subcontractors for this service?', 'Fourth-party / concentration', ['No', 'Yes', 'Unknown'], { weight: 6 }),
-                    q('ir_spend', 'What is the estimated annual spend?', 'Risk management', ['Under $25k', '$25k–$250k', 'More than $250k'], { weight: 4 }),
-                    q('ir_ai', 'Does the engagement involve AI or machine-learning processing of organization data?', 'AI governance', ['No', 'Yes'], { weight: 6 }),
-                    q('ir_1', 'What business services depend on this vendor?', 'Risk management', ['Customer-facing revenue', 'Internal operations', 'Regulated process', 'Non-critical support', 'Unknown'], { weight: 8 }),
+                    q('ir_01', 'Would an outage materially disrupt critical operations or customer commitments?', 'Service criticality', IR_RATING, { weight: 4, guidance: 'Workbook IR-01.' }),
+                    q('ir_02', 'Will the vendor store or process confidential, regulated, authentication, payment, or health information?', 'Sensitive data', IR_RATING, { weight: 4, guidance: 'Workbook IR-02.' }),
+                    q('ir_03', 'Will the vendor process a large or rapidly growing volume of organizational or customer records?', 'Data volume', IR_RATING, { weight: 4, guidance: 'Workbook IR-03.' }),
+                    q('ir_04', 'Will the vendor have administrative or privileged access to systems, networks, or cloud environments?', 'Privileged access', IR_RATING, { weight: 4, guidance: 'Workbook IR-04.' }),
+                    q('ir_05', 'Will the service connect directly to production systems or trusted networks?', 'System integration', IR_RATING, { weight: 4, guidance: 'Workbook IR-05.' }),
+                    q('ir_06', 'Is the service directly used by customers or embedded in a customer-facing product?', 'Customer-facing', IR_RATING, { weight: 4, guidance: 'Workbook IR-06.' }),
+                    q('ir_07', 'Could service failure, fraud, or misuse create material financial loss?', 'Financial impact', IR_RATING, { weight: 4, guidance: 'Workbook IR-07.' }),
+                    q('ir_08', 'Could the service affect compliance with a law, regulation, license, or supervisory commitment?', 'Regulatory impact', IR_RATING, { weight: 4, guidance: 'Workbook IR-08.' }),
+                    q('ir_09', 'Will data or service delivery depend on higher-risk or legally complex jurisdictions?', 'Geographic exposure', IR_RATING, { weight: 4, guidance: 'Workbook IR-09.' }),
+                    q('ir_10', 'Will important service components or data processing be delegated to other providers?', 'Subcontracting', IR_RATING, { weight: 4, guidance: 'Workbook IR-10.' }),
+                    q('ir_11', 'Would replacement be difficult because of unique technology, data, skills, or market concentration?', 'Concentration', IR_RATING, { weight: 4, guidance: 'Workbook IR-11.' }),
+                    q('ir_12', 'Is the vendor required for time-sensitive or high-volume operations?', 'Operational dependency', IR_RATING, { weight: 4, guidance: 'Workbook IR-12.' }),
+                    q('ir_13', 'Will the service train, operate, or make decisions using machine-learning or generative-AI capabilities?', 'Artificial intelligence', IR_RATING, { weight: 4, guidance: 'Workbook IR-13.' }),
+                    q('ir_14', 'Is the service reachable from the public internet or responsible for externally accessible infrastructure?', 'Public exposure', IR_RATING, { weight: 4, guidance: 'Workbook IR-14.' }),
+                    q('ir_15', 'Could failure or misuse create significant customer harm or reputational damage?', 'Brand impact', IR_RATING, { weight: 4, guidance: 'Workbook IR-15.' }),
                 ],
             },
         ],
@@ -343,6 +351,39 @@ export const SUPREME_LIBRARY: LibraryTemplate[] = [
             ]},
         ],
     },
+    {
+        key: 'software-api',
+        name: 'Software and API Assessment',
+        framework: 'Supreme Software and API',
+        version: '1.0.0',
+        purpose: 'Secure development and API controls when the vendor supplies software, a hosted application, or an API. Complements Information Security; does not duplicate it.',
+        sections: [
+            { title: 'Software delivery', questions: [
+                q('sa_1', 'Is a secure software-development lifecycle used for code delivered to this organization?', 'Application security', YN_DOC, { weight: 9, evidenceRequired: true }),
+                q('sa_2', 'Are open-source and third-party components inventoried and monitored for vulnerabilities?', 'Application security', YN, { weight: 8 }),
+                q('sa_3', 'Are material code or API changes reviewed before production release?', 'Change management', YN, { weight: 8 }),
+            ]},
+            { title: 'API controls', questions: [
+                q('sa_4', 'Are APIs authenticated, authorized, and rate-limited for this service?', 'Application security', YN, { weight: 9, evidenceRequired: true }),
+                q('sa_5', 'Is customer data in APIs limited to the fields required for the engagement?', 'Data protection', YN, { weight: 7 }),
+            ]},
+        ],
+    },
+    {
+        key: 'physical-delivery',
+        name: 'Physical Delivery Assessment',
+        framework: 'Supreme Physical Delivery',
+        version: '1.0.0',
+        purpose: 'Facility, media, and on-site controls when the workbook Physical Delivery pack applies.',
+        sections: [
+            { title: 'Facilities and media', questions: [
+                q('pd_1', 'Are vendor facilities used for this service access-controlled and monitored?', 'Physical security', YN_DOC, { weight: 8, evidenceRequired: true }),
+                q('pd_2', 'Are visitors and on-site personnel logged and escorted in sensitive areas?', 'Physical security', YN, { weight: 7 }),
+                q('pd_3', 'Is physical media containing organization data encrypted or equivalently protected in transit and storage?', 'Physical security', YN, { weight: 8 }),
+                q('pd_4', 'Is secure destruction used for physical records or media at end of life?', 'Physical security', YN, { weight: 7 }),
+            ]},
+        ],
+    },
 ];
 
 function isUniqueViolation(error: unknown) {
@@ -506,47 +547,26 @@ export async function ensureSupremeLibrary() {
     await ensureInFlight;
 }
 
-const SCOPE_BY_TIER: Record<string, string[]> = {
-    LOW: ['inherent-risk', 'information-security'],
-    MEDIUM: ['inherent-risk', 'information-security', 'privacy', 'cloud-saas'],
-    HIGH: ['inherent-risk', 'information-security', 'privacy', 'bcdr', 'cloud-saas', 'incident'],
-    CRITICAL: ['inherent-risk', 'information-security', 'privacy', 'bcdr', 'identity', 'cloud-saas', 'incident', 'fourth-party', 'soc2'],
-};
-
 const PLAN_REASON: Record<string, string> = {
     'inherent-risk': 'Determines due-diligence scope before controls are credited.',
-    'information-security': 'Network, system, or data access requires a security program review.',
-    privacy: 'The relationship may process personal or confidential information.',
-    bcdr: 'The vendor is an operational dependency that needs continuity coverage.',
-    'cloud-saas': 'Hosted or SaaS delivery requires a cloud-control review.',
-    incident: 'An incident at this vendor could require customer or regulator notice.',
-    identity: 'Privileged or production access requires identity-control review.',
-    'fourth-party': 'Concentration and subcontracting risk rises at this tier.',
-    soc2: 'Customers often expect an assurance review at this residual-risk level.',
-    resilience: 'Payment or financial operations raise resilience expectations.',
-    regulatory: 'The relationship may support a regulated activity.',
+    'information-security': 'Workbook Baseline pack — required for every vendor.',
+    privacy: 'Personal and Sensitive Data pack — confidential, personal, regulated, payment, or health data.',
+    'software-api': 'Software and API pack — vendor supplies software, a hosted application, or an API.',
+    'cloud-saas': 'Cloud Hosting pack — vendor-hosted, cloud, or platform delivery.',
+    identity: 'Privileged and Network Access pack — administrative, remote, or production-network access.',
+    bcdr: 'Critical Operations pack — material outage or critical dependency.',
+    regulatory: 'Regulated Service pack — regulated activity or legal/audit obligation.',
+    'physical-delivery': 'Physical Delivery pack — facilities, physical records, on-site access, or media.',
+    incident: 'Recommended because incident notice may be required for this engagement.',
+    'fourth-party': 'Recommended because subcontracting was recorded.',
+    soc2: 'Optional assurance review. Not a SOC 2 examination.',
+    resilience: 'Optional resilience review.',
 };
 
-function reasonFor(key: string, vendor: { vendorType?: string | null; tier?: string | null }, signals?: IntakeAwareSignals) {
-    if (key === 'information-security' && signals?.systemAccess) {
-        return 'Vendor accesses company systems.';
-    }
-    if (key === 'privacy' && signals?.personalData) {
-        return 'Personal data is involved.';
-    }
-    if (key === 'bcdr' && signals?.criticalDependency) {
-        return 'Critical business dependency.';
-    }
-    if (key === 'fourth-party' && signals?.fourthParty) {
-        return 'Subcontractors recorded.';
-    }
-    if (key === 'identity' && signals?.privilegedAccess) {
-        return 'Privileged or production access recorded.';
-    }
-    if (key === 'cloud-saas' && /SAAS|CLOUD/i.test(String(vendor.vendorType || ''))) {
-        return 'Hosted service — cloud and SaaS controls apply.';
-    }
-    return PLAN_REASON[key] || 'Recommended from this vendor’s recorded risk tier.';
+function reasonFor(key: string, _vendor: { vendorType?: string | null; tier?: string | null }, signals?: IntakeAwareSignals) {
+    const packWhy = signals?.packReasons?.[key];
+    if (packWhy?.length) return packWhy.join(' ');
+    return PLAN_REASON[key] || 'Derived from recorded intake facts.';
 }
 
 export type IntakeAwareSignals = {
@@ -556,6 +576,13 @@ export type IntakeAwareSignals = {
     fourthParty?: boolean;
     aiInvolved?: boolean;
     criticalDependency?: boolean;
+    softwareOrApi?: boolean;
+    cloudHosted?: boolean;
+    physicalDelivery?: boolean;
+    regulatedProcess?: boolean;
+    requiredTemplateKeys?: string[];
+    recommendedTemplateKeys?: string[];
+    packReasons?: Record<string, string[]>;
 };
 
 export async function getLibraryTemplateByKey(key: string) {
@@ -577,21 +604,20 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     if (!vendor) throw new ApiError(404, 'Vendor not found');
     await ensureSupremeLibrary();
     const tier = tierOverride || vendor.tier;
-    const keys = SCOPE_BY_TIER[tier] || SCOPE_BY_TIER.MEDIUM;
-    const extra: string[] = [];
-    if (/PAYMENT|FINANCIAL/i.test(String(vendor.vendorType || ''))) extra.push('resilience', 'regulatory');
-    if (signals?.personalData) extra.push('privacy');
-    if (signals?.systemAccess || signals?.privilegedAccess) extra.push('information-security');
-    if (signals?.privilegedAccess) extra.push('identity');
-    if (signals?.criticalDependency) extra.push('bcdr');
-    if (signals?.fourthParty) extra.push('fourth-party');
-    const wanted = new Set([...keys, ...extra]);
-    const requiredKeys = new Set<string>(['inherent-risk']);
-    if (signals?.systemAccess || signals?.privilegedAccess) requiredKeys.add('information-security');
-    if (signals?.personalData) requiredKeys.add('privacy');
-    if (signals?.criticalDependency) requiredKeys.add('bcdr');
-    if (signals?.fourthParty) requiredKeys.add('fourth-party');
-    const recommendedKeys = new Set([...wanted].filter((key) => !requiredKeys.has(key)));
+    const requiredKeys = new Set<string>(['inherent-risk', 'information-security', ...(signals?.requiredTemplateKeys || [])]);
+    const recommendedKeys = new Set<string>([...(signals?.recommendedTemplateKeys || [])].filter((key) => !requiredKeys.has(key)));
+    if (!signals?.requiredTemplateKeys?.length) {
+        if (signals?.personalData) requiredKeys.add('privacy');
+        if (signals?.softwareOrApi) requiredKeys.add('software-api');
+        if (signals?.cloudHosted) requiredKeys.add('cloud-saas');
+        if (signals?.privilegedAccess || signals?.systemAccess) requiredKeys.add('identity');
+        if (signals?.criticalDependency) requiredKeys.add('bcdr');
+        if (signals?.regulatedProcess) requiredKeys.add('regulatory');
+        if (signals?.physicalDelivery) requiredKeys.add('physical-delivery');
+        if (signals?.fourthParty) recommendedKeys.add('fourth-party');
+        if (signals?.aiInvolved) recommendedKeys.add('incident');
+    }
+    const wanted = new Set([...requiredKeys, ...recommendedKeys]);
     const optionalKeys = SUPREME_LIBRARY.map((item) => item.key).filter((key) => !wanted.has(key));
     const allKeys = [...requiredKeys, ...recommendedKeys, ...optionalKeys];
     const names = SUPREME_LIBRARY.filter((item) => allKeys.includes(item.key)).map((item) => item.name);
@@ -641,7 +667,7 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     const optional = toItems(optionalKeys);
     return {
         vendor,
-        rationale: `Recommended from recorded vendor tier ${tier}. This is assessment scope, not a residual-risk score change. Aligned assessments do not provide certification.`,
+        rationale: `Recommended due-diligence package derived from intake facts. Confirmed vendor tier ${tier} does not replace pack selection. This is assessment scope, not a residual-risk score change.`,
         required,
         recommended,
         optional,

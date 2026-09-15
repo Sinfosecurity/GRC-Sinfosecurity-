@@ -31,8 +31,8 @@ describe('public frontend URLs and invitation payload safety', () => {
         expect(body).toContain(
             'https://supreme-risk-staging.onrender.com/activate?token=opaque-invite-token'
         );
-        expect(body).toContain('Amina Cole invited you to join Elite Claims on Supreme.');
-        expect(body).toContain('Your role: Viewer');
+        expect(body).toContain('Amina Cole invited you to join Elite Claims on Supreme');
+        expect(body).toContain('Role: Viewer');
         expect(body).not.toMatch(/\bVIEWER\b|ORGANIZATION_ADMIN|SMTP|SENDGRID/);
         expect(body).not.toMatch(/localhost|127\.0\.0\.1|5173/);
     });

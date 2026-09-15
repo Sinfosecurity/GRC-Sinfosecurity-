@@ -49,6 +49,10 @@ export default function VendorOnboardingWorkspace() {
     const [clauses, setClauses] = useState<Record<string, boolean>>({});
     const [approval, setApproval] = useState({ decision: 'APPROVE', conditions: '', rationale: '' });
     const [acceptance, setAcceptance] = useState<Record<string, { rationale: string; conditions: string }>>({});
+    const [customizePlan, setCustomizePlan] = useState(false);
+    const [excludedPacks, setExcludedPacks] = useState<string[]>([]);
+    const [packReason, setPackReason] = useState('');
+    const [copiedLink, setCopiedLink] = useState('');
     const [exitNotes, setExitNotes] = useState('');
     const [acknowledgeOutstanding, setAcknowledgeOutstanding] = useState(false);
     const [reassessment, setReassessment] = useState<any>(null);
@@ -259,27 +263,62 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 3 && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="h6">Recommended due-diligence plan</Typography>
-                                <Typography variant="body2">{data.plan?.rationale || 'Confirm the tier to generate the plan. Nothing is sent to the vendor in this phase.'}</Typography>
+                                <Typography variant="h6">Recommended due-diligence package</Typography>
+                                <Typography variant="body2">{data.plan?.rationale || 'Confirm the tier to generate the package. Nothing is sent to the vendor in this phase.'}</Typography>
                             </Surface>
-                            {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
-                            {data.plan?.triggers?.aiGovernance && <Alert severity="info">AI Governance review may be required</Alert>}
-                            {data.plan?.triggers?.resilience && <Alert severity="info">Resilience / BCP review may be required</Alert>}
+                            {(data.plan?.unresolved || []).length > 0 && (
+                                <Alert severity="warning">
+                                    We still need to know {(data.plan.unresolved as any[]).map((row) => row.question).join(' ')} Complete intake. Unknown answers cannot be used to drop a pack.
+                                </Alert>
+                            )}
+                            <Surface>
+                                <Typography variant="subtitle1">Required</Typography>
+                                {(data.plan?.package?.required || data.plan?.assessments || []).filter((item: any) => item.requirement !== 'Recommended' && item.requirement !== 'Optional').map((item: any) => (
+                                    <Stack key={item.key || item.name} spacing={0.5} sx={{ mt: 1 }}>
+                                        <Typography><strong>{item.name || item.packName}</strong></Typography>
+                                        <Typography variant="body2">Included because: {(item.why || [item.rationale]).filter(Boolean).join(' ')}</Typography>
+                                        {customizePlan && item.templateKey !== 'information-security' && item.key !== 'information-security' && item.key !== 'baseline' && (
+                                            <FormControlLabel
+                                                control={<Checkbox checked={!excludedPacks.includes(item.templateKey || item.key)} onChange={(event) => {
+                                                    const key = item.templateKey || item.key;
+                                                    setExcludedPacks(event.target.checked ? excludedPacks.filter((row) => row !== key) : [...excludedPacks, key]);
+                                                }} />}
+                                                label="Include this pack"
+                                            />
+                                        )}
+                                    </Stack>
+                                ))}
+                            </Surface>
+                            {(data.plan?.package?.recommended || []).length > 0 && (
+                                <Surface>
+                                    <Typography variant="subtitle1">Recommended</Typography>
+                                    {data.plan.package.recommended.map((item: any) => (
+                                        <Typography key={item.key} variant="body2" sx={{ mt: 0.75 }}><strong>{item.name}</strong> — {(item.why || []).join(' ')}</Typography>
+                                    ))}
+                                </Surface>
+                            )}
                             {(data.plan?.assessments || []).map((item: any) => (
-                                <Surface key={item.key || item.name}>
+                                <Surface key={`assess-${item.key || item.name}`}>
                                     <Typography variant="subtitle1">{item.requirement === 'Completed' ? '✓ ' : ''}{item.name}</Typography>
                                     <Typography>{item.requirement}</Typography>
-                                    <Typography variant="body2">Why: {item.rationale}</Typography>
+                                    <Typography variant="body2">Why this was selected: {(item.why || [item.rationale]).filter(Boolean).join(' ')}</Typography>
                                     <Typography variant="body2">Expected evidence: {item.expectedEvidence}</Typography>
-                                    {(item.reusableEvidence || []).length > 0 && (
-                                        <Typography variant="body2">Existing reusable evidence: {item.reusableEvidence.map((row: any) => row.title).join(', ')}</Typography>
-                                    )}
                                 </Surface>
                             ))}
+                            {data.plan?.override && <Alert severity="info">Package customized: {data.plan.override.reason}</Alert>}
                             {data.canReviewTier && data.stageKey === 'DUE_DILIGENCE_PLAN' && (
-                                <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}>Confirm plan · Ready to send</Button>
+                                <Stack spacing={1.5}>
+                                    <Button variant="contained" disabled={saving || (data.plan?.unresolved || []).length > 0} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}>Confirm package</Button>
+                                    <Button disabled={saving} onClick={() => setCustomizePlan(!customizePlan)}>Customize</Button>
+                                    {customizePlan && (
+                                        <>
+                                            <TextField required fullWidth multiline minRows={2} label="Customization rationale" value={packReason} onChange={(event) => setPackReason(event.target.value)} helperText="Required. Actor and time are recorded in the audit trail." />
+                                            <Button disabled={saving || !packReason} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id, { excludeKeys: excludedPacks, reason: packReason }))}>Save customized package</Button>
+                                        </>
+                                    )}
+                                </Stack>
                             )}
-                            {data.stageKey === 'READY_TO_SEND' && <Alert severity="success">Plan confirmed. Choose the vendor contact and send due diligence.</Alert>}
+                            {data.stageKey === 'READY_TO_SEND' && <Alert severity="success">Package confirmed. Choose Send invitation email or Copy secure invitation link.</Alert>}
                             {data.plan?.triggers?.privacy && <Button onClick={() => navigate(`/privacy-ops/vendors/${data.id}`)}>Open privacy</Button>}
                             {data.plan?.triggers?.aiGovernance && <Button onClick={() => navigate('/ai-governance')}>Open AI Governance</Button>}
                         </Stack>
@@ -288,22 +327,34 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 4 && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="h6">Send due diligence</Typography>
-                                <Typography variant="body2">Supreme prepares the invitation. You authorize sending it to the vendor contact.</Typography>
+                                <Typography variant="h6">Vendor delivery</Typography>
+                                <Typography variant="body2">Both paths use the same single-use secure activation. Copying a link is not email delivery. Queued is not Delivered.</Typography>
                             </Surface>
                             {data.invitation && (
                                 <Alert severity="info">
-                                    Invitation {data.invitation.status}. Email {data.invitation.emailStatus}. {data.invitation.emailTruth || 'Provider accepted or queued the message. This is not inbox delivery.'}
+                                    {data.invitation.status}. {data.invitation.deliveryMethod === 'LINK' ? 'Secure link path.' : data.invitation.deliveryMethod === 'EMAIL' ? `Email ${data.invitation.emailStatus}.` : ''} {data.invitation.emailTruth}
                                 </Alert>
                             )}
+                            {copiedLink && <Alert severity="success">Secure invitation link copied. Share it through your approved channel.</Alert>}
                             <Surface>
-                                <Stack spacing={1.5} component="form" onSubmit={(event) => { event.preventDefault(); run(() => vendorOnboardingAPI.send(id, contact)); }}>
+                                <Stack spacing={1.5}>
                                     <TextField required label="Primary assessment contact" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} />
                                     <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
                                     <TextField label="Title / role" value={contact.title} onChange={(event) => setContact({ ...contact, title: event.target.value })} />
                                     <TextField label="Phone" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} />
                                     {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && (
-                                        <Button type="submit" variant="contained" disabled={saving}>Send due diligence</Button>
+                                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                            <Button variant="contained" disabled={saving || !contact.name || !contact.email} onClick={() => run(() => vendorOnboardingAPI.send(id, contact))}>Send invitation email</Button>
+                                            <Button disabled={saving || !contact.name || !contact.email} onClick={() => run(async () => {
+                                                const response = await vendorOnboardingAPI.activationLink(id, contact);
+                                                const url = response.data.data.activationUrl;
+                                                if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
+                                                setCopiedLink(url || 'copied');
+                                            })}>Copy secure invitation link</Button>
+                                            {data.invitation?.deliveryMethod === 'LINK' && (
+                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as shared</Button>
+                                            )}
+                                        </Stack>
                                     )}
                                 </Stack>
                             </Surface>
@@ -313,7 +364,7 @@ export default function VendorOnboardingWorkspace() {
                                     <Typography>{item.status} · {item.answered} / {item.total} answered</Typography>
                                 </Surface>
                             ))}
-                            {data.canReviewTier && data.invitation && (
+                            {data.canReviewTier && data.invitation?.deliveryMethod === 'EMAIL' && (
                                 <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.resend(id))}>Resend invitation</Button>
                             )}
                         </Stack>
@@ -325,6 +376,7 @@ export default function VendorOnboardingWorkspace() {
                                 <Typography variant="h6">Exception-focused review</Typography>
                                 <Typography variant="body2">
                                     {(data.review?.questionsAnswered || 0)} answers recorded · {data.review?.satisfactory || 0} satisfactory · {data.review?.needClarification || 0} need clarification · {data.review?.potentialFindings || 0} potential findings
+                                    {data.review?.controlGap?.percent != null ? ` · Assessment control-gap ${data.review.controlGap.percent}% (${data.review.controlGap.band}). This is not the vendor residual score.` : ''}
                                 </Typography>
                             </Surface>
                             {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
@@ -391,7 +443,8 @@ export default function VendorOnboardingWorkspace() {
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Contract review</Typography>
-                                <Typography variant="body2">This is an attestation workspace, not legal advice. Required items come from tier and the due-diligence plan.</Typography>
+                                <Typography variant="body2">This is an attestation workspace, not legal advice. Required items come from tier and the due-diligence plan. Contract renewal uses the existing VendorContract date.</Typography>
+                                {data.lifecycle?.contractRenewalDate && <Fact label="Contract renewal date" value={formatShortDate(data.lifecycle.contractRenewalDate)} />}
                             </Surface>
                             {['Security', 'Privacy', 'Incident', 'Subprocessors', 'Data lifecycle', 'Assurance'].map((group) => {
                                 const items = (data.lifecycle?.checklist || []).filter((item: any) => clauseGroup(item.key) === group);
@@ -479,6 +532,7 @@ export default function VendorOnboardingWorkspace() {
                                 <Fact label="Overdue remediation" value={String(data.lifecycle?.monitoring?.overdueRemediation ?? 0)} />
                                 <Fact label="Accepted risks" value={String(data.lifecycle?.monitoring?.acceptedRisks ?? 0)} />
                                 <Fact label="Next reassessment" value={formatShortDate(data.lifecycle?.nextReassessmentAt || data.lifecycle?.monitoring?.nextReassessment)} />
+                                <Fact label="Contract renewal" value={formatShortDate(data.lifecycle?.contractRenewalDate)} />
                                 <Fact label="External intelligence" value={data.lifecycle?.monitoring?.externalIntelligence} />
                             </Surface>
                             <Surface>

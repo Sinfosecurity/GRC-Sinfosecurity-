@@ -5,7 +5,9 @@ import {
     formatVendorPublicId,
     namesLikelyDuplicate,
     recommendTierFromIntake,
+    workbookControlGap,
 } from '../services/vendorOnboardingScoring';
+import { canonicalIntakeAnswers } from './helpers/canonicalIntake';
 
 describe('vendor onboarding scoring', () => {
     it('allocates public vendor IDs as VND-YYYY-NNNN', () => {
@@ -19,52 +21,103 @@ describe('vendor onboarding scoring', () => {
         expect(extractVendorDomain('https://www.acmepayroll.com/security')).toBe('acmepayroll.com');
     });
 
-    it('recommends an explainable tier from intake answers', () => {
-        const result = recommendTierFromIntake([
-            { questionKey: 'ir_data', response: 'Confidential' },
-            { questionKey: 'ir_volume', response: '1,000 to 10,000' },
-            { questionKey: 'ir_access', response: 'Read-only API' },
-            { questionKey: 'ir_onsite', response: 'No' },
-            { questionKey: 'ir_geo', response: 'Domestic only' },
-            { questionKey: 'ir_regulated', response: 'No' },
-            { questionKey: 'ir_fourth', response: 'No' },
-            { questionKey: 'ir_availability', response: 'After 1 week / significant' },
-            { questionKey: 'ir_spend', response: '$25k–$250k' },
-            { questionKey: 'ir_ai', response: 'No' },
-        ]);
+    it('recommends an explainable tier from canonical IR-01 to IR-15', () => {
+        const result = recommendTierFromIntake(canonicalIntakeAnswers({
+            ir_01: 'Moderate',
+            ir_03: 'Low',
+            ir_04: 'Low',
+            ir_06: 'Low',
+            ir_07: 'Low',
+            ir_09: 'Low',
+            ir_10: 'Low',
+            ir_11: 'Low',
+            ir_12: 'Low',
+            ir_13: 'Low',
+            ir_14: 'Low',
+            ir_15: 'Low',
+        }));
         expect(result.recommendedTier).toBe(VendorTier.MEDIUM);
+        expect(result.maxScore).toBe(60);
         expect(result.score).toBeGreaterThan(0);
-        expect(result.factors.some((factor) => factor.label === 'Sensitive data')).toBe(true);
+        expect(result.factors.some((factor) => factor.code === 'IR-03' || factor.label === 'Data volume')).toBe(true);
+        expect(result.factors.find((factor) => factor.code === 'annual_spend')?.points).toBe(0);
         expect(result.explanation).toMatch(/medium/i);
         expect(result.signals.aiInvolved).toBe(false);
+        expect(result.packs.required.some((pack) => pack.key === 'baseline')).toBe(true);
+        expect(result.packs.required.some((pack) => pack.key === 'personal-sensitive-data')).toBe(true);
+        expect(result.packs.required.some((pack) => pack.key === 'cloud-hosting')).toBe(true);
+        expect(result.packs.unresolved).toHaveLength(0);
     });
 
     it('applies hard-floor rules for privileged access, cardholder data, and PHI', () => {
-        const privileged = recommendTierFromIntake([{ questionKey: 'ir_access', response: 'Privileged or network access' }]);
+        const privileged = recommendTierFromIntake([{ questionKey: 'ir_04', response: 'High' }]);
         expect(privileged.recommendedTier).toBe(VendorTier.CRITICAL);
         expect(privileged.hardFloors.find((floor) => floor.code === 'privileged_access')?.applies).toBe(true);
 
-        const cardholder = recommendTierFromIntake([{ questionKey: 'ir_data', response: 'Cardholder (PCI)' }]);
+        const cardholder = recommendTierFromIntake([{ questionKey: 'ir_eng_data', response: 'Cardholder (PCI)' }]);
         expect(cardholder.recommendedTier).toBe(VendorTier.CRITICAL);
         expect(cardholder.signals.cardholder).toBe(true);
 
-        const phi = recommendTierFromIntake([{ questionKey: 'ir_data', response: 'PHI / highly sensitive' }]);
+        const phi = recommendTierFromIntake([{ questionKey: 'ir_eng_data', response: 'PHI / highly sensitive' }]);
         expect(phi.recommendedTier).toBe(VendorTier.CRITICAL);
         expect(phi.signals.phi).toBe(true);
         expect(phi.signals.personalData).toBe(true);
     });
 
+    it('does not silently drop a pack when the controlling fact is Unknown', () => {
+        const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_04: 'Unknown', ir_05: 'Low' }));
+        expect(result.packs.unresolved.some((row) => row.code === 'IR-04')).toBe(true);
+        expect(result.packs.required.some((pack) => pack.key === 'privileged-network')).toBe(false);
+    });
+
+    it('maps the workbook eighth pack from the physical-delivery trigger', () => {
+        const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_physical: 'Yes' }));
+        expect(result.packs.required.some((pack) => pack.key === 'physical-delivery')).toBe(true);
+        expect(result.packs.required.find((pack) => pack.key === 'physical-delivery')?.why.join(' ')).toMatch(/Physical delivery/i);
+    });
+
     it('surfaces privacy, AI, and resilience signals without writing a legal conclusion', () => {
-        const result = recommendTierFromIntake([
-            { questionKey: 'ir_data', response: 'Personal data' },
-            { questionKey: 'ir_ai', response: 'Yes' },
-            { questionKey: 'ir_availability', response: 'Within 1 day / severe' },
-            { questionKey: 'ir_fourth', response: 'Yes' },
-        ]);
+        const result = recommendTierFromIntake(canonicalIntakeAnswers({
+            ir_02: 'High',
+            ir_13: 'High',
+            ir_01: 'High',
+            ir_10: 'High',
+        }));
         expect(result.signals.personalData).toBe(true);
         expect(result.signals.aiInvolved).toBe(true);
         expect(result.signals.criticalDependency).toBe(true);
         expect(result.signals.fourthParty).toBe(true);
+    });
+
+    it('computes workbook control-gap percent without replacing vendor residual', () => {
+        const gap = workbookControlGap([
+            { weight: 5, response: 'Yes' },
+            { weight: 5, response: 'Partial' },
+            { weight: 5, response: 'No' },
+            { weight: 5, response: 'N/A' },
+            { weight: 5, response: 'Not Answered' },
+        ]);
+        expect(gap.percent).toBe(50);
+        expect(gap.band).toBe('High');
+        expect(gap.formula).toMatch(/Not Answered excluded/);
+    });
+
+    it('applies the four approved workbook control-gap band boundaries', () => {
+        const yes = (weight: number) => ({ weight, response: 'Yes' });
+        const no = (weight: number) => ({ weight, response: 'No' });
+        expect(workbookControlGap([yes(5)]).band).toBe('Low');
+        expect(workbookControlGap([no(3), yes(18)]).percent).toBe(14.3);
+        expect(workbookControlGap([no(3), yes(18)]).band).toBe('Low');
+        expect(workbookControlGap([no(3), yes(17)]).percent).toBe(15);
+        expect(workbookControlGap([no(3), yes(17)]).band).toBe('Moderate');
+        expect(workbookControlGap([no(7), yes(14)]).percent).toBe(33.3);
+        expect(workbookControlGap([no(7), yes(14)]).band).toBe('Moderate');
+        expect(workbookControlGap([no(7), yes(13)]).percent).toBe(35);
+        expect(workbookControlGap([no(7), yes(13)]).band).toBe('High');
+        expect(workbookControlGap([no(12), yes(9)]).percent).toBe(57.1);
+        expect(workbookControlGap([no(12), yes(9)]).band).toBe('High');
+        expect(workbookControlGap([no(12), yes(8)]).percent).toBe(60);
+        expect(workbookControlGap([no(12), yes(8)]).band).toBe('Critical');
     });
 
     it('counts business days and skips weekends', () => {

@@ -2,6 +2,7 @@ import request from 'supertest';
 import { IssueReviewState, ScanStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
 import { app } from '../server';
 import { prisma } from '../config/database';
+import { canonicalIntakeAnswers } from './helpers/canonicalIntake';
 
 jest.setTimeout(90000);
 
@@ -20,19 +21,7 @@ async function completePhaseA(token: string, ownerId: string, suffix: string) {
     });
     expect(created.status).toBe(201);
     const publicId = created.body.data.publicId;
-    const answers = [
-        { questionKey: 'ir_eng_what', response: 'Process payroll' },
-        { questionKey: 'ir_data', response: 'Personal data' },
-        { questionKey: 'ir_volume', response: '10,000 to 100,000' },
-        { questionKey: 'ir_access', response: 'Read-write' },
-        { questionKey: 'ir_onsite', response: 'No' },
-        { questionKey: 'ir_geo', response: 'Same region' },
-        { questionKey: 'ir_regulated', response: 'Yes' },
-        { questionKey: 'ir_fourth', response: 'Yes' },
-        { questionKey: 'ir_availability', response: 'Within 1 day / severe' },
-        { questionKey: 'ir_spend', response: 'More than $250k' },
-        { questionKey: 'ir_ai', response: 'Yes' },
-    ];
+    const answers = canonicalIntakeAnswers();
     await request(app).post(`${API}/vendors/onboarding/${publicId}/intake/complete`).set('Authorization', `Bearer ${token}`).send({ answers, attested: true });
     await request(app).post(`${API}/vendors/onboarding/${publicId}/tier/confirm`).set('Authorization', `Bearer ${token}`).send({ confirm: true });
     const plan = await request(app).post(`${API}/vendors/onboarding/${publicId}/plan/confirm`).set('Authorization', `Bearer ${token}`).send({});

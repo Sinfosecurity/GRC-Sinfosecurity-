@@ -1,5 +1,6 @@
 import {
     emailFromAddress,
+    emailFromName,
     emailProviderSnapshot,
     selectedEmailProvider,
 } from '../services/emailProvider';
@@ -96,8 +97,10 @@ describe('transactional email provider routing', () => {
             SENDGRID_FROM_EMAIL: 'noreply@supremerisk.com',
         } as NodeJS.ProcessEnv;
         expect(emailFromAddress(env)).toBe('noreply@sinfosecurity.com');
+        expect(emailFromName(env)).toBe('Supreme');
         expect(emailProviderSnapshot(env).RESEND_CONFIGURED).toBe('YES');
         expect(emailProviderSnapshot(env).SENDGRID_CONFIGURED).toBe('NO');
+        expect(emailProviderSnapshot(env).FROM_NAME).toBe('Supreme');
     });
 
     it('sends through Resend and does not call SMTP when Resend is selected', async () => {

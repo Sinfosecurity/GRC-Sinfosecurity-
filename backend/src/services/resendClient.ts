@@ -67,6 +67,7 @@ export async function sendResendEmail(input: {
     subject: string;
     body: string;
     html?: string;
+    fromName?: string;
     tags?: Array<{ name: string; value: string }>;
     env?: NodeJS.ProcessEnv;
 }): Promise<ResendSendResult> {
@@ -79,7 +80,7 @@ export async function sendResendEmail(input: {
     if (!fromEmail) {
         throw new Error('RESEND_FROM_EMAIL is not configured');
     }
-    const fromName = emailFromName(env, 'RESEND');
+    const fromName = input.fromName || emailFromName(env, 'RESEND');
     const replyTo = emailReplyTo(env);
     const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',

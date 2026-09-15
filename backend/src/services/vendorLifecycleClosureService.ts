@@ -109,6 +109,10 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
         where: { organizationId, vendorId: vendor.id },
         orderBy: { calculatedAt: 'desc' },
     });
+    const contract = await prisma.vendorContract.findFirst({
+        where: { organizationId, vendorId: vendor.id },
+        orderBy: { createdAt: 'desc' },
+    });
     const checklist = Array.isArray(onboarding.contractChecklist)
         ? onboarding.contractChecklist
         : contractRequirements(vendor.tier, onboarding.plan);
@@ -130,6 +134,8 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
             vendorStatus: vendor.status,
             residualRisk: latestScore?.residualRisk ?? null,
             residualAtApproval: onboarding.residualAtApproval,
+            contractRenewalDate: contract?.renewalDate || contract?.expirationDate || null,
+            contractExpirationDate: contract?.expirationDate || null,
             checklist,
             contractAttestedAt: onboarding.contractAttestedAt,
             approvalDecision: onboarding.approvalDecision,
@@ -248,6 +254,12 @@ export async function attestContract(organizationId: string, vendorKey: string, 
     const missing = required.filter((row) => row.required && !clauses[row.key]);
     if (missing.length) throw new ApiError(409, `${missing.length} required contract item${missing.length === 1 ? '' : 's'} remain.`);
     const existing = await prisma.vendorContract.findFirst({ where: { organizationId, vendorId: vendor.id } });
+    if (existing && !existing.renewalDate) {
+        await prisma.vendorContract.update({
+            where: { id: existing.id },
+            data: { renewalDate: existing.expirationDate },
+        });
+    }
     if (!existing) {
         await prisma.vendorContract.create({
             data: {
@@ -257,6 +269,7 @@ export async function attestContract(organizationId: string, vendorKey: string, 
                 title: `${vendor.name} third-party agreement`,
                 effectiveDate: new Date(),
                 expirationDate: addBusinessDays(new Date(), 365),
+                renewalDate: addBusinessDays(new Date(), 365),
                 contractValue: vendor.estimatedAnnualSpend || 0,
                 hasDataProtectionClause: Boolean(clauses.dpa),
                 hasRightToAudit: Boolean(clauses.right_to_audit),
@@ -359,12 +372,23 @@ export async function activateVendor(organizationId: string, vendorKey: string, 
         },
     });
     if (vendor.businessOwnerUserId) {
+        const { customerAppUrl, vendorActivatedEmail } = await import('./transactionalEmail');
+        const activeMail = vendorActivatedEmail({
+            vendorName: vendor.name,
+            publicId: vendor.publicId,
+            nextReview: nextReassessmentAt,
+            ctaUrl: customerAppUrl(`/vendor-onboarding/${vendor.publicId}`),
+            conditions: vendor.onboarding?.approvalConditions || undefined,
+        });
         await notifyUser({
             organizationId,
             userId: vendor.businessOwnerUserId,
             eventType: 'approval.decision',
-            title: 'Third party is active',
-            body: `${vendor.name} is active. Next reassessment is scheduled.`,
+            title: activeMail.subject,
+            body: activeMail.text,
+            emailBody: activeMail.text,
+            emailHtml: activeMail.html,
+            fromName: activeMail.fromName,
             resourceType: 'Vendor',
             resourceId: vendor.id,
         });

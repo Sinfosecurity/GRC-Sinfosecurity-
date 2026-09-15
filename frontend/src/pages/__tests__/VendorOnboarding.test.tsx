@@ -19,6 +19,8 @@ vi.mock('../../services/api', () => ({
         saveContact: vi.fn(),
         send: vi.fn(),
         resend: vi.fn(),
+        activationLink: vi.fn(),
+        markInvitationShared: vi.fn(),
         reviewFinding: vi.fn(),
         reassessment: vi.fn().mockResolvedValue({ data: { data: { recommendation: 'Targeted reassessment' } } }),
     },

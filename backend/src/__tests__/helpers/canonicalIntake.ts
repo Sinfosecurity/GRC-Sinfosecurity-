@@ -1,0 +1,26 @@
+export function canonicalIntakeAnswers(overrides: Record<string, string> = {}) {
+    const base: Record<string, string> = {
+        ir_eng_what: 'Process payroll',
+        ir_eng_category: 'SaaS',
+        ir_eng_data: 'Personal data',
+        ir_physical: 'No',
+        ir_spend: '$25k–$250k',
+        ir_01: 'High',
+        ir_02: 'High',
+        ir_03: 'Moderate',
+        ir_04: 'Low',
+        ir_05: 'Moderate',
+        ir_06: 'Moderate',
+        ir_07: 'Moderate',
+        ir_08: 'High',
+        ir_09: 'Low',
+        ir_10: 'Moderate',
+        ir_11: 'Low',
+        ir_12: 'High',
+        ir_13: 'High',
+        ir_14: 'Moderate',
+        ir_15: 'Moderate',
+        ...overrides,
+    };
+    return Object.entries(base).map(([questionKey, response]) => ({ questionKey, response }));
+}
