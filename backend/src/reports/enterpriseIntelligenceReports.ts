@@ -17,7 +17,7 @@ export async function renderIntelligencePdf(organizationId: string, role: string
         generatedAt,
         reportId: reportId('INT', generatedAt),
         classification: 'Confidential — Executive',
-        footerNote: `${honestyCopy()} Generated ${isoDate(generatedAt)}.`,
+        footerNote: `Generated ${isoDate(generatedAt)}.`,
     }, (doc) => {
         drawSectionTitle(doc, 'Executive summary');
         drawParagraph(doc, honestyCopy());

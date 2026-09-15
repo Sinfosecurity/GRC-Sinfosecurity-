@@ -145,6 +145,39 @@ describe('deterministic rate-limit abuse', () => {
         expect(result.totalHits).toBe(0);
     });
 
+    it('keeps intelligence browsing on a dedicated budget separate from report PDFs', () => {
+        resetRateLimitPolicy();
+        const intelligence = getRateLimitSpec('intelligence');
+        const report = getRateLimitSpec('report');
+        expect(intelligence.max).toBe(180);
+        expect(intelligence.windowMs).toBe(15 * 60 * 1000);
+        expect(intelligence.keying).toBe('user+org');
+        expect(intelligence.failurePolicy).toBe('fail-open');
+        expect(report.max).toBe(40);
+    });
+
+    it('throttles intelligence bursts without consuming the report limiter', async () => {
+        delete process.env.REDIS_URL;
+        overrideRateLimitPolicy({ intelligence: { max: 2, windowMs: 60_000 }, report: { max: 2, windowMs: 60_000 } });
+        resetMemoryRateLimitStore();
+        const app = express();
+        app.set('trust proxy', 1);
+        app.use(express.json());
+        app.get('/intelligence', (req, _res, next) => {
+            (req as any).user = { id: 'user-intel', organizationId: 'org-intel' };
+            next();
+        }, createCategoryLimiter('intelligence'), (_req, res) => res.json({ ok: true }));
+        app.get('/report', (req, _res, next) => {
+            (req as any).user = { id: 'user-intel', organizationId: 'org-intel' };
+            next();
+        }, createCategoryLimiter('report'), (_req, res) => res.json({ ok: true }));
+
+        await request(app).get('/intelligence').expect(200);
+        await request(app).get('/intelligence').expect(200);
+        await request(app).get('/intelligence').expect(429);
+        await request(app).get('/report').expect(200);
+    });
+
     it('keeps graph reads on a dedicated budget separate from report PDFs', () => {
         resetRateLimitPolicy();
         const graph = getRateLimitSpec('graph');
