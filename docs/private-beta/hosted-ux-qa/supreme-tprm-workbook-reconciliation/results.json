@@ -1,0 +1,983 @@
+{
+  "checks": [
+    {
+      "name": "hosted-api-sha",
+      "result": "PASS",
+      "detail": "e250493c7dba98d882701acd83907f8cfaff1886"
+    },
+    {
+      "name": "hosted-frontend-sha",
+      "result": "PARTIAL",
+      "detail": "980f717d19d527acc9567eb330c03a540841e4b4 (D-01 UI SHA; e250493 changed tests only)"
+    },
+    {
+      "name": "request-golden",
+      "result": "PASS",
+      "detail": "201 VND-2026-0013"
+    },
+    {
+      "name": "unknown-blocks-complete",
+      "result": "PASS",
+      "detail": "400 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Unknown cannot remain on a required scoping fact. Will the vendor have administrative or privileged access to systems, networks, or cloud environments?\", \"statusCode\": 400, \"timestamp\": \"2026-09-15T0"
+    },
+    {
+      "name": "unknown-blocks-ready-to-send",
+      "result": "PASS",
+      "detail": "409 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"The due-diligence plan is not waiting for confirmation.\", \"statusCode\": 409, \"timestamp\": \"2026-09-15T04:04:14.503Z\", \"requestId\": \"78213fbc-4e3c-4b73-9e7b-73a"
+    },
+    {
+      "name": "save-resume-VND-2026-0013",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "intake-complete-VND-2026-0013",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "customize-requires-rationale",
+      "result": "PASS",
+      "detail": "400 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"Customizing the recommended package requires a reason.\", \"statusCode\": 400, \"timestamp\": \"2026-09-15T04:04:18.467Z\", \"requestId\": \"b25f0969-866e-459e-90f6-0eba"
+    },
+    {
+      "name": "customize-package",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "canonical-ir-count",
+      "result": "PASS",
+      "detail": "15 governed IR keys in payload"
+    },
+    {
+      "name": "hosted-ir_01",
+      "result": "PASS",
+      "detail": "critical operations"
+    },
+    {
+      "name": "hosted-ir_02",
+      "result": "PASS",
+      "detail": "confidential, regulated, authentication, payment, or health"
+    },
+    {
+      "name": "hosted-ir_03",
+      "result": "PASS",
+      "detail": "volume of organizational"
+    },
+    {
+      "name": "hosted-ir_04",
+      "result": "PASS",
+      "detail": "privileged access"
+    },
+    {
+      "name": "hosted-ir_05",
+      "result": "PASS",
+      "detail": "production systems"
+    },
+    {
+      "name": "hosted-ir_06",
+      "result": "PASS",
+      "detail": "customer-facing"
+    },
+    {
+      "name": "hosted-ir_07",
+      "result": "PASS",
+      "detail": "material financial loss"
+    },
+    {
+      "name": "hosted-ir_11",
+      "result": "PASS",
+      "detail": "market concentration"
+    },
+    {
+      "name": "hosted-ir_14",
+      "result": "PASS",
+      "detail": "public internet"
+    },
+    {
+      "name": "hosted-ir_15",
+      "result": "PASS",
+      "detail": "reputational damage"
+    },
+    {
+      "name": "raw-ir-keys-not-primary",
+      "result": "PASS",
+      "detail": " What will this third party do for the organization?  What is the service category?  What types of organization data will the vendor access, store, or process?  Does the service de"
+    },
+    {
+      "name": "estimated-spend-context",
+      "result": "PASS",
+      "detail": "{'key': 'ir_spend', 'question': 'What is the estimated annual spend?', 'guidance': 'Commercial context only. Not part of inherent-risk scoring.', 'type': 'SINGLE_CHOICE', 'options': ['Under $25k', '$25k\u2013$250k', 'More tha"
+    },
+    {
+      "name": "spend-not-scored",
+      "result": "PASS",
+      "detail": "points=0"
+    },
+    {
+      "name": "pack-count",
+      "result": "PASS",
+      "detail": "['Baseline', 'Personal and Sensitive Data', 'Software and API', 'Cloud Hosting', 'Privileged and Network Access', 'Critical Operations', 'Regulated Service', 'Physical Delivery']"
+    },
+    {
+      "name": "baseline-required",
+      "result": "PASS",
+      "detail": "['Baseline', 'Personal and Sensitive Data', 'Software and API', 'Cloud Hosting', 'Privileged and Network Access', 'Critical Operations', 'Regulated Service', 'Physical Delivery']"
+    },
+    {
+      "name": "pack-Baseline",
+      "result": "PASS",
+      "detail": "Baseline"
+    },
+    {
+      "name": "pack-Personal and Sensitive Data",
+      "result": "PASS",
+      "detail": "Personal and Sensitive Data"
+    },
+    {
+      "name": "pack-Software and API",
+      "result": "PASS",
+      "detail": "Software and API"
+    },
+    {
+      "name": "pack-Cloud Hosting",
+      "result": "PASS",
+      "detail": "Cloud Hosting"
+    },
+    {
+      "name": "pack-Privileged and Network Access",
+      "result": "PASS",
+      "detail": "Privileged and Network Access"
+    },
+    {
+      "name": "pack-Critical Operations",
+      "result": "PASS",
+      "detail": "Critical Operations"
+    },
+    {
+      "name": "pack-Regulated Service",
+      "result": "PASS",
+      "detail": "Regulated Service"
+    },
+    {
+      "name": "pack-Physical Delivery",
+      "result": "PASS",
+      "detail": "Physical Delivery"
+    },
+    {
+      "name": "why-baseline",
+      "result": "PASS",
+      "detail": "All vendors receive the Baseline pack."
+    },
+    {
+      "name": "why-personal-sensitive-data",
+      "result": "PASS",
+      "detail": "Sensitive data fact: High."
+    },
+    {
+      "name": "why-software-api",
+      "result": "PASS",
+      "detail": "Service category is SaaS."
+    },
+    {
+      "name": "why-cloud-hosting",
+      "result": "PASS",
+      "detail": "Service category is SaaS."
+    },
+    {
+      "name": "why-privileged-network",
+      "result": "PASS",
+      "detail": "Privileged access fact: High. System integration fact: High."
+    },
+    {
+      "name": "why-critical-operations",
+      "result": "PASS",
+      "detail": "Service criticality fact: High."
+    },
+    {
+      "name": "why-regulated-service",
+      "result": "PASS",
+      "detail": "Regulatory impact fact: High."
+    },
+    {
+      "name": "why-physical-delivery",
+      "result": "PASS",
+      "detail": "Physical delivery fact: Yes."
+    },
+    {
+      "name": "pack-override-audit",
+      "result": "PASS",
+      "detail": "9 events"
+    },
+    {
+      "name": "copy-secure-link",
+      "result": "PASS",
+      "detail": "200 {'status': 'Link copied', 'activationStatus': 'Pending', 'deliveryMethod': 'LINK', 'emailStatus': 'Not emailed', 'emailTruth': 'Secure link copied or marked as shared. This is not email delivery.', 'sentAt': None, 'expiresAt': '2026-09-29T04:04:20.960Z'}"
+    },
+    {
+      "name": "copy-link-not-email",
+      "result": "PASS",
+      "detail": "{'status': 'Link copied', 'activationStatus': 'Pending', 'deliveryMethod': 'LINK', 'emailStatus': 'Not emailed', 'emailTruth': 'Secure link copied or marked as shared. This is not email delivery.', 'sentAt': None, 'expiresAt': '2026-09-29T04:04:20.960Z'}"
+    },
+    {
+      "name": "copy-link-email-api",
+      "result": "PASS",
+      "detail": "{'status': 'Link copied', 'activationStatus': 'Pending', 'deliveryMethod': 'LINK', 'emailStatus': 'Not emailed', 'emailTruth': 'Secure link copied or marked as shared. This is not email delivery.', 'sentAt': None, 'expiresAt': '2026-09-29T04:04:20.960Z'}"
+    },
+    {
+      "name": "copy-link-false-email-claim",
+      "result": "PASS",
+      "detail": "{\"status\": \"link copied\", \"activationstatus\": \"pending\", \"deliverymethod\": \"link\", \"emailstatus\": \"not emailed\", \"emailtruth\": \"secure link copied or marked as shared. this is not email delivery.\", \"sentat\": null, \"expir"
+    },
+    {
+      "name": "mark-as-shared",
+      "result": "PASS",
+      "detail": "{'status': 'Link copied', 'activationStatus': 'Pending', 'deliveryMethod': 'LINK', 'emailStatus': 'Not emailed', 'emailTruth': 'Secure link copied or marked as shared. This is not email delivery.', 'sentAt': None, 'expiresAt': '2026-09-29T04:04:20.960Z'}"
+    },
+    {
+      "name": "resend-invalidation",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "vendor-activation",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "single-use",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "token-reuse",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "revoke",
+      "result": "PASS",
+      "detail": "prior copy-link token rejected after rotation"
+    },
+    {
+      "name": "vendor-plane",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "tenant-isolation",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "forged-org-denied",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "request-email",
+      "result": "PASS",
+      "detail": "201 VND-2026-0014"
+    },
+    {
+      "name": "save-resume-VND-2026-0014",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "intake-complete-VND-2026-0014",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "confirm-package",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send-email",
+      "result": "PASS",
+      "detail": "201 {'status': 'Email queued', 'activationStatus': 'Pending', 'deliveryMethod': 'EMAIL', 'emailStatus': 'Queued', 'emailTruth': 'Provider accepted or queued the message. Queued is not inbox delivery.', 'sentAt': '2026-09-15T04:04:28.739Z', 'expiresAt': '2026-09-29T04:04:27.928Z'}"
+    },
+    {
+      "name": "provider-accepted",
+      "result": "PASS",
+      "detail": "{'status': 'Email queued', 'activationStatus': 'Pending', 'deliveryMethod': 'EMAIL', 'emailStatus': 'Queued', 'emailTruth': 'Provider accepted or queued the message. Queued is not inbox delivery.', 'sentAt': '2026-09-15T04:04:28.739Z', 'expiresAt': '2026-09-29T04:04:27.928Z'}"
+    },
+    {
+      "name": "email-resend-invalidation",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "request-cross",
+      "result": "PASS",
+      "detail": "201 VND-2026-0015"
+    },
+    {
+      "name": "save-resume-VND-2026-0015",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "intake-complete-VND-2026-0015",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "confirm-package",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "cross-vendor",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "vendor-portal-assigned-packs",
+      "result": "PASS",
+      "detail": "['Supreme Information Security', 'Supreme Privacy', 'Supreme Software and API', 'Supreme Cloud', 'Supreme Identity', 'Supreme BCDR', 'Supreme Regulatory', 'Supreme Physical Delivery']"
+    },
+    {
+      "name": "vendor-cannot-see-admin",
+      "result": "PASS",
+      "detail": "portal workspace inspected"
+    },
+    {
+      "name": "not-answered-blocks-submit",
+      "result": "PASS",
+      "detail": "409 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"1 item remain before this can be submitted.\", \"statusCode\": 409, \"timestamp\": \"2026-09-15T04:04:41.402Z\", \"requestId\": "
+    },
+    {
+      "name": "vendor-submit",
+      "result": "PASS",
+      "detail": "8 assessments"
+    },
+    {
+      "name": "vendor-landing-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "vendor-landing-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "vendor-landing-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "vendor-landing-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "vendor-landing-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "axe-vendor-landing",
+      "result": "FAIL",
+      "detail": "serious=2 total=2"
+    },
+    {
+      "name": "vendor-questionnaire-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe-vendor-questionnaire",
+      "result": "FAIL",
+      "detail": "serious=1 total=1"
+    },
+    {
+      "name": "response-model",
+      "result": "PASS",
+      "detail": "['4 hours or less', 'In progress', 'No', 'None identified', 'Not applicable', 'Partial', 'Yes', 'Yes \u2014 current document available', 'Yes \u2014 full test']"
+    },
+    {
+      "name": "control-gap",
+      "result": "PASS",
+      "detail": "{\"percent\": 40.6, \"band\": \"High\", \"formula\": \"Workbook residual % = (Partial\\u00d72 + No\\u00d74) / (4 \\u00d7 applicable weights). Not Answered excluded. N/A adds 0.\"}"
+    },
+    {
+      "name": "vendor-residual-method",
+      "result": "PASS",
+      "detail": "{\"id\": \"6607d449-844e-494a-ac86-77a57dfdf6c7\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"vendorId\": \"61e867d2-0ec2-4d8d-9a9e-7ab914435f6f\", \"scoreVersion\": \"supreme-risk-1.1.0\", \"inherentRisk\": 93, \"controlEffectiveness\": 6"
+    },
+    {
+      "name": "historical-score",
+      "result": "PASS",
+      "detail": "<class 'dict'>"
+    },
+    {
+      "name": "d01-register-residual",
+      "result": "PASS",
+      "detail": "register=100 residual=100 inherent=93"
+    },
+    {
+      "name": "d02-submit-sync",
+      "result": "PASS",
+      "detail": "100"
+    },
+    {
+      "name": "register-workspace-match",
+      "result": "PASS",
+      "detail": "100 vs 100"
+    },
+    {
+      "name": "report-match",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "exception-review",
+      "result": "PASS",
+      "detail": "32 exceptions"
+    },
+    {
+      "name": "finding",
+      "result": "PASS",
+      "detail": "556e091c-9aeb-4d4f-aae8-9beecc83370f"
+    },
+    {
+      "name": "remediation",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "close-without-evidence",
+      "result": "PASS",
+      "detail": "409"
+    },
+    {
+      "name": "malware-fail-closed",
+      "result": "PASS",
+      "detail": "409 scan=CLEAN"
+    },
+    {
+      "name": "clean-evidence",
+      "result": "PASS",
+      "detail": "scan=CLEAN"
+    },
+    {
+      "name": "finding-closed",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "risk-acceptance",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "acceptance-changes-residual",
+      "result": "PASS",
+      "detail": "before=100 after=100"
+    },
+    {
+      "name": "contract-review",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "contract-renewal",
+      "result": "PASS",
+      "detail": "2028-02-08T04:05:26.480Z"
+    },
+    {
+      "name": "human-approval",
+      "result": "PASS",
+      "detail": "APPROVE_WITH_CONDITIONS"
+    },
+    {
+      "name": "active",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "monitoring",
+      "result": "PASS",
+      "detail": "{\"vendorStatus\": \"ACTIVE\", \"residualRisk\": 100, \"openFindings\": 0, \"acceptedRisks\": 1, \"overdueRemediation\": 0, \"nextReassessment\": \"2027-01-19T04:05:27.530Z\", \"contractAttested\": true, \"acceptanceExpiring\": 0, \"externalIntelligence\": \"Only"
+    },
+    {
+      "name": "request-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "request-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "request-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "request-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "request-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "axe-request",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "workspace-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "workspace-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "workspace-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "workspace-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "workspace-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "intake-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "intake-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "intake-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "intake-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "intake-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "axe-intake",
+      "result": "FAIL",
+      "detail": "serious=1 total=1"
+    },
+    {
+      "name": "tier-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "packs-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "packs-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "packs-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "packs-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "packs-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "axe-packs",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "send-375-overflow",
+      "result": "PASS",
+      "detail": "width 375 overflow=False"
+    },
+    {
+      "name": "send-768-overflow",
+      "result": "PASS",
+      "detail": "width 768 overflow=False"
+    },
+    {
+      "name": "send-1024-overflow",
+      "result": "PASS",
+      "detail": "width 1024 overflow=False"
+    },
+    {
+      "name": "send-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "send-1920-overflow",
+      "result": "PASS",
+      "detail": "width 1920 overflow=False"
+    },
+    {
+      "name": "axe-send",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "review-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe-review",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "finding-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe-finding",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "approval-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe-approval",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "active-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "history-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "register-1440-overflow",
+      "result": "PASS",
+      "detail": "width 1440 overflow=False"
+    },
+    {
+      "name": "axe-register",
+      "result": "FAIL",
+      "detail": "serious=1 total=1"
+    },
+    {
+      "name": "reassessment",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "history-preserved",
+      "result": "PASS",
+      "detail": "rows=9"
+    },
+    {
+      "name": "request-reject",
+      "result": "PASS",
+      "detail": "201 VND-2026-0016"
+    },
+    {
+      "name": "save-resume-VND-2026-0016",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "intake-complete-VND-2026-0016",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "confirm-package",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "reject-path",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "history-business-story",
+      "result": "PASS",
+      "detail": "50 events"
+    },
+    {
+      "name": "no-raw-token-in-history",
+      "result": "PASS",
+      "detail": "token absent"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/vendor-landing-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/vendor-landing-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/vendor-landing-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/vendor-landing-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/vendor-landing-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/vendor-questionnaire-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/request-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/request-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/request-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/request-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/request-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/workspace-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/workspace-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/workspace-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/intake-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/intake-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/intake-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/intake-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/intake-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/tier-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/packs-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/packs-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/packs-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/packs-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/packs-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/send-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/send-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/send-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/send-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/send-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/review-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/finding-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/approval-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/active-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/history-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/register-1440.png"
+  ],
+  "axe": [
+    {
+      "name": "vendor-landing",
+      "serious": 2,
+      "violations": [
+        {
+          "id": "aria-progressbar-name",
+          "impact": "serious",
+          "help": "ARIA progressbar nodes must have an accessible name",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "name": "vendor-questionnaire",
+      "serious": 1,
+      "violations": [
+        {
+          "id": "aria-progressbar-name",
+          "impact": "serious",
+          "help": "ARIA progressbar nodes must have an accessible name",
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "name": "request",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "intake",
+      "serious": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 20
+        }
+      ]
+    },
+    {
+      "name": "packs",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "send",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "review",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "finding",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "approval",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "register",
+      "serious": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodes": 1
+        }
+      ]
+    }
+  ],
+  "sha": {
+    "api": "e250493c7dba98d882701acd83907f8cfaff1886",
+    "frontend": "980f717d19d527acc9567eb330c03a540841e4b4",
+    "health": "degraded",
+    "environment": "staging",
+    "required": "e250493c7dba98d882701acd83907f8cfaff1886"
+  },
+  "workflow": {
+    "publicId": "VND-2026-0013",
+    "vendorId": "61e867d2-0ec2-4d8d-9a9e-7ab914435f6f",
+    "packWhy": [
+      {
+        "pack": "Baseline",
+        "why": "All vendors receive the Baseline pack."
+      },
+      {
+        "pack": "Personal and Sensitive Data",
+        "why": "Sensitive data fact: High."
+      },
+      {
+        "pack": "Software and API",
+        "why": "Service category is SaaS."
+      },
+      {
+        "pack": "Cloud Hosting",
+        "why": "Service category is SaaS."
+      },
+      {
+        "pack": "Privileged and Network Access",
+        "why": "Privileged access fact: High. System integration fact: High."
+      },
+      {
+        "pack": "Critical Operations",
+        "why": "Service criticality fact: High."
+      },
+      {
+        "pack": "Regulated Service",
+        "why": "Regulatory impact fact: High."
+      },
+      {
+        "pack": "Physical Delivery",
+        "why": "Physical delivery fact: Yes."
+      }
+    ],
+    "residualBefore": 28,
+    "emailInvitation": {
+      "status": "Email queued",
+      "activationStatus": "Pending",
+      "deliveryMethod": "EMAIL",
+      "emailStatus": "Queued",
+      "emailTruth": "Provider accepted or queued the message. Queued is not inbox delivery.",
+      "sentAt": "2026-09-15T04:04:28.739Z",
+      "expiresAt": "2026-09-29T04:04:27.928Z"
+    },
+    "emailStatus": "Queued",
+    "controlGap": {
+      "percent": 40.6,
+      "band": "High",
+      "formula": "Workbook residual % = (Partial\u00d72 + No\u00d74) / (4 \u00d7 applicable weights). Not Answered excluded. N/A adds 0."
+    },
+    "residualAfter": 100,
+    "residualMethod": "supreme-risk-1.1.0",
+    "findingId": "556e091c-9aeb-4d4f-aae8-9beecc83370f",
+    "acceptanceResidual": {
+      "before": 100,
+      "after": 100
+    },
+    "emailPublicId": "VND-2026-0014",
+    "crossPublicId": "VND-2026-0015",
+    "rejectPublicId": "VND-2026-0016",
+    "copyInvitation": {
+      "status": "Link copied",
+      "activationStatus": "Pending",
+      "deliveryMethod": "LINK",
+      "emailStatus": "Not emailed",
+      "emailTruth": "Secure link copied or marked as shared. This is not email delivery.",
+      "sentAt": null,
+      "expiresAt": "2026-09-29T04:04:20.960Z"
+    },
+    "assignedPacks": [
+      "Supreme Information Security",
+      "Supreme Privacy",
+      "Supreme Software and API",
+      "Supreme Cloud",
+      "Supreme Identity",
+      "Supreme BCDR",
+      "Supreme Regulatory",
+      "Supreme Physical Delivery"
+    ],
+    "recommendation": "Full reassessment",
+    "activeStatus": "ACTIVE"
+  },
+  "packs": [
+    "Baseline",
+    "Personal and Sensitive Data",
+    "Software and API",
+    "Cloud Hosting",
+    "Privileged and Network Access",
+    "Critical Operations",
+    "Regulated Service",
+    "Physical Delivery"
+  ],
+  "discrepancies": []
+}
