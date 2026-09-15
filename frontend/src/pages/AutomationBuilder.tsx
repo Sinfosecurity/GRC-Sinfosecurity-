@@ -8,9 +8,9 @@ import { automationAPI } from '../services/api';
 const TRIGGERS = [
     'finding.overdue', 'finding.confirmed', 'control.test.failed', 'evidence.expiring', 'evidence.expired',
     'risk.outside_appetite', 'risk.acceptance.expiring', 'assessment.submitted', 'intelligence.critical_attention',
-    'privacy.deadline.approaching', 'ai.approval.due', 'scheduled.review',
+    'compliance.gap.opened', 'privacy.deadline.approaching', 'ai.approval.due', 'scheduled.review',
 ];
-const FIELDS = ['finding.severity', 'vendor.tier', 'control.test.result', 'risk.outside_appetite', 'evidence.expires_within_days', 'owner.exists', 'due.exceeded', 'intelligence.priority'];
+const FIELDS = ['finding.severity', 'vendor.tier', 'control.test.result', 'risk.outside_appetite', 'evidence.expires_within_days', 'owner.exists', 'due.exceeded', 'intelligence.priority', 'intelligence.current'];
 const ACTIONS = ['CREATE_REVIEW_REQUEST', 'NOTIFY_OWNER', 'CREATE_REMINDER', 'REQUEST_EVIDENCE', 'CREATE_DECISION_PACKAGE', 'REQUEST_REASSESSMENT', 'ESCALATE_OVERDUE'];
 
 export default function AutomationBuilder() {

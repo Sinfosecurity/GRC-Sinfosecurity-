@@ -544,6 +544,17 @@ export const enterpriseAiGovernanceService = {
         await history(organizationId, 'AiSystem', row.publicId, 'updated', `AI system ${row.publicId} updated`, actorUserId);
         await audit({ organizationId, actorUserId, action: 'ai.system.updated', resourceType: 'AiSystem', resourceId: row.publicId });
         await projectSystem(organizationId, row.id, actorUserId);
+        if (row.reviewAt && row.reviewAt.getTime() <= Date.now() + 14 * 86400000) {
+            const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+            await emitSupremeAutomationEvent({
+                organizationId,
+                event: 'ai.approval.due',
+                sourceModel: 'AiSystem',
+                sourceId: row.id,
+                sourcePublicId: row.publicId,
+                actorUserId,
+            });
+        }
         return this.getSystem(organizationId, row.publicId);
     },
 

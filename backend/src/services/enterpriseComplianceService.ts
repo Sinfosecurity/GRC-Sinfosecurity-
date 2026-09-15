@@ -1202,6 +1202,15 @@ export const enterpriseComplianceService = {
         await projectScopedGap(organizationId, gap, actorUserId);
         await history(organizationId, 'GAP', gap.id, 'Gap opened', gap.title, actorUserId);
         await audit({ organizationId, actorUserId, action: 'compliance.gap.opened', resourceType: 'ComplianceGap', resourceId: gap.id });
+        const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+        await emitSupremeAutomationEvent({
+            organizationId,
+            event: 'compliance.gap.opened',
+            sourceModel: 'ComplianceGap',
+            sourceId: gap.id,
+            sourcePublicId: gap.publicId,
+            actorUserId,
+        });
         return gap;
     },
 

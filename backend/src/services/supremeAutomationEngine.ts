@@ -17,6 +17,7 @@ export type AutomationFacts = {
     'owner.exists'?: boolean;
     'due.exceeded'?: boolean;
     'intelligence.priority'?: string | null;
+    'intelligence.current'?: boolean;
     ownerUserId?: string | null;
     ownerLabel?: string | null;
     sourceHref?: string | null;

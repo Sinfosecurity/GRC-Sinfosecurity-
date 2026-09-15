@@ -56,6 +56,12 @@ router.get('/executions', requirePermission(PERMISSIONS['automation.read']), asy
     } catch (error) { next(error); }
 });
 
+router.get('/work/:publicId', requirePermission(PERMISSIONS['automation.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await supremeAutomationService.workItem(orgId(req, req.query.organizationId), req.params.publicId) });
+    } catch (error) { next(error); }
+});
+
 router.get('/executions/:publicId', requirePermission(PERMISSIONS['automation.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await supremeAutomationService.execution(orgId(req, req.query.organizationId), req.params.publicId) });

@@ -146,12 +146,67 @@ async function loadFacts(input: { organizationId: string; sourceModel: string; s
         if (!row) return {};
         return {
             'intelligence.priority': row.priority,
-            'owner.exists': Boolean(row.ownerUserId),
+            'intelligence.current': row.current,
+            'owner.exists': Boolean(row.ownerUserId || row.ownerLabel),
             ownerUserId: row.ownerUserId,
             ownerLabel: row.ownerLabel || 'Reviewer',
             sourceHref: sourceHref('IntelligenceItem', row.id, row.publicId),
             sourcePublicId: row.publicId,
             title: row.title,
+        };
+    }
+    if (input.sourceModel === 'ComplianceGap') {
+        const row = await prisma.complianceGap.findFirst({ where: { id: input.sourceId, organizationId: input.organizationId } });
+        if (!row) return {};
+        return {
+            'owner.exists': Boolean(row.ownerUserId),
+            ownerUserId: row.ownerUserId,
+            ownerLabel: 'Compliance owner',
+            sourceHref: sourceHref('ComplianceGap', row.id, row.publicId),
+            sourcePublicId: row.publicId,
+            title: row.title,
+        };
+    }
+    if (input.sourceModel === 'PrivacyRightsRequest') {
+        const row = await prisma.privacyRightsRequest.findFirst({ where: { id: input.sourceId, organizationId: input.organizationId } });
+        if (!row) return {};
+        return {
+            'owner.exists': Boolean(row.ownerUserId),
+            'due.exceeded': Boolean(row.dueAt && row.dueAt.getTime() < now.getTime() && !['COMPLETED', 'DENIED', 'CLOSED'].includes(row.status)),
+            ownerUserId: row.ownerUserId,
+            ownerLabel: 'Privacy owner',
+            sourceHref: sourceHref('PrivacyRightsRequest', row.id, row.publicId),
+            sourcePublicId: row.publicId,
+            title: row.publicId,
+        };
+    }
+    if (input.sourceModel === 'AiSystem') {
+        const row = await prisma.aiSystem.findFirst({ where: { id: input.sourceId, organizationId: input.organizationId } });
+        if (!row) return {};
+        return {
+            'owner.exists': Boolean(row.businessOwner || row.riskOwner || row.technicalOwner),
+            'due.exceeded': Boolean(row.reviewAt && row.reviewAt.getTime() < now.getTime()),
+            ownerUserId: null,
+            ownerLabel: row.riskOwner || row.businessOwner || 'AI owner',
+            sourceHref: sourceHref('AiSystem', row.id, row.publicId),
+            sourcePublicId: row.publicId,
+            title: row.name,
+        };
+    }
+    if (input.sourceModel === 'AiApproval') {
+        const row = await prisma.aiApproval.findFirst({
+            where: { id: input.sourceId, organizationId: input.organizationId },
+            include: { system: { select: { publicId: true, name: true, businessOwner: true, riskOwner: true, technicalOwner: true } } },
+        });
+        if (!row) return {};
+        return {
+            'owner.exists': Boolean(row.system.businessOwner || row.system.riskOwner || row.system.technicalOwner || row.decisionMaker),
+            'due.exceeded': Boolean(row.reviewAt && row.reviewAt.getTime() < now.getTime()),
+            ownerUserId: null,
+            ownerLabel: row.system.riskOwner || row.system.businessOwner || 'AI owner',
+            sourceHref: sourceHref('AiApproval', row.id, row.publicId),
+            sourcePublicId: row.publicId,
+            title: row.system.name,
         };
     }
     if (input.sourceModel === 'Vendor') {
@@ -255,6 +310,7 @@ function presentExecution(row: any) {
             'Declare compliance',
             'Approve AI',
             'Change residual risk',
+            'Make a legal conclusion',
         ],
         whoNeedsToAct: row.nextActorLabel,
         whatFailed: (failed || []).map((item) => ({ type: item.type, error: item.error })),
@@ -665,6 +721,24 @@ export const supremeAutomationService = {
             .map(presentExecution);
     },
 
+    async workItem(organizationId: string, publicId: string) {
+        const row = await prisma.automationWorkItem.findFirst({
+            where: { organizationId, publicId },
+            include: { execution: { select: { publicId: true } } },
+        });
+        if (!row) throw new ApiError(404, 'Work item not found');
+        return {
+            publicId: row.publicId,
+            title: row.title,
+            kind: row.kind,
+            status: row.status,
+            dueAt: row.dueAt,
+            sourceHref: row.sourceHref,
+            humanRequired: row.humanRequired,
+            href: `/automation/runs/${row.execution.publicId}`,
+        };
+    },
+
     async execution(organizationId: string, publicId: string) {
         const row = await prisma.automationExecution.findFirst({
             where: { organizationId, publicId },
@@ -977,6 +1051,37 @@ export const supremeAutomationService = {
             });
             for (const row of outside) {
                 emitted.push(await this.handleEvent({ organizationId: org.id, event: 'risk.outside_appetite', sourceModel: 'EnterpriseRisk', sourceId: row.id }));
+            }
+            const rights = await prisma.privacyRightsRequest.findMany({
+                where: {
+                    organizationId: org.id,
+                    status: { notIn: ['COMPLETED', 'DENIED', 'CLOSED'] },
+                    dueAt: { lte: new Date(now.getTime() + 7 * 86400000) },
+                },
+                take: 100,
+            });
+            for (const row of rights) {
+                emitted.push(await this.handleEvent({ organizationId: org.id, event: 'privacy.deadline.approaching', sourceModel: 'PrivacyRightsRequest', sourceId: row.id }));
+            }
+            const aiSystems = await prisma.aiSystem.findMany({
+                where: {
+                    organizationId: org.id,
+                    reviewAt: { lte: new Date(now.getTime() + 14 * 86400000) },
+                },
+                take: 100,
+            });
+            for (const row of aiSystems) {
+                emitted.push(await this.handleEvent({ organizationId: org.id, event: 'ai.approval.due', sourceModel: 'AiSystem', sourceId: row.id }));
+            }
+            const aiApprovals = await prisma.aiApproval.findMany({
+                where: {
+                    organizationId: org.id,
+                    reviewAt: { lte: new Date(now.getTime() + 14 * 86400000) },
+                },
+                take: 100,
+            });
+            for (const row of aiApprovals) {
+                emitted.push(await this.handleEvent({ organizationId: org.id, event: 'ai.approval.due', sourceModel: 'AiApproval', sourceId: row.id }));
             }
             await prisma.automationDefinition.updateMany({
                 where: { organizationId: org.id, status: 'ACTIVE' },

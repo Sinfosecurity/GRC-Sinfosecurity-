@@ -7,6 +7,11 @@ export type AutomationEventInput = {
     sourceId: string;
     sourcePublicId?: string | null;
     actorUserId?: string | null;
+    priority?: string | null;
+    domain?: string | null;
+    ruleId?: string | null;
+    lifecycle?: string | null;
+    current?: boolean;
 };
 
 export async function emitSupremeAutomationEvent(input: AutomationEventInput) {

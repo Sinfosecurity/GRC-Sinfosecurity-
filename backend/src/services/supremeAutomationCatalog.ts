@@ -56,6 +56,7 @@ export const CONDITIONS = [
     { key: 'owner.exists', label: 'Owner exists', ops: ['true', 'exists'] as ConditionOp[] },
     { key: 'due.exceeded', label: 'Due date exceeded', ops: ['true'] as ConditionOp[] },
     { key: 'intelligence.priority', label: 'Intelligence priority', ops: ['eq'] as ConditionOp[] },
+    { key: 'intelligence.current', label: 'Intelligence item is current', ops: ['true'] as ConditionOp[] },
 ] as const;
 
 export const ACTIONS = [
@@ -185,12 +186,25 @@ export const TEMPLATES: AutomationTemplate[] = [
         humanBoundary: { required: true, before: 'compliance_declaration', label: 'Required before a requirement is marked compliant' },
     },
     {
+        key: 'compliance-gap-opened',
+        name: 'Compliance gap opened',
+        description: 'When a compliance gap is opened, assign review work and notify the owner. Compliance is not declared.',
+        domain: 'COMPLIANCE',
+        trigger: { type: 'EVENT', event: 'compliance.gap.opened' },
+        conditions: [{ field: 'owner.exists', op: 'true' }],
+        actions: [
+            { type: 'CREATE_REVIEW_REQUEST', params: { dueInDays: 7, workKind: 'REVIEW' } },
+            { type: 'NOTIFY_OWNER' },
+        ],
+        humanBoundary: { required: true, before: 'compliance_declaration', label: 'Required before a requirement is marked compliant' },
+    },
+    {
         key: 'privacy-deadline-reminder',
         name: 'Privacy deadline reminder',
         description: 'Remind the owner when a privacy deadline is approaching. No legal conclusion is made.',
         domain: 'PRIVACY',
         trigger: { type: 'SCHEDULE', event: 'privacy.deadline.approaching', lookAheadDays: 7 },
-        conditions: [{ field: 'due.exceeded', op: 'true' }],
+        conditions: [{ field: 'owner.exists', op: 'true' }],
         actions: [
             { type: 'CREATE_REMINDER', params: { dueInDays: 3, workKind: 'REMINDER' } },
             { type: 'NOTIFY_OWNER' },
@@ -216,7 +230,10 @@ export const TEMPLATES: AutomationTemplate[] = [
         description: 'When Intelligence marks Critical Attention, create review work and notify the owner. Intelligence does not change source records.',
         domain: 'INTELLIGENCE',
         trigger: { type: 'EVENT', event: 'intelligence.critical_attention' },
-        conditions: [{ field: 'intelligence.priority', op: 'eq', value: 'CRITICAL_ATTENTION' }],
+        conditions: [
+            { field: 'intelligence.priority', op: 'eq', value: 'CRITICAL_ATTENTION' },
+            { field: 'intelligence.current', op: 'true' },
+        ],
         actions: [
             { type: 'CREATE_REVIEW_REQUEST', params: { dueInDays: 5, workKind: 'REVIEW' } },
             { type: 'NOTIFY_OWNER' },

@@ -34,11 +34,34 @@ describe('Supreme Automation engine', () => {
     it('rejects material auto-decisions', () => {
         expect(isProhibitedAction('AUTO_ACCEPT_RISK')).toBe(true);
         expect(isProhibitedAction('AUTO_APPROVE_VENDOR')).toBe(true);
+        expect(isProhibitedAction('AUTO_CLOSE_CRITICAL_FINDING')).toBe(true);
+        expect(isProhibitedAction('AUTO_MARK_COMPLIANT')).toBe(true);
+        expect(isProhibitedAction('AUTO_APPROVE_AI')).toBe(true);
+        expect(isProhibitedAction('AUTO_DECLARE_PRIVACY_TRANSFER_VALID')).toBe(true);
         expect(validateDefinition({
             trigger: { type: 'EVENT', event: 'finding.overdue' },
             actions: [{ type: 'AUTO_ACCEPT_RISK' }],
             humanBoundary: { required: true, before: 'risk_acceptance', label: 'Human' },
         })[0]).toMatch(/not allowed/i);
+    });
+
+    it('matches current Critical Attention and rejects High Attention', () => {
+        const template = TEMPLATES.find((row) => row.key === 'intelligence-critical-attention')!;
+        const matched = evaluateConditions(template.conditions, {
+            'intelligence.priority': 'CRITICAL_ATTENTION',
+            'intelligence.current': true,
+        });
+        const high = evaluateConditions(template.conditions, {
+            'intelligence.priority': 'HIGH_ATTENTION',
+            'intelligence.current': true,
+        });
+        const resolved = evaluateConditions(template.conditions, {
+            'intelligence.priority': 'CRITICAL_ATTENTION',
+            'intelligence.current': false,
+        });
+        expect(matched.matched).toBe(true);
+        expect(high.matched).toBe(false);
+        expect(resolved.matched).toBe(false);
     });
 
     it('requires a human boundary before publish', () => {

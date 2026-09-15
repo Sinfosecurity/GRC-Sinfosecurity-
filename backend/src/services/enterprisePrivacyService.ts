@@ -1058,6 +1058,17 @@ export const enterprisePrivacyService = {
         if (activity) await projectActivity(organizationId, activity.id, actorUserId);
         await history(organizationId, 'RIGHTS', created.id, 'Rights request received', `${publicId} was recorded.`, actorUserId);
         await audit({ organizationId, actorUserId, action: 'privacy.rights.received', resourceType: 'PrivacyRightsRequest', resourceId: created.id, metadata: { publicId } });
+        if (dueAt && dueAt.getTime() <= Date.now() + 7 * 86400000) {
+            const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+            await emitSupremeAutomationEvent({
+                organizationId,
+                event: 'privacy.deadline.approaching',
+                sourceModel: 'PrivacyRightsRequest',
+                sourceId: created.id,
+                sourcePublicId: created.publicId,
+                actorUserId,
+            });
+        }
         return this.getRights(organizationId, publicId, true);
     },
 

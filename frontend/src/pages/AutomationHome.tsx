@@ -40,7 +40,7 @@ export default function AutomationHome({ initialTab = 0 }: { initialTab?: number
                 {data && (
                     <Stack spacing={2.5}>
                         <Alert severity="info">{data.honesty}</Alert>
-                        <Alert severity="warning">{data.noAiAgents} Queue: {data.queue?.status}. {data.queue?.message} Timezone used: {data.timezone}.</Alert>
+                        <Alert severity="warning">{data.noAiAgents} Scheduled checks: {data.queue?.status}. {data.queue?.message} Timezone used: {data.timezone}.</Alert>
                         {(data.recommendations || []).map((row: any) => (
                             <Alert key={row.templateKey} severity="info">{row.message}</Alert>
                         ))}

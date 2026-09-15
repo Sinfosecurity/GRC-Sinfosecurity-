@@ -272,6 +272,7 @@ export const automationAPI = {
     scan: () => api.post('/automation/scan', {}),
     executions: (params?: unknown) => api.get('/automation/executions', { params }),
     execution: (publicId: string) => api.get(`/automation/executions/${publicId}`),
+    workItem: (publicId: string) => api.get(`/automation/work/${publicId}`),
     retry: (publicId: string) => api.post(`/automation/executions/${publicId}/retry`, {}),
 };
 

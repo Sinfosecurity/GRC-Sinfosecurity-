@@ -42,6 +42,30 @@ async function history(organizationId: string, itemId: string, eventType: string
     });
 }
 
+async function emitIntelligenceCriticalAttention(input: {
+    organizationId: string;
+    actorUserId?: string;
+    item: { id: string; publicId: string; priority: string; current: boolean; domain: string; ruleId: string; lifecycle: string };
+    prior: { current: boolean; priority: string } | null;
+}) {
+    if (input.item.priority !== 'CRITICAL_ATTENTION' || !input.item.current) return;
+    if (input.prior?.current && input.prior.priority === 'CRITICAL_ATTENTION') return;
+    const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+    await emitSupremeAutomationEvent({
+        organizationId: input.organizationId,
+        event: 'intelligence.critical_attention',
+        sourceModel: 'IntelligenceItem',
+        sourceId: input.item.id,
+        sourcePublicId: input.item.publicId,
+        actorUserId: input.actorUserId,
+        priority: input.item.priority,
+        domain: input.item.domain,
+        ruleId: input.item.ruleId,
+        lifecycle: input.item.lifecycle,
+        current: true,
+    });
+}
+
 async function buildSnapshot(organizationId: string): Promise<IntelligenceSnapshot> {
     const now = new Date();
     const [
@@ -382,21 +406,16 @@ async function persist(organizationId: string, candidates: IntelligenceCandidate
                 result: 'success',
                 metadata: { publicId: created.publicId, ruleId: candidate.ruleId, ruleVersion: candidate.ruleVersion },
             });
-            if (candidate.priority === 'CRITICAL_ATTENTION') {
-                const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
-                await emitSupremeAutomationEvent({
-                    organizationId,
-                    event: 'intelligence.critical_attention',
-                    sourceModel: 'IntelligenceItem',
-                    sourceId: created.id,
-                    sourcePublicId: created.publicId,
-                    actorUserId,
-                });
-            }
+            await emitIntelligenceCriticalAttention({
+                organizationId,
+                item: created,
+                actorUserId,
+                prior: null,
+            });
             continue;
         }
         if (prior.fingerprint !== candidate.fingerprint || !prior.current) {
-            await prisma.intelligenceItem.update({
+            const updated = await prisma.intelligenceItem.update({
                 where: { id: prior.id },
                 data: {
                     title: candidate.title,
@@ -421,6 +440,12 @@ async function persist(organizationId: string, candidates: IntelligenceCandidate
             await history(organizationId, prior.id, prior.current ? 'updated' : 'reopened', `${prior.publicId} reconciled from source change`, actorUserId, {
                 ruleVersion: candidate.ruleVersion,
                 fingerprint: candidate.fingerprint,
+            });
+            await emitIntelligenceCriticalAttention({
+                organizationId,
+                item: updated,
+                actorUserId,
+                prior,
             });
         }
     }

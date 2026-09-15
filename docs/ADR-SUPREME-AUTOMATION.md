@@ -143,3 +143,73 @@ Pause stops new triggers. Work items are not deleted. Source governance records 
 ## PUBLIC STATUS
 
 Marketing remains Roadmap / Private Testing until Product Leadership accepts #20.
+
+## ADDENDUM — INTELLIGENCE → AUTOMATION CONTRACT
+
+**Date:** 2026-09-15  
+**Status:** ACCEPTED for #20 closure  
+**Does not change #19 deterministic priority rules.**
+
+### Root cause of the prior hosted miss
+
+`#19` rule `control.test_failed` assigns **HIGH_ATTENTION**, not **CRITICAL_ATTENTION**.  
+`persist()` previously emitted `intelligence.critical_attention` only when a **new** Intelligence item was created at Critical Attention.
+
+A failed control test therefore correctly created INT-* as High Attention and never emitted this event. That is not a fake-event problem. It is a contract mismatch: the previous walk used a fact `#19` does not classify as Critical Attention.
+
+### Authoritative origin
+
+The event is emitted only from `enterpriseIntelligenceService.persist` after a successful Intelligence generate/reconcile write. It is never emitted from UI code, Automation scan of Intelligence rows, or direct database insertion.
+
+`generate()` / `workspace()` remain the accepted `#19` generation path. Opening Intelligence after an authoritative source write is the real product path.
+
+### Event
+
+`intelligence.critical_attention`
+
+Emitted when an Intelligence item **becomes current Critical Attention**:
+
+1. first create with `priority = CRITICAL_ATTENTION` and `current = true`
+2. reopen (`current` was false) as Critical Attention
+3. priority change to Critical Attention while remaining or becoming current
+
+Not emitted when:
+
+- priority is HIGH_ATTENTION, REVIEW, or POSITIVE
+- the item is already current Critical Attention and the fingerprint is unchanged (regenerate / redelivery)
+- the item is resolved (`current = false`, lifecycle `RESOLVED_BY_SOURCE`)
+
+Resolved items do not create a new current-critical run unless a later material source condition produces a new or reopened Critical Attention item.
+
+### Payload (documented; facts are loaded from the Intelligence record)
+
+| Field | Source |
+|---|---|
+| organizationId | persist tenant |
+| event | `intelligence.critical_attention` |
+| sourceModel | `IntelligenceItem` |
+| sourceId | Intelligence item UUID |
+| sourcePublicId | `INT-*` |
+| actorUserId | generate actor, when present |
+| priority | `CRITICAL_ATTENTION` |
+| domain | Intelligence domain |
+| ruleId | deterministic rule id |
+| lifecycle | item lifecycle at emit |
+| current | `true` |
+| generatedAt | item generatedAt (loaded, not invented) |
+
+Automation then loads authoritative facts from `IntelligenceItem` (`intelligence.priority`, `intelligence.current`, owner). It does not mutate Intelligence or the source product.
+
+### Delivery
+
+Existing `emitSupremeAutomationEvent` → in-process `handleEvent`. Same at-least-once bus as other `#20` events. No second event bus. Duplicate event delivery is suppressed by the execution idempotency key:
+
+`automationId:versionId:intelligence.critical_attention:IntelligenceItem:{itemId}:{timezoneDay}`
+
+### Human boundary
+
+Automation may create review work and notify. It must not accept risk, close findings, change residual risk, approve vendors or AI, declare compliance, or rewrite Intelligence source facts.
+
+### High Attention
+
+High Attention is a permitted Intelligence priority. It does **not** emit `intelligence.critical_attention`. A failed control test remains High Attention per `#19` and may still trigger the separate `control.test.failed` automation.
