@@ -1,0 +1,157 @@
+{
+  "checks": [
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "b01609aa7c45414bf3c3a2ca08249bf574366952"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "b01609aa7c45414bf3c3a2ca08249bf574366952"
+    },
+    {
+      "name": "admin-overview",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "truthful-status",
+      "result": "PASS",
+      "detail": "Not configured"
+    },
+    {
+      "name": "isolated-org",
+      "result": "PASS",
+      "detail": "7250d714"
+    },
+    {
+      "name": "create-provider",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "enable-before-test",
+      "result": "PASS",
+      "detail": "409 {'success': False, 'error': {'type': 'ApiError', 'message': 'Complete a successful test before enabling Company SSO.', 'statusCode': 409, 'timestamp': '2026-09-15T05:06:12.971Z', 'requestId': 'a9662753-b7eb-44bc-bf58-64e188a55396'}}"
+    },
+    {
+      "name": "require-before-test",
+      "result": "PASS",
+      "detail": "409"
+    },
+    {
+      "name": "domain-start",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "domain-verify-without-dns",
+      "result": "PARTIAL",
+      "detail": "400"
+    },
+    {
+      "name": "scim-token-once",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "scim-token-not-listed",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "scim-create",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "scim-retry",
+      "result": "PASS",
+      "detail": "de722af1-8f5d-49d2-8adc-3fd04799b6f6"
+    },
+    {
+      "name": "scim-deactivate",
+      "result": "PASS",
+      "detail": "False"
+    },
+    {
+      "name": "scim-cross-tenant-admin-jwt",
+      "result": "DENIED",
+      "detail": "401"
+    },
+    {
+      "name": "viewer-route-exists",
+      "result": "PASS",
+      "detail": "admin can read; viewer mutation covered by CI"
+    },
+    {
+      "name": "identity-page",
+      "result": "PASS",
+      "detail": "heading"
+    },
+    {
+      "name": "no-fake-connected",
+      "result": "PASS",
+      "detail": "no Connected badge"
+    },
+    {
+      "name": "axe:identity-overview",
+      "result": "PASS",
+      "detail": "serious/critical=0"
+    },
+    {
+      "name": "viewport-375",
+      "result": "PASS",
+      "detail": "375 captured"
+    },
+    {
+      "name": "viewport-768",
+      "result": "PASS",
+      "detail": "768 captured"
+    },
+    {
+      "name": "viewport-1024",
+      "result": "PASS",
+      "detail": "1024 captured"
+    },
+    {
+      "name": "viewport-1440",
+      "result": "PASS",
+      "detail": "1440 captured"
+    },
+    {
+      "name": "viewport-1920",
+      "result": "PASS",
+      "detail": "1920 captured"
+    }
+  ],
+  "shots": [
+    "identity-overview-1440",
+    "identity-overview-375",
+    "identity-overview-768",
+    "identity-overview-1024",
+    "identity-overview-1440",
+    "identity-overview-1920",
+    "identity-sso-1440",
+    "identity-domains-1440",
+    "identity-provisioning-1440",
+    "identity-mapping-1440",
+    "identity-policy-1440",
+    "login-sso-discovery"
+  ],
+  "axe": [
+    {
+      "name": "identity-overview",
+      "violations": [],
+      "serious": 0
+    }
+  ],
+  "sha": {
+    "api": "b01609aa7c45414bf3c3a2ca08249bf574366952",
+    "frontend": "b01609aa7c45414bf3c3a2ca08249bf574366952",
+    "required": "b01609aa7c45414bf3c3a2ca08249bf574366952",
+    "health": 200
+  },
+  "notes": []
+}

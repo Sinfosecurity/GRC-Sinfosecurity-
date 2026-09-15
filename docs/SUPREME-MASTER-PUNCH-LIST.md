@@ -381,9 +381,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Not PASS.
 
-**CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation and hosted SHAs recorded after CI.
+**CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. Login-field follow-up / CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`.
 
-**EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Extends accepted identity/admin ADR. One User / Organization / role / session plane. Live Entra/Okta/Google not claimed unless hosted-proved. Cursor does not declare #21 PASS.
+**EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Hosted walk `docs/private-beta/hosted-ux-qa/enterprise-identity/`. CI `34930403949` PASS on `b01609a` (416 backend / 174 frontend). Live Entra/Okta/Google not tested. Domain verify without DNS correctly failed. Cursor does not declare #21 PASS.
 
 **NEXT ACTION:** Product Leadership hosted review. Do not start #22. Do not merge `main` or deploy commercial production. Do not alter #12 uncommitted leftovers.
 
