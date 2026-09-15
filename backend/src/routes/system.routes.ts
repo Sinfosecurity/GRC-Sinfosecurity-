@@ -4,6 +4,7 @@ import { PERMISSIONS } from '../security/rbac';
 import { providerHealth } from '../services/providerHealth';
 import { emailStatus, isEmailConfigured, notify, recordEmailDelivery } from '../services/notificationDeliveryService';
 import { verifySmtpConnection } from '../services/smtpClient';
+import { EMAIL_TEMPLATE_INVENTORY, emailPreviewFixtures } from '../services/transactionalEmail';
 
 const router = Router();
 router.use(authenticate);
@@ -19,7 +20,7 @@ router.get('/status', async (req: AuthRequest, res: Response, next: NextFunction
 
 router.post('/alert-test', requirePermission(PERMISSIONS['organization.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const title = 'SUPREME RISK — STAGING alert test';
+        const title = 'Supreme staging alert test';
         const body = `Critical-path alert test at ${new Date().toISOString()} for ${req.user!.organizationId}.`;
         const email = await notify({
             organizationId: req.user!.organizationId,
@@ -77,7 +78,7 @@ router.post('/smtp-verify', requirePermission(PERMISSIONS['organization.manage']
             organizationId: req.user!.organizationId,
             userId: req.user!.id,
             eventType: 'ops.alert',
-            title: 'Supreme Risk SMTP verification',
+            title: 'Supreme SMTP verification',
             body: 'Controlled SMTP verification for the signed-in administrator. No tenant workflow was created.',
             resourceType: 'System',
             resourceId: 'smtp-verify',
@@ -101,6 +102,28 @@ router.post('/smtp-verify', requirePermission(PERMISSIONS['organization.manage']
                 emailProvider: emailStatus(),
             },
         });
+    }
+});
+
+router.get('/email-previews', requirePermission(PERMISSIONS['organization.manage']), async (_req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const fixtures = emailPreviewFixtures();
+        res.json({
+            success: true,
+            data: {
+                sent: false,
+                inventory: EMAIL_TEMPLATE_INVENTORY,
+                previews: fixtures.map((item) => ({
+                    templateKey: item.templateKey,
+                    subject: item.subject,
+                    fromName: item.fromName,
+                    text: item.text,
+                    html: item.html,
+                })),
+            },
+        });
+    } catch (error) {
+        next(error);
     }
 });
 

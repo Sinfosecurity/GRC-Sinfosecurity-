@@ -476,7 +476,7 @@ export const authService = {
             organizationId: user.organizationId,
             userId: user.id,
             eventType: 'auth.password_reset',
-            title: 'Password reset requested',
+            title: 'Action required: Reset your Supreme password',
             body: 'A password reset was requested for this Supreme account.',
             emailBody: passwordResetEmailBody(token, process.env, isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE),
             emailHtml: passwordResetEmailHtml(token, process.env, isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE),

@@ -373,12 +373,25 @@ async function performAction(input: {
         }
     }
     if (input.action.type === 'NOTIFY_OWNER' || input.action.type === 'CREATE_REMINDER' || input.action.type === 'ESCALATE_OVERDUE' || input.action.type === 'CREATE_REVIEW_REQUEST') {
+        const { automationWorkEmail, customerAppUrl } = await import('./transactionalEmail');
+        const workMail = automationWorkEmail({
+            title: input.facts.title || input.automation.name,
+            why: `Supreme identified work that needs a person. ${input.facts.title || 'Open the source record'} requires attention.`,
+            dueAt: due,
+            ctaUrl: input.facts.sourceHref?.startsWith('http')
+                ? input.facts.sourceHref
+                : customerAppUrl(input.facts.sourceHref || '/automation'),
+            source: input.sourceModel.replace(/([A-Z])/g, ' $1').trim(),
+        });
         await notifyUser({
             organizationId: input.organizationId,
             userId: input.facts.ownerUserId,
             eventType: 'automation.action',
-            title: `${input.automation.name} needs a person`,
-            body: `Triggered by ${input.event}. Needed: review ${input.facts.title || 'the source record'}. Automation ${input.automation.publicId}. Due ${due ? due.toISOString().slice(0, 10) : 'not set'}.`,
+            title: workMail.subject,
+            body: workMail.text,
+            emailBody: workMail.text,
+            emailHtml: workMail.html,
+            fromName: workMail.fromName,
             resourceType: input.sourceModel,
             resourceId: input.sourceId,
         });

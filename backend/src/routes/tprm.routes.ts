@@ -11,6 +11,7 @@ import { tenantWhere } from '../security/tenant';
 import { monitoringCredentialsConfigured, resolveMonitoringProviderStatus } from '../services/monitoringProviderStatus';
 import tprmOperationsRoutes from './tprm.operations.routes';
 import { notifyUser } from '../services/notificationDeliveryService';
+import { approvalRequiredEmail, customerAppUrl, genericOperationalEmail, vendorActivatedEmail } from '../services/transactionalEmail';
 import { enforceSubscriptionWrites } from '../middleware/entitlement';
 import { vendorOffboardService } from '../services/vendorOffboardService';
 
@@ -71,12 +72,21 @@ router.post('/vendors/:vendorId/decision-briefs', requirePermission(PERMISSIONS[
             req.params.vendorId,
             req.user!.id
         );
+        const snapshot = data.immutableSnapshot as { vendor?: { name?: string } } | null;
+        const vendorName = snapshot?.vendor?.name || 'this vendor';
+        const mail = approvalRequiredEmail({
+            vendorName,
+            ctaUrl: customerAppUrl('/decision-briefs'),
+        });
         await notifyUser({
             organizationId: req.user!.organizationId,
             userId: req.user!.id,
             eventType: 'approval.requested',
-            title: 'Approval requested',
-            body: 'A Decision Brief is ready for a human decision.',
+            title: mail.subject,
+            body: mail.text,
+            emailBody: mail.text,
+            emailHtml: mail.html,
+            fromName: mail.fromName,
             resourceType: 'RiskDecisionBrief',
             resourceId: data.id,
         });
@@ -108,15 +118,30 @@ router.post('/decision-briefs/:briefId/decide', requirePermission(PERMISSIONS['a
             nextReviewDate,
             actorUserId: req.user!.id,
         });
+        const decidedSnapshot = data.immutableSnapshot as { vendor?: { name?: string } } | null;
+        const decidedVendor = decidedSnapshot?.vendor?.name || 'Vendor';
+        const decidedMail = decision === 'REJECT'
+            ? genericOperationalEmail({
+                subject: `${decidedVendor} was not approved`,
+                body: `A person recorded that ${decidedVendor} was not approved. Open the decision brief in Supreme for the recorded rationale. This is not a claim about residual risk.`,
+                cta: { label: 'Review decision', url: customerAppUrl('/decision-briefs') },
+            })
+            : vendorActivatedEmail({
+                vendorName: decidedVendor,
+                publicId: '',
+                nextReview: data.nextReviewDate,
+                ctaUrl: customerAppUrl('/decision-briefs'),
+                conditions: decision === 'APPROVE_WITH_CONDITIONS' ? String(conditions || '') : undefined,
+            });
         await notifyUser({
             organizationId: req.user!.organizationId,
             userId: req.user!.id,
             eventType: 'approval.decision',
-            title: 'Decision recorded',
-            body:
-                decision === 'APPROVE_WITH_CONDITIONS'
-                    ? `Decision recorded with conditions requiring action: ${conditions || 'see brief'}.`
-                    : `Human decision recorded: ${decision}.`,
+            title: decidedMail.subject,
+            body: decidedMail.text,
+            emailBody: decidedMail.text,
+            emailHtml: decidedMail.html,
+            fromName: decidedMail.fromName,
             resourceType: 'RiskDecisionBrief',
             resourceId: data.id,
         });

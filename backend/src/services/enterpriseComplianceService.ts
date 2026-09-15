@@ -22,6 +22,7 @@ import { recordAudit } from './auditEventService';
 import { createRelationship, ensureNode } from './governanceGraphService';
 import { adoptCatalogForOrganization, seedPlatformCatalog } from './sharedControlEvidenceService';
 import { notifyUser } from './notificationDeliveryService';
+import { complianceAttestationEmail, customerAppUrl } from './transactionalEmail';
 import {
     buildReadiness,
     COMPLIANCE_HONESTY,
@@ -1329,12 +1330,21 @@ export const enterpriseComplianceService = {
                     reviewerUserId: input.reviewerUserId || null,
                 },
             });
+            const mail = complianceAttestationEmail({
+                campaignName: campaign.name,
+                publicId: campaign.publicId,
+                dueAt: campaign.dueAt,
+                ctaUrl: customerAppUrl(`/compliance/campaigns/${campaign.publicId}`),
+            });
             await notifyUser({
                 organizationId,
                 userId: attestorUserId,
                 eventType: 'attestation.assigned',
-                title: 'Control attestation assigned',
-                body: `${campaign.name} needs an attestation. This is a governance statement, not a control test.`,
+                title: mail.subject,
+                body: mail.text,
+                emailBody: mail.text,
+                emailHtml: mail.html,
+                fromName: mail.fromName,
                 resourceType: 'ComplianceAttestationCampaign',
                 resourceId: campaign.id,
             });

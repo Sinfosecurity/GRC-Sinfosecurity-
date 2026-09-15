@@ -7,6 +7,12 @@ import { IssuePriority, IssueSeverity, IssueSource, Prisma, VendorIssue, VendorI
 import { prisma } from '../config/database';
 import logger from '../config/logger';
 import { notifyUser } from './notificationDeliveryService';
+import {
+    customerAppUrl,
+    findingAssignedEmail,
+    findingClosedEmail,
+    remediationRequestedEmail,
+} from './transactionalEmail';
 
 export interface CreateVendorIssueInput {
     vendorId: string;
@@ -172,12 +178,20 @@ class VendorIssueService {
         });
         const issue = await this.getIssueById(issueId, organizationId);
         if (issue) {
+            const mail = remediationRequestedEmail({
+                title: issue.title,
+                vendorName: issue.vendor?.name,
+                ctaUrl: customerAppUrl('/findings'),
+            });
             await notifyUser({
                 organizationId,
                 userId: issue.assignedTo || issue.identifiedBy,
                 eventType: 'remediation.requested',
-                title: 'Corrective action requested',
-                body: `A corrective action plan was recorded for ${issue.title}.`,
+                title: mail.subject,
+                body: mail.text,
+                emailBody: mail.text,
+                emailHtml: mail.html,
+                fromName: mail.fromName,
                 resourceType: 'VendorIssue',
                 resourceId: issue.id,
             });
@@ -245,12 +259,22 @@ class VendorIssueService {
 
         const record = await this.getIssueById(issueId, organizationId);
         if (record) {
+            const mail = remediationRequestedEmail({
+                title: record.title,
+                vendorName: record.vendor?.name,
+                ctaUrl: customerAppUrl('/findings'),
+            });
             await notifyUser({
                 organizationId,
                 userId: record.assignedTo || record.identifiedBy,
                 eventType: 'remediation.validation_requested',
-                title: approved ? 'Remediation validated' : 'Remediation validation recorded',
-                body: `${record.title} validation ${approved ? 'approved' : 'returned for further work'}.`,
+                title: approved ? `Review required: Remediation submitted for ${record.title}` : `Action required: Further remediation work for ${record.title}`,
+                body: approved
+                    ? `${record.title} remediation evidence was submitted and requires review. The finding is not closed until validation is complete.`
+                    : `${record.title} was returned for further work. The finding remains open.`,
+                emailBody: mail.text,
+                emailHtml: mail.html,
+                fromName: mail.fromName,
                 resourceType: 'VendorIssue',
                 resourceId: record.id,
             });
@@ -285,12 +309,20 @@ class VendorIssueService {
         });
         const record = await this.getIssueById(issueId, organizationId);
         if (record) {
+            const mail = findingClosedEmail({
+                title: record.title,
+                vendorName: record.vendor?.name,
+                ctaUrl: customerAppUrl('/findings'),
+            });
             await notifyUser({
                 organizationId,
                 userId: record.assignedTo || record.identifiedBy || closedBy,
                 eventType: 'finding.closed',
-                title: 'Finding closed',
-                body: `${record.title} was closed.`,
+                title: mail.subject,
+                body: mail.text,
+                emailBody: mail.text,
+                emailHtml: mail.html,
+                fromName: mail.fromName,
                 resourceType: 'VendorIssue',
                 resourceId: record.id,
             });
@@ -486,13 +518,22 @@ class VendorIssueService {
     /**
      * Notify stakeholders about new issue
      */
-    private async notifyIssueStakeholders(issue: VendorIssue) {
+    private async notifyIssueStakeholders(issue: VendorIssue & { vendor?: { name?: string } }) {
+        const mail = findingAssignedEmail({
+            title: issue.title,
+            vendorName: issue.vendor?.name,
+            severity: issue.severity,
+            ctaUrl: customerAppUrl('/findings'),
+        });
         await notifyUser({
             organizationId: issue.organizationId,
             userId: issue.assignedTo || issue.identifiedBy,
             eventType: 'finding.assigned',
-            title: 'Finding assigned',
-            body: `${issue.title} was recorded and assigned.`,
+            title: mail.subject,
+            body: mail.text,
+            emailBody: mail.text,
+            emailHtml: mail.html,
+            fromName: mail.fromName,
             resourceType: 'VendorIssue',
             resourceId: issue.id,
         });

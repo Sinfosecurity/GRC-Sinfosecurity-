@@ -273,7 +273,7 @@ export const identityUserService = {
             organizationId,
             userId: invitedById,
             eventType: 'user.invitation',
-            title: "You're invited to Supreme",
+            title: 'Action required: Activate your Supreme account',
             body: `${invitedByName} invited you as ${roleLabel}.`,
             emailBody: invitationEmailBody(role, result.token, process.env, {
                 organizationName: organization?.name,

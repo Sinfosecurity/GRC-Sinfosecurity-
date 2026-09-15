@@ -1,0 +1,20 @@
+Northwind Insurance has requested your participation
+
+Hello Casey,
+Northwind Insurance has invited your organization to complete a third-party due-diligence assessment through Supreme. Once you start, you can complete assigned questionnaires, save and resume, upload supporting evidence, and submit your response.
+
+Organization: Acme Cloud
+Requested by: Northwind Insurance
+Due date: September 22, 2026
+
+Start assessment:
+https://example.test/vendor-assessment/activate?token=preview-token
+
+What happens next
+1. Open the secure invitation.
+2. Complete the assigned questionnaires and evidence.
+3. Submit your response to the requesting organization.
+
+This secure invitation is intended for the named recipient and can be used once. It expires if it is not used in time. If you were not expecting this request, contact your customer.
+
+Supreme Governance Platform · Secure third-party assessment portal

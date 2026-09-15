@@ -14,6 +14,12 @@ import type { ReportFilters } from '../reports/portfolioData';
 import { prisma } from '../config/database';
 import { reportLimiter, uploadLimiter } from '../middleware/rateLimiter';
 import { notifyUser } from '../services/notificationDeliveryService';
+import {
+    assessmentSubmittedEmail,
+    customerAppUrl,
+    genericOperationalEmail,
+    humanizeEmailTerm,
+} from '../services/transactionalEmail';
 import { requireEntitlement, organizationHasProductFeature, organizationHasEvaluationAccess } from '../middleware/entitlement';
 import { canExportReport, reportDenialReason, type ReportKind } from '../security/reportAuthorization';
 import { ensureSupremeLibrary, recommendAssessments } from '../services/questionnaireLibrary';
@@ -133,12 +139,20 @@ router.post('/vendors/:vendorId/assessments', requirePermission(PERMISSIONS['ass
             dueDate: req.body.dueDate ? new Date(req.body.dueDate) : undefined,
             templateId: req.body.templateId,
         });
+        const assignedMail = genericOperationalEmail({
+            subject: `Action required: ${humanizeEmailTerm(String(data.assessmentType)) || 'An assessment'} was assigned`,
+            body: `${humanizeEmailTerm(String(data.assessmentType)) || 'An assessment'} was assigned. Open the vendor workspace in Supreme to continue.`,
+            cta: { label: 'Open assessment', url: customerAppUrl('/assessments') },
+        });
         await notifyUser({
             organizationId: req.user!.organizationId,
             userId: data.assignedTo || req.user!.id,
             eventType: 'assessment.assigned',
-            title: 'Assessment assigned',
-            body: `${data.assessmentType || 'An assessment'} was assigned.`,
+            title: assignedMail.subject,
+            body: assignedMail.text,
+            emailBody: assignedMail.text,
+            emailHtml: assignedMail.html,
+            fromName: assignedMail.fromName,
             resourceType: 'VendorAssessment',
             resourceId: data.id,
         });
@@ -187,12 +201,21 @@ router.post('/vendors/:vendorId/assessments/:assessmentId/complete', requirePerm
             throw new ApiError(404, 'Assessment not found');
         }
         const data = await vendorAssessmentService.completeAssessment(req.params.assessmentId, req.user!.id, req.user!.organizationId);
+        const completedMail = assessmentSubmittedEmail({
+            vendorName: existing.vendor?.name || 'Vendor',
+            publicId: existing.vendor?.publicId || existing.vendorId,
+            assessmentName: humanizeEmailTerm(String(data.assessmentType)) || 'Assessment',
+            ctaUrl: customerAppUrl('/assessments'),
+        });
         await notifyUser({
             organizationId: req.user!.organizationId,
             userId: data.assignedTo || req.user!.id,
             eventType: 'assessment.completed',
-            title: 'Assessment completed',
-            body: `${data.assessmentType || 'An assessment'} was completed.`,
+            title: completedMail.subject,
+            body: completedMail.text,
+            emailBody: completedMail.text,
+            emailHtml: completedMail.html,
+            fromName: completedMail.fromName,
             resourceType: 'VendorAssessment',
             resourceId: data.id,
         });

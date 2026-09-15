@@ -1,0 +1,17 @@
+A vendor submission is ready for review
+
+Acme Cloud submitted Information Security Assessment. Review exceptions before findings are confirmed.
+
+Vendor: Acme Cloud
+Vendor ID: VND-2026-0042
+Assessment: Information Security Assessment
+
+Review submission:
+https://example.test/vendor-onboarding/VND-2026-0042
+
+What happens next
+1. Supreme has evaluated the submitted answers.
+2. An analyst reviews exceptions and potential findings.
+3. Confirmed findings can move to remediation or risk acceptance.
+
+Supreme Governance Platform
