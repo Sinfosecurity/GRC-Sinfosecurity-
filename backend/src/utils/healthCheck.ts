@@ -272,6 +272,18 @@ export function registerDefaultHealthChecks() {
             : { status: 'degraded', message: 'NOT_CONFIGURED' };
     });
 
+    healthChecker.registerCheck('automation', async () => {
+        const { supremeAutomationService } = await import('../services/supremeAutomationService');
+        const status = await supremeAutomationService.queueStatus();
+        if (status.status === 'CONNECTED') {
+            return { status: 'up', message: 'Automation queue connected' };
+        }
+        if (status.status === 'DEGRADED') {
+            return { status: 'degraded', message: 'DEGRADED' };
+        }
+        return { status: 'degraded', message: 'NOT_CONFIGURED' };
+    });
+
     logger.info('Default health checks registered');
 }
 

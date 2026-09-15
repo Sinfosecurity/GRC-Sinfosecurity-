@@ -91,6 +91,9 @@ export const PERMISSIONS = {
     'intelligence.read': 'intelligence.read',
     'intelligence.acknowledge': 'intelligence.acknowledge',
     'intelligence.report': 'intelligence.report',
+    'automation.read': 'automation.read',
+    'automation.manage': 'automation.manage',
+    'automation.retry': 'automation.retry',
     'platform.overview': 'platform.overview',
     'platform.organizations.read': 'platform.organizations.read',
     'platform.support.read': 'platform.support.read',
@@ -182,6 +185,7 @@ const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['rightsRequest.read'],
     PERMISSIONS['ai.read'],
     PERMISSIONS['intelligence.read'],
+    PERMISSIONS['automation.read'],
 ];
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
@@ -256,6 +260,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['ai.report'],
         PERMISSIONS['intelligence.acknowledge'],
         PERMISSIONS['intelligence.report'],
+        PERMISSIONS['automation.manage'],
+        PERMISSIONS['automation.retry'],
     ],
     ASSESSOR: [
         ...READ_PORTFOLIO,

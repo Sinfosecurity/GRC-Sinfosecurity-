@@ -70,6 +70,14 @@ class VendorIssueService {
         await this.notifyIssueStakeholders(issue);
 
         logger.info(`Created issue: ${issue.title} for ${issue.vendor.name}`);
+        const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+        await emitSupremeAutomationEvent({
+            organizationId: issue.organizationId,
+            event: 'finding.confirmed',
+            sourceModel: 'VendorIssue',
+            sourceId: issue.id,
+            actorUserId: data.identifiedBy,
+        });
         return issue;
     }
 

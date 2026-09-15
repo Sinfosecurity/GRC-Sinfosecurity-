@@ -21,6 +21,7 @@ export type RateLimitCategory =
     | 'report'
     | 'graph'
     | 'intelligence'
+    | 'automation'
     | 'billing'
     | 'admin'
     | 'ai'
@@ -53,6 +54,7 @@ const DEFAULTS: Record<RateLimitCategory, RateLimitSpec> = {
     report: { max: 40, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     graph: { max: 180, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     intelligence: { max: 180, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
+    automation: { max: 180, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     billing: { max: 10, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     admin: { max: 20, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     ai: { max: 30, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },

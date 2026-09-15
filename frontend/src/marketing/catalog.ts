@@ -75,12 +75,12 @@ export const PRODUCTS: ProductModule[] = [
     {
         slug: 'automation',
         name: 'Supreme Automation',
-        subtitle: 'Workflows & Agents',
-        summary: 'Automate repetitive governance work without removing human accountability for scores or decisions.',
-        purpose: 'Orchestrate assessments, remediation, approvals and governed agents.',
+        subtitle: 'Governed workflows',
+        summary: 'Coordinate reminders and follow-up work without removing human accountability for scores or decisions.',
+        purpose: 'Orchestrate assessments, remediation, and human decision routing. Not generally available.',
         status: 'roadmap',
         href: '/products/automation',
-        points: ['Triggered workflows', 'Notifications', 'Human checkpoints'],
+        points: ['Triggered workflows', 'Human checkpoints', 'Private testing'],
     },
 ];
 

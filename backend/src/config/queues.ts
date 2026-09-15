@@ -13,6 +13,8 @@ export enum JobType {
   COMPLIANCE_STATUS_UPDATE = 'compliance_status_update',
   VENDOR_MONITORING_CHECK = 'vendor_monitoring_check',
   DATA_CLEANUP = 'data_cleanup',
+  AUTOMATION_SCAN = 'automation_scan',
+  AUTOMATION_EXECUTE = 'automation_execute',
 }
 
 // Queue names
@@ -187,6 +189,12 @@ monitoringQueue.process(async (job: Job) => {
       case JobType.COMPLIANCE_STATUS_UPDATE:
         await processComplianceStatusUpdate(data);
         break;
+      case JobType.AUTOMATION_SCAN:
+        await processAutomationScan(data);
+        break;
+      case JobType.AUTOMATION_EXECUTE:
+        await processAutomationExecute(data);
+        break;
       default:
         logger.warn(`Unknown monitoring job type: ${type}`);
     }
@@ -256,6 +264,17 @@ async function processReportGeneration(data: any) {
 async function processVendorMonitoringCheck(data: any) {
   logger.info('Checking vendor monitoring', data);
   // TODO: Implement vendor monitoring check logic
+}
+
+async function processAutomationScan(_data: any) {
+  const { supremeAutomationService } = await import('../services/supremeAutomationService');
+  await supremeAutomationService.scan();
+}
+
+async function processAutomationExecute(data: any) {
+  const { supremeAutomationService } = await import('../services/supremeAutomationService');
+  if (!data?.organizationId || !data?.event || !data?.sourceModel || !data?.sourceId) return;
+  await supremeAutomationService.handleEvent(data);
 }
 
 async function processComplianceStatusUpdate(data: any) {
@@ -334,6 +353,11 @@ export async function scheduleRecurringJobs() {
   await monitoringQueue.add(
     { type: JobType.VENDOR_MONITORING_CHECK, data: {} },
     { repeat: { cron: '0 */6 * * *' } } // Every 6 hours
+  );
+
+  await monitoringQueue.add(
+    { type: JobType.AUTOMATION_SCAN, data: {} },
+    { repeat: { cron: '0 * * * *' } }
   );
 
   // Data cleanup every Sunday at 2 AM

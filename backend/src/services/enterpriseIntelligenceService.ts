@@ -382,6 +382,17 @@ async function persist(organizationId: string, candidates: IntelligenceCandidate
                 result: 'success',
                 metadata: { publicId: created.publicId, ruleId: candidate.ruleId, ruleVersion: candidate.ruleVersion },
             });
+            if (candidate.priority === 'CRITICAL_ATTENTION') {
+                const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+                await emitSupremeAutomationEvent({
+                    organizationId,
+                    event: 'intelligence.critical_attention',
+                    sourceModel: 'IntelligenceItem',
+                    sourceId: created.id,
+                    sourcePublicId: created.publicId,
+                    actorUserId,
+                });
+            }
             continue;
         }
         if (prior.fingerprint !== candidate.fingerprint || !prior.current) {

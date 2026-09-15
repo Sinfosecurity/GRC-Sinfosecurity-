@@ -255,6 +255,26 @@ export const aiGovernanceAPI = {
     downloadBoardPptx: () => api.get('/ai-governance/reports/board.pptx', { responseType: 'blob' }),
 };
 
+export const automationAPI = {
+    catalog: () => api.get('/automation/catalog'),
+    workspace: () => api.get('/automation/workspace'),
+    templates: () => api.get('/automation/templates'),
+    recommendations: () => api.get('/automation/recommendations'),
+    list: () => api.get('/automation'),
+    get: (publicId: string) => api.get(`/automation/${publicId}`),
+    create: (data: unknown) => api.post('/automation', data),
+    save: (publicId: string, data: unknown) => api.patch(`/automation/${publicId}`, data),
+    publish: (publicId: string) => api.post(`/automation/${publicId}/publish`, {}),
+    pause: (publicId: string) => api.post(`/automation/${publicId}/pause`, {}),
+    resume: (publicId: string) => api.post(`/automation/${publicId}/resume`, {}),
+    archive: (publicId: string) => api.post(`/automation/${publicId}/archive`, {}),
+    preview: (publicId: string, data: unknown) => api.post(`/automation/${publicId}/preview`, data),
+    scan: () => api.post('/automation/scan', {}),
+    executions: (params?: unknown) => api.get('/automation/executions', { params }),
+    execution: (publicId: string) => api.get(`/automation/executions/${publicId}`),
+    retry: (publicId: string) => api.post(`/automation/executions/${publicId}/retry`, {}),
+};
+
 export const intelligenceAPI = {
     catalog: () => api.get('/intelligence/catalog'),
     workspace: () => api.get('/intelligence/workspace'),

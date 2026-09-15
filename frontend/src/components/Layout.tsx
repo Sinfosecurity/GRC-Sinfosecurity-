@@ -33,6 +33,7 @@ import {
     HistoryOutlined,
     HubOutlined,
     InsightsOutlined,
+    PlayCircleOutline,
     Menu as MenuIcon,
     MonitorHeartOutlined,
     NotificationsNone,
@@ -107,6 +108,14 @@ const menuSections: NavSection[] = [
             { text: 'Overview', path: '/intelligence', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
             { text: 'What changed', path: '/intelligence/changes', icon: <HistoryOutlined fontSize="small" />, permission: 'intelligence.read' },
             { text: 'Executive', path: '/intelligence/executive', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
+        ],
+    },
+    {
+        title: 'Automation',
+        items: [
+            { text: 'Automations', path: '/automation', icon: <PlayCircleOutline fontSize="small" />, permission: 'automation.read' },
+            { text: 'Runs', path: '/automation/runs', icon: <HistoryOutlined fontSize="small" />, permission: 'automation.read' },
+            { text: 'Templates', path: '/automation/templates', icon: <QuizOutlined fontSize="small" />, permission: 'automation.read' },
         ],
     },
     {

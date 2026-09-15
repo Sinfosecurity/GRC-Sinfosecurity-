@@ -333,6 +333,15 @@ class VendorAssessmentService {
             const { explainableRiskService } = await import('./explainableRiskService');
             await explainableRiskService.recalculate(result.updated.organizationId, result.updated.vendorId);
 
+            const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+            await emitSupremeAutomationEvent({
+                organizationId: result.updated.organizationId,
+                event: 'assessment.submitted',
+                sourceModel: 'VendorAssessment',
+                sourceId: result.updated.id,
+                actorUserId: completedBy,
+            });
+
             return result.updated;
         } catch (error: any) {
             logger.error('Failed to complete assessment', { error: error.message, assessmentId });

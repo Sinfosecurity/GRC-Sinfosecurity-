@@ -30,7 +30,8 @@ export type NotificationEvent =
     | 'vendor.review_due'
     | 'user.invitation'
     | 'auth.password_reset'
-    | 'ops.alert';
+    | 'ops.alert'
+    | 'automation.action';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
 export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';

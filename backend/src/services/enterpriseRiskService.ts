@@ -187,6 +187,17 @@ async function scoreRisk(organizationId: string, riskId: string, reason: string,
         resourceId: risk.id,
         metadata: { publicId: risk.publicId, residualScore: scored.residualScore, methodologyVersion: scored.methodologyVersion },
     });
+    if (appetite === 'OUTSIDE_APPETITE') {
+        const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+        await emitSupremeAutomationEvent({
+            organizationId,
+            event: 'risk.outside_appetite',
+            sourceModel: 'EnterpriseRisk',
+            sourceId: risk.id,
+            sourcePublicId: risk.publicId,
+            actorUserId,
+        });
+    }
     return { risk: updated, scored, appetite };
 }
 

@@ -52,7 +52,7 @@ export const ROUTE_META: Record<string, RouteMeta> = {
         description: 'Supreme Intelligence is a roadmap product for external signals only when a provider is connected and evidence is recorded.',
     },
     '/products/automation': {
-        title: 'Supreme Automation — Workflows & Agents',
+        title: 'Supreme Automation — Governed workflows',
         description: 'Supreme Automation is a roadmap product for triggered work that keeps humans accountable for scores and decisions.',
     },
     '/pricing': {

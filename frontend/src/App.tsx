@@ -119,6 +119,10 @@ const IntelligenceDashboard = lazy(() => import('./pages/IntelligenceDashboard')
 const IntelligenceChanges = lazy(() => import('./pages/IntelligenceChanges'));
 const IntelligenceExecutive = lazy(() => import('./pages/IntelligenceExecutive'));
 const IntelligenceDetail = lazy(() => import('./pages/IntelligenceDetail'));
+const AutomationHome = lazy(() => import('./pages/AutomationHome'));
+const AutomationDetail = lazy(() => import('./pages/AutomationDetail'));
+const AutomationBuilder = lazy(() => import('./pages/AutomationBuilder'));
+const AutomationRunDetail = lazy(() => import('./pages/AutomationRunDetail'));
 const PlatformLayout = lazy(() => import('./platform/PlatformLayout'));
 const PlatformOverview = lazy(() => import('./platform/pages/PlatformOverview'));
 const PlatformOrganizations = lazy(() => import('./platform/pages/PlatformOrganizations'));
@@ -226,6 +230,13 @@ export default function App() {
                     <Route path="intelligence/changes" element={<IntelligenceChanges />} />
                     <Route path="intelligence/executive" element={<IntelligenceExecutive />} />
                     <Route path="intelligence/:publicId" element={<IntelligenceDetail />} />
+                    <Route path="automation" element={<AutomationHome />} />
+                    <Route path="automation/runs" element={<AutomationHome initialTab={2} />} />
+                    <Route path="automation/templates" element={<AutomationHome initialTab={4} />} />
+                    <Route path="automation/new" element={<AutomationBuilder />} />
+                    <Route path="automation/runs/:publicId" element={<AutomationRunDetail />} />
+                    <Route path="automation/:publicId/edit" element={<AutomationBuilder />} />
+                    <Route path="automation/:publicId" element={<AutomationDetail />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

@@ -768,6 +768,16 @@ export async function recordControlTest(input: {
             });
         }
     }
+    if (test.result === 'FAIL') {
+        const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
+        await emitSupremeAutomationEvent({
+            organizationId: input.organizationId,
+            event: 'control.test.failed',
+            sourceModel: 'OrganizationControlTest',
+            sourceId: test.id,
+            actorUserId: input.actorUserId,
+        });
+    }
     return test;
 }
 

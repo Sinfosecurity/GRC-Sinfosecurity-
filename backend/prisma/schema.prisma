@@ -161,6 +161,10 @@ model Organization {
   aiHistory                   AiHistory[]
   intelligenceItems           IntelligenceItem[]
   intelligenceHistory         IntelligenceHistory[]
+  automations                 AutomationDefinition[]
+  automationVersions          AutomationVersion[]
+  automationExecutions        AutomationExecution[]
+  automationWorkItems         AutomationWorkItem[]
   risks                       Risk[]
   controls                    Control[]
   incidents                   Incident[]
@@ -5310,6 +5314,175 @@ model IntelligenceHistory {
 }
 
 model IntelligenceCounter {
+  organizationId String
+  kind           String
+  next           Int    @default(1)
+
+  @@id([organizationId, kind])
+}
+
+enum AutomationStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum AutomationExecutionStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  PARTIAL
+  FAILED
+  DEAD_LETTER
+  PREVIEW
+  SKIPPED
+}
+
+enum AutomationWorkStatus {
+  OPEN
+  DONE
+  CANCELLED
+}
+
+enum AutomationDomain {
+  THIRD_PARTY
+  RISK
+  CONTROL
+  EVIDENCE
+  COMPLIANCE
+  PRIVACY
+  AI_GOVERNANCE
+  INTELLIGENCE
+  CROSS_PLATFORM
+}
+
+enum AutomationWorkKind {
+  REVIEW
+  REMINDER
+  EVIDENCE_REQUEST
+  DECISION_REQUEST
+  REASSESSMENT_REQUEST
+}
+
+model AutomationDefinition {
+  id                 String                    @id @default(uuid())
+  organization       Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  publicId           String
+  name               String
+  description        String
+  status             AutomationStatus          @default(DRAFT)
+  domain             AutomationDomain
+  ownerUserId        String?
+  timezone           String                    @default("UTC")
+  currentVersionId   String?
+  templateKey        String?
+  enabled            Boolean                   @default(false)
+  createdByUserId    String
+  publishedByUserId  String?
+  effectiveAt        DateTime?
+  lastRunAt          DateTime?
+  nextRunAt          DateTime?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  versions           AutomationVersion[]
+  executions         AutomationExecution[]
+  workItems          AutomationWorkItem[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, domain])
+}
+
+model AutomationVersion {
+  id                 String                 @id @default(uuid())
+  organization       Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String
+  automation         AutomationDefinition   @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId       String
+  versionNumber      Int
+  trigger            Json
+  conditions         Json
+  actions            Json
+  humanBoundary      Json
+  publishedAt        DateTime?
+  publishedByUserId  String?
+  createdAt          DateTime               @default(now())
+  executions         AutomationExecution[]
+
+  @@unique([automationId, versionNumber])
+  @@index([organizationId, automationId])
+}
+
+model AutomationExecution {
+  id                      String                      @id @default(uuid())
+  organization            Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId          String
+  publicId                String
+  automation              AutomationDefinition        @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId            String
+  version                 AutomationVersion           @relation(fields: [versionId], references: [id])
+  versionId               String
+  versionNumber           Int
+  idempotencyKey          String
+  correlationId           String
+  triggerEvent            String
+  sourceModel             String
+  sourceId                String
+  sourcePublicId          String?
+  status                  AutomationExecutionStatus
+  conditionsEvaluated     Json
+  actionsAttempted        Json
+  actionsSucceeded        Json
+  actionsFailed           Json
+  humanApprovalRequired   Boolean                     @default(true)
+  nextActorLabel          String?
+  preview                 Boolean                     @default(false)
+  retryCount              Int                         @default(0)
+  timezoneUsed            String
+  startedAt               DateTime?
+  completedAt             DateTime?
+  durationMs              Int?
+  errorSummary            String?
+  createdAt               DateTime                    @default(now())
+  workItems               AutomationWorkItem[]
+
+  @@unique([organizationId, publicId])
+  @@unique([organizationId, idempotencyKey])
+  @@index([organizationId, status])
+  @@index([organizationId, automationId, createdAt])
+  @@index([organizationId, sourceModel, sourceId])
+}
+
+model AutomationWorkItem {
+  id             String                 @id @default(uuid())
+  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  publicId       String
+  automation     AutomationDefinition   @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationId   String
+  execution      AutomationExecution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  executionId    String
+  title          String
+  body           String
+  sourceModel    String
+  sourceId       String
+  sourceHref     String?
+  ownerUserId    String?
+  dueAt          DateTime?
+  status         AutomationWorkStatus   @default(OPEN)
+  kind           AutomationWorkKind
+  humanRequired  Boolean                @default(true)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, ownerUserId])
+}
+
+model AutomationCounter {
   organizationId String
   kind           String
   next           Int    @default(1)
