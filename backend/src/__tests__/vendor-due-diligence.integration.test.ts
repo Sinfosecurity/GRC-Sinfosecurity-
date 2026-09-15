@@ -96,7 +96,8 @@ describe('Supreme Third Party onboarding Phase B', () => {
         expect(copied.body.data.activationUrl).toBeTruthy();
         expect(copied.body.data.invitation.deliveryMethod).toBe('LINK');
         expect(copied.body.data.invitation.emailTruth).toMatch(/not email delivery/i);
-        expect(JSON.stringify(copied.body.data)).not.toMatch(/Due diligence sent to Casey Contact/);
+        expect(copied.body.data.invitation.emailStatus).toMatch(/not emailed|link copied/i);
+        expect(JSON.stringify(copied.body.data.invitation)).not.toMatch(/Due diligence sent|Email sent|Delivered/);
         const shared = await request(app).post(`${API}/vendors/onboarding/${publicId}/invitation/shared`).set('Authorization', `Bearer ${tokenA}`).send({});
         expect(shared.status).toBe(200);
         expect(shared.body.data.invitation.emailTruth).toMatch(/not email delivery/i);
