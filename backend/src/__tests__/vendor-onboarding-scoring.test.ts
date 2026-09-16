@@ -5,6 +5,7 @@ import {
     formatVendorPublicId,
     namesLikelyDuplicate,
     recommendTierFromIntake,
+    unresolvedScopeBlockMessage,
     workbookControlGap,
 } from '../services/vendorOnboardingScoring';
 import { canonicalIntakeAnswers } from './helpers/canonicalIntake';
@@ -68,6 +69,8 @@ describe('vendor onboarding scoring', () => {
         const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_04: 'Unknown', ir_05: 'Low' }));
         expect(result.packs.unresolved.some((row) => row.code === 'IR-04')).toBe(true);
         expect(result.packs.required.some((pack) => pack.key === 'privileged-network')).toBe(false);
+        expect(unresolvedScopeBlockMessage(result.packs.unresolved)).toMatch(/privileged administrative access/i);
+        expect(unresolvedScopeBlockMessage(result.packs.unresolved)).toMatch(/Complete intake/i);
     });
 
     it('maps the workbook eighth pack from the physical-delivery trigger', () => {

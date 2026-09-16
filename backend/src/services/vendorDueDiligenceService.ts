@@ -23,7 +23,7 @@ import { deliverEmail, notifyUser } from './notificationDeliveryService';
 import { hashToken, randomToken } from './passwordService';
 import { portalFrontendUrl, publicFrontendUrl } from './publicFrontendUrl';
 import { scoreAssessmentResponse } from './vendorAssessmentService';
-import { addBusinessDays, recommendTierFromIntake, workbookControlGap } from './vendorOnboardingScoring';
+import { addBusinessDays, recommendTierFromIntake, unresolvedScopeBlockMessage, workbookControlGap } from './vendorOnboardingScoring';
 import { getOnboarding } from './vendorOnboardingService';
 import { explainableRiskService } from './explainableRiskService';
 import {
@@ -199,7 +199,7 @@ async function assertReadyToInvite(organizationId: string, vendor: { id: string;
     });
     const unresolved = recommendTierFromIntake(answers.map((row) => ({ questionKey: row.questionId, response: row.response }))).packs.unresolved;
     if (unresolved.length) {
-        throw new ApiError(409, `We still need to know: ${unresolved.map((row) => row.question).join(' ')} Complete intake before sending.`);
+        throw new ApiError(409, unresolvedScopeBlockMessage(unresolved));
     }
 }
 

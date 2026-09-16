@@ -10,11 +10,13 @@ import { getLibraryTemplateByKey, recommendAssessments } from './questionnaireLi
 import vendorAssessmentService from './vendorAssessmentService';
 import {
     addBusinessDays,
+    describeUnresolvedScope,
     extractVendorDomain,
     formatVendorPublicId,
     missingCanonicalIntake,
     namesLikelyDuplicate,
     recommendTierFromIntake,
+    unresolvedScopeBlockMessage,
     type IntakeAnswer,
 } from './vendorOnboardingScoring';
 import { assertTierMeetsFloor, parseVendorTier, resolveMinimumTier } from './vendorTierIntegrity';
@@ -520,7 +522,7 @@ async function completeIntake(organizationId: string, vendorId: string, actor: A
     if (missing.length) throw new ApiError(400, `Complete the inherent-risk questions before submitting intake. Still needed: ${missing.map((key) => key.toUpperCase().replace('_', '-')).join(', ')}.`);
     const result = recommendTierFromIntake(answers);
     if (result.packs.unresolved.length) {
-        throw new ApiError(400, `Unknown cannot remain on a required scoping fact. ${result.packs.unresolved.map((row) => row.question).join(' ')}`);
+        throw new ApiError(400, unresolvedScopeBlockMessage(result.packs.unresolved));
     }
     const tierReviewDueAt = addBusinessDays(new Date(), TIER_REVIEW_SLA_DAYS);
     await prisma.vendor.update({
@@ -656,7 +658,7 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
     const confirmedTier = vendor.onboarding.confirmedTier || vendor.tier;
     const plan = await buildPlan(organizationId, vendor.id, confirmedTier, input);
     if (plan.unresolved?.length) {
-        throw new ApiError(409, `Unresolved scope questions must be completed before Ready to Send. ${plan.unresolved.map((row: { question: string }) => row.question).join(' ')}`);
+        throw new ApiError(409, unresolvedScopeBlockMessage(plan.unresolved));
     }
     for (const item of plan.assessments.filter((row: any) => row.key !== 'inherent-risk' && (row.requirement === 'Required' || row.requirement === 'Recommended'))) {
         if (!item.templateId) continue;
@@ -774,7 +776,7 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
             required: result.packs.required,
             recommended: result.packs.recommended,
         },
-        unresolved: result.packs.unresolved,
+        unresolved: describeUnresolvedScope(result.packs.unresolved),
         override: customized ? {
             reason: String(customization.reason).trim(),
             includeKeys: customization.includeKeys || [],
@@ -825,6 +827,11 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         ? vendor.onboarding.tierReviewDueAt
         : vendor.onboarding?.intakeDueAt;
     const overdue = Boolean(due && due < new Date() && vendor.onboarding?.stage !== VendorOnboardingStage.READY_TO_SEND);
+    const liveRecommendation = recommendTierFromIntake((assessment?.responses || []).map((row) => ({
+        questionKey: row.questionId,
+        response: row.response,
+    })));
+    const unresolvedScope = describeUnresolvedScope(liveRecommendation.packs.unresolved);
     const plan = vendor.onboarding?.plan && typeof vendor.onboarding.plan === 'object'
         ? vendor.onboarding.plan
         : vendor.onboarding?.recommendedTier
@@ -893,6 +900,7 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
             overrideReason: vendor.onboarding.overrideReason,
             confirmedBy: users.get(vendor.onboarding.tierConfirmedBy || '')?.name || null,
         } : null,
+        unresolvedScope,
         plan,
         history: history.map((event) => ({
             at: event.timestamp,

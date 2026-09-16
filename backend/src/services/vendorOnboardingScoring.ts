@@ -327,6 +327,30 @@ export function recommendDueDiligencePacks(answers: IntakeAnswer[], signals: Int
     };
 }
 
+const SCOPE_CUSTOMER_MESSAGES: Record<string, string> = {
+    'IR-01': 'We still need to know whether an outage would disrupt critical operations or customer commitments before Supreme can finalize the due-diligence package.',
+    'IR-02': 'We still need to know whether this vendor will store or process confidential, regulated, payment, or health information before Supreme can finalize the due-diligence package.',
+    'IR-04': 'We still need to know whether this vendor will have privileged administrative access before Supreme can finalize the due-diligence package.',
+    'IR-05': 'We still need to know whether this service will connect directly to production systems or trusted networks before Supreme can finalize the due-diligence package.',
+    'IR-08': 'We still need to know whether this service could affect a legal, regulatory, or supervisory commitment before Supreme can finalize the due-diligence package.',
+    'SCOPE-CATEGORY': 'We still need to know the service category before Supreme can recommend the right due-diligence packs.',
+    'SCOPE-SOFTWARE': 'We still need to know the service category before Supreme can recommend the right due-diligence packs.',
+    'SCOPE-PHYSICAL': 'We still need to know whether this service depends on vendor facilities, physical records, or on-site access before Supreme can finalize the due-diligence package.',
+};
+
+export function describeUnresolvedScope(unresolved: ScopeFact[]) {
+    return unresolved.map((row) => ({
+        ...row,
+        message: SCOPE_CUSTOMER_MESSAGES[row.code] || `We still need to know: ${row.question}`,
+    }));
+}
+
+export function unresolvedScopeBlockMessage(unresolved: ScopeFact[]) {
+    const described = describeUnresolvedScope(unresolved);
+    if (!described.length) return '';
+    return `${described.map((row) => row.message).join(' ')} Complete intake. Unknown is not treated as No.`;
+}
+
 export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierResult {
     const data = dataType(answers);
     const spend = answer(answers, 'ir_spend');

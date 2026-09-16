@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../marketing/routerFuture';
 import VendorOnboarding from '../VendorOnboarding';
@@ -90,6 +90,54 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.getByText('VND-2026-0001')).toBeInTheDocument();
         expect(screen.getByText('Complete vendor intake')).toBeInTheDocument();
         expect(screen.queryByText('INTAKE_PENDING')).not.toBeInTheDocument();
+    });
+
+    it('explains a controlling Unknown and keeps submit intake blocked', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v2',
+                    publicId: 'VND-2026-0002',
+                    name: 'Unknown Access Vendor',
+                    stage: 'Intake',
+                    stageKey: 'INTAKE',
+                    owner: 'Ava Owner',
+                    requester: 'Ava Owner',
+                    canEditIntake: true,
+                    canReviewTier: true,
+                    request: { name: 'Unknown Access Vendor', servicesProvided: 'Admin access' },
+                    intake: {
+                        completed: false,
+                        sections: [{
+                            title: 'Inherent risk',
+                            questions: [{
+                                key: 'ir_04',
+                                question: 'Will the vendor have privileged access?',
+                                type: 'SINGLE_CHOICE',
+                                options: ['High', 'Moderate', 'Low', 'Unknown'],
+                                response: 'Unknown',
+                            }],
+                        }],
+                    },
+                    unresolvedScope: [{
+                        code: 'IR-04',
+                        message: 'We still need to know whether this vendor will have privileged administrative access before Supreme can finalize the due-diligence package.',
+                    }],
+                    plan: { unresolved: [], assessments: [], triggers: {} },
+                    history: [],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0002']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText(/finalize the due-diligence package/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save and resume later' })).toBeEnabled();
+        fireEvent.click(screen.getByLabelText(/I attest that this intake is accurate/i));
+        expect(screen.getByRole('button', { name: 'Submit intake' })).toBeDisabled();
     });
 
     it('shows explainable tier, plan rationale, and governance triggers', async () => {

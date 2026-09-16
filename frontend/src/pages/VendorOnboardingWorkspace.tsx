@@ -93,6 +93,7 @@ export default function VendorOnboardingWorkspace() {
     useEffect(load, [id]);
 
     const payload = useMemo(() => Object.entries(answers).map(([questionKey, response]) => ({ questionKey, response })), [answers]);
+    const unresolvedScope = useMemo(() => controllingUnknowns(answers, data?.unresolvedScope || data?.plan?.unresolved), [answers, data]);
 
     const run = async (work: () => Promise<unknown>) => {
         setSaving(true);
@@ -192,9 +193,14 @@ export default function VendorOnboardingWorkspace() {
                             <Typography variant="body2" sx={{ mb: 1 }}>Completed by the business owner. This is not sent to the vendor.</Typography>
                             <Typography variant="body2" sx={{ mb: 2 }}>
                                 {intakeProgress(data.intake?.sections, answers)} answered.
-                                {hasUnknown(answers) ? ' Unknown answers can block dropping a due-diligence pack. They are not treated as Low risk.' : ''}
+                                {hasUnknown(answers) ? ' Unknown is saved honestly and is not treated as No or Low risk.' : ''}
                                 {' '}Estimated spend, if asked, is context only and does not change inherent or residual risk.
                             </Typography>
+                            {unresolvedScope.length > 0 && !data.intake.completed && (
+                                <Alert severity="warning" sx={{ mb: 2 }}>
+                                    {unresolvedScope.map((row) => row.message).join(' ')} You can save and resume later. Submit intake stays blocked until these facts are resolved.
+                                </Alert>
+                            )}
                             <Stack component="form" spacing={2.5} onSubmit={data.intake.completed ? saveIntake : completeIntake}>
                                 {(data.intake.sections || []).map((section: any) => (
                                     <Stack key={section.title} spacing={1.5}>
@@ -235,7 +241,7 @@ export default function VendorOnboardingWorkspace() {
                                         <FormControlLabel control={<Checkbox checked={attested} onChange={(event) => setAttested(event.target.checked)} />} label="I attest that this intake is accurate for this engagement." />
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                                             <Button onClick={saveIntake} disabled={saving}>Save and resume later</Button>
-                                            <Button type="submit" variant="contained" disabled={saving || !attested}>Submit intake</Button>
+                                            <Button type="submit" variant="contained" disabled={saving || !attested || unresolvedScope.length > 0}>Submit intake</Button>
                                         </Stack>
                                     </>
                                 )}
@@ -287,9 +293,10 @@ export default function VendorOnboardingWorkspace() {
                                 <Typography variant="h6">Recommended due-diligence package</Typography>
                                 <Typography variant="body2">{data.plan?.rationale || 'Confirm the tier to generate the package. Nothing is sent to the vendor in this phase.'}</Typography>
                             </Surface>
-                            {(data.plan?.unresolved || []).length > 0 && (
+                            {unresolvedScope.length > 0 && (
                                 <Alert severity="warning">
-                                    We still need to know {(data.plan.unresolved as any[]).map((row) => row.question).join(' ')} Complete intake. Unknown answers cannot be used to drop a pack.
+                                    {unresolvedScope.map((row) => row.message).join(' ')} Package confirmation and invitation stay blocked until intake is completed with those facts resolved.
+                                    <Button sx={{ display: 'block', mt: 1 }} onClick={() => setTab(1)}>Complete intake</Button>
                                 </Alert>
                             )}
                             <Surface>
@@ -329,7 +336,7 @@ export default function VendorOnboardingWorkspace() {
                             {data.plan?.override && <Alert severity="info">Package customized: {data.plan.override.reason}</Alert>}
                             {data.canReviewTier && data.stageKey === 'DUE_DILIGENCE_PLAN' && (
                                 <Stack spacing={1.5}>
-                                    <Button variant="contained" disabled={saving || (data.plan?.unresolved || []).length > 0} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}>Confirm package</Button>
+                                    <Button variant="contained" disabled={saving || unresolvedScope.length > 0} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}>Confirm package</Button>
                                     <Button disabled={saving} onClick={() => setCustomizePlan(!customizePlan)}>Customize</Button>
                                     {customizePlan && (
                                         <>
@@ -363,7 +370,7 @@ export default function VendorOnboardingWorkspace() {
                                     <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
                                     <TextField label="Title / role" value={contact.title} onChange={(event) => setContact({ ...contact, title: event.target.value })} />
                                     <TextField label="Phone" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} />
-                                    {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && (
+                                    {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && unresolvedScope.length === 0 && (
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                                             <Button variant="contained" disabled={saving || !contact.name || !contact.email} onClick={() => run(() => vendorOnboardingAPI.send(id, contact))}>Send invitation email</Button>
                                             <Button disabled={saving || !contact.name || !contact.email} onClick={() => run(async () => {
@@ -681,6 +688,46 @@ function intakeProgress(sections: any[] | undefined, answers: Record<string, str
 
 function hasUnknown(answers: Record<string, string>) {
     return Object.values(answers).some((value) => /^unknown$/i.test(String(value).trim()));
+}
+
+const CONTROLLING_UNKNOWN_MESSAGES: Record<string, { code: string; message: string }> = {
+    ir_01: {
+        code: 'IR-01',
+        message: 'We still need to know whether an outage would disrupt critical operations or customer commitments before Supreme can finalize the due-diligence package.',
+    },
+    ir_02: {
+        code: 'IR-02',
+        message: 'We still need to know whether this vendor will store or process confidential, regulated, payment, or health information before Supreme can finalize the due-diligence package.',
+    },
+    ir_04: {
+        code: 'IR-04',
+        message: 'We still need to know whether this vendor will have privileged administrative access before Supreme can finalize the due-diligence package.',
+    },
+    ir_05: {
+        code: 'IR-05',
+        message: 'We still need to know whether this service will connect directly to production systems or trusted networks before Supreme can finalize the due-diligence package.',
+    },
+    ir_08: {
+        code: 'IR-08',
+        message: 'We still need to know whether this service could affect a legal, regulatory, or supervisory commitment before Supreme can finalize the due-diligence package.',
+    },
+    ir_physical: {
+        code: 'SCOPE-PHYSICAL',
+        message: 'We still need to know whether this service depends on vendor facilities, physical records, or on-site access before Supreme can finalize the due-diligence package.',
+    },
+};
+
+function controllingUnknowns(answers: Record<string, string> = {}, fromApi: Array<{ code?: string; message?: string; question?: string }> = []) {
+    const formHasControllingAnswers = Object.keys(CONTROLLING_UNKNOWN_MESSAGES).some((key) => String(answers[key] || '').trim());
+    if (formHasControllingAnswers) {
+        return Object.entries(CONTROLLING_UNKNOWN_MESSAGES)
+            .filter(([key]) => /^unknown$/i.test(String(answers[key] || '').trim()))
+            .map(([, row]) => row);
+    }
+    return (fromApi || []).filter((row) => row.message || row.question).map((row) => ({
+        code: row.code || '',
+        message: row.message || `We still need to know: ${row.question}`,
+    }));
 }
 
 function Fact({ label, value }: { label: string; value?: string | null }) {

@@ -8,8 +8,9 @@ function evidenceFileStatus(status?: string | null) {
     if (!status) return null;
     const key = String(status).trim();
     if (key === 'Ready' || key === 'CLEAN') return 'Ready';
-    if (key === 'Scanning' || key === 'PENDING' || key === 'PENDING_SCAN') return 'Security check in progress';
-    if (key === 'Blocked' || key === 'INFECTED' || key === 'QUARANTINED') return 'Blocked';
+    if (key === 'Uploading' || key === 'UPLOADING') return 'Uploading';
+    if (key === 'Scanning' || key === 'PENDING' || key === 'PENDING_SCAN') return 'Scanning';
+    if (key === 'Blocked' || key === 'Rejected' || key === 'INFECTED' || key === 'QUARANTINED' || key === 'REJECTED') return 'Rejected';
     if (key === 'Unavailable' || key === 'UNKNOWN' || key === 'unknown' || key === 'Security status unavailable') {
         return 'Security status unavailable';
     }
