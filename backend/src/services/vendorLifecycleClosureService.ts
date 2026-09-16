@@ -12,7 +12,8 @@ import {
 } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
-import { canonicalizeRole } from '../security/rbac';
+import { canonicalRoleIn, hasPermission, PERMISSIONS } from '../security/rbac';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 import { recordAudit } from './auditEventService';
 import { notifyUser } from './notificationDeliveryService';
 import { riskDecisionBriefService } from './riskDecisionBriefService';
@@ -24,11 +25,10 @@ import { addBusinessDays } from './vendorOnboardingScoring';
 
 type Actor = { id: string; role: string; name?: string };
 
-const REVIEW_ROLES = ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR', 'COMPLIANCE_OFFICER'];
-const APPROVAL_AUTHORITY: Record<string, string[]> = {
-    LOW: ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR'],
-    MEDIUM: ['ORGANIZATION_ADMIN', 'RISK_MANAGER'],
-    HIGH: ['ORGANIZATION_ADMIN', 'RISK_MANAGER'],
+const APPROVAL_AUTHORITY: Record<string, Array<'ORGANIZATION_ADMIN' | 'RISK_MANAGER' | 'APPROVER'>> = {
+    LOW: ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'APPROVER'],
+    MEDIUM: ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'APPROVER'],
+    HIGH: ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'APPROVER'],
     CRITICAL: ['ORGANIZATION_ADMIN'],
 };
 
@@ -40,11 +40,12 @@ export const REASSESSMENT_DAYS: Record<VendorTier, number> = {
 };
 
 function canReview(role: string) {
-    return REVIEW_ROLES.includes(canonicalizeRole(role));
+    return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR']);
 }
 
 function canApprove(role: string, tier: VendorTier) {
-    return (APPROVAL_AUTHORITY[tier] || APPROVAL_AUTHORITY.HIGH).includes(canonicalizeRole(role));
+    const allowed = APPROVAL_AUTHORITY[tier] || APPROVAL_AUTHORITY.HIGH;
+    return hasPermission(role, PERMISSIONS['approval.decide']) && canonicalRoleIn(role, allowed);
 }
 
 async function loadVendor(organizationId: string, vendorKey: string) {
@@ -143,6 +144,9 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
             contractAttestedAt: onboarding.contractAttestedAt,
             approvalDecision: onboarding.approvalDecision,
             approvalConditions: onboarding.approvalConditions,
+            approvalPreparedBy: onboarding.approvalPreparedBy,
+            approvalPreparedAt: onboarding.approvalPreparedAt,
+            readyForIndependentApproval: Boolean(onboarding.approvalPreparedBy && !onboarding.approvalDecision),
             nextReassessmentAt: onboarding.nextReassessmentAt,
             reassessmentFrequencyDays: onboarding.reassessmentFrequencyDays,
             findings: findings.map((row) => ({
@@ -157,6 +161,9 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
                 validatedAt: row.validatedAt,
                 acceptanceRationale: row.closureNotes,
                 acceptanceAuthority: row.closedBy,
+                acceptanceRequestedBy: row.acceptanceRequestedBy,
+                acceptanceRequestedAt: row.acceptanceRequestedAt,
+                pendingIndependentApproval: Boolean(row.acceptanceRequestedBy && row.status !== VendorIssueStatus.RISK_ACCEPTED),
                 acceptanceExpiresAt: row.status === VendorIssueStatus.RISK_ACCEPTED
                     ? briefs.find((brief) => brief.humanDecision === 'RISK_ACCEPTED' && String(brief.reviewerAnalysis || '').includes(row.title))?.nextReviewDate
                         || briefs.find((brief) => brief.humanDecision === 'RISK_ACCEPTED')?.nextReviewDate
@@ -171,6 +178,11 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
             })),
             monitoring,
         },
+        actorId: actor.id,
+        canCloseFinding: hasPermission(actor.role, PERMISSIONS['finding.close']),
+        canPrepareRiskAcceptance: hasPermission(actor.role, PERMISSIONS['finding.update']) || hasPermission(actor.role, PERMISSIONS['risk.accept']),
+        canApproveRiskAcceptance: hasPermission(actor.role, PERMISSIONS['risk.accept']),
+        canDecideApproval: canApprove(actor.role, vendor.tier),
     };
 }
 
@@ -209,7 +221,7 @@ export async function validateFinding(organizationId: string, vendorKey: string,
 }
 
 export async function closeFinding(organizationId: string, vendorKey: string, actor: Actor, findingId: string, input: { notes?: string; evidenceId?: string }) {
-    if (!canReview(actor.role)) throw new ApiError(403, 'Only a risk reviewer can close a finding.');
+    if (!hasPermission(actor.role, PERMISSIONS['finding.close'])) throw new ApiError(403, 'Only an authorized reviewer can close a finding.');
     const vendor = await loadVendor(organizationId, vendorKey);
     const finding = await prisma.vendorIssue.findFirst({ where: { id: findingId, organizationId, vendorId: vendor.id } });
     if (!finding) throw new ApiError(404, 'Finding not found.');
@@ -231,29 +243,79 @@ export async function acceptFindingRisk(organizationId: string, vendorKey: strin
     conditions?: string;
     expiry?: string;
 }) {
-    if (!canReview(actor.role)) throw new ApiError(403, 'Only a risk reviewer can request risk acceptance.');
+    if (!hasPermission(actor.role, PERMISSIONS['finding.update']) && !hasPermission(actor.role, PERMISSIONS['risk.accept'])) {
+        throw new ApiError(403, 'Only an authorized reviewer can request risk acceptance.');
+    }
     const vendor = await loadVendor(organizationId, vendorKey);
     const finding = await prisma.vendorIssue.findFirst({ where: { id: findingId, organizationId, vendorId: vendor.id, reviewState: IssueReviewState.CONFIRMED } });
     if (!finding) throw new ApiError(404, 'Confirmed finding not found.');
+    if (finding.status === VendorIssueStatus.RISK_ACCEPTED) throw new ApiError(409, 'This finding already has an accepted residual.');
     if (!String(input.rationale || '').trim()) throw new ApiError(400, 'Acceptance requires a rationale.');
     const expiry = input.expiry ? new Date(input.expiry) : addBusinessDays(new Date(), 180);
     if (expiry.getTime() - Date.now() > 366 * 24 * 60 * 60 * 1000) throw new ApiError(400, 'Risk acceptance cannot exceed 12 months.');
-    const before = await prisma.scoreCalculation.findFirst({ where: { organizationId, vendorId: vendor.id }, orderBy: { calculatedAt: 'desc' } });
-    const brief = await riskDecisionBriefService.generate(organizationId, vendor.id, actor.id);
-    await riskDecisionBriefService.decide(organizationId, brief.id, {
-        decision: 'RISK_ACCEPTED' as RiskDecision,
-        conditions: input.conditions,
+    const brief = await riskDecisionBriefService.generate(organizationId, vendor.id, actor.id, {
+        proposedDecision: 'RISK_ACCEPTED',
         reviewerAnalysis: `${finding.title}: ${input.rationale}`,
-        nextReviewDate: expiry.toISOString(),
-        actorUserId: actor.id,
+        conditions: input.conditions,
+        nextReviewDate: expiry,
+        pendingFindingId: finding.id,
     });
-    await vendorIssueService.acceptRisk(finding.id, organizationId, actor.id, input.rationale!);
+    await prisma.vendorIssue.update({
+        where: { id: finding.id },
+        data: {
+            acceptanceRequestedBy: actor.id,
+            acceptanceRequestedAt: new Date(),
+            closureNotes: input.rationale,
+        },
+    });
+    await prisma.vendorOnboarding.update({ where: { vendorId: vendor.id }, data: { stage: VendorOnboardingStage.RISK_ACCEPTANCE } });
+    await history(organizationId, actor.id, vendor.id, 'vendor.risk_acceptance_requested', `${actor.name || 'Analyst'} requested a time-bounded risk acceptance. Residual score is unchanged until an independent reviewer approves.`);
+    const presented = await presentLifecycle(organizationId, vendor.id, actor);
+    return { ...presented, pendingBriefId: brief.id, readyForIndependentApproval: true };
+}
+
+export async function approveFindingRisk(organizationId: string, vendorKey: string, actor: Actor, findingId: string, input: {
+    rationale?: string;
+    conditions?: string;
+    expiry?: string;
+    approvedBy?: string;
+    organizationId?: string;
+} = {}) {
+    if (!hasPermission(actor.role, PERMISSIONS['risk.accept'])) {
+        throw new ApiError(403, 'Only an authorized reviewer can accept residual risk.');
+    }
+    const vendor = await loadVendor(organizationId, vendorKey);
+    const finding = await prisma.vendorIssue.findFirst({ where: { id: findingId, organizationId, vendorId: vendor.id, reviewState: IssueReviewState.CONFIRMED } });
+    if (!finding) throw new ApiError(404, 'Confirmed finding not found.');
+    if (!finding.acceptanceRequestedBy) throw new ApiError(409, 'Risk acceptance must be prepared before it can be approved.');
+    assertIndependentReviewer(finding.acceptanceRequestedBy, actor.id);
+    const rationale = String(input.rationale || finding.closureNotes || '').trim();
+    if (!rationale) throw new ApiError(400, 'Acceptance requires a rationale.');
+    const expiry = input.expiry
+        ? new Date(input.expiry)
+        : finding.acceptanceRequestedAt
+            ? addBusinessDays(finding.acceptanceRequestedAt, 180)
+            : addBusinessDays(new Date(), 180);
+    const before = await prisma.scoreCalculation.findFirst({ where: { organizationId, vendorId: vendor.id }, orderBy: { calculatedAt: 'desc' } });
+    const pendingBrief = await prisma.riskDecisionBrief.findFirst({
+        where: { organizationId, vendorId: vendor.id, status: 'DRAFT', preparedByUserId: finding.acceptanceRequestedBy },
+        orderBy: { createdAt: 'desc' },
+    });
+    if (pendingBrief) {
+        await riskDecisionBriefService.decide(organizationId, pendingBrief.id, {
+            decision: 'RISK_ACCEPTED' as RiskDecision,
+            conditions: input.conditions,
+            reviewerAnalysis: `${finding.title}: ${rationale}`,
+            nextReviewDate: expiry.toISOString(),
+            actorUserId: actor.id,
+        });
+    }
+    await vendorIssueService.acceptRisk(finding.id, organizationId, actor.id, rationale);
     const after = await prisma.scoreCalculation.findFirst({ where: { organizationId, vendorId: vendor.id }, orderBy: { calculatedAt: 'desc' } });
     if (before && after && before.residualRisk !== after.residualRisk) {
         throw new ApiError(500, 'Risk acceptance must not change the residual score.');
     }
-    await prisma.vendorOnboarding.update({ where: { vendorId: vendor.id }, data: { stage: VendorOnboardingStage.RISK_ACCEPTANCE } });
-    await history(organizationId, actor.id, vendor.id, 'vendor.risk_accepted', `${actor.name || 'Analyst'} recorded a time-bounded risk acceptance. Residual score unchanged.`);
+    await history(organizationId, actor.id, vendor.id, 'vendor.risk_accepted', `${actor.name || 'Approver'} recorded an independent time-bounded risk acceptance. Residual score unchanged.`);
     return presentLifecycle(organizationId, vendor.id, actor);
 }
 
@@ -302,6 +364,8 @@ export async function attestContract(organizationId: string, vendorKey: string, 
             contractChecklist: required.map((row) => ({ ...row, attested: Boolean(clauses[row.key]) })) as Prisma.InputJsonValue,
             contractAttestedAt: new Date(),
             contractAttestedBy: actor.id,
+            approvalPreparedBy: actor.id,
+            approvalPreparedAt: new Date(),
         },
     });
     await history(organizationId, actor.id, vendor.id, 'vendor.contract_attested', `${actor.name || 'Legal'} attested the required contract controls.`);
@@ -312,7 +376,12 @@ export async function decideApproval(organizationId: string, vendorKey: string, 
     decision?: 'APPROVE' | 'REJECT' | 'APPROVE_WITH_CONDITIONS';
     conditions?: string;
     rationale?: string;
+    approvedBy?: string;
+    organizationId?: string;
 }) {
+    if (!hasPermission(actor.role, PERMISSIONS['approval.decide'])) {
+        throw new ApiError(403, 'Only an authorized reviewer can record this decision.');
+    }
     const vendor = await loadVendor(organizationId, vendorKey);
     if (!canApprove(actor.role, vendor.tier)) throw new ApiError(403, 'This role cannot approve this vendor tier.');
     if (!input.decision) throw new ApiError(400, 'Approve, reject, or approve with conditions.');
@@ -326,8 +395,28 @@ export async function decideApproval(organizationId: string, vendorKey: string, 
     if (input.decision !== 'REJECT' && !vendor.onboarding?.contractAttestedAt) {
         throw new ApiError(409, 'Contract requirements must be attested before approval.');
     }
+    const preparer = vendor.onboarding?.approvalPreparedBy || vendor.onboarding?.contractAttestedBy || null;
+    if (input.decision !== 'REJECT' && !preparer) {
+        throw new ApiError(409, 'The approval package must be prepared before an independent reviewer can decide.');
+    }
+    if (preparer) assertIndependentReviewer(preparer, actor.id);
     const latest = await prisma.scoreCalculation.findFirst({ where: { organizationId, vendorId: vendor.id }, orderBy: { calculatedAt: 'desc' } });
-    const brief = await riskDecisionBriefService.generate(organizationId, vendor.id, actor.id);
+    const pendingBrief = await prisma.riskDecisionBrief.findFirst({
+        where: {
+            organizationId,
+            vendorId: vendor.id,
+            status: 'DRAFT',
+            ...(preparer ? { preparedByUserId: preparer } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+    });
+    const brief = pendingBrief && pendingBrief.preparedByUserId !== actor.id
+        ? pendingBrief
+        : await riskDecisionBriefService.generate(organizationId, vendor.id, preparer || undefined, {
+            proposedDecision: input.decision as RiskDecision,
+            reviewerAnalysis: input.rationale,
+            conditions: input.conditions,
+        });
     await riskDecisionBriefService.decide(organizationId, brief.id, {
         decision: input.decision as RiskDecision,
         conditions: input.conditions,

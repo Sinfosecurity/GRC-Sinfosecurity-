@@ -513,6 +513,7 @@ export const vendorOnboardingAPI = {
     validateFinding: (id: string, findingId: string, data: unknown) => api.post(`/vendors/onboarding/${id}/findings/${findingId}/validate`, data),
     closeFinding: (id: string, findingId: string, data: unknown) => api.post(`/vendors/onboarding/${id}/findings/${findingId}/close`, data),
     acceptFindingRisk: (id: string, findingId: string, data: unknown) => api.post(`/vendors/onboarding/${id}/findings/${findingId}/accept-risk`, data),
+    approveFindingRisk: (id: string, findingId: string, data: unknown) => api.post(`/vendors/onboarding/${id}/findings/${findingId}/accept-risk/approve`, data),
     attestContract: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/contract/attest`, data),
     decideApproval: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/approval`, data),
     activate: (id: string) => api.post(`/vendors/onboarding/${id}/activate`),

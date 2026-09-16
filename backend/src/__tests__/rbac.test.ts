@@ -8,6 +8,20 @@ describe('RBAC', () => {
         expect(canonicalizeRole('COMPLIANCE_OFFICER')).toBe('ASSESSOR');
     });
 
+    it('fails closed for unknown and empty roles', () => {
+        expect(canonicalizeRole('EXECUTIVE')).toBeNull();
+        expect(canonicalizeRole('BOARD_MEMBER')).toBeNull();
+        expect(canonicalizeRole('CFO')).toBeNull();
+        expect(canonicalizeRole('UNKNOWN_PRIVILEGED')).toBeNull();
+        expect(canonicalizeRole(undefined)).toBeNull();
+        expect(canonicalizeRole('')).toBeNull();
+        expect(hasPermission('EXECUTIVE', PERMISSIONS['approval.decide'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['approval.decide'])).toBe(false);
+        expect(roleMatches('VIEWER', ['ADMIN', 'RISK_MANAGER', 'EXECUTIVE'])).toBe(false);
+        expect(roleMatches('EXECUTIVE', ['ADMIN', 'RISK_MANAGER', 'EXECUTIVE'])).toBe(false);
+        expect(hasPermission(undefined, PERMISSIONS['vendor.read'])).toBe(false);
+    });
+
     it('denies sensitive actions to viewers', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['intelligence.read'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['automation.read'])).toBe(true);

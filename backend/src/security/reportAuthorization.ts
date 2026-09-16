@@ -23,6 +23,7 @@ const BOARD_ROLES = new Set([
 
 export function canExportReport(role: string | undefined | null, kind: ReportKind): boolean {
     const canonical = canonicalizeRole(role);
+    if (!canonical) return false;
     if (kind === 'board') return BOARD_ROLES.has(canonical);
     return OPERATIONAL_ROLES.has(canonical);
 }

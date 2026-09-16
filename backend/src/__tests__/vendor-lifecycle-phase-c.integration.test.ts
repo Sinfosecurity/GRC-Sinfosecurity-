@@ -1,8 +1,9 @@
 import request from 'supertest';
-import { IssueReviewState, ScanStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
+import { IssueReviewState, Role, ScanStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
 import { app } from '../server';
 import { prisma } from '../config/database';
 import { canonicalIntakeAnswers } from './helpers/canonicalIntake';
+import { createOrgUser } from './helpers/orgUser';
 
 jest.setTimeout(90000);
 
@@ -150,10 +151,23 @@ describe('Supreme Third Party lifecycle Phase C', () => {
         const closed = await request(app).post(`${API}/vendors/onboarding/${publicId}/findings/${closable.id}/close`).set('Authorization', `Bearer ${token}`).send({});
         expect(closed.status).toBe(200);
 
-        const accepted = await request(app).post(`${API}/vendors/onboarding/${publicId}/findings/${acceptable.id}/accept-risk`).set('Authorization', `Bearer ${token}`).send({
+        const prepared = await request(app).post(`${API}/vendors/onboarding/${publicId}/findings/${acceptable.id}/accept-risk`).set('Authorization', `Bearer ${token}`).send({
             rationale: 'Fourth-party inventory is incomplete but monitored monthly.',
             conditions: 'Complete the inventory before the next review.',
         });
+        expect(prepared.status).toBe(200);
+        expect(prepared.body.data.readyForIndependentApproval).toBe(true);
+        const approver = await createOrgUser({
+            organizationId: orgId,
+            email: `phasec-approver-${suffix}@lifecycle.test`,
+            password: PASSWORD,
+            role: Role.ORGANIZATION_ADMIN,
+            firstName: 'Pat',
+            lastName: 'Approver',
+        });
+        const selfApprove = await request(app).post(`${API}/vendors/onboarding/${publicId}/findings/${acceptable.id}/accept-risk/approve`).set('Authorization', `Bearer ${token}`).send({});
+        expect(selfApprove.status).toBe(403);
+        const accepted = await request(app).post(`${API}/vendors/onboarding/${publicId}/findings/${acceptable.id}/accept-risk/approve`).set('Authorization', `Bearer ${approver.token}`).send({});
         expect(accepted.status).toBe(200);
         const residualAfterClose = closed.body.data.lifecycle.residualRisk;
         expect(accepted.body.data.lifecycle.residualRisk).toBe(residualAfterClose);
@@ -172,7 +186,12 @@ describe('Supreme Third Party lifecycle Phase C', () => {
         });
         expect(attested.status).toBe(200);
 
-        const approved = await request(app).post(`${API}/vendors/onboarding/${publicId}/approval`).set('Authorization', `Bearer ${token}`).send({
+        const selfVendor = await request(app).post(`${API}/vendors/onboarding/${publicId}/approval`).set('Authorization', `Bearer ${token}`).send({
+            decision: 'APPROVE',
+            rationale: 'Findings are closed or time-bounded. Contract controls are attested.',
+        });
+        expect(selfVendor.status).toBe(403);
+        const approved = await request(app).post(`${API}/vendors/onboarding/${publicId}/approval`).set('Authorization', `Bearer ${approver.token}`).send({
             decision: 'APPROVE',
             rationale: 'Findings are closed or time-bounded. Contract controls are attested.',
         });

@@ -65,7 +65,7 @@ router.get('/decision-briefs', requirePermission(PERMISSIONS['approval.read']), 
     }
 });
 
-router.post('/vendors/:vendorId/decision-briefs', requirePermission(PERMISSIONS['approval.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/vendors/:vendorId/decision-briefs', requirePermission(PERMISSIONS['finding.update'], PERMISSIONS['approval.decide']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const data = await riskDecisionBriefService.generate(
             req.user!.organizationId,

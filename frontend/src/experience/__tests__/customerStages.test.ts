@@ -16,6 +16,10 @@ describe('five-stage customer mapping', () => {
         expect(dominantNextAction({ stageKey: 'TIER_REVIEW' }).label).toMatch(/Confirm recommended tier/);
         expect(dominantNextAction({ stageKey: 'SUBMITTED', review: { potentialFindings: 4 } }).label).toBe('Review 4 material issues');
         expect(dominantNextAction({
+            stageKey: 'APPROVAL',
+            lifecycle: { readyForIndependentApproval: true },
+        }).label).toBe('Ready for independent approval');
+        expect(dominantNextAction({
             stageKey: 'UNDER_REVIEW',
             review: {
                 items: [

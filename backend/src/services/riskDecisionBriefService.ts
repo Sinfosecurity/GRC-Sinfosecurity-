@@ -3,6 +3,7 @@ import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { runAi } from '../ai/aiProvider';
 import { tenantWhere } from '../security/tenant';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 import { recordAudit } from './auditEventService';
 import { explainableRiskService } from './explainableRiskService';
 
@@ -44,7 +45,18 @@ export const riskDecisionBriefService = {
         return brief;
     },
 
-    async generate(organizationId: string, vendorId: string, actorUserId?: string) {
+    async generate(
+        organizationId: string,
+        vendorId: string,
+        actorUserId?: string,
+        extras?: {
+            proposedDecision?: RiskDecision;
+            reviewerAnalysis?: string;
+            conditions?: string;
+            nextReviewDate?: Date;
+            pendingFindingId?: string;
+        }
+    ) {
         const vendor = await prisma.vendor.findFirst({
             where: tenantWhere(organizationId, { id: vendorId }),
         });
@@ -120,6 +132,13 @@ export const riskDecisionBriefService = {
             evidenceConfidence: confidence,
             openFindings,
             monitoringAlerts,
+            proposal: extras ? {
+                proposedDecision: extras.proposedDecision || null,
+                reviewerAnalysis: extras.reviewerAnalysis || null,
+                conditions: extras.conditions || null,
+                pendingFindingId: extras.pendingFindingId || null,
+                preparedByUserId: actorUserId || null,
+            } : undefined,
         };
 
         const brief = await prisma.riskDecisionBrief.create({
@@ -135,6 +154,10 @@ export const riskDecisionBriefService = {
                 evidenceConfidence: confidence,
                 openFindingsCount: openFindings,
                 monitoringAlertCount: monitoringAlerts,
+                reviewerAnalysis: extras?.reviewerAnalysis,
+                conditions: extras?.conditions,
+                nextReviewDate: extras?.nextReviewDate,
+                preparedByUserId: actorUserId || null,
                 aiSummary: ai.status === 'SUCCESS' ? ai.text : null,
                 aiSummaryStatus: ai.status,
                 immutableSnapshot: snapshot as Prisma.InputJsonValue,
@@ -171,17 +194,21 @@ export const riskDecisionBriefService = {
         if (!DECISION_OPTIONS.includes(input.decision)) {
             throw new ApiError(400, 'Invalid decision');
         }
+        const actorRecord = await prisma.user.findFirst({
+            where: { id: input.actorUserId, organizationId },
+            select: { id: true, firstName: true, lastName: true, email: true },
+        });
+        if (!actorRecord) {
+            throw new ApiError(403, 'Another authorized reviewer must approve this decision.');
+        }
+        assertIndependentReviewer(brief.preparedByUserId, input.actorUserId);
         if (input.decision === 'APPROVE_WITH_CONDITIONS' && !input.conditions?.trim()) {
             throw new ApiError(400, 'Conditions are required for APPROVE_WITH_CONDITIONS');
         }
 
         const nextReviewDate = input.nextReviewDate ? new Date(input.nextReviewDate) : brief.nextReviewDate;
         const decidedAt = new Date();
-        const actor = await prisma.user.findFirst({
-            where: { id: input.actorUserId, organizationId },
-            select: { firstName: true, lastName: true, email: true },
-        });
-        const decidedByName = actor ? `${actor.firstName} ${actor.lastName}`.trim() || actor.email : input.actorUserId;
+        const decidedByName = `${actorRecord.firstName} ${actorRecord.lastName}`.trim() || actorRecord.email;
         const updated = await prisma.riskDecisionBrief.update({
             where: { id: brief.id },
             data: {

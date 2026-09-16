@@ -707,6 +707,10 @@ model VendorOnboarding {
   approvalConditions    String?
   approvedAt            DateTime?
   approvedBy            String?
+  approvalPreparedBy    String?
+  approvalPreparedAt    DateTime?
+  approvalPreparedDecision String?
+  approvalPreparedRationale String?
   lifecycleActivatedAt  DateTime?
   nextReassessmentAt    DateTime?
   reassessmentFrequencyDays Int?
@@ -1170,6 +1174,8 @@ model VendorIssue {
   closedAt              DateTime?
   closedBy              String?
   closureNotes          String?
+  acceptanceRequestedBy String?
+  acceptanceRequestedAt DateTime?
 
   assessmentId          String?
   questionId            String?
@@ -2504,6 +2510,7 @@ model RiskDecisionBrief {
   humanDecision      RiskDecision?
   conditions         String?
   nextReviewDate     DateTime?
+  preparedByUserId   String?
   decidedByUserId    String?
   decidedAt          DateTime?
   status             DecisionBriefStatus  @default(DRAFT)

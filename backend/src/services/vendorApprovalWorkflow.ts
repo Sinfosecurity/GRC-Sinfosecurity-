@@ -6,6 +6,8 @@
 import { VendorApprovalWorkflow, WorkflowType, WorkflowStatus, ApprovalDecision } from '@prisma/client';
 import { prisma } from '../config/database';
 import { handlePrismaError, NotFoundError, ValidationError, BusinessLogicError } from '../utils/errors';
+import { ApiError } from '../middleware/errorHandler';
+import { INDEPENDENT_REVIEW_REQUIRED } from '../security/separationOfDuties';
 import logger from '../config/logger';
 
 export interface CreateWorkflowInput {
@@ -168,7 +170,7 @@ class VendorApprovalWorkflowService {
                 }
 
                 if (!data.allowSelfApproval && workflow.initiatedBy === data.decidedBy) {
-                    throw new BusinessLogicError('Self-approval is not permitted for this workflow');
+                    throw new ApiError(403, INDEPENDENT_REVIEW_REQUIRED);
                 }
 
                 // Validate workflow is not already completed
@@ -176,10 +178,18 @@ class VendorApprovalWorkflowService {
                     throw new BusinessLogicError('Workflow is already completed');
                 }
 
+                if (data.stepOrder !== workflow.currentStep) {
+                    throw new ApiError(409, 'Only the current approval step can be decided.');
+                }
+
                 // Get the current step
                 const currentStep = workflow.steps.find(s => s.stepOrder === data.stepOrder);
                 if (!currentStep) {
                     throw new NotFoundError('Approval Step', data.stepOrder.toString());
+                }
+
+                if (currentStep.approverUserId && currentStep.approverUserId !== data.decidedBy) {
+                    throw new ApiError(403, INDEPENDENT_REVIEW_REQUIRED);
                 }
 
                 // Validate step hasn't been decided yet

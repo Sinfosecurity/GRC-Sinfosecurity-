@@ -1,6 +1,7 @@
 import { Router, Response, NextFunction } from 'express';
 import { VendorTier } from '@prisma/client';
-import { AuthRequest, authorize } from '../middleware/auth';
+import { AuthRequest, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
 import { ApiError } from '../middleware/errorHandler';
 import {
     confirmPlan,
@@ -22,6 +23,7 @@ import {
 } from '../services/vendorDueDiligenceService';
 import {
     acceptFindingRisk,
+    approveFindingRisk,
     activateVendor,
     attestContract,
     closeFinding,
@@ -37,9 +39,6 @@ import { IssueSeverity } from '@prisma/client';
 
 const router = Router();
 
-const REQUEST_ROLES = ['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER', 'BUSINESS_OWNER', 'ASSESSOR'];
-const REVIEW_ROLES = ['ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER', 'ASSESSOR'];
-
 function actor(req: AuthRequest) {
     return { id: req.user!.id, role: req.user!.role, name: req.user!.name };
 }
@@ -52,7 +51,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     }
 });
 
-router.get('/owners', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/owners', requirePermission(PERMISSIONS['vendor.create'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await listOwnerDirectory(req.user!.organizationId) });
     } catch (error) {
@@ -60,7 +59,7 @@ router.get('/owners', authorize(...REQUEST_ROLES), async (req: AuthRequest, res:
     }
 });
 
-router.post('/duplicates', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/duplicates', requirePermission(PERMISSIONS['vendor.create'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await findDuplicateVendors(req.user!.organizationId, req.body || {}) });
     } catch (error) {
@@ -68,7 +67,7 @@ router.post('/duplicates', authorize(...REQUEST_ROLES), async (req: AuthRequest,
     }
 });
 
-router.post('/', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/', requirePermission(PERMISSIONS['vendor.create'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const data = await createOnboardingRequest(req.user!.organizationId, actor(req), req.body || {});
         res.status(201).json({ success: true, data });
@@ -85,7 +84,7 @@ router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
     }
 });
 
-router.patch('/:id/intake', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.patch('/:id/intake', requirePermission(PERMISSIONS['vendor.create'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const answers = Array.isArray(req.body?.answers) ? req.body.answers : [];
         res.json({ success: true, data: await saveIntake(req.user!.organizationId, req.params.id, actor(req), answers, false) });
@@ -94,7 +93,7 @@ router.patch('/:id/intake', authorize(...REQUEST_ROLES), async (req: AuthRequest
     }
 });
 
-router.post('/:id/intake/complete', authorize(...REQUEST_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/intake/complete', requirePermission(PERMISSIONS['vendor.create'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const answers = Array.isArray(req.body?.answers) ? req.body.answers : [];
         if (!req.body?.attested) throw new ApiError(400, 'The business owner must attest that the intake is accurate.');
@@ -104,7 +103,7 @@ router.post('/:id/intake/complete', authorize(...REQUEST_ROLES), async (req: Aut
     }
 });
 
-router.post('/:id/tier/confirm', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/tier/confirm', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -119,7 +118,7 @@ router.post('/:id/tier/confirm', authorize(...REVIEW_ROLES), async (req: AuthReq
     }
 });
 
-router.post('/:id/plan/confirm', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/plan/confirm', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -134,7 +133,7 @@ router.post('/:id/plan/confirm', authorize(...REVIEW_ROLES), async (req: AuthReq
     }
 });
 
-router.post('/:id/contact', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/contact', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await upsertAssessmentContact(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
@@ -142,7 +141,7 @@ router.post('/:id/contact', authorize(...REVIEW_ROLES), async (req: AuthRequest,
     }
 });
 
-router.post('/:id/send', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/send', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const data = await sendDueDiligence(req.user!.organizationId, req.params.id, actor(req), req.body || {});
         res.status(201).json({ success: true, data });
@@ -151,7 +150,7 @@ router.post('/:id/send', authorize(...REVIEW_ROLES), async (req: AuthRequest, re
     }
 });
 
-router.post('/:id/invitation/resend', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/invitation/resend', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await resendInvitation(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
@@ -159,7 +158,7 @@ router.post('/:id/invitation/resend', authorize(...REVIEW_ROLES), async (req: Au
     }
 });
 
-router.post('/:id/invitation/link', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/invitation/link', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await activationLink(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
@@ -167,7 +166,7 @@ router.post('/:id/invitation/link', authorize(...REVIEW_ROLES), async (req: Auth
     }
 });
 
-router.post('/:id/invitation/shared', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/invitation/shared', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await markInvitationShared(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
@@ -175,7 +174,7 @@ router.post('/:id/invitation/shared', authorize(...REVIEW_ROLES), async (req: Au
     }
 });
 
-router.post('/:id/findings/:findingId/review', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/findings/:findingId/review', requirePermission(PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -190,7 +189,7 @@ router.post('/:id/findings/:findingId/review', authorize(...REVIEW_ROLES), async
     }
 });
 
-router.post('/:id/findings/:findingId/remediate', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/findings/:findingId/remediate', requirePermission(PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await planRemediation(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
     } catch (error) {
@@ -198,7 +197,7 @@ router.post('/:id/findings/:findingId/remediate', authorize(...REVIEW_ROLES), as
     }
 });
 
-router.post('/:id/findings/:findingId/validate', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/findings/:findingId/validate', requirePermission(PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await validateFinding(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
     } catch (error) {
@@ -206,7 +205,7 @@ router.post('/:id/findings/:findingId/validate', authorize(...REVIEW_ROLES), asy
     }
 });
 
-router.post('/:id/findings/:findingId/close', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/findings/:findingId/close', requirePermission(PERMISSIONS['finding.close']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await closeFinding(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
     } catch (error) {
@@ -214,7 +213,7 @@ router.post('/:id/findings/:findingId/close', authorize(...REVIEW_ROLES), async 
     }
 });
 
-router.post('/:id/findings/:findingId/accept-risk', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/findings/:findingId/accept-risk', requirePermission(PERMISSIONS['finding.update'], PERMISSIONS['risk.accept']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await acceptFindingRisk(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
     } catch (error) {
@@ -222,7 +221,15 @@ router.post('/:id/findings/:findingId/accept-risk', authorize(...REVIEW_ROLES), 
     }
 });
 
-router.post('/:id/contract/attest', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/findings/:findingId/accept-risk/approve', requirePermission(PERMISSIONS['risk.accept']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await approveFindingRisk(req.user!.organizationId, req.params.id, actor(req), req.params.findingId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/contract/attest', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await attestContract(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
@@ -230,7 +237,7 @@ router.post('/:id/contract/attest', authorize(...REVIEW_ROLES), async (req: Auth
     }
 });
 
-router.post('/:id/approval', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/approval', requirePermission(PERMISSIONS['approval.decide']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await decideApproval(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
@@ -238,7 +245,7 @@ router.post('/:id/approval', authorize(...REVIEW_ROLES), async (req: AuthRequest
     }
 });
 
-router.post('/:id/activate', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/activate', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await activateVendor(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
@@ -254,7 +261,7 @@ router.get('/:id/reassessment', async (req: AuthRequest, res: Response, next: Ne
     }
 });
 
-router.post('/:id/reassessment', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/reassessment', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await startReassessment(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
@@ -262,7 +269,7 @@ router.post('/:id/reassessment', authorize(...REVIEW_ROLES), async (req: AuthReq
     }
 });
 
-router.post('/:id/offboard', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/offboard', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await startOffboarding(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
     } catch (error) {
@@ -270,7 +277,7 @@ router.post('/:id/offboard', authorize(...REVIEW_ROLES), async (req: AuthRequest
     }
 });
 
-router.post('/:id/clarification', authorize(...REVIEW_ROLES), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/clarification', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,

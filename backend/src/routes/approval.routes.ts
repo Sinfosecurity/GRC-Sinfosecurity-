@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
 import { validateBody, validateUUID } from '../middleware/validation';
 import { CreateWorkflowSchema, SubmitDecisionSchema } from '../validators/approval.validators';
 import vendorApprovalWorkflow from '../services/vendorApprovalWorkflow';
@@ -64,7 +65,7 @@ router.use(authenticate);
  *       404:
  *         description: Vendor not found
  */
-router.post('/workflows', validateBody(CreateWorkflowSchema), async (req: any, res) => {
+router.post('/workflows', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['approval.decide']), validateBody(CreateWorkflowSchema), async (req: any, res) => {
     try {
         const workflow = await vendorApprovalWorkflow.createWorkflow({
             ...req.body,
@@ -106,7 +107,7 @@ router.post('/workflows', validateBody(CreateWorkflowSchema), async (req: any, r
  *       404:
  *         description: Workflow not found
  */
-router.get('/workflows/:workflowId', validateUUID('workflowId'), async (req: any, res) => {
+router.get('/workflows/:workflowId', requirePermission(PERMISSIONS['approval.read']), validateUUID('workflowId'), async (req: any, res) => {
     try {
         const workflow = await vendorApprovalWorkflow.getWorkflowById(
             req.params.workflowId,
@@ -176,6 +177,7 @@ router.get('/workflows/:workflowId', validateUUID('workflowId'), async (req: any
  */
 router.post('/workflows/:workflowId/steps/:stepOrder/approve', 
     validateUUID('workflowId'),
+    requirePermission(PERMISSIONS['approval.decide']),
     async (req: any, res) => {
         try {
             const workflow = await vendorApprovalWorkflow.submitApprovalDecision({
@@ -225,7 +227,7 @@ router.post('/workflows/:workflowId/steps/:stepOrder/approve',
  *       200:
  *         description: List of workflows
  */
-router.get('/vendors/:vendorId/workflows', validateUUID('vendorId'), async (req: any, res) => {
+router.get('/vendors/:vendorId/workflows', requirePermission(PERMISSIONS['approval.read']), validateUUID('vendorId'), async (req: any, res) => {
     try {
         const workflows = await vendorApprovalWorkflow.listVendorWorkflows(
             req.params.vendorId,
@@ -258,7 +260,7 @@ router.get('/vendors/:vendorId/workflows', validateUUID('vendorId'), async (req:
  *       200:
  *         description: List of pending approvals
  */
-router.get('/pending', async (req: any, res) => {
+router.get('/pending', requirePermission(PERMISSIONS['approval.read']), async (req: any, res) => {
     try {
         const pendingApprovals = await vendorApprovalWorkflow.listPendingApprovals(
             req.user.id,
@@ -312,7 +314,7 @@ router.get('/pending', async (req: any, res) => {
  */
 router.post('/workflows/:workflowId/cancel',
     validateUUID('workflowId'),
-    authorize('ADMIN', 'RISK_MANAGER'),
+    requirePermission(PERMISSIONS['approval.decide']),
     async (req: any, res) => {
         try {
             const workflow = await vendorApprovalWorkflow.cancelWorkflow(
@@ -361,7 +363,7 @@ router.post('/workflows/:workflowId/cancel',
  *         description: Workflow statistics
  */
 router.get('/statistics', 
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
+    requirePermission(PERMISSIONS['approval.read']),
     async (req: any, res) => {
         try {
             const startDate = req.query.startDate ? new Date(req.query.startDate) : undefined;

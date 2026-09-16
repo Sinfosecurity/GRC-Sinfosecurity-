@@ -18,6 +18,7 @@ import {
 } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 import { recordAudit } from './auditEventService';
 import { createRelationship, ensureNode } from './governanceGraphService';
 import { adoptCatalogForOrganization, seedPlatformCatalog } from './sharedControlEvidenceService';
@@ -1262,7 +1263,7 @@ export const enterpriseComplianceService = {
                 scope: input.scope.trim(),
                 rationale: input.rationale.trim(),
                 conditions: input.conditions || null,
-                ownerUserId: input.ownerUserId,
+                ownerUserId: actorUserId || input.ownerUserId,
                 startAt: new Date(input.startAt),
                 expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
                 reviewAt: input.reviewAt ? new Date(input.reviewAt) : null,
@@ -1281,6 +1282,9 @@ export const enterpriseComplianceService = {
     async decideException(organizationId: string, publicId: string, actorUserId: string | null, input: { decision: 'APPROVED' | 'REJECTED' | 'CLOSED' }) {
         const exception = await prisma.complianceException.findFirst({ where: { organizationId, publicId } });
         if (!exception) throw new ApiError(404, 'Exception not found');
+        if (input.decision === 'APPROVED' || input.decision === 'REJECTED') {
+            assertIndependentReviewer(exception.ownerUserId, actorUserId);
+        }
         const updated = await prisma.complianceException.update({
             where: { id: exception.id },
             data: {
@@ -1509,6 +1513,7 @@ export const enterpriseComplianceService = {
         }
         const attestation = await prisma.complianceAttestation.findFirst({ where: { organizationId, publicId } });
         if (!attestation) throw new ApiError(404, 'Attestation not found');
+        assertIndependentReviewer(attestation.attestorUserId, actorUserId);
         const updated = await prisma.complianceAttestation.update({
             where: { id: attestation.id },
             data: { reviewStatus: input.reviewStatus, reviewerUserId: actorUserId, reviewedAt: new Date(), reviewNotes: input.reviewNotes || null },

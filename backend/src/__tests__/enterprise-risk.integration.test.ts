@@ -2,6 +2,8 @@ import request from 'supertest';
 import { app } from '../server';
 import { prisma } from '../config/database';
 import { calculateEnterpriseRisk } from '../services/enterpriseRiskEngine';
+import { Role } from '@prisma/client';
+import { createOrgUser } from './helpers/orgUser';
 
 jest.setTimeout(60000);
 
@@ -22,6 +24,7 @@ describe('enterprise risk tenant isolation and scoring', () => {
     let tokenB = '';
     let publicIdB = '';
     let userIdA = '';
+    let orgA = '';
 
     beforeAll(async () => {
         await prisma.$queryRaw`SELECT 1`;
@@ -46,6 +49,7 @@ describe('enterprise risk tenant isolation and scoring', () => {
         tokenA = signupA.body.data.token;
         tokenB = signupB.body.data.token;
         userIdA = signupA.body.data.user.id;
+        orgA = signupA.body.data.user.organizationId;
         const created = await request(app).post(`${API}/erm/risks`).set('Authorization', `Bearer ${tokenB}`).send({
             title: 'Cross-tenant bait',
             category: 'CYBERSECURITY',
@@ -78,7 +82,19 @@ describe('enterprise risk tenant isolation and scoring', () => {
         });
         expect(created.status).toBe(201);
         const before = created.body.data.residualScore || 25;
-        const decided = await request(app).post(`${API}/erm/risks/${created.body.data.publicId}/decisions`).set('Authorization', `Bearer ${tokenA}`).send({
+        const selfDecide = await request(app).post(`${API}/erm/risks/${created.body.data.publicId}/decisions`).set('Authorization', `Bearer ${tokenA}`).send({
+            decision: 'ACCEPT',
+            rationale: 'Board accepted this residual exposure.',
+            approve: true,
+        });
+        expect(selfDecide.status).toBe(403);
+        const approver = await createOrgUser({
+            organizationId: orgA,
+            email: `erm-approver-${suffix}@tenant-a.test`,
+            password: PASSWORD,
+            role: Role.APPROVER,
+        });
+        const decided = await request(app).post(`${API}/erm/risks/${created.body.data.publicId}/decisions`).set('Authorization', `Bearer ${approver.token}`).send({
             decision: 'ACCEPT',
             rationale: 'Board accepted this residual exposure.',
             approve: true,

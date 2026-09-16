@@ -14,6 +14,7 @@ import {
 } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 import { recordAudit } from './auditEventService';
 import { createRelationship, ensureNode } from './governanceGraphService';
 import {
@@ -923,6 +924,11 @@ export const enterpriseAiGovernanceService = {
     async decideAssessment(organizationId: string, publicId: string, body: Record<string, unknown>, actorUserId?: string) {
         const row = await prisma.aiAssessment.findFirst({ where: { organizationId, publicId } });
         if (!row) throw new ApiError(404, 'AI assessment not found');
+        const prepared = await prisma.aiHistory.findFirst({
+            where: { organizationId, entityType: 'AiAssessment', entityId: publicId, eventType: 'created' },
+            orderBy: { createdAt: 'desc' },
+        });
+        assertIndependentReviewer(prepared?.actorUserId, actorUserId);
         const updated = await prisma.aiAssessment.update({
             where: { id: row.id },
             data: {
@@ -964,8 +970,24 @@ export const enterpriseAiGovernanceService = {
         if (!decision) throw new ApiError(400, 'Decision is required');
         const rationale = String(body.rationale || '').trim();
         if (!rationale) throw new ApiError(400, 'Rationale is required');
-        const decisionMaker = String(body.decisionMaker || '').trim();
-        if (!decisionMaker) throw new ApiError(400, 'Decision maker is required');
+        if (!actorUserId) throw new ApiError(401, 'Authentication required');
+        const actor = await prisma.user.findFirst({
+            where: { id: actorUserId, organizationId },
+            select: { firstName: true, lastName: true, email: true },
+        });
+        if (!actor) throw new ApiError(403, 'Another authorized reviewer must approve this decision.');
+        const latestAssessment = await prisma.aiAssessment.findFirst({
+            where: { organizationId, systemId: system.id },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (latestAssessment) {
+            const prepared = await prisma.aiHistory.findFirst({
+                where: { organizationId, entityType: 'AiAssessment', entityId: latestAssessment.publicId, eventType: 'created' },
+                orderBy: { createdAt: 'desc' },
+            });
+            assertIndependentReviewer(prepared?.actorUserId, actorUserId);
+        }
+        const decisionMaker = `${actor.firstName} ${actor.lastName}`.trim() || actor.email;
         const row = await prisma.aiApproval.create({
             data: {
                 organizationId,
@@ -1032,7 +1054,7 @@ export const enterpriseAiGovernanceService = {
                 scope: String(body.scope || 'Recorded exception'),
                 rationale: String(body.rationale || 'Recorded exception'),
                 owner: body.owner ? String(body.owner) : null,
-                approver: body.approver ? String(body.approver) : null,
+                approver: actorUserId || null,
                 expiresAt: body.expiresAt ? new Date(String(body.expiresAt)) : new Date(Date.now() + 30 * 86400000),
                 conditions: body.conditions ? String(body.conditions) : null,
             },

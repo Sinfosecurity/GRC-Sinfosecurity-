@@ -9,8 +9,7 @@ import { notify } from './notificationDeliveryService';
 const ALLOWED_DURATIONS = [15, 30, 60];
 
 function isCustomerApprover(role: string) {
-    const canonical = canonicalizeRole(role);
-    return canonical === 'ORGANIZATION_ADMIN';
+    return canonicalizeRole(role) === 'ORGANIZATION_ADMIN';
 }
 
 function maxMinutes() {

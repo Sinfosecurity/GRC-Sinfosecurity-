@@ -13,6 +13,7 @@ import {
 } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 import { requireBusinessUnitForOrganization } from '../security/tenantOwnership';
 import { recordAudit } from './auditEventService';
 
@@ -648,6 +649,11 @@ export const enterpriseRiskService = {
         const risk = await prisma.enterpriseRisk.findFirst({ where: { organizationId, publicId } });
         if (!risk) throw new ApiError(404, 'Risk not found');
         if (!input.rationale?.trim()) throw new ApiError(400, 'A rationale is required');
+        const created = await prisma.enterpriseRiskHistory.findFirst({
+            where: { organizationId, riskId: risk.id },
+            orderBy: { createdAt: 'asc' },
+        });
+        assertIndependentReviewer(risk.ownerUserId || created?.actorUserId, actorUserId);
         const status = input.approve === false ? EnterpriseDecisionStatus.REJECTED : EnterpriseDecisionStatus.APPROVED;
         const decision = await prisma.enterpriseRiskDecision.create({
             data: {

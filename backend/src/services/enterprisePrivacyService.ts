@@ -20,6 +20,7 @@ import {
 } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 import { recordAudit } from './auditEventService';
 import { createRelationship, ensureNode } from './governanceGraphService';
 import {
@@ -929,6 +930,11 @@ export const enterprisePrivacyService = {
     async decideDpia(organizationId: string, publicId: string, actorUserId: string | null, input: Record<string, unknown>) {
         const row = await prisma.privacyDpia.findFirst({ where: { organizationId, publicId } });
         if (!row) throw new ApiError(404, 'DPIA not found');
+        const prepared = await prisma.privacyHistory.findFirst({
+            where: { organizationId, entityType: 'DPIA', entityId: row.id },
+            orderBy: { createdAt: 'asc' },
+        });
+        assertIndependentReviewer(row.ownerUserId || prepared?.actorUserId, actorUserId);
         const updated = await prisma.privacyDpia.update({
             where: { id: row.id },
             data: {

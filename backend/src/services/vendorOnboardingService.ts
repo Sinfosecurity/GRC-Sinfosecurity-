@@ -1,7 +1,7 @@
 import { AssessmentStatus, AssessmentType, Prisma, VendorOnboardingStage, VendorStatus, VendorTier, VendorType } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
-import { canonicalizeRole } from '../security/rbac';
+import { canonicalizeRole, canonicalRoleIn } from '../security/rbac';
 import { recordAudit } from './auditEventService';
 import { explainableRiskService } from './explainableRiskService';
 import { notifyUser, type NotificationEvent } from './notificationDeliveryService';
@@ -105,19 +105,16 @@ const MILESTONE_ACTIONS = new Set([
 type Actor = { id: string; role: string; name?: string };
 
 function canRequest(role: string) {
-    const canonical = canonicalizeRole(role);
-    return ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR', 'BUSINESS_OWNER'].includes(canonical);
+    return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR', 'BUSINESS_OWNER']);
 }
 
 function canCompleteIntake(role: string, actorId: string, ownerId?: string | null) {
     if (ownerId && actorId === ownerId) return true;
-    const canonical = canonicalizeRole(role);
-    return ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR'].includes(canonical);
+    return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR']);
 }
 
 function canReviewTier(role: string) {
-    const canonical = canonicalizeRole(role);
-    return ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR'].includes(canonical);
+    return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR']);
 }
 
 function categoryFromService(category?: string): 'TECHNOLOGY' | 'CLOUD_HOSTING' | 'PAYMENT_PROCESSING' | 'HR_PAYROLL' | 'OTHER' {
@@ -185,7 +182,7 @@ async function orgAnalysts(organizationId: string) {
         where: { organizationId, status: 'ACTIVE' },
         select: { id: true, role: true },
     });
-    return users.filter((user) => ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR', 'ADMIN', 'COMPLIANCE_OFFICER'].includes(canonicalizeRole(user.role)));
+    return users.filter((user) => canonicalRoleIn(user.role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR']));
 }
 
 async function writeHistory(organizationId: string, actorUserId: string | null, action: string, vendorId: string, metadata: Record<string, unknown> = {}) {

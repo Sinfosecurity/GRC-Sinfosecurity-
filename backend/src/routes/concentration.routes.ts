@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
 import vendorConcentrationRisk from '../services/vendorConcentrationRisk';
 import { legacyErrorMessage } from '../middleware/errorHandler';
 
@@ -50,7 +51,7 @@ router.use(authenticate);
  *                       type: array
  */
 router.get('/', 
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
@@ -84,7 +85,7 @@ router.get('/',
  *         description: Spend concentration metrics
  */
 router.get('/spend',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'CFO'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
@@ -119,7 +120,7 @@ router.get('/spend',
  *         description: Geographic concentration analysis
  */
 router.get('/geographic',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
@@ -154,7 +155,7 @@ router.get('/geographic',
  *         description: Single point of failure vendors
  */
 router.get('/single-points-of-failure',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(
@@ -205,7 +206,7 @@ router.get('/single-points-of-failure',
  *               format: binary
  */
 router.get('/board-report',
-    authorize('ADMIN', 'EXECUTIVE', 'BOARD_MEMBER'),
+    requirePermission(PERMISSIONS['report.read']),
     async (req: any, res) => {
         try {
             const format = (req.query.format as 'pdf' | 'docx' | 'json') || 'json';
@@ -251,7 +252,7 @@ router.get('/board-report',
  *         description: Analysis refreshed
  */
 router.post('/refresh',
-    authorize('ADMIN', 'RISK_MANAGER'),
+    requirePermission(PERMISSIONS['risk.manage']),
     async (req: any, res) => {
         try {
             const analysis = await vendorConcentrationRisk.analyzeConcentrationRisk(

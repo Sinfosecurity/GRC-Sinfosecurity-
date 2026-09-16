@@ -1,6 +1,8 @@
 import request from 'supertest';
 import { app } from '../server';
 import { prisma } from '../config/database';
+import { Role } from '@prisma/client';
+import { createOrgUser } from './helpers/orgUser';
 
 jest.setTimeout(120000);
 
@@ -19,6 +21,7 @@ describe('supreme compliance tenant isolation and honesty', () => {
     const suffix = `${Date.now()}`;
     let tokenA = '';
     let tokenB = '';
+    let orgA = '';
     let activationA = '';
     let requirementA = '';
 
@@ -44,6 +47,7 @@ describe('supreme compliance tenant isolation and honesty', () => {
         expect(signupB.status).toBe(201);
         tokenA = signupA.body.data.token;
         tokenB = signupB.body.data.token;
+        orgA = signupA.body.data.user.organizationId;
 
         const catalog = await request(app).get(`${API}/compliance/catalog`).set('Authorization', `Bearer ${tokenA}`);
         expect(catalog.status).toBe(200);
@@ -113,7 +117,17 @@ describe('supreme compliance tenant isolation and honesty', () => {
             expiresAt: new Date(Date.now() + 86400000).toISOString(),
         });
         expect(exception.status).toBe(201);
-        const approved = await request(app).post(`${API}/compliance/exceptions/${exception.body.data.publicId}/decision`).set('Authorization', `Bearer ${tokenA}`).send({
+        const selfException = await request(app).post(`${API}/compliance/exceptions/${exception.body.data.publicId}/decision`).set('Authorization', `Bearer ${tokenA}`).send({
+            decision: 'APPROVED',
+        });
+        expect(selfException.status).toBe(403);
+        const approver = await createOrgUser({
+            organizationId: orgA,
+            email: `cmp-approver-${suffix}@tenant-a.test`,
+            password: PASSWORD,
+            role: Role.APPROVER,
+        });
+        const approved = await request(app).post(`${API}/compliance/exceptions/${exception.body.data.publicId}/decision`).set('Authorization', `Bearer ${approver.token}`).send({
             decision: 'APPROVED',
         });
         expect(approved.status).toBe(200);
@@ -173,7 +187,18 @@ describe('supreme compliance tenant isolation and honesty', () => {
             });
             const before = await request(app).get(`${API}/scc/controls/${controlId}`).set('Authorization', `Bearer ${tokenA}`);
             const beforeEffectiveness = before.body.data?.effectivenessStatus || before.body.data?.control?.effectivenessStatus;
-            const reviewed = await request(app).post(`${API}/compliance/attestations/${attested.body.data.publicId}/review`).set('Authorization', `Bearer ${tokenA}`).send({
+            const selfReview = await request(app).post(`${API}/compliance/attestations/${attested.body.data.publicId}/review`).set('Authorization', `Bearer ${tokenA}`).send({
+                reviewStatus: 'REVIEWED',
+                reviewNotes: 'Reviewed. Not a control test.',
+            });
+            expect(selfReview.status).toBe(403);
+            const reviewer = await createOrgUser({
+                organizationId: orgA,
+                email: `cmp-reviewer-${suffix}@tenant-a.test`,
+                password: PASSWORD,
+                role: Role.APPROVER,
+            });
+            const reviewed = await request(app).post(`${API}/compliance/attestations/${attested.body.data.publicId}/review`).set('Authorization', `Bearer ${reviewer.token}`).send({
                 reviewStatus: 'REVIEWED',
                 reviewNotes: 'Reviewed. Not a control test.',
             });

@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
 import { validateBody, validateUUID } from '../middleware/validation';
 import { CreateRiskAppetiteSchema, UpdateRiskAppetiteSchema, ResolveBreachSchema } from '../validators/risk-appetite.validators';
 import riskAppetiteService from '../services/riskAppetite';
@@ -77,13 +78,14 @@ router.use(authenticate);
  *         description: Invalid input
  */
 router.post('/', 
-    authorize('ADMIN', 'RISK_MANAGER', 'EXECUTIVE', 'BOARD_MEMBER'),
+    requirePermission(PERMISSIONS['risk.appetite.manage']),
     validateBody(CreateRiskAppetiteSchema),
     async (req: any, res) => {
         try {
             const riskAppetite = await riskAppetiteService.createRiskAppetite({
                 ...req.body,
                 organizationId: req.user.organizationId,
+                approvedBy: req.user.name || req.user.id,
                 approvalDate: new Date(req.body.approvalDate),
             });
 
@@ -114,7 +116,7 @@ router.post('/',
  *         description: List of risk appetites
  */
 router.get('/',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const appetites = await riskAppetiteService.listRiskAppetites(
@@ -175,7 +177,8 @@ router.get('/',
  */
 router.put('/:id',
     validateUUID('id'),
-    authorize('ADMIN', 'RISK_MANAGER', 'EXECUTIVE'),
+    requirePermission(PERMISSIONS['risk.appetite.manage']),
+    validateBody(UpdateRiskAppetiteSchema),
     async (req: any, res) => {
         try {
             const riskAppetite = await riskAppetiteService.updateRiskAppetite(
@@ -219,7 +222,7 @@ router.put('/:id',
  */
 router.post('/:id/monitor',
     validateUUID('id'),
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
+    requirePermission(PERMISSIONS['risk.appetite.manage']),
     async (req: any, res) => {
         try {
             const result = await riskAppetiteService.monitorRiskAppetite(
@@ -254,7 +257,7 @@ router.post('/:id/monitor',
  *         description: All risk appetites monitored
  */
 router.post('/monitor-all',
-    authorize('ADMIN', 'RISK_MANAGER'),
+    requirePermission(PERMISSIONS['risk.appetite.manage']),
     async (req: any, res) => {
         try {
             const results = await riskAppetiteService.monitorAllRiskAppetites(
@@ -295,7 +298,7 @@ router.post('/monitor-all',
  *         description: List of breaches
  */
 router.get('/breaches',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'AUDITOR'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const breaches = await riskAppetiteService.listBreaches(
@@ -355,7 +358,7 @@ router.get('/breaches',
  */
 router.post('/breaches/:breachId/resolve',
     validateUUID('breachId'),
-    authorize('ADMIN', 'RISK_MANAGER', 'EXECUTIVE'),
+    requirePermission(PERMISSIONS['risk.appetite.manage']),
     validateBody(ResolveBreachSchema),
     async (req: any, res) => {
         try {
@@ -395,7 +398,7 @@ router.post('/breaches/:breachId/resolve',
  *         description: Risk appetite dashboard
  */
 router.get('/dashboard',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE', 'BOARD_MEMBER'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const dashboard = await riskAppetiteService.getDashboard(
@@ -429,7 +432,7 @@ router.get('/dashboard',
  *         description: Appetites requiring review
  */
 router.get('/review-required',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
+    requirePermission(PERMISSIONS['risk.appetite.manage']),
     async (req: any, res) => {
         try {
             const appetites = await riskAppetiteService.getAppetitesRequiringReview(

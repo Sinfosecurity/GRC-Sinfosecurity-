@@ -453,23 +453,39 @@ export default function VendorOnboardingWorkspace() {
                                         <Stack spacing={1} sx={{ mt: 1 }}>
                                             <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.remediateFinding(id, finding.id, { cap: 'Correct the control gap and provide current evidence.' }))}>Assign remediation</Button>
                                             <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.validateFinding(id, finding.id, { approved: true, notes: 'Remediation validated.' }))}>Validate</Button>
-                                            <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.closeFinding(id, finding.id, {}))}>Close with ready evidence</Button>
-                                            <TextField
-                                                required
-                                                fullWidth
-                                                multiline
-                                                minRows={2}
-                                                label="Acceptance rationale"
-                                                value={acceptance[finding.id]?.rationale || ''}
-                                                onChange={(event) => setAcceptance({ ...acceptance, [finding.id]: { rationale: event.target.value, conditions: acceptance[finding.id]?.conditions || '' } })}
-                                            />
-                                            <TextField
-                                                fullWidth
-                                                label="Acceptance conditions"
-                                                value={acceptance[finding.id]?.conditions || ''}
-                                                onChange={(event) => setAcceptance({ ...acceptance, [finding.id]: { rationale: acceptance[finding.id]?.rationale || '', conditions: event.target.value } })}
-                                            />
-                                            <Button disabled={saving || !acceptance[finding.id]?.rationale} onClick={() => run(() => vendorOnboardingAPI.acceptFindingRisk(id, finding.id, acceptance[finding.id]))}>Accept risk for 180 days</Button>
+                                            {data.canCloseFinding && (
+                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.closeFinding(id, finding.id, {}))}>Close with ready evidence</Button>
+                                            )}
+                                        </Stack>
+                                    )}
+                                    {['OPEN', 'IN_PROGRESS', 'PENDING_VALIDATION', 'REMEDIATED'].includes(finding.status) && (data.canPrepareRiskAcceptance || data.canApproveRiskAcceptance) && (
+                                        <Stack spacing={1} sx={{ mt: 1 }}>
+                                            {data.canPrepareRiskAcceptance && !finding.pendingIndependentApproval && (
+                                                <>
+                                                    <TextField
+                                                        required
+                                                        fullWidth
+                                                        multiline
+                                                        minRows={2}
+                                                        label="Acceptance rationale"
+                                                        value={acceptance[finding.id]?.rationale || ''}
+                                                        onChange={(event) => setAcceptance({ ...acceptance, [finding.id]: { rationale: event.target.value, conditions: acceptance[finding.id]?.conditions || '' } })}
+                                                    />
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Acceptance conditions"
+                                                        value={acceptance[finding.id]?.conditions || ''}
+                                                        onChange={(event) => setAcceptance({ ...acceptance, [finding.id]: { rationale: acceptance[finding.id]?.rationale || '', conditions: event.target.value } })}
+                                                    />
+                                                    <Button disabled={saving || !acceptance[finding.id]?.rationale} onClick={() => run(() => vendorOnboardingAPI.acceptFindingRisk(id, finding.id, acceptance[finding.id]))}>Request risk acceptance</Button>
+                                                </>
+                                            )}
+                                            {finding.pendingIndependentApproval && finding.acceptanceRequestedBy === data.actorId && (
+                                                <Typography variant="body2" role="status">Ready for independent approval. Another authorized reviewer must accept this residual.</Typography>
+                                            )}
+                                            {finding.pendingIndependentApproval && data.canApproveRiskAcceptance && finding.acceptanceRequestedBy !== data.actorId && (
+                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.approveFindingRisk(id, finding.id, acceptance[finding.id] || {}))}>Approve risk acceptance</Button>
+                                            )}
                                         </Stack>
                                     )}
                                 </Surface>
@@ -541,9 +557,12 @@ export default function VendorOnboardingWorkspace() {
                                 {!(data.lifecycle?.findings || []).some((row: any) => row.status === 'RISK_ACCEPTED') && <Typography variant="body2">No accepted risks.</Typography>}
                             </Surface>
                             {data.lifecycle?.approvalDecision && <Alert severity="info">Decision: {humanizeLabel(data.lifecycle.approvalDecision)}{data.lifecycle.approvalConditions ? `. ${data.lifecycle.approvalConditions}` : ''}</Alert>}
-                            {data.canReviewTier && (
+                            {data.lifecycle?.readyForIndependentApproval && data.lifecycle?.approvalPreparedBy === data.actorId && (
+                                <Typography variant="body2" role="status">Ready for independent approval. Another authorized reviewer must record the decision.</Typography>
+                            )}
+                            {data.canDecideApproval && data.lifecycle?.approvalPreparedBy && data.lifecycle.approvalPreparedBy !== data.actorId && !data.lifecycle?.approvalDecision && (
                                 <Surface>
-                                    <Typography variant="subtitle1" sx={{ mb: 1 }}>Decision required</Typography>
+                                    <Typography variant="subtitle1" sx={{ mb: 1 }}>Independent decision required</Typography>
                                     <Stack spacing={1.5}>
                                         <TextField fullWidth multiline minRows={2} label="Conditions" value={approval.conditions} onChange={(event) => setApproval({ ...approval, conditions: event.target.value })} helperText="Required when approving with conditions." />
                                         <TextField fullWidth multiline minRows={2} label="Rationale" value={approval.rationale} onChange={(event) => setApproval({ ...approval, rationale: event.target.value })} />
@@ -553,10 +572,10 @@ export default function VendorOnboardingWorkspace() {
                                             <Button color="error" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.decideApproval(id, { ...approval, decision: 'REJECT' }))}>Reject</Button>
                                         </Stack>
                                     </Stack>
-                                    {['APPROVE', 'APPROVE_WITH_CONDITIONS'].includes(data.lifecycle?.approvalDecision) && data.lifecycle?.vendorStatus !== 'ACTIVE' && (
-                                        <Button sx={{ mt: 1.5 }} disabled={saving} onClick={() => run(() => vendorOnboardingAPI.activate(id))}>Activate vendor</Button>
-                                    )}
                                 </Surface>
+                            )}
+                            {['APPROVE', 'APPROVE_WITH_CONDITIONS'].includes(data.lifecycle?.approvalDecision) && data.lifecycle?.vendorStatus !== 'ACTIVE' && data.canReviewTier && (
+                                <Button sx={{ mt: 1.5 }} disabled={saving} onClick={() => run(() => vendorOnboardingAPI.activate(id))}>Activate vendor</Button>
                             )}
                         </Stack>
                     )}

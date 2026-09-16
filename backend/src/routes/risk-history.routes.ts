@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
 import { validateUUID } from '../middleware/validation';
 import vendorRiskHistory from '../services/vendorRiskHistory';
 import { legacyErrorMessage } from '../middleware/errorHandler';
@@ -137,7 +138,7 @@ router.get('/:vendorId', validateUUID('vendorId'), async (req: any, res) => {
  */
 router.post('/:vendorId/snapshot',
     validateUUID('vendorId'),
-    authorize('ADMIN', 'RISK_MANAGER'),
+    requirePermission(PERMISSIONS['risk.manage']),
     async (req: any, res) => {
         try {
             const snapshot = await vendorRiskHistory.recordRiskSnapshot(
@@ -201,7 +202,7 @@ router.post('/:vendorId/snapshot',
  *         description: Risk trends for all vendors
  */
 router.get('/trends', 
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const months = req.query.months ? parseInt(req.query.months) : 6;
@@ -264,7 +265,7 @@ router.get('/trends',
  *         description: Vendors with increasing risk
  */
 router.get('/trends/increasing',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const result = await vendorRiskHistory.getAllVendorTrends(
@@ -303,7 +304,7 @@ router.get('/trends/increasing',
  *         description: Vendors with volatile risk
  */
 router.get('/trends/volatile',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const result = await vendorRiskHistory.getAllVendorTrends(
@@ -349,7 +350,7 @@ router.get('/trends/volatile',
  *         description: Risk trend report
  */
 router.get('/trends/export',
-    authorize('ADMIN', 'RISK_MANAGER', 'COMPLIANCE_OFFICER', 'EXECUTIVE'),
+    requirePermission(PERMISSIONS['risk.read']),
     async (req: any, res) => {
         try {
             const result = await vendorRiskHistory.getAllVendorTrends(

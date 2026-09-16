@@ -362,13 +362,15 @@ const ROLE_ALIASES: Record<string, CanonicalRole> = {
     CONTRIBUTOR: 'ASSESSOR',
 };
 
-export function canonicalizeRole(role: string | undefined | null): CanonicalRole {
-    if (!role) return 'VIEWER';
-    return ROLE_ALIASES[role] || 'VIEWER';
+export function canonicalizeRole(role: string | undefined | null): CanonicalRole | null {
+    if (!role) return null;
+    return ROLE_ALIASES[role] || null;
 }
 
 export function permissionsForRole(role: string | undefined | null): Permission[] {
-    return ROLE_PERMISSIONS[canonicalizeRole(role)];
+    const canonical = canonicalizeRole(role);
+    if (!canonical) return [];
+    return ROLE_PERMISSIONS[canonical];
 }
 
 export function hasPermission(role: string | undefined | null, permission: Permission): boolean {
@@ -379,11 +381,18 @@ export function hasAnyPermission(role: string | undefined | null, permissions: P
     return permissions.some((permission) => hasPermission(role, permission));
 }
 
+export function canonicalRoleIn(role: string | undefined | null, allowed: CanonicalRole[]): boolean {
+    const canonical = canonicalizeRole(role);
+    return canonical !== null && allowed.includes(canonical);
+}
+
 export function roleMatches(userRole: string | undefined | null, allowed: string[]): boolean {
     if (!userRole) return false;
     const canonical = canonicalizeRole(userRole);
+    if (!canonical) return false;
     return allowed.some((role) => {
         const allowedCanonical = canonicalizeRole(role);
+        if (!allowedCanonical) return false;
         return role === userRole || allowedCanonical === canonical || role === canonical;
     });
 }

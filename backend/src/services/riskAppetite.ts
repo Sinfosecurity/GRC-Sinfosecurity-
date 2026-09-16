@@ -87,7 +87,13 @@ class RiskAppetiteService {
         const riskAppetite = await prisma.riskAppetite.update({
             where: { id, organizationId },
             data: {
-                ...data,
+                appetiteStatement: data.appetiteStatement,
+                quantitativeThreshold: data.quantitativeThreshold,
+                qualitativeThreshold: data.qualitativeThreshold,
+                riskTolerance: data.riskTolerance,
+                earlyWarningThreshold: data.earlyWarningThreshold,
+                reviewFrequency: data.reviewFrequency,
+                effectiveUntil: data.effectiveUntil,
                 updatedAt: new Date(),
             },
         });

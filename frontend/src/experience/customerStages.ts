@@ -63,6 +63,7 @@ export function dominantNextAction(data: {
     canEditIntake?: boolean;
     canReviewTier?: boolean;
     intake?: { completed?: boolean };
+    lifecycle?: { readyForIndependentApproval?: boolean; findings?: Array<{ pendingIndependentApproval?: boolean }> };
 }) {
     const stage = data.stageKey || data.stage;
     if ((data.unresolvedScope || []).length && !data.intake?.completed) {
@@ -84,6 +85,9 @@ export function dominantNextAction(data: {
     if (clarifications > 0) return { label: `Review ${clarifications} clarification${clarifications === 1 ? '' : 's'}`, detail: 'These answers need a person before they become findings.' };
     if (['SUBMITTED', 'UNDER_REVIEW', 'Submitted', 'Under review'].includes(String(stage))) {
         return { label: 'Review exceptions', detail: data.nextAction || 'Start with answers that need judgment.' };
+    }
+    if (data.lifecycle?.readyForIndependentApproval || data.lifecycle?.findings?.some((row) => row.pendingIndependentApproval)) {
+        return { label: 'Ready for independent approval', detail: 'Supreme prepared the record. Another authorized reviewer must decide.' };
     }
     if (['REMEDIATION', 'RISK_ACCEPTANCE', 'Remediation', 'Risk acceptance'].includes(String(stage))) {
         return { label: 'Validate or accept risk', detail: data.nextAction || 'Acceptance does not reduce residual risk.' };

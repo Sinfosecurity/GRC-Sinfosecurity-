@@ -10,7 +10,7 @@ export const CreateRiskAppetiteSchema = z.object({
     appetiteStatement: z.string().min(1, 'Appetite statement is required'),
     riskTolerance: z.number().min(0).max(100),
     earlyWarningThreshold: z.number().min(0).max(100),
-    approvedBy: z.string().min(1, 'Approver is required'),
+    approvedBy: z.string().optional(),
     approvalDate: z.string().datetime(),
     reviewDate: z.string().datetime().optional(),
     metrics: z.array(z.object({

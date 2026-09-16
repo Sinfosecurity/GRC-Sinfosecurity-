@@ -15,7 +15,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../config/database';
 import { getEnv } from '../config/env';
 import { ApiError } from '../middleware/errorHandler';
-import { canonicalizeRole } from '../security/rbac';
+import { canonicalRoleIn } from '../security/rbac';
 import { VENDOR_PLANE } from '../security/sessionPlane';
 import { recordAudit } from './auditEventService';
 import { evidenceLinkageService } from './evidenceLinkageService';
@@ -57,7 +57,7 @@ type Actor = { id: string; role: string; name?: string };
 type VendorActor = { sessionId: string; contactId: string; vendorId: string; organizationId: string; email: string; name: string };
 
 function canSend(role: string) {
-    return ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR'].includes(canonicalizeRole(role));
+    return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR']);
 }
 
 function deliveryLabel(status?: string | null) {

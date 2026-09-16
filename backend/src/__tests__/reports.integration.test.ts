@@ -1,5 +1,6 @@
 import request from 'supertest';
-import { VendorTier, VendorType } from '@prisma/client';
+import { Role, VendorTier, VendorType } from '@prisma/client';
+import { createOrgUser } from './helpers/orgUser';
 import { app } from '../server';
 import { prisma } from '../config/database';
 import vendorManagementService from '../services/vendorManagementService';
@@ -73,10 +74,22 @@ describe('report generation and tenant isolation', () => {
         expect(brief.status).toBe(201);
         briefA = brief.body.data.id;
         residualA = brief.body.data.residualRisk;
-        await request(app)
+        const selfDecide = await request(app)
             .post(`${API}/tprm/decision-briefs/${briefA}/decide`)
             .set('Authorization', `Bearer ${tokenA}`)
             .send({ decision: 'RISK_ACCEPTED', reviewerAnalysis: 'Accepted for reports test' });
+        expect(selfDecide.status).toBe(403);
+        const approver = await createOrgUser({
+            organizationId: orgA,
+            email: `report-approver-${suffix}@tenant-a.test`,
+            password: PASSWORD,
+            role: Role.APPROVER,
+        });
+        const decided = await request(app)
+            .post(`${API}/tprm/decision-briefs/${briefA}/decide`)
+            .set('Authorization', `Bearer ${approver.token}`)
+            .send({ decision: 'RISK_ACCEPTED', reviewerAnalysis: 'Accepted for reports test' });
+        expect(decided.status).toBe(200);
     });
 
     afterAll(async () => {

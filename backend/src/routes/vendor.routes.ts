@@ -11,7 +11,8 @@
  */
 
 import express from 'express';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate, requirePermission } from '../middleware/auth';
+import { PERMISSIONS } from '../security/rbac';
 import { publicServerErrorPayload } from '../middleware/errorHandler';
 import { validateBody, validateQuery, validateUUID } from '../middleware/validation';
 import {
@@ -187,7 +188,7 @@ router.get('/:id', validateUUID('id'), async (req: any, res) => {
  * POST /api/vendors
  * Create new vendor
  */
-router.post('/', authorize('ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUPERADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER', 'BUSINESS_OWNER', 'ASSESSOR'), validateBody(CreateVendorSchema), async (req: any, res) => {
+router.post('/', requirePermission(PERMISSIONS['vendor.create']), validateBody(CreateVendorSchema), async (req: any, res) => {
     try {
         const vendor = await vendorManagementService.createVendor({
             ...req.body,
@@ -204,7 +205,7 @@ router.post('/', authorize('ADMIN', 'ORGANIZATION_ADMIN', 'PLATFORM_ADMIN', 'SUP
  * PUT /api/vendors/:id
  * Update vendor
  */
-router.put('/:id', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateBody(UpdateVendorSchema), async (req: any, res) => {
+router.put('/:id', requirePermission(PERMISSIONS['vendor.update']), validateUUID('id'), validateBody(UpdateVendorSchema), async (req: any, res) => {
     try {
         const vendor = await vendorManagementService.updateVendor(
             req.params.id,
@@ -222,7 +223,7 @@ router.put('/:id', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), val
  * DELETE /api/vendors/:id
  * Terminate vendor (soft delete)
  */
-router.delete('/:id', authorize('ADMIN'), validateUUID('id'), async (req: any, res) => {
+router.delete('/:id', requirePermission(PERMISSIONS['vendor.delete']), validateUUID('id'), async (req: any, res) => {
     try {
         await vendorManagementService.deleteVendor(req.params.id, req.user.organizationId);
         res.status(204).send();
@@ -235,7 +236,7 @@ router.delete('/:id', authorize('ADMIN'), validateUUID('id'), async (req: any, r
  * POST /api/vendors/:id/approve
  * Approve vendor
  */
-router.post('/:id/approve', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('id'), async (req: any, res) => {
+router.post('/:id/approve', requirePermission(PERMISSIONS['approval.decide']), validateUUID('id'), async (req: any, res) => {
     try {
         await vendorManagementService.approveVendor(
             req.params.id,
@@ -252,7 +253,7 @@ router.post('/:id/approve', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUU
  * POST /api/vendors/:id/onboard
  * Onboard vendor
  */
-router.post('/:id/onboard', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('id'), async (req: any, res) => {
+router.post('/:id/onboard', requirePermission(PERMISSIONS['vendor.update']), validateUUID('id'), async (req: any, res) => {
     try {
         await vendorManagementService.onboardVendor(req.params.id, req.user.organizationId);
         res.json({ message: 'Vendor onboarded successfully' });
@@ -265,7 +266,7 @@ router.post('/:id/onboard', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUU
  * POST /api/vendors/:id/offboard
  * Offboard vendor
  */
-router.post('/:id/offboard', authorize('ADMIN'), validateUUID('id'), async (req: any, res) => {
+router.post('/:id/offboard', requirePermission(PERMISSIONS['vendor.update']), validateUUID('id'), async (req: any, res) => {
     try {
         await vendorManagementService.offboardVendor(
             req.params.id,
@@ -302,7 +303,7 @@ router.get('/:id/assessments', async (req: any, res) => {
  * POST /api/vendors/:id/assessments
  * Create new assessment for vendor
  */
-router.post('/:id/assessments', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateBody(CreateAssessmentSchema), async (req: any, res) => {
+router.post('/:id/assessments', requirePermission(PERMISSIONS['assessment.create']), validateUUID('id'), validateBody(CreateAssessmentSchema), async (req: any, res) => {
     try {
         const assessment = await vendorAssessmentService.createAssessment({
             ...req.body,
@@ -341,7 +342,7 @@ router.get('/assessments/:assessmentId', async (req: any, res) => {
  * POST /api/assessments/:id/responses
  * Submit response to assessment question
  */
-router.post('/assessments/:assessmentId/responses', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('assessmentId'), validateBody(SubmitAssessmentResponseSchema), async (req: any, res) => {
+router.post('/assessments/:assessmentId/responses', requirePermission(PERMISSIONS['assessment.respond']), validateUUID('assessmentId'), validateBody(SubmitAssessmentResponseSchema), async (req: any, res) => {
     try {
         await vendorAssessmentService.submitResponse(
             {
@@ -364,7 +365,7 @@ router.post('/assessments/:assessmentId/responses', authorize('ADMIN', 'COMPLIAN
  * POST /api/assessments/:id/complete
  * Complete assessment and calculate scores
  */
-router.post('/assessments/:assessmentId/complete', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('assessmentId'), validateBody(CompleteAssessmentSchema), async (req: any, res) => {
+router.post('/assessments/:assessmentId/complete', requirePermission(PERMISSIONS['assessment.complete']), validateUUID('assessmentId'), validateBody(CompleteAssessmentSchema), async (req: any, res) => {
     try {
         const assessment = await vendorAssessmentService.completeAssessment(
             req.params.assessmentId,
@@ -393,7 +394,7 @@ router.get('/:id/assessments/:assessmentId', validateUUID('id'), validateUUID('a
     }
 });
 
-router.post('/:id/assessments/:assessmentId/responses', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
+router.post('/:id/assessments/:assessmentId/responses', requirePermission(PERMISSIONS['assessment.respond']), validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
     try {
         const data = await vendorAssessmentService.submitResponse(
             {
@@ -412,7 +413,7 @@ router.post('/:id/assessments/:assessmentId/responses', authorize('ADMIN', 'COMP
     }
 });
 
-router.post('/:id/assessments/:assessmentId/complete', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
+router.post('/:id/assessments/:assessmentId/complete', requirePermission(PERMISSIONS['assessment.complete']), validateUUID('id'), validateUUID('assessmentId'), async (req: any, res) => {
     try {
         const existing = await vendorAssessmentService.getAssessmentById(req.params.assessmentId, req.user.organizationId);
         if (!existing || existing.vendorId !== req.params.id) {
@@ -468,7 +469,7 @@ router.get('/:id/contracts', async (req: any, res) => {
  * POST /api/vendors/:id/contracts
  * Create contract for vendor
  */
-router.post('/:id/contracts', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('id'), validateBody(CreateContractSchema), async (req: any, res) => {
+router.post('/:id/contracts', requirePermission(PERMISSIONS['vendor.update']), validateUUID('id'), validateBody(CreateContractSchema), async (req: any, res) => {
     try {
         const contract = await vendorContractService.createContract({
             ...req.body,
@@ -507,7 +508,7 @@ router.get('/contracts/:contractId', async (req: any, res) => {
  * PUT /api/contracts/:id
  * Update contract
  */
-router.put('/contracts/:contractId', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('contractId'), validateBody(UpdateContractSchema), async (req: any, res) => {
+router.put('/contracts/:contractId', requirePermission(PERMISSIONS['vendor.update']), validateUUID('contractId'), validateBody(UpdateContractSchema), async (req: any, res) => {
     try {
         await vendorContractService.updateContract(
             req.params.contractId,
@@ -525,7 +526,7 @@ router.put('/contracts/:contractId', authorize('ADMIN', 'COMPLIANCE_OFFICER'), v
  * POST /api/contracts/:id/approve
  * Approve contract
  */
-router.post('/contracts/:contractId/approve', authorize('ADMIN'), async (req: any, res) => {
+router.post('/contracts/:contractId/approve', requirePermission(PERMISSIONS['approval.decide']), async (req: any, res) => {
     try {
         await vendorContractService.approveContract(
             req.params.contractId,
@@ -561,7 +562,7 @@ router.get('/contracts/expiring', async (req: any, res) => {
  * POST /api/contracts/:id/sla
  * Track SLA metric
  */
-router.post('/contracts/:contractId/sla', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('contractId'), validateBody(RecordSLAIncidentSchema), async (req: any, res) => {
+router.post('/contracts/:contractId/sla', requirePermission(PERMISSIONS['vendor.update']), validateUUID('contractId'), validateBody(RecordSLAIncidentSchema), async (req: any, res) => {
     try {
         const slaRecord = await vendorContractService.trackSLAMetric({
             ...req.body,
@@ -632,7 +633,7 @@ router.get('/:id/issues', async (req: any, res) => {
  * POST /api/vendors/:id/issues
  * Create issue for vendor
  */
-router.post('/:id/issues', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateBody(CreateVendorIssueSchema), async (req: any, res) => {
+router.post('/:id/issues', requirePermission(PERMISSIONS['finding.create']), validateUUID('id'), validateBody(CreateVendorIssueSchema), async (req: any, res) => {
     try {
         const issue = await vendorIssueService.createIssue({
             ...req.body,
@@ -651,7 +652,7 @@ router.post('/:id/issues', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGE
  * PUT /api/issues/:id/cap
  * Update Corrective Action Plan
  */
-router.put('/issues/:issueId/cap', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('issueId'), validateBody(UpdateRemediationPlanSchema), async (req: any, res) => {
+router.put('/issues/:issueId/cap', requirePermission(PERMISSIONS['finding.update']), validateUUID('issueId'), validateBody(UpdateRemediationPlanSchema), async (req: any, res) => {
     try {
         await vendorIssueService.updateCorrectiveActionPlan(
             req.params.issueId,
@@ -670,7 +671,7 @@ router.put('/issues/:issueId/cap', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RIS
  * POST /api/issues/:id/remediation
  * Submit remediation evidence
  */
-router.post('/issues/:issueId/remediation', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('issueId'), async (req: any, res) => {
+router.post('/issues/:issueId/remediation', requirePermission(PERMISSIONS['finding.update']), validateUUID('issueId'), async (req: any, res) => {
     try {
         await vendorIssueService.submitRemediation(
             req.params.issueId,
@@ -689,7 +690,7 @@ router.post('/issues/:issueId/remediation', authorize('ADMIN', 'COMPLIANCE_OFFIC
  * POST /api/issues/:id/validate
  * Validate remediation
  */
-router.post('/issues/:issueId/validate', authorize('ADMIN', 'COMPLIANCE_OFFICER'), async (req: any, res) => {
+router.post('/issues/:issueId/validate', requirePermission(PERMISSIONS['finding.update']), async (req: any, res) => {
     try {
         await vendorIssueService.validateRemediation(
             req.params.issueId,
@@ -709,7 +710,7 @@ router.post('/issues/:issueId/validate', authorize('ADMIN', 'COMPLIANCE_OFFICER'
  * POST /api/issues/:id/close
  * Close issue
  */
-router.post('/issues/:issueId/close', authorize('ADMIN', 'COMPLIANCE_OFFICER'), async (req: any, res) => {
+router.post('/issues/:issueId/close', requirePermission(PERMISSIONS['finding.close']), async (req: any, res) => {
     try {
         await vendorIssueService.closeIssue(
             req.params.issueId,
@@ -729,7 +730,7 @@ router.post('/issues/:issueId/close', authorize('ADMIN', 'COMPLIANCE_OFFICER'), 
  * POST /api/issues/:id/accept-risk
  * Accept risk without remediation
  */
-router.post('/issues/:issueId/accept-risk', authorize('ADMIN'), async (req: any, res) => {
+router.post('/issues/:issueId/accept-risk', requirePermission(PERMISSIONS['risk.accept']), async (req: any, res) => {
     try {
         await vendorIssueService.acceptRisk(
             req.params.issueId,
@@ -794,7 +795,7 @@ router.get('/:id/monitoring', async (req: any, res) => {
  * POST /api/vendors/:id/monitoring
  * Record monitoring signal
  */
-router.post('/:id/monitoring', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('id'), validateBody(CreateMonitoringSignalSchema), async (req: any, res) => {
+router.post('/:id/monitoring', requirePermission(PERMISSIONS['monitoring.manage']), validateUUID('id'), validateBody(CreateMonitoringSignalSchema), async (req: any, res) => {
     try {
         const signal = await vendorContinuousMonitoring.recordSignal({
             ...req.body,
@@ -812,7 +813,7 @@ router.post('/:id/monitoring', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MA
  * POST /api/monitoring/:id/acknowledge
  * Acknowledge monitoring signal
  */
-router.post('/monitoring/:signalId/acknowledge', authorize('ADMIN', 'COMPLIANCE_OFFICER', 'RISK_MANAGER'), validateUUID('signalId'), validateBody(AcknowledgeSignalSchema), async (req: any, res) => {
+router.post('/monitoring/:signalId/acknowledge', requirePermission(PERMISSIONS['monitoring.manage']), validateUUID('signalId'), validateBody(AcknowledgeSignalSchema), async (req: any, res) => {
     try {
         await vendorContinuousMonitoring.acknowledgeSignal(
             req.params.signalId,
@@ -830,7 +831,7 @@ router.post('/monitoring/:signalId/acknowledge', authorize('ADMIN', 'COMPLIANCE_
  * POST /api/monitoring/:id/resolve
  * Resolve monitoring signal
  */
-router.post('/monitoring/:signalId/resolve', authorize('ADMIN', 'COMPLIANCE_OFFICER'), validateUUID('signalId'), async (req: any, res) => {
+router.post('/monitoring/:signalId/resolve', requirePermission(PERMISSIONS['monitoring.manage']), validateUUID('signalId'), async (req: any, res) => {
     try {
         await vendorContinuousMonitoring.resolveSignal(
             req.params.signalId,
