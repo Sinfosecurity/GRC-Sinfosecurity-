@@ -159,4 +159,54 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.getByRole('list', { name: 'Third party stages' })).toHaveTextContent('Request');
         expect(screen.getByRole('list', { name: 'Third party stages' })).toHaveTextContent('Assess');
     });
+
+    it('groups Review & Decide exceptions instead of listing every response', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v3',
+                    publicId: 'VND-2026-0030',
+                    name: 'High Exception Vendor',
+                    stage: 'Under review',
+                    stageKey: 'UNDER_REVIEW',
+                    owner: 'Ava Owner',
+                    request: { name: 'High Exception Vendor', servicesProvided: 'Privileged claims review' },
+                    canReviewTier: true,
+                    intake: { completed: true, sections: [{ questions: [{ key: 'ir_04', response: 'High' }] }] },
+                    plan: { triggers: { privacy: true }, assessments: [] },
+                    review: {
+                        questionsAnswered: 36,
+                        satisfactory: 14,
+                        needClarification: 6,
+                        potentialFindings: 4,
+                        items: [
+                            { assessmentId: 'a1', assessmentName: 'Privileged Access', questionId: 'q1', question: 'MFA required?', response: 'No', reason: 'The recorded answer does not satisfy the requirement.', findingId: 'f1', reviewState: 'DRAFT', priority: 'high' },
+                            { assessmentId: 'a1', assessmentName: 'Privileged Access', questionId: 'q2', question: 'Admin logging?', response: 'No', reason: 'The recorded answer does not satisfy the requirement.', findingId: 'f2', reviewState: 'DRAFT', priority: 'high' },
+                            { assessmentId: 'a2', assessmentName: 'Privacy', questionId: 'q3', question: 'DPA in place?', response: 'Not answered', reason: 'Not answered — complete or request clarification.', priority: 'high' },
+                            { assessmentId: 'a3', assessmentName: 'Baseline', questionId: 'q4', question: 'Policy current?', response: 'Yes', reason: 'Required evidence is missing or not ready.', findingId: 'f3', reviewState: 'DRAFT' },
+                        ],
+                    },
+                    vendorAssessments: [{ id: 'a1', name: 'Privileged Access', status: 'Submitted', answered: 12, total: 12 }],
+                    lifecycle: { residualRisk: 42, findings: [{ id: 'f1', title: 'MFA required', severity: 'HIGH', status: 'OPEN', reviewState: 'DRAFT' }] },
+                    history: [],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0030']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect(await screen.findByRole('heading', { level: 2, name: 'Review 1 material issue' })).toBeInTheDocument();
+        expect(screen.getByText(/36 responses · 14 satisfactory · 6 require clarification · 1 material issue · 1 evidence issue/)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /requirement not met/i })).toBeInTheDocument();
+        expect(screen.getByText(/2 related responses/)).toBeInTheDocument();
+        expect(screen.queryByText('Admin logging?')).not.toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Clarifications 1' }));
+        expect(screen.getByRole('heading', { name: 'Clarification queue' })).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'View full assessment' }));
+        expect(screen.getByRole('heading', { name: 'Full assessment' })).toBeInTheDocument();
+        expect(screen.getAllByText(/Privileged access is recorded as High/).length).toBeGreaterThan(0);
+    });
 });

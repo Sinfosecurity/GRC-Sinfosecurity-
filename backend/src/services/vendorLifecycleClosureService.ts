@@ -151,9 +151,16 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
                 severity: row.severity,
                 status: row.status,
                 assignedTo: row.assignedTo,
+                owner: row.assignedTo,
                 dueDate: row.targetRemediationDate,
                 cap: row.correctiveActionPlan,
                 validatedAt: row.validatedAt,
+                acceptanceRationale: row.closureNotes,
+                acceptanceAuthority: row.closedBy,
+                acceptanceExpiresAt: row.status === VendorIssueStatus.RISK_ACCEPTED
+                    ? briefs.find((brief) => brief.humanDecision === 'RISK_ACCEPTED' && String(brief.reviewerAnalysis || '').includes(row.title))?.nextReviewDate
+                        || briefs.find((brief) => brief.humanDecision === 'RISK_ACCEPTED')?.nextReviewDate
+                    : null,
             })),
             decisions: briefs.map((row) => ({
                 id: row.id,

@@ -1,3 +1,5 @@
+import { groupReviewItems, reviewPrimaryAction, type ReviewItem } from './reviewUnits';
+
 export const CUSTOMER_STAGES = ['Request', 'Assess', 'Vendor Review', 'Review & Decide', 'Monitor'] as const;
 export type CustomerStage = (typeof CUSTOMER_STAGES)[number];
 
@@ -56,14 +58,13 @@ export function dominantNextAction(data: {
     stage?: string;
     stageKey?: string;
     nextAction?: string;
-    review?: { potentialFindings?: number; needClarification?: number; items?: unknown[] };
+    review?: { potentialFindings?: number; needClarification?: number; items?: unknown[]; satisfactory?: number; questionsAnswered?: number };
     unresolvedScope?: unknown[];
     canEditIntake?: boolean;
     canReviewTier?: boolean;
     intake?: { completed?: boolean };
 }) {
     const stage = data.stageKey || data.stage;
-    const exceptions = Number(data.review?.potentialFindings || data.review?.needClarification || data.review?.items?.length || 0);
     if ((data.unresolvedScope || []).length && !data.intake?.completed) {
         return { label: 'Complete intake', detail: 'A controlling fact is still Unknown. Save is allowed. Ready to send is not.' };
     }
@@ -74,7 +75,13 @@ export function dominantNextAction(data: {
     if (['AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'Awaiting vendor', 'Vendor in progress'].includes(String(stage))) {
         return { label: 'Waiting on vendor', detail: data.nextAction || 'Supreme is tracking vendor progress.' };
     }
-    if (exceptions > 0) return { label: `Review ${exceptions} items`, detail: 'Satisfactory answers stay in the full assessment.' };
+    if (Array.isArray(data.review?.items) && data.review.items.length) {
+        return reviewPrimaryAction(groupReviewItems(data.review.items as ReviewItem[], data.review), stage);
+    }
+    const material = Number(data.review?.potentialFindings || 0);
+    const clarifications = Number(data.review?.needClarification || 0);
+    if (material > 0) return { label: `Review ${material} material issue${material === 1 ? '' : 's'}`, detail: 'Related responses stay grouped. Satisfactory answers stay in the full assessment.' };
+    if (clarifications > 0) return { label: `Review ${clarifications} clarification${clarifications === 1 ? '' : 's'}`, detail: 'These answers need a person before they become findings.' };
     if (['SUBMITTED', 'UNDER_REVIEW', 'Submitted', 'Under review'].includes(String(stage))) {
         return { label: 'Review exceptions', detail: data.nextAction || 'Start with answers that need judgment.' };
     }

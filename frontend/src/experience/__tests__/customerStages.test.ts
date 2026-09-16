@@ -14,6 +14,16 @@ describe('five-stage customer mapping', () => {
 
     it('names one next human action', () => {
         expect(dominantNextAction({ stageKey: 'TIER_REVIEW' }).label).toMatch(/Confirm recommended tier/);
-        expect(dominantNextAction({ stageKey: 'SUBMITTED', review: { potentialFindings: 4 } }).label).toBe('Review 4 items');
+        expect(dominantNextAction({ stageKey: 'SUBMITTED', review: { potentialFindings: 4 } }).label).toBe('Review 4 material issues');
+        expect(dominantNextAction({
+            stageKey: 'UNDER_REVIEW',
+            review: {
+                items: [
+                    { assessmentName: 'Privileged Access', reason: 'The recorded answer does not satisfy the requirement.', findingId: 'f1' },
+                    { assessmentName: 'Privileged Access', reason: 'The recorded answer does not satisfy the requirement.', findingId: 'f2' },
+                    { assessmentName: 'Privacy', reason: 'Not answered — complete or request clarification.' },
+                ],
+            },
+        }).label).toBe('Review 1 material issue');
     });
 });

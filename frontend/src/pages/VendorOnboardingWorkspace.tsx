@@ -5,6 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import { EntitySummary, LifecycleProgress, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
+import ReviewDecidePanel from '../components/experience/ReviewDecidePanel';
 import { customerStage, customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
@@ -41,9 +42,7 @@ export default function VendorOnboardingWorkspace() {
     const [reassessment, setReassessment] = useState<any>(null);
     const [confirmPriorAnswers, setConfirmPriorAnswers] = useState(false);
     const [historyLayer, setHistoryLayer] = useState<'milestones' | 'audit'>('milestones');
-    const [showFullAssessment, setShowFullAssessment] = useState(false);
     const [showCompletedIntake, setShowCompletedIntake] = useState(false);
-    const [showAllExceptions, setShowAllExceptions] = useState(false);
 
     const load = () => {
         vendorOnboardingAPI.get(id)
@@ -418,50 +417,24 @@ export default function VendorOnboardingWorkspace() {
 
                     {tab === 4 && (
                         <Stack spacing={1.5}>
-                            <Surface>
-                                <Typography variant="h6">
-                                    {(data.review?.potentialFindings || data.review?.needClarification || 0) > 0
-                                        ? `${data.review?.potentialFindings || data.review?.needClarification} items need your review`
-                                        : 'Exception-focused review'}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {(data.review?.questionsAnswered || data.review?.totalResponses || 0)} answers recorded · {data.review?.satisfactory || 0} satisfactory · {data.review?.needClarification || 0} need clarification · {data.review?.potentialFindings || 0} potential findings
-                                    {data.review?.controlGap?.percent != null ? ` · Assessment control-gap ${data.review.controlGap.percent}% (${data.review.controlGap.band}). This is not the vendor residual score.` : ''}
-                                </Typography>
-                                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                                <Button onClick={() => setShowFullAssessment((value) => !value)}>
-                                    {showFullAssessment ? 'Hide full assessment' : 'View full assessment'}
-                                </Button>
-                                {(data.review?.items || []).length > 8 && (
-                                    <Button onClick={() => setShowAllExceptions((value) => !value)}>
-                                        {showAllExceptions ? 'Show first 8' : `Show all ${(data.review?.items || []).length}`}
-                                    </Button>
-                                )}
-                                </Stack>
-                            </Surface>
-                            {showFullAssessment && (data.vendorAssessments || []).map((item: any) => (
-                                <Surface key={`full-${item.id}`}>
-                                    <Typography variant="subtitle1">{item.name}</Typography>
-                                    <Typography>{item.status} · {item.answered} / {item.total} answered</Typography>
-                                </Surface>
-                            ))}
                             {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
                             {data.plan?.triggers?.aiGovernance && <Alert severity="info">AI Governance review may be required</Alert>}
-                            {(showAllExceptions ? (data.review?.items || []) : (data.review?.items || []).slice(0, 8)).map((item: any) => (
-                                <Surface key={`${item.assessmentId}-${item.questionId}`}>
-                                    <Typography variant="subtitle2">{item.question}</Typography>
-                                    <Typography>Answer: {item.response}</Typography>
-                                    <Typography variant="body2">Why: {item.reason}{item.score != null ? ` · Score ${item.score}` : ''}</Typography>
-                                    {item.findingId && data.canReviewTier && item.reviewState === 'DRAFT' && (
-                                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1 }}>
-                                            <Button onClick={() => run(() => vendorOnboardingAPI.reviewFinding(id, item.findingId, { action: 'confirm' }))}>Confirm</Button>
-                                            <Button onClick={() => run(() => vendorOnboardingAPI.reviewFinding(id, item.findingId, { action: 'adjust', severity: 'HIGH', reason: 'Confirmed at high severity after review.' }))}>Adjust to High</Button>
-                                            <Button onClick={() => run(() => vendorOnboardingAPI.reviewFinding(id, item.findingId, { action: 'dismiss', reason: 'Accepted as documented and not a finding.' }))}>Dismiss</Button>
-                                        </Stack>
-                                    )}
-                                </Surface>
-                            ))}
-                            {!data.review?.items?.length && <Typography>No exceptions require review yet.</Typography>}
+                            <ReviewDecidePanel
+                                review={data.review}
+                                stage={data.stageKey || data.stage}
+                                assessments={data.vendorAssessments}
+                                findings={data.lifecycle?.findings || []}
+                                residual={data.residualRiskScore != null ? data.residualRiskScore : data.lifecycle?.residualRisk}
+                                owner={data.owner}
+                                riskContext={reviewRiskContext(data)}
+                                canReview={data.canReviewTier}
+                                saving={saving}
+                                onReviewFinding={(findingId, action) => run(() => vendorOnboardingAPI.reviewFinding(id, findingId, action === 'adjust'
+                                    ? { action, severity: 'HIGH', reason: 'Confirmed at high severity after review.' }
+                                    : action === 'dismiss'
+                                        ? { action, reason: 'Accepted as documented and not a finding.' }
+                                        : { action }))}
+                            />
                         </Stack>
                     )}
 
@@ -803,6 +776,22 @@ const MILESTONE_TITLES = new Set([
     'Reassessment started',
     'Offboarding started',
 ]);
+
+function reviewRiskContext(data: any) {
+    const facts = [];
+    const triggers = data.plan?.triggers || {};
+    if (triggers.privacy) facts.push('Privacy is in scope.');
+    if (triggers.aiGovernance) facts.push('AI Governance is in scope.');
+    const privileged = (data.intake?.sections || [])
+        .flatMap((section: any) => section.questions || [])
+        .find((question: any) => question.key === 'ir_04')?.response;
+    if (privileged && !/^unknown$/i.test(String(privileged))) facts.push(`Privileged access is recorded as ${privileged}.`);
+    const regulated = (data.intake?.sections || [])
+        .flatMap((section: any) => section.questions || [])
+        .find((question: any) => question.key === 'ir_02')?.response;
+    if (regulated && !/^unknown$/i.test(String(regulated))) facts.push(`Regulated or confidential data is recorded as ${regulated}.`);
+    return facts.join(' ');
+}
 
 function privacyAiScope(data: any) {
     const triggers = data.plan?.triggers || data.lifecycle?.plan?.triggers || {};
