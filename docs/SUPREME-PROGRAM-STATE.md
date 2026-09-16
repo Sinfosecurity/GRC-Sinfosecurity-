@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-16
 
-**CURRENT ITEM:** #12-F Supreme Third Party — Final Facelift & UX Closure. #21 remains PAUSED.
+**CURRENT ITEM:** #12-V Supreme Third Party — Seamless Experience & Visual Transformation. #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** #12-F ENGINEERING CLOSURE COMPLETE — PRODUCT LEADERSHIP REVIEW REQUIRED. Starting SHA `96ab7aed3c5d184639ebf7929768f3a7072c65a5`. Implementation `35f2e32b9a5d71fd2c837a358858b5cf1b2b5cbd`. CI `35047762510` PASS. Hosted API /health and frontend `version.json` `35f2e32`. Unknown blocking, vendor portal, hosted axe (0 serious / 0 critical), and 375–1920 screenshots recorded. #12 remains PARTIAL. Cursor does not declare #12-F PASS or #12 PASS. H-2 and H-4–H-7 remain out of scope. #21 remains PAUSED. #22 is not authorized.
+**CURRENT ITEM STATUS:** #12-V ENGINEERING IMPLEMENTED — HOSTED CERTIFICATION COMPLETE — PRODUCT LEADERSHIP REVIEW REQUIRED. Starting SHA `11b37f52006092bee3e15b8bb1608650cdb0151c`. Implementation `a11405ff624571336dcc4cbd8690be48149c0a2f`. CI `35048895472` PASS (447 backend / 178 frontend). Hosted API `/health` and frontend `version.json` `a11405f`. Fresh vendor `VND-2026-0017`. Hosted axe 0 serious / 0 critical. 375–1920 screenshots in `docs/private-beta/hosted-ux-qa/supreme-experience-2/`. #12 remains PARTIAL. Cursor does not declare #12-V PASS or #12 PASS. H-2 and H-4–H-7 remain out of scope. #21 remains PAUSED. #22 is not authorized.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 

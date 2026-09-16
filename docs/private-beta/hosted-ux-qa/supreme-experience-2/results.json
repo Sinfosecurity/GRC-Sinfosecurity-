@@ -1,0 +1,820 @@
+{
+  "checks": [
+    {
+      "name": "hosted-sha",
+      "result": "PASS",
+      "detail": "a11405ff624571336dcc4cbd8690be48149c0a2f"
+    },
+    {
+      "name": "request",
+      "result": "PASS",
+      "detail": "201 VND-2026-0017"
+    },
+    {
+      "name": "unknown-blocks",
+      "result": "PASS",
+      "detail": "400 {\"success\": false, \"error\": {\"type\": \"ApiError\", \"message\": \"We still need to know whether this vendor will have privileged administrative access before Supreme can finalize the du"
+    },
+    {
+      "name": "unknown-save",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "intake",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "packs",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send-email",
+      "result": "PASS",
+      "detail": "201 Queued"
+    },
+    {
+      "name": "queued-not-delivered",
+      "result": "PASS",
+      "detail": "Queued"
+    },
+    {
+      "name": "vendor-activate",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "token-reuse",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "vendor-plane",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "vendor-submit",
+      "result": "PASS",
+      "detail": "9/9 assessments, 36 questions"
+    },
+    {
+      "name": "exceptions-first",
+      "result": "PASS",
+      "detail": "{\"total\": 36, \"satisfactory\": 14, \"needClarification\": 6, \"potentialFindings\": 30, \"items\": 36}"
+    },
+    {
+      "name": "finding",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "risk-acceptance",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "contract",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "approval",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "active",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "reassessment-date",
+      "result": "PASS",
+      "detail": "{\"vendorStatus\": \"ACTIVE\", \"residualRisk\": 100, \"openFindings\": 0, \"acceptedRisks\": 1, \"overdueRemediation\": 0, \"nextReassessment\": \"2027-01-20T02:44:51.506Z\", \"contractAttested\": true, \"acceptanceExp"
+    },
+    {
+      "name": "home-api-count",
+      "result": "PARTIAL",
+      "detail": "5 ['https://supreme-risk-staging-api.onrender.com/api/v1/auth/me', 'https://supreme-risk-staging-api.onrender.com/api/v1/intelligence/teaser', 'https://supreme-risk-staging-api.onrender.com/api/v1/organization/current', 'https://supreme-risk-staging-api.onrender.com/api/v1/tprm/attention', 'https://supreme-risk-staging-api.onrender.com/api/v1/vendors/statistics']"
+    },
+    {
+      "name": "home-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-home",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "register-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "register-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "register-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "register-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "register-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-register",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "request-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "request-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "request-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "request-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "request-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-request",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "workspace-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-workspace",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "assess-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "assess-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "assess-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "assess-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "assess-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-assess",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "finding-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-decision",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "history-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "history-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "monitor-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "monitor-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "monitor-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "monitor-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "monitor-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-monitor",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "decision-list-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-landing-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-landing-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-landing-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-landing-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-landing-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-vendor-landing",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "questionnaire-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "questionnaire-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "questionnaire-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "questionnaire-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "questionnaire-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-questionnaire",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "reassessment-read",
+      "result": "PASS",
+      "detail": "200"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/home-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/home-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/home-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/register-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/register-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/register-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/register-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/register-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/request-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/request-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/request-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/request-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/request-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/workspace-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/workspace-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/workspace-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/assess-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/assess-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/assess-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/assess-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/assess-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/finding-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/finding-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/evidence-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/decision-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/decision-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/decision-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/decision-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/decision-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/history-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/history-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/monitor-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/monitor-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/monitor-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/monitor-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/monitor-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/decision-list-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/vendor-landing-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/vendor-landing-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/vendor-landing-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/vendor-landing-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/vendor-landing-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/questionnaire-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/questionnaire-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/questionnaire-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/questionnaire-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2/questionnaire-1920.png"
+  ],
+  "axe": [
+    {
+      "name": "home",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "register",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "request",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "workspace",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "assess",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "decision",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "monitor",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "vendor-landing",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "questionnaire",
+      "serious": 0,
+      "violations": []
+    }
+  ],
+  "overflows": [
+    {
+      "name": "home",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "home",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "home",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "home",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "home",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "register",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "register",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "register",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "register",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "register",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "request",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "request",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "request",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "request",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "request",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "workspace",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "workspace",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "workspace",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "workspace",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "workspace",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "assess",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "assess",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "assess",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "assess",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "assess",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "finding",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "finding",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "evidence",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "evidence",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "decision",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "decision",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "decision",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "decision",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "decision",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "history",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "history",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "monitor",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "monitor",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "monitor",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "monitor",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "monitor",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "decision-list",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "vendor-landing",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "vendor-landing",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "vendor-landing",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "vendor-landing",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "vendor-landing",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "questionnaire",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "questionnaire",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "questionnaire",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "questionnaire",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "questionnaire",
+      "width": 1920,
+      "overflow": false
+    }
+  ],
+  "sha": {
+    "api": "a11405ff624571336dcc4cbd8690be48149c0a2f",
+    "frontend": "a11405ff624571336dcc4cbd8690be48149c0a2f",
+    "health": "degraded",
+    "required": "a11405ff624571336dcc4cbd8690be48149c0a2f"
+  },
+  "workflow": {
+    "publicId": "VND-2026-0017",
+    "vendorId": "3d6ff55c-8c10-4f5c-b262-8b8be6326228",
+    "review": {
+      "total": 36,
+      "satisfactory": 14,
+      "needClarification": 6,
+      "potentialFindings": 30,
+      "items": 36
+    }
+  },
+  "homeApis": [
+    "https://supreme-risk-staging-api.onrender.com/api/v1/auth/me",
+    "https://supreme-risk-staging-api.onrender.com/api/v1/intelligence/teaser",
+    "https://supreme-risk-staging-api.onrender.com/api/v1/organization/current",
+    "https://supreme-risk-staging-api.onrender.com/api/v1/tprm/attention",
+    "https://supreme-risk-staging-api.onrender.com/api/v1/vendors/statistics"
+  ],
+  "personas": {
+    "analyst": {
+      "landing": "Home attention queue",
+      "nextVisible": true
+    },
+    "requester": {
+      "landing": "Request a third party",
+      "nextVisible": true
+    },
+    "approver": {
+      "landing": "Decisions",
+      "nextVisible": true
+    },
+    "vendor": {
+      "landing": "Security review",
+      "adminHidden": true,
+      "nextVisible": true
+    }
+  }
+}
