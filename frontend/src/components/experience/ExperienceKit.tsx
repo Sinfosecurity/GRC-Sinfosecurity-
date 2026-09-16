@@ -144,7 +144,7 @@ export function LifecycleProgress({
                         sx={{
                             pr: 2.5,
                             py: 0.75,
-                            color: state === 'future' ? color.inkFaint : color.ink,
+                            color: state === 'future' ? color.inkMuted : color.ink,
                             fontWeight: state === 'current' ? 700 : 500,
                             fontSize: 14,
                             borderBottom: state === 'current' ? `2px solid ${color.navy900}` : '2px solid transparent',

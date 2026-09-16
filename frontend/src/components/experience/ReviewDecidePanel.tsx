@@ -79,12 +79,12 @@ export default function ReviewDecidePanel({
             <Surface>
                 <Typography variant="overline" component="p" sx={{ color: color.ink, fontSize: '0.78rem', letterSpacing: '0.06em' }}>Assessment review</Typography>
                 <Typography variant="h4" component="h2">{primary.label}</Typography>
-                <Typography variant="body2" sx={{ mt: 0.75 }}>
+                <Typography variant="body2" sx={{ mt: 0.75, color: color.ink }}>
                     {bundle.totalResponses} responses · {bundle.satisfactory} satisfactory · {bundle.needClarification} require clarification · {bundle.material.length} material issue{bundle.material.length === 1 ? '' : 's'} · {bundle.evidence.length} evidence issue{bundle.evidence.length === 1 ? '' : 's'}
                     {review?.controlGap?.percent != null ? ` · Control-gap ${review.controlGap.percent}% (${review.controlGap.band}). This is not residual risk.` : ''}
                 </Typography>
-                <Typography variant="body2" sx={{ mt: 0.5 }}>Decision readiness: {readiness}. {primary.detail}</Typography>
-                {riskContext && <Typography variant="body2" sx={{ mt: 0.5 }}>{riskContext}</Typography>}
+                <Typography variant="body2" sx={{ mt: 0.5, color: color.ink }}>Decision readiness: {readiness}. {primary.detail}</Typography>
+                {riskContext && <Typography variant="body2" sx={{ mt: 0.5, color: color.ink }}>{riskContext}</Typography>}
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1.5 }}>
                     <FilterButton current={filter} value="material" label={`Material issues ${bundle.material.length}`} onClick={setFilter} />
                     <FilterButton current={filter} value="clarification" label={`Clarifications ${bundle.clarifications.length}`} onClick={setFilter} />

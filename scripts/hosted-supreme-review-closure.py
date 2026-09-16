@@ -259,7 +259,10 @@ def run_axe(page, name):
                     impact: row.impact,
                     help: row.help,
                     nodes: row.nodes.length,
-                    targets: row.nodes.slice(0, 4).map((node) => node.target),
+                    targets: row.nodes.slice(0, 4).map((node) => ({
+                        target: node.target,
+                        html: String(node.html || "").slice(0, 240),
+                    })),
                 })),
             };
         }"""
