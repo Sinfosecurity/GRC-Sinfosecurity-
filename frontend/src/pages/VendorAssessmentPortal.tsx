@@ -44,7 +44,7 @@ export default function VendorAssessmentPortal() {
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: color.workspace, px: { xs: 2, md: 6 }, py: 4 }}>
             <Stack spacing={2.5} sx={{ maxWidth: 820, mx: 'auto' }}>
-                <Typography variant="overline" sx={{ color: color.gold, fontWeight: 700 }}>Supreme Third Party</Typography>
+                <Typography variant="overline" sx={{ color: color.goldInk, fontWeight: 700 }}>Supreme Third Party</Typography>
                 <Typography variant="h4">Assessment requested by {data.organizationName}</Typography>
                 <Typography variant="body1">
                     {data.requesterName || data.requestedBy || 'The requesting organization'} asked {data.vendorName} to complete due diligence. You will only see this assignment.

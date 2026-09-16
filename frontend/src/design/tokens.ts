@@ -18,6 +18,7 @@ export const color = {
     inkFaint: '#7a8491',
     gold: '#b0893a',
     goldSoft: '#c9a45a',
+    goldInk: '#6b5014',
     goldDim: 'rgba(176, 137, 58, 0.12)',
     line: 'rgba(20, 32, 46, 0.1)',
     lineStrong: 'rgba(20, 32, 46, 0.18)',

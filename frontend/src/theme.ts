@@ -162,6 +162,14 @@ const theme = createTheme({
                 root: { borderRadius: radius.md },
             },
         },
+        MuiFormHelperText: {
+            styleOverrides: {
+                root: {
+                    color: color.inkMuted,
+                    '&.Mui-disabled': { color: color.inkMuted },
+                },
+            },
+        },
         MuiTabs: { styleOverrides: { indicator: { backgroundColor: color.gold, height: 2 } } },
         MuiTab: {
             styleOverrides: {
