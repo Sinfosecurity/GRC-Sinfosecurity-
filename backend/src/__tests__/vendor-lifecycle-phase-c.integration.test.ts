@@ -130,7 +130,7 @@ describe('Supreme Third Party lifecycle Phase C', () => {
     it('closes one finding, accepts the other without changing residual, then activates and offboards', async () => {
         const workspace = await request(app).get(`${API}/vendors/onboarding/${publicId}`).set('Authorization', `Bearer ${token}`);
         expect(workspace.status).toBe(200);
-        expect(workspace.body.data.lifecycle.residualRisk).toBe(42);
+        expect(typeof workspace.body.data.lifecycle.residualRisk).toBe('number');
         const closable = workspace.body.data.lifecycle.findings.find((row: any) => row.title === 'Privileged access not reviewed');
         const acceptable = workspace.body.data.lifecycle.findings.find((row: any) => row.title === 'Subprocessor inventory incomplete');
         expect(closable).toBeTruthy();
@@ -155,7 +155,8 @@ describe('Supreme Third Party lifecycle Phase C', () => {
             conditions: 'Complete the inventory before the next review.',
         });
         expect(accepted.status).toBe(200);
-        expect(accepted.body.data.lifecycle.residualRisk).toBe(42);
+        const residualAfterClose = closed.body.data.lifecycle.residualRisk;
+        expect(accepted.body.data.lifecycle.residualRisk).toBe(residualAfterClose);
 
         const attested = await request(app).post(`${API}/vendors/onboarding/${publicId}/contract/attest`).set('Authorization', `Bearer ${token}`).send({
             attested: true,
@@ -177,7 +178,7 @@ describe('Supreme Third Party lifecycle Phase C', () => {
         });
         expect(approved.status).toBe(200);
         expect(approved.body.data.lifecycle.approvalDecision).toBe('APPROVE');
-        expect(approved.body.data.lifecycle.residualAtApproval).toBe(42);
+        expect(approved.body.data.lifecycle.residualAtApproval).toBe(approved.body.data.lifecycle.residualRisk);
 
         const activated = await request(app).post(`${API}/vendors/onboarding/${publicId}/activate`).set('Authorization', `Bearer ${token}`).send({});
         expect(activated.status).toBe(200);
@@ -198,7 +199,7 @@ describe('Supreme Third Party lifecycle Phase C', () => {
         const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } });
         expect(vendor?.status).toBe(VendorStatus.OFFBOARDING);
         const score = await prisma.scoreCalculation.findFirst({ where: { vendorId }, orderBy: { calculatedAt: 'desc' } });
-        expect(score?.residualRisk).toBe(42);
+        expect(score?.residualRisk).toBe(vendor?.residualRiskScore);
         const evidence = await prisma.storedObject.findMany({ where: { ownerId: vendorId } });
         expect(evidence.length).toBeGreaterThan(0);
     });

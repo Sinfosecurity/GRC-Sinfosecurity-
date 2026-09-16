@@ -211,6 +211,8 @@ export async function closeFinding(organizationId: string, vendorKey: string, ac
     if (!finding.validatedAt) throw new ApiError(409, 'An analyst must validate remediation before close.');
     await vendorIssueService.closeIssue(finding.id, organizationId, actor.id, input.notes || 'Closed with ready remediation evidence.', stored.id);
     await history(organizationId, actor.id, vendor.id, 'vendor.finding_closed', `${actor.name || 'Analyst'} closed a finding.`);
+    const { explainableRiskService } = await import('./explainableRiskService');
+    await explainableRiskService.recalculate(organizationId, vendor.id);
     return presentLifecycle(organizationId, vendor.id, actor);
 }
 

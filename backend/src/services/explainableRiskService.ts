@@ -1,10 +1,39 @@
-import { Prisma, VendorIssueStatus } from '@prisma/client';
+import { AssessmentStatus, AssessmentType, Prisma, VendorIssueStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { calculateVendorRiskAt, RISK_SCORE_VERSION, type RiskEngineInput, type RiskEngineResult } from './deterministicRiskEngine';
 import { tenantWhere } from '../security/tenant';
 import { recordAudit } from './auditEventService';
 import { scoringMethodologyService } from './scoringMethodologyService';
+import { recommendTierFromIntake } from './vendorOnboardingScoring';
+
+function residualResponseScore(response: string): number | null {
+    const lower = response.trim().toLowerCase();
+    if (!lower || lower === 'not answered' || lower === 'unknown') return null;
+    if (lower === 'n/a' || lower.startsWith('not applicable')) return null;
+    if (lower.startsWith('yes') || lower.includes('no exceptions') || lower.includes('type ii')) return 9;
+    if (lower.startsWith('partial') || lower.startsWith('in progress') || lower.includes('outdated') || lower.includes('bridge')) return 5;
+    if (lower.startsWith('no') || lower.startsWith('qualified')) return 2;
+    return null;
+}
+
+export type AssessmentPurpose = 'INHERENT_INTAKE' | 'DUE_DILIGENCE' | 'REASSESSMENT' | 'OTHER';
+
+const REASSESSMENT_TYPES = new Set<AssessmentType>([
+    AssessmentType.ANNUAL_REVIEW,
+    AssessmentType.TRIGGERED_REASSESSMENT,
+    AssessmentType.CONTRACT_RENEWAL,
+    AssessmentType.POST_INCIDENT,
+    AssessmentType.CONTINUOUS_MONITORING,
+    AssessmentType.FOURTH_PARTY_REVIEW,
+]);
+
+const SCORING_FINDING_STATUSES: VendorIssueStatus[] = [
+    VendorIssueStatus.OPEN,
+    VendorIssueStatus.IN_PROGRESS,
+    VendorIssueStatus.PENDING_VALIDATION,
+    VendorIssueStatus.RISK_ACCEPTED,
+];
 
 function toInput(vendor: {
     tier: string;
@@ -19,6 +48,38 @@ function toInput(vendor: {
         hasSubcontractors: vendor.hasSubcontractors,
         ...extras,
     };
+}
+
+export function assessmentPurpose(assessment: {
+    id: string;
+    assessmentType: AssessmentType;
+    respondentPlane?: string | null;
+}, intakeAssessmentId?: string | null): AssessmentPurpose {
+    if (intakeAssessmentId && assessment.id === intakeAssessmentId) return 'INHERENT_INTAKE';
+    if (assessment.respondentPlane === 'VENDOR') return 'DUE_DILIGENCE';
+    if (REASSESSMENT_TYPES.has(assessment.assessmentType)) return 'REASSESSMENT';
+    return 'OTHER';
+}
+
+function isControlEligible(purpose: AssessmentPurpose, status: AssessmentStatus): boolean {
+    return (purpose === 'DUE_DILIGENCE' || purpose === 'REASSESSMENT') && status === AssessmentStatus.COMPLETED;
+}
+
+function controlQuestionScores(responses: Array<{ score?: number | null; maxScore?: number | null; weight?: number | null; response?: string | null }>) {
+    const scores: Array<{ score: number; maxScore: number; weight: number }> = [];
+    for (const row of responses) {
+        const raw = String(row.response || '').trim().toLowerCase();
+        if (!raw || raw === 'not answered' || raw === 'unknown') continue;
+        if (raw === 'n/a' || raw.startsWith('not applicable')) continue;
+        const scored = residualResponseScore(row.response || '');
+        if (scored == null) continue;
+        scores.push({
+            score: scored,
+            maxScore: row.maxScore || 10,
+            weight: row.weight || 1,
+        });
+    }
+    return scores;
 }
 
 export async function persistVendorScore(params: {
@@ -58,38 +119,57 @@ export const explainableRiskService = {
     async recalculate(organizationId: string, vendorId: string) {
         const vendor = await prisma.vendor.findFirst({
             where: tenantWhere(organizationId, { id: vendorId }),
+            include: { onboarding: true },
         });
         if (!vendor) {
             throw new ApiError(404, 'Vendor not found');
         }
-        const [issues, monitoringEvents, latestAssessment, methodology] = await Promise.all([
+        const [issues, monitoringEvents, assessments, methodology] = await Promise.all([
             prisma.vendorIssue.findMany({
                 where: {
                     organizationId,
                     vendorId,
-                    status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS, VendorIssueStatus.PENDING_VALIDATION] },
+                    status: { in: SCORING_FINDING_STATUSES },
                 },
             }),
             prisma.vendorMonitoring.count({
                 where: { organizationId, vendorId, requiresAction: true },
             }),
-            prisma.vendorAssessment.findFirst({
-                where: { organizationId, vendorId, status: 'COMPLETED' },
+            prisma.vendorAssessment.findMany({
+                where: { organizationId, vendorId },
                 include: { responses: true },
                 orderBy: { completedAt: 'desc' },
             }),
             scoringMethodologyService.requireActive(organizationId),
         ]);
+
+        const intakeId = vendor.onboarding?.intakeAssessmentId || null;
+        const intake = assessments.find((row) => row.id === intakeId);
+        let authoritativeInherent: number | undefined;
+        if (intake) {
+            const answers = intake.responses.map((row) => ({ questionKey: row.questionId, response: row.response }));
+            if (answers.some((row) => row.response)) {
+                authoritativeInherent = recommendTierFromIntake(answers).inherentRisk;
+            }
+        }
+
+        const controlSource = assessments.find((row) => isControlEligible(assessmentPurpose(row, intakeId), row.status));
+        const questionScores = controlSource ? controlQuestionScores(controlSource.responses) : [];
+        const noEligibleControls = !controlSource || questionScores.length === 0;
+        const authoritativeTier = vendor.onboarding?.confirmedTier
+            || vendor.onboarding?.recommendedTier
+            || vendor.tier;
+
         const result = calculateVendorRiskAt(
-            toInput(vendor, {
+            toInput({
+                ...vendor,
+                tier: authoritativeTier,
+            }, {
                 openFindings: issues.map((issue) => ({ severity: issue.severity })),
                 monitoringEvents,
-                questionScores: latestAssessment?.responses
-                    .filter((row) => row.score != null)
-                    .map((row) => ({ score: row.score || 0, maxScore: row.maxScore || 10, weight: row.weight || 1 })),
-                controlMaturity: typeof latestAssessment?.overallScore === 'number'
-                    ? Math.round(latestAssessment.overallScore / 20)
-                    : undefined,
+                questionScores: noEligibleControls ? [] : questionScores,
+                noEligibleControls,
+                authoritativeInherent,
                 methodology: methodology.weights,
                 methodologyVersion: methodology.version,
             }),
@@ -102,9 +182,15 @@ export const explainableRiskService = {
             resourceType: 'Vendor',
             resourceId: vendorId,
             result: 'success',
-            metadata: { scoreVersion: result.scoreVersion, residualRisk: result.residualRisk, riskBand: result.riskBand },
+            metadata: {
+                scoreVersion: result.scoreVersion,
+                residualRisk: result.residualRisk,
+                riskBand: result.riskBand,
+                controlAssessmentId: controlSource?.id || null,
+                assessmentPurpose: controlSource ? assessmentPurpose(controlSource, intakeId) : null,
+            },
         });
-        return { ...result, id: record.id };
+        return { ...result, id: record.id, controlAssessmentId: controlSource?.id || null };
     },
 
     async latest(organizationId: string, vendorId: string) {

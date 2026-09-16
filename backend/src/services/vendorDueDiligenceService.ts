@@ -919,6 +919,29 @@ export async function presentDueDiligence(organizationId: string, vendorKey: str
     };
 }
 
+export async function promoteReviewedControlAssessments(organizationId: string, vendorId: string) {
+    const vendor = await prisma.vendor.findFirst({
+        where: { id: vendorId, organizationId },
+        include: { onboarding: true },
+    });
+    if (!vendor) return;
+    await prisma.vendorAssessment.updateMany({
+        where: {
+            organizationId,
+            vendorId,
+            respondentPlane: 'VENDOR',
+            submittedAt: { not: null },
+            status: { notIn: [AssessmentStatus.COMPLETED, AssessmentStatus.CANCELLED] },
+            ...(vendor.onboarding?.intakeAssessmentId ? { id: { not: vendor.onboarding.intakeAssessmentId } } : {}),
+        },
+        data: {
+            status: AssessmentStatus.COMPLETED,
+            completedAt: new Date(),
+        },
+    });
+    await explainableRiskService.recalculate(organizationId, vendorId);
+}
+
 export async function analystReview(organizationId: string, vendorId: string) {
     const vendor = await prisma.vendor.findFirst({
         where: { id: vendorId, organizationId },
@@ -979,6 +1002,12 @@ export async function analystReview(organizationId: string, vendorId: string) {
             where: { vendorId },
             data: { stage: VendorOnboardingStage.UNDER_REVIEW },
         });
+    }
+    const drafts = await prisma.vendorIssue.count({
+        where: { organizationId, vendorId, reviewState: IssueReviewState.DRAFT },
+    });
+    if (!drafts && !items.length && assessments.some((row) => row.submittedAt)) {
+        await promoteReviewedControlAssessments(organizationId, vendorId);
     }
     return {
         vendor: vendor.name,
@@ -1045,6 +1074,7 @@ export async function reviewFinding(organizationId: string, vendorKey: string, a
             where: { vendorId: vendor.id },
             data: { stage: VendorOnboardingStage.REMEDIATION },
         });
+        await promoteReviewedControlAssessments(organizationId, vendor.id);
     }
     return presentDueDiligence(organizationId, vendor.id, actor);
 }

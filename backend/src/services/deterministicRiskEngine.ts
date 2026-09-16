@@ -3,7 +3,8 @@
  * Identical inputs always produce identical outputs. No randomness.
  */
 
-export const RISK_SCORE_VERSION = 'supreme-risk-1.1.0';
+export const RISK_SCORE_VERSION = 'supreme-risk-1.2.0';
+export const PREVIOUS_RISK_SCORE_VERSION = 'supreme-risk-1.1.0';
 
 export type FindingSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
@@ -42,6 +43,10 @@ export type RiskEngineInput = {
     compensatingControls?: number;
     methodology?: ScoringWeights;
     methodologyVersion?: string;
+    /** Canonical intake inherent. When set, the engine does not reconstruct inherent from placeholder tier. */
+    authoritativeInherent?: number;
+    /** When true, residual starts at inherent. No fabricated 50% control credit. */
+    noEligibleControls?: boolean;
 };
 
 export type RiskFactorGroup = 'inherent' | 'control' | 'residual';
@@ -132,11 +137,24 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
         rationale: input.hasSubcontractors ? 'Subcontractors flagged' : 'No subcontractors flagged',
     });
 
-    let inherent = criticalityPoints + dataPoints + regulatoryPoints + fourthPartyPoints;
-    inherent = clamp(inherent);
+    let inherent = typeof input.authoritativeInherent === 'number'
+        ? clamp(input.authoritativeInherent)
+        : clamp(criticalityPoints + dataPoints + regulatoryPoints + fourthPartyPoints);
+    if (typeof input.authoritativeInherent === 'number') {
+        factors[0] = {
+            code: 'canonical_intake',
+            label: 'Canonical intake inherent exposure',
+            group: 'inherent',
+            points: inherent,
+            rationale: `Authoritative inherent ${inherent} from IR-01–IR-15; not reconstructed from placeholder tier`,
+        };
+        factors[1].points = 0;
+        factors[2].points = 0;
+        factors[3].points = 0;
+    }
 
-    let controlEffectiveness = 50;
-    if (input.questionScores && input.questionScores.length > 0) {
+    let controlEffectiveness = 0;
+    if (!input.noEligibleControls && input.questionScores && input.questionScores.length > 0) {
         const weighted = input.questionScores.reduce(
             (acc, q) => {
                 const ratio = q.maxScore > 0 ? q.score / q.maxScore : 0;
@@ -147,9 +165,9 @@ export function calculateVendorRisk(input: RiskEngineInput): RiskEngineResult {
             },
             { score: 0, weight: 0 }
         );
-        controlEffectiveness = weighted.weight > 0 ? (weighted.score / weighted.weight) * 100 : 50;
+        controlEffectiveness = weighted.weight > 0 ? (weighted.score / weighted.weight) * 100 : 0;
     }
-    if (typeof input.controlMaturity === 'number') {
+    if (!input.noEligibleControls && typeof input.controlMaturity === 'number' && input.questionScores && input.questionScores.length > 0) {
         controlEffectiveness = (controlEffectiveness + clamp(input.controlMaturity * 20, 0, 100)) / 2;
     }
     controlEffectiveness += (input.compensatingControls || 0) * weights.compensatingControlPoints;

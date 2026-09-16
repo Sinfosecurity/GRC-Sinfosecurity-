@@ -14,6 +14,7 @@ import { assertVendorTransition } from './vendorLifecycle';
 import { recordAudit } from './auditEventService';
 import { allocateVendorPublicId } from './vendorOnboardingService';
 import { extractVendorDomain } from './vendorOnboardingScoring';
+import { applyHardFloorToTier, resolveMinimumTier } from './vendorTierIntegrity';
 
 export interface CreateVendorInput {
     name: string;
@@ -82,15 +83,16 @@ class VendorManagementService {
      */
     async createVendor(data: CreateVendorInput): Promise<Vendor> {
         try {
-            // Calculate initial inherent risk score based on tier and data access
-            const inherentRiskScore = this.calculateInherentRisk(
+            const tier = applyHardFloorToTier(
                 data.tier,
+                resolveMinimumTier({ dataTypesAccessed: data.dataTypesAccessed })
+            );
+            const inherentRiskScore = this.calculateInherentRisk(
+                tier,
                 data.dataTypesAccessed,
                 data.hasSubcontractors || false
             );
-
-            // Calculate next review date based on tier
-            const nextReviewDate = this.calculateNextReviewDate(data.tier);
+            const nextReviewDate = this.calculateNextReviewDate(tier);
 
             const createData: Prisma.VendorUncheckedCreateInput = {
                 publicId: await allocateVendorPublicId(data.organizationId),
@@ -98,7 +100,7 @@ class VendorManagementService {
                 legalName: data.legalName,
                 vendorType: data.vendorType,
                 category: this.toVendorCategory(data.category),
-                tier: data.tier,
+                tier,
                 primaryContact: data.primaryContact,
                 contactEmail: data.contactEmail,
                 contactPhone: data.contactPhone,
@@ -119,7 +121,7 @@ class VendorManagementService {
                 residualRiskScore: inherentRiskScore,
                 nextReviewDate,
                 status: VendorStatus.PROPOSED,
-                criticalityLevel: this.mapTierToCriticality(data.tier),
+                criticalityLevel: this.mapTierToCriticality(tier),
             };
 
             const vendor = await prisma.vendor.create({
@@ -293,6 +295,18 @@ class VendorManagementService {
 
         let additionalData: any = {};
         if (data.tier) {
+            const onboarding = await prisma.vendorOnboarding.findUnique({
+                where: { vendorId },
+                select: { hardFloors: true },
+            });
+            const floors = Array.isArray(onboarding?.hardFloors) ? onboarding.hardFloors as Array<{ applies?: boolean }> : [];
+            data.tier = applyHardFloorToTier(
+                data.tier,
+                resolveMinimumTier({
+                    hardFloors: floors,
+                    dataTypesAccessed: data.dataTypesAccessed || existing.dataTypesAccessed,
+                })
+            );
             additionalData.nextReviewDate = this.calculateNextReviewDate(data.tier);
             additionalData.criticalityLevel = this.mapTierToCriticality(data.tier);
         }
@@ -317,6 +331,10 @@ class VendorManagementService {
             result: 'success',
             metadata: { status: data.status, tier: data.tier },
         });
+
+        if (data.tier && data.tier !== existing.tier) {
+            await explainableRiskService.recalculate(organizationId, vendorId);
+        }
 
         logger.info(`Updated vendor: ${vendorId}`);
         return await this.getVendorById(vendorId, organizationId) as Vendor;
@@ -432,6 +450,16 @@ class VendorManagementService {
                 tier: t.tier,
                 count: t._count,
             })),
+            tierCounts: {
+                CRITICAL: tierDistribution.find((t) => t.tier === VendorTier.CRITICAL)?._count || 0,
+                HIGH: tierDistribution.find((t) => t.tier === VendorTier.HIGH)?._count || 0,
+                MEDIUM: tierDistribution.find((t) => t.tier === VendorTier.MEDIUM)?._count || 0,
+                LOW: tierDistribution.find((t) => t.tier === VendorTier.LOW)?._count || 0,
+                Critical: tierDistribution.find((t) => t.tier === VendorTier.CRITICAL)?._count || 0,
+                High: tierDistribution.find((t) => t.tier === VendorTier.HIGH)?._count || 0,
+                Medium: tierDistribution.find((t) => t.tier === VendorTier.MEDIUM)?._count || 0,
+                Low: tierDistribution.find((t) => t.tier === VendorTier.LOW)?._count || 0,
+            },
             categoryDistribution: categoryDistribution.map(c => ({
                 category: c.category,
                 count: c._count,

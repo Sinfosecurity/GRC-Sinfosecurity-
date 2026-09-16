@@ -17,6 +17,7 @@ import {
     recommendTierFromIntake,
     type IntakeAnswer,
 } from './vendorOnboardingScoring';
+import { assertTierMeetsFloor, parseVendorTier, resolveMinimumTier } from './vendorTierIntegrity';
 
 export const INTAKE_SLA_DAYS = 5;
 export const TIER_REVIEW_SLA_DAYS = 2;
@@ -527,6 +528,8 @@ async function completeIntake(organizationId: string, vendorId: string, actor: A
         data: {
             inherentRiskScore: result.inherentRisk,
             residualRiskScore: result.inherentRisk,
+            tier: result.recommendedTier,
+            criticalityLevel: result.recommendedTier === VendorTier.CRITICAL ? 'CRITICAL' : result.recommendedTier === VendorTier.HIGH ? 'HIGH' : result.recommendedTier === VendorTier.LOW ? 'LOW' : 'MEDIUM',
             dataTypesAccessed: result.signals.dataTypes,
             hasSubcontractors: result.signals.fourthParty,
             geographicFootprint: vendor.country ? [vendor.country] : vendor.geographicFootprint,
@@ -593,11 +596,19 @@ export async function confirmTier(organizationId: string, vendorKey: string, act
     }
     const recommended = vendor.onboarding.recommendedTier;
     if (!recommended) throw new ApiError(409, 'Inherent risk has not been calculated.');
-    const override = input.overrideTier && input.overrideTier !== recommended;
+    const requestedOverride = parseVendorTier(input.overrideTier);
+    if (input.overrideTier && !requestedOverride) {
+        throw new ApiError(400, 'Override tier must be Critical, High, Medium, or Low.');
+    }
+    const override = requestedOverride && requestedOverride !== recommended;
     if (override && !String(input.reason || '').trim()) {
         throw new ApiError(400, 'An override requires a reason.');
     }
-    const confirmed = override ? input.overrideTier! : recommended;
+    const minimum = resolveMinimumTier({
+        hardFloors: Array.isArray(vendor.onboarding.hardFloors) ? vendor.onboarding.hardFloors as Array<{ applies?: boolean }> : [],
+        dataTypesAccessed: vendor.dataTypesAccessed,
+    });
+    const confirmed = assertTierMeetsFloor(override ? requestedOverride! : recommended, minimum);
     const users = await userDirectory(organizationId, [actor.id]);
     const actorName = users.get(actor.id)?.name || actor.name || 'Analyst';
     await prisma.vendor.update({
@@ -628,6 +639,7 @@ export async function confirmTier(organizationId: string, vendorKey: string, act
     await writeHistory(organizationId, actor.id, 'vendor.plan_generated', vendor.id, {
         summary: 'Due-diligence plan generated from the confirmed tier.',
     });
+    await explainableRiskService.recalculate(organizationId, vendor.id);
     return presentOnboarding(organizationId, vendor.id, actor);
 }
 

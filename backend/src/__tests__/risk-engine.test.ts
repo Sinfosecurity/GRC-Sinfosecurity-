@@ -64,4 +64,44 @@ describe('deterministic risk engine', () => {
         expect(afterAcceptance.factors.some((factor) => factor.code === 'risk_acceptance')).toBe(false);
         expect(afterAcceptance.explanation).not.toContain('risk acceptance applied');
     });
+
+    it('uses canonical inherent instead of placeholder tier reconstruction', () => {
+        const placeholder = calculateVendorRisk({
+            vendorCriticality: 'MEDIUM',
+            dataSensitivityCount: 1,
+            authoritativeInherent: 80,
+            noEligibleControls: true,
+        });
+        expect(placeholder.inherentRisk).toBe(80);
+        expect(placeholder.residualRisk).toBe(80);
+        expect(placeholder.controlEffectiveness).toBe(0);
+        expect(placeholder.factors.some((factor) => factor.code === 'canonical_intake')).toBe(true);
+    });
+
+    it('does not grant control credit from unanswered questions or intake-style maturity alone', () => {
+        const none = calculateVendorRisk({
+            vendorCriticality: 'HIGH',
+            authoritativeInherent: 70,
+            noEligibleControls: true,
+            controlMaturity: 4,
+            questionScores: [],
+        });
+        expect(none.controlEffectiveness).toBe(0);
+        expect(none.residualRisk).toBe(70);
+    });
+
+    it('does not improve residual when control answers get worse', () => {
+        const strong = calculateVendorRisk({
+            vendorCriticality: 'HIGH',
+            authoritativeInherent: 70,
+            questionScores: [{ score: 9, maxScore: 10, weight: 1 }],
+        });
+        const weak = calculateVendorRisk({
+            vendorCriticality: 'HIGH',
+            authoritativeInherent: 70,
+            questionScores: [{ score: 2, maxScore: 10, weight: 1 }],
+        });
+        expect(strong.residualRisk).toBeLessThanOrEqual(weak.residualRisk);
+        expect(strong.controlEffectiveness).toBeGreaterThan(weak.controlEffectiveness);
+    });
 });

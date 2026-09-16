@@ -455,6 +455,26 @@ export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierRe
     };
 }
 
+export const TIER_RANK: Record<VendorTier, number> = {
+    LOW: 1,
+    MEDIUM: 2,
+    HIGH: 3,
+    CRITICAL: 4,
+};
+
+export function minTierFromFloors(floors: Array<{ applies?: boolean }> | null | undefined): VendorTier | null {
+    return floors?.some((floor) => floor.applies) ? VendorTier.CRITICAL : null;
+}
+
+export function criticalFloorAppliesFromFacts(dataTypes: string[] = [], privilegedAccess = false): boolean {
+    const blob = dataTypes.join(' ');
+    return (
+        privilegedAccess
+        || /cardholder|pci/i.test(blob)
+        || /\bphi\b|highly sensitive/i.test(blob)
+    );
+}
+
 export function missingCanonicalIntake(answers: IntakeAnswer[]) {
     return CANONICAL_IR_KEYS.filter((key) => {
         const aliases = {

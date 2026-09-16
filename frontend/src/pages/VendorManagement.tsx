@@ -184,7 +184,10 @@ export default function VendorManagement() {
         }
     };
 
-    const criticalVendors = statistics?.tierDistribution?.Critical || vendors.filter((v) => v.tier === 'Critical').length;
+    const criticalVendors = statistics?.summary?.criticalVendors
+        ?? statistics?.tierCounts?.CRITICAL
+        ?? statistics?.tierCounts?.Critical
+        ?? vendors.filter((v) => v.tier === 'Critical' || v.tier === 'CRITICAL').length;
     const overdueAssessments = vendors.filter((v) => v.assessmentStatus === 'Overdue').length;
     const highVendors = vendors.filter((v) => v.tier === 'Critical' || v.tier === 'High').length;
 

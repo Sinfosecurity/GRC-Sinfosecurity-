@@ -227,7 +227,7 @@ export default function ScoringMethodologyEditor({
                 Publishing stores an immutable version. Recorded scores keep the methodology they were calculated with.
             </Typography>
             <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 2 }}>
-                <StatusBadge kind="plain" tone="info" label={`Engine ${methodology?.engineVersion || 'supreme-risk-1.1.0'}`} />
+                <StatusBadge kind="plain" tone="info" label={`Engine ${methodology?.engineVersion || 'supreme-risk-1.2.0'}`} />
                 <StatusBadge kind="plain" tone="success" label={`Active ${methodology?.active?.version || '1.0.0'}`} />
                 {dirty ? <StatusBadge kind="plain" tone="high" label="Unpublished draft" /> : <StatusBadge kind="plain" label="Matches published version" />}
                 {vsDefault ? <StatusBadge kind="plain" label="Differs from Supreme default" /> : <StatusBadge kind="plain" label="Matches Supreme default" />}

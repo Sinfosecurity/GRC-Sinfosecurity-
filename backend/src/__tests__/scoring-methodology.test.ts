@@ -13,7 +13,7 @@ describe('organization scoring methodology', () => {
     it('keeps default weights producing the same residual as the certified formula', () => {
         const result = calculateVendorRisk(base);
         expect(result.inherentRisk).toBe(78);
-        expect(result.scoreVersion).toBe('supreme-risk-1.1.0');
+        expect(result.scoreVersion).toBe('supreme-risk-1.2.0');
     });
 
     it('applies a new methodology version without rewriting the prior result object', () => {

@@ -9,6 +9,7 @@ import vendorIssueService from '../services/vendorIssueService';
 import { listTemplates } from '../services/questionnaireService';
 import { evidenceLinkageService } from '../services/evidenceLinkageService';
 import { scoringMethodologyService } from '../services/scoringMethodologyService';
+import { RISK_SCORE_VERSION } from '../services/deterministicRiskEngine';
 import { reportGenerationService } from '../reports/reportGenerationService';
 import type { ReportFilters } from '../reports/portfolioData';
 import { prisma } from '../config/database';
@@ -355,7 +356,7 @@ router.get('/scoring-methodology', requirePermission(PERMISSIONS['risk.read']), 
             scoringMethodologyService.getActive(req.user!.organizationId),
             scoringMethodologyService.list(req.user!.organizationId),
         ]);
-        res.json({ success: true, data: { active, history, engineVersion: 'supreme-risk-1.1.0' } });
+        res.json({ success: true, data: { active, history, engineVersion: RISK_SCORE_VERSION } });
     } catch (error) {
         next(error);
     }
