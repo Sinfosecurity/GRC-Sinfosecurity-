@@ -22,19 +22,23 @@ export function ExecutiveMetric({
     hint,
     emphasis = false,
     onClick,
+    phase = 'ready',
 }: {
     label: string;
     value: string | number;
     hint?: string;
     emphasis?: boolean;
     onClick?: () => void;
+    phase?: 'loading' | 'error' | 'ready';
 }) {
+    const spoken = phase === 'loading' ? `${label}: checking` : phase === 'error' ? `${label}: unavailable` : `${label}: ${value}`;
     return (
         <Box
-            component={onClick ? 'button' : 'div'}
-            type={onClick ? 'button' : undefined}
-            aria-label={`${label}: ${value}`}
-            onClick={onClick}
+            component={onClick && phase === 'ready' ? 'button' : 'div'}
+            type={onClick && phase === 'ready' ? 'button' : undefined}
+            aria-label={spoken}
+            aria-busy={phase === 'loading' || undefined}
+            onClick={phase === 'ready' ? onClick : undefined}
             sx={{
                 textAlign: 'left',
                 py: 1.5,
@@ -44,13 +48,17 @@ export function ExecutiveMetric({
                 border: 0,
                 bgcolor: 'transparent',
                 color: color.ink,
-                cursor: onClick ? 'pointer' : 'default',
+                cursor: onClick && phase === 'ready' ? 'pointer' : 'default',
                 font: 'inherit',
             }}
         >
-            <Typography sx={{ fontFamily: type.display, fontSize: emphasis ? 36 : 26, lineHeight: 1, fontWeight: 500 }}>
-                {value}
-            </Typography>
+            {phase === 'loading' ? (
+                <Box aria-hidden sx={{ width: emphasis ? 72 : 48, height: emphasis ? 36 : 26, bgcolor: color.surfaceMuted, borderRadius: 0.5 }} />
+            ) : (
+                <Typography sx={{ fontFamily: type.display, fontSize: emphasis ? 36 : 26, lineHeight: 1, fontWeight: 500 }}>
+                    {phase === 'error' ? 'Unavailable' : value}
+                </Typography>
+            )}
             <Typography sx={{ mt: 0.75, fontSize: 14, fontWeight: emphasis ? 700 : 600 }}>{label}</Typography>
             {hint && <Typography variant="body2" sx={{ mt: 0.25 }}>{hint}</Typography>}
         </Box>
@@ -63,15 +71,20 @@ export function AttentionHero({
     body,
     actionLabel,
     onAction,
+    phase = 'ready',
 }: {
     count: number;
     title: string;
     body: string;
     actionLabel: string;
     onAction: () => void;
+    phase?: 'loading' | 'error' | 'ready';
 }) {
     return (
         <Box
+            role={phase === 'loading' ? 'status' : undefined}
+            aria-busy={phase === 'loading' || undefined}
+            aria-live={phase === 'loading' ? 'polite' : undefined}
             sx={{
                 display: 'grid',
                 gridTemplateColumns: { xs: '1fr', md: '1fr auto' },
@@ -84,12 +97,21 @@ export function AttentionHero({
         >
             <Box>
                 <Typography sx={{ fontSize: 13, color: color.inkMuted, fontWeight: 650, mb: 0.5 }}>
-                    {count} need your attention
+                    {phase === 'loading' ? 'Checking what needs your attention…' : phase === 'error' ? 'Attention could not be loaded' : `${count} need your attention`}
                 </Typography>
-                <Typography variant="h3">{title}</Typography>
-                <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 560 }}>{body}</Typography>
+                {phase === 'loading' ? (
+                    <>
+                        <Box aria-hidden sx={{ width: { xs: '80%', md: 360 }, height: 28, bgcolor: color.surfaceMuted, borderRadius: 0.5, mb: 1 }} />
+                        <Box aria-hidden sx={{ width: { xs: '60%', md: 240 }, height: 16, bgcolor: color.surfaceMuted, borderRadius: 0.5 }} />
+                    </>
+                ) : (
+                    <>
+                        <Typography variant="h3">{phase === 'error' ? 'The attention queue is unavailable' : title}</Typography>
+                        <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 560 }}>{body}</Typography>
+                    </>
+                )}
             </Box>
-            <Button variant="contained" onClick={onAction}>{actionLabel}</Button>
+            {phase === 'ready' && <Button variant="contained" onClick={onAction}>{actionLabel}</Button>}
         </Box>
     );
 }

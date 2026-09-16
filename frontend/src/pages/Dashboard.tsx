@@ -8,6 +8,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { humanizeLabel } from '../utils/humanizeLabel';
 import { intelligenceAPI, tprmAPI, vendorAPI } from '../services/api';
 
+type LoadPhase = 'loading' | 'ready' | 'error';
+
 type AttentionItem = {
     id: string;
     severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
@@ -41,8 +43,12 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const home = homeForRole(user?.role);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [attentionPhase, setAttentionPhase] = useState<LoadPhase>('loading');
+    const [statsPhase, setStatsPhase] = useState<LoadPhase>('loading');
+    const [workPhase, setWorkPhase] = useState<LoadPhase>('loading');
+    const [intelligencePhase, setIntelligencePhase] = useState<LoadPhase>('loading');
+    const [attentionError, setAttentionError] = useState<string | null>(null);
+    const [statsError, setStatsError] = useState<string | null>(null);
     const [items, setItems] = useState<AttentionItem[]>([]);
     const [stats, setStats] = useState<{
         totalVendors?: number;
@@ -52,48 +58,65 @@ export default function Dashboard() {
         criticalVendors?: number;
         tierCounts?: { CRITICAL?: number; HIGH?: number; MEDIUM?: number; LOW?: number };
     } | null>(null);
-    const [work, setWork] = useState({ dueAssessments: 0, overdueFindings: 0, pendingDecisions: 0 });
+    const [work, setWork] = useState<{ dueAssessments: number; overdueFindings: number; pendingDecisions: number } | null>(null);
     const [intelligence, setIntelligence] = useState<Array<{ publicId: string; title: string; whyItMatters: string; href: string }>>([]);
 
     useEffect(() => {
         let cancelled = false;
-        (async () => {
-            try {
-                const [attention, statistics, teaser] = await Promise.allSettled([
-                    tprmAPI.attention(),
-                    vendorAPI.getStatistics(),
-                    intelligenceAPI.teaser(),
-                ]);
+        setAttentionPhase('loading');
+        setStatsPhase('loading');
+        setWorkPhase('loading');
+        setIntelligencePhase('loading');
+        setAttentionError(null);
+        setStatsError(null);
+        setItems([]);
+        setStats(null);
+        setWork(null);
+        setIntelligence([]);
+        const attention = tprmAPI.attention()
+            .then((response) => {
                 if (cancelled) return;
-                if (attention.status === 'fulfilled') {
-                    const payload = attention.value.data.data || {};
-                    setItems(payload.items || []);
-                    if (payload.work) {
-                        setWork({
-                            dueAssessments: payload.work.dueAssessments || 0,
-                            overdueFindings: payload.work.overdueFindings || 0,
-                            pendingDecisions: payload.work.pendingDecisions || 0,
-                        });
-                    }
-                } else {
-                    setError(attention.reason?.message || 'Unable to load work that needs attention.');
-                }
-                if (statistics.status === 'fulfilled') {
-                    const body = statistics.value.data;
-                    setStats({
-                        ...(body.summary || body),
-                        tierCounts: body.tierCounts || body.summary?.tierCounts,
-                    });
-                }
-                if (teaser.status === 'fulfilled') {
-                    setIntelligence(teaser.value.data.data?.items || []);
-                }
-            } catch (err: any) {
-                if (!cancelled) setError(err.message || 'Unable to load the overview.');
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        })();
+                const payload = response.data.data || {};
+                setItems(payload.items || []);
+                setWork({
+                    dueAssessments: Number(payload.work?.dueAssessments || 0),
+                    overdueFindings: Number(payload.work?.overdueFindings || 0),
+                    pendingDecisions: Number(payload.work?.pendingDecisions || 0),
+                });
+                setAttentionPhase('ready');
+                setWorkPhase('ready');
+            })
+            .catch((err: any) => {
+                if (cancelled) return;
+                setAttentionError(err?.message || 'Unable to load work that needs attention.');
+                setAttentionPhase('error');
+                setWorkPhase('error');
+            });
+        const statistics = vendorAPI.getStatistics()
+            .then((response) => {
+                if (cancelled) return;
+                const body = response.data;
+                setStats({
+                    ...(body.summary || body),
+                    tierCounts: body.tierCounts || body.summary?.tierCounts,
+                });
+                setStatsPhase('ready');
+            })
+            .catch((err: any) => {
+                if (cancelled) return;
+                setStatsError(err?.message || 'Portfolio statistics are unavailable.');
+                setStatsPhase('error');
+            });
+        const teaser = intelligenceAPI.teaser()
+            .then((response) => {
+                if (cancelled) return;
+                setIntelligence(response.data.data?.items || []);
+                setIntelligencePhase('ready');
+            })
+            .catch(() => {
+                if (!cancelled) setIntelligencePhase('error');
+            });
+        void Promise.allSettled([attention, statistics, teaser]);
         return () => { cancelled = true; };
     }, [user?.role]);
 
@@ -103,35 +126,41 @@ export default function Dashboard() {
         title: item.title.replace(/_/g, ' '),
     })), [items]);
     const first = queue[0];
-    const firstRun = !loading && stats?.totalVendors === 0 && queue.length === 0;
+    const firstRun = attentionPhase === 'ready' && statsPhase === 'ready' && stats?.totalVendors === 0 && queue.length === 0;
 
     return (
         <PageShell>
             <PageHeader title={greeting(user?.firstName)} description={home.job} />
-            {error && <Typography sx={{ color: color.danger, mb: 2 }}>{error}</Typography>}
+            {attentionError && <Typography role="alert" sx={{ color: color.danger, mb: 2 }}>{attentionError}</Typography>}
             <AttentionHero
+                phase={attentionPhase === 'loading' ? 'loading' : attentionPhase === 'error' ? 'error' : 'ready'}
                 count={queue.length}
                 title={first ? first.title : firstRun ? 'Start with one third party' : 'Nothing needs your attention'}
-                body={first ? first.detail : home.job}
+                body={attentionPhase === 'error' ? 'Supreme could not retrieve the attention queue. This is not an all-clear.' : first ? first.detail : home.job}
                 actionLabel={first ? first.action : home.cta}
                 onAction={() => navigate(first?.href || home.href)}
             />
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 1fr' }, gap: 0, mb: 3, borderBottom: `1px solid ${color.line}` }}>
                 <ExecutiveMetric
                     emphasis
+                    phase={statsPhase}
                     label="Critical vendors"
-                    value={stats?.criticalVendors ?? '—'}
+                    value={statsPhase === 'ready' ? stats?.criticalVendors ?? 0 : '—'}
                     hint="Authoritative tier, not a control-gap label"
                     onClick={() => navigate('/vendor-management')}
                 />
-                <ExecutiveMetric label="Decisions waiting" value={work.pendingDecisions} onClick={() => navigate('/decision-briefs')} />
-                <ExecutiveMetric label="Overdue findings" value={work.overdueFindings} onClick={() => navigate('/findings')} />
-                <ExecutiveMetric label="Assessments due" value={work.dueAssessments} onClick={() => navigate('/assessments')} />
+                <ExecutiveMetric phase={workPhase} label="Decisions waiting" value={work?.pendingDecisions ?? '—'} onClick={() => navigate('/decision-briefs')} />
+                <ExecutiveMetric phase={workPhase} label="Overdue findings" value={work?.overdueFindings ?? '—'} onClick={() => navigate('/findings')} />
+                <ExecutiveMetric phase={workPhase} label="Assessments due" value={work?.dueAssessments ?? '—'} onClick={() => navigate('/assessments')} />
             </Box>
             <SectionHeader title="Priority actions" body="What happened, why it matters, and the next human action." />
-            {loading ? (
-                <Typography>Loading live work…</Typography>
-            ) : (
+            {attentionPhase === 'loading' && (
+                <Typography role="status" aria-live="polite">Checking recorded work…</Typography>
+            )}
+            {attentionPhase === 'error' && (
+                <Typography>The attention queue is unavailable. This is not an all-clear.</Typography>
+            )}
+            {attentionPhase === 'ready' && (
                 <ActionQueue
                     items={queue}
                     emptyTitle="The recorded work is current"
@@ -142,20 +171,30 @@ export default function Dashboard() {
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} sx={{ mt: 4 }}>
                 <Box sx={{ flex: 1 }}>
                     <Typography variant="h5">Portfolio</Typography>
-                    <Typography sx={{ color: color.inkMuted, mt: 0.5, mb: 2 }}>
-                        {stats?.totalVendors ?? '—'} third parties · {stats?.highRiskVendors ?? '—'} high residual · {stats?.overdueReviews ?? '—'} overdue reviews
-                    </Typography>
-                    <RiskDistribution
-                        counts={{
-                            critical: stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors,
-                            high: stats?.tierCounts?.HIGH,
-                            medium: stats?.tierCounts?.MEDIUM,
-                            low: stats?.tierCounts?.LOW,
-                        }}
-                    />
+                    {statsPhase === 'loading' && (
+                        <Typography role="status" aria-live="polite" sx={{ color: color.inkMuted, mt: 0.5, mb: 2 }}>Checking the recorded portfolio…</Typography>
+                    )}
+                    {statsPhase === 'error' && (
+                        <Typography sx={{ color: color.ink, mt: 0.5, mb: 2 }}>{statsError || 'Portfolio statistics are unavailable.'}</Typography>
+                    )}
+                    {statsPhase === 'ready' && (
+                        <>
+                            <Typography sx={{ color: color.inkMuted, mt: 0.5, mb: 2 }}>
+                                {stats?.totalVendors ?? 0} third parties · {stats?.highRiskVendors ?? 0} high residual · {stats?.overdueReviews ?? 0} overdue reviews
+                            </Typography>
+                            <RiskDistribution
+                                counts={{
+                                    critical: stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors,
+                                    high: stats?.tierCounts?.HIGH,
+                                    medium: stats?.tierCounts?.MEDIUM,
+                                    low: stats?.tierCounts?.LOW,
+                                }}
+                            />
+                        </>
+                    )}
                     <Button sx={{ mt: 1.5 }} onClick={() => navigate('/vendor-management')}>Open register</Button>
                 </Box>
-                {intelligence.length > 0 && (
+                {intelligencePhase === 'ready' && intelligence.length > 0 && (
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="h5">What changed</Typography>
                         {intelligence.slice(0, 3).map((row) => (
