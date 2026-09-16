@@ -14,13 +14,13 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "docs" / "private-beta" / "hosted-ux-qa" / "supreme-experience-2"
+OUT = ROOT / "docs" / "private-beta" / "hosted-ux-qa" / os.environ.get("E2E_EVIDENCE", "supreme-experience-2-visual")
 AXE_PATH = ROOT / "scripts" / "axe.min.js"
 BASE = os.environ.get("E2E_BASE", "https://supreme-risk-staging.onrender.com")
 API = os.environ.get("E2E_API", "https://supreme-risk-staging-api.onrender.com")
 EMAIL = os.environ.get("E2E_EMAIL", "report-proof-20260913@staging.supremerisk.test")
 PASSWORD = os.environ.get("E2E_PASSWORD", "ReportProof1x")
-REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "a11405ff624571336dcc4cbd8690be48149c0a2f")
+REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "6c0795cebcf83c0dd5e187cdd619e6daaaba4c7b")
 WIDTHS = (375, 768, 1024, 1440, 1920)
 RESULTS: dict = {
     "checks": [],

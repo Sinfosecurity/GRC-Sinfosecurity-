@@ -4,7 +4,8 @@ Engineering record for #12-V. Product Leadership decides #12 PASS. This file doe
 
 **Item:** #12-V Supreme Third Party — Seamless Experience & Visual Transformation  
 **Starting SHA:** `11b37f52006092bee3e15b8bb1608650cdb0151c`  
-**Implementation SHA:** `a11405ff624571336dcc4cbd8690be48149c0a2f`  
+**Implementation SHA:** `6c0795cebcf83c0dd5e187cdd619e6daaaba4c7b`  
+**Prior structure SHA:** `a11405ff624571336dcc4cbd8690be48149c0a2f`  
 **Branch:** `supreme-risk-transformation`  
 **Migration:** NONE  
 **Duplicate TPRM model:** NO
@@ -94,6 +95,21 @@ Counts include required confirmations. They do not include typing every IR answe
 | Submit → exception review | Find Review among 11 tabs, scan the full list (2 screens, all items first) | Decisions opens on exception counts; Review N items is the next action (1 screen) |
 | Exceptions → decision ready | Findings, Contract, and Approval as separate tabs (3 screens) | Findings stay available; contract and decision brief share Decisions (1–2 screens) |
 | Decision → monitor | Activate, then find Active tab (2 screens) | Activate; Overview already shows monitoring posture (1 screen) |
+
+## Visual refinement after first hosted pass
+
+The first #12-V pass changed structure. This follow-up removed competing navy slabs, oversized page titles, and unbounded attention lists.
+
+- Page titles use `h2` sizing.
+- Home greeting, priority queue (first six), and portfolio sit on cream with separators instead of stacked MetricCards.
+- Vendor hero is a compact metadata header.
+- Lifecycle uses an underline current step.
+- Completed intake collapses behind Review intake answers.
+- Exception lists show eight rows unless the analyst asks for all.
+- Send appears only in Vendor Review or later, as Review and send.
+- Home leftover count sits outside the list so axe `list` stays valid.
+
+Prior screenshots in `supreme-experience-2/` were not overwritten. Visual follow-up shots are in `supreme-experience-2-visual/`.
 
 ## Remaining limitations
 
