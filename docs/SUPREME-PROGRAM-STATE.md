@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-15
+**LAST UPDATED:** 2026-09-16
 
 **CURRENT ITEM:** Independent Review Remediation Sprint 2 — Authoritative Risk Scoring & Tier Integrity (C-1 / H-3). #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** ENGINEERING IN PROGRESS. Starting SHA `a158c5afe7b2e3866388a49847beb3b881c0de85`. Sprint 1 C-2/H-1 remains Product Leadership accepted. C-1 and H-3 are current. H-2 and H-4–H-7 remain out of scope. Cursor reports FIX IMPLEMENTED only after CI + hosted scoring proof. Next remediation sprint is not authorized. #21 remains PAUSED. #22 is not authorized.
+**CURRENT ITEM STATUS:** ENGINEERING REMEDIATION IMPLEMENTED — PRODUCT LEADERSHIP REVIEW REQUIRED. Starting SHA `a158c5afe7b2e3866388a49847beb3b881c0de85`. Implementation `94ed9821c82df65788546210e7076a4943c1e830`. CI `35042991803` PASS. Hosted API /health and frontend `version.json` `94ed982`. C-1 and H-3 are not closed by Cursor. H-2 and H-4–H-7 remain out of scope. Next remediation sprint is not authorized. #21 remains PAUSED. #22 is not authorized.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 
