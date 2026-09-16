@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-16
 
-**CURRENT ITEM:** #12-V Supreme Third Party — Final Experience Closure. #21 remains PAUSED.
+**CURRENT ITEM:** Independent Review Remediation Sprint 2 — H-2 + H-7 authorization and separation of duties. #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** #12-V FINAL EXPERIENCE CLOSURE ENGINEERING IMPLEMENTED — HOSTED CERTIFICATION COMPLETE — PRODUCT LEADERSHIP FINAL ACCEPTANCE REQUIRED. Starting structure SHA `a11405ff624571336dcc4cbd8690be48149c0a2f`. Home data-state and Review recert implementation `7dac1ba30f3cddfa51ab7080cda03a94b10b62af`. CI `35055313722` PASS (90/447 backend, 59/187 frontend). Hosted API `/health` and frontend `version.json` `7dac1ba`. Fresh vendor `VND-2026-0023`. Home no longer renders all-clear zeros while attention is pending. Review counts 36 / 13 / 18 / 19 / 8 material units / 3 evidence groups. Hosted axe 0 serious / 0 critical. Evidence `docs/private-beta/hosted-ux-qa/supreme-experience-2-final-closure/`. Prior folders were not overwritten. #12 remains PARTIAL. Cursor does not declare #12-V PASS or #12 PASS. H-2 and H-4–H-7 remain out of scope. #21 remains PAUSED. #22 is not authorized.
+**CURRENT ITEM STATUS:** SPRINT 2 ENGINEERING IMPLEMENTED — HOSTED TWO-USER PROOF NOT YET COMPLETE. Starting SHA `7dac1ba30f3cddfa51ab7080cda03a94b10b62af`. Implementation `fdd0b9d713cc9bc155bb56f799e8bb8aeada7232`. H-2 and H-7 remain OPEN until CI and hosted two-user proof pass. #12-F and #12-V were accepted by Product Leadership. #12 remains PARTIAL for security remediation. H-4, H-5, and H-6 remain OPEN and out of scope. Cursor does not declare H-2 CLOSED, H-7 CLOSED, or #12 PASS. #21 remains PAUSED. Commercial production remains NO-GO.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 
