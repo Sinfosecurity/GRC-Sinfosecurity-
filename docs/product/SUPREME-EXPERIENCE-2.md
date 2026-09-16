@@ -4,8 +4,9 @@ Engineering record for #12-V. Product Leadership decides #12 PASS. This file doe
 
 **Item:** #12-V Supreme Third Party — Seamless Experience & Visual Transformation  
 **Starting SHA:** `11b37f52006092bee3e15b8bb1608650cdb0151c`  
-**Implementation SHA:** `6cb25e8e4e61db7dc9674df6d5757b9e483badc0`  
+**Implementation SHA:** `7dac1ba30f3cddfa51ab7080cda03a94b10b62af`  
 **Review-closure SHA:** `6cb25e8e4e61db7dc9674df6d5757b9e483badc0`  
+**Final-closure SHA:** `7dac1ba30f3cddfa51ab7080cda03a94b10b62af`  
 **Prior visual SHA:** `6c0795cebcf83c0dd5e187cdd619e6daaaba4c7b`  
 **Prior structure SHA:** `a11405ff624571336dcc4cbd8690be48149c0a2f`  
 **Branch:** `supreme-risk-transformation`  
@@ -40,6 +41,8 @@ Primary **Work** group stays open: Home, Third Parties, Onboard, Assessments, Fi
 Programs, Intelligence, Automation, Governance, Reports, and Administration collapse unless the current route is inside them. Authorization still uses `canSeeNav`. Nothing authorized was removed.
 
 ## Home
+
+Home distinguishes loading, successful data, successful zero, and error. Attention, work counts, statistics, and intelligence no longer initialize as authoritative zeros. "Nothing needs your attention" appears only after a successful empty attention response.
 
 The equal MetricCard strip is gone.
 
