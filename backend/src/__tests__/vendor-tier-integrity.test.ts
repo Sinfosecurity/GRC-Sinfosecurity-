@@ -1,5 +1,5 @@
 import { VendorTier } from '@prisma/client';
-import { applyHardFloorToTier, resolveMinimumTier } from '../services/vendorTierIntegrity';
+import { applyHardFloorToTier, assertLegacyUpdateMaySetTier, resolveMinimumTier } from '../services/vendorTierIntegrity';
 
 describe('vendor tier hard floors', () => {
     it('does not persist MEDIUM when a critical floor applies', () => {
@@ -18,5 +18,10 @@ describe('vendor tier hard floors', () => {
 
     it('does not invent a floor when exposure facts are absent', () => {
         expect(applyHardFloorToTier(VendorTier.LOW, resolveMinimumTier({ dataTypesAccessed: ['Public'] }))).toBe(VendorTier.LOW);
+    });
+
+    it('rejects ordinary updates once canonical onboarding owns the tier', () => {
+        expect(() => assertLegacyUpdateMaySetTier(true)).toThrow(/onboarding review/);
+        expect(() => assertLegacyUpdateMaySetTier(false)).not.toThrow();
     });
 });

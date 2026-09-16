@@ -14,7 +14,7 @@ import { assertVendorTransition } from './vendorLifecycle';
 import { recordAudit } from './auditEventService';
 import { allocateVendorPublicId } from './vendorOnboardingService';
 import { extractVendorDomain } from './vendorOnboardingScoring';
-import { applyHardFloorToTier, resolveMinimumTier } from './vendorTierIntegrity';
+import { applyHardFloorToTier, assertLegacyUpdateMaySetTier, resolveMinimumTier } from './vendorTierIntegrity';
 
 export interface CreateVendorInput {
     name: string;
@@ -75,6 +75,11 @@ export interface VendorFilters {
     hasOverdueReview?: boolean;
     minRiskScore?: number;
     maxRiskScore?: number;
+}
+
+function groupCount(value: number | { _all?: number } | undefined): number {
+    if (typeof value === 'number') return value;
+    return value?._all || 0;
 }
 
 class VendorManagementService {
@@ -293,31 +298,45 @@ class VendorManagementService {
             assertVendorTransition(existing.status, data.status);
         }
 
-        let additionalData: any = {};
-        if (data.tier) {
+        const {
+            inherentRiskScore: _clientInherent,
+            residualRiskScore: _clientResidual,
+            tier: requestedTier,
+            ...safeData
+        } = data;
+        void _clientInherent;
+        void _clientResidual;
+
+        let additionalData: Prisma.VendorUncheckedUpdateManyInput = {};
+        if (requestedTier) {
             const onboarding = await prisma.vendorOnboarding.findUnique({
                 where: { vendorId },
                 select: { hardFloors: true },
             });
+            assertLegacyUpdateMaySetTier(Boolean(onboarding));
             const floors = Array.isArray(onboarding?.hardFloors) ? onboarding.hardFloors as Array<{ applies?: boolean }> : [];
-            data.tier = applyHardFloorToTier(
-                data.tier,
+            const tier = applyHardFloorToTier(
+                requestedTier,
                 resolveMinimumTier({
                     hardFloors: floors,
                     dataTypesAccessed: data.dataTypesAccessed || existing.dataTypesAccessed,
                 })
             );
-            additionalData.nextReviewDate = this.calculateNextReviewDate(data.tier);
-            additionalData.criticalityLevel = this.mapTierToCriticality(data.tier);
+            additionalData.tier = tier;
+            additionalData.nextReviewDate = this.calculateNextReviewDate(tier);
+            additionalData.criticalityLevel = this.mapTierToCriticality(tier);
+            data.tier = tier;
         }
 
+        const { category, ...safeWithoutCategory } = safeData;
         await prisma.vendor.updateMany({
             where: {
                 id: vendorId,
                 organizationId,
             },
             data: {
-                ...data,
+                ...safeWithoutCategory,
+                ...(category ? { category: this.toVendorCategory(category) } : {}),
                 ...additionalData,
                 updatedAt: new Date(),
             },
@@ -382,10 +401,10 @@ class VendorManagementService {
                 where: { organizationId, status: VendorStatus.ACTIVE },
             }),
             prisma.vendor.count({
-                where: { organizationId, tier: VendorTier.CRITICAL },
+                where: { organizationId, tier: VendorTier.CRITICAL, status: { not: VendorStatus.TERMINATED } },
             }),
             prisma.vendor.count({
-                where: { organizationId, residualRiskScore: { gte: 70 } },
+                where: { organizationId, residualRiskScore: { gte: 70 }, status: { not: VendorStatus.TERMINATED } },
             }),
             prisma.vendor.count({
                 where: {
@@ -411,23 +430,25 @@ class VendorManagementService {
             }),
         ]);
 
-        // Tier distribution
+        const inRegister = { organizationId, status: { not: VendorStatus.TERMINATED } };
+
+        // Tier distribution — same population as Critical KPI / register (not ACTIVE-only)
         const tierDistribution = await prisma.vendor.groupBy({
             by: ['tier'],
-            where: { organizationId, status: VendorStatus.ACTIVE },
+            where: inRegister,
             _count: true,
         });
 
         // Category distribution
         const categoryDistribution = await prisma.vendor.groupBy({
             by: ['category'],
-            where: { organizationId, status: VendorStatus.ACTIVE },
+            where: inRegister,
             _count: true,
         });
 
         // Average risk scores
         const riskScores = await prisma.vendor.aggregate({
-            where: { organizationId, status: VendorStatus.ACTIVE },
+            where: inRegister,
             _avg: {
                 inherentRiskScore: true,
                 residualRiskScore: true,
@@ -448,17 +469,17 @@ class VendorManagementService {
             averageInherentRisk: riskScores._avg.inherentRiskScore || 0,
             tierDistribution: tierDistribution.map(t => ({
                 tier: t.tier,
-                count: t._count,
+                count: groupCount(t._count),
             })),
             tierCounts: {
-                CRITICAL: tierDistribution.find((t) => t.tier === VendorTier.CRITICAL)?._count || 0,
-                HIGH: tierDistribution.find((t) => t.tier === VendorTier.HIGH)?._count || 0,
-                MEDIUM: tierDistribution.find((t) => t.tier === VendorTier.MEDIUM)?._count || 0,
-                LOW: tierDistribution.find((t) => t.tier === VendorTier.LOW)?._count || 0,
-                Critical: tierDistribution.find((t) => t.tier === VendorTier.CRITICAL)?._count || 0,
-                High: tierDistribution.find((t) => t.tier === VendorTier.HIGH)?._count || 0,
-                Medium: tierDistribution.find((t) => t.tier === VendorTier.MEDIUM)?._count || 0,
-                Low: tierDistribution.find((t) => t.tier === VendorTier.LOW)?._count || 0,
+                CRITICAL: groupCount(tierDistribution.find((t) => t.tier === VendorTier.CRITICAL)?._count),
+                HIGH: groupCount(tierDistribution.find((t) => t.tier === VendorTier.HIGH)?._count),
+                MEDIUM: groupCount(tierDistribution.find((t) => t.tier === VendorTier.MEDIUM)?._count),
+                LOW: groupCount(tierDistribution.find((t) => t.tier === VendorTier.LOW)?._count),
+                Critical: groupCount(tierDistribution.find((t) => t.tier === VendorTier.CRITICAL)?._count),
+                High: groupCount(tierDistribution.find((t) => t.tier === VendorTier.HIGH)?._count),
+                Medium: groupCount(tierDistribution.find((t) => t.tier === VendorTier.MEDIUM)?._count),
+                Low: groupCount(tierDistribution.find((t) => t.tier === VendorTier.LOW)?._count),
             },
             categoryDistribution: categoryDistribution.map(c => ({
                 category: c.category,

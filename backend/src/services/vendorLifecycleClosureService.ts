@@ -116,9 +116,10 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
     const checklist = Array.isArray(onboarding.contractChecklist)
         ? onboarding.contractChecklist
         : contractRequirements(vendor.tier, onboarding.plan);
+    const residualRisk = vendor.residualRiskScore ?? latestScore?.residualRisk ?? null;
     const monitoring = {
         vendorStatus: vendor.status,
-        residualRisk: latestScore?.residualRisk ?? null,
+        residualRisk,
         openFindings: findings.filter((row) => ['OPEN', 'IN_PROGRESS', 'PENDING_VALIDATION'].includes(row.status)).length,
         acceptedRisks: findings.filter((row) => row.status === VendorIssueStatus.RISK_ACCEPTED).length,
         overdueRemediation: findings.filter((row) => row.targetRemediationDate && row.targetRemediationDate < new Date() && ['OPEN', 'IN_PROGRESS'].includes(row.status)).length,
@@ -129,10 +130,12 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
     };
     return {
         ...base,
+        inherentRiskScore: vendor.inherentRiskScore,
+        residualRiskScore: residualRisk,
         lifecycle: {
             stage: onboarding.stage,
             vendorStatus: vendor.status,
-            residualRisk: latestScore?.residualRisk ?? null,
+            residualRisk,
             residualAtApproval: onboarding.residualAtApproval,
             contractRenewalDate: contract?.renewalDate || contract?.expirationDate || null,
             contractExpirationDate: contract?.expirationDate || null,

@@ -147,6 +147,11 @@ export default function VendorOnboardingWorkspace() {
                         activeStep={stepperIndex(data.stage)}
                     />
                     {error && <Alert severity="error">{error}</Alert>}
+                    <Surface>
+                        <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
+                        <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : 'Not scored'} />
+                        <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                    </Surface>
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
                         <Tab label="Request" />
                         <Tab label="Intake" />
@@ -477,8 +482,11 @@ export default function VendorOnboardingWorkspace() {
                                 <Typography variant="body2" sx={{ mb: 1.5 }}>Supreme prepared this record. Approve, approve with conditions, or reject. Residual risk does not change because a person accepts it.</Typography>
                                 <Fact label="Vendor / service" value={`${data.publicId || ''} ${data.name}${data.request?.servicesProvided ? ` · ${data.request.servicesProvided}` : ''}`.trim()} />
                                 <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
-                                <Fact label="Inherent risk" value={data.tierReview?.score != null ? `${data.tierReview.score} of ${data.tierReview.maxScore || 30}` : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
-                                <Fact label="Residual risk" value={data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                                <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
+                                <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                                {data.tierReview?.score != null && (
+                                    <Fact label="Intake score" value={`${data.tierReview.score} of ${data.tierReview.maxScore || 60}`} />
+                                )}
                                 <Fact label="Business owner" value={data.owner} />
                                 <Fact label="Contract posture" value={data.lifecycle?.contractAttestedAt ? 'Required controls attested' : 'Not attested'} />
                                 <Fact label="Privacy / AI context" value={privacyAiScope(data)} />
@@ -527,7 +535,7 @@ export default function VendorOnboardingWorkspace() {
                             <Surface>
                                 <Typography variant="h6">Active relationship</Typography>
                                 <Fact label="Vendor status" value={humanizeLabel(data.lifecycle?.vendorStatus || data.lifecycle?.monitoring?.vendorStatus)} />
-                                <Fact label="Residual risk" value={data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                                <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
                                 <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
                                 <Fact label="Overdue remediation" value={String(data.lifecycle?.monitoring?.overdueRemediation ?? 0)} />
                                 <Fact label="Accepted risks" value={String(data.lifecycle?.monitoring?.acceptedRisks ?? 0)} />

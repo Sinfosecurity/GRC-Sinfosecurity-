@@ -177,6 +177,32 @@ describe('independent review C-1 / H-3 scoring and tier integrity', () => {
         expect(legacy.status).toBe(409);
         const still = await prisma.vendor.findUnique({ where: { id: floorVendorId } });
         expect(still?.tier).toBe(VendorTier.CRITICAL);
+
+        const forged = await request(app)
+            .put(`${API}/vendors/${highVendorId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ inherentRiskScore: 1, residualRiskScore: 1, tier: 'LOW' });
+        expect(forged.status).toBe(409);
+        const high = await prisma.vendor.findUnique({ where: { id: highVendorId } });
+        expect(high?.tier).not.toBe(VendorTier.LOW);
+        expect(high?.inherentRiskScore).not.toBe(1);
+        expect(high?.residualRiskScore).not.toBe(1);
+
+        const workspace = await request(app)
+            .get(`${API}/vendors/onboarding/${floorPublicId}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(workspace.status).toBe(200);
+        expect(workspace.body.data.tierKey || workspace.body.data.tier).toBeTruthy();
+        expect(workspace.body.data.inherentRiskScore).toBe(still?.inherentRiskScore);
+        expect(workspace.body.data.residualRiskScore).toBe(still?.residualRiskScore);
+        expect(workspace.body.data.lifecycle.residualRisk).toBe(still?.residualRiskScore);
+
+        const stats = await request(app)
+            .get(`${API}/vendors/statistics`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(stats.status).toBe(200);
+        expect(stats.body.summary.criticalVendors).toBeGreaterThanOrEqual(1);
+        expect(stats.body.tierCounts.CRITICAL).toBe(stats.body.summary.criticalVendors);
     });
 
     it('uses reviewed due-diligence answers, not intake, for residual and preserves history', async () => {

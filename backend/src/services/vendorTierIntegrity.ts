@@ -39,3 +39,9 @@ export function applyHardFloorToTier(requested: VendorTier | undefined, minimum:
     const tier = requested || VendorTier.MEDIUM;
     return assertTierMeetsFloor(tier, minimum);
 }
+
+export function assertLegacyUpdateMaySetTier(hasCanonicalOnboarding: boolean): void {
+    if (hasCanonicalOnboarding) {
+        throw new ApiError(409, 'Confirm or override the vendor tier through onboarding review. Ordinary vendor updates cannot change the authoritative tier.');
+    }
+}
