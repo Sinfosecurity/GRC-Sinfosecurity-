@@ -10,7 +10,7 @@ const CUSTOMER_LABELS: Record<string, string> = {
     IN_REVIEW: 'In Review',
     NOT_STARTED: 'Not Started',
     PARTIALLY_EFFECTIVE: 'Partially Effective',
-    PENDING_REVIEW: 'Under Review',
+    PENDING_REVIEW: 'Pending review',
     SATISFIED_BY: 'Mapped to Control',
     SUPPORTED_BY: 'Supported by Evidence',
     INITIAL_DUE_DILIGENCE: 'Initial Due Diligence',

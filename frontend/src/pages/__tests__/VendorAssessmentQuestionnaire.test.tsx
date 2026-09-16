@@ -53,5 +53,7 @@ describe('Vendor questionnaire evidence status', () => {
         expect(await screen.findByText(/Security status unavailable/)).toBeInTheDocument();
         expect(screen.queryByText(/File status: Ready/)).not.toBeInTheDocument();
         expect(screen.queryByText(/CLEAN/)).not.toBeInTheDocument();
+        expect(screen.getByRole('progressbar', { name: /1 of 1 answered/i })).toBeInTheDocument();
+        expect(screen.getByText(/Review before you submit/)).toBeInTheDocument();
     });
 });

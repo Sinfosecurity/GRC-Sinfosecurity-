@@ -92,27 +92,39 @@ export default function VendorOnboarding() {
                 {error && <Alert severity="error">{error}</Alert>}
                 <Surface>
                     <Typography variant="h6">New request</Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>Name a real business owner. Supreme then opens Complete Vendor Intake for that person.</Typography>
-                    <Stack component="form" onSubmit={(event) => submit(event)} spacing={1.5}>
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField required fullWidth label="Vendor name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
-                            <TextField fullWidth label="Legal name" value={form.legalName} onChange={(event) => setForm({ ...form, legalName: event.target.value })} />
+                    <Typography variant="body2" sx={{ mb: 2 }}>Name the vendor, the service, and the internal owner. After you submit, Supreme opens intake for that owner. No questionnaire is sent to the vendor yet.</Typography>
+                    <Stack component="form" onSubmit={(event) => submit(event)} spacing={2}>
+                        <Stack spacing={1.25}>
+                            <Typography variant="subtitle2">Who is this vendor?</Typography>
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
+                                <TextField required fullWidth label="Vendor name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} helperText={!form.name ? 'Required to open a request.' : undefined} />
+                                <TextField fullWidth label="Legal name" value={form.legalName} onChange={(event) => setForm({ ...form, legalName: event.target.value })} />
+                            </Stack>
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
+                                <TextField fullWidth label="Website or domain" value={form.website} onChange={(event) => setForm({ ...form, website: event.target.value })} />
+                                <TextField fullWidth label="Country" value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value })} />
+                            </Stack>
                         </Stack>
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField fullWidth label="Website or domain" value={form.website} onChange={(event) => setForm({ ...form, website: event.target.value })} />
-                            <TextField fullWidth label="Country" value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value })} />
+                        <Stack spacing={1.25}>
+                            <Typography variant="subtitle2">What service will they provide?</Typography>
+                            <TextField required fullWidth multiline minRows={2} label="Service or product" value={form.servicesProvided} onChange={(event) => setForm({ ...form, servicesProvided: event.target.value })} helperText={!form.servicesProvided ? 'Required. Describe the work this third party will do.' : undefined} />
                         </Stack>
-                        <TextField required fullWidth multiline minRows={2} label="Service or product" value={form.servicesProvided} onChange={(event) => setForm({ ...form, servicesProvided: event.target.value })} />
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField select fullWidth label="Business owner" value={form.businessOwnerUserId} onChange={(event) => setForm({ ...form, businessOwnerUserId: event.target.value })}>
-                                <MenuItem value="">Assign after create</MenuItem>
-                                {owners.map((owner) => <MenuItem key={owner.id} value={owner.id}>{owner.name}</MenuItem>)}
-                            </TextField>
-                            <TextField fullWidth label="Business unit" value={form.businessUnit} onChange={(event) => setForm({ ...form, businessUnit: event.target.value })} />
+                        <Stack spacing={1.25}>
+                            <Typography variant="subtitle2">Who owns this relationship internally?</Typography>
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
+                                <TextField select fullWidth label="Business owner" value={form.businessOwnerUserId} onChange={(event) => setForm({ ...form, businessOwnerUserId: event.target.value })}>
+                                    <MenuItem value="">Assign after create</MenuItem>
+                                    {owners.map((owner) => <MenuItem key={owner.id} value={owner.id}>{owner.name}</MenuItem>)}
+                                </TextField>
+                                <TextField fullWidth label="Business unit" value={form.businessUnit} onChange={(event) => setForm({ ...form, businessUnit: event.target.value })} />
+                            </Stack>
                         </Stack>
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField fullWidth type="number" label="Estimated annual spend" value={form.estimatedAnnualSpend} onChange={(event) => setForm({ ...form, estimatedAnnualSpend: event.target.value })} />
-                            <TextField fullWidth type="date" label="Target start date" InputLabelProps={{ shrink: true }} value={form.targetStartDate} onChange={(event) => setForm({ ...form, targetStartDate: event.target.value })} />
+                        <Stack spacing={1.25}>
+                            <Typography variant="subtitle2">Context only</Typography>
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
+                                <TextField fullWidth type="number" label="Estimated annual spend" value={form.estimatedAnnualSpend} onChange={(event) => setForm({ ...form, estimatedAnnualSpend: event.target.value })} helperText="Context for the owner. Spend does not change inherent or residual risk." />
+                                <TextField fullWidth type="date" label="Target start date" InputLabelProps={{ shrink: true }} value={form.targetStartDate} onChange={(event) => setForm({ ...form, targetStartDate: event.target.value })} />
+                            </Stack>
                         </Stack>
                         <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided}>Start onboarding</Button>
                     </Stack>

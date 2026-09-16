@@ -35,7 +35,12 @@ export default function VendorAssessmentQuestionnaire() {
 
     const questions = useMemo(() => (data?.questions || []).filter((row: any) => row.visible), [data]);
     const current = questions[index];
-    const progress = questions.length ? Math.round((questions.filter((row: any) => row.response).length / questions.length) * 100) : 0;
+    const answeredCount = questions.filter((row: any) => row.response && !/^not answered$/i.test(String(row.response))).length;
+    const unansweredCount = questions.length - answeredCount;
+    const evidenceOutstanding = questions.filter((row: any) => row.evidenceRequired && !row.evidenceStatus).length;
+    const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0;
+    const progressLabel = `${answeredCount} of ${questions.length} answered`;
+    const saveLabel = saving ? 'Saving…' : savedAt ? 'Saved' : data?.lastSaved ? 'Saved' : null;
 
     const save = async (response?: string) => {
         if (!current || current.locked) return;
@@ -88,10 +93,11 @@ export default function VendorAssessmentQuestionnaire() {
             <Stack spacing={2} sx={{ maxWidth: 820, mx: 'auto' }}>
                 <Button onClick={() => navigate('/vendor-assessment')}>All assessments</Button>
                 <Typography variant="h4">{data.name}</Typography>
-                <Typography>Due {formatShortDate(data.dueDate)} · Last saved {formatShortDate(savedAt || data.lastSaved)}</Typography>
-                <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 999 }} />
-                {error && <Alert severity="error">{error}</Alert>}
-                {data.submitted && <Alert severity="success">Submitted. The requesting organization will review this assessment.</Alert>}
+                <Typography>Due {formatShortDate(data.dueDate)} · {saveLabel || `Last saved ${formatShortDate(savedAt || data.lastSaved)}`}</Typography>
+                <Typography variant="body2">{progressLabel}. Not answered does not count as complete. Not applicable is excluded from control credit later.</Typography>
+                <LinearProgress variant="determinate" value={progress} aria-label={`Questionnaire progress ${progressLabel}`} sx={{ height: 8, borderRadius: 999 }} />
+                {error && <Alert severity="error">{error}. Your last successful save is still on this page if one exists.</Alert>}
+                {data.submitted && <Alert severity="success">Your assessment was submitted successfully. The requesting organization will review your responses and may request clarification.</Alert>}
                 <Box sx={{ bgcolor: 'white', p: 2.5, borderRadius: 2 }}>
                     <Typography variant="overline">{current.section}</Typography>
                     <Typography variant="h6">{current.question}</Typography>
@@ -136,7 +142,9 @@ export default function VendorAssessmentQuestionnaire() {
                 </Stack>
                 {!data.submitted && (
                     <Stack component="form" spacing={1.5} onSubmit={submit} sx={{ bgcolor: 'white', p: 2.5, borderRadius: 2 }}>
-                        <Typography variant="h6">Submit</Typography>
+                        <Typography variant="h6">Review before you submit</Typography>
+                        <Typography variant="body2">{progressLabel} · {unansweredCount} not answered · {evidenceOutstanding} evidence still outstanding.</Typography>
+                        {unansweredCount > 0 && <Alert severity="warning">Submit is available after attestation, but unanswered questions will not receive control credit.</Alert>}
                         <Typography variant="body2">{data.attestation}</Typography>
                         <FormControlLabel control={<Checkbox checked={attested} onChange={(event) => setAttested(event.target.checked)} />} label="I attest that I am authorized to submit this assessment." />
                         <Button type="submit" variant="contained" disabled={saving || !attested}>Submit assessment</Button>

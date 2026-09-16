@@ -148,9 +148,15 @@ export default function VendorOnboardingWorkspace() {
                     />
                     {error && <Alert severity="error">{error}</Alert>}
                     <Surface>
-                        <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
-                        <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : 'Not scored'} />
-                        <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} useFlexGap flexWrap="wrap">
+                            <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
+                            <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : 'Not scored'} />
+                            <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
+                            {data.review?.controlGap?.percent != null && (
+                                <Fact label="Control gap" value={`${data.review.controlGap.percent}% · ${data.review.controlGap.band}`} />
+                            )}
+                        </Stack>
+                        <Typography variant="body2" sx={{ mt: 1 }}>Inherent is intake exposure. Residual is current posture. Control gap is the assessment workbook metric, not residual risk.</Typography>
                     </Surface>
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
                         <Tab label="Request" />
@@ -183,7 +189,12 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 1 && (
                         <Surface>
                             <Typography variant="h6">Internal intake</Typography>
-                            <Typography variant="body2" sx={{ mb: 2 }}>Completed by the business owner. This is not sent to the vendor.</Typography>
+                            <Typography variant="body2" sx={{ mb: 1 }}>Completed by the business owner. This is not sent to the vendor.</Typography>
+                            <Typography variant="body2" sx={{ mb: 2 }}>
+                                {intakeProgress(data.intake?.sections, answers)} answered.
+                                {hasUnknown(answers) ? ' Unknown answers can block dropping a due-diligence pack. They are not treated as Low risk.' : ''}
+                                {' '}Estimated spend, if asked, is context only and does not change inherent or residual risk.
+                            </Typography>
                             <Stack component="form" spacing={2.5} onSubmit={data.intake.completed ? saveIntake : completeIntake}>
                                 {(data.intake.sections || []).map((section: any) => (
                                     <Stack key={section.title} spacing={1.5}>
@@ -238,15 +249,20 @@ export default function VendorOnboardingWorkspace() {
                             <Typography variant="h6">Tier review</Typography>
                             {data.tierReview ? (
                                 <Stack spacing={1.5} sx={{ mt: 1 }}>
-                                    <Typography>Recommended vendor tier: <strong>{data.tierReview.recommendedTier}</strong></Typography>
-                                    <Typography>{data.tierReview.explanation}</Typography>
-                                    <Typography variant="subtitle2">Why Supreme recommends this tier</Typography>
+                                    <Typography variant="h5">Recommended tier {data.tierReview.recommendedTier}</Typography>
+                                    <Typography>Why Supreme recommends this: {data.tierReview.explanation}</Typography>
+                                    {data.inherentRiskScore != null && <Fact label="Inherent risk" value={String(data.inherentRiskScore)} />}
+                                    {data.tierReview.score != null && <Fact label="Intake score" value={`${data.tierReview.score} of ${data.tierReview.maxScore || 60} · secondary to inherent risk`} />}
+                                    <Typography variant="subtitle2">Important exposure factors</Typography>
                                     {(data.tierReview.factors || []).map((factor: any) => (
                                         <Typography key={factor.code || factor.label}>{factor.label}: {factor.rationale}{factor.points ? ` (${factor.points})` : ''}</Typography>
                                     ))}
                                     {(data.tierReview.hardFloors || []).filter((floor: any) => floor.applies).map((floor: any) => (
-                                        <Alert key={floor.code} severity="warning">{floor.label}. {floor.rationale}</Alert>
+                                        <Alert key={floor.code} severity="warning">Minimum tier: Critical. {floor.label}. {floor.rationale}</Alert>
                                     ))}
+                                    {data.canReviewTier && data.stageKey === 'TIER_REVIEW' && (
+                                        <Typography variant="body2">Analyst action: confirm the recommendation, or record an allowed override with a reason. A below-floor override is not permitted.</Typography>
+                                    )}
                                     {data.tierReview.confirmedTier && <Alert severity="info">Confirmed tier: {data.tierReview.confirmedTier}{data.tierReview.overrideReason ? `. Override reason: ${data.tierReview.overrideReason}` : ''}</Alert>}
                                     {data.canReviewTier && data.stageKey === 'TIER_REVIEW' && (
                                         <>
@@ -340,7 +356,7 @@ export default function VendorOnboardingWorkspace() {
                                     {data.invitation.status}. {data.invitation.deliveryMethod === 'LINK' ? 'Secure link path.' : data.invitation.deliveryMethod === 'EMAIL' ? `Email ${data.invitation.emailStatus}.` : ''} {data.invitation.emailTruth}
                                 </Alert>
                             )}
-                            {copiedLink && <Alert severity="success">Secure invitation link copied. Share it through your approved channel.</Alert>}
+                            {copiedLink && <Alert severity="success">Link copied. Not emailed. Share this secure invitation through your approved channel.</Alert>}
                             <Surface>
                                 <Stack spacing={1.5}>
                                     <TextField required label="Primary assessment contact" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} />
@@ -408,7 +424,7 @@ export default function VendorOnboardingWorkspace() {
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Findings and remediation</Typography>
-                                <Typography variant="body2">Confirm findings first. Close only with ready remediation evidence. Risk acceptance does not change the residual score.</Typography>
+                                <Typography variant="body2">Confirm findings first. Close only with ready remediation evidence. Accepting risk records a governance disposition. It does not mean the risk is eliminated, the finding is fixed, or residual risk is reduced.</Typography>
                             </Surface>
                             {(data.lifecycle?.findings || []).map((finding: any) => (
                                 <Surface key={finding.id}>
@@ -535,6 +551,8 @@ export default function VendorOnboardingWorkspace() {
                             <Surface>
                                 <Typography variant="h6">Active relationship</Typography>
                                 <Fact label="Vendor status" value={humanizeLabel(data.lifecycle?.vendorStatus || data.lifecycle?.monitoring?.vendorStatus)} />
+                                <Fact label="Current tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier)} />
+                                <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : 'Not scored'} />
                                 <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
                                 <Fact label="Open findings" value={String(data.lifecycle?.monitoring?.openFindings ?? 0)} />
                                 <Fact label="Overdue remediation" value={String(data.lifecycle?.monitoring?.overdueRemediation ?? 0)} />
@@ -653,6 +671,16 @@ export default function VendorOnboardingWorkspace() {
             )}
         </QueryState>
     );
+}
+
+function intakeProgress(sections: any[] | undefined, answers: Record<string, string>) {
+    const questions = (sections || []).flatMap((section) => section.questions || []);
+    const answered = questions.filter((question: any) => String(answers[question.key] || question.response || '').trim()).length;
+    return `${answered} of ${questions.length}`;
+}
+
+function hasUnknown(answers: Record<string, string>) {
+    return Object.values(answers).some((value) => /^unknown$/i.test(String(value).trim()));
 }
 
 function Fact({ label, value }: { label: string; value?: string | null }) {

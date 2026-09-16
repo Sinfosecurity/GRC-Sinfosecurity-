@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { vendorPortalAPI } from '../services/api';
+import { color } from '../design/tokens';
 
 export default function VendorAssessmentActivate() {
     const navigate = useNavigate();
@@ -34,9 +35,9 @@ export default function VendorAssessmentActivate() {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#0b1f33', color: 'white', px: 2, py: 8 }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: color.navy900, color: color.navInk, px: 2, py: 8 }}>
             <Stack spacing={2} sx={{ maxWidth: 480, mx: 'auto' }}>
-                <Typography variant="overline" sx={{ color: '#e7e0d4' }}>Supreme Third Party</Typography>
+                <Typography variant="overline" sx={{ color: color.goldSoft, fontWeight: 700 }}>Supreme Third Party</Typography>
                 <Typography variant="h4">Open your assessment</Typography>
                 <Typography>Use the secure invitation from the requesting organization. You will only see the assessments assigned to you.</Typography>
                 {error && <Alert severity="error">{error}</Alert>}

@@ -106,5 +106,6 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.getByRole('tab', { name: 'Contract' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Approval' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Active' })).toBeInTheDocument();
+        expect(screen.getByText(/Inherent is intake exposure/)).toBeInTheDocument();
     });
 });

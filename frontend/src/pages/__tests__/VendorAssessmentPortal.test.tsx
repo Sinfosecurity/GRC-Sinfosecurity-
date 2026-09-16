@@ -36,5 +36,6 @@ describe('Vendor assessment portal', () => {
         expect(await screen.findByText(/Assessment requested by Elite Claims/)).toBeInTheDocument();
         expect(screen.getByText(/Information Security/)).toBeInTheDocument();
         expect(screen.queryByText(/Dashboard/)).not.toBeInTheDocument();
+        expect(screen.getByRole('progressbar', { name: /18 of 30 answered/i })).toBeInTheDocument();
     });
 });

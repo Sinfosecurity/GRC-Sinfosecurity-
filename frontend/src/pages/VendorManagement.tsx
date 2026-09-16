@@ -29,6 +29,7 @@ import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
 import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 interface Vendor {
     id: string | number;
@@ -332,6 +333,7 @@ export default function VendorManagement() {
                         ) },
                         { id: 'category', label: 'Category', hideOnMobile: true, sortValue: (row) => row.category, render: (row) => (categories.find((item) => item.value === row.category)?.label || row.category.replace(/_/g, ' ').toLowerCase()) },
                         { id: 'tier', label: 'Tier', sortValue: (row) => row.tier, render: (row) => <StatusBadge value={row.tier} kind="severity" /> },
+                        { id: 'inherent', label: 'Inherent risk', hideOnMobile: true, sortValue: (row) => row.inherentRiskScore ?? -1, render: (row) => row.inherentRiskScore != null ? `${row.inherentRiskScore}` : 'Not scored' },
                         { id: 'risk', label: 'Residual risk', hideOnMobile: true, sortValue: (row) => row.residualRiskScore ?? -1, render: (row) => row.residualRiskScore != null ? `${row.residualRiskScore}` : 'Not scored' },
                         { id: 'assessment', label: 'Assessment', sortValue: (row) => row.assessmentStatus, render: (row) => (
                             <StatusBadge kind="plain" tone={row.assessmentStatus === 'Overdue' ? 'critical' : row.assessmentStatus === 'Completed' ? 'success' : 'high'} label={row.assessmentStatus} />
@@ -416,7 +418,7 @@ export default function VendorManagement() {
                         <Typography variant="h3" sx={{ mb: 1 }}>{selectedVendor.name}</Typography>
                         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
                             <StatusBadge value={selectedVendor.tier} kind="severity" />
-                            <StatusBadge kind="plain" label={selectedVendor.status} />
+                            <StatusBadge kind="plain" label={humanizeLabel(selectedVendor.status)} />
                             <StatusBadge kind="plain" tone={selectedVendor.assessmentStatus === 'Overdue' ? 'critical' : 'info'} label={selectedVendor.assessmentStatus} />
                         </Stack>
                         <Typography variant="body2" sx={{ mb: 2 }}>
