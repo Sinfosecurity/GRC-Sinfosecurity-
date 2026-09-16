@@ -28,7 +28,9 @@ REQUIRED_SHAS = {
     item
     for item in (
         os.environ.get("REQUIRED_SHA", ""),
-        "db7f5398242f89a8a03e857654c192e2b7c50fa4",
+        os.environ.get("REQUIRED_FRONTEND_SHA", ""),
+        "f78580555bc9a39f1f843fe03a68f971ec36678c",
+        "473d1c56fd4abcbddad87daa09669c24ebede75f",
     )
     if item
 }
@@ -499,8 +501,9 @@ def main():
         record("finding", "FAIL", "No draft findings")
 
     score_status, score = api("POST", f"/api/v1/tprm/vendors/{vendor_id}/recalculate-risk", token_a, {})
-    before = unwrap(score).get("residualRisk") if score_status == 200 else None
-    record("residual-before", "PASS" if before is not None else "PARTIAL", f"{score_status} residual={before}")
+    residual_after_scoring = unwrap(score).get("residualRisk") if score_status == 200 else None
+    before = residual_after_scoring
+    record("residual-before-close", "PASS" if residual_after_scoring is not None else "PARTIAL", f"{score_status} residual={residual_after_scoring}")
 
     _, workspace = api("GET", f"/api/v1/vendors/onboarding/{public_id}", token_a)
     open_findings = [
@@ -617,6 +620,9 @@ def main():
         )
         record("valid-close", "PASS" if close_status == 200 else "FAIL", str(close_status))
         record("finding-close-authorized", "PASS" if close_status == 200 else "FAIL", str(close_status))
+        _, after_close_ws = api("GET", f"/api/v1/vendors/onboarding/{public_id}", token_a)
+        before = residual(after_close_ws)
+        record("residual-after-close-before-acceptance", "PASS" if before is not None else "FAIL", str(before))
 
     if not acceptable:
         _, workspace = api("GET", f"/api/v1/vendors/onboarding/{public_id}", token_a)

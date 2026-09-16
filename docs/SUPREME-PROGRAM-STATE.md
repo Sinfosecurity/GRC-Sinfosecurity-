@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-16
 
-**CURRENT ITEM:** Independent Review Remediation Sprint 2 — H-2 + H-7 authorization and separation of duties. #21 remains PAUSED.
+**CURRENT ITEM:** Independent Review Remediation Sprint 3 — H-4 Phase C governance and evidence integrity. #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** SPRINT 2 ENGINEERING COMPLETE — HOSTED TWO-USER PROOF RECORDED. Starting SHA `7dac1ba30f3cddfa51ab7080cda03a94b10b62af`. Implementation `fdd0b9d713cc9bc155bb56f799e8bb8aeada7232`. Hosted frontend/API and CI SHA `7717b5cefbdc4cae70e46e51a0ab9e42f0519e2a`. CI `35084379243` PASS. H-2 and H-7 are CLOSED on implementation + CI + hosted two-user proof. #12-F and #12-V remain Product Leadership accepted. #12 remains PARTIAL because H-4, H-5, and H-6 are still open. Cursor does not declare #12 PASS or commercial GO. #21 remains PAUSED. Next security sprint is not authorized.
+**CURRENT ITEM STATUS:** SPRINT 3 ENGINEERING IMPLEMENTED — HOSTED FRESH-VENDOR PROOF RECORDED. Starting SHA `7717b5cefbdc4cae70e46e51a0ab9e42f0519e2a`. Implementation `f78580555bc9a39f1f843fe03a68f971ec36678c`. CI `35090107814` PASS on `f785805`. Hosted API `f785805`. Hosted frontend `473d1c56fd4abcbddad87daa09669c24ebede75f`. H-4 remains OPEN for Product Leadership. Cursor reports ENGINEERING IMPLEMENTED and HOSTED CERTIFICATION COMPLETE for this sprint only. Cursor does not declare H-4 CLOSED, #12 PASS, or commercial GO. H-5 and H-6 remain open and were not started. #21 remains PAUSED. Next security sprint is not authorized.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 

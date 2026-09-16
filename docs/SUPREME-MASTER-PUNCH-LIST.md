@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. Hosted email proof `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Real inbox not tested. Copy link is not email sent. Phase C reused on the same vendor.
 
-**NEXT ACTION:** Independent Review Sprint 2 (H-2 / H-7) implementation, CI, and hosted two-user proof are recorded. Evidence: `docs/independent-review/SPRINT-2-AUTHORIZATION-SEPARATION-OF-DUTIES.md`. Product Leadership independently reviews the repository before authorizing H-4. Do not start H-4, H-5, H-6, or #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 remains PAUSED.
+**NEXT ACTION:** Independent Review Sprint 3 (H-4) engineering and hosted fresh-vendor proof are recorded. Evidence: `docs/independent-review/SPRINT-3-PHASE-C-GOVERNANCE-EVIDENCE.md`. Product Leadership independently decides whether H-4 is CLOSED. Do not start H-5, H-6, or #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 remains PAUSED.
 
 ---
 

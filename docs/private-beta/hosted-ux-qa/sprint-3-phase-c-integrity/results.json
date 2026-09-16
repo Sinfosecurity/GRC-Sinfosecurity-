@@ -1,0 +1,583 @@
+{
+  "checks": [
+    {
+      "name": "hosted-sha",
+      "result": "PASS",
+      "detail": "api=f78580555bc9a39f1f843fe03a68f971ec36678c frontend=473d1c56fd4abcbddad87daa09669c24ebede75f"
+    },
+    {
+      "name": "user-a-login",
+      "result": "PASS",
+      "detail": "200 report-proof-20260913@staging.supremerisk.test"
+    },
+    {
+      "name": "user-b-existing",
+      "result": "PASS",
+      "detail": "sales@eliteadjustersny.com role=ORGANIZATION_ADMIN"
+    },
+    {
+      "name": "same-tenant",
+      "result": "PASS",
+      "detail": "05d7821b-cab1-44af-9f5c-1f528a2d0a0e"
+    },
+    {
+      "name": "cross-tenant-signup",
+      "result": "PASS",
+      "detail": "201 sprint3-cross-1789558678@staging.supremerisk.test"
+    },
+    {
+      "name": "request",
+      "result": "PASS",
+      "detail": "201 VND-2026-0025"
+    },
+    {
+      "name": "intake",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "tier",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "packs",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "vendor-portal",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "vendor-plane",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "questionnaire",
+      "result": "PASS",
+      "detail": "200 submitted=9"
+    },
+    {
+      "name": "submit",
+      "result": "PASS",
+      "detail": "9 assessments"
+    },
+    {
+      "name": "review",
+      "result": "PASS",
+      "detail": "200 drafts=50"
+    },
+    {
+      "name": "finding",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "residual-before",
+      "result": "PASS",
+      "detail": "200 residual=87"
+    },
+    {
+      "name": "remediation",
+      "result": "PASS",
+      "detail": "200 IN_PROGRESS"
+    },
+    {
+      "name": "vendor-response-not-closure",
+      "result": "PASS",
+      "detail": "IN_PROGRESS"
+    },
+    {
+      "name": "approval-before-contract",
+      "result": "DENIED",
+      "detail": "409 Contract requirements must be attested before approval."
+    },
+    {
+      "name": "premature-activation",
+      "result": "DENIED",
+      "detail": "409 Activation requires a human approval decision."
+    },
+    {
+      "name": "generic-status-spoof",
+      "result": "DENIED",
+      "detail": "200 status=PROPOSED residual=87"
+    },
+    {
+      "name": "invalid-close-without-evidence",
+      "result": "DENIED",
+      "detail": "409 This finding cannot be closed yet. An analyst must validate remediation."
+    },
+    {
+      "name": "legacy-close-bypass",
+      "result": "DENIED",
+      "detail": "409 This finding cannot be closed yet. An analyst must validate remediation."
+    },
+    {
+      "name": "tprm-close-parity",
+      "result": "DENIED",
+      "detail": "409 This finding cannot be closed yet. An analyst must validate remediation."
+    },
+    {
+      "name": "generic-issue-cannot-close",
+      "result": "PASS",
+      "detail": "404 IN_PROGRESS"
+    },
+    {
+      "name": "evidence",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "valid-close",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "finding-close-authorized",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "user-a-prepare-risk",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "acceptance-does-not-change-residual-on-prepare",
+      "result": "FAIL",
+      "detail": "before=87 after=79"
+    },
+    {
+      "name": "user-a-self-approve-risk",
+      "result": "DENIED",
+      "detail": "403 Another authorized reviewer must approve this decision."
+    },
+    {
+      "name": "unauthorized-approve-risk",
+      "result": "DENIED",
+      "detail": "patch=200 login=200 approve=403 Forbidden: Insufficient permissions"
+    },
+    {
+      "name": "cross-tenant-approve-risk",
+      "result": "DENIED",
+      "detail": "404 Vendor onboarding was not found."
+    },
+    {
+      "name": "platform-admin-customer-approve",
+      "result": "DENIED",
+      "detail": "404 Vendor onboarding was not found."
+    },
+    {
+      "name": "user-b-approve-risk",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+    },
+    {
+      "name": "acceptance-does-not-change-residual",
+      "result": "FAIL",
+      "detail": "before=87 after=79"
+    },
+    {
+      "name": "risk-audit-actors",
+      "result": "PASS",
+      "detail": "{\"preparedBy\": \"e5fe1b60-a942-4127-b994-7206ea3cedbb\", \"approvedBy\": \"9efdbc83-8b3a-48e4-8ba1-f993c0741c22\", \"a\": \"e5fe1b60-a942-4127-b994-7206ea3cedbb\", \"b\": \"9efdbc83-8b3a-48e4-8ba1-f993c0741c22\"}"
+    },
+    {
+      "name": "contract",
+      "result": "FAIL",
+      "detail": "520"
+    },
+    {
+      "name": "ready-for-independent-approval",
+      "result": "FAIL",
+      "detail": "None"
+    },
+    {
+      "name": "user-a-self-approve-vendor",
+      "result": "FAIL",
+      "detail": "409 Contract requirements must be attested before approval."
+    },
+    {
+      "name": "cross-tenant-approve-vendor",
+      "result": "DENIED",
+      "detail": "404 Vendor onboarding was not found."
+    },
+    {
+      "name": "user-b-approve-vendor",
+      "result": "FAIL",
+      "detail": "409 None"
+    },
+    {
+      "name": "vendor-audit-actors",
+      "result": "FAIL",
+      "detail": "{\"preparedBy\": null, \"decision\": null}"
+    },
+    {
+      "name": "active",
+      "result": "FAIL",
+      "detail": "409 None"
+    },
+    {
+      "name": "monitoring",
+      "result": "PARTIAL",
+      "detail": "{}"
+    },
+    {
+      "name": "reassessment",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "home-data-state",
+      "result": "PASS",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content  Supreme  Governance \u00b7 Staging  Work  Home Third Parties Onboard "
+    },
+    {
+      "name": "home-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-home",
+      "result": "PASS",
+      "detail": "serious+critical=0 total=0"
+    },
+    {
+      "name": "blocked-state-copy",
+      "result": "PARTIAL",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content  Supreme  Governance \u00b7 Staging  Work  Home Third Parties Onboard Assessments Findings Decisions Programs Intelligence Automat"
+    },
+    {
+      "name": "five-stage-experience",
+      "result": "PASS",
+      "detail": "Workspace rendered"
+    },
+    {
+      "name": "workspace-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-workspace",
+      "result": "PASS",
+      "detail": "serious+critical=0 total=0"
+    },
+    {
+      "name": "keyboard",
+      "result": "PASS",
+      "detail": "Tab moves focus on the workspace"
+    },
+    {
+      "name": "user-a-login",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "user-b-login",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "residual-after-close-before-more-acceptance",
+      "result": "PASS",
+      "detail": "79"
+    },
+    {
+      "name": "acceptance-does-not-change-residual",
+      "result": "PASS",
+      "detail": "before=79 after=79"
+    },
+    {
+      "name": "contract",
+      "result": "PASS",
+      "detail": "200 {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+    },
+    {
+      "name": "ready-for-independent-approval",
+      "result": "PASS",
+      "detail": "True"
+    },
+    {
+      "name": "user-a-self-approve-vendor",
+      "result": "DENIED",
+      "detail": "403 Another authorized reviewer must approve this decision."
+    },
+    {
+      "name": "independent-approval",
+      "result": "PASS",
+      "detail": "200 APPROVE_WITH_CONDITIONS {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+    },
+    {
+      "name": "active",
+      "result": "PASS",
+      "detail": "200 ACTIVE {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+    },
+    {
+      "name": "monitoring",
+      "result": "PASS",
+      "detail": "{\"vendorStatus\": \"ACTIVE\", \"residualRisk\": 79, \"openFindings\": 0, \"acceptedRisks\": 1, \"overdueRemediation\": 0, \"nextReassessment\": \"2027-01-20T11:40:54.761Z\", \"contractAttested\": true, \"acceptanceExpiring\": 0, \"externalIntelligence\": \"Only "
+    },
+    {
+      "name": "reassessment",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "workspace-active-copy",
+      "result": "PASS",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content  Supreme  Governance \u00b7 Staging  Work  Home Third Parties Onboard Assessments Findings Decisions Programs "
+    },
+    {
+      "name": "workspace-active-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-active-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-active-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-active-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-active-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-workspace-active",
+      "result": "PASS",
+      "detail": "serious+critical=0"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/home-375.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/home-768.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/home-1024.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/home-1920.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-768.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-1024.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-1920.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-375.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-768.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-1024.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-1440.png",
+    "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-1920.png"
+  ],
+  "axe": [
+    {
+      "name": "home",
+      "violations": [],
+      "seriousOrCritical": 0
+    },
+    {
+      "name": "workspace",
+      "violations": [],
+      "seriousOrCritical": 0
+    },
+    {
+      "name": "workspace-active",
+      "violations": [],
+      "seriousOrCritical": 0
+    }
+  ],
+  "overflows": [],
+  "sha": {
+    "api": "f78580555bc9a39f1f843fe03a68f971ec36678c",
+    "frontend": "473d1c56fd4abcbddad87daa09669c24ebede75f",
+    "health": "degraded",
+    "environment": "staging",
+    "accepted": [
+      "473d1c56fd4abcbddad87daa09669c24ebede75f",
+      "f78580555bc9a39f1f843fe03a68f971ec36678c"
+    ]
+  },
+  "actors": {
+    "a": {
+      "id": "e5fe1b60-a942-4127-b994-7206ea3cedbb",
+      "email": "report-proof-20260913@staging.supremerisk.test",
+      "role": "ORGANIZATION_ADMIN"
+    },
+    "b": {
+      "id": "9efdbc83-8b3a-48e4-8ba1-f993c0741c22",
+      "email": "sales@eliteadjustersny.com",
+      "role": "ORGANIZATION_ADMIN"
+    }
+  },
+  "workflow": {
+    "publicId": "VND-2026-0025",
+    "vendorId": "8f875512-c326-492e-a6ae-dfef7821a410"
+  },
+  "followup": {
+    "checks": [
+      {
+        "name": "user-a-login",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "user-b-login",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "residual-after-close-before-more-acceptance",
+        "result": "PASS",
+        "detail": "79"
+      },
+      {
+        "name": "acceptance-does-not-change-residual",
+        "result": "PASS",
+        "detail": "before=79 after=79"
+      },
+      {
+        "name": "contract",
+        "result": "PASS",
+        "detail": "200 {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+      },
+      {
+        "name": "ready-for-independent-approval",
+        "result": "PASS",
+        "detail": "True"
+      },
+      {
+        "name": "user-a-self-approve-vendor",
+        "result": "DENIED",
+        "detail": "403 Another authorized reviewer must approve this decision."
+      },
+      {
+        "name": "independent-approval",
+        "result": "PASS",
+        "detail": "200 APPROVE_WITH_CONDITIONS {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+      },
+      {
+        "name": "active",
+        "result": "PASS",
+        "detail": "200 ACTIVE {\"success\": true, \"data\": {\"id\": \"8f875512-c326-492e-a6ae-dfef7821a410\", \"publicId\": \"VND-2026-0025\", \"name\": \"Sprint 3 Phase C 1789558679\", \"tier\": \"Critical\", \"tierKey\": \"CRITICAL\", \"inherentRiskScore\": 83, \"residualRiskScore\": 79, \"legal"
+      },
+      {
+        "name": "monitoring",
+        "result": "PASS",
+        "detail": "{\"vendorStatus\": \"ACTIVE\", \"residualRisk\": 79, \"openFindings\": 0, \"acceptedRisks\": 1, \"overdueRemediation\": 0, \"nextReassessment\": \"2027-01-20T11:40:54.761Z\", \"contractAttested\": true, \"acceptanceExpiring\": 0, \"externalIntelligence\": \"Only "
+      },
+      {
+        "name": "reassessment",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "workspace-active-copy",
+        "result": "PASS",
+        "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content  Supreme  Governance \u00b7 Staging  Work  Home Third Parties Onboard Assessments Findings Decisions Programs "
+      },
+      {
+        "name": "workspace-active-375",
+        "result": "PASS",
+        "detail": "overflow=False"
+      },
+      {
+        "name": "workspace-active-768",
+        "result": "PASS",
+        "detail": "overflow=False"
+      },
+      {
+        "name": "workspace-active-1024",
+        "result": "PASS",
+        "detail": "overflow=False"
+      },
+      {
+        "name": "workspace-active-1440",
+        "result": "PASS",
+        "detail": "overflow=False"
+      },
+      {
+        "name": "workspace-active-1920",
+        "result": "PASS",
+        "detail": "overflow=False"
+      },
+      {
+        "name": "axe-workspace-active",
+        "result": "PASS",
+        "detail": "serious+critical=0"
+      }
+    ],
+    "shots": [
+      "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-375.png",
+      "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-768.png",
+      "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-1024.png",
+      "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-1440.png",
+      "docs/private-beta/hosted-ux-qa/sprint-3-phase-c-integrity/workspace-active-1920.png"
+    ],
+    "axe": [
+      {
+        "name": "workspace-active",
+        "violations": [],
+        "seriousOrCritical": 0
+      }
+    ],
+    "overflows": [],
+    "sha": {},
+    "workflow": {
+      "publicId": "VND-2026-0025"
+    }
+  }
+}
