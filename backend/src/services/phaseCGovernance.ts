@@ -87,8 +87,19 @@ export async function requireValidClosureEvidence(input: {
             issueId: input.findingId,
         },
     });
+    const linkedToOtherFinding = await prisma.evidenceLink.findFirst({
+        where: {
+            organizationId: input.organizationId,
+            storedObjectId: stored.id,
+            issueId: { not: input.findingId },
+        },
+    });
     const namedOnFinding = input.closureEvidence === stored.id || input.evidenceUrl === stored.id;
-    if (!linkedToFinding && !namedOnFinding) {
+    const namedInRequest = input.evidenceId === stored.id;
+    if (linkedToOtherFinding && !linkedToFinding && !namedOnFinding) {
+        throw new ApiError(409, CLOSURE_COPY.unrelated);
+    }
+    if (!linkedToFinding && !namedOnFinding && !namedInRequest) {
         throw new ApiError(409, CLOSURE_COPY.unrelated);
     }
 

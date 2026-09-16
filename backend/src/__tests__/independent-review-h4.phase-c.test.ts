@@ -257,6 +257,15 @@ describe('H-4 Phase C governance and evidence integrity', () => {
         expect(foreignClose.status).toBe(409);
         expect(JSON.stringify(foreignClose.body)).toContain(CLOSURE_COPY.foreign);
 
+        await prisma.evidenceLink.create({
+            data: {
+                organizationId: orgA,
+                storedObjectId: unrelatedId,
+                vendorId,
+                issueId: secondFindingId,
+                createdBy: userA,
+            },
+        });
         const unrelated = await request(app).post(`${API}/vendors/onboarding/${publicId}/findings/${findingId}/close`).set('Authorization', `Bearer ${tokenA}`).send({ evidenceId: unrelatedId });
         expect(unrelated.status).toBe(409);
         expect(JSON.stringify(unrelated.body)).toContain(CLOSURE_COPY.unrelated);
