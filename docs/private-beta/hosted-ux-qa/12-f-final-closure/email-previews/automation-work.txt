@@ -1,0 +1,14 @@
+Work needs a person
+
+Supreme identified a vendor finding that is overdue.
+
+Work: Vendor finding needs review
+Source: Vendor finding
+Due: September 22, 2026
+
+View work item:
+https://example.test/findings
+
+Supreme created this follow-up from a recorded event. A person must act. Automation did not accept risk, approve a vendor, or close a finding.
+
+Supreme Governance Platform

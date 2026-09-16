@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. Hosted email proof `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Real inbox not tested. Copy link is not email sent. Phase C reused on the same vendor.
 
-**NEXT ACTION:** Product Leadership hosted review of #12-F facelift evidence. Do not alter leftover historical #12 working-tree files. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #20 is accepted. #21 remains PAUSED.
+**NEXT ACTION:** Product Leadership hosted review of #12-F closure evidence. Do not alter leftover historical #12 working-tree files. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #20 is accepted. #21 remains PAUSED.
 
 ---
 

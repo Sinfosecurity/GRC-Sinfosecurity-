@@ -1,0 +1,16 @@
+A decision is required
+
+Review Acme Cloud inside Supreme. Approve, approve with conditions, or reject. This email does not record a decision.
+
+Vendor: Acme Cloud
+Vendor ID: VND-2026-0042
+
+Review decision:
+https://example.test/vendor-onboarding/VND-2026-0042
+
+What happens next
+1. Open the decision brief in Supreme.
+2. A person records Approve, Approve with conditions, or Reject.
+3. Residual risk does not change because a decision is recorded.
+
+Supreme Governance Platform

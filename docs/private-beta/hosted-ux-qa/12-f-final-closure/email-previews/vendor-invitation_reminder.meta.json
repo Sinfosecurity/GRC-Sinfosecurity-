@@ -1,0 +1,6 @@
+{
+  "templateKey": "vendor.invitation_reminder",
+  "subject": "Reminder: Your due diligence for Northwind Insurance is due September 22, 2026",
+  "fromName": "Northwind Insurance via Supreme",
+  "sent": false
+}

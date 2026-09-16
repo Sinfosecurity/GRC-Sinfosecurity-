@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-16
 
-**CURRENT ITEM:** #12-F Supreme Third Party — Final Facelift & UX Certification. #21 remains PAUSED.
+**CURRENT ITEM:** #12-F Supreme Third Party — Final Facelift & UX Closure. #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** #12-F ENGINEERING PARTIAL — PRODUCT LEADERSHIP REVIEW REQUIRED. Starting SHA `fa50b08ff323321b0c2743f7c856b6b0f09401ec`. Implementation `d66a71521ea6a0a27879b3e777e56106b51a25b3`. CI `35045243621` PASS. Hosted API /health and frontend `version.json` `d66a715`. #12 remains PARTIAL. Cursor does not declare #12 PASS. H-2 and H-4–H-7 remain out of scope. #21 remains PAUSED. #22 is not authorized.
+**CURRENT ITEM STATUS:** #12-F ENGINEERING CLOSURE COMPLETE — PRODUCT LEADERSHIP REVIEW REQUIRED. Starting SHA `96ab7aed3c5d184639ebf7929768f3a7072c65a5`. Implementation `35f2e32b9a5d71fd2c837a358858b5cf1b2b5cbd`. CI `35047762510` PASS. Hosted API /health and frontend `version.json` `35f2e32`. Unknown blocking, vendor portal, hosted axe (0 serious / 0 critical), and 375–1920 screenshots recorded. #12 remains PARTIAL. Cursor does not declare #12-F PASS or #12 PASS. H-2 and H-4–H-7 remain out of scope. #21 remains PAUSED. #22 is not authorized.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 

@@ -1,0 +1,6 @@
+{
+  "templateKey": "vendor.approval_required",
+  "subject": "Decision required: Review Acme Cloud for approval",
+  "fromName": "Supreme",
+  "sent": false
+}
