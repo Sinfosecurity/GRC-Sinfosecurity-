@@ -5,6 +5,7 @@ import {
     Alert,
     Box,
     Button,
+    Collapse,
     Drawer,
     IconButton,
     InputBase,
@@ -52,61 +53,44 @@ const EXPANDED = 248;
 const COLLAPSED = 72;
 
 type NavItem = { text: string; path: string; icon: React.ReactNode; permission: NavPermission };
-type NavSection = { title: string; items: NavItem[] };
+type NavSection = { title: string; items: NavItem[]; primary?: boolean };
 
 const menuSections: NavSection[] = [
     {
-        title: 'Home',
-        items: [{ text: 'Home', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' }],
-    },
-    {
-        title: 'Third Parties',
+        title: 'Work',
+        primary: true,
         items: [
+            { text: 'Home', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' },
             { text: 'Third Parties', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
             { text: 'Onboard', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
             { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
-            { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
             { text: 'Decisions', path: '/decision-briefs', icon: <GavelOutlined fontSize="small" />, permission: 'approval.read' },
         ],
     },
     {
-        title: 'Risk',
+        title: 'Programs',
         items: [
-            { text: 'Overview', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
-            { text: 'Register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
-        ],
-    },
-    {
-        title: 'Compliance',
-        items: [
-            { text: 'Overview', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },
+            { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
+            { text: 'Risk', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
+            { text: 'Risk register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
+            { text: 'Compliance', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },
             { text: 'Frameworks', path: '/compliance/frameworks', icon: <HubOutlined fontSize="small" />, permission: 'compliance.read' },
             { text: 'Gaps', path: '/compliance/gaps', icon: <ReportProblemOutlined fontSize="small" />, permission: 'compliance.read' },
-        ],
-    },
-    {
-        title: 'Privacy',
-        items: [
-            { text: 'Overview', path: '/privacy-ops', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
+            { text: 'Privacy', path: '/privacy-ops', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
             { text: 'Activities', path: '/privacy-ops/activities', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
             { text: 'Rights', path: '/privacy-ops/rights', icon: <GppGoodOutlined fontSize="small" />, permission: 'privacy.read' },
             { text: 'Transfers', path: '/privacy-ops/transfers', icon: <HubOutlined fontSize="small" />, permission: 'privacy.read' },
-        ],
-    },
-    {
-        title: 'AI Governance',
-        items: [
-            { text: 'Overview', path: '/ai-governance', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Systems', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Approvals', path: '/ai-governance/approvals', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
-            { text: 'Testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'AI Governance', path: '/ai-governance', icon: <HubOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'AI systems', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'AI approvals', path: '/ai-governance/approvals', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'AI testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
         ],
     },
     {
         title: 'Intelligence',
         items: [
-            { text: 'Overview', path: '/intelligence', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
+            { text: 'Intelligence', path: '/intelligence', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
             { text: 'What changed', path: '/intelligence/changes', icon: <HistoryOutlined fontSize="small" />, permission: 'intelligence.read' },
             { text: 'Executive', path: '/intelligence/executive', icon: <InsightsOutlined fontSize="small" />, permission: 'intelligence.read' },
         ],
@@ -161,6 +145,8 @@ function NavList({
     permissions,
     pathname,
     sections,
+    openGroups,
+    onToggleGroup,
 }: {
     collapsed: boolean;
     onNavigate: (path: string) => void;
@@ -168,19 +154,33 @@ function NavList({
     permissions?: string[];
     pathname: string;
     sections: NavSection[];
+    openGroups: Record<string, boolean>;
+    onToggleGroup: (title: string) => void;
 }) {
     return (
         <Box component="div" sx={{ px: collapsed ? 0.75 : 1.25, py: 0.5 }}>
             {sections.map((section) => {
                 const items = section.items.filter((item) => canSeeNav(role, item.permission, permissions));
                 if (items.length === 0) return null;
+                const sectionActive = items.some((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
+                const open = Boolean(section.primary || openGroups[section.title] || sectionActive);
                 return (
                     <Box key={section.title} sx={{ mb: 1.5 }}>
-                        {!collapsed && (
-                            <Typography sx={{ px: 1.25, mb: 0.5, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: color.navMuted }}>
+                        {!collapsed && !section.primary && (
+                            <Button
+                                onClick={() => onToggleGroup(section.title)}
+                                aria-expanded={open}
+                                sx={{ px: 1.25, minHeight: 32, color: color.navMuted, justifyContent: 'flex-start', textTransform: 'none', fontWeight: 700 }}
+                            >
+                                {section.title}
+                            </Button>
+                        )}
+                        {!collapsed && section.primary && (
+                            <Typography sx={{ px: 1.25, mb: 0.5, fontSize: 13, color: color.navMuted, fontWeight: 700 }}>
                                 {section.title}
                             </Typography>
                         )}
+                        <Collapse in={collapsed || open} unmountOnExit={!section.primary}>
                         {items.map((item) => {
                             const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
                             const button = (
@@ -213,6 +213,7 @@ function NavList({
                             );
                             return collapsed ? <Tooltip key={item.text} title={item.text} placement="right">{button}</Tooltip> : button;
                         })}
+                        </Collapse>
                     </Box>
                 );
             })}
@@ -229,6 +230,7 @@ export default function Layout() {
     const [query, setQuery] = useState('');
     const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
     const [orgName, setOrgName] = useState('');
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
     const [serviceNotice, setServiceNotice] = useState(false);
     const [lastChecked, setLastChecked] = useState<string | null>(null);
 
@@ -290,6 +292,8 @@ export default function Layout() {
                     permissions={user?.permissions}
                     pathname={location.pathname}
                     sections={menuSections}
+                    openGroups={openGroups}
+                    onToggleGroup={(title) => setOpenGroups((current) => ({ ...current, [title]: !current[title] }))}
                 />
             </Box>
         </Box>

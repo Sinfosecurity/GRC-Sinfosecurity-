@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../marketing/routerFuture';
 import { AuthProvider } from '../../contexts/AuthContext';
@@ -43,6 +43,7 @@ describe('Layout Component', () => {
         );
 
         expect(screen.getAllByText(/Test/i).length).toBeGreaterThan(0);
+        fireEvent.click(screen.getAllByRole('button', { name: 'Administration' })[0]);
         expect(screen.getAllByText(/Team/i).length).toBeGreaterThan(0);
         localStorage.clear();
     });

@@ -8,6 +8,7 @@ import QueryState from '../components/QueryState';
 import StatusBadge from '../components/design/StatusBadge';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate } from '../utils/humanizeLabel';
+import { customerStage } from '../experience/customerStages';
 
 type Owner = { id: string; name: string; email: string };
 type Duplicate = { id: string; publicId?: string; name: string; matchReason: string; status: string };
@@ -84,15 +85,15 @@ export default function VendorOnboarding() {
     return (
         <QueryState loading={loading && !rows.length} error={null} empty={false}>
             <PageHeader
-                crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Onboard' }]}
-                title="Onboard Third Party"
-                description="Supreme prepares the request, intake, tier recommendation, and due-diligence plan. People confirm material risk decisions."
+                crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Request' }]}
+                title="Request a third party"
+                description="Name the vendor, the service, and the internal owner. Supreme then opens Assess. No questionnaire is sent to the vendor yet."
             />
             <Stack spacing={2.5} sx={{ minWidth: 0 }}>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Surface>
                     <Typography variant="h6">New request</Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>Name the vendor, the service, and the internal owner. After you submit, Supreme opens intake for that owner. No questionnaire is sent to the vendor yet.</Typography>
+                    <Typography variant="body2" sx={{ mb: 2 }}>Ask only what is needed now. After you submit, Supreme opens Assess for the internal contact. The vendor is not invited yet.</Typography>
                     <Stack component="form" onSubmit={(event) => submit(event)} spacing={2}>
                         <Stack spacing={1.25}>
                             <Typography variant="subtitle2">Who is this vendor?</Typography>
@@ -126,7 +127,8 @@ export default function VendorOnboarding() {
                                 <TextField fullWidth type="date" label="Target start date" InputLabelProps={{ shrink: true }} value={form.targetStartDate} onChange={(event) => setForm({ ...form, targetStartDate: event.target.value })} />
                             </Stack>
                         </Stack>
-                        <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided}>Start onboarding</Button>
+                        <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided}>Submit request</Button>
+                        <Typography variant="body2">Next: the named internal contact answers intake. Supreme scores inherent risk and recommends tier and packs.</Typography>
                     </Stack>
                 </Surface>
                 <Surface>
@@ -141,7 +143,7 @@ export default function VendorOnboarding() {
                             { id: 'vendor', label: 'Vendor', render: (row) => (
                                 <BoxText title={row.name} caption={row.publicId || 'ID pending'} />
                             ) },
-                            { id: 'stage', label: 'Stage', render: (row) => <StatusBadge kind="plain" label={row.stage} /> },
+                            { id: 'stage', label: 'Stage', render: (row) => <StatusBadge kind="plain" label={customerStage(row.stage)} /> },
                             { id: 'owner', label: 'Owner', hideOnMobile: true, render: (row) => row.owner },
                             { id: 'due', label: 'Due', hideOnMobile: true, render: (row) => formatShortDate(row.dueDate) },
                             { id: 'next', label: 'Next action', render: (row) => row.nextAction },

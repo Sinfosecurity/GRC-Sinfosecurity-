@@ -86,7 +86,8 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboarding />
             </MemoryRouter>
         );
-        expect(await screen.findByText('Onboard Third Party')).toBeInTheDocument();
+        expect(await screen.findByText('Request a third party')).toBeInTheDocument();
+        expect(screen.getByText('Assess')).toBeInTheDocument();
         expect(screen.getByText('VND-2026-0001')).toBeInTheDocument();
         expect(screen.getByText('Complete vendor intake')).toBeInTheDocument();
         expect(screen.queryByText('INTAKE_PENDING')).not.toBeInTheDocument();
@@ -134,7 +135,7 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect(await screen.findByText(/finalize the due-diligence package/i)).toBeInTheDocument();
+        expect((await screen.findAllByText(/finalize the due-diligence package/i)).length).toBeGreaterThan(0);
         expect(screen.getByRole('button', { name: 'Save and resume later' })).toBeEnabled();
         fireEvent.click(screen.getByLabelText(/I attest that this intake is accurate/i));
         expect(screen.getByRole('button', { name: 'Submit intake' })).toBeDisabled();
@@ -148,12 +149,14 @@ describe('Onboard Third Party workspace', () => {
         );
         expect((await screen.findAllByRole('heading', { name: 'Acme Payroll' })).length).toBeGreaterThan(0);
         expect(screen.getAllByText('VND-2026-0001').length).toBeGreaterThan(0);
+        expect(screen.getByText(/Assessment scope ready/i)).toBeInTheDocument();
         expect(screen.getByText(/Supreme recommends high/i)).toBeInTheDocument();
-        expect(screen.getByRole('tab', { name: 'Assessment Plan' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Assessment' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Findings' })).toBeInTheDocument();
-        expect(screen.getByRole('tab', { name: 'Contract' })).toBeInTheDocument();
-        expect(screen.getByRole('tab', { name: 'Approval' })).toBeInTheDocument();
-        expect(screen.getByRole('tab', { name: 'Active' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Decisions' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Overview' })).toBeInTheDocument();
         expect(screen.getByText(/Inherent is intake exposure/)).toBeInTheDocument();
+        expect(screen.getByRole('list', { name: 'Third party stages' })).toHaveTextContent('Request');
+        expect(screen.getByRole('list', { name: 'Third party stages' })).toHaveTextContent('Assess');
     });
 });

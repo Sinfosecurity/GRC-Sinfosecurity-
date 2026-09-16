@@ -4,33 +4,16 @@ import { Alert, Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, 
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import LifecycleHeader from '../components/design/LifecycleHeader';
+import { EntitySummary, LifecycleProgress, NextActionCard } from '../components/experience/ExperienceKit';
+import { customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
-const STEPS = ['Request', 'Intake', 'Tier Review', 'Due Diligence', 'Findings', 'Contract', 'Approval', 'Active'];
-
-function stepperIndex(stage?: string) {
-    if (stage === 'Intake') return 1;
-    if (stage === 'Tier review') return 2;
-    if (['Due diligence', 'Ready to send', 'Awaiting vendor', 'Vendor in progress', 'Submitted', 'Under review'].includes(String(stage))) return 3;
-    if (['Remediation', 'Risk acceptance'].includes(String(stage))) return 4;
-    if (stage === 'Contract review') return 5;
-    if (stage === 'Approval') return 6;
-    if (['Active', 'Reassessment', 'Offboarding'].includes(String(stage))) return 7;
-    return 0;
-}
-
 function defaultTab(stage?: string) {
-    if (stage === 'Intake') return 1;
-    if (stage === 'Tier review') return 2;
-    if (stage === 'Due diligence' || stage === 'Ready to send') return 3;
-    if (['Awaiting vendor', 'Vendor in progress'].includes(String(stage))) return 4;
-    if (['Submitted', 'Under review'].includes(String(stage))) return 5;
-    if (['Remediation', 'Risk acceptance'].includes(String(stage))) return 6;
-    if (stage === 'Contract review') return 7;
-    if (stage === 'Approval') return 8;
-    if (['Active', 'Reassessment', 'Offboarding'].includes(String(stage))) return 9;
+    const section = workspaceSection(stage);
+    if (section === 'assessment') return 1;
+    if (section === 'findings') return 2;
+    if (section === 'decisions') return 4;
     return 0;
 }
 
@@ -58,6 +41,7 @@ export default function VendorOnboardingWorkspace() {
     const [reassessment, setReassessment] = useState<any>(null);
     const [confirmPriorAnswers, setConfirmPriorAnswers] = useState(false);
     const [historyLayer, setHistoryLayer] = useState<'milestones' | 'audit'>('milestones');
+    const [showFullAssessment, setShowFullAssessment] = useState(false);
 
     const load = () => {
         vendorOnboardingAPI.get(id)
@@ -129,51 +113,43 @@ export default function VendorOnboardingWorkspace() {
             {data && (
                 <Stack spacing={2.5} sx={{ minWidth: 0, overflowX: 'hidden' }}>
                     <PageHeader
-                        crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Onboard', to: '/vendor-onboarding' }, { label: data.publicId || data.name }]}
+                        crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: data.publicId || data.name }]}
                         title={data.name}
-                        description="Supreme prepared this lifecycle. Confirm the next human action below."
+                        description={data.request?.servicesProvided || 'One workspace. Supreme tracks the governed lifecycle underneath.'}
                     />
-                    <LifecycleHeader
+                    <EntitySummary
                         name={data.name}
-                        publicId={data.publicId}
-                        tier={data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier}
-                        status={data.workflowStatus || data.lifecycle?.vendorStatus}
+                        service={data.request?.servicesProvided}
                         owner={data.owner}
-                        stage={data.stage}
-                        nextAction={data.nextAction}
-                        nextActionOwner={data.nextActionOwner}
-                        dueDate={data.dueDate}
-                        overdue={data.overdue}
-                        steps={STEPS}
-                        activeStep={stepperIndex(data.stage)}
+                        tier={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)}
+                        inherent={data.inherentRiskScore != null ? data.inherentRiskScore : 'Not scored'}
+                        residual={data.residualRiskScore != null ? data.residualRiskScore : data.lifecycle?.residualRisk ?? 'Not scored'}
+                        status={humanizeLabel(data.workflowStatus || data.stage)}
+                    />
+                    <LifecycleProgress active={customerStageIndex(data.stageKey || data.stage)} blocked={(data.unresolvedScope || []).length > 0 && !data.intake?.completed} />
+                    <NextActionCard
+                        label={dominantNextAction(data).label}
+                        detail={`${dominantNextAction(data).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
+                        onAction={() => setTab(defaultTab(data.stage))}
                     />
                     {error && <Alert severity="error">{error}</Alert>}
-                    <Surface>
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} useFlexGap flexWrap="wrap">
-                            <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
-                            <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : 'Not scored'} />
-                            <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
-                            {data.review?.controlGap?.percent != null && (
-                                <Fact label="Control gap" value={`${data.review.controlGap.percent}% · ${data.review.controlGap.band}`} />
-                            )}
-                        </Stack>
-                        <Typography variant="body2" sx={{ mt: 1 }}>Inherent is intake exposure. Residual is current posture. Control gap is the assessment workbook metric, not residual risk.</Typography>
-                    </Surface>
+                    <Typography variant="body2">Inherent is intake exposure. Residual is current posture. Control gap stays separate from residual.</Typography>
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
-                        <Tab label="Request" />
-                        <Tab label="Intake" />
-                        <Tab label="Tier Review" />
-                        <Tab label="Assessment Plan" />
-                        <Tab label="Due Diligence" />
-                        <Tab label="Review" />
+                        <Tab label="Overview" />
+                        <Tab label="Assessment" />
                         <Tab label="Findings" />
-                        <Tab label="Contract" />
-                        <Tab label="Approval" />
-                        <Tab label="Active" />
+                        <Tab label="Evidence" />
+                        <Tab label="Decisions" />
                         <Tab label="History" />
                     </Tabs>
 
                     {tab === 0 && (
+                        <Stack spacing={2}>
+                        <Surface>
+                            <Typography variant="h6">Where this case stands</Typography>
+                            <Typography>You are in {humanizeLabel(data.stage)}. {dominantNextAction(data).detail}</Typography>
+                            <Typography variant="body2">Owner {data.owner || 'Not assigned'} · Due {formatShortDate(data.dueDate)}</Typography>
+                        </Surface>
                         <Surface>
                             <Typography variant="h6">Request</Typography>
                             <Fact label="Vendor" value={data.request.name} />
@@ -184,6 +160,37 @@ export default function VendorOnboardingWorkspace() {
                             <Fact label="Business unit" value={data.request.businessUnit} />
                             <Fact label="Requester" value={data.requester} />
                             <Fact label="Business owner" value={data.owner} />
+                        </Surface>
+                        </Stack>
+                    )}
+
+                    {tab === 3 && (
+                        <Stack spacing={1.5}>
+                            <Typography variant="h6">Evidence</Typography>
+                            <Typography variant="body2">Ready files can be reused. Scanning or rejected files are not usable.</Typography>
+                            {(data.lifecycle?.documents || data.evidence || []).length === 0 && <Typography>No evidence is recorded for this vendor yet.</Typography>}
+                            {(data.lifecycle?.documents || data.evidence || []).map((row: any) => (
+                                <Typography key={row.id || row.filename}>{row.title || row.filename} · {humanizeLabel(row.scanStatus || row.status)}</Typography>
+                            ))}
+                        </Stack>
+                    )}
+
+                    {tab === 1 && data.intake?.completed && (
+                        <Surface>
+                            <Typography sx={{ fontSize: 13, fontWeight: 700, color: 'text.secondary' }}>Assessment scope ready</Typography>
+                            <Typography variant="h5" sx={{ fontFamily: '"Newsreader", serif', mt: 0.5 }}>
+                                Recommended tier {humanizeLabel(data.tierReview?.confirmedTier || data.tierReview?.recommendedTier || 'Not confirmed')}
+                            </Typography>
+                            <Typography sx={{ mt: 1 }}>
+                                Inherent risk {data.inherentRiskScore != null ? data.inherentRiskScore : 'Not scored'}
+                                {data.residualRiskScore != null ? ` · Residual risk ${data.residualRiskScore}` : ''}
+                            </Typography>
+                            <Typography sx={{ mt: 1 }}>
+                                Why: {(data.tierReview?.factors || []).slice(0, 4).map((factor: any) => factor.label || factor.rationale).filter(Boolean).join(' · ') || data.tierReview?.explanation || 'Complete intake facts determine this recommendation.'}
+                            </Typography>
+                            <Typography sx={{ mt: 1 }}>
+                                Recommended assessment: {(data.plan?.package?.required || data.plan?.assessments || []).map((item: any) => item.name || item.packName).filter(Boolean).join(' + ') || 'Confirm the tier to generate the package.'}
+                            </Typography>
                         </Surface>
                     )}
 
@@ -250,7 +257,7 @@ export default function VendorOnboardingWorkspace() {
                         </Surface>
                     )}
 
-                    {tab === 2 && (
+                    {tab === 1 && (
                         <Surface>
                             <Typography variant="h6">Tier review</Typography>
                             {data.tierReview ? (
@@ -287,7 +294,7 @@ export default function VendorOnboardingWorkspace() {
                         </Surface>
                     )}
 
-                    {tab === 3 && (
+                    {tab === 1 && (
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Recommended due-diligence package</Typography>
@@ -352,7 +359,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 4 && (
+                    {tab === 1 && (
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Vendor delivery</Typography>
@@ -398,15 +405,28 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 5 && (
+                    {tab === 4 && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="h6">Exception-focused review</Typography>
+                                <Typography variant="h6">
+                                    {(data.review?.potentialFindings || data.review?.needClarification || 0) > 0
+                                        ? `${data.review?.potentialFindings || data.review?.needClarification} items need your review`
+                                        : 'Exception-focused review'}
+                                </Typography>
                                 <Typography variant="body2">
-                                    {(data.review?.questionsAnswered || 0)} answers recorded · {data.review?.satisfactory || 0} satisfactory · {data.review?.needClarification || 0} need clarification · {data.review?.potentialFindings || 0} potential findings
+                                    {(data.review?.questionsAnswered || data.review?.totalResponses || 0)} answers recorded · {data.review?.satisfactory || 0} satisfactory · {data.review?.needClarification || 0} need clarification · {data.review?.potentialFindings || 0} potential findings
                                     {data.review?.controlGap?.percent != null ? ` · Assessment control-gap ${data.review.controlGap.percent}% (${data.review.controlGap.band}). This is not the vendor residual score.` : ''}
                                 </Typography>
+                                <Button sx={{ mt: 1 }} onClick={() => setShowFullAssessment((value) => !value)}>
+                                    {showFullAssessment ? 'Hide full assessment' : 'View full assessment'}
+                                </Button>
                             </Surface>
+                            {showFullAssessment && (data.vendorAssessments || []).map((item: any) => (
+                                <Surface key={`full-${item.id}`}>
+                                    <Typography variant="subtitle1">{item.name}</Typography>
+                                    <Typography>{item.status} · {item.answered} / {item.total} answered</Typography>
+                                </Surface>
+                            ))}
                             {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
                             {data.plan?.triggers?.aiGovernance && <Alert severity="info">AI Governance review may be required</Alert>}
                             {(data.review?.items || []).map((item: any) => (
@@ -427,7 +447,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 6 && (
+                    {tab === 2 && (
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Findings and remediation</Typography>
@@ -467,7 +487,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 7 && (
+                    {tab === 4 && (
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Contract review</Typography>
@@ -497,7 +517,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 8 && (
+                    {tab === 4 && (
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="overline">Decision brief</Typography>
@@ -550,7 +570,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 9 && (
+                    {tab === 0 && data.stage && ['Active', 'Reassessment', 'Offboarding'].includes(String(data.stage)) && (
                         <Stack spacing={1.5}>
                             {['Active', 'Reassessment'].includes(String(data.stage)) && (
                                 <Alert severity="success">Onboarding is complete. This workspace is now lifecycle management.</Alert>
@@ -643,7 +663,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 10 && (
+                    {tab === 5 && (
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="h6">Customer history</Typography>

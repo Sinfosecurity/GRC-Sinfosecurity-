@@ -24,9 +24,9 @@ import { useNavigate } from 'react-router-dom';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
-import MetricCard from '../components/design/MetricCard';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
+import { ExecutiveMetric } from '../components/experience/ExperienceKit';
 import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -295,11 +295,11 @@ export default function VendorManagement() {
                 }
             />
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
-                <MetricCard label="Total" value={vendors.length} />
-                <MetricCard label="Critical" value={criticalVendors} />
-                <MetricCard label="High risk" value={highVendors} />
-                <MetricCard label="Due for review" value={overdueAssessments} />
+            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 3, bgcolor: 'background.paper' }} useFlexGap flexWrap="wrap">
+                <ExecutiveMetric emphasis label="Critical vendors" value={criticalVendors} hint="Highest dependency" />
+                <ExecutiveMetric label="High or critical" value={highVendors} />
+                <ExecutiveMetric label="Due for review" value={overdueAssessments} />
+                <ExecutiveMetric label="All third parties" value={vendors.length} />
             </Stack>
 
             <Tabs value={tabValue} onChange={(_, value) => setTabValue(value)} sx={{ mb: 2 }}>
@@ -462,7 +462,7 @@ export default function VendorManagement() {
                         )}
                         {detailTab === 1 && (
                             <Stack spacing={1.5}>
-                                <MetricCard label="Residual risk" value={selectedVendor.residualRiskScore != null ? `${selectedVendor.residualRiskScore}` : 'Not scored'} />
+                                <ExecutiveMetric label="Residual risk" value={selectedVendor.residualRiskScore != null ? `${selectedVendor.residualRiskScore}` : 'Not scored'} hint="Current posture. Acceptance does not reduce this score." />
                                 {selectedVendor.inherentRiskScore != null && (
                                     <Typography variant="body2">Inherent risk {selectedVendor.inherentRiskScore} is intake exposure, not the register posture.</Typography>
                                 )}

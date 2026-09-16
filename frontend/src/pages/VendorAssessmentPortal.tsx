@@ -38,50 +38,48 @@ export default function VendorAssessmentPortal() {
     const assessments = data.assessments || [];
     const answered = assessments.reduce((sum: number, item: any) => sum + (item.answered || 0), 0);
     const total = assessments.reduce((sum: number, item: any) => sum + (item.total || 0), 0);
-    const evidenceRequired = assessments.some((item: any) => item.evidenceRequired || item.evidenceCount > 0);
+    const remaining = Math.max(0, total - answered);
+    const current = assessments.find((item: any) => item.status !== 'Submitted' && item.answered < item.total) || assessments[0];
     const progressLabel = total ? `${answered} of ${total} answered` : `${data.progress || 0}% complete`;
+    const percent = total ? Math.round((answered / total) * 100) : Number(data.progress || 0);
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: color.workspace, px: { xs: 2, md: 6 }, py: 4 }}>
-            <Stack spacing={2.5} sx={{ maxWidth: 820, mx: 'auto' }}>
-                <Typography variant="overline" sx={{ color: color.goldInk, fontWeight: 700 }}>Supreme Third Party</Typography>
-                <Typography variant="h4">Assessment requested by {data.organizationName}</Typography>
-                <Typography variant="body1">
-                    {data.requesterName || data.requestedBy || 'The requesting organization'} asked {data.vendorName} to complete due diligence. You will only see this assignment.
+        <Box sx={{ minHeight: '100vh', bgcolor: color.workspace }}>
+            <Box sx={{ bgcolor: color.navy950, color: color.navInk, px: { xs: 2, md: 6 }, py: 4 }}>
+                <Typography sx={{ color: color.goldSoft, fontWeight: 700, fontSize: 13 }}>Security review for {data.organizationName}</Typography>
+                <Typography variant="h3" sx={{ fontFamily: '"Newsreader", serif', fontWeight: 500, mt: 1 }}>{percent}% complete</Typography>
+                <Typography sx={{ color: color.navMuted, mt: 1, maxWidth: 640 }}>
+                    {data.requesterName || 'The requesting organization'} asked {data.vendorName} to answer questions and provide evidence. You will only see this assignment.
                 </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-                    <Fact label="Vendor" value={data.vendorName} />
-                    <Fact label="Due" value={formatShortDate(data.dueDate)} />
-                    <Fact label="Progress" value={progressLabel} />
-                    <Fact label="Evidence" value={evidenceRequired || data.evidenceRequired ? 'Some questions require a supporting file' : 'Upload files where a question asks for evidence'} />
-                </Box>
+                <Typography sx={{ mt: 2 }}>Next: {remaining ? `Complete ${remaining} remaining questions` : 'Submit your assessment'} · Due {formatShortDate(data.dueDate)}</Typography>
                 <LinearProgress
                     variant="determinate"
-                    value={data.progress || 0}
+                    value={percent}
                     aria-label={`Assessment progress ${progressLabel}`}
-                    sx={{ height: 10, borderRadius: 999 }}
+                    sx={{ height: 10, borderRadius: 999, mt: 2, bgcolor: 'rgba(255,255,255,0.16)', '& .MuiLinearProgress-bar': { bgcolor: color.gold } }}
                 />
-                <Typography variant="body2">Choose an assessment to begin or resume. Your answers save as you go.</Typography>
+                {current && (
+                    <Button
+                        variant="contained"
+                        sx={{ mt: 3, bgcolor: color.gold, color: color.navy950, '&:hover': { bgcolor: color.goldSoft } }}
+                        onClick={() => navigate(`/vendor-assessment/${current.id}`)}
+                    >
+                        {current.answered ? 'Continue assessment' : 'Begin assessment'}
+                    </Button>
+                )}
+            </Box>
+            <Stack spacing={2} sx={{ maxWidth: 820, mx: 'auto', px: { xs: 2, md: 6 }, py: 4 }}>
                 {assessments.map((item: any) => (
-                    <Box key={item.id} sx={{ bgcolor: color.surface, p: 2.5, borderRadius: '8px', border: `1px solid ${color.line}` }}>
-                        <Typography variant="h6">{item.name}</Typography>
-                        <Typography>{humanizeLabel(item.status)} · {item.answered} / {item.total} answered</Typography>
-                        <Button sx={{ mt: 1.5 }} variant="contained" onClick={() => navigate(`/vendor-assessment/${item.id}`)}>
-                            {item.status === 'Submitted' ? 'View submission' : item.answered ? 'Resume assessment' : 'Begin assessment'}
+                    <Box key={item.id} sx={{ py: 2, borderBottom: `1px solid ${color.line}` }}>
+                        <Typography variant="h6" sx={{ fontFamily: '"Newsreader", serif' }}>{item.name}</Typography>
+                        <Typography sx={{ color: color.inkMuted }}>{humanizeLabel(item.status)} · {item.answered} / {item.total} answered</Typography>
+                        <Button sx={{ mt: 1 }} onClick={() => navigate(`/vendor-assessment/${item.id}`)}>
+                            {item.status === 'Submitted' ? 'View submission' : item.answered ? 'Resume' : 'Begin'}
                         </Button>
                     </Box>
                 ))}
                 <Button onClick={() => { localStorage.removeItem('vendorToken'); navigate('/vendor-assessment/activate'); }}>Sign out</Button>
             </Stack>
-        </Box>
-    );
-}
-
-function Fact({ label, value }: { label: string; value?: string | null }) {
-    return (
-        <Box>
-            <Typography variant="caption">{label}</Typography>
-            <Typography>{value || '—'}</Typography>
         </Box>
     );
 }

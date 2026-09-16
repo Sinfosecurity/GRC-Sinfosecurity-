@@ -137,9 +137,13 @@ export default function VendorAssessmentQuestionnaire() {
                         </Stack>
                     )}
                 </Box>
-                <Stack direction="row" spacing={1}>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                     <Button disabled={index === 0} onClick={() => setIndex(index - 1)}>Previous</Button>
                     <Button disabled={index >= questions.length - 1} onClick={() => { save(); setIndex(index + 1); }}>Save and continue</Button>
+                    <Button onClick={() => {
+                        const next = questions.findIndex((row: any, idx: number) => idx > index && (!row.response || /^not answered$/i.test(String(row.response))));
+                        if (next >= 0) setIndex(next);
+                    }}>Next unanswered</Button>
                 </Stack>
                 {!data.submitted && (
                     <Stack component="form" spacing={1.5} onSubmit={submit} sx={{ bgcolor: 'white', p: 2.5, borderRadius: 2 }}>
