@@ -182,6 +182,7 @@ export function ActionQueue({
     const visible = items.slice(0, limit);
     const hidden = items.length - visible.length;
     return (
+        <Box>
         <Stack spacing={0} component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
             {visible.map((item) => (
                 <Box
@@ -206,10 +207,11 @@ export function ActionQueue({
                     <Button variant="contained" onClick={() => onOpen(item.href)} sx={{ alignSelf: { md: 'center' } }}>{item.action}</Button>
                 </Box>
             ))}
+        </Stack>
             {hidden > 0 && (
                 <Typography variant="body2" sx={{ py: 1.5 }}>{hidden} more recorded items stay in Third Parties.</Typography>
             )}
-        </Stack>
+        </Box>
     );
 }
 
