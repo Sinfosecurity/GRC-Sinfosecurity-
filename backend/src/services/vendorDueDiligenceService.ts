@@ -1035,6 +1035,9 @@ export async function reviewFinding(organizationId: string, vendorKey: string, a
     const finding = await prisma.vendorIssue.findFirst({ where: { id: findingId, organizationId, vendorId: vendor.id } });
     if (!finding) throw new ApiError(404, 'Finding not found.');
     if (input.action === 'dismiss') {
+        if (finding.reviewState !== IssueReviewState.DRAFT) {
+            throw new ApiError(409, 'Only a draft finding can be dismissed. Confirmed findings require closure evidence or independent risk acceptance.');
+        }
         if (!String(input.reason || '').trim()) throw new ApiError(400, 'A dismiss reason is required.');
         await prisma.vendorIssue.update({
             where: { id: finding.id },

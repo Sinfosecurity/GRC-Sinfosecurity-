@@ -4,7 +4,6 @@ import {
     IssueReviewState,
     Prisma,
     RiskDecision,
-    ScanStatus,
     VendorIssueStatus,
     VendorOnboardingStage,
     VendorStatus,
@@ -83,14 +82,8 @@ function contractRequirements(tier: VendorTier, plan: any) {
 }
 
 async function openConfirmedFindings(organizationId: string, vendorId: string) {
-    return prisma.vendorIssue.findMany({
-        where: {
-            organizationId,
-            vendorId,
-            reviewState: IssueReviewState.CONFIRMED,
-            status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS, VendorIssueStatus.PENDING_VALIDATION, VendorIssueStatus.REMEDIATED] },
-        },
-    });
+    const { openConfirmedFindings: governedOpen } = await import('./phaseCGovernance');
+    return governedOpen(organizationId, vendorId);
 }
 
 export async function presentLifecycle(organizationId: string, vendorKey: string, actor: Actor) {
@@ -163,6 +156,8 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
                 acceptanceAuthority: row.closedBy,
                 acceptanceRequestedBy: row.acceptanceRequestedBy,
                 acceptanceRequestedAt: row.acceptanceRequestedAt,
+                closureEvidenceId: row.closureEvidence,
+                evidenceId: row.evidenceUrl,
                 pendingIndependentApproval: Boolean(row.acceptanceRequestedBy && row.status !== VendorIssueStatus.RISK_ACCEPTED),
                 acceptanceExpiresAt: row.status === VendorIssueStatus.RISK_ACCEPTED
                     ? briefs.find((brief) => brief.humanDecision === 'RISK_ACCEPTED' && String(brief.reviewerAnalysis || '').includes(row.title))?.nextReviewDate
@@ -225,12 +220,12 @@ export async function closeFinding(organizationId: string, vendorKey: string, ac
     const vendor = await loadVendor(organizationId, vendorKey);
     const finding = await prisma.vendorIssue.findFirst({ where: { id: findingId, organizationId, vendorId: vendor.id } });
     if (!finding) throw new ApiError(404, 'Finding not found.');
-    if (finding.reviewState !== IssueReviewState.CONFIRMED) throw new ApiError(409, 'Only a confirmed finding can enter remediation close.');
-    const evidenceId = input.evidenceId || finding.closureEvidence || finding.evidenceUrl;
-    if (!evidenceId) throw new ApiError(409, 'Close requires governed remediation evidence.');
-    const stored = await prisma.storedObject.findFirst({ where: { id: evidenceId, organizationId, ownerId: vendor.id } });
-    if (!stored || stored.scanStatus !== ScanStatus.CLEAN) throw new ApiError(409, 'Remediation evidence must be ready before the finding can close.');
-    if (!finding.validatedAt) throw new ApiError(409, 'An analyst must validate remediation before close.');
+    const { assertFindingMayClose } = await import('./phaseCGovernance');
+    const { stored } = await assertFindingMayClose({
+        organizationId,
+        findingId: finding.id,
+        evidenceId: input.evidenceId,
+    });
     await vendorIssueService.closeIssue(finding.id, organizationId, actor.id, input.notes || 'Closed with ready remediation evidence.', stored.id);
     await history(organizationId, actor.id, vendor.id, 'vendor.finding_closed', `${actor.name || 'Analyst'} closed a finding.`);
     const { explainableRiskService } = await import('./explainableRiskService');
@@ -388,17 +383,9 @@ export async function decideApproval(organizationId: string, vendorKey: string, 
     if (input.decision === 'APPROVE_WITH_CONDITIONS' && !String(input.conditions || '').trim()) {
         throw new ApiError(400, 'Conditions are required.');
     }
-    const open = await openConfirmedFindings(organizationId, vendor.id);
-    if (input.decision !== 'REJECT' && open.length) {
-        throw new ApiError(409, `${open.length} confirmed finding${open.length === 1 ? '' : 's'} still require remediation or acceptance.`);
-    }
-    if (input.decision !== 'REJECT' && !vendor.onboarding?.contractAttestedAt) {
-        throw new ApiError(409, 'Contract requirements must be attested before approval.');
-    }
+    const { requireVendorApprovalEligibility } = await import('./phaseCGovernance');
+    await requireVendorApprovalEligibility(organizationId, vendor.id, input.decision);
     const preparer = vendor.onboarding?.approvalPreparedBy || vendor.onboarding?.contractAttestedBy || null;
-    if (input.decision !== 'REJECT' && !preparer) {
-        throw new ApiError(409, 'The approval package must be prepared before an independent reviewer can decide.');
-    }
     if (preparer) assertIndependentReviewer(preparer, actor.id);
     const latest = await prisma.scoreCalculation.findFirst({ where: { organizationId, vendorId: vendor.id }, orderBy: { calculatedAt: 'desc' } });
     const pendingBrief = await prisma.riskDecisionBrief.findFirst({
@@ -445,11 +432,8 @@ export async function decideApproval(organizationId: string, vendorKey: string, 
 export async function activateVendor(organizationId: string, vendorKey: string, actor: Actor) {
     if (!canReview(actor.role)) throw new ApiError(403, 'Only a risk reviewer can activate a vendor.');
     const vendor = await loadVendor(organizationId, vendorKey);
-    if (!['APPROVE', 'APPROVE_WITH_CONDITIONS'].includes(String(vendor.onboarding?.approvalDecision))) {
-        throw new ApiError(409, 'Activation requires a human approval decision.');
-    }
-    const open = await openConfirmedFindings(organizationId, vendor.id);
-    if (open.length) throw new ApiError(409, 'Activation cannot proceed while confirmed findings remain open.');
+    const { requireActivatableVendor } = await import('./phaseCGovernance');
+    await requireActivatableVendor(organizationId, vendor.id);
     const next = vendor.status === VendorStatus.PROPOSED ? VendorStatus.APPROVED : vendor.status;
     if (next === VendorStatus.APPROVED && vendor.status === VendorStatus.PROPOSED) {
         assertVendorTransition(vendor.status, VendorStatus.APPROVED);

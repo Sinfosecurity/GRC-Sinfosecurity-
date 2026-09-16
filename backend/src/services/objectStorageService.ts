@@ -198,6 +198,10 @@ export const objectStorageService = {
             where: { id: stored.id },
             data: { deletedAt: new Date(), retentionStatus: 'DELETED' },
         });
+        await prisma.evidenceGovernanceLink.updateMany({
+            where: { storedObjectId: stored.id, organizationId, validTo: null },
+            data: { validTo: new Date() },
+        });
         await recordAudit({
             organizationId,
             actorUserId,

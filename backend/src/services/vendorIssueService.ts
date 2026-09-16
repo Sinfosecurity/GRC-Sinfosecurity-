@@ -14,6 +14,8 @@ import {
     remediationRequestedEmail,
 } from './transactionalEmail';
 import { omitForeignParent, requireAssessmentForOrganization, requireVendorForOrganization } from '../security/tenantOwnership';
+import { ApiError } from '../middleware/errorHandler';
+import { assertIndependentReviewer } from '../security/separationOfDuties';
 
 export interface CreateVendorIssueInput {
     vendorId: string;
@@ -313,6 +315,12 @@ class VendorIssueService {
         closureNotes: string,
         closureEvidence?: string
     ) {
+        const { assertFindingMayClose } = await import('./phaseCGovernance');
+        const { stored } = await assertFindingMayClose({
+            organizationId,
+            findingId: issueId,
+            evidenceId: closureEvidence,
+        });
         const closed = await prisma.vendorIssue.updateMany({
             where: {
                 id: issueId,
@@ -323,7 +331,7 @@ class VendorIssueService {
                 closedBy,
                 closedAt: new Date(),
                 closureNotes,
-                closureEvidence,
+                closureEvidence: stored.id,
                 updatedAt: new Date(),
             },
         });
@@ -359,6 +367,14 @@ class VendorIssueService {
         acceptedBy: string,
         acceptanceRationale: string
     ) {
+        const existing = await this.getIssueById(issueId, organizationId);
+        if (!existing) {
+            throw new ApiError(404, 'Finding not found.');
+        }
+        if (!existing.acceptanceRequestedBy) {
+            throw new ApiError(409, 'Risk acceptance must be prepared before it can be approved.');
+        }
+        assertIndependentReviewer(existing.acceptanceRequestedBy, acceptedBy);
         return await prisma.vendorIssue.updateMany({
             where: {
                 id: issueId,

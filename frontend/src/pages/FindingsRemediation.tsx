@@ -20,6 +20,10 @@ type Finding = {
     correctiveActionPlan?: string | null;
     vendor?: { id: string; name: string };
     identifiedDate: string;
+    closureEvidence?: string | null;
+    evidenceUrl?: string | null;
+    closureEvidenceId?: string | null;
+    evidenceId?: string | null;
 };
 
 export default function FindingsRemediation() {
@@ -36,6 +40,7 @@ export default function FindingsRemediation() {
     const [cap, setCap] = useState('');
     const [target, setTarget] = useState('');
     const [busy, setBusy] = useState(false);
+    const [actionError, setActionError] = useState<string | null>(null);
 
     const load = async () => {
         setLoading(true);
@@ -175,10 +180,19 @@ export default function FindingsRemediation() {
                                 await load();
                             }}>Mark verification complete</Button>
                             <Button disabled={busy} onClick={async () => {
-                                const updated = await tprmAPI.closeFinding(selected.id, { closureNotes: 'Closed from findings workspace' });
-                                setSelected(updated.data.data);
-                                await load();
+                                setActionError(null);
+                                try {
+                                    const updated = await tprmAPI.closeFinding(selected.id, {
+                                        closureNotes: 'Closed from findings workspace',
+                                        evidenceId: selected.closureEvidenceId || selected.closureEvidence || selected.evidenceId || selected.evidenceUrl,
+                                    });
+                                    setSelected(updated.data.data);
+                                    await load();
+                                } catch (err: any) {
+                                    setActionError(err.message || 'This finding cannot be closed yet. Validated evidence is still required.');
+                                }
                             }}>Close finding</Button>
+                            {actionError && <Alert severity="warning">{actionError}</Alert>}
                             <EntityRelationships sourceModel="VendorIssue" sourceId={selected.id} />
                             <Button onClick={() => setSelected(null)}>Close panel</Button>
                         </Stack>

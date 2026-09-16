@@ -216,7 +216,8 @@ function usableEvidenceWhere(organizationId: string) {
         organizationId,
         validTo: null,
         relationship: { in: [...USABLE_EVIDENCE] },
-        storedObject: { scanStatus: 'CLEAN' as const },
+        reviewStatus: { not: 'REJECTED' as const },
+        storedObject: { scanStatus: 'CLEAN' as const, deletedAt: null },
         freshness: { in: [EvidenceFreshness.CURRENT, EvidenceFreshness.EXPIRING] },
     };
 }

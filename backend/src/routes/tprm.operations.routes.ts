@@ -336,13 +336,17 @@ router.post('/findings/:issueId/validate', requirePermission(PERMISSIONS['findin
 
 router.post('/findings/:issueId/close', requirePermission(PERMISSIONS['finding.close']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        await vendorIssueService.closeIssue(
-            req.params.issueId,
-            req.user!.organizationId,
-            req.user!.id,
-            req.body.closureNotes || '',
-            req.body.closureEvidence
-        );
+        const issue = await vendorIssueService.getIssueById(req.params.issueId, req.user!.organizationId);
+        if (!issue) throw new ApiError(404, 'Finding not found.');
+        const { closeFinding } = await import('../services/vendorLifecycleClosureService');
+        await closeFinding(req.user!.organizationId, issue.vendorId, {
+            id: req.user!.id,
+            role: req.user!.role,
+            name: req.user!.name,
+        }, req.params.issueId, {
+            notes: req.body?.closureNotes,
+            evidenceId: req.body?.closureEvidence || req.body?.evidenceId,
+        });
         const data = await vendorIssueService.getIssueById(req.params.issueId, req.user!.organizationId);
         res.json({ success: true, data });
     } catch (error) {

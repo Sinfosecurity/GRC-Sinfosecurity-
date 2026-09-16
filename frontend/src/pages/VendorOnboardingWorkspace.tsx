@@ -454,7 +454,7 @@ export default function VendorOnboardingWorkspace() {
                                             <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.remediateFinding(id, finding.id, { cap: 'Correct the control gap and provide current evidence.' }))}>Assign remediation</Button>
                                             <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.validateFinding(id, finding.id, { approved: true, notes: 'Remediation validated.' }))}>Validate</Button>
                                             {data.canCloseFinding && (
-                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.closeFinding(id, finding.id, {}))}>Close with ready evidence</Button>
+                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.closeFinding(id, finding.id, { evidenceId: finding.closureEvidenceId || finding.evidenceId }))}>Close with ready evidence</Button>
                                             )}
                                         </Stack>
                                     )}

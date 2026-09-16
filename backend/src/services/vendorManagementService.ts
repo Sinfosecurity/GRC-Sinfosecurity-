@@ -7,10 +7,10 @@ import { CriticalityLevel, Prisma, Vendor, VendorCategory, VendorTier, VendorSta
 import { prisma } from '../config/database';
 import { deriveAssessmentStatus } from './vendorAssessmentStatus';
 import { handlePrismaError, NotFoundError, ValidationError, BusinessLogicError } from '../utils/errors';
+import { ApiError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { calculateVendorRiskAt } from './deterministicRiskEngine';
 import { explainableRiskService } from './explainableRiskService';
-import { assertVendorTransition } from './vendorLifecycle';
 import { recordAudit } from './auditEventService';
 import { allocateVendorPublicId } from './vendorOnboardingService';
 import { extractVendorDomain } from './vendorOnboardingScoring';
@@ -294,16 +294,14 @@ class VendorManagementService {
         if (!existing) {
             throw new NotFoundError('Vendor', vendorId);
         }
-        if (data.status && data.status !== existing.status) {
-            assertVendorTransition(existing.status, data.status);
-        }
-
         const {
             inherentRiskScore: _clientInherent,
             residualRiskScore: _clientResidual,
+            status: _clientStatus,
             tier: requestedTier,
             ...safeData
-        } = data;
+        } = data as UpdateVendorInput & { status?: unknown };
+        void _clientStatus;
         void _clientInherent;
         void _clientResidual;
 
@@ -647,27 +645,34 @@ class VendorManagementService {
     /**
      * Approve vendor (change status from PROPOSED to APPROVED)
      */
-    async approveVendor(vendorId: string, organizationId: string, approvedBy: string) {
-        return await prisma.vendor.updateMany({
-            where: { id: vendorId, organizationId },
-            data: {
-                status: VendorStatus.APPROVED,
-                updatedAt: new Date(),
-            },
+    async approveVendor(vendorId: string, organizationId: string, approvedBy: string, input: { decision?: string; conditions?: string; rationale?: string } = {}) {
+        const actor = await prisma.user.findFirst({ where: { id: approvedBy, organizationId }, select: { id: true, role: true, firstName: true, lastName: true } });
+        if (!actor) throw new ApiError(403, 'Only an authorized reviewer can record this decision.');
+        const { decideApproval } = await import('./vendorLifecycleClosureService');
+        return decideApproval(organizationId, vendorId, {
+            id: actor.id,
+            role: actor.role,
+            name: `${actor.firstName || ''} ${actor.lastName || ''}`.trim(),
+        }, {
+            decision: (input.decision as 'APPROVE' | 'REJECT' | 'APPROVE_WITH_CONDITIONS') || 'APPROVE',
+            conditions: input.conditions,
+            rationale: input.rationale,
         });
     }
 
     /**
      * Onboard vendor (change status from APPROVED to ACTIVE)
      */
-    async onboardVendor(vendorId: string, organizationId: string) {
-        return await prisma.vendor.updateMany({
-            where: { id: vendorId, organizationId },
-            data: {
-                status: VendorStatus.ACTIVE,
-                onboardedAt: new Date(),
-                updatedAt: new Date(),
-            },
+    async onboardVendor(vendorId: string, organizationId: string, actorUserId?: string) {
+        const actor = actorUserId
+            ? await prisma.user.findFirst({ where: { id: actorUserId, organizationId }, select: { id: true, role: true, firstName: true, lastName: true } })
+            : null;
+        if (!actor) throw new ApiError(403, 'Only a risk reviewer can activate a vendor.');
+        const { activateVendor } = await import('./vendorLifecycleClosureService');
+        return activateVendor(organizationId, vendorId, {
+            id: actor.id,
+            role: actor.role,
+            name: `${actor.firstName || ''} ${actor.lastName || ''}`.trim(),
         });
     }
 

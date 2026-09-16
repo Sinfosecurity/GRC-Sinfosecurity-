@@ -110,7 +110,7 @@ export const evidenceLinkageService = {
                         },
                     });
                 }
-                if (input.assessmentId && input.questionId) {
+                if (input.assessmentId && input.questionId && stored.scanStatus === 'CLEAN') {
                     await tx.assessmentResponse.updateMany({
                         where: { assessmentId: input.assessmentId, questionId: input.questionId },
                         data: { hasEvidence: true },

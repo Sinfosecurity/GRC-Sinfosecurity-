@@ -16,4 +16,9 @@ describe('vendor lifecycle', () => {
     it('blocks terminated to active', () => {
         expect(() => assertVendorTransition(VendorStatus.TERMINATED, VendorStatus.ACTIVE)).toThrow();
     });
+
+    it('blocks proposed to active without the governed activation path', () => {
+        expect(allowedVendorTransitions(VendorStatus.PROPOSED)).not.toContain(VendorStatus.ACTIVE);
+        expect(() => assertVendorTransition(VendorStatus.PROPOSED, VendorStatus.ACTIVE)).toThrow();
+    });
 });

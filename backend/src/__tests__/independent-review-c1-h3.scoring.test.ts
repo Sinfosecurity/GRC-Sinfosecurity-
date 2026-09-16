@@ -271,7 +271,15 @@ describe('independent review C-1 / H-3 scoring and tier integrity', () => {
         });
         await explainableRiskService.recalculate(orgId, highVendorId);
         const withFinding = await prisma.vendor.findUnique({ where: { id: highVendorId } });
-        await vendorIssueService.acceptRisk(issue.id, orgId, ownerId, 'Accepted for go-live');
+        await prisma.vendorIssue.update({
+            where: { id: issue.id },
+            data: {
+                status: VendorIssueStatus.RISK_ACCEPTED,
+                closedBy: ownerId,
+                closedAt: new Date(),
+                closureNotes: 'Accepted for go-live',
+            },
+        });
         const afterAccept = await explainableRiskService.recalculate(orgId, highVendorId);
         expect(afterAccept.residualRisk).toBe(withFinding?.residualRiskScore);
         expect(afterAccept.residualRisk).toBeGreaterThanOrEqual(before?.residualRiskScore || 0);

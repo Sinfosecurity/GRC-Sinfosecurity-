@@ -43,6 +43,11 @@ import vendorOnboardingRoutes from './vendorOnboarding.routes';
 
 const router = express.Router();
 
+function sendRouteError(res: { status: (code: number) => { json: (body: unknown) => void } }, error: { statusCode?: number; status?: number; message?: string }, fallback = 400) {
+    const status = error.statusCode || error.status || fallback;
+    res.status(status).json({ error: { message: error.message || 'Request failed.' } });
+}
+
 // Apply authentication to all routes
 router.use(authenticate);
 router.use('/onboarding', vendorOnboardingRoutes);
@@ -238,14 +243,15 @@ router.delete('/:id', requirePermission(PERMISSIONS['vendor.delete']), validateU
  */
 router.post('/:id/approve', requirePermission(PERMISSIONS['approval.decide']), validateUUID('id'), async (req: any, res) => {
     try {
-        await vendorManagementService.approveVendor(
+        const data = await vendorManagementService.approveVendor(
             req.params.id,
             req.user.organizationId,
-            req.user.id
+            req.user.id,
+            req.body || {}
         );
-        res.json({ message: 'Vendor approved successfully' });
+        res.json({ success: true, message: 'Vendor approved successfully', data });
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        sendRouteError(res, error);
     }
 });
 
@@ -255,10 +261,10 @@ router.post('/:id/approve', requirePermission(PERMISSIONS['approval.decide']), v
  */
 router.post('/:id/onboard', requirePermission(PERMISSIONS['vendor.update']), validateUUID('id'), async (req: any, res) => {
     try {
-        await vendorManagementService.onboardVendor(req.params.id, req.user.organizationId);
-        res.json({ message: 'Vendor onboarded successfully' });
+        const data = await vendorManagementService.onboardVendor(req.params.id, req.user.organizationId, req.user.id);
+        res.json({ success: true, message: 'Vendor onboarded successfully', data });
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        sendRouteError(res, error);
     }
 });
 
@@ -712,17 +718,23 @@ router.post('/issues/:issueId/validate', requirePermission(PERMISSIONS['finding.
  */
 router.post('/issues/:issueId/close', requirePermission(PERMISSIONS['finding.close']), async (req: any, res) => {
     try {
-        await vendorIssueService.closeIssue(
-            req.params.issueId,
-            req.user.organizationId,
-            req.user.id,
-            req.body.closureNotes,
-            req.body.closureEvidence
-        );
-
-        res.json({ message: 'Issue closed successfully' });
+        const issue = await vendorIssueService.getIssueById(req.params.issueId, req.user.organizationId);
+        if (!issue) {
+            res.status(404).json({ error: 'Finding not found' });
+            return;
+        }
+        const { closeFinding } = await import('../services/vendorLifecycleClosureService');
+        const data = await closeFinding(req.user.organizationId, issue.vendorId, {
+            id: req.user.id,
+            role: req.user.role,
+            name: req.user.name,
+        }, req.params.issueId, {
+            notes: req.body?.closureNotes,
+            evidenceId: req.body?.closureEvidence || req.body?.evidenceId,
+        });
+        res.json({ success: true, message: 'Issue closed successfully', data });
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        sendRouteError(res, error);
     }
 });
 
@@ -732,16 +744,25 @@ router.post('/issues/:issueId/close', requirePermission(PERMISSIONS['finding.clo
  */
 router.post('/issues/:issueId/accept-risk', requirePermission(PERMISSIONS['risk.accept']), async (req: any, res) => {
     try {
-        await vendorIssueService.acceptRisk(
-            req.params.issueId,
-            req.user.organizationId,
-            req.user.id,
-            req.body.acceptanceRationale
-        );
-
-        res.json({ message: 'Risk accepted successfully' });
+        const issue = await vendorIssueService.getIssueById(req.params.issueId, req.user.organizationId);
+        if (!issue) {
+            res.status(404).json({ error: 'Finding not found' });
+            return;
+        }
+        const actor = { id: req.user.id, role: req.user.role, name: req.user.name };
+        const { acceptFindingRisk, approveFindingRisk } = await import('../services/vendorLifecycleClosureService');
+        const data = issue.acceptanceRequestedBy && issue.acceptanceRequestedBy !== req.user.id
+            ? await approveFindingRisk(req.user.organizationId, issue.vendorId, actor, req.params.issueId, {
+                rationale: req.body?.acceptanceRationale || req.body?.rationale,
+                conditions: req.body?.conditions,
+            })
+            : await acceptFindingRisk(req.user.organizationId, issue.vendorId, actor, req.params.issueId, {
+                rationale: req.body?.acceptanceRationale || req.body?.rationale,
+                conditions: req.body?.conditions,
+            });
+        res.json({ success: true, message: issue.acceptanceRequestedBy && issue.acceptanceRequestedBy !== req.user.id ? 'Risk accepted successfully' : 'Risk acceptance requested', data });
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+        sendRouteError(res, error);
     }
 });
 
