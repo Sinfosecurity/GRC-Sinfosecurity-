@@ -138,10 +138,28 @@ describe('Supreme Automation Intelligence contract and domain proofs', () => {
     });
 
     it('reconciles Intelligence after human source close and keeps the run historical', async () => {
+        const evidence = await prisma.storedObject.create({
+            data: {
+                organizationId: orgA,
+                ownerType: 'vendor',
+                ownerId: vendorId,
+                filename: 'mfa-review.pdf',
+                storageKey: `auto-intel/${findingId}.pdf`,
+                contentType: 'application/pdf',
+                size: 24,
+                checksum: `auto-intel-${findingId}`,
+                uploadedBy: userA,
+                scanStatus: 'CLEAN',
+            },
+        });
+        await prisma.vendorIssue.update({
+            where: { id: findingId },
+            data: { validatedAt: new Date(), closureEvidence: evidence.id },
+        });
         const closed = await request(app)
             .post(`${API}/tprm/findings/${findingId}/close`)
             .set('Authorization', `Bearer ${tokenA}`)
-            .send({ closureNotes: 'Human closed the authoritative finding.' });
+            .send({ closureNotes: 'Human closed the authoritative finding.', evidenceId: evidence.id });
         expect(closed.status).toBe(200);
         const workspace = await request(app).get(`${API}/intelligence/workspace`).set('Authorization', `Bearer ${tokenA}`);
         expect(workspace.status).toBe(200);

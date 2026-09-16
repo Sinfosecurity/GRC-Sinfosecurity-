@@ -217,7 +217,10 @@ export async function validateFinding(organizationId: string, vendorKey: string,
 
 export async function closeFinding(organizationId: string, vendorKey: string, actor: Actor, findingId: string, input: { notes?: string; evidenceId?: string }) {
     if (!hasPermission(actor.role, PERMISSIONS['finding.close'])) throw new ApiError(403, 'Only an authorized reviewer can close a finding.');
-    const vendor = await loadVendor(organizationId, vendorKey);
+    const vendor = await prisma.vendor.findFirst({
+        where: { organizationId, OR: [{ id: vendorKey }, { publicId: vendorKey }] },
+    });
+    if (!vendor) throw new ApiError(404, 'Finding not found.');
     const finding = await prisma.vendorIssue.findFirst({ where: { id: findingId, organizationId, vendorId: vendor.id } });
     if (!finding) throw new ApiError(404, 'Finding not found.');
     const { assertFindingMayClose } = await import('./phaseCGovernance');
@@ -230,7 +233,11 @@ export async function closeFinding(organizationId: string, vendorKey: string, ac
     await history(organizationId, actor.id, vendor.id, 'vendor.finding_closed', `${actor.name || 'Analyst'} closed a finding.`);
     const { explainableRiskService } = await import('./explainableRiskService');
     await explainableRiskService.recalculate(organizationId, vendor.id);
-    return presentLifecycle(organizationId, vendor.id, actor);
+    const onboarding = await prisma.vendorOnboarding.findUnique({ where: { vendorId: vendor.id } });
+    if (onboarding) {
+        return presentLifecycle(organizationId, vendor.id, actor);
+    }
+    return { finding: await vendorIssueService.getIssueById(finding.id, organizationId) };
 }
 
 export async function acceptFindingRisk(organizationId: string, vendorKey: string, actor: Actor, findingId: string, input: {
