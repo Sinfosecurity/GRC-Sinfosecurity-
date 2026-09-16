@@ -77,7 +77,7 @@ export default function ReviewDecidePanel({
     return (
         <Stack spacing={2}>
             <Surface>
-                <Typography variant="overline" component="p">Assessment review</Typography>
+                <Typography variant="overline" component="p" sx={{ color: color.ink, fontSize: '0.78rem', letterSpacing: '0.06em' }}>Assessment review</Typography>
                 <Typography variant="h4" component="h2">{primary.label}</Typography>
                 <Typography variant="body2" sx={{ mt: 0.75 }}>
                     {bundle.totalResponses} responses · {bundle.satisfactory} satisfactory · {bundle.needClarification} require clarification · {bundle.material.length} material issue{bundle.material.length === 1 ? '' : 's'} · {bundle.evidence.length} evidence issue{bundle.evidence.length === 1 ? '' : 's'}

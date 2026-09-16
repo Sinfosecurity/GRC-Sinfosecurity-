@@ -417,8 +417,8 @@ export default function VendorOnboardingWorkspace() {
 
                     {tab === 4 && (
                         <Stack spacing={1.5}>
-                            {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
-                            {data.plan?.triggers?.aiGovernance && <Alert severity="info">AI Governance review may be required</Alert>}
+                            {data.plan?.triggers?.privacy && <Typography variant="body2" sx={{ color: 'text.primary' }}>Privacy review may be required.</Typography>}
+                            {data.plan?.triggers?.aiGovernance && <Typography variant="body2" sx={{ color: 'text.primary' }}>AI Governance review may be required.</Typography>}
                             <ReviewDecidePanel
                                 review={data.review}
                                 stage={data.stageKey || data.stage}
@@ -511,7 +511,7 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 4 && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="overline">Decision brief</Typography>
+                                <Typography variant="overline" sx={{ color: 'text.primary', fontSize: '0.78rem', letterSpacing: '0.06em' }}>Decision brief</Typography>
                                 <Typography variant="h6">A person must decide</Typography>
                                 <Typography variant="body2" sx={{ mb: 1.5 }}>Supreme prepared this record. Approve, approve with conditions, or reject. Residual risk does not change because a person accepts it.</Typography>
                                 <Fact label="Vendor / service" value={`${data.publicId || ''} ${data.name}${data.request?.servicesProvided ? ` · ${data.request.servicesProvided}` : ''}`.trim()} />

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -258,6 +259,7 @@ def run_axe(page, name):
                     impact: row.impact,
                     help: row.help,
                     nodes: row.nodes.length,
+                    targets: row.nodes.slice(0, 4).map((node) => node.target),
                 })),
             };
         }"""
@@ -394,7 +396,7 @@ def main():
             shot(page, "finding-context", 1440)
 
         try:
-            page.get_by_role("button", name=lambda name: name.startswith("Clarifications")).click()
+            page.get_by_role("button", name=re.compile(r"^Clarifications")).click()
             page.wait_for_timeout(400)
             for width in WIDTHS:
                 shot(page, "clarifications", width)
@@ -404,7 +406,7 @@ def main():
             shot(page, "clarifications", 1440)
 
         try:
-            page.get_by_role("button", name=lambda name: name.startswith("Evidence issues")).click()
+            page.get_by_role("button", name=re.compile(r"^Evidence issues")).click()
             page.wait_for_timeout(400)
             for width in WIDTHS:
                 shot(page, "evidence-issues", width)
