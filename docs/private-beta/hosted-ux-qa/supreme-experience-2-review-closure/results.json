@@ -1,0 +1,677 @@
+{
+  "checks": [
+    {
+      "name": "hosted-sha",
+      "result": "PASS",
+      "detail": "6cb25e8e4e61db7dc9674df6d5757b9e483badc0"
+    },
+    {
+      "name": "request",
+      "result": "PASS",
+      "detail": "201 VND-2026-0022"
+    },
+    {
+      "name": "c1-unknown-blocks",
+      "result": "PASS",
+      "detail": "400"
+    },
+    {
+      "name": "intake",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "packs",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "send-email",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "h1-vendor-activate",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "token-reuse",
+      "result": "PASS",
+      "detail": "410"
+    },
+    {
+      "name": "vendor-plane",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "vendor-submit",
+      "result": "PASS",
+      "detail": "4/9 assessments, 36 questions"
+    },
+    {
+      "name": "exceptions-first",
+      "result": "PASS",
+      "detail": "{\"totalResponses\": 36, \"satisfactory\": 13, \"needClarification\": 18, \"potentialFindings\": 19, \"flatItems\": 37, \"materialUnits\": 8, \"clarificationUnits\": 15, \"evidenceUnits\": 3, \"primaryBefore\": 37, \"primaryAfter\": 8}"
+    },
+    {
+      "name": "material-grouped",
+      "result": "PASS",
+      "detail": "{\"material\": [{\"kind\": \"material\", \"related\": 1}, {\"kind\": \"material\", \"related\": 4}, {\"kind\": \"material\", \"related\": 1}, {\"kind\": \"material\", \"related\": 2}, {\"kind\": \"material\", \"related\": 1}, {\"kind\": \"material\", \"related\": 1}, {\"kind\": \"material\", \"related\": 4}, {\"kind\": \"material\", \"related\": 1}], \"clarification\": [{\"kind\": \"clarification\", \"related\": 2}, {\"kind\": \"clarification\", \"related\": 2"
+    },
+    {
+      "name": "review-api-count",
+      "result": "PASS",
+      "detail": "3 ['https://supreme-risk-staging-api.onrender.com/api/v1/auth/me', 'https://supreme-risk-staging-api.onrender.com/api/v1/organization/current', 'https://supreme-risk-staging-api.onrender.com/api/v1/vendors/onboarding/VND-2026-0022']"
+    },
+    {
+      "name": "n-plus-one",
+      "result": "PASS",
+      "detail": "3"
+    },
+    {
+      "name": "ui-material",
+      "result": "PASS",
+      "detail": "material issue visible"
+    },
+    {
+      "name": "ui-summary",
+      "result": "PASS",
+      "detail": "summary visible"
+    },
+    {
+      "name": "ui-satisfactory-deemphasized",
+      "result": "PASS",
+      "detail": "satisfactory remains secondary"
+    },
+    {
+      "name": "review-summary-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "material-issues-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "review-summary-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "material-issues-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "review-summary-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "material-issues-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "review-summary-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "material-issues-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "review-summary-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "material-issues-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-review-summary",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "finding-context-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-context-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-context-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-context-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-context-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-context",
+      "result": "PASS",
+      "detail": "expanded related responses"
+    },
+    {
+      "name": "clarifications-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "clarifications-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "clarifications-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "clarifications-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "clarifications-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "ui-clarifications",
+      "result": "PASS",
+      "detail": "clarification queue"
+    },
+    {
+      "name": "evidence-issues-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-issues-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-issues-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-issues-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-issues-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "ui-evidence",
+      "result": "PASS",
+      "detail": "evidence queue"
+    },
+    {
+      "name": "full-assessment-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "full-assessment-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "full-assessment-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "full-assessment-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "full-assessment-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "ui-full-assessment",
+      "result": "PASS",
+      "detail": "full assessment available"
+    },
+    {
+      "name": "home-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-home",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "home-regression",
+      "result": "PASS",
+      "detail": "home loaded"
+    },
+    {
+      "name": "request-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "request-regression",
+      "result": "PASS",
+      "detail": "request form"
+    },
+    {
+      "name": "assess-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "assess-regression",
+      "result": "PASS",
+      "detail": "assessment tab"
+    },
+    {
+      "name": "vendor-review-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "finding-confirm",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "remediation-handoff",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "risk-acceptance",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "acceptance-score-unchanged",
+      "result": "PASS",
+      "detail": "100->100"
+    },
+    {
+      "name": "contract",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "approval-handoff",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "decision-ready-375",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-ready-768",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-ready-1024",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-ready-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-ready-1920",
+      "result": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "axe-decision-ready",
+      "result": "PASS",
+      "detail": "serious=0 total=0"
+    },
+    {
+      "name": "decision-ready",
+      "result": "PASS",
+      "detail": "decision surface"
+    },
+    {
+      "name": "monitor-regression",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "monitor-1440",
+      "result": "PASS",
+      "detail": "overflow=False"
+    }
+  ],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/review-summary-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/material-issues-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/review-summary-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/material-issues-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/review-summary-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/material-issues-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/review-summary-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/material-issues-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/review-summary-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/material-issues-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/finding-context-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/finding-context-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/finding-context-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/finding-context-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/finding-context-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/clarifications-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/clarifications-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/clarifications-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/clarifications-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/clarifications-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/evidence-issues-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/evidence-issues-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/evidence-issues-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/evidence-issues-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/evidence-issues-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/full-assessment-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/full-assessment-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/full-assessment-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/full-assessment-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/full-assessment-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/request-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/assess-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/vendor-review-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/decision-ready-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/decision-ready-768.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/decision-ready-1024.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/decision-ready-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/decision-ready-1920.png",
+    "docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/monitor-1440.png"
+  ],
+  "axe": [
+    {
+      "name": "review-summary",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "home",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "name": "decision-ready",
+      "serious": 0,
+      "violations": []
+    }
+  ],
+  "overflows": [
+    {
+      "name": "review-summary",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "material-issues",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "review-summary",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "material-issues",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "review-summary",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "material-issues",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "review-summary",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "material-issues",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "review-summary",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "material-issues",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "finding-context",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "finding-context",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "finding-context",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "finding-context",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "finding-context",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "clarifications",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "clarifications",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "clarifications",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "clarifications",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "clarifications",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "evidence-issues",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "evidence-issues",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "evidence-issues",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "evidence-issues",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "evidence-issues",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "full-assessment",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "full-assessment",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "full-assessment",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "full-assessment",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "full-assessment",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "home",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "home",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "request",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "assess",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "vendor-review",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "decision-ready",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "name": "decision-ready",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "name": "decision-ready",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "name": "decision-ready",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "name": "decision-ready",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "name": "monitor",
+      "width": 1440,
+      "overflow": false
+    }
+  ],
+  "sha": {
+    "api": "6cb25e8e4e61db7dc9674df6d5757b9e483badc0",
+    "frontend": "6cb25e8e4e61db7dc9674df6d5757b9e483badc0",
+    "health": "degraded",
+    "required": "6cb25e8e4e61db7dc9674df6d5757b9e483badc0"
+  },
+  "review": {
+    "totalResponses": 36,
+    "satisfactory": 13,
+    "needClarification": 18,
+    "potentialFindings": 19,
+    "flatItems": 37,
+    "materialUnits": 8,
+    "clarificationUnits": 15,
+    "evidenceUnits": 3,
+    "primaryBefore": 37,
+    "primaryAfter": 8
+  },
+  "reviewApis": [
+    "https://supreme-risk-staging-api.onrender.com/api/v1/auth/me",
+    "https://supreme-risk-staging-api.onrender.com/api/v1/organization/current",
+    "https://supreme-risk-staging-api.onrender.com/api/v1/vendors/onboarding/VND-2026-0022"
+  ],
+  "workflow": {
+    "publicId": "VND-2026-0022"
+  }
+}

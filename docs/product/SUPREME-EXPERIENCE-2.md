@@ -4,7 +4,9 @@ Engineering record for #12-V. Product Leadership decides #12 PASS. This file doe
 
 **Item:** #12-V Supreme Third Party — Seamless Experience & Visual Transformation  
 **Starting SHA:** `11b37f52006092bee3e15b8bb1608650cdb0151c`  
-**Implementation SHA:** `6c0795cebcf83c0dd5e187cdd619e6daaaba4c7b`  
+**Implementation SHA:** `6cb25e8e4e61db7dc9674df6d5757b9e483badc0`  
+**Review-closure SHA:** `6cb25e8e4e61db7dc9674df6d5757b9e483badc0`  
+**Prior visual SHA:** `6c0795cebcf83c0dd5e187cdd619e6daaaba4c7b`  
 **Prior structure SHA:** `a11405ff624571336dcc4cbd8690be48149c0a2f`  
 **Branch:** `supreme-risk-transformation`  
 **Migration:** NONE  
@@ -74,6 +76,10 @@ Vendor home is **Security review for [customer]**, percent complete, remaining q
 ## Exception-driven review
 
 Analysts see how many items need review first. Satisfactory answers stay in the full assessment.
+
+### Review & Decide closure
+
+Decisions no longer opens a flat equal list of every exception row. The existing `review.items` payload is grouped client-side into material issues, clarifications, and evidence issues. Hosted fixture `VND-2026-0022` had 36 responses, 13 satisfactory, 18 clarification rows, 19 potential findings, and 37 flat exception rows. After grouping the primary queue was 8 material units, with 15 clarification groups and 3 evidence groups still visible in their own queues. View full assessment remains. Finding confirm, remediation, and risk acceptance stay in context. Acceptance did not change residual (100 → 100). Evidence: `docs/private-beta/hosted-ux-qa/supreme-experience-2-review-closure/`.
 
 ## Automation boundaries
 
