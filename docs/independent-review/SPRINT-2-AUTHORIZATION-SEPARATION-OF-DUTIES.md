@@ -4,9 +4,11 @@
 **Branch:** `supreme-risk-transformation`  
 **Starting SHA:** `7dac1ba30f3cddfa51ab7080cda03a94b10b62af`  
 **Implementation SHA:** `fdd0b9d713cc9bc155bb56f799e8bb8aeada7232`  
+**Documentation / hosted SHA:** `7717b5cefbdc4cae70e46e51a0ab9e42f0519e2a`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35084379243 PASS (452 backend / 187 frontend)  
 **Scope:** Customer-plane authorization and material decision SoD only. H-4, H-5, H-6, and #21 were not started.
 
-H-2 and H-7 remain **OPEN** until implementation, CI, and hosted two-user proof all pass. This file is engineering evidence, not Product Leadership acceptance.
+H-2 and H-7 are **CLOSED** on implementation + CI + hosted two-user proof. This file is engineering evidence. It is not commercial production acceptance and does not declare #12 PASS.
 
 ---
 
@@ -142,12 +144,26 @@ Schema added for provenance: `RiskDecisionBrief.preparedByUserId`, `VendorOnboar
 
 ## Hosted two-user proof
 
-Not completed in this engineering pass. Required before H-2 / H-7 can be marked closed:
+Staging only. API `/health` and frontend `version.json` both `7717b5cefbdc4cae70e46e51a0ab9e42f0519e2a`. Tenant Elite Claims `05d7821b-cab1-44af-9f5c-1f528a2d0a0e`. Vendor `VND-2026-0024`.
 
-1. Same staging tenant, User A prepares risk acceptance and vendor package; User A self-approve denied; User B approves; audit A then B.
-2. Unauthorized role denied.
-3. Cross-tenant denied.
-4. Staging frontend `version.json` and API `/health` SHA match the implementation commit.
+| Actor | Account | Role |
+|---|---|---|
+| User A (preparer) | `report-proof-20260913@staging.supremerisk.test` | `ORGANIZATION_ADMIN` `e5fe1b60-a942-4127-b994-7206ea3cedbb` |
+| User B (approver) | `sales@eliteadjustersny.com` | `ORGANIZATION_ADMIN` `9efdbc83-8b3a-48e4-8ba1-f993c0741c22` |
+| Unauthorized | User B patched to `VIEWER`, then restored | 403 Insufficient permissions |
+| Cross-tenant | Fresh signup `sprint2-cross-*@staging.supremerisk.test` | 404 on A's vendor |
+| Platform admin | `admin@sinfosecurity.com` | 404 on customer onboarding |
+
+Observed:
+
+1. A prepared risk acceptance. A self-approve → **403** `Another authorized reviewer must approve this decision.` B approved → **200**. `acceptanceRequestedBy=A`, `acceptanceAuthority=B`. Residual **79** before approve and after approve. The earlier **87** reading was taken before finding close, not before acceptance.
+2. A attested the contract (`readyForIndependentApproval=true`). A self-approve vendor → **403** same message. B approved `APPROVE_WITH_CONDITIONS`. `approvalPreparedBy=A`. Vendor became **ACTIVE**.
+3. Viewer approve denied. Cross-tenant approve denied. Platform admin did not become a customer decision-maker.
+4. Body `approvedBy` / `organizationId` did not bind the recorded actor or tenant (`Cannot act on another organization` on spoofed create).
+5. Cross-module: A created `EXC-00002`. A decide → **403** SoD message. B decide → **200** `ownerUserId=A` `approverUserId=B`.
+6. Authenticated Home and Active workspace: no overflow at 375/768/1024/1440/1920. axe serious=0 critical=0. Keyboard focus moved. Product CSP was not changed; Playwright `bypass_csp` was used only to run axe.
+
+Machine log: `docs/private-beta/hosted-ux-qa/sprint-2-authorization/results.json`.
 
 ---
 
@@ -156,7 +172,7 @@ Not completed in this engineering pass. Required before H-2 / H-7 can be marked 
 - H-4 Phase C finding-closure evidence bypass was not remediated (authorization only).
 - H-5 and H-6 remain open.
 - AUD-1 immutable audit was not implemented.
-- `#12` remains PARTIAL for security remediation until hosted proof and Product Leadership review.
+- `#12` remains PARTIAL. H-4, H-5, and H-6 are still open. Product Leadership independently reviews this sprint. Commercial production remains NO-GO.
 - A generated route × role matrix test was not added; explicit negative/positive cases cover the H-2/H-7 claims.
 - `COMPLIANCE_OFFICER` remains an ASSESSOR alias. Approval routes no longer use that alias as an allowlist.
 - Intelligence narrative `ERROR` vs `NOT_CONFIGURED` can flake when the AI provider is unavailable; that path was not changed.
