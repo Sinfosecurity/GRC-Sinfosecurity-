@@ -26,7 +26,7 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
-import { ExecutiveMetric } from '../components/experience/ExperienceKit';
+import { ExecutiveMetric, PageShell } from '../components/experience/ExperienceKit';
 import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -271,13 +271,13 @@ export default function VendorManagement() {
     };
 
     const filtered = vendors.filter((vendor) => {
-        if (tabValue === 1) return vendor.tier === 'Critical' || vendor.tier === 'High';
-        if (tabValue === 2) return vendor.assessmentStatus !== 'Completed';
+        if (tabValue === 1) return vendor.assessmentStatus === 'Overdue' || vendor.assessmentStatus === 'In Progress';
+        if (tabValue === 2) return vendor.tier === 'Critical' || vendor.tier === 'High';
         return true;
     });
 
     return (
-        <Box>
+        <PageShell>
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                 <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                     {snackbar.message}
@@ -304,8 +304,8 @@ export default function VendorManagement() {
 
             <Tabs value={tabValue} onChange={(_, value) => setTabValue(value)} sx={{ mb: 2 }}>
                 <Tab label="All" />
-                <Tab label="Critical & high" />
-                <Tab label="Assessments pending" />
+                <Tab label="Needs action" />
+                <Tab label="Critical and high" />
             </Tabs>
 
             <QueryState
@@ -582,6 +582,6 @@ export default function VendorManagement() {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </PageShell>
     );
 }

@@ -8,7 +8,8 @@ import QueryState from '../components/QueryState';
 import StatusBadge from '../components/design/StatusBadge';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate } from '../utils/humanizeLabel';
-import { customerStage } from '../experience/customerStages';
+import { CUSTOMER_STAGES, customerStage } from '../experience/customerStages';
+import { PageShell, SectionHeader } from '../components/experience/ExperienceKit';
 
 type Owner = { id: string; name: string; email: string };
 type Duplicate = { id: string; publicId?: string; name: string; matchReason: string; status: string };
@@ -84,6 +85,7 @@ export default function VendorOnboarding() {
 
     return (
         <QueryState loading={loading && !rows.length} error={null} empty={false}>
+            <PageShell>
             <PageHeader
                 crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Request' }]}
                 title="Request a third party"
@@ -132,7 +134,7 @@ export default function VendorOnboarding() {
                     </Stack>
                 </Surface>
                 <Surface>
-                    <Typography variant="h6" sx={{ mb: 1.5 }}>Open onboarding</Typography>
+                    <SectionHeader title="Open work" body={CUSTOMER_STAGES.map((stage) => `${stage} ${rows.filter((row) => customerStage(row.stage) === stage).length}`).join(' · ')} />
                     <AppTable
                         rows={rows}
                         rowKey={(row) => row.id}
@@ -168,6 +170,7 @@ export default function VendorOnboarding() {
                     <Button variant="contained" onClick={(event) => { setDuplicates([]); submit(event as unknown as FormEvent, true); }}>Continue with new request</Button>
                 </DialogActions>
             </Dialog>
+            </PageShell>
         </QueryState>
     );
 }

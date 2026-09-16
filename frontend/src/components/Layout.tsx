@@ -395,7 +395,7 @@ export default function Layout() {
                         <MenuItem onClick={async () => { setMenuEl(null); await logout(); navigate('/login'); }}>Sign out</MenuItem>
                     </Menu>
                 </Box>
-                <Box component="main" id="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: { xs: 2, md: 3 } }}>
+                <Box component="main" id="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, lg: 4 }, py: { xs: 2, md: 2.5 } }}>
                     {serviceNotice && (
                         <Alert
                             severity="warning"

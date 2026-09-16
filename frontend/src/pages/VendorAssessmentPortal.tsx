@@ -45,9 +45,9 @@ export default function VendorAssessmentPortal() {
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: color.workspace }}>
-            <Box sx={{ bgcolor: color.navy950, color: color.navInk, px: { xs: 2, md: 6 }, py: 4 }}>
-                <Typography sx={{ color: color.goldSoft, fontWeight: 700, fontSize: 13 }}>Security review for {data.organizationName}</Typography>
-                <Typography variant="h3" sx={{ fontFamily: '"Newsreader", serif', fontWeight: 500, mt: 1 }}>{percent}% complete</Typography>
+            <Box sx={{ bgcolor: color.navy950, color: color.navInk, px: { xs: 2, md: 6 }, py: 3 }}>
+                <Typography sx={{ color: color.navMuted, fontWeight: 650, fontSize: 13 }}>Security review for {data.organizationName}</Typography>
+                <Typography variant="h3" sx={{ mt: 0.75 }}>{percent}% complete</Typography>
                 <Typography sx={{ color: color.navMuted, mt: 1, maxWidth: 640 }}>
                     {data.requesterName || 'The requesting organization'} asked {data.vendorName} to answer questions and provide evidence. You will only see this assignment.
                 </Typography>
@@ -71,7 +71,7 @@ export default function VendorAssessmentPortal() {
             <Stack spacing={2} sx={{ maxWidth: 820, mx: 'auto', px: { xs: 2, md: 6 }, py: 4 }}>
                 {assessments.map((item: any) => (
                     <Box key={item.id} sx={{ py: 2, borderBottom: `1px solid ${color.line}` }}>
-                        <Typography variant="h6" sx={{ fontFamily: '"Newsreader", serif' }}>{item.name}</Typography>
+                        <Typography variant="h6">{item.name}</Typography>
                         <Typography sx={{ color: color.inkMuted }}>{humanizeLabel(item.status)} · {item.answered} / {item.total} answered</Typography>
                         <Button sx={{ mt: 1 }} onClick={() => navigate(`/vendor-assessment/${item.id}`)}>
                             {item.status === 'Submitted' ? 'View submission' : item.answered ? 'Resume' : 'Begin'}

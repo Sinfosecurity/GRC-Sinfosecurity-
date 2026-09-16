@@ -1,6 +1,20 @@
+import type { ReactNode } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { color } from '../../design/tokens';
+import { color, type } from '../../design/tokens';
 import { CUSTOMER_STAGES } from '../../experience/customerStages';
+
+export function PageShell({ children }: { children: ReactNode }) {
+    return <Box sx={{ maxWidth: 1180, mx: 'auto' }}>{children}</Box>;
+}
+
+export function SectionHeader({ title, body }: { title: string; body?: string }) {
+    return (
+        <Box sx={{ mb: 1.5 }}>
+            <Typography variant="h4">{title}</Typography>
+            {body && <Typography variant="body2" sx={{ mt: 0.5 }}>{body}</Typography>}
+        </Box>
+    );
+}
 
 export function ExecutiveMetric({
     label,
@@ -23,21 +37,22 @@ export function ExecutiveMetric({
             onClick={onClick}
             sx={{
                 textAlign: 'left',
-                p: emphasis ? 2.5 : 2,
-                minWidth: emphasis ? 180 : 120,
-                flex: emphasis ? 1.4 : 1,
+                py: 1.5,
+                pr: 3,
+                minWidth: emphasis ? 160 : 110,
+                flex: emphasis ? 1.2 : 1,
                 border: 0,
-                bgcolor: emphasis ? color.navy950 : 'transparent',
-                color: emphasis ? color.navInk : color.ink,
+                bgcolor: 'transparent',
+                color: color.ink,
                 cursor: onClick ? 'pointer' : 'default',
                 font: 'inherit',
             }}
         >
-            <Typography sx={{ fontFamily: '"Newsreader", serif', fontSize: emphasis ? 40 : 28, lineHeight: 1, fontWeight: 500 }}>
+            <Typography sx={{ fontFamily: type.display, fontSize: emphasis ? 36 : 26, lineHeight: 1, fontWeight: 500 }}>
                 {value}
             </Typography>
-            <Typography sx={{ mt: 1, fontSize: 15, fontWeight: 650 }}>{label}</Typography>
-            {hint && <Typography sx={{ mt: 0.5, fontSize: 13, color: emphasis ? color.navMuted : color.inkMuted }}>{hint}</Typography>}
+            <Typography sx={{ mt: 0.75, fontSize: 14, fontWeight: emphasis ? 700 : 600 }}>{label}</Typography>
+            {hint && <Typography variant="body2" sx={{ mt: 0.25 }}>{hint}</Typography>}
         </Box>
     );
 }
@@ -56,13 +71,25 @@ export function AttentionHero({
     onAction: () => void;
 }) {
     return (
-        <Box sx={{ bgcolor: color.navy950, color: color.navInk, p: { xs: 2.5, md: 4 }, mb: 3 }}>
-            <Typography sx={{ fontSize: 13, color: color.goldSoft, fontWeight: 700, mb: 1 }}>{count} need your attention</Typography>
-            <Typography variant="h3" sx={{ fontFamily: '"Newsreader", serif', fontWeight: 500, mb: 1 }}>{title}</Typography>
-            <Typography sx={{ maxWidth: 640, color: color.navMuted, mb: 2 }}>{body}</Typography>
-            <Button variant="contained" onClick={onAction} sx={{ bgcolor: color.gold, color: color.navy950, '&:hover': { bgcolor: color.goldSoft } }}>
-                {actionLabel}
-            </Button>
+        <Box
+            sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr auto' },
+                gap: 2,
+                alignItems: 'center',
+                py: 2,
+                mb: 3,
+                borderBottom: `1px solid ${color.line}`,
+            }}
+        >
+            <Box>
+                <Typography sx={{ fontSize: 13, color: color.inkMuted, fontWeight: 650, mb: 0.5 }}>
+                    {count} need your attention
+                </Typography>
+                <Typography variant="h3">{title}</Typography>
+                <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 560 }}>{body}</Typography>
+            </Box>
+            <Button variant="contained" onClick={onAction}>{actionLabel}</Button>
         </Box>
     );
 }
@@ -77,15 +104,23 @@ export function NextActionCard({
     onAction?: () => void;
 }) {
     return (
-        <Box sx={{ bgcolor: color.navy900, color: color.navInk, p: { xs: 2, md: 2.5 } }}>
-            <Typography sx={{ fontSize: 13, color: color.goldSoft, fontWeight: 700, mb: 0.5 }}>Next</Typography>
-            <Typography variant="h5" sx={{ fontFamily: '"Newsreader", serif', fontWeight: 500 }}>{label}</Typography>
-            {detail && <Typography sx={{ mt: 0.75, color: color.navMuted }}>{detail}</Typography>}
-            {onAction && (
-                <Button variant="contained" onClick={onAction} sx={{ mt: 2, bgcolor: color.gold, color: color.navy950, '&:hover': { bgcolor: color.goldSoft } }}>
-                    {label}
-                </Button>
-            )}
+        <Box
+            sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr auto' },
+                gap: 1.5,
+                alignItems: 'center',
+                py: 1.75,
+                borderTop: `1px solid ${color.line}`,
+                borderBottom: `1px solid ${color.line}`,
+            }}
+        >
+            <Box>
+                <Typography sx={{ fontSize: 13, color: color.inkMuted, fontWeight: 650 }}>Next</Typography>
+                <Typography variant="h5" sx={{ mt: 0.25 }}>{label}</Typography>
+                {detail && <Typography variant="body2" sx={{ mt: 0.4 }}>{detail}</Typography>}
+            </Box>
+            {onAction && <Button variant="contained" onClick={onAction}>{label}</Button>}
         </Box>
     );
 }
@@ -98,7 +133,7 @@ export function LifecycleProgress({
     blocked?: boolean;
 }) {
     return (
-        <Box component="ol" aria-label="Third party stages" sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, listStyle: 'none', p: 0, m: 0 }}>
+        <Box component="ol" aria-label="Third party stages" sx={{ display: 'flex', flexWrap: 'wrap', gap: 0, listStyle: 'none', p: 0, m: 0 }}>
             {CUSTOMER_STAGES.map((step, index) => {
                 const state = index < active ? 'completed' : index === active ? (blocked ? 'blocked' : 'current') : 'future';
                 return (
@@ -107,12 +142,12 @@ export function LifecycleProgress({
                         key={step}
                         aria-current={state === 'current' ? 'step' : undefined}
                         sx={{
-                            px: 1.5,
+                            pr: 2.5,
                             py: 0.75,
-                            bgcolor: state === 'current' ? color.navy950 : state === 'completed' ? color.surfaceMuted : 'transparent',
-                            color: state === 'current' ? color.navInk : color.ink,
+                            color: state === 'future' ? color.inkFaint : color.ink,
                             fontWeight: state === 'current' ? 700 : 500,
                             fontSize: 14,
+                            borderBottom: state === 'current' ? `2px solid ${color.navy900}` : '2px solid transparent',
                         }}
                     >
                         {index + 1}. {step}{state === 'blocked' ? ' · blocked' : ''}
@@ -128,23 +163,27 @@ export function ActionQueue({
     emptyTitle,
     emptyBody,
     onOpen,
+    limit = 6,
 }: {
     items: Array<{ id: string; title: string; detail: string; vendorName?: string; due?: string; action: string; href: string; severity?: string }>;
     emptyTitle: string;
     emptyBody: string;
     onOpen: (href: string) => void;
+    limit?: number;
 }) {
     if (!items.length) {
         return (
-            <Box sx={{ py: 4 }}>
+            <Box sx={{ py: 3 }}>
                 <Typography variant="h5">{emptyTitle}</Typography>
-                <Typography sx={{ color: color.inkMuted, mt: 1 }}>{emptyBody}</Typography>
+                <Typography variant="body2" sx={{ mt: 0.75 }}>{emptyBody}</Typography>
             </Box>
         );
     }
+    const visible = items.slice(0, limit);
+    const hidden = items.length - visible.length;
     return (
         <Stack spacing={0} component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
-            {items.map((item) => (
+            {visible.map((item) => (
                 <Box
                     component="li"
                     key={item.id}
@@ -152,21 +191,24 @@ export function ActionQueue({
                         display: 'flex',
                         flexDirection: { xs: 'column', md: 'row' },
                         justifyContent: 'space-between',
-                        gap: 1.5,
-                        py: 2,
+                        gap: 1.25,
+                        py: 1.5,
                         borderBottom: `1px solid ${color.line}`,
                     }}
                 >
                     <Box>
-                        <Typography sx={{ fontSize: 13, color: color.inkMuted }}>
+                        <Typography variant="body2">
                             {[item.vendorName, item.due, item.severity].filter(Boolean).join(' · ')}
                         </Typography>
-                        <Typography variant="h6" sx={{ fontFamily: '"Newsreader", serif', fontWeight: 500 }}>{item.title}</Typography>
-                        <Typography sx={{ color: color.inkMuted }}>{item.detail}</Typography>
+                        <Typography sx={{ fontWeight: 650 }}>{item.title}</Typography>
+                        <Typography variant="body2">{item.detail}</Typography>
                     </Box>
                     <Button variant="contained" onClick={() => onOpen(item.href)} sx={{ alignSelf: { md: 'center' } }}>{item.action}</Button>
                 </Box>
             ))}
+            {hidden > 0 && (
+                <Typography variant="body2" sx={{ py: 1.5 }}>{hidden} more recorded items stay in Third Parties.</Typography>
+            )}
         </Stack>
     );
 }
@@ -189,11 +231,11 @@ export function EntitySummary({
     status?: string;
 }) {
     return (
-        <Box sx={{ bgcolor: color.navy950, color: color.navInk, p: { xs: 2.5, md: 3.5 } }}>
-            <Typography sx={{ fontSize: 13, color: color.goldSoft, fontWeight: 700 }}>{status}</Typography>
-            <Typography variant="h3" sx={{ fontFamily: '"Newsreader", serif', fontWeight: 500, mt: 0.5 }}>{name}</Typography>
-            {service && <Typography sx={{ color: color.navMuted, mt: 0.5 }}>{service}</Typography>}
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mt: 2.5 }}>
+        <Box sx={{ pb: 2, borderBottom: `1px solid ${color.line}` }}>
+            <Typography variant="body2">{status}</Typography>
+            <Typography variant="h2" sx={{ mt: 0.25 }}>{name}</Typography>
+            {service && <Typography variant="body2" sx={{ mt: 0.4 }}>{service}</Typography>}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1.25, sm: 3.5 }} sx={{ mt: 1.75 }}>
                 <Fact label="Tier" value={tier} />
                 <Fact label="Inherent risk" value={inherent} />
                 <Fact label="Residual risk" value={residual} />
@@ -206,8 +248,8 @@ export function EntitySummary({
 function Fact({ label, value }: { label: string; value?: string | number | null }) {
     return (
         <Box>
-            <Typography sx={{ fontSize: 13, color: color.navMuted }}>{label}</Typography>
-            <Typography sx={{ fontSize: 20, fontFamily: '"Newsreader", serif' }}>{value ?? '—'}</Typography>
+            <Typography variant="body2">{label}</Typography>
+            <Typography sx={{ fontSize: 18, fontFamily: type.display }}>{value ?? '—'}</Typography>
         </Box>
     );
 }
@@ -227,24 +269,24 @@ export function RiskDistribution({
     if (!total) {
         return (
             <Box>
-                <Typography variant="h5" sx={{ fontFamily: '"Newsreader", serif' }}>Risk distribution</Typography>
-                <Typography sx={{ color: color.inkMuted, mt: 0.5 }}>No third parties are recorded yet, so there is no distribution to show.</Typography>
+                <Typography variant="h5">Risk distribution</Typography>
+                <Typography variant="body2" sx={{ mt: 0.5 }}>No third parties are recorded yet, so there is no distribution to show.</Typography>
             </Box>
         );
     }
     return (
         <Box>
-            <Typography variant="h5" sx={{ fontFamily: '"Newsreader", serif' }}>Risk distribution</Typography>
-            <Typography component="p" sx={{ color: color.inkMuted, mt: 0.5, mb: 1.5 }}>
+            <Typography variant="h5">Risk distribution</Typography>
+            <Typography component="p" variant="body2" sx={{ mt: 0.5, mb: 1.25 }}>
                 {rows.map((row) => `${row.label} ${row.value}`).join(' · ')}
             </Typography>
-            <Box aria-hidden sx={{ display: 'flex', height: 12, bgcolor: color.surfaceMuted }}>
+            <Box aria-hidden sx={{ display: 'flex', height: 8, bgcolor: color.surfaceMuted }}>
                 {rows.filter((row) => row.value).map((row) => (
                     <Box
                         key={row.label}
                         sx={{
                             width: `${(row.value / total) * 100}%`,
-                            bgcolor: row.label === 'Critical' ? color.navy950 : row.label === 'High' ? color.navy700 : row.label === 'Medium' ? color.gold : color.line,
+                            bgcolor: row.label === 'Critical' ? color.navy950 : row.label === 'High' ? color.navy700 : row.label === 'Medium' ? color.gold : color.lineStrong,
                         }}
                     />
                 ))}

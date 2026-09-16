@@ -4,8 +4,8 @@ import { Alert, Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, 
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import { EntitySummary, LifecycleProgress, NextActionCard } from '../components/experience/ExperienceKit';
-import { customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
+import { EntitySummary, LifecycleProgress, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
+import { customerStage, customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
@@ -42,6 +42,8 @@ export default function VendorOnboardingWorkspace() {
     const [confirmPriorAnswers, setConfirmPriorAnswers] = useState(false);
     const [historyLayer, setHistoryLayer] = useState<'milestones' | 'audit'>('milestones');
     const [showFullAssessment, setShowFullAssessment] = useState(false);
+    const [showCompletedIntake, setShowCompletedIntake] = useState(false);
+    const [showAllExceptions, setShowAllExceptions] = useState(false);
 
     const load = () => {
         vendorOnboardingAPI.get(id)
@@ -111,7 +113,8 @@ export default function VendorOnboardingWorkspace() {
     return (
         <QueryState loading={!data && !error} error={error && !data ? error : null} empty={!data} emptyTitle="Onboarding" emptyBody="This onboarding workspace was not found.">
             {data && (
-                <Stack spacing={2.5} sx={{ minWidth: 0, overflowX: 'hidden' }}>
+                <PageShell>
+                <Stack spacing={2} sx={{ minWidth: 0, overflowX: 'hidden' }}>
                     <PageHeader
                         crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: data.publicId || data.name }]}
                         title={data.name}
@@ -133,7 +136,7 @@ export default function VendorOnboardingWorkspace() {
                         onAction={() => setTab(defaultTab(data.stage))}
                     />
                     {error && <Alert severity="error">{error}</Alert>}
-                    <Typography variant="body2">Inherent is intake exposure. Residual is current posture. Control gap stays separate from residual.</Typography>
+                    <Typography variant="body2">Inherent is intake exposure. Residual is current posture.</Typography>
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
                         <Tab label="Overview" />
                         <Tab label="Assessment" />
@@ -194,7 +197,11 @@ export default function VendorOnboardingWorkspace() {
                         </Surface>
                     )}
 
-                    {tab === 1 && (
+                    {tab === 1 && data.intake?.completed && !showCompletedIntake && (
+                        <Button onClick={() => setShowCompletedIntake(true)}>Review intake answers</Button>
+                    )}
+
+                    {tab === 1 && (!data.intake?.completed || showCompletedIntake) && (
                         <Surface>
                             <Typography variant="h6">Internal intake</Typography>
                             <Typography variant="body2" sx={{ mb: 1 }}>Completed by the business owner. This is not sent to the vendor.</Typography>
@@ -359,11 +366,15 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 1 && (
+                    {tab === 1 && ['Vendor Review', 'Review & Decide', 'Monitor'].includes(customerStage(data.stageKey || data.stage)) && (
                         <Stack spacing={1.5}>
                             <Surface>
-                                <Typography variant="h6">Vendor delivery</Typography>
-                                <Typography variant="body2">Both paths use the same single-use secure activation. Copying a link is not email delivery. Queued is not Delivered.</Typography>
+                                <Typography variant="h6">Review and send</Typography>
+                                <Typography variant="body2">
+                                    {data.name} · {data.request?.servicesProvided || 'Service recorded'} · due {formatShortDate(data.dueDate)}.
+                                    {' '}Included: {(data.plan?.package?.required || data.plan?.assessments || []).map((item: any) => item.name || item.packName).filter(Boolean).join(', ') || 'Confirm packs first'}.
+                                </Typography>
+                                <Typography variant="body2" sx={{ mt: 1 }}>Send invitation emails the named contact. Copying a secure link is not email. Queued is not Delivered.</Typography>
                             </Surface>
                             {data.invitation && (
                                 <Alert severity="info">
@@ -417,9 +428,16 @@ export default function VendorOnboardingWorkspace() {
                                     {(data.review?.questionsAnswered || data.review?.totalResponses || 0)} answers recorded · {data.review?.satisfactory || 0} satisfactory · {data.review?.needClarification || 0} need clarification · {data.review?.potentialFindings || 0} potential findings
                                     {data.review?.controlGap?.percent != null ? ` · Assessment control-gap ${data.review.controlGap.percent}% (${data.review.controlGap.band}). This is not the vendor residual score.` : ''}
                                 </Typography>
-                                <Button sx={{ mt: 1 }} onClick={() => setShowFullAssessment((value) => !value)}>
+                                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                                <Button onClick={() => setShowFullAssessment((value) => !value)}>
                                     {showFullAssessment ? 'Hide full assessment' : 'View full assessment'}
                                 </Button>
+                                {(data.review?.items || []).length > 8 && (
+                                    <Button onClick={() => setShowAllExceptions((value) => !value)}>
+                                        {showAllExceptions ? 'Show first 8' : `Show all ${(data.review?.items || []).length}`}
+                                    </Button>
+                                )}
+                                </Stack>
                             </Surface>
                             {showFullAssessment && (data.vendorAssessments || []).map((item: any) => (
                                 <Surface key={`full-${item.id}`}>
@@ -429,7 +447,7 @@ export default function VendorOnboardingWorkspace() {
                             ))}
                             {data.plan?.triggers?.privacy && <Alert severity="info">Privacy review may be required</Alert>}
                             {data.plan?.triggers?.aiGovernance && <Alert severity="info">AI Governance review may be required</Alert>}
-                            {(data.review?.items || []).map((item: any) => (
+                            {(showAllExceptions ? (data.review?.items || []) : (data.review?.items || []).slice(0, 8)).map((item: any) => (
                                 <Surface key={`${item.assessmentId}-${item.questionId}`}>
                                     <Typography variant="subtitle2">{item.question}</Typography>
                                     <Typography>Answer: {item.response}</Typography>
@@ -695,6 +713,7 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
                 </Stack>
+                </PageShell>
             )}
         </QueryState>
     );

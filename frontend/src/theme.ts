@@ -37,7 +37,7 @@ const theme = createTheme({
     },
     typography: {
         fontFamily: type.ui,
-        h1: { fontFamily: type.display, fontSize: '2rem', fontWeight: 550, lineHeight: 1.2, letterSpacing: '-0.02em' },
+        h1: { fontFamily: type.display, fontSize: '1.75rem', fontWeight: 550, lineHeight: 1.2, letterSpacing: '-0.02em' },
         h2: { fontFamily: type.display, fontSize: '1.55rem', fontWeight: 550, lineHeight: 1.25, letterSpacing: '-0.018em' },
         h3: { fontFamily: type.display, fontSize: '1.3rem', fontWeight: 550, lineHeight: 1.28 },
         h4: { fontFamily: type.display, fontSize: '1.15rem', fontWeight: 550, lineHeight: 1.3 },
@@ -123,12 +123,10 @@ const theme = createTheme({
             styleOverrides: {
                 root: { borderBottom: `1px solid ${color.line}`, fontSize: '0.84rem', padding: '12px 14px' },
                 head: {
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
+                    fontWeight: 650,
+                    fontSize: '0.78rem',
                     color: color.inkMuted,
-                    backgroundColor: color.surfaceMuted,
+                    backgroundColor: 'transparent',
                 },
             },
         },

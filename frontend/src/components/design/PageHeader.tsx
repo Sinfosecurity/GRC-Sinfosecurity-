@@ -15,7 +15,7 @@ type Props = {
 
 export default function PageHeader({ eyebrow, title, description, crumbs, actions, meta }: Props) {
     return (
-        <Box component="header" sx={{ mb: 3 }}>
+        <Box component="header" sx={{ mb: 2.25 }}>
             {crumbs && crumbs.length > 0 && (
                 <Breadcrumbs
                     aria-label="Breadcrumb"
@@ -35,7 +35,7 @@ export default function PageHeader({ eyebrow, title, description, crumbs, action
             <Stack direction={{ xs: 'column', lg: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ lg: 'flex-start' }}>
                 <Box sx={{ minWidth: 0, maxWidth: 760 }}>
                     {eyebrow && <Typography variant="overline">{eyebrow}</Typography>}
-                    <Typography variant="h1" component="h1">{title}</Typography>
+                    <Typography variant="h2" component="h1">{title}</Typography>
                     {description && (
                         <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 640 }}>
                             {description}

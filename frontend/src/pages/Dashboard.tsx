@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/design/PageHeader';
-import { ActionQueue, AttentionHero, ExecutiveMetric, RiskDistribution } from '../components/experience/ExperienceKit';
+import { ActionQueue, AttentionHero, ExecutiveMetric, PageShell, RiskDistribution, SectionHeader } from '../components/experience/ExperienceKit';
 import { color } from '../design/tokens';
 import { useAuth } from '../contexts/AuthContext';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -106,7 +106,7 @@ export default function Dashboard() {
     const firstRun = !loading && stats?.totalVendors === 0 && queue.length === 0;
 
     return (
-        <Box sx={{ maxWidth: 1360 }}>
+        <PageShell>
             <PageHeader title={greeting(user?.firstName)} description={home.job} />
             {error && <Typography sx={{ color: color.danger, mb: 2 }}>{error}</Typography>}
             <AttentionHero
@@ -116,7 +116,7 @@ export default function Dashboard() {
                 actionLabel={first ? first.action : home.cta}
                 onAction={() => navigate(first?.href || home.href)}
             />
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 1fr' }, gap: 0, mb: 4, bgcolor: color.surface }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 1fr' }, gap: 0, mb: 3, borderBottom: `1px solid ${color.line}` }}>
                 <ExecutiveMetric
                     emphasis
                     label="Critical vendors"
@@ -128,8 +128,7 @@ export default function Dashboard() {
                 <ExecutiveMetric label="Overdue findings" value={work.overdueFindings} onClick={() => navigate('/findings')} />
                 <ExecutiveMetric label="Assessments due" value={work.dueAssessments} onClick={() => navigate('/assessments')} />
             </Box>
-            <Typography variant="h4" sx={{ fontFamily: '"Newsreader", serif', mb: 1 }}>Needs your attention</Typography>
-            <Typography sx={{ color: color.inkMuted, mb: 2 }}>Where you are, what happened, and the next human action. Secondary programs stay in navigation.</Typography>
+            <SectionHeader title="Priority actions" body="What happened, why it matters, and the next human action." />
             {loading ? (
                 <Typography>Loading live work…</Typography>
             ) : (
@@ -140,9 +139,9 @@ export default function Dashboard() {
                     onOpen={(href) => navigate(href)}
                 />
             )}
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} sx={{ mt: 5 }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} sx={{ mt: 4 }}>
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant="h5" sx={{ fontFamily: '"Newsreader", serif' }}>Portfolio</Typography>
+                    <Typography variant="h5">Portfolio</Typography>
                     <Typography sx={{ color: color.inkMuted, mt: 0.5, mb: 2 }}>
                         {stats?.totalVendors ?? '—'} third parties · {stats?.highRiskVendors ?? '—'} high residual · {stats?.overdueReviews ?? '—'} overdue reviews
                     </Typography>
@@ -158,7 +157,7 @@ export default function Dashboard() {
                 </Box>
                 {intelligence.length > 0 && (
                     <Box sx={{ flex: 1 }}>
-                        <Typography variant="h5" sx={{ fontFamily: '"Newsreader", serif' }}>What changed</Typography>
+                        <Typography variant="h5">What changed</Typography>
                         {intelligence.slice(0, 3).map((row) => (
                             <Box key={row.publicId} sx={{ mt: 1.5 }}>
                                 <Typography>{row.title}</Typography>
@@ -168,6 +167,6 @@ export default function Dashboard() {
                     </Box>
                 )}
             </Stack>
-        </Box>
+        </PageShell>
     );
 }
