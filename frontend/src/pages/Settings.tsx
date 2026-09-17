@@ -1,7 +1,11 @@
 import { FormEvent, useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
+import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
+import FormSection from '../components/design/FormSection';
+import FactList from '../components/design/FactList';
 
 export default function Settings() {
     const { user } = useAuth();
@@ -29,38 +33,55 @@ export default function Settings() {
     };
 
     return (
-        <Box sx={{ maxWidth: 640 }}>
-            <Typography variant="overline" sx={{ color: '#8b5cf6', fontWeight: 800, letterSpacing: '0.14em' }}>
-                Administration
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>Security</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Session identity and password change. Notification toggles and MFA enrollment are not mocked here.
-            </Typography>
+        <Box sx={{ maxWidth: 880 }}>
+            <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Settings' }]}
+                title="Settings"
+                description="Session identity and password change. Notification toggles and MFA enrollment are not mocked here."
+            />
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            <Card sx={{ mb: 3, bgcolor: 'rgba(15,23,42,0.85)' }}>
-                <CardContent>
-                    <Typography variant="h6" sx={{ mb: 2 }}>Signed-in account</Typography>
-                    <Typography><strong>Name:</strong> {user ? `${user.firstName} ${user.lastName}` : '—'}</Typography>
-                    <Typography><strong>Email:</strong> {user?.email || '—'}</Typography>
-                    <Typography><strong>Role:</strong> {user?.role || '—'}</Typography>
-                </CardContent>
-            </Card>
-            <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
-                <CardContent>
-                    <Typography variant="h6" sx={{ mb: 2 }}>Change password</Typography>
+            <Surface>
+                <FormSection title="Signed-in account" body="Who is using this session. Role changes happen in Team.">
+                    <FactList
+                        columns={1}
+                        items={[
+                            { label: 'Name', value: user ? `${user.firstName} ${user.lastName}` : '—' },
+                            { label: 'Email', value: user?.email || '—' },
+                            { label: 'Role', value: user?.role || '—' },
+                        ]}
+                    />
+                </FormSection>
+                <FormSection title="Change password" body="Must meet the server password policy.">
                     <Box component="form" onSubmit={changePassword}>
                         <Stack spacing={2}>
-                            <TextField required type="password" label="Current password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-                            <TextField required type="password" label="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} helperText="Must meet the server password policy." />
+                            <TextField
+                                required
+                                type="password"
+                                label="Current password"
+                                autoComplete="current-password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                            />
+                            <TextField
+                                required
+                                type="password"
+                                label="New password"
+                                autoComplete="new-password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                helperText="Must meet the server password policy."
+                            />
                             <Button type="submit" variant="contained" disabled={busy || !currentPassword || !newPassword}>
-                                Update password
+                                {busy ? 'Updating…' : 'Update password'}
                             </Button>
                         </Stack>
                     </Box>
-                </CardContent>
-            </Card>
+                </FormSection>
+                <Typography variant="body2" sx={{ pt: 2 }}>
+                    Identity provider, billing, and organization profile have their own Administration pages.
+                </Typography>
+            </Surface>
         </Box>
     );
 }

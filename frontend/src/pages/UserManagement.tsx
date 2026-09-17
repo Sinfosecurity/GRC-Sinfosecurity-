@@ -19,6 +19,7 @@ import PageHeader from '../components/design/PageHeader';
 import MetricCard from '../components/design/MetricCard';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
+import Surface from '../components/design/Surface';
 import { usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { deliveryLabel } from './invitationDelivery';
@@ -220,7 +221,9 @@ export default function UserManagement() {
 
             {tab === 0 && (
                 <QueryState loading={loading} error={error} empty={users.length === 0} emptyTitle="No members yet" emptyBody="Invite someone to this organization.">
+                    <Surface padded={false}>
                     <AppTable
+                        embedded
                         rows={users}
                         rowKey={(row) => row.id}
                         searchPlaceholder="Search members"
@@ -256,12 +259,15 @@ export default function UserManagement() {
                             ) },
                         ]}
                     />
+                    </Surface>
                 </QueryState>
             )}
 
             {tab === 1 && (
                 <QueryState loading={loading} error={error} empty={invitations.length === 0} emptyTitle="No invitations" emptyBody="Invitations appear here after you invite a member. A pending row is not proof that email arrived.">
+                    <Surface padded={false}>
                     <AppTable
+                        embedded
                         rows={invitations}
                         rowKey={(row) => row.id}
                         searchPlaceholder="Search invitations"
@@ -282,16 +288,17 @@ export default function UserManagement() {
                             ) },
                         ]}
                     />
+                    </Surface>
                 </QueryState>
             )}
 
             {tab === 2 && (
                 <Stack spacing={1.5}>
                     {ASSIGNABLE_ROLES.map((item) => (
-                        <Box key={item.value} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                        <Surface key={item.value}>
                             <Typography variant="subtitle1">{item.label}</Typography>
                             <Typography variant="body2">{item.description}</Typography>
-                        </Box>
+                        </Surface>
                     ))}
                 </Stack>
             )}

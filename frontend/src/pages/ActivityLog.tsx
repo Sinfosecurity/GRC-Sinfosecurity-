@@ -1,23 +1,12 @@
 import { useEffect, useState } from 'react';
-import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    MenuItem,
-    Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    TextField,
-    Typography,
-} from '@mui/material';
+import { Box, Button, MenuItem, Stack, TextField } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
+import AppTable from '../components/design/AppTable';
+import StatusBadge from '../components/design/StatusBadge';
 import { auditAPI } from '../services/api';
+import { formatDateTime } from '../utils/humanizeLabel';
 
 type AuditRow = {
     id: string;
@@ -77,55 +66,58 @@ export default function ActivityLog() {
                 title="Audit log"
                 description="Tenant-scoped events only. Search by actor, action, resource, or result."
             />
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
-                <TextField label="Search" value={q} onChange={(e) => setQ(e.target.value)} sx={{ minWidth: 220 }} />
-                <TextField label="Action" value={action} onChange={(e) => setAction(e.target.value)} sx={{ minWidth: 180 }} />
-                <TextField label="Resource" value={resourceType} onChange={(e) => setResourceType(e.target.value)} sx={{ minWidth: 160 }} />
-                <TextField select label="Result" value={result} onChange={(e) => setResult(e.target.value)} sx={{ minWidth: 140 }}>
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="success">success</MenuItem>
-                    <MenuItem value="failure">failure</MenuItem>
-                </TextField>
-                <Button variant="contained" onClick={() => load(1)}>Apply</Button>
-            </Stack>
-            <QueryState loading={loading} error={error} empty={rows.length === 0} emptyTitle="No audit events" emptyBody="Actions taken in this organization will appear here.">
-                <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
-                    <CardContent>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Timestamp</TableCell>
-                                    <TableCell>Actor</TableCell>
-                                    <TableCell>Action</TableCell>
-                                    <TableCell>Resource</TableCell>
-                                    <TableCell>Result</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rows.map((row) => {
-                                    const actor = row.actor
-                                        ? `${row.actor.firstName || ''} ${row.actor.lastName || ''}`.trim() || row.actor.email
-                                        : 'system';
-                                    return (
-                                        <TableRow key={row.id}>
-                                            <TableCell>{new Date(row.timestamp).toLocaleString()}</TableCell>
-                                            <TableCell>{actor}</TableCell>
-                                            <TableCell>{row.action}</TableCell>
-                                            <TableCell>{row.resourceType}{row.resourceId ? ` · ${row.resourceId.slice(0, 8)}` : ''}</TableCell>
-                                            <TableCell><Chip size="small" label={row.result} color={row.result === 'success' ? 'success' : 'warning'} /></TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                        <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
-                            <Button disabled={page <= 1} onClick={() => load(page - 1)}>Previous</Button>
-                            <Typography variant="body2">Page {page} of {pages} · {total} events</Typography>
-                            <Button disabled={page >= pages} onClick={() => load(page + 1)}>Next</Button>
-                        </Stack>
-                    </CardContent>
-                </Card>
-            </QueryState>
+            <Surface>
+                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
+                    <TextField label="Search" value={q} onChange={(e) => setQ(e.target.value)} sx={{ minWidth: 220, flex: 1 }} />
+                    <TextField label="Action" value={action} onChange={(e) => setAction(e.target.value)} sx={{ minWidth: 180 }} />
+                    <TextField label="Resource" value={resourceType} onChange={(e) => setResourceType(e.target.value)} sx={{ minWidth: 160 }} />
+                    <TextField select label="Result" value={result} onChange={(e) => setResult(e.target.value)} sx={{ minWidth: 140 }}>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="success">success</MenuItem>
+                        <MenuItem value="failure">failure</MenuItem>
+                    </TextField>
+                    <Button variant="contained" onClick={() => load(1)}>Apply</Button>
+                </Stack>
+                <QueryState loading={loading} error={error} empty={rows.length === 0} emptyTitle="No audit events" emptyBody="Actions taken in this organization will appear here.">
+                    <AppTable
+                        embedded
+                        rows={rows}
+                        rowKey={(row) => row.id}
+                        pageSize={pageSize}
+                        searchPlaceholder="Filter this page"
+                        searchValue={(row) => `${row.action} ${row.resourceType} ${row.result} ${row.actor?.email || ''}`}
+                        columns={[
+                            { id: 'when', label: 'Timestamp', sortValue: (row) => row.timestamp, render: (row) => formatDateTime(row.timestamp) },
+                            { id: 'actor', label: 'Actor', render: (row) => {
+                                const actor = row.actor
+                                    ? `${row.actor.firstName || ''} ${row.actor.lastName || ''}`.trim() || row.actor.email
+                                    : 'system';
+                                return actor || 'system';
+                            } },
+                            { id: 'action', label: 'Action', sortValue: (row) => row.action, render: (row) => row.action },
+                            { id: 'resource', label: 'Resource', hideOnMobile: true, render: (row) => (
+                                `${row.resourceType}${row.resourceId ? ` · ${row.resourceId.slice(0, 8)}` : ''}`
+                            ) },
+                            { id: 'result', label: 'Result', render: (row) => (
+                                <StatusBadge
+                                    kind="plain"
+                                    tone={row.result === 'success' ? 'success' : 'high'}
+                                    label={row.result}
+                                />
+                            ) },
+                        ]}
+                        toolbar={(
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <Button disabled={page <= 1} onClick={() => load(page - 1)}>Previous</Button>
+                                <Button disabled={page >= pages} onClick={() => load(page + 1)}>Next</Button>
+                            </Stack>
+                        )}
+                    />
+                    <Box sx={{ px: { xs: 2, md: 3 }, pb: 2, color: 'text.secondary', fontSize: 13 }}>
+                        Page {page} of {pages} · {total} events
+                    </Box>
+                </QueryState>
+            </Surface>
         </Box>
     );
 }

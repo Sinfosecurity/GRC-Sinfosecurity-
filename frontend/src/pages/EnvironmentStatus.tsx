@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Box, Card, CardContent, Chip, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
+import FactList from '../components/design/FactList';
+import StatusBadge from '../components/design/StatusBadge';
 import { systemAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
+
+function toneFor(value: string): 'success' | 'high' | 'medium' | 'neutral' {
+    const key = String(value).toUpperCase();
+    if (key === 'UP' || key === 'CONNECTED' || key === 'OK') return 'success';
+    if (key === 'DOWN' || key === 'ERROR' || key === 'FAILED') return 'high';
+    if (key === 'NOT_CONFIGURED' || key === 'DEGRADED') return 'medium';
+    return 'neutral';
+}
 
 export default function EnvironmentStatus() {
     const [data, setData] = useState<Record<string, string> | null>(null);
@@ -16,24 +28,24 @@ export default function EnvironmentStatus() {
             .finally(() => setLoading(false));
     }, []);
 
+    const items = data
+        ? Object.entries(data).map(([key, value]) => ({
+            label: humanizeLabel(key),
+            value: <StatusBadge kind="plain" tone={toneFor(String(value))} label={humanizeLabel(String(value))} />,
+        }))
+        : [];
+
     return (
-        <Box sx={{ maxWidth: 720 }}>
+        <Box sx={{ maxWidth: 880 }}>
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Environment' }]}
                 title="Environment status"
                 description="Provider and environment facts from the server. This page does not invent connected status."
             />
             <QueryState loading={loading} error={error}>
-                <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
-                    <CardContent>
-                        {data && Object.entries(data).map(([key, value]) => (
-                            <Box key={key} sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
-                                <Typography>{key}</Typography>
-                                <Chip size="small" label={String(value)} />
-                            </Box>
-                        ))}
-                    </CardContent>
-                </Card>
+                <Surface>
+                    <FactList columns={2} items={items} />
+                </Surface>
             </QueryState>
         </Box>
     );

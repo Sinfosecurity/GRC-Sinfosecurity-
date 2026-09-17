@@ -4,6 +4,7 @@ import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
+import Surface from '../components/design/Surface';
 import MetricCard from '../components/design/MetricCard';
 import { Stack } from '@mui/material';
 import { tprmAPI } from '../services/api';
@@ -57,7 +58,9 @@ export default function ContinuousMonitoring() {
                 emptyTitle="No monitoring signals"
                 emptyBody="When a connected provider records a vendor signal, it appears here and can raise a finding. An empty list is truthful — it is not a healthy-score placeholder."
             >
+                <Surface padded={false}>
                 <AppTable
+                    embedded
                     rows={signals}
                     rowKey={(row) => row.id}
                     searchPlaceholder="Search signals"
@@ -73,6 +76,7 @@ export default function ContinuousMonitoring() {
                         { id: 'when', label: 'Detected', hideOnMobile: true, sortValue: (row) => row.detectedAt, render: (row) => row.detectedAt?.slice(0, 16) || '—' },
                     ]}
                 />
+                </Surface>
             </QueryState>
         </Box>
     );

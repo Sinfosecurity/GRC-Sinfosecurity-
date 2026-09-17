@@ -5,6 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import MetricCard from '../components/design/MetricCard';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
+import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import { sccAPI } from '../services/api';
 
@@ -91,6 +92,7 @@ export default function ControlCenter() {
                 <MetricCard label="Expiring evidence" value={summary?.needsReview ?? '—'} />
                 <MetricCard label="With findings" value={summary?.withFindings ?? '—'} />
             </Stack>
+            <Surface>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
                 <TextField select label="Domain" value={domain} onChange={(event) => setDomain(event.target.value)} sx={{ minWidth: 220 }}>
                     <MenuItem value="">All domains</MenuItem>
@@ -112,6 +114,7 @@ export default function ControlCenter() {
             </Stack>
             <QueryState loading={loading} error={error} empty={rows.length === 0} emptyTitle="No controls match" emptyBody="Clear filters or wait for the common control library to adopt into this organization.">
                 <AppTable
+                    embedded
                     rows={rows}
                     rowKey={(row) => row.id}
                     onRowClick={(row) => navigate(`/control-center/${row.id}`)}
@@ -136,6 +139,7 @@ export default function ControlCenter() {
                     ]}
                 />
             </QueryState>
+            </Surface>
         </Box>
     );
 }

@@ -1,8 +1,11 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
+import StatusBadge from '../components/design/StatusBadge';
 import { aiAPI } from '../services/api';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 const features = [
     'evidence_summary',
@@ -21,6 +24,7 @@ export default function AIInsights() {
     const [result, setResult] = useState<{ status: string; text?: string } | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [busy, setBusy] = useState(false);
 
     useEffect(() => {
         aiAPI.status()
@@ -32,16 +36,30 @@ export default function AIInsights() {
     const analyze = async (event: FormEvent) => {
         event.preventDefault();
         setError(null);
-        const response = await aiAPI.analyze(feature, context);
-        setResult(response.data.data);
+        setBusy(true);
+        try {
+            const response = await aiAPI.analyze(feature, context);
+            setResult(response.data.data);
+        } catch (err: any) {
+            setError(err.message || 'Analysis failed');
+        } finally {
+            setBusy(false);
+        }
     };
 
     return (
-        <Box sx={{ maxWidth: 860 }}>
+        <Box sx={{ maxWidth: 880 }}>
             <PageHeader
                 crumbs={[{ label: 'Intelligence' }, { label: 'AI Analyst' }]}
                 title="AI analyst"
                 description="Assistance stays labeled as facts, inferences, and recommendations. Residual risk still comes from the deterministic engine."
+                meta={!loading ? (
+                    <StatusBadge
+                        kind="plain"
+                        tone={status === 'NOT_CONFIGURED' ? 'medium' : status === 'ERROR' ? 'high' : 'success'}
+                        label={humanizeLabel(status)}
+                    />
+                ) : undefined}
             />
             {!loading && (
                 <Alert severity={status === 'NOT_CONFIGURED' ? 'info' : status === 'ERROR' ? 'error' : 'success'} sx={{ mb: 2 }}>
@@ -51,34 +69,32 @@ export default function AIInsights() {
                 </Alert>
             )}
             <QueryState loading={loading} error={error} notConfigured={status === 'NOT_CONFIGURED'}>
-                <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)', border: '1px solid rgba(56,189,248,0.2)' }}>
-                    <CardContent>
-                        <Box component="form" onSubmit={analyze}>
-                            <Stack spacing={2}>
-                                <TextField select label="Feature" value={feature} onChange={(e) => setFeature(e.target.value)}>
-                                    {features.map((item) => (
-                                        <MenuItem key={item} value={item}>{item}</MenuItem>
-                                    ))}
-                                </TextField>
-                                <TextField
-                                    label="Evidence or vendor context"
-                                    multiline
-                                    minRows={6}
-                                    value={context}
-                                    onChange={(e) => setContext(e.target.value)}
-                                    required
-                                />
-                                <Button type="submit" variant="contained">Analyze</Button>
-                            </Stack>
-                        </Box>
-                        {result && (
-                            <Alert severity={result.status === 'SUCCESS' ? 'success' : 'warning'} sx={{ mt: 2, whiteSpace: 'pre-wrap' }}>
-                                {result.status}
-                                {result.text ? `\n${result.text}` : ' No generated analysis.'}
-                            </Alert>
-                        )}
-                    </CardContent>
-                </Card>
+                <Surface>
+                    <Box component="form" onSubmit={analyze}>
+                        <Stack spacing={2}>
+                            <TextField select label="Feature" value={feature} onChange={(e) => setFeature(e.target.value)}>
+                                {features.map((item) => (
+                                    <MenuItem key={item} value={item}>{humanizeLabel(item)}</MenuItem>
+                                ))}
+                            </TextField>
+                            <TextField
+                                label="Evidence or vendor context"
+                                multiline
+                                minRows={6}
+                                value={context}
+                                onChange={(e) => setContext(e.target.value)}
+                                required
+                            />
+                            <Button type="submit" variant="contained" disabled={busy}>{busy ? 'Analyzing…' : 'Analyze'}</Button>
+                        </Stack>
+                    </Box>
+                    {result && (
+                        <Alert severity={result.status === 'SUCCESS' ? 'success' : 'warning'} sx={{ mt: 2, whiteSpace: 'pre-wrap' }}>
+                            {result.status}
+                            {result.text ? `\n${result.text}` : ' No generated analysis.'}
+                        </Alert>
+                    )}
+                </Surface>
             </QueryState>
             {status === 'NOT_CONFIGURED' && (
                 <Typography sx={{ mt: 2 }} color="text.secondary">

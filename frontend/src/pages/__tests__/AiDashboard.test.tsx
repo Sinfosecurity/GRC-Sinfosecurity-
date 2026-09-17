@@ -40,7 +40,7 @@ describe('Supreme AI Governance dashboard', () => {
             </MemoryRouter>
         );
         expect(await screen.findByText('Supreme AI Governance')).toBeInTheDocument();
-        expect(screen.getAllByText(/not an approval/i).length).toBeGreaterThan(0);
+        expect(await screen.findByText(/not an approval/i)).toBeInTheDocument();
         expect(screen.getByText(/Manual \/ Not configured/)).toBeInTheDocument();
         expect(screen.getByText(/Unapproved production AI/)).toBeInTheDocument();
         expect(screen.getByText(/AI-00001 is recorded as PRODUCTION/)).toBeInTheDocument();

@@ -6,6 +6,8 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import MetricCard from '../components/design/MetricCard';
 import AppTable from '../components/design/AppTable';
+import Surface from '../components/design/Surface';
+import FormSection from '../components/design/FormSection';
 import { tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 
@@ -108,21 +110,28 @@ export default function FindingsRemediation() {
                     return due >= Date.now() && due <= Date.now() + 7 * 86400000;
                 }).length} />
             </Stack>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
-                <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
-                    <MenuItem value="">All vendors</MenuItem>
-                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
-                        <MenuItem value={vendorId}>Selected vendor</MenuItem>
-                    )}
-                    {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
-                </TextField>
-                <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />
-                <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 140 }}>
-                    {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
-                </TextField>
-                <Button variant="contained" disabled={!vendorId || !title || busy} onClick={create}>Create finding</Button>
-            </Stack>
-            <TextField fullWidth sx={{ mb: 3 }} label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Surface>
+                <FormSection title="Record a finding" body="Use this when an issue is not already created by an assessment or monitoring signal.">
+                    <Stack spacing={1.5}>
+                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
+                            <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                                <MenuItem value="">All vendors</MenuItem>
+                                {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                                    <MenuItem value={vendorId}>Selected vendor</MenuItem>
+                                )}
+                                {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                            </TextField>
+                            <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />
+                            <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 140 }}>
+                                {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
+                            </TextField>
+                            <Button variant="contained" disabled={!vendorId || !title || busy} onClick={create}>Create finding</Button>
+                        </Stack>
+                        <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                    </Stack>
+                </FormSection>
+            </Surface>
+            <Box sx={{ mt: 2 }}>
             <QueryState
                 loading={loading}
                 error={error}
@@ -130,7 +139,9 @@ export default function FindingsRemediation() {
                 emptyTitle="No findings yet"
                 emptyBody="When assessments or monitoring create issues — or you record one here — they appear with a remediation path."
             >
+                <Surface padded={false}>
                 <AppTable
+                    embedded
                     rows={filtered}
                     rowKey={(row) => row.id}
                     onRowClick={(row) => {
@@ -153,13 +164,15 @@ export default function FindingsRemediation() {
                         { id: 'due', label: 'Due', hideOnMobile: true, sortValue: (row) => row.targetRemediationDate || '', render: (row) => row.targetRemediationDate?.slice(0, 10) || '—' },
                     ]}
                 />
+                </Surface>
             </QueryState>
+            </Box>
 
             <Drawer anchor="right" open={Boolean(selected)} onClose={() => setSelected(null)} PaperProps={{ sx: { width: { xs: '100%', sm: 460 } } }}>
                 {selected && (
-                    <Box sx={{ p: 3 }}>
+                    <Box sx={{ p: 3 }} component="aside" aria-label="Finding detail">
                         <Typography variant="overline">Finding</Typography>
-                        <Typography variant="h4" sx={{ mb: 1 }}>{selected.title}</Typography>
+                        <Typography variant="h2" component="h2" sx={{ mb: 1 }}>{selected.title}</Typography>
                         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                             <StatusBadge value={selected.severity} kind="severity" />
                             <StatusBadge value={selected.status} />

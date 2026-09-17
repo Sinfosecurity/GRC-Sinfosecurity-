@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, Grid, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
+import FactList from '../components/design/FactList';
 import QueryState from '../components/QueryState';
 import { PageShell } from '../components/experience/ExperienceKit';
 import { identityAPI } from '../services/api';
@@ -112,29 +113,21 @@ export default function IdentityAccess() {
                 </Tabs>
 
                 {tab === 0 && overview && (
-                    <Grid container spacing={2}>
-                        {[
-                            ['Single Sign-On', overview.sso.label],
-                            ['Protocol', overview.protocol || 'Not configured'],
-                            ['Domain', overview.domain.value ? `${overview.domain.label}: ${overview.domain.value}` : overview.domain.label],
-                            ['JIT provisioning', overview.jit],
-                            ['Provisioning', overview.scim.label],
-                            ['SSO enforcement', overview.ssoEnforcement],
-                            ['Provisioned users', String(overview.provisionedUsers)],
-                            ['Last successful SSO', overview.lastSuccessfulSso ? new Date(overview.lastSuccessfulSso).toLocaleString() : 'None'],
-                            ['Last provisioning activity', overview.lastProvisioningActivity ? new Date(overview.lastProvisioningActivity).toLocaleString() : 'None'],
-                            ['Recovery administrator', overview.recoveryAdministrator ? 'Set' : 'Not set'],
-                        ].map(([label, value]) => (
-                            <Grid item xs={12} sm={6} md={4} key={label}>
-                                <Card>
-                                    <CardContent>
-                                        <Typography variant="overline">{label}</Typography>
-                                        <Typography variant="h6">{value}</Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+                    <FactList
+                        columns={3}
+                        items={[
+                            { label: 'Single Sign-On', value: overview.sso.label },
+                            { label: 'Protocol', value: overview.protocol || 'Not configured' },
+                            { label: 'Domain', value: overview.domain.value ? `${overview.domain.label}: ${overview.domain.value}` : overview.domain.label },
+                            { label: 'JIT provisioning', value: overview.jit },
+                            { label: 'Provisioning', value: overview.scim.label },
+                            { label: 'SSO enforcement', value: overview.ssoEnforcement },
+                            { label: 'Provisioned users', value: String(overview.provisionedUsers) },
+                            { label: 'Last successful SSO', value: overview.lastSuccessfulSso ? new Date(overview.lastSuccessfulSso).toLocaleString() : 'None' },
+                            { label: 'Last provisioning activity', value: overview.lastProvisioningActivity ? new Date(overview.lastProvisioningActivity).toLocaleString() : 'None' },
+                            { label: 'Recovery administrator', value: overview.recoveryAdministrator ? 'Set' : 'Not set' },
+                        ]}
+                    />
                 )}
 
                 {tab === 1 && (
@@ -151,8 +144,7 @@ export default function IdentityAccess() {
                             </Stack>
                         )}
                         {provider && (
-                            <Card>
-                                <CardContent>
+                            <Box>
                                     <Typography variant="h6" sx={{ mb: 1 }}>{provider.displayName}</Typography>
                                     <Typography sx={{ mb: 2 }}>Status: {provider.status?.label}</Typography>
                                     {provider.saml && (
@@ -188,15 +180,13 @@ export default function IdentityAccess() {
                                             }} />
                                         </Stack>
                                     )}
-                                </CardContent>
-                            </Card>
+                            </Box>
                         )}
                     </Stack>
                 )}
 
                 {tab === 2 && (
-                    <Card>
-                        <CardContent>
+                    <Box>
                             <Stack spacing={2} component="form" onSubmit={(event) => {
                                 event.preventDefault();
                                 run(async () => {
@@ -220,13 +210,11 @@ export default function IdentityAccess() {
                                     </Stack>
                                 ))}
                             </Stack>
-                        </CardContent>
-                    </Card>
+                    </Box>
                 )}
 
                 {tab === 3 && (
-                    <Card>
-                        <CardContent>
+                    <Box>
                             <Typography sx={{ mb: 2 }}>SCIM 2.0 base URL: <code>/scim/v2</code></Typography>
                             <Button variant="contained" onClick={() => run(async () => {
                                 const created = await identityAPI.createScimToken({ label: 'IdP provisioning', providerId: provider?.id });
@@ -249,13 +237,11 @@ export default function IdentityAccess() {
                                     </Stack>
                                 ))}
                             </Stack>
-                        </CardContent>
-                    </Card>
+                    </Box>
                 )}
 
                 {tab === 4 && provider && (
-                    <Card>
-                        <CardContent>
+                    <Box>
                             <Stack spacing={2} component="form" onSubmit={(event) => {
                                 event.preventDefault();
                                 run(async () => {
@@ -274,32 +260,27 @@ export default function IdentityAccess() {
                                     <Typography key={row.id}>{row.idpGroup} → {row.supremeRole}</Typography>
                                 ))}
                             </Stack>
-                        </CardContent>
-                    </Card>
+                    </Box>
                 )}
 
                 {tab === 5 && provider && (
-                    <Card>
-                        <CardContent>
+                    <Box>
                             <Stack spacing={2}>
                                 <Button variant="outlined" onClick={() => run(async () => { await identityAPI.setPolicy(provider.id, { ssoEnforcement: 'OPTIONAL', passwordLoginAllowed: true }); }, 'Company SSO is optional.')}>SSO optional</Button>
                                 <Button variant="contained" onClick={() => run(async () => { await identityAPI.setPolicy(provider.id, { ssoEnforcement: 'REQUIRED' }); }, 'Company SSO is required. Recovery administrator remains able to sign in with a password.')}>Require Company SSO</Button>
                                 <Button onClick={() => run(async () => { await identityAPI.setPolicy(provider.id, { jitEnabled: true }); }, 'Just-in-time provisioning enabled.')}>Enable JIT</Button>
                                 <Button onClick={() => run(async () => { await identityAPI.setPolicy(provider.id, { jitEnabled: false }); }, 'Just-in-time provisioning disabled.')}>Disable JIT</Button>
                             </Stack>
-                        </CardContent>
-                    </Card>
+                    </Box>
                 )}
 
                 {tab === 6 && (
-                    <Card>
-                        <CardContent>
+                    <Box>
                             {activity.length === 0 && <Typography>No identity activity yet.</Typography>}
                             {activity.map((row) => (
                                 <Typography key={row.id} sx={{ mb: 1 }}>{new Date(row.timestamp || row.createdAt).toLocaleString()} — {row.action} — {row.result}</Typography>
                             ))}
-                        </CardContent>
-                    </Card>
+                    </Box>
                 )}
             </Surface>
             </QueryState>

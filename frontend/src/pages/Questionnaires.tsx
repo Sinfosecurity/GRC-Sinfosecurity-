@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
 import TemplateCard from '../components/design/TemplateCard';
 import { tprmAPI } from '../services/api';
 import ScoringMethodologyEditor from '../components/ScoringMethodologyEditor';
@@ -89,9 +90,9 @@ export default function Questionnaires() {
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             <TextField fullWidth label="Search templates" value={query} onChange={(e) => setQuery(e.target.value)} sx={{ mb: 3 }} />
             <QueryState loading={loading} error={error} empty={templates.length === 0} emptyTitle="No templates yet" emptyBody="Supreme assessment templates are created on first open.">
-                <Stack spacing={3}>
+                <Stack spacing={2}>
                     {groups.map(([group, rows]) => (
-                        <Box key={group}>
+                        <Surface key={group}>
                             <Typography variant="overline">{group}</Typography>
                             <Stack spacing={1.5} sx={{ mt: 1 }}>
                                 {rows.map((template) => (
@@ -113,7 +114,7 @@ export default function Questionnaires() {
                                     </Box>
                                 ))}
                             </Stack>
-                        </Box>
+                        </Surface>
                     ))}
                 </Stack>
             </QueryState>

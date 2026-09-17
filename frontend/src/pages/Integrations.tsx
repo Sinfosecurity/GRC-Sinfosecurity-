@@ -1,15 +1,31 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { integrationAPI } from '../services/api';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
+import StatusBadge from '../components/design/StatusBadge';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
-const PROVIDERS = ['slack', 'jira', 'servicenow', 'siem'];
+const PROVIDERS = [
+    { id: 'slack', label: 'Slack' },
+    { id: 'jira', label: 'Jira' },
+    { id: 'servicenow', label: 'ServiceNow' },
+    { id: 'siem', label: 'SIEM' },
+] as const;
+
+function statusTone(value?: string): 'success' | 'medium' | 'high' | 'neutral' {
+    if (value === 'CONNECTED') return 'success';
+    if (value === 'ERROR' || value === 'FAILED') return 'high';
+    if (value === 'NOT_CONFIGURED' || !value) return 'medium';
+    return 'neutral';
+}
 
 export default function Integrations() {
     const [status, setStatus] = useState<Record<string, string>>({});
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [busy, setBusy] = useState<string | null>(null);
 
     useEffect(() => {
         integrationAPI.status()
@@ -19,38 +35,53 @@ export default function Integrations() {
     }, []);
 
     return (
-        <Box>
+        <Box sx={{ maxWidth: 880 }}>
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Integrations' }]}
                 title="Integrations"
                 description="Status is reported by the server. Not configured means the integration can be connected later — not that it is working."
             />
             <QueryState loading={loading} error={error}>
-                <Grid container spacing={2}>
-                    {PROVIDERS.map((provider) => (
-                        <Grid item xs={12} md={6} key={provider}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6" sx={{ textTransform: 'capitalize' }}>{provider}</Typography>
-                                    <Chip
-                                        sx={{ mt: 1, mb: 2 }}
-                                        label={status[provider] || 'NOT_CONFIGURED'}
-                                        color={status[provider] === 'CONNECTED' ? 'success' : 'default'}
-                                    />
-                                    <Button
-                                        size="small"
-                                        onClick={async () => {
-                                            const result = await integrationAPI.test(provider);
-                                            setStatus((prev) => ({ ...prev, [provider]: result.data.data.status }));
-                                        }}
-                                    >
-                                        Test connection
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                <Stack spacing={1.25}>
+                    {PROVIDERS.map((provider) => {
+                        const raw = status[provider.id] || 'NOT_CONFIGURED';
+                        return (
+                            <Surface key={provider.id}>
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between" alignItems={{ sm: 'center' }}>
+                                    <Box>
+                                        <Typography variant="subtitle1">{provider.label}</Typography>
+                                        <Typography variant="body2">
+                                            {raw === 'NOT_CONFIGURED'
+                                                ? 'Not configured for this environment.'
+                                                : raw === 'CONNECTED'
+                                                    ? 'The server reports a working connection.'
+                                                    : 'The last test did not succeed.'}
+                                        </Typography>
+                                    </Box>
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <StatusBadge kind="plain" tone={statusTone(raw)} label={humanizeLabel(raw)} />
+                                        <Button
+                                            size="small"
+                                            disabled={busy === provider.id}
+                                            aria-label={`Test ${provider.label} connection`}
+                                            onClick={async () => {
+                                                setBusy(provider.id);
+                                                try {
+                                                    const result = await integrationAPI.test(provider.id);
+                                                    setStatus((prev) => ({ ...prev, [provider.id]: result.data.data.status }));
+                                                } finally {
+                                                    setBusy(null);
+                                                }
+                                            }}
+                                        >
+                                            {busy === provider.id ? 'Testing…' : 'Test connection'}
+                                        </Button>
+                                    </Stack>
+                                </Stack>
+                            </Surface>
+                        );
+                    })}
+                </Stack>
             </QueryState>
         </Box>
     );

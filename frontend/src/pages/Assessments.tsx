@@ -15,11 +15,13 @@ import {
     Tabs,
     TextField,
     Typography,
+    ListItemButton,
 } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
+import AppTable from '../components/design/AppTable';
 import MetricCard from '../components/design/MetricCard';
 import WorkflowStepper from '../components/design/WorkflowStepper';
 import TemplateCard from '../components/design/TemplateCard';
@@ -531,11 +533,13 @@ export default function Assessments() {
             </Tabs>
 
             {tab === 3 ? (
-                <Stack spacing={1.5}>
-                    {templates.map((template) => (
-                        <TemplateCard key={template.id} template={template} />
-                    ))}
-                </Stack>
+                <Surface>
+                    <Stack spacing={1.5}>
+                        {templates.map((template) => (
+                            <TemplateCard key={template.id} template={template} />
+                        ))}
+                    </Stack>
+                </Surface>
             ) : (
                 <QueryState
                     loading={loading}
@@ -545,33 +549,28 @@ export default function Assessments() {
                     emptyBody="Start a risk-based assessment to evaluate a third party's security, privacy and operational controls."
                     emptyAction={<Button variant="contained" onClick={startWizard}>New assessment</Button>}
                 >
-                    <Stack spacing={1}>
-                        {filteredAssessments.map((row) => (
-                            <Box
-                                key={row.id}
-                                onClick={() => openAssessment(row)}
-                                sx={{
-                                    p: 2,
-                                    cursor: 'pointer',
-                                    border: `1px solid ${color.line}`,
-                                    bgcolor: color.surface,
-                                    borderRadius: '8px',
-                                    '&:hover': { borderColor: color.lineStrong },
-                                }}
-                            >
-                                <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={1}>
+                    <Surface padded={false}>
+                        <AppTable
+                            embedded
+                            rows={filteredAssessments}
+                            rowKey={(row) => row.id}
+                            onRowClick={(row) => openAssessment(row)}
+                            searchPlaceholder="Search assessments"
+                            searchValue={(row) => `${row.vendor?.name || ''} ${templateById[row.templateId || '']?.name || ''} ${row.assessmentType} ${row.status}`}
+                            columns={[
+                                { id: 'vendor', label: 'Third party', sortValue: (row) => row.vendor?.name || '', render: (row) => (
                                     <Box>
-                                        <Typography variant="subtitle1">{row.vendor?.name || 'Vendor'}</Typography>
+                                        <Typography variant="subtitle2">{row.vendor?.name || 'Vendor'}</Typography>
                                         <Typography variant="body2">{templateById[row.templateId || '']?.name || row.assessmentType}</Typography>
                                     </Box>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        {row.dueDate && <Typography variant="caption">Due {row.dueDate.slice(0, 10)}</Typography>}
-                                        <StatusBadge value={row.status} kind="plain" tone={row.status === 'COMPLETED' ? 'success' : 'high'} />
-                                    </Stack>
-                                </Stack>
-                            </Box>
-                        ))}
-                    </Stack>
+                                ) },
+                                { id: 'due', label: 'Due', hideOnMobile: true, sortValue: (row) => row.dueDate || '', render: (row) => row.dueDate ? row.dueDate.slice(0, 10) : '—' },
+                                { id: 'status', label: 'Status', render: (row) => (
+                                    <StatusBadge value={row.status} kind="plain" tone={row.status === 'COMPLETED' ? 'success' : 'high'} />
+                                ) },
+                            ]}
+                        />
+                    </Surface>
                 </QueryState>
             )}
 
@@ -591,22 +590,24 @@ export default function Assessments() {
                             />
                             <Stack spacing={1}>
                                 {vendorMatches.map((vendor) => (
-                                    <Box
+                                    <ListItemButton
                                         key={vendor.id}
+                                        selected={vendor.id === vendorId}
                                         onClick={() => setVendorId(vendor.id)}
+                                        aria-label={`Select ${vendor.name}`}
                                         sx={{
-                                            p: 1.5,
                                             border: `1px solid ${vendor.id === vendorId ? color.navy800 : color.line}`,
                                             borderRadius: '8px',
-                                            cursor: 'pointer',
                                             bgcolor: vendor.id === vendorId ? color.goldDim : color.surface,
                                         }}
                                     >
-                                        <Typography variant="subtitle2">{vendor.name}</Typography>
-                                        <Typography variant="caption">
-                                            {vendor.tier || 'Tier pending'} · residual {vendor.residualRiskScore ?? '—'} · inherent {vendor.inherentRiskScore ?? '—'}
-                                        </Typography>
-                                    </Box>
+                                        <Box>
+                                            <Typography variant="subtitle2">{vendor.name}</Typography>
+                                            <Typography variant="caption">
+                                                {vendor.tier || 'Tier pending'} · residual {vendor.residualRiskScore ?? '—'} · inherent {vendor.inherentRiskScore ?? '—'}
+                                            </Typography>
+                                        </Box>
+                                    </ListItemButton>
                                 ))}
                                 {vendorMatches.length === 0 && <Typography variant="body2">No third parties match. Add one from the Vendors page first.</Typography>}
                             </Stack>

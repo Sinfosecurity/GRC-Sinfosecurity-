@@ -1,7 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, Grid, MenuItem, TextField } from '@mui/material';
+import { Alert, Box, Button, Grid, MenuItem, TextField } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
+import FormSection from '../components/design/FormSection';
 import { organizationAPI } from '../services/api';
 
 const emptyForm = {
@@ -74,9 +76,9 @@ export default function OrganizationSettings() {
             />
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             <QueryState loading={loading} error={error}>
-                <Card sx={{ bgcolor: 'rgba(15,23,42,0.85)' }}>
-                    <CardContent>
-                        <Box component="form" onSubmit={save}>
+                <Surface>
+                    <Box component="form" onSubmit={save}>
+                        <FormSection title="Organization" body="Legal and operating identity for this tenant.">
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
                                     <TextField fullWidth required label="Business name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -100,6 +102,10 @@ export default function OrganizationSettings() {
                                 <Grid item xs={12} md={6}>
                                     <TextField fullWidth label="Organization size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} />
                                 </Grid>
+                            </Grid>
+                        </FormSection>
+                        <FormSection title="Primary contact" body="Used for tenant administration, not marketing.">
+                            <Grid container spacing={2}>
                                 <Grid item xs={12} md={4}>
                                     <TextField fullWidth label="Contact name" value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} />
                                 </Grid>
@@ -110,12 +116,12 @@ export default function OrganizationSettings() {
                                     <TextField fullWidth label="Contact phone" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} />
                                 </Grid>
                             </Grid>
-                            <Button type="submit" variant="contained" sx={{ mt: 3 }} disabled={saving || !form.name || !form.country}>
-                                Save organization
-                            </Button>
-                        </Box>
-                    </CardContent>
-                </Card>
+                        </FormSection>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} disabled={saving || !form.name || !form.country}>
+                            {saving ? 'Saving…' : 'Save organization'}
+                        </Button>
+                    </Box>
+                </Surface>
             </QueryState>
         </Box>
     );
