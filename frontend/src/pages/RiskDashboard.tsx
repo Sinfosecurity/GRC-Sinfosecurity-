@@ -6,13 +6,10 @@ import MetricCard from '../components/design/MetricCard';
 import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import { color } from '../design/tokens';
+import { HeatmapMatrix } from '../components/design/RiskVisuals';
 import { ermAPI } from '../services/api';
 import { downloadBinaryResponse } from '../services/download';
 import { humanizeLabel } from '../utils/humanizeLabel';
-
-const LIKELIHOOD_LABELS = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost certain'];
-const IMPACT_LABELS = ['Negligible', 'Minor', 'Moderate', 'Major', 'Severe'];
 
 type AppetiteRow = {
     id: string;
@@ -51,14 +48,6 @@ function ratingTone(rating: string): 'critical' | 'high' | 'medium' | 'success' 
     if (rating === 'MEDIUM') return 'medium';
     if (rating === 'LOW') return 'success';
     return 'neutral';
-}
-
-function heatStyle(likelihood: number, impact: number) {
-    const score = likelihood * impact;
-    if (score >= 20) return { bgcolor: 'rgba(180, 35, 24, 0.16)', borderColor: color.critical, color: color.critical };
-    if (score >= 13) return { bgcolor: 'rgba(181, 71, 8, 0.14)', borderColor: color.high, color: color.high };
-    if (score >= 7) return { bgcolor: 'rgba(92, 107, 122, 0.12)', borderColor: color.medium, color: color.ink };
-    return { bgcolor: 'rgba(59, 109, 74, 0.12)', borderColor: color.low, color: color.low };
 }
 
 export default function RiskDashboard() {
@@ -126,42 +115,14 @@ export default function RiskDashboard() {
                 <Surface>
                     <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Likelihood × impact</Typography>
                     <Typography variant="body2" sx={{ mb: 1.5 }}>Inherent position on the 5×5 matrix. Each cell is a live count. Click a cell to open that slice of the register.</Typography>
-                    <Box sx={{ overflowX: 'auto' }}>
-                        <Box sx={{ minWidth: 420, display: 'grid', gridTemplateColumns: '88px repeat(5, minmax(52px, 1fr))', gap: 0.75, alignItems: 'stretch' }}>
-                            <Box />
-                            {LIKELIHOOD_LABELS.map((label) => (
-                                <Typography key={label} variant="caption" sx={{ textAlign: 'center', color: 'text.secondary' }}>{label}</Typography>
-                            ))}
-                            {[5, 4, 3, 2, 1].map((impact) => (
-                                <Box key={impact} sx={{ display: 'contents' }}>
-                                    <Typography variant="caption" sx={{ alignSelf: 'center', color: 'text.secondary' }}>{IMPACT_LABELS[impact - 1]}</Typography>
-                                    {[1, 2, 3, 4, 5].map((likelihood) => {
-                                        const item = data.heatmap[impact - 1][likelihood - 1];
-                                        const selected = cell?.likelihood === likelihood && cell?.impact === impact;
-                                        return (
-                                            <Button
-                                                key={`${likelihood}-${impact}`}
-                                                size="small"
-                                                onClick={() => {
-                                                    setCell(item);
-                                                    navigate(`/risks/register?likelihood=${likelihood}&impact=${impact}`);
-                                                }}
-                                                sx={{
-                                                    minHeight: 52,
-                                                    border: '1px solid',
-                                                    ...heatStyle(likelihood, impact),
-                                                    fontWeight: 700,
-                                                    outline: selected ? `2px solid ${color.navy800}` : 'none',
-                                                }}
-                                            >
-                                                {item.count}
-                                            </Button>
-                                        );
-                                    })}
-                                </Box>
-                            ))}
-                        </Box>
-                    </Box>
+                    <HeatmapMatrix
+                        cells={data.heatmap}
+                        selected={cell}
+                        onSelect={(item) => {
+                            setCell(item);
+                            navigate(`/risks/register?likelihood=${item.likelihood}&impact=${item.impact}`);
+                        }}
+                    />
                 </Surface>
                 <Surface>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>Needs attention</Typography>

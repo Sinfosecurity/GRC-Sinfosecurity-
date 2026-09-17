@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import { ActionQueue, AttentionHero, ExecutiveMetric, PageShell, RiskDistribution, SectionHeader } from '../components/experience/ExperienceKit';
+import { CoverageRing } from '../components/design/RiskVisuals';
 import { color } from '../design/tokens';
 import { useAuth } from '../contexts/AuthContext';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -168,28 +169,15 @@ export default function Dashboard() {
                 <ExecutiveMetric phase={workPhase} label="Assessments due" value={work?.dueAssessments ?? '—'} onClick={() => navigate('/assessments')} />
             </Box>
             </Surface>
-            <Box sx={{ mt: 2.5 }}>
-            <Surface>
-            <SectionHeader title="Priority actions" body="What happened, why it matters, and the next human action." />
-            {attentionPhase === 'loading' && (
-                <Typography role="status" aria-live="polite">Checking recorded work…</Typography>
-            )}
-            {attentionPhase === 'error' && (
-                <Typography>The attention queue is unavailable. This is not an all-clear.</Typography>
-            )}
-            {attentionPhase === 'ready' && (
-                <ActionQueue
-                    items={queue}
-                    emptyTitle="The recorded work is current"
-                    emptyBody="Supreme will surface reviews, findings, evidence, and decisions here when a person is needed. Empty is not a simulated all-clear."
-                    onOpen={(href) => navigate(href)}
-                />
-            )}
-            </Surface>
-            </Box>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} sx={{ mt: 2.5 }}>
-                <Box sx={{ flex: 1 }}>
-                    <Surface>
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', lg: '1.7fr 1fr' },
+                    gap: 2.5,
+                    mt: 2.5,
+                }}
+            >
+                <Surface>
                     <Typography variant="h5">Portfolio</Typography>
                     {statsPhase === 'loading' && (
                         <Typography role="status" aria-live="polite" sx={{ color: color.inkMuted, mt: 0.5, mb: 2 }}>Checking the recorded portfolio…</Typography>
@@ -213,11 +201,50 @@ export default function Dashboard() {
                         </>
                     )}
                     <Button sx={{ mt: 1.5 }} onClick={() => navigate('/vendor-management')}>Open register</Button>
-                    </Surface>
-                </Box>
-                {intelligencePhase === 'ready' && intelligence.length > 0 && (
-                    <Box sx={{ flex: 1 }}>
-                        <Surface>
+                </Surface>
+                <Surface>
+                    <Typography variant="h5">Concentration</Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
+                        Critical and high of recorded tiers. This is not control coverage.
+                    </Typography>
+                    <CoverageRing
+                        phase={statsPhase}
+                        label="Critical and high"
+                        tone="critical"
+                        numerator={(stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors ?? 0) + (stats?.tierCounts?.HIGH ?? 0)}
+                        denominator={
+                            (stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors ?? 0)
+                            + (stats?.tierCounts?.HIGH ?? 0)
+                            + (stats?.tierCounts?.MEDIUM ?? 0)
+                            + (stats?.tierCounts?.LOW ?? 0)
+                        }
+                        caption="Authoritative tier, not a control-gap label."
+                        emptyReason={statsPhase === 'error' ? undefined : 'No recorded tiers yet, so there is no concentration to show.'}
+                    />
+                </Surface>
+            </Box>
+            <Box sx={{ mt: 2.5 }}>
+            <Surface>
+            <SectionHeader title="Priority actions" body="What happened, why it matters, and the next human action." />
+            {attentionPhase === 'loading' && (
+                <Typography role="status" aria-live="polite">Checking recorded work…</Typography>
+            )}
+            {attentionPhase === 'error' && (
+                <Typography>The attention queue is unavailable. This is not an all-clear.</Typography>
+            )}
+            {attentionPhase === 'ready' && (
+                <ActionQueue
+                    items={queue}
+                    emptyTitle="The recorded work is current"
+                    emptyBody="Supreme will surface reviews, findings, evidence, and decisions here when a person is needed. Empty is not a simulated all-clear."
+                    onOpen={(href) => navigate(href)}
+                />
+            )}
+            </Surface>
+            </Box>
+            {intelligencePhase === 'ready' && intelligence.length > 0 && (
+                <Box sx={{ mt: 2.5 }}>
+                    <Surface>
                         <Typography variant="h5">What changed</Typography>
                         {intelligence.slice(0, 3).map((row) => (
                             <Box key={row.publicId} sx={{ mt: 1.5 }}>
@@ -225,10 +252,9 @@ export default function Dashboard() {
                                 <Typography sx={{ color: color.inkMuted }}>{row.whyItMatters}</Typography>
                             </Box>
                         ))}
-                        </Surface>
-                    </Box>
-                )}
-            </Stack>
+                    </Surface>
+                </Box>
+            )}
         </PageShell>
     );
 }

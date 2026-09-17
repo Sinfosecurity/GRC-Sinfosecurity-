@@ -324,6 +324,7 @@ export function RiskDistribution({
         { label: 'Low', value: Number(counts.low || 0) },
     ];
     const total = rows.reduce((sum, row) => sum + row.value, 0);
+    const tone = (label: string) => (label === 'Critical' ? color.critical : label === 'High' ? color.high : label === 'Medium' ? color.medium : color.low);
     if (!total) {
         return (
             <Box>
@@ -335,16 +336,45 @@ export function RiskDistribution({
     return (
         <Box>
             <Typography variant="h5">Risk distribution</Typography>
-            <Typography component="p" variant="body2" sx={{ mt: 0.5, mb: 1.25 }}>
+            <Typography component="p" variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
                 {rows.map((row) => `${row.label} ${row.value}`).join(' · ')}
             </Typography>
-            <Box aria-hidden sx={{ display: 'flex', height: 8, bgcolor: color.surfaceMuted }}>
+            <Box
+                aria-hidden
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(4, 1fr)' },
+                    gap: 1,
+                    mb: 1.5,
+                }}
+            >
+                {rows.map((row) => (
+                    <Box
+                        key={row.label}
+                        sx={{
+                            px: 1.25,
+                            py: 1.5,
+                            borderRadius: '8px',
+                            border: `1px solid ${color.line}`,
+                            bgcolor: `${tone(row.label)}14`,
+                        }}
+                    >
+                        <Typography sx={{ fontFamily: type.display, fontSize: 28, lineHeight: 1, fontWeight: 500, color: tone(row.label) }}>
+                            {row.value}
+                        </Typography>
+                        <Typography sx={{ mt: 0.6, fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: tone(row.label) }}>
+                            {row.label}
+                        </Typography>
+                    </Box>
+                ))}
+            </Box>
+            <Box aria-hidden sx={{ display: 'flex', height: 12, borderRadius: '999px', overflow: 'hidden', bgcolor: color.surfaceMuted }}>
                 {rows.filter((row) => row.value).map((row) => (
                     <Box
                         key={row.label}
                         sx={{
                             width: `${(row.value / total) * 100}%`,
-                            bgcolor: row.label === 'Critical' ? color.critical : row.label === 'High' ? color.high : row.label === 'Medium' ? color.medium : color.low,
+                            bgcolor: tone(row.label),
                         }}
                     />
                 ))}

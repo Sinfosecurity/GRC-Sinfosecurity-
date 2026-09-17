@@ -63,6 +63,9 @@ Motion is 180–220ms and disabled when `prefers-reduced-motion: reduce`.
 | `EmptyState` | Title + why + next action. No dashed box. |
 | `LifecycleProgress` | Compact ticks. Current / completed / blocked / next. |
 | `QueryState` | Skeleton while loading. Customer-safe errors. |
+| `HeatmapMatrix` | 5×5 likelihood × impact. Live counts only. Color encodes band; the numeral remains. |
+| `CoverageRing` | Numerator of a real denominator. Loading is not 0%. Empty is not 0%. Not a certification claim. |
+| `RiskDistribution` | Four tier tiles plus a spectrum. Counts from recorded tiers. |
 
 ---
 
@@ -78,6 +81,18 @@ Motion is 180–220ms and disabled when `prefers-reduced-motion: reduce`.
 | `CLEAN` evidence | Ready |
 
 The preparer does not see an Approve control. 403 remains the security backstop, not the normal experience.
+
+---
+
+## Visual communication
+
+Historical reference `Sinfosecurity/GRC-Dashboard-Web-App` was reviewed for composition only. Supreme does not copy its architecture, mock data, marketing claims, hard-coded 72% coverage, scatter seeds, or MockGRCApp.
+
+Taken from that concept: a command center that shows risk as a picture first — heatmap or tier spectrum, then a coverage figure with a real denominator, then the work list. Navigation stays short. Hierarchy is title, purpose, visual, then action.
+
+Refused from that concept: invented metrics, green/red SaaS rings, testimonials, and any coverage figure that cannot name its numerator and denominator.
+
+Home order is attention, metrics, portfolio visual + concentration, priority actions, then Intelligence. Risk keeps the authoritative 5×5. Compliance draws a ring only when readiness is calculable.
 
 ---
 

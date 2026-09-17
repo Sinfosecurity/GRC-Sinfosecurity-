@@ -6,6 +6,7 @@ import MetricCard from '../components/design/MetricCard';
 import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
+import { CoverageRing } from '../components/design/RiskVisuals';
 import { complianceAPI } from '../services/api';
 import { downloadBinaryResponse } from '../services/download';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -107,9 +108,23 @@ export default function ComplianceDashboard() {
                         </Surface>
                         <Surface>
                             <Typography variant="h6" sx={{ mb: 1.5 }}>Readiness / coverage</Typography>
+                            <Typography variant="body2" sx={{ mb: 2 }}>Readiness is not certification. A percentage appears only when the denominator is meaningful.</Typography>
                             {!data.frameworks.length && <Typography color="text.secondary">No framework is activated. Activation is opt-in.</Typography>}
-                            {data.frameworks.map((row) => (
-                                <Box key={row.publicId} sx={{ mb: 2, cursor: 'pointer' }} onClick={() => navigate(`/compliance/frameworks/${row.publicId}`)}>
+                            {data.frameworks.map((row) => {
+                                const requirement = row.metrics.requirementCoverage;
+                                const showRing = row.calculable && requirement?.percent != null && (requirement.denominator || 0) > 0;
+                                return (
+                                <Box key={row.publicId} sx={{ mb: 2, cursor: 'pointer', display: 'grid', gridTemplateColumns: { xs: '1fr', md: showRing ? '148px 1fr' : '1fr' }, gap: 2, alignItems: 'center' }} onClick={() => navigate(`/compliance/frameworks/${row.publicId}`)}>
+                                    {showRing && (
+                                        <CoverageRing
+                                            label="Requirement coverage"
+                                            tone="gold"
+                                            numerator={requirement.numerator}
+                                            denominator={requirement.denominator}
+                                            caption="Mapped requirements. Not a certification claim."
+                                        />
+                                    )}
+                                    <Box>
                                     <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                                         <Typography fontWeight={700}>{row.name} {row.version}</Typography>
                                         <StatusBadge tone="neutral" label={row.status} />
@@ -121,8 +136,10 @@ export default function ComplianceDashboard() {
                                     ) : (
                                         <Typography color="text.secondary">{row.emptyReason}</Typography>
                                     )}
+                                    </Box>
                                 </Box>
-                            ))}
+                                );
+                            })}
                         </Surface>
                         <Surface>
                             <Typography variant="h6" sx={{ mb: 1.5 }}>What changed</Typography>
