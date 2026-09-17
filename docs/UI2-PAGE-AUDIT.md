@@ -138,4 +138,4 @@ Customer routes now classify as **UI 2.0**, **UI 2.0 — SPECIAL PURPOSE**, or *
 | `/questionnaires` | UI 2.0 | Grouped Surfaces |
 | Quarantined mock routes | BLOCKED | LegacyQuarantine is UI 2.0 — SPECIAL PURPOSE |
 
-Hosted page-walk results are recorded in the sprint handoff after staging deploy. This file does not declare UI 2.0 accepted.
+Hosted walk (2026-09-17): frontend `302785b429b0a8cc4db3f51db824af6d164c6b61` on `supreme-risk-staging.onrender.com`. 61 list/hub/admin routes plus quarantine screens at 1440; remediations also sampled at 375/768/1024/1920. Every walked page had an `h1`, no horizontal overflow, no leftover navy cards, no crash copy. Detail routes that require a record id were not opened unless already linked from a list. This file does not declare UI 2.0 accepted.
