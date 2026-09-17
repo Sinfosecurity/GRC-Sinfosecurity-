@@ -129,6 +129,16 @@ export default function Dashboard() {
     })), [items]);
     const first = queue[0];
     const firstRun = attentionPhase === 'ready' && statsPhase === 'ready' && stats?.totalVendors === 0 && queue.length === 0;
+    const recordedTiers = statsPhase === 'ready'
+        ? (stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors ?? 0)
+            + (stats?.tierCounts?.HIGH ?? 0)
+            + (stats?.tierCounts?.MEDIUM ?? 0)
+            + (stats?.tierCounts?.LOW ?? 0)
+        : 0;
+    const concentrated = statsPhase === 'ready'
+        ? (stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors ?? 0) + (stats?.tierCounts?.HIGH ?? 0)
+        : 0;
+    const unclassified = statsPhase === 'ready' ? Math.max(0, (stats?.totalVendors ?? 0) - recordedTiers) : 0;
 
     return (
         <PageShell>
@@ -205,22 +215,22 @@ export default function Dashboard() {
                 <Surface>
                     <Typography variant="h5">Concentration</Typography>
                     <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
-                        Critical and high of recorded tiers. This is not control coverage.
+                        Critical and high of recorded tiers. This is not control coverage. Third parties without a recorded tier are not in the ring.
                     </Typography>
                     <CoverageRing
                         phase={statsPhase}
                         label="Critical and high"
                         tone="critical"
-                        numerator={(stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors ?? 0) + (stats?.tierCounts?.HIGH ?? 0)}
-                        denominator={
-                            (stats?.tierCounts?.CRITICAL ?? stats?.criticalVendors ?? 0)
-                            + (stats?.tierCounts?.HIGH ?? 0)
-                            + (stats?.tierCounts?.MEDIUM ?? 0)
-                            + (stats?.tierCounts?.LOW ?? 0)
-                        }
+                        numerator={concentrated}
+                        denominator={recordedTiers}
                         caption="Authoritative tier, not a control-gap label."
                         emptyReason={statsPhase === 'error' ? undefined : 'No recorded tiers yet, so there is no concentration to show.'}
                     />
+                    {statsPhase === 'ready' && unclassified > 0 && (
+                        <Typography variant="body2" sx={{ mt: 1.5 }}>
+                            {unclassified} third {unclassified === 1 ? 'party has' : 'parties have'} no recorded tier and {unclassified === 1 ? 'is' : 'are'} not included in this concentration.
+                        </Typography>
+                    )}
                 </Surface>
             </Box>
             <Box sx={{ mt: 2.5 }}>

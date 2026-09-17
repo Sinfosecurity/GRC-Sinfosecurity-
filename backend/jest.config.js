@@ -14,7 +14,6 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^isomorphic-dompurify$': '<rootDir>/src/tests/dompurify-stub.ts',
   },
   setupFiles: ['<rootDir>/src/tests/env.ts'],
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],

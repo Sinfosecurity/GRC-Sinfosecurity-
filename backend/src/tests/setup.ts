@@ -47,6 +47,17 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
+afterEach(() => {
+  try {
+    const { loginLockoutService } = require('../services/loginLockoutService') as {
+      loginLockoutService: { reset: () => void };
+    };
+    loginLockoutService.reset();
+  } catch {
+    // Lockout module may be unused in some suites.
+  }
+});
+
 afterAll(async () => {
   try {
     const db = require('../config/database') as { prisma?: { $disconnect?: () => Promise<void> } };

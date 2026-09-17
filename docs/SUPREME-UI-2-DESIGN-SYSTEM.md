@@ -98,4 +98,4 @@ Home order is attention, metrics, portfolio visual + concentration, priority act
 
 ## Out of scope
 
-H-5, H-6, and #21 were not started. Risk methodology, certified security controls, and Phase C gates are unchanged.
+H-5 and H-6 have engineering remediations on this branch and remain OPEN pending hosted proof. #21 remains PARTIAL; live IdP was not tested. Risk methodology, certified security controls, and Phase C gates are unchanged. Cursor does not declare H-5 CLOSED, H-6 CLOSED, or #21 PASS.

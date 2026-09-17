@@ -774,4 +774,4 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **EVIDENCE:** `docs/SUPREME-UI-2-DESIGN-SYSTEM.md`, `docs/private-beta/SUPREME-UI-2-CERTIFICATION.md`, `docs/private-beta/hosted-ux-qa/supreme-ui-2/before/`
 
-**NEXT ACTION:** Finish hosted AFTER proof, two-user approval walkthrough, TPRM golden journey, and security regression on staging after CI. Do not start H-5, H-6, or #21. Do not merge `main`. Do not deploy production.
+**NEXT ACTION:** Product Leadership reviews UI 2.0 on staging. H-5/H-6 remediations are engineering-complete on the transformation branch and remain OPEN until hosted proof. #21 remains PARTIAL. Do not merge `main`. Do not deploy production. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, or #21 PASS.

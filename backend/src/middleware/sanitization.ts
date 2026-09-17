@@ -1,59 +1,46 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult, ValidationChain } from 'express-validator';
-import DOMPurify from 'isomorphic-dompurify';
 
 /**
- * Sanitize input data to prevent XSS and injection attacks
+ * Pass user text through unchanged. React, email, and PDF encode on output.
+ * Passwords and secrets are never rewritten. Null bytes are rejected, not repaired.
  */
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
-    // Sanitize body
-    if (req.body && typeof req.body === 'object') {
-        req.body = sanitizeObject(req.body);
+    try {
+        if (req.body && typeof req.body === 'object') {
+            req.body = preserveUserText(req.body);
+        }
+        if (req.query && typeof req.query === 'object') {
+            req.query = preserveUserText(req.query);
+        }
+        if (req.params && typeof req.params === 'object') {
+            req.params = preserveUserText(req.params);
+        }
+    } catch (err) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION', message: err instanceof Error ? err.message : 'Invalid input' },
+        });
     }
-
-    // Sanitize query parameters
-    if (req.query && typeof req.query === 'object') {
-        req.query = sanitizeObject(req.query);
-    }
-
-    // Sanitize params
-    if (req.params && typeof req.params === 'object') {
-        req.params = sanitizeObject(req.params);
-    }
-
     next();
 };
 
-/**
- * Recursively sanitize object properties
- */
-function sanitizeObject(obj: any): any {
-    if (obj === null || obj === undefined) {
+function preserveUserText(obj: any, key = ''): any {
+    if (obj === null || obj === undefined) return obj;
+    if (Array.isArray(obj)) return obj.map((item) => preserveUserText(item, key));
+    if (typeof obj === 'object') {
+        const next: any = {};
+        for (const name of Object.keys(obj)) {
+            next[name] = preserveUserText(obj[name], name);
+        }
+        return next;
+    }
+    if (typeof obj === 'string') {
+        if (obj.includes('\0')) {
+            throw new Error('Input contains a null byte');
+        }
         return obj;
     }
-
-    if (Array.isArray(obj)) {
-        return obj.map(item => sanitizeObject(item));
-    }
-
-    if (typeof obj === 'object') {
-        const sanitized: any = {};
-        for (const key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                sanitized[key] = sanitizeObject(obj[key]);
-            }
-        }
-        return sanitized;
-    }
-
-    if (typeof obj === 'string') {
-        // Remove HTML tags and sanitize
-        return DOMPurify.sanitize(obj, { 
-            ALLOWED_TAGS: [], 
-            ALLOWED_ATTR: [] 
-        }).trim();
-    }
-
     return obj;
 }
 

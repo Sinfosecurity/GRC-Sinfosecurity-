@@ -88,17 +88,21 @@ export function normalizeEmail(value: unknown): string {
     return String(value || '').trim().toLowerCase();
 }
 
+function pathOnly(req: Pick<Request, 'path' | 'originalUrl'>) {
+    return String(req.path || '').split('?')[0];
+}
+
 export function shouldSkipRateLimit(req: Pick<Request, 'path' | 'originalUrl'>, env: NodeJS.ProcessEnv = process.env) {
-    const path = `${req.originalUrl || ''} ${req.path || ''}`;
+    if ((env.NODE_ENV === 'test' && env.RATE_LIMIT_ENFORCE !== 'true') || env.RATE_LIMIT_RELAXED === 'true') {
+        return true;
+    }
+    const path = pathOnly(req);
     return (
-        (env.NODE_ENV === 'test' && env.RATE_LIMIT_ENFORCE !== 'true') ||
-        env.RATE_LIMIT_RELAXED === 'true' ||
-        req.path === '/health' ||
-        req.path === '/health/basic' ||
-        /\/health(\/|$|\?)/.test(path) ||
-        /\/billing\/webhook/.test(path) ||
-        /\/webhooks\/resend/.test(path) ||
-        req.path === '/metrics'
+        path === '/health' ||
+        path === '/health/basic' ||
+        path === '/metrics' ||
+        path.endsWith('/billing/webhook') ||
+        path.endsWith('/webhooks/resend')
     );
 }
 

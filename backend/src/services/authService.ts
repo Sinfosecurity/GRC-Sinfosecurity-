@@ -9,6 +9,7 @@ import { recordAudit } from './auditEventService';
 import { notify } from './notificationDeliveryService';
 import { passwordResetEmailBody, passwordResetEmailHtml } from './publicFrontendUrl';
 import { totpMfaService } from './totpMfaService';
+import { loginLockoutService } from './loginLockoutService';
 import { ApiError } from '../middleware/errorHandler';
 
 const GENERIC_AUTH_ERROR = 'Invalid credentials';
@@ -151,12 +152,14 @@ export const authService = {
     cookieOptions,
 
     async login(email: string, password: string, meta?: { ip?: string; userAgent?: string; requestId?: string; plane?: AuthPlane }) {
+        await loginLockoutService.assertNotLocked(email);
         const user = await prisma.user.findUnique({
             where: { email: email.toLowerCase().trim() },
             include: { organization: true },
         });
 
         if (!user) {
+            await loginLockoutService.recordFailure(email, { ip: meta?.ip, userAgent: meta?.userAgent, requestId: meta?.requestId });
             await recordAudit({
                 action: 'auth.login',
                 resourceType: 'User',
@@ -195,6 +198,13 @@ export const authService = {
 
         const valid = await verifyPassword(password, user.hashedPassword);
         if (!valid) {
+            await loginLockoutService.recordFailure(email, {
+                organizationId: user.organizationId,
+                userId: user.id,
+                ip: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+            });
             await recordAudit({
                 organizationId: user.organizationId,
                 actorUserId: user.id,
@@ -209,6 +219,7 @@ export const authService = {
             });
             throw new ApiError(401, GENERIC_AUTH_ERROR);
         }
+        await loginLockoutService.recordSuccess(email);
 
         const plane = meta?.plane || CUSTOMER_PLANE;
         if (plane === CUSTOMER_PLANE) {

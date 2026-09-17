@@ -34,6 +34,22 @@ describe('production-like rate limit policy', () => {
             { NODE_ENV: 'production' }
         )).toBe(true);
     });
+
+    it('does not skip login because a query string mentions a skipped path', () => {
+        const production = { NODE_ENV: 'production' };
+        expect(shouldSkipRateLimit(
+            { path: '/v1/auth/login', originalUrl: '/api/v1/auth/login?x=/billing/webhook' },
+            production
+        )).toBe(false);
+        expect(shouldSkipRateLimit(
+            { path: '/v1/auth/login', originalUrl: '/api/v1/auth/login?x=/health/' },
+            production
+        )).toBe(false);
+        expect(shouldSkipRateLimit(
+            { path: '/v1/auth/forgot-password', originalUrl: '/api/v1/auth/forgot-password?next=/webhooks/resend' },
+            production
+        )).toBe(false);
+    });
 });
 
 describe('proxy-safe client IP', () => {

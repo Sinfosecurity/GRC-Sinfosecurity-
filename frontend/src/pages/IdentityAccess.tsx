@@ -1,7 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Alert, Box, Button, Card, CardContent, Grid, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
+import { PageShell } from '../components/experience/ExperienceKit';
 import { identityAPI } from '../services/api';
 
 const ROLES = ['VIEWER', 'AUDITOR', 'BUSINESS_OWNER', 'APPROVER', 'ASSESSOR', 'RISK_MANAGER', 'ORGANIZATION_ADMIN'];
@@ -89,7 +91,7 @@ export default function IdentityAccess() {
     };
 
     return (
-        <Box sx={{ maxWidth: 1100 }}>
+        <PageShell>
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Identity & Access' }]}
                 title="Identity & Access"
@@ -98,6 +100,7 @@ export default function IdentityAccess() {
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             {onceToken && <Alert severity="warning" sx={{ mb: 2 }}>Copy this provisioning token now. Supreme will not show it again.</Alert>}
             <QueryState loading={loading} error={error}>
+            <Surface>
                 <Tabs value={tab} onChange={(_, next) => setTab(next)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }} aria-label="Identity and access sections">
                     <Tab label="Overview" />
                     <Tab label="Single Sign-On" />
@@ -298,7 +301,8 @@ export default function IdentityAccess() {
                         </CardContent>
                     </Card>
                 )}
+            </Surface>
             </QueryState>
-        </Box>
+        </PageShell>
     );
 }
