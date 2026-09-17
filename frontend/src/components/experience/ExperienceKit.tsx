@@ -87,31 +87,50 @@ export function AttentionHero({
             aria-live={phase === 'loading' ? 'polite' : undefined}
             sx={{
                 display: 'grid',
-                gridTemplateColumns: { xs: '1fr', md: '1fr auto' },
-                gap: 2,
+                gridTemplateColumns: { xs: '1fr', md: 'auto 1fr auto' },
+                gap: { xs: 2, md: 4 },
                 alignItems: 'center',
-                py: 2,
-                mb: 3,
-                borderBottom: `1px solid ${color.line}`,
+                px: { xs: 2.5, md: 4 },
+                py: { xs: 3, md: 4 },
+                mb: 4,
+                bgcolor: color.navy950,
+                color: color.navInk,
+                boxShadow: `inset 0 0 0 1px ${color.gold}`,
             }}
         >
+            {phase === 'loading' ? (
+                <Box aria-hidden sx={{ width: { xs: 72, md: 96 }, height: { xs: 56, md: 72 }, bgcolor: 'rgba(243,236,222,0.12)' }} />
+            ) : (
+                <Typography
+                    aria-hidden={phase !== 'ready'}
+                    sx={{ fontFamily: type.display, fontSize: { xs: 56, md: 80 }, lineHeight: 0.9, fontWeight: 500, color: color.goldSoft, minWidth: { md: 96 } }}
+                >
+                    {phase === 'error' ? '—' : count}
+                </Typography>
+            )}
             <Box>
-                <Typography sx={{ fontSize: 13, color: color.inkMuted, fontWeight: 650, mb: 0.5 }}>
+                <Typography sx={{ fontSize: 12, color: color.goldSoft, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', mb: 0.75 }}>
                     {phase === 'loading' ? 'Checking what needs your attention…' : phase === 'error' ? 'Attention could not be loaded' : `${count} need your attention`}
                 </Typography>
                 {phase === 'loading' ? (
                     <>
-                        <Box aria-hidden sx={{ width: { xs: '80%', md: 360 }, height: 28, bgcolor: color.surfaceMuted, borderRadius: 0.5, mb: 1 }} />
-                        <Box aria-hidden sx={{ width: { xs: '60%', md: 240 }, height: 16, bgcolor: color.surfaceMuted, borderRadius: 0.5 }} />
+                        <Box aria-hidden sx={{ width: { xs: '80%', md: 360 }, height: 28, bgcolor: 'rgba(243,236,222,0.12)', mb: 1 }} />
+                        <Box aria-hidden sx={{ width: { xs: '60%', md: 240 }, height: 16, bgcolor: 'rgba(243,236,222,0.08)' }} />
                     </>
                 ) : (
                     <>
-                        <Typography variant="h3">{phase === 'error' ? 'The attention queue is unavailable' : title}</Typography>
-                        <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 560 }}>{body}</Typography>
+                        <Typography sx={{ fontFamily: type.display, fontSize: { xs: 26, md: 34 }, lineHeight: 1.15, fontWeight: 500, color: color.navInk }}>
+                            {phase === 'error' ? 'The attention queue is unavailable' : title}
+                        </Typography>
+                        <Typography sx={{ mt: 1, maxWidth: 560, color: color.navMuted, fontSize: 15, lineHeight: 1.5 }}>{body}</Typography>
                     </>
                 )}
             </Box>
-            {phase === 'ready' && <Button variant="contained" onClick={onAction}>{actionLabel}</Button>}
+            {phase === 'ready' && (
+                <Button variant="contained" color="secondary" onClick={onAction} sx={{ justifySelf: { md: 'end' } }}>
+                    {actionLabel}
+                </Button>
+            )}
         </Box>
     );
 }
@@ -155,7 +174,7 @@ export function LifecycleProgress({
     blocked?: boolean;
 }) {
     return (
-        <Box component="ol" aria-label="Third party stages" sx={{ display: 'flex', flexWrap: 'wrap', gap: 0, listStyle: 'none', p: 0, m: 0 }}>
+        <Box component="ol" aria-label="Third party stages" sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, md: 3 }, listStyle: 'none', p: 0, m: 0, py: 1 }}>
             {CUSTOMER_STAGES.map((step, index) => {
                 const state = index < active ? 'completed' : index === active ? (blocked ? 'blocked' : 'current') : 'future';
                 return (
@@ -164,15 +183,27 @@ export function LifecycleProgress({
                         key={step}
                         aria-current={state === 'current' ? 'step' : undefined}
                         sx={{
-                            pr: 2.5,
-                            py: 0.75,
-                            color: state === 'future' ? color.inkMuted : color.ink,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            color: state === 'future' ? color.inkFaint : color.ink,
                             fontWeight: state === 'current' ? 700 : 500,
-                            fontSize: 14,
-                            borderBottom: state === 'current' ? `2px solid ${color.navy900}` : '2px solid transparent',
+                            fontSize: 13,
+                            letterSpacing: '0.04em',
+                            textTransform: 'uppercase',
                         }}
                     >
-                        {index + 1}. {step}{state === 'blocked' ? ' · blocked' : ''}
+                        <Box
+                            aria-hidden
+                            sx={{
+                                width: 8,
+                                height: 8,
+                                bgcolor: state === 'current' ? color.gold : state === 'completed' ? color.ink : 'transparent',
+                                border: `1px solid ${state === 'future' ? color.lineStrong : color.ink}`,
+                                transform: state === 'blocked' ? 'rotate(45deg)' : 'none',
+                            }}
+                        />
+                        {step}{state === 'blocked' ? ' · blocked' : state === 'current' ? ' · now' : ''}
                     </Box>
                 );
             })}
@@ -310,7 +341,7 @@ export function RiskDistribution({
                         key={row.label}
                         sx={{
                             width: `${(row.value / total) * 100}%`,
-                            bgcolor: row.label === 'Critical' ? color.navy950 : row.label === 'High' ? color.navy700 : row.label === 'Medium' ? color.gold : color.lineStrong,
+                            bgcolor: row.label === 'Critical' ? color.critical : row.label === 'High' ? color.high : row.label === 'Medium' ? color.medium : color.low,
                         }}
                     />
                 ))}

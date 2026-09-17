@@ -6,6 +6,7 @@ import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import { EntitySummary, LifecycleProgress, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
 import ReviewDecidePanel from '../components/experience/ReviewDecidePanel';
+import { approvalStatusCopy } from '../experience/approvalCopy';
 import { customerStage, customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
@@ -126,12 +127,14 @@ export default function VendorOnboardingWorkspace() {
                         tier={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)}
                         inherent={data.inherentRiskScore != null ? data.inherentRiskScore : 'Not scored'}
                         residual={data.residualRiskScore != null ? data.residualRiskScore : data.lifecycle?.residualRisk ?? 'Not scored'}
-                        status={humanizeLabel(data.workflowStatus || data.stage)}
+                        status={approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status !== 'Draft'
+                            ? approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status
+                            : humanizeLabel(data.workflowStatus || data.stage)}
                     />
                     <LifecycleProgress active={customerStageIndex(data.stageKey || data.stage)} blocked={(data.unresolvedScope || []).length > 0 && !data.intake?.completed} />
                     <NextActionCard
-                        label={dominantNextAction(data).label}
-                        detail={`${dominantNextAction(data).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
+                        label={dominantNextAction({ ...data, actorId: data.actorId }).label}
+                        detail={`${dominantNextAction({ ...data, actorId: data.actorId }).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
                         onAction={() => setTab(defaultTab(data.stage))}
                     />
                     {error && <Alert severity="error">{error}</Alert>}
@@ -149,7 +152,7 @@ export default function VendorOnboardingWorkspace() {
                         <Stack spacing={2}>
                         <Surface>
                             <Typography variant="h6">Where this case stands</Typography>
-                            <Typography>You are in {humanizeLabel(data.stage)}. {dominantNextAction(data).detail}</Typography>
+                            <Typography>You are in {humanizeLabel(data.stage)}. {dominantNextAction({ ...data, actorId: data.actorId }).detail}</Typography>
                             <Typography variant="body2">Owner {data.owner || 'Not assigned'} · Due {formatShortDate(data.dueDate)}</Typography>
                         </Surface>
                         <Surface>
@@ -528,8 +531,12 @@ export default function VendorOnboardingWorkspace() {
                         <Stack spacing={1.5}>
                             <Surface>
                                 <Typography variant="overline" sx={{ color: 'text.primary', fontSize: '0.78rem', letterSpacing: '0.06em' }}>Decision brief</Typography>
-                                <Typography variant="h6">A person must decide</Typography>
-                                <Typography variant="body2" sx={{ mb: 1.5 }}>Supreme prepared this record. Approve, approve with conditions, or reject. Residual risk does not change because a person accepts it.</Typography>
+                                <Typography variant="h6">What is being decided</Typography>
+                                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                                    {approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status}.
+                                    {approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).waitingDetail ? ` ${approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).waitingDetail}.` : ''}
+                                    {' '}Supreme prepared this record. Residual risk does not change because a person accepts it.
+                                </Typography>
                                 <Fact label="Vendor / service" value={`${data.publicId || ''} ${data.name}${data.request?.servicesProvided ? ` · ${data.request.servicesProvided}` : ''}`.trim()} />
                                 <Fact label="Tier" value={humanizeLabel(data.tier || data.tierReview?.confirmedTier || data.tierReview?.recommendedTier)} />
                                 <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
@@ -558,11 +565,17 @@ export default function VendorOnboardingWorkspace() {
                             </Surface>
                             {data.lifecycle?.approvalDecision && <Alert severity="info">Decision: {humanizeLabel(data.lifecycle.approvalDecision)}{data.lifecycle.approvalConditions ? `. ${data.lifecycle.approvalConditions}` : ''}</Alert>}
                             {data.lifecycle?.readyForIndependentApproval && data.lifecycle?.approvalPreparedBy === data.actorId && (
-                                <Typography variant="body2" role="status">Ready for independent approval. Another authorized reviewer must record the decision.</Typography>
+                                <Typography variant="body2" role="status">
+                                    Waiting for approval. {data.lifecycle.waitingFor ? `Waiting for ${data.lifecycle.waitingFor}.` : 'Waiting for an authorized approver.'} Supreme routed this to the attention queue. You do not approve your own decision.
+                                </Typography>
+                            )}
+                            {data.lifecycle?.readyForIndependentApproval && data.lifecycle?.approvalPreparedBy !== data.actorId && !data.canDecideApproval && (
+                                <Typography variant="body2" role="status">Ready for independent approval. An authorized reviewer will record the decision.</Typography>
                             )}
                             {data.canDecideApproval && data.lifecycle?.approvalPreparedBy && data.lifecycle.approvalPreparedBy !== data.actorId && !data.lifecycle?.approvalDecision && (
                                 <Surface>
                                     <Typography variant="subtitle1" sx={{ mb: 1 }}>Independent decision required</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1.5 }}>Approve, approve with conditions, or reject. The preparer cannot record this decision.</Typography>
                                     <Stack spacing={1.5}>
                                         <TextField fullWidth multiline minRows={2} label="Conditions" value={approval.conditions} onChange={(event) => setApproval({ ...approval, conditions: event.target.value })} helperText="Required when approving with conditions." />
                                         <TextField fullWidth multiline minRows={2} label="Rationale" value={approval.rationale} onChange={(event) => setApproval({ ...approval, rationale: event.target.value })} />

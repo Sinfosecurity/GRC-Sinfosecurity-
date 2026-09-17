@@ -14,6 +14,23 @@ export type AttentionItem = {
     href: string;
 };
 
+function customerOnboardingLabel(stage?: string | null): string {
+    switch (stage) {
+        case 'INTAKE': return 'intake';
+        case 'TIER_REVIEW': return 'tier review';
+        case 'DUE_DILIGENCE_PLAN': return 'due diligence plan';
+        case 'READY_TO_SEND': return 'ready to send';
+        case 'AWAITING_VENDOR': return 'waiting on vendor';
+        case 'VENDOR_IN_PROGRESS': return 'vendor in progress';
+        case 'SUBMITTED': return 'submitted';
+        case 'UNDER_REVIEW': return 'under review';
+        case 'RISK_ACCEPTANCE': return 'risk acceptance';
+        case 'CONTRACT_REVIEW': return 'contract review';
+        case 'APPROVAL': return 'independent approval';
+        default: return String(stage || 'review').replace(/_/g, ' ').toLowerCase();
+    }
+}
+
 function customerScanLabel(status?: string | null): string {
     switch (String(status || '').toUpperCase()) {
         case 'CLEAN':
@@ -47,7 +64,7 @@ export const attentionService = {
         const onboarding = await prisma.vendorOnboarding.findMany({
             where: {
                 organizationId,
-                stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN, VendorOnboardingStage.READY_TO_SEND, VendorOnboardingStage.AWAITING_VENDOR, VendorOnboardingStage.VENDOR_IN_PROGRESS, VendorOnboardingStage.SUBMITTED, VendorOnboardingStage.UNDER_REVIEW] },
+                stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN, VendorOnboardingStage.READY_TO_SEND, VendorOnboardingStage.AWAITING_VENDOR, VendorOnboardingStage.VENDOR_IN_PROGRESS, VendorOnboardingStage.SUBMITTED, VendorOnboardingStage.UNDER_REVIEW, VendorOnboardingStage.RISK_ACCEPTANCE, VendorOnboardingStage.CONTRACT_REVIEW, VendorOnboardingStage.APPROVAL] },
             },
             include: { vendor: { select: { id: true, name: true, publicId: true } } },
             take: 25,
@@ -55,6 +72,7 @@ export const attentionService = {
         for (const row of onboarding) {
             const due = row.dueDiligenceDueAt || (row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt);
             const overdue = Boolean(due && due < now);
+            const waitingApproval = row.stage === VendorOnboardingStage.APPROVAL && !row.approvalDecision;
             const action = row.stage === VendorOnboardingStage.INTAKE
                 ? 'COMPLETE INTAKE'
                 : row.stage === VendorOnboardingStage.TIER_REVIEW
@@ -65,13 +83,21 @@ export const attentionService = {
                             ? 'SEND DUE DILIGENCE'
                             : row.stage === VendorOnboardingStage.SUBMITTED || row.stage === VendorOnboardingStage.UNDER_REVIEW
                                 ? 'REVIEW SUBMISSION'
-                                : 'VENDOR DUE DILIGENCE';
+                                : row.stage === VendorOnboardingStage.RISK_ACCEPTANCE
+                                    ? 'REVIEW ACCEPTANCE'
+                                    : waitingApproval || row.stage === VendorOnboardingStage.CONTRACT_REVIEW
+                                        ? 'RECORD DECISION'
+                                        : 'VENDOR DUE DILIGENCE';
             items.push({
                 id: `onboarding-${row.vendorId}`,
-                severity: overdue ? 'HIGH' : 'MEDIUM',
+                severity: waitingApproval || overdue ? 'HIGH' : 'MEDIUM',
                 action,
-                title: `${row.vendor.name} · ${row.stage.replace(/_/g, ' ').toLowerCase()}`,
-                detail: `${row.vendor.publicId || 'Vendor'} · due ${due ? due.toISOString().slice(0, 10) : 'not set'}${overdue ? ' · overdue' : ''}.`,
+                title: waitingApproval
+                    ? `${row.vendor.name} needs independent approval`
+                    : `${row.vendor.name} · ${customerOnboardingLabel(row.stage)}`,
+                detail: waitingApproval
+                    ? `${row.vendor.publicId || 'Vendor'} is ready for independent approval. Open the decision brief.`
+                    : `${row.vendor.publicId || 'Vendor'} · due ${due ? due.toISOString().slice(0, 10) : 'not set'}${overdue ? ' · overdue' : ''}.`,
                 vendorId: row.vendorId,
                 vendorName: row.vendor.name,
                 href: `/vendor-onboarding/${row.vendor.publicId || row.vendorId}`,
@@ -195,7 +221,7 @@ export const attentionService = {
         }
 
         const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        const [dueAssessments, overdueFindings, pendingDecisions] = await Promise.all([
+        const [dueAssessments, overdueFindings, pendingBriefs, pendingVendorApprovals] = await Promise.all([
             prisma.vendorAssessment.count({
                 where: {
                     organizationId,
@@ -217,7 +243,15 @@ export const attentionService = {
                     status: { not: DecisionBriefStatus.DECIDED },
                 },
             }),
+            prisma.vendorOnboarding.count({
+                where: {
+                    organizationId,
+                    approvalPreparedBy: { not: null },
+                    approvalDecision: null,
+                },
+            }),
         ]);
+        const pendingDecisions = pendingBriefs + pendingVendorApprovals;
 
         const rank: Record<AttentionSeverity, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2 };
         items.sort((a, b) => rank[a.severity] - rank[b.severity]);

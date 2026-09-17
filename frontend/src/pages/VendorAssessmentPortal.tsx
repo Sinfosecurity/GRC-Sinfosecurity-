@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Box, Button, LinearProgress, Stack, Typography } from '@mui/material';
 import { vendorPortalAPI } from '../services/api';
-import { color } from '../design/tokens';
+import { color, type } from '../design/tokens';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
 export default function VendorAssessmentPortal() {
@@ -45,32 +45,50 @@ export default function VendorAssessmentPortal() {
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: color.workspace }}>
-            <Box sx={{ bgcolor: color.navy950, color: color.navInk, px: { xs: 2, md: 6 }, py: 3 }}>
-                <Typography sx={{ color: color.navMuted, fontWeight: 650, fontSize: 13 }}>Security review for {data.organizationName}</Typography>
-                <Typography variant="h3" sx={{ mt: 0.75 }}>{percent}% complete</Typography>
-                <Typography sx={{ color: color.navMuted, mt: 1, maxWidth: 640 }}>
-                    {data.requesterName || 'The requesting organization'} asked {data.vendorName} to answer questions and provide evidence. You will only see this assignment.
+            <Box sx={{ bgcolor: color.navy950, color: color.navInk, px: { xs: 2, md: 8 }, py: { xs: 3.5, md: 5 }, boxShadow: `inset 0 -3px 0 ${color.gold}` }}>
+                <Typography sx={{ color: color.goldSoft, fontWeight: 700, fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+                    {data.organizationName} is requesting this
                 </Typography>
-                <Typography sx={{ mt: 2 }}>Next: {remaining ? `Complete ${remaining} remaining questions` : 'Submit your assessment'} · Due {formatShortDate(data.dueDate)}</Typography>
+                <Typography sx={{ fontFamily: type.display, fontSize: { xs: 32, md: 48 }, lineHeight: 1.05, mt: 1.25 }}>
+                    What you need to do
+                </Typography>
+                <Typography sx={{ color: color.navMuted, mt: 1.5, maxWidth: 640, fontSize: 16 }}>
+                    Answer the questions and attach the requested files for {data.vendorName}. You will only see this assignment.
+                </Typography>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1.5, sm: 4 }} sx={{ mt: 3 }}>
+                    <Box>
+                        <Typography sx={{ fontFamily: type.display, fontSize: 40, color: color.goldSoft, lineHeight: 1 }}>{percent}%</Typography>
+                        <Typography sx={{ color: color.navMuted, mt: 0.5 }}>{progressLabel}</Typography>
+                    </Box>
+                    <Box>
+                        <Typography sx={{ fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: color.goldSoft }}>Due</Typography>
+                        <Typography sx={{ mt: 0.5 }}>{formatShortDate(data.dueDate)}</Typography>
+                    </Box>
+                    <Box>
+                        <Typography sx={{ fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: color.goldSoft }}>Next</Typography>
+                        <Typography sx={{ mt: 0.5 }}>{remaining ? `Complete ${remaining} remaining questions` : 'Submit your answers'}</Typography>
+                    </Box>
+                </Stack>
                 <LinearProgress
                     variant="determinate"
                     value={percent}
                     aria-label={`Assessment progress ${progressLabel}`}
-                    sx={{ height: 10, borderRadius: 999, mt: 2, bgcolor: 'rgba(255,255,255,0.16)', '& .MuiLinearProgress-bar': { bgcolor: color.gold } }}
+                    sx={{ height: 6, borderRadius: 0, mt: 3, bgcolor: 'rgba(255,255,255,0.12)', '& .MuiLinearProgress-bar': { bgcolor: color.gold } }}
                 />
                 {current && (
                     <Button
                         variant="contained"
-                        sx={{ mt: 3, bgcolor: color.gold, color: color.navy950, '&:hover': { bgcolor: color.goldSoft } }}
+                        color="secondary"
+                        sx={{ mt: 3 }}
                         onClick={() => navigate(`/vendor-assessment/${current.id}`)}
                     >
-                        {current.answered ? 'Continue assessment' : 'Begin assessment'}
+                        {current.answered ? 'Continue' : 'Begin'}
                     </Button>
                 )}
             </Box>
-            <Stack spacing={2} sx={{ maxWidth: 820, mx: 'auto', px: { xs: 2, md: 6 }, py: 4 }}>
+            <Stack spacing={0} sx={{ maxWidth: 820, mx: 'auto', px: { xs: 2, md: 6 }, py: 4 }}>
                 {assessments.map((item: any) => (
-                    <Box key={item.id} sx={{ py: 2, borderBottom: `1px solid ${color.line}` }}>
+                    <Box key={item.id} sx={{ py: 2.25, borderBottom: `1px solid ${color.line}` }}>
                         <Typography variant="h6">{item.name}</Typography>
                         <Typography sx={{ color: color.inkMuted }}>{humanizeLabel(item.status)} · {item.answered} / {item.total} answered</Typography>
                         <Button sx={{ mt: 1 }} onClick={() => navigate(`/vendor-assessment/${item.id}`)}>

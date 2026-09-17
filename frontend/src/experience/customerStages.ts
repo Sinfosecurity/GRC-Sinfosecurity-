@@ -63,7 +63,14 @@ export function dominantNextAction(data: {
     canEditIntake?: boolean;
     canReviewTier?: boolean;
     intake?: { completed?: boolean };
-    lifecycle?: { readyForIndependentApproval?: boolean; findings?: Array<{ pendingIndependentApproval?: boolean }> };
+    actorId?: string;
+    lifecycle?: {
+        readyForIndependentApproval?: boolean;
+        waitingForApproval?: boolean;
+        approvalPreparedBy?: string | null;
+        waitingFor?: string | null;
+        findings?: Array<{ pendingIndependentApproval?: boolean }>;
+    };
 }) {
     const stage = data.stageKey || data.stage;
     if ((data.unresolvedScope || []).length && !data.intake?.completed) {
@@ -86,7 +93,14 @@ export function dominantNextAction(data: {
     if (['SUBMITTED', 'UNDER_REVIEW', 'Submitted', 'Under review'].includes(String(stage))) {
         return { label: 'Review exceptions', detail: data.nextAction || 'Start with answers that need judgment.' };
     }
-    if (data.lifecycle?.readyForIndependentApproval || data.lifecycle?.findings?.some((row) => row.pendingIndependentApproval)) {
+    if (data.lifecycle?.readyForIndependentApproval || data.lifecycle?.waitingForApproval || data.lifecycle?.findings?.some((row) => row.pendingIndependentApproval)) {
+        const isPreparer = Boolean(data.actorId && data.lifecycle?.approvalPreparedBy && data.actorId === data.lifecycle.approvalPreparedBy);
+        if (isPreparer) {
+            return {
+                label: 'Waiting for approval',
+                detail: data.lifecycle?.waitingFor ? `Waiting for ${data.lifecycle.waitingFor}.` : 'Waiting for an authorized approver.',
+            };
+        }
         return { label: 'Ready for independent approval', detail: 'Supreme prepared the record. Another authorized reviewer must decide.' };
     }
     if (['REMEDIATION', 'RISK_ACCEPTANCE', 'Remediation', 'Risk acceptance'].includes(String(stage))) {

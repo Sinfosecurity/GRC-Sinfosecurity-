@@ -21,7 +21,7 @@ type CatalogItem = {
 };
 
 const catalog: CatalogItem[] = [
-    { id: 'executive', name: 'Executive report', category: 'Executive', description: 'Portfolio overview, attention, trend, top residual-risk vendors, and recommendations.', formats: ['PDF'], kind: 'operational' },
+    { id: 'executive', name: 'Executive report', category: 'Executive', description: 'For leadership. Portfolio overview, attention, trend, top residual-risk vendors, and recommendations.', formats: ['PDF'], kind: 'operational' },
     { id: 'scorecard', name: 'Vendor scorecard', category: 'Third Party', description: 'Profile, score, assessments, evidence, findings, monitoring, and decision status for one vendor.', formats: ['PDF'], requiresVendor: true, kind: 'operational' },
     { id: 'assessment', name: 'Assessment report', category: 'Third Party', description: 'Persisted questionnaire, responses, scoring, evidence, gaps, and outcome.', formats: ['PDF'], requiresAssessment: true, kind: 'operational' },
     { id: 'findings', name: 'Findings report', category: 'Third Party', description: 'Vendor, severity, owner, age, remediation, evidence, and risk acceptance.', formats: ['PDF', 'CSV', 'XLSX'], kind: 'operational' },
@@ -229,7 +229,7 @@ export default function Reports() {
         <Box sx={{ maxWidth: 1200 }}>
             <PageHeader
                 title="Reports"
-                description="Generate files from this organization’s records. Unavailable actions explain why — they will not fail after you click."
+                description="Executive deliverables from this organization’s records. Each report names its audience, scope, and format. Unavailable actions explain why — they will not fail after you click."
             />
             {(capabilities?.testingAccess || capabilities?.isDemo) && (
                 <Alert severity="info" sx={{ mb: 2 }}>

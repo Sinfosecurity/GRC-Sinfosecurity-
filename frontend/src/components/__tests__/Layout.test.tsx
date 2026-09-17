@@ -18,6 +18,9 @@ describe('Layout Component', () => {
         expect(screen.getAllByText(/^Home$/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Third Parties/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Assessments/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/^Supreme$/i).length).toBeGreaterThan(0);
+        expect(screen.getByLabelText('Search')).toBeInTheDocument();
+        expect(screen.getByLabelText('Account menu')).toBeInTheDocument();
     });
 
     it('displays user information in sidebar', () => {

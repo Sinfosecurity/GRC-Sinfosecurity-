@@ -12,11 +12,13 @@ export default function Surface({ children, padded = true, flush }: Props) {
     return (
         <Box
             sx={{
-                bgcolor: color.surface,
-                border: flush ? 'none' : `1px solid ${color.line}`,
-                borderRadius: flush ? 0 : '8px',
+                bgcolor: 'transparent',
+                border: 'none',
+                borderBottom: flush ? 'none' : `1px solid ${color.line}`,
+                borderRadius: 0,
                 overflow: 'hidden',
-                p: padded ? 2.5 : 0,
+                py: padded ? 2.25 : 0,
+                px: 0,
             }}
         >
             {children}

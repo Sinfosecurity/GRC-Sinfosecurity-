@@ -42,6 +42,68 @@ function canReview(role: string) {
     return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR']);
 }
 
+function displayName(user?: { firstName?: string | null; lastName?: string | null; email?: string | null } | null) {
+    if (!user) return null;
+    const name = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+    return name || user.email || null;
+}
+
+async function approvalRouting(
+    organizationId: string,
+    tier: VendorTier,
+    preparedBy?: string | null,
+    decision?: string | null,
+) {
+    const waiting = Boolean(preparedBy && !decision);
+    if (!waiting) {
+        return { approvalStatus: decision ? customerApprovalDecision(decision) : 'Draft', preparedByName: null, waitingFor: null, eligibleApproverNames: [] as string[] };
+    }
+    const allowed = APPROVAL_AUTHORITY[tier] || APPROVAL_AUTHORITY.HIGH;
+    const [preparer, approvers] = await Promise.all([
+        prisma.user.findFirst({
+            where: { id: preparedBy!, organizationId },
+            select: { firstName: true, lastName: true, email: true },
+        }),
+        prisma.user.findMany({
+            where: { organizationId, status: 'ACTIVE', role: { in: allowed }, id: { not: preparedBy! } },
+            select: { firstName: true, lastName: true, email: true },
+            take: 8,
+        }),
+    ]);
+    const names = approvers.map((row) => displayName(row)).filter((row): row is string => Boolean(row));
+    return {
+        approvalStatus: 'Ready for independent approval',
+        preparedByName: displayName(preparer),
+        waitingFor: names.length === 1 ? names[0] : 'an authorized approver',
+        eligibleApproverNames: names,
+    };
+}
+
+function customerApprovalDecision(decision: string) {
+    if (decision === 'APPROVE') return 'Approved';
+    if (decision === 'APPROVE_WITH_CONDITIONS') return 'Approved with conditions';
+    if (decision === 'REJECT') return 'Rejected';
+    return 'Decision recorded';
+}
+
+async function routeIndependentApprovers(organizationId: string, vendor: { id: string; name: string; publicId?: string | null; tier: VendorTier }, actor: Actor) {
+    const allowed = APPROVAL_AUTHORITY[vendor.tier] || APPROVAL_AUTHORITY.HIGH;
+    const approvers = await prisma.user.findMany({
+        where: { organizationId, status: 'ACTIVE', role: { in: allowed }, id: { not: actor.id } },
+        select: { id: true },
+        take: 12,
+    });
+    await Promise.all(approvers.map((user) => notifyUser({
+        organizationId,
+        userId: user.id,
+        eventType: 'approval.requested',
+        title: `${vendor.name} is waiting for independent approval`,
+        body: `${actor.name || 'A colleague'} prepared this decision. Open the decision brief and approve, approve with conditions, or reject.`,
+        resourceType: 'Vendor',
+        resourceId: vendor.id,
+    })));
+}
+
 function canApprove(role: string, tier: VendorTier) {
     const allowed = APPROVAL_AUTHORITY[tier] || APPROVAL_AUTHORITY.HIGH;
     return hasPermission(role, PERMISSIONS['approval.decide']) && canonicalRoleIn(role, allowed);
@@ -140,6 +202,8 @@ export async function presentLifecycle(organizationId: string, vendorKey: string
             approvalPreparedBy: onboarding.approvalPreparedBy,
             approvalPreparedAt: onboarding.approvalPreparedAt,
             readyForIndependentApproval: Boolean(onboarding.approvalPreparedBy && !onboarding.approvalDecision),
+            waitingForApproval: Boolean(onboarding.approvalPreparedBy && !onboarding.approvalDecision),
+            ...(await approvalRouting(organizationId, vendor.tier, onboarding.approvalPreparedBy, onboarding.approvalDecision)),
             nextReassessmentAt: onboarding.nextReassessmentAt,
             reassessmentFrequencyDays: onboarding.reassessmentFrequencyDays,
             findings: findings.map((row) => ({
@@ -371,6 +435,7 @@ export async function attestContract(organizationId: string, vendorKey: string, 
         },
     });
     await history(organizationId, actor.id, vendor.id, 'vendor.contract_attested', `${actor.name || 'Legal'} attested the required contract controls.`);
+    await routeIndependentApprovers(organizationId, vendor, actor);
     return presentLifecycle(organizationId, vendor.id, actor);
 }
 

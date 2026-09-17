@@ -89,8 +89,8 @@ export default function RiskRegister() {
     return (
         <Box sx={{ maxWidth: 1280 }}>
             <PageHeader
-                title="Risk register"
-                description="Customer-readable IDs, explainable scores, and appetite status from live records."
+                title="Supreme Risk"
+                description="What the risk is, who owns it, inherent to residual, treatment, and the next review. Appetite status comes from live records."
                 actions={(
                     <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                         <Button variant="outlined" onClick={async () => downloadBinaryResponse(await ermAPI.exportRegister('csv'), 'Supreme-Governance-Register.csv')}>Export CSV</Button>

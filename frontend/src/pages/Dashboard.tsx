@@ -130,7 +130,7 @@ export default function Dashboard() {
 
     return (
         <PageShell>
-            <PageHeader title={greeting(user?.firstName)} description={home.job} />
+            <PageHeader eyebrow="Governance command center" title={greeting(user?.firstName)} description={home.job} />
             {attentionError && <Typography role="alert" sx={{ color: color.danger, mb: 2 }}>{attentionError}</Typography>}
             <AttentionHero
                 phase={attentionPhase === 'loading' ? 'loading' : attentionPhase === 'error' ? 'error' : 'ready'}

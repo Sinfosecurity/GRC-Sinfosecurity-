@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { color } from '../../design/tokens';
+import { color, type } from '../../design/tokens';
 
 type Props = {
     label: string;
@@ -20,23 +20,22 @@ export default function MetricCard({ label, value, hint, onClick }: Props) {
                 flex: 1,
                 minWidth: 140,
                 textAlign: 'left',
-                p: 2,
-                border: `1px solid ${color.line}`,
-                borderRadius: '8px',
-                bgcolor: color.surface,
+                py: 1.5,
+                pr: 3,
+                border: 0,
+                bgcolor: 'transparent',
                 cursor: onClick ? 'pointer' : 'default',
                 color: 'inherit',
                 font: 'inherit',
-                '&:hover': onClick ? { borderColor: color.lineStrong } : undefined,
             }}
         >
             <Typography
                 className="sr-metric"
-                sx={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '1.65rem', fontWeight: 500, lineHeight: 1.1, letterSpacing: '-0.03em' }}
+                sx={{ fontFamily: type.display, fontSize: '1.85rem', fontWeight: 500, lineHeight: 1, letterSpacing: '-0.03em' }}
             >
                 {value}
             </Typography>
-            <Typography variant="caption" sx={{ display: 'block', mt: 0.75, color: 'text.secondary', fontWeight: 650 }}>
+            <Typography variant="caption" sx={{ display: 'block', mt: 0.75, color: color.inkMuted, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {label}
             </Typography>
             {hint && <Typography variant="caption" display="block">{hint}</Typography>}

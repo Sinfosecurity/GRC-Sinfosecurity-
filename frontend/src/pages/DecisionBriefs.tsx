@@ -30,7 +30,13 @@ type Brief = {
     immutableSnapshot?: { vendor?: { name?: string }; score?: { factors?: Array<{ label: string; points: number; rationale: string }> } };
 };
 
-const decisions = ['APPROVE', 'APPROVE_WITH_CONDITIONS', 'ESCALATE', 'REJECT', 'RISK_ACCEPTED'];
+const decisions = [
+    { value: 'APPROVE', label: 'Approve' },
+    { value: 'APPROVE_WITH_CONDITIONS', label: 'Approve with conditions' },
+    { value: 'ESCALATE', label: 'Request changes' },
+    { value: 'REJECT', label: 'Reject' },
+    { value: 'RISK_ACCEPTED', label: 'Accept residual risk' },
+];
 
 export default function DecisionBriefs() {
     const [searchParams] = useSearchParams();
@@ -107,8 +113,8 @@ export default function DecisionBriefs() {
         <Box sx={{ maxWidth: 1200 }}>
             <PageHeader
                 crumbs={[{ label: 'Third-party risk' }, { label: 'Decisions' }]}
-                title="Decision workspace"
-                description="Record a defensible human decision against explainable residual risk. AI may summarize; it never owns the score."
+                title="Decisions"
+                description="What needs a human decision, why it matters, and what happens after you record it. Supreme prepared the record. You decide."
                 actions={
                     <Stack direction="row" spacing={1}>
                         <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
@@ -137,11 +143,12 @@ export default function DecisionBriefs() {
                                         key={brief.id}
                                         onClick={() => setSelected(brief)}
                                         sx={{
-                                            p: 1.5,
+                                            py: 1.5,
                                             cursor: 'pointer',
-                                            border: `1px solid ${active ? color.gold : color.line}`,
-                                            bgcolor: color.surface,
-                                            borderRadius: '6px',
+                                            border: 0,
+                                            borderBottom: `1px solid ${color.line}`,
+                                            boxShadow: active ? `inset 3px 0 0 ${color.gold}` : 'none',
+                                            bgcolor: 'transparent',
                                         }}
                                     >
                                         <Typography variant="subtitle2">{brief.immutableSnapshot?.vendor?.name || brief.vendorId}</Typography>
@@ -159,9 +166,9 @@ export default function DecisionBriefs() {
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} sx={{ mb: 2 }}>
                                 <Box>
-                                    <Typography variant="overline">Residual risk decision</Typography>
+                                    <Typography variant="overline">Decision brief</Typography>
                                     <Typography variant="h3">{vendorName}</Typography>
-                                    <Typography variant="body2">Why this engagement is {selected.riskBand}. Scores come from the deterministic engine.</Typography>
+                                    <Typography variant="body2">What is being decided, why it needs a person, current residual risk, and the recorded evidence. Scores come from the deterministic engine.</Typography>
                                 </Box>
                                 <Button variant="outlined" disabled={downloading} onClick={downloadPdf}>
                                     {downloading ? <CircularProgress size={16} /> : 'Download PDF'}
@@ -209,7 +216,7 @@ export default function DecisionBriefs() {
                                             <Stack spacing={2}>
                                                 <TextField select label="Decision" value={decision} onChange={(e) => setDecision(e.target.value)}>
                                                     {decisions.map((option) => (
-                                                        <MenuItem key={option} value={option}>{option.replace(/_/g, ' ')}</MenuItem>
+                                                        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
                                                     ))}
                                                 </TextField>
                                                 <TextField label="Conditions or residual-risk rationale" value={conditions} onChange={(e) => setConditions(e.target.value)} />
@@ -219,7 +226,7 @@ export default function DecisionBriefs() {
                                         </Box>
                                     ) : (
                                         <Alert severity="success">
-                                            Recorded: {selected.humanDecision}. Historical briefs are immutable.
+                                            Recorded: {selected.humanDecision?.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())}. Historical briefs are immutable.
                                             {selected.conditions ? ` Conditions: ${selected.conditions}` : ''}
                                         </Alert>
                                     )}

@@ -286,7 +286,7 @@ export default function VendorManagement() {
 
             <PageHeader
                 title="Third Parties"
-                description="Search, filter, and open a vendor record. Residual risk and reviews come from persisted tenant data only."
+                description="Who matters, who needs attention, who is waiting, and what happens next. Residual risk and reviews come from persisted tenant data only."
                 actions={
                     <Stack direction="row" spacing={1}>
                         <Button onClick={() => navigate('/vendor-onboarding')}>Onboard Third Party</Button>
@@ -312,36 +312,37 @@ export default function VendorManagement() {
                 loading={loading && vendors.length === 0}
                 error={error}
                 empty={!loading && vendors.length === 0}
-                emptyTitle="No vendors yet"
-                emptyBody="Add a vendor with type, category, contact, and services. The new record appears in this list immediately."
+                emptyTitle="No third parties are recorded yet"
+                emptyBody="Onboard a third party or add an existing record. The new vendor appears in this list immediately."
                 emptyAction={<Button variant="contained" onClick={() => setOpenDialog(true)}>Add vendor</Button>}
             >
                 <AppTable
                     rows={filtered}
                     rowKey={(row) => String(row.id)}
                     onRowClick={handleViewVendor}
-                    searchPlaceholder="Search vendors"
+                    searchPlaceholder="Search third parties"
                     searchValue={(row) => `${row.name} ${row.category} ${row.tier} ${row.contactEmail} ${row.status}`}
-                    emptyTitle="No vendors match this view"
+                    emptyTitle="No third parties match this view"
                     emptyBody="Change the filter or search to see other vendors."
                     columns={[
-                        { id: 'name', label: 'Vendor', sortValue: (row) => row.name, render: (row) => (
+                        { id: 'name', label: 'Third party', sortValue: (row) => row.name, render: (row) => (
                             <Box>
                                 <Typography variant="subtitle2">{row.name}</Typography>
-                                <Typography variant="caption">{row.publicId || row.contactEmail}</Typography>
+                                <Typography variant="caption">{row.publicId || humanizeLabel(row.status)}</Typography>
                             </Box>
                         ) },
-                        { id: 'category', label: 'Category', hideOnMobile: true, sortValue: (row) => row.category, render: (row) => (categories.find((item) => item.value === row.category)?.label || row.category.replace(/_/g, ' ').toLowerCase()) },
                         { id: 'tier', label: 'Tier', sortValue: (row) => row.tier, render: (row) => <StatusBadge value={row.tier} kind="severity" /> },
-                        { id: 'inherent', label: 'Inherent risk', hideOnMobile: true, sortValue: (row) => row.inherentRiskScore ?? -1, render: (row) => row.inherentRiskScore != null ? `${row.inherentRiskScore}` : 'Not scored' },
-                        { id: 'risk', label: 'Residual risk', hideOnMobile: true, sortValue: (row) => row.residualRiskScore ?? -1, render: (row) => row.residualRiskScore != null ? `${row.residualRiskScore}` : 'Not scored' },
-                        { id: 'assessment', label: 'Assessment', sortValue: (row) => row.assessmentStatus, render: (row) => (
-                            <StatusBadge kind="plain" tone={row.assessmentStatus === 'Overdue' ? 'critical' : row.assessmentStatus === 'Completed' ? 'success' : 'high'} label={row.assessmentStatus} />
+                        { id: 'risk', label: 'Residual', sortValue: (row) => row.residualRiskScore ?? -1, render: (row) => row.residualRiskScore != null ? `${row.residualRiskScore}` : 'Not scored' },
+                        { id: 'status', label: 'State', hideOnMobile: true, sortValue: (row) => row.status, render: (row) => <StatusBadge kind="plain" label={humanizeLabel(row.status)} /> },
+                        { id: 'assessment', label: 'Attention', sortValue: (row) => row.assessmentStatus, render: (row) => (
+                            <StatusBadge kind="plain" tone={row.assessmentStatus === 'Overdue' ? 'critical' : row.assessmentStatus === 'Completed' ? 'success' : 'high'} label={row.assessmentStatus === 'Overdue' ? 'Overdue' : row.assessmentStatus === 'In Progress' ? 'Waiting on us' : row.assessmentStatus} />
                         ) },
-                        { id: 'review', label: 'Next review', hideOnMobile: true, sortValue: (row) => row.nextReview, render: (row) => row.nextReview },
+                        { id: 'next', label: 'Next action', hideOnMobile: true, render: (row) => (
+                            row.assessmentStatus === 'Overdue' ? 'Review now' : row.assessmentStatus === 'In Progress' ? 'Continue review' : row.assessmentStatus === 'Completed' ? 'Open workspace' : 'Start assessment'
+                        ) },
                         { id: 'action', label: '', render: (row) => (
-                            <Button size="small" onClick={(event) => { event.stopPropagation(); handleStartAssessment(row); }}>
-                                Assess
+                            <Button size="small" onClick={(event) => { event.stopPropagation(); navigate(`/vendor-onboarding/${row.publicId || row.id}`); }}>
+                                Open
                             </Button>
                         ) },
                     ]}

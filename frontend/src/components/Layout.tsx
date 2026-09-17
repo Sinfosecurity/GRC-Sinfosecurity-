@@ -196,8 +196,9 @@ function NavList({
                                         px: collapsed ? 1 : 1.25,
                                         justifyContent: collapsed ? 'center' : 'flex-start',
                                         color: isActive ? color.navInk : color.navMuted,
-                                        '&.Mui-selected': { bgcolor: 'rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' } },
-                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
+                                        borderLeft: isActive ? `2px solid ${color.gold}` : '2px solid transparent',
+                                        '&.Mui-selected': { bgcolor: 'rgba(196,160,86,0.12)', '&:hover': { bgcolor: 'rgba(196,160,86,0.18)' } },
+                                        '&:hover': { bgcolor: 'rgba(243,236,222,0.06)' },
                                     }}
                                 >
                                     <ListItemIcon sx={{ minWidth: collapsed ? 0 : 32, color: 'inherit', justifyContent: 'center' }}>
@@ -276,12 +277,14 @@ export default function Layout() {
 
     const sidebar = (isCollapsed: boolean) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', color: color.navInk }}>
-            <Box sx={{ px: isCollapsed ? 1 : 1.75, py: 2 }}>
-                <Typography sx={{ fontFamily: '"Newsreader", serif', fontSize: isCollapsed ? 18 : 18, fontWeight: 550 }}>
+            <Box sx={{ px: isCollapsed ? 1 : 2, py: 2.5, borderBottom: `1px solid rgba(243,236,222,0.08)` }}>
+                <Typography sx={{ fontFamily: '"Newsreader", serif', fontSize: isCollapsed ? 22 : 15, fontWeight: 550, letterSpacing: isCollapsed ? 0 : '0.22em', textTransform: isCollapsed ? 'none' : 'uppercase' }}>
                     {isCollapsed ? 'S' : 'Supreme'}
                 </Typography>
                 {!isCollapsed && (
-                    <Typography sx={{ fontSize: 11, color: color.navMuted, mt: 0.25 }}>Governance · {environmentCaption()}</Typography>
+                    <Typography sx={{ fontSize: 11, color: color.goldSoft, mt: 0.75, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                        Governance · {environmentCaption()}
+                    </Typography>
                 )}
             </Box>
             <Box sx={{ flex: 1, overflowY: 'auto' }}>
@@ -310,6 +313,7 @@ export default function Layout() {
                     width: desktopWidth,
                     flexShrink: 0,
                     bgcolor: color.navy950,
+                    boxShadow: `inset -1px 0 0 ${color.gold}`,
                     position: 'sticky',
                     top: 0,
                     height: '100vh',
@@ -325,7 +329,7 @@ export default function Layout() {
                     onClose={() => setMobileOpen(false)}
                     ModalProps={{ keepMounted: true }}
                     PaperProps={{ 'aria-label': 'Product navigation' }}
-                    sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: EXPANDED, bgcolor: color.navy950, border: 'none' } }}
+                    sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: EXPANDED, bgcolor: color.navy950, border: 'none', boxShadow: `inset -1px 0 0 ${color.gold}` } }}
                 >
                     {sidebar(false)}
                 </Drawer>
@@ -338,20 +342,21 @@ export default function Layout() {
                         alignItems: 'center',
                         gap: 1.5,
                         px: { xs: 1.5, md: 3 },
-                        py: 1,
-                        bgcolor: color.navy950,
-                        color: color.navInk,
-                        minHeight: 56,
+                        py: 1.25,
+                        bgcolor: color.surface,
+                        color: color.ink,
+                        minHeight: 64,
+                        borderBottom: `1px solid ${color.lineStrong}`,
                     }}
                 >
-                    <IconButton aria-label="Open navigation" onClick={() => setMobileOpen(true)} sx={{ display: { md: 'none' }, color: color.navInk }}>
+                    <IconButton aria-label="Open navigation" onClick={() => setMobileOpen(true)} sx={{ display: { md: 'none' }, color: color.ink }}>
                         <MenuIcon />
                     </IconButton>
-                    <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontSize: 13, color: color.navMuted, minWidth: 140 }}>
+                    <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: color.inkMuted, minWidth: 140, fontWeight: 700 }}>
                         {orgName || 'Organization'}
                     </Typography>
-                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 1, px: 1.25, py: 0.5, maxWidth: 520 }}>
-                        <Search fontSize="small" sx={{ color: color.navMuted }} />
+                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, borderBottom: `1px solid ${color.lineStrong}`, px: 0.5, py: 0.5, maxWidth: 520 }}>
+                        <Search fontSize="small" sx={{ color: color.inkMuted }} />
                         <InputBase
                             placeholder="Search names and pages"
                             value={query}
@@ -361,17 +366,17 @@ export default function Layout() {
                                 const match = searchable.find((item) => item.text.toLowerCase().includes(query.trim().toLowerCase()));
                                 if (match) go(match.path);
                             }}
-                            sx={{ color: color.navInk, fontSize: 14, width: '100%' }}
+                            sx={{ color: color.ink, fontSize: 14, width: '100%' }}
                             inputProps={{ 'aria-label': 'Search' }}
                         />
                     </Box>
                     <Tooltip title="Notifications">
-                        <IconButton aria-label="Notifications" sx={{ color: color.navInk }} onClick={() => navigate('/notifications')}>
+                        <IconButton aria-label="Notifications" sx={{ color: color.ink }} onClick={() => navigate('/notifications')}>
                             <NotificationsNone />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Help">
-                        <IconButton aria-label="Help" sx={{ color: color.navInk }} onClick={() => navigate('/help')}>
+                        <IconButton aria-label="Help" sx={{ color: color.ink }} onClick={() => navigate('/help')}>
                             <HelpOutline />
                         </IconButton>
                     </Tooltip>
@@ -382,7 +387,7 @@ export default function Layout() {
                         aria-expanded={Boolean(menuEl)}
                         aria-label="Account menu"
                         onClick={(event) => setMenuEl(event.currentTarget)}
-                        sx={{ border: 0, bgcolor: 'transparent', color: color.navInk, cursor: 'pointer', font: 'inherit', fontSize: 13 }}
+                        sx={{ border: 0, bgcolor: 'transparent', color: color.ink, cursor: 'pointer', font: 'inherit', fontSize: 13, fontWeight: 700 }}
                     >
                         {user?.firstName || user?.email || 'Account'}
                     </Typography>

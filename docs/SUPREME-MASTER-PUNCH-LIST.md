@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Hosted walk `docs/private-beta/hosted-ux-qa/supreme-tprm-workbook-reconciliation/`. Hosted email proof `docs/private-beta/hosted-ux-qa/transactional-email/hosted/`. CI `34925131005` PASS on `e250493` (412 backend / 173 frontend). Invitation email on the walk was Queued. Queued ≠ Delivered. Real inbox not tested. Copy link is not email sent. Phase C reused on the same vendor.
 
-**NEXT ACTION:** Independent Review Sprint 3 (H-4) engineering and hosted fresh-vendor proof are recorded. Evidence: `docs/independent-review/SPRINT-3-PHASE-C-GOVERNANCE-EVIDENCE.md`. Product Leadership independently decides whether H-4 is CLOSED. Do not start H-5, H-6, or #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 remains PAUSED.
+**NEXT ACTION:** Product Leadership closed H-4. Supreme UI 2.0 is the authorized current work. Do not start H-5, H-6, or #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 remains PAUSED.
 
 ---
 
@@ -757,3 +757,21 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 **EVIDENCE:** `docs/private-beta/hosted-ux-qa/premium-experience/final-verify/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34909432591 PASS on `842e403`.
 
 **NEXT ACTION:** Product Leadership hosted final review. Do not merge `main`. Do not deploy production. Do not start #19 or #20.
+
+---
+
+## UNNUMBERED. Supreme UI 2.0
+
+**PURPOSE:** Platform-wide visual design system and premium experience transformation. Immediately obvious versus the previous Supreme generation. Not a color/radius facelift. Not H-5, H-6, or #21.
+
+**DEPENDENCIES:** C-1, C-2, H-1, H-2, H-3, H-4, H-7 CLOSED. #12-F and #12-V PASS. #12 remains PARTIAL.
+
+**DEFINITION OF DONE:** Product Leadership independently inspects repository, hosted application, before/after screenshots, seamless approval workflow, CI, and security regression. Cursor may report ENGINEERING COMPLETE or HOSTED UX CERTIFICATION COMPLETE. Cursor does not declare SUPREME UI 2.0 PRODUCT LEADERSHIP ACCEPTED.
+
+**CURRENT STATUS:** ENGINEERING IN PROGRESS — PRODUCT LEADERSHIP ACCEPTANCE PENDING
+
+**CERTIFICATION SHA:** Starting documentation head `0f165c1c6d54dd992f09ec6f802c57d8365772a7`. Product implementation beneath `f78580555bc9a39f1f843fe03a68f971ec36678c`.
+
+**EVIDENCE:** `docs/SUPREME-UI-2-DESIGN-SYSTEM.md`, `docs/private-beta/SUPREME-UI-2-CERTIFICATION.md`, `docs/private-beta/hosted-ux-qa/supreme-ui-2/before/`
+
+**NEXT ACTION:** Finish hosted AFTER proof, two-user approval walkthrough, TPRM golden journey, and security regression on staging after CI. Do not start H-5, H-6, or #21. Do not merge `main`. Do not deploy production.

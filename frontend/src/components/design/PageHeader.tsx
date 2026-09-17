@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Box, Breadcrumbs, Link, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { color, type } from '../../design/tokens';
 
 type Crumb = { label: string; to?: string };
 
@@ -15,7 +16,7 @@ type Props = {
 
 export default function PageHeader({ eyebrow, title, description, crumbs, actions, meta }: Props) {
     return (
-        <Box component="header" sx={{ mb: 2.25 }}>
+        <Box component="header" sx={{ mb: 3, pb: 2, borderBottom: `1px solid ${color.line}` }}>
             {crumbs && crumbs.length > 0 && (
                 <Breadcrumbs
                     aria-label="Breadcrumb"
@@ -34,8 +35,8 @@ export default function PageHeader({ eyebrow, title, description, crumbs, action
             )}
             <Stack direction={{ xs: 'column', lg: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ lg: 'flex-start' }}>
                 <Box sx={{ minWidth: 0, maxWidth: 760 }}>
-                    {eyebrow && <Typography variant="overline">{eyebrow}</Typography>}
-                    <Typography variant="h2" component="h1">{title}</Typography>
+                    {eyebrow && <Typography variant="overline" sx={{ color: color.goldInk }}>{eyebrow}</Typography>}
+                    <Typography variant="h2" component="h1" sx={{ fontFamily: type.display, fontSize: { xs: '1.85rem', md: '2.15rem' }, letterSpacing: '-0.03em' }}>{title}</Typography>
                     {description && (
                         <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 640 }}>
                             {description}

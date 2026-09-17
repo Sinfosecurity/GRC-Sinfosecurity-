@@ -5,22 +5,22 @@
 }
 
 :root {
-  --navy-950: #07111c;
-  --navy-900: #0c1826;
-  --navy-850: #122033;
-  --navy-800: #18283e;
-  --workspace: #f3efe6;
-  --ink: #14202e;
-  --ink-muted: #5a6573;
-  --ink-faint: #7a8491;
-  --gold: #b0893a;
-  --gold-dim: rgba(176, 137, 58, 0.12);
-  --line: rgba(20, 32, 46, 0.1);
-  --line-strong: rgba(20, 32, 46, 0.18);
+  --navy-950: #100e0b;
+  --navy-900: #1c1812;
+  --navy-850: #26211a;
+  --navy-800: #322b22;
+  --workspace: #cfc8b8;
+  --ink: #16130f;
+  --ink-muted: #5c564c;
+  --ink-faint: #7a7368;
+  --gold: #9a7b3c;
+  --gold-dim: rgba(154, 123, 60, 0.14);
+  --line: rgba(22, 19, 15, 0.12);
+  --line-strong: rgba(22, 19, 15, 0.22);
   --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
   --font-ui: "Source Sans 3", "Source Sans Pro", "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
-  --radius: 8px;
+  --radius: 3px;
 }
 
 html,
@@ -33,9 +33,22 @@ body {
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--workspace);
+  background:
+    linear-gradient(180deg, rgba(16, 14, 11, 0.03), transparent 180px),
+    var(--workspace);
   color: var(--ink);
   overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -90,8 +103,8 @@ textarea:focus-visible,
   top: -48px;
   z-index: 2000;
   padding: 8px 12px;
-  background: #0c1826;
-  color: #f3efe6;
+  background: #100e0b;
+  color: #f3ecde;
   border-radius: 4px;
 }
 

@@ -28,18 +28,18 @@ const theme = createTheme({
         },
         divider: color.line,
         action: {
-            hover: 'rgba(20,32,46,0.04)',
+            hover: 'rgba(22,19,15,0.04)',
             selected: color.goldDim,
-            disabled: 'rgba(20,32,46,0.28)',
-            disabledBackground: 'rgba(20,32,46,0.06)',
-            focus: 'rgba(176,137,58,0.28)',
+            disabled: 'rgba(22,19,15,0.28)',
+            disabledBackground: 'rgba(22,19,15,0.06)',
+            focus: 'rgba(154,123,60,0.28)',
         },
     },
     typography: {
         fontFamily: type.ui,
-        h1: { fontFamily: type.display, fontSize: '1.75rem', fontWeight: 550, lineHeight: 1.2, letterSpacing: '-0.02em' },
-        h2: { fontFamily: type.display, fontSize: '1.55rem', fontWeight: 550, lineHeight: 1.25, letterSpacing: '-0.018em' },
-        h3: { fontFamily: type.display, fontSize: '1.3rem', fontWeight: 550, lineHeight: 1.28 },
+        h1: { fontFamily: type.display, fontSize: '2.05rem', fontWeight: 550, lineHeight: 1.15, letterSpacing: '-0.03em' },
+        h2: { fontFamily: type.display, fontSize: '1.75rem', fontWeight: 550, lineHeight: 1.2, letterSpacing: '-0.025em' },
+        h3: { fontFamily: type.display, fontSize: '1.4rem', fontWeight: 550, lineHeight: 1.25 },
         h4: { fontFamily: type.display, fontSize: '1.15rem', fontWeight: 550, lineHeight: 1.3 },
         h5: { fontFamily: type.ui, fontSize: '1.02rem', fontWeight: 700, lineHeight: 1.35 },
         h6: { fontFamily: type.ui, fontSize: '0.92rem', fontWeight: 700, lineHeight: 1.4 },
@@ -75,7 +75,7 @@ const theme = createTheme({
         MuiButton: {
             defaultProps: { disableElevation: true },
             styleOverrides: {
-                root: { borderRadius: radius.md, padding: '8px 14px', minHeight: 36 },
+                root: { borderRadius: radius.sm, padding: '9px 16px', minHeight: 38 },
                 containedPrimary: {
                     backgroundColor: color.navy900,
                     color: color.navInk,
@@ -89,7 +89,7 @@ const theme = createTheme({
                 outlined: {
                     borderColor: color.lineStrong,
                     color: color.ink,
-                    '&:hover': { borderColor: color.navy700, backgroundColor: 'rgba(20,32,46,0.03)' },
+                    '&:hover': { borderColor: color.navy700, backgroundColor: 'rgba(22,19,15,0.03)' },
                 },
             },
         },
@@ -98,8 +98,8 @@ const theme = createTheme({
                 root: {
                     backgroundImage: 'none',
                     backgroundColor: color.surface,
-                    border: `1px solid ${color.line}`,
-                    borderRadius: radius.lg,
+                    border: 'none',
+                    borderRadius: radius.sm,
                     boxShadow: 'none',
                 },
             },
@@ -110,13 +110,14 @@ const theme = createTheme({
                 root: {
                     backgroundImage: 'none',
                     backgroundColor: color.surface,
-                    border: `1px solid ${color.line}`,
+                    border: 'none',
+                    boxShadow: 'none',
                 },
             },
         },
         MuiChip: {
             styleOverrides: {
-                root: { borderRadius: radius.sm, fontWeight: 700, height: 24, fontSize: '0.72rem' },
+                root: { borderRadius: radius.sm, fontWeight: 700, height: 22, fontSize: '0.7rem', letterSpacing: '0.04em' },
             },
         },
         MuiTableCell: {
