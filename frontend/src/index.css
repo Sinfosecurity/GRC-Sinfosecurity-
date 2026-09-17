@@ -5,22 +5,22 @@
 }
 
 :root {
-  --navy-950: #100e0b;
-  --navy-900: #1c1812;
-  --navy-850: #26211a;
-  --navy-800: #322b22;
-  --workspace: #cfc8b8;
-  --ink: #16130f;
-  --ink-muted: #5c564c;
-  --ink-faint: #7a7368;
-  --gold: #9a7b3c;
-  --gold-dim: rgba(154, 123, 60, 0.14);
-  --line: rgba(22, 19, 15, 0.12);
-  --line-strong: rgba(22, 19, 15, 0.22);
+  --navy-950: #14110e;
+  --navy-900: #1f1a15;
+  --navy-850: #2a241d;
+  --navy-800: #3a3228;
+  --workspace: #efe8db;
+  --ink: #1a1612;
+  --ink-muted: #5f584e;
+  --ink-faint: #7d756a;
+  --gold: #a07d38;
+  --gold-dim: rgba(160, 125, 56, 0.12);
+  --line: rgba(26, 22, 18, 0.08);
+  --line-strong: rgba(26, 22, 18, 0.14);
   --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
   --font-ui: "Source Sans 3", "Source Sans Pro", "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
-  --radius: 3px;
+  --radius: 10px;
 }
 
 html,
@@ -61,7 +61,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9aa6b5;
+  background: #8a7f70;
   border-radius: 8px;
   border: 2px solid var(--workspace);
 }

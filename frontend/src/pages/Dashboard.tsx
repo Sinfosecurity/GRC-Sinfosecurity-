@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/design/PageHeader';
+import Surface from '../components/design/Surface';
 import { ActionQueue, AttentionHero, ExecutiveMetric, PageShell, RiskDistribution, SectionHeader } from '../components/experience/ExperienceKit';
 import { color } from '../design/tokens';
 import { useAuth } from '../contexts/AuthContext';
@@ -140,7 +141,20 @@ export default function Dashboard() {
                 actionLabel={first ? first.action : home.cta}
                 onAction={() => navigate(first?.href || home.href)}
             />
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 1fr' }, gap: 0, mb: 3, borderBottom: `1px solid ${color.line}` }}>
+            <Surface padded={false}>
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr 1fr' },
+                    '& > *': {
+                        px: { xs: 2.25, md: 3 },
+                        py: 2.5,
+                        borderBottom: { xs: `1px solid ${color.line}`, md: 'none' },
+                        borderRight: { md: `1px solid ${color.line}` },
+                    },
+                    '& > *:last-child': { borderBottom: 0, borderRight: 0 },
+                }}
+            >
                 <ExecutiveMetric
                     emphasis
                     phase={statsPhase}
@@ -153,6 +167,9 @@ export default function Dashboard() {
                 <ExecutiveMetric phase={workPhase} label="Overdue findings" value={work?.overdueFindings ?? '—'} onClick={() => navigate('/findings')} />
                 <ExecutiveMetric phase={workPhase} label="Assessments due" value={work?.dueAssessments ?? '—'} onClick={() => navigate('/assessments')} />
             </Box>
+            </Surface>
+            <Box sx={{ mt: 2.5 }}>
+            <Surface>
             <SectionHeader title="Priority actions" body="What happened, why it matters, and the next human action." />
             {attentionPhase === 'loading' && (
                 <Typography role="status" aria-live="polite">Checking recorded work…</Typography>
@@ -168,8 +185,11 @@ export default function Dashboard() {
                     onOpen={(href) => navigate(href)}
                 />
             )}
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} sx={{ mt: 4 }}>
+            </Surface>
+            </Box>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} sx={{ mt: 2.5 }}>
                 <Box sx={{ flex: 1 }}>
+                    <Surface>
                     <Typography variant="h5">Portfolio</Typography>
                     {statsPhase === 'loading' && (
                         <Typography role="status" aria-live="polite" sx={{ color: color.inkMuted, mt: 0.5, mb: 2 }}>Checking the recorded portfolio…</Typography>
@@ -193,9 +213,11 @@ export default function Dashboard() {
                         </>
                     )}
                     <Button sx={{ mt: 1.5 }} onClick={() => navigate('/vendor-management')}>Open register</Button>
+                    </Surface>
                 </Box>
                 {intelligencePhase === 'ready' && intelligence.length > 0 && (
                     <Box sx={{ flex: 1 }}>
+                        <Surface>
                         <Typography variant="h5">What changed</Typography>
                         {intelligence.slice(0, 3).map((row) => (
                             <Box key={row.publicId} sx={{ mt: 1.5 }}>
@@ -203,6 +225,7 @@ export default function Dashboard() {
                                 <Typography sx={{ color: color.inkMuted }}>{row.whyItMatters}</Typography>
                             </Box>
                         ))}
+                        </Surface>
                     </Box>
                 )}
             </Stack>

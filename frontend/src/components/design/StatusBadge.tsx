@@ -37,18 +37,19 @@ export default function StatusBadge({ value, kind = 'status', label, tone }: Pro
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 0.75,
-                pl: 1,
-                py: 0.1,
-                borderLeft: `2px solid ${color}`,
+                px: 1,
+                py: 0.25,
+                borderRadius: '999px',
+                bgcolor: `${color}14`,
                 color,
-                fontSize: '0.74rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
+                letterSpacing: '0.02em',
                 lineHeight: 1.4,
                 whiteSpace: 'nowrap',
             }}
         >
+            <Box aria-hidden sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: color }} />
             {shown}
         </Box>
     );

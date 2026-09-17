@@ -18,6 +18,7 @@ import {
     useMediaQuery,
     useTheme,
 } from '@mui/material';
+import { color, radius } from '../../design/tokens';
 import EmptyState from './EmptyState';
 
 export type Column<T> = {
@@ -42,6 +43,7 @@ type Props<T> = {
     emptyAction?: ReactNode;
     pageSize?: number;
     toolbar?: ReactNode;
+    embedded?: boolean;
 };
 
 export default function AppTable<T>({
@@ -56,6 +58,7 @@ export default function AppTable<T>({
     emptyAction,
     pageSize = 12,
     toolbar,
+    embedded = false,
 }: Props<T>) {
     const [query, setQuery] = useState('');
     const [sortId, setSortId] = useState<string | null>(null);
@@ -103,7 +106,17 @@ export default function AppTable<T>({
 
     return (
         <Box>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 1.5 }} alignItems={{ sm: 'center' }}>
+            <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.5}
+                alignItems={{ sm: 'center' }}
+                sx={{
+                    mb: embedded ? 0 : 1.5,
+                    px: embedded ? { xs: 2, md: 3 } : 0,
+                    py: embedded ? 2 : 0,
+                    borderBottom: embedded ? `1px solid ${color.line}` : 'none',
+                }}
+            >
                 {searchValue && (
                     <TextField
                         value={query}
@@ -113,13 +126,22 @@ export default function AppTable<T>({
                         }}
                         placeholder={searchPlaceholder}
                         inputProps={{ 'aria-label': searchPlaceholder }}
-                        sx={{ minWidth: { sm: 260 }, flex: 1 }}
+                        sx={{
+                            minWidth: { sm: 260 },
+                            flex: 1,
+                            '& .MuiOutlinedInput-root': {
+                                bgcolor: color.surfaceMuted,
+                                borderRadius: `${radius.md}px`,
+                            },
+                        }}
                     />
                 )}
                 {toolbar}
             </Stack>
             {filtered.length === 0 ? (
-                <EmptyState title={emptyTitle} body={emptyBody} action={emptyAction} />
+                <Box sx={{ px: embedded ? { xs: 2, md: 3 } : 0, py: embedded ? 1 : 0 }}>
+                    <EmptyState title={emptyTitle} body={emptyBody} action={emptyAction} />
+                </Box>
             ) : (
                 <>
                     {compact ? (
@@ -185,7 +207,7 @@ export default function AppTable<T>({
                     })}
                 </Stack>
                     ) : (
-                    <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', border: '1px solid', borderColor: 'divider', borderRadius: '8px' }}>
+                    <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', border: embedded ? 'none' : '1px solid', borderColor: embedded ? 'transparent' : 'divider', borderRadius: embedded ? 0 : '8px' }}>
                         <Table size="small" sx={{ minWidth: 640 }} aria-label="Records">
                             <TableHead>
                                 <TableRow>
@@ -243,7 +265,7 @@ export default function AppTable<T>({
                         </Table>
                     </TableContainer>
                     )}
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 1.5 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: embedded ? 0 : 1.5, px: embedded ? { xs: 2, md: 3 } : 0, py: embedded ? 1.5 : 0 }}>
                         <Typography variant="caption">
                             {filtered.length} record{filtered.length === 1 ? '' : 's'}
                         </Typography>

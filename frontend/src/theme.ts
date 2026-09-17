@@ -75,7 +75,7 @@ const theme = createTheme({
         MuiButton: {
             defaultProps: { disableElevation: true },
             styleOverrides: {
-                root: { borderRadius: radius.sm, padding: '9px 16px', minHeight: 38 },
+                root: { borderRadius: radius.sm, padding: '8px 16px', minHeight: 38 },
                 containedPrimary: {
                     backgroundColor: color.navy900,
                     color: color.navInk,
@@ -98,9 +98,9 @@ const theme = createTheme({
                 root: {
                     backgroundImage: 'none',
                     backgroundColor: color.surface,
-                    border: 'none',
-                    borderRadius: radius.sm,
-                    boxShadow: 'none',
+                    border: `1px solid ${color.line}`,
+                    borderRadius: radius.lg,
+                    boxShadow: '0 1px 2px rgba(20,17,14,0.04)',
                 },
             },
         },
@@ -110,7 +110,7 @@ const theme = createTheme({
                 root: {
                     backgroundImage: 'none',
                     backgroundColor: color.surface,
-                    border: 'none',
+                    border: `1px solid ${color.line}`,
                     boxShadow: 'none',
                 },
             },
@@ -133,7 +133,7 @@ const theme = createTheme({
         },
         MuiTableRow: {
             styleOverrides: {
-                root: { '&:hover': { backgroundColor: 'rgba(20,32,46,0.03)' } },
+                root: { '&:hover': { backgroundColor: 'rgba(20,17,14,0.03)' } },
             },
         },
         MuiTextField: { defaultProps: { size: 'small', variant: 'outlined' } },
@@ -141,8 +141,9 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: color.surface,
+                    borderRadius: radius.sm,
                     '& fieldset': { borderColor: color.lineStrong },
-                    '&.Mui-focused fieldset': { borderColor: color.navy700 },
+                    '&.Mui-focused fieldset': { borderColor: color.gold },
                 },
             },
         },

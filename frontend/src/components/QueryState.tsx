@@ -70,7 +70,7 @@ export default function QueryState({
     children,
 }: Props) {
     if (loading) {
-        return <SkeletonBlock />;
+        return <Box sx={{ px: { xs: 2, md: 3 }, py: 2 }}><SkeletonBlock /></Box>;
     }
     if (notConfigured) {
         return (
@@ -96,7 +96,7 @@ export default function QueryState({
     }
     if (empty) {
         return (
-            <Box sx={{ py: 1 }}>
+            <Box sx={{ px: { xs: 2, md: 3 }, py: 2 }}>
                 <EmptyState title={emptyTitle} body={emptyBody} action={emptyAction} />
             </Box>
         );

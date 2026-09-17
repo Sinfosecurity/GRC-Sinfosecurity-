@@ -277,12 +277,12 @@ export default function Layout() {
 
     const sidebar = (isCollapsed: boolean) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', color: color.navInk }}>
-            <Box sx={{ px: isCollapsed ? 1 : 2, py: 2.5, borderBottom: `1px solid rgba(243,236,222,0.08)` }}>
-                <Typography sx={{ fontFamily: '"Newsreader", serif', fontSize: isCollapsed ? 22 : 15, fontWeight: 550, letterSpacing: isCollapsed ? 0 : '0.22em', textTransform: isCollapsed ? 'none' : 'uppercase' }}>
+            <Box sx={{ px: isCollapsed ? 1 : 2.25, py: 2.25, borderBottom: `1px solid rgba(246,240,228,0.08)` }}>
+                <Typography sx={{ fontFamily: '"Newsreader", serif', fontSize: isCollapsed ? 26 : 22, fontWeight: 550, letterSpacing: '-0.02em' }}>
                     {isCollapsed ? 'S' : 'Supreme'}
                 </Typography>
                 {!isCollapsed && (
-                    <Typography sx={{ fontSize: 11, color: color.goldSoft, mt: 0.75, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    <Typography sx={{ fontSize: 12, color: color.navMuted, mt: 0.4 }}>
                         Governance · {environmentCaption()}
                     </Typography>
                 )}
@@ -346,7 +346,8 @@ export default function Layout() {
                         bgcolor: color.surface,
                         color: color.ink,
                         minHeight: 64,
-                        borderBottom: `1px solid ${color.lineStrong}`,
+                        borderBottom: `1px solid ${color.line}`,
+                        boxShadow: '0 1px 0 rgba(20,17,14,0.03)',
                     }}
                 >
                     <IconButton aria-label="Open navigation" onClick={() => setMobileOpen(true)} sx={{ display: { md: 'none' }, color: color.ink }}>
@@ -355,7 +356,7 @@ export default function Layout() {
                     <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: color.inkMuted, minWidth: 140, fontWeight: 700 }}>
                         {orgName || 'Organization'}
                     </Typography>
-                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, borderBottom: `1px solid ${color.lineStrong}`, px: 0.5, py: 0.5, maxWidth: 520 }}>
+                    <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: color.surfaceMuted, border: `1px solid ${color.line}`, borderRadius: '10px', px: 1.25, py: 0.65, maxWidth: 520 }}>
                         <Search fontSize="small" sx={{ color: color.inkMuted }} />
                         <InputBase
                             placeholder="Search names and pages"

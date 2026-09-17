@@ -1,29 +1,29 @@
 /**
- * Supreme Design System 2.0 — The Ledger.
- * Warm ink chrome, stone canvas, brass reserved for action and current state.
- * Semantic color is for risk and governance status only.
+ * Supreme Design System 2.0 — Boardroom paper.
+ * Warm white workspace, ivory documents, ink chrome.
+ * Color is reserved for risk, status, and the current action.
  */
 
 export const color = {
-    navy950: '#100e0b',
-    navy900: '#1c1812',
-    navy850: '#26211a',
-    navy800: '#322b22',
-    navy700: '#4a4033',
-    navy600: '#6a5c48',
-    workspace: '#cfc8b8',
-    surface: '#f7f1e6',
-    surfaceMuted: '#e4dccb',
-    ink: '#16130f',
-    inkMuted: '#5c564c',
-    inkFaint: '#7a7368',
-    gold: '#9a7b3c',
+    navy950: '#14110e',
+    navy900: '#1f1a15',
+    navy850: '#2a241d',
+    navy800: '#3a3228',
+    navy700: '#53483b',
+    navy600: '#6d6152',
+    workspace: '#efe8db',
+    surface: '#fffdf8',
+    surfaceMuted: '#f3eee3',
+    ink: '#1a1612',
+    inkMuted: '#5f584e',
+    inkFaint: '#7d756a',
+    gold: '#a07d38',
     goldSoft: '#c4a056',
     goldInk: '#5c4716',
-    goldDim: 'rgba(154, 123, 60, 0.14)',
-    line: 'rgba(22, 19, 15, 0.12)',
-    lineStrong: 'rgba(22, 19, 15, 0.22)',
-    focus: '#9a7b3c',
+    goldDim: 'rgba(160, 125, 56, 0.12)',
+    line: 'rgba(26, 22, 18, 0.08)',
+    lineStrong: 'rgba(26, 22, 18, 0.14)',
+    focus: '#a07d38',
     critical: '#9f2a1f',
     high: '#a14a0d',
     medium: '#6a6458',
@@ -32,8 +32,8 @@ export const color = {
     warning: '#a14a0d',
     info: '#3f5366',
     danger: '#9f2a1f',
-    navInk: '#f3ecde',
-    navMuted: '#b7ae9c',
+    navInk: '#f6f0e4',
+    navMuted: '#b8ae9d',
 } as const;
 
 export const space = {
@@ -49,17 +49,17 @@ export const space = {
 } as const;
 
 export const radius = {
-    sm: 2,
-    md: 3,
-    lg: 4,
+    sm: 6,
+    md: 10,
+    lg: 14,
     pill: 999,
 } as const;
 
 export const shadow = {
     none: 'none',
-    sm: '0 1px 0 rgba(22,19,15,0.06)',
-    md: '0 18px 40px rgba(16,14,11,0.12)',
-    drawer: '0 20px 56px rgba(16,14,11,0.28)',
+    sm: '0 1px 2px rgba(20,17,14,0.04), 0 8px 24px rgba(20,17,14,0.04)',
+    md: '0 12px 40px rgba(20,17,14,0.08)',
+    drawer: '0 20px 56px rgba(20,17,14,0.24)',
 } as const;
 
 export const type = {

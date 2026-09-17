@@ -41,9 +41,8 @@ export function ExecutiveMetric({
             onClick={phase === 'ready' ? onClick : undefined}
             sx={{
                 textAlign: 'left',
-                py: 1.5,
-                pr: 3,
-                minWidth: emphasis ? 160 : 110,
+                py: 0.25,
+                minWidth: 0,
                 flex: emphasis ? 1.2 : 1,
                 border: 0,
                 bgcolor: 'transparent',
@@ -88,46 +87,49 @@ export function AttentionHero({
             sx={{
                 display: 'grid',
                 gridTemplateColumns: { xs: '1fr', md: 'auto 1fr auto' },
-                gap: { xs: 2, md: 4 },
+                gap: { xs: 2, md: 3.5 },
                 alignItems: 'center',
-                px: { xs: 2.5, md: 4 },
-                py: { xs: 3, md: 4 },
-                mb: 4,
-                bgcolor: color.navy950,
-                color: color.navInk,
-                boxShadow: `inset 0 0 0 1px ${color.gold}`,
+                px: { xs: 2.25, md: 3 },
+                py: { xs: 2.25, md: 2.75 },
+                mb: 2.5,
+                bgcolor: color.surface,
+                color: color.ink,
+                border: `1px solid ${color.line}`,
+                borderRadius: '14px',
+                boxShadow: '0 1px 2px rgba(20,17,14,0.04), 0 8px 24px rgba(20,17,14,0.04)',
+                borderLeft: `4px solid ${color.gold}`,
             }}
         >
             {phase === 'loading' ? (
-                <Box aria-hidden sx={{ width: { xs: 72, md: 96 }, height: { xs: 56, md: 72 }, bgcolor: 'rgba(243,236,222,0.12)' }} />
+                <Box aria-hidden sx={{ width: { xs: 56, md: 72 }, height: { xs: 44, md: 56 }, bgcolor: color.surfaceMuted, borderRadius: 1 }} />
             ) : (
                 <Typography
                     aria-hidden={phase !== 'ready'}
-                    sx={{ fontFamily: type.display, fontSize: { xs: 56, md: 80 }, lineHeight: 0.9, fontWeight: 500, color: color.goldSoft, minWidth: { md: 96 } }}
+                    sx={{ fontFamily: type.display, fontSize: { xs: 44, md: 56 }, lineHeight: 0.95, fontWeight: 500, color: color.ink, minWidth: { md: 72 } }}
                 >
                     {phase === 'error' ? '—' : count}
                 </Typography>
             )}
             <Box>
-                <Typography sx={{ fontSize: 12, color: color.goldSoft, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', mb: 0.75 }}>
+                <Typography sx={{ fontSize: 12, color: color.goldInk, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', mb: 0.5 }}>
                     {phase === 'loading' ? 'Checking what needs your attention…' : phase === 'error' ? 'Attention could not be loaded' : `${count} need your attention`}
                 </Typography>
                 {phase === 'loading' ? (
                     <>
-                        <Box aria-hidden sx={{ width: { xs: '80%', md: 360 }, height: 28, bgcolor: 'rgba(243,236,222,0.12)', mb: 1 }} />
-                        <Box aria-hidden sx={{ width: { xs: '60%', md: 240 }, height: 16, bgcolor: 'rgba(243,236,222,0.08)' }} />
+                        <Box aria-hidden sx={{ width: { xs: '80%', md: 360 }, height: 24, bgcolor: color.surfaceMuted, borderRadius: 1, mb: 1 }} />
+                        <Box aria-hidden sx={{ width: { xs: '60%', md: 240 }, height: 14, bgcolor: color.surfaceMuted, borderRadius: 1 }} />
                     </>
                 ) : (
                     <>
-                        <Typography sx={{ fontFamily: type.display, fontSize: { xs: 26, md: 34 }, lineHeight: 1.15, fontWeight: 500, color: color.navInk }}>
+                        <Typography sx={{ fontFamily: type.display, fontSize: { xs: 22, md: 28 }, lineHeight: 1.2, fontWeight: 500, color: color.ink }}>
                             {phase === 'error' ? 'The attention queue is unavailable' : title}
                         </Typography>
-                        <Typography sx={{ mt: 1, maxWidth: 560, color: color.navMuted, fontSize: 15, lineHeight: 1.5 }}>{body}</Typography>
+                        <Typography sx={{ mt: 0.75, maxWidth: 560, color: color.inkMuted, fontSize: 15, lineHeight: 1.5 }}>{body}</Typography>
                     </>
                 )}
             </Box>
             {phase === 'ready' && (
-                <Button variant="contained" color="secondary" onClick={onAction} sx={{ justifySelf: { md: 'end' } }}>
+                <Button variant="contained" color="secondary" onClick={onAction} sx={{ justifySelf: { md: 'end' }, alignSelf: { md: 'center' } }}>
                     {actionLabel}
                 </Button>
             )}
@@ -246,8 +248,9 @@ export function ActionQueue({
                         flexDirection: { xs: 'column', md: 'row' },
                         justifyContent: 'space-between',
                         gap: 1.25,
-                        py: 1.5,
+                        py: 1.75,
                         borderBottom: `1px solid ${color.line}`,
+                        '&:last-of-type': { borderBottom: 0 },
                     }}
                 >
                     <Box>
@@ -257,7 +260,7 @@ export function ActionQueue({
                         <Typography sx={{ fontWeight: 650 }}>{item.title}</Typography>
                         <Typography variant="body2">{item.detail}</Typography>
                     </Box>
-                    <Button variant="contained" onClick={() => onOpen(item.href)} sx={{ alignSelf: { md: 'center' } }}>{item.action}</Button>
+                    <Button variant="outlined" onClick={() => onOpen(item.href)} sx={{ alignSelf: { md: 'center' } }}>{item.action}</Button>
                 </Box>
             ))}
         </Stack>

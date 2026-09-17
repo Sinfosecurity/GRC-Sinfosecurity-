@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
+import FormSection from '../components/design/FormSection';
 import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import QueryState from '../components/QueryState';
@@ -94,12 +95,13 @@ export default function VendorOnboarding() {
             <Stack spacing={2.5} sx={{ minWidth: 0 }}>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Surface>
-                    <Typography variant="h6">New request</Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>Ask only what is needed now. After you submit, Supreme opens Assess for the internal contact. The vendor is not invited yet.</Typography>
-                    <Stack component="form" onSubmit={(event) => submit(event)} spacing={2}>
-                        <Stack spacing={1.25}>
-                            <Typography variant="subtitle2">Who is this vendor?</Typography>
-                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
+                    <Box sx={{ pb: 2, mb: 0.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                        <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.secondary' }}>New request</Typography>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>Ask only what is needed now. After you submit, Supreme opens Assess for the internal contact. The vendor is not invited yet.</Typography>
+                    </Box>
+                    <Stack component="form" onSubmit={(event) => submit(event)} spacing={0}>
+                        <FormSection title="Who is this vendor?" body="Name the company. Legal name and website help Supreme recognize a duplicate.">
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>
                                 <TextField required fullWidth label="Vendor name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} helperText={!form.name ? 'Required to open a request.' : undefined} />
                                 <TextField fullWidth label="Legal name" value={form.legalName} onChange={(event) => setForm({ ...form, legalName: event.target.value })} />
                             </Stack>
@@ -107,13 +109,11 @@ export default function VendorOnboarding() {
                                 <TextField fullWidth label="Website or domain" value={form.website} onChange={(event) => setForm({ ...form, website: event.target.value })} />
                                 <TextField fullWidth label="Country" value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value })} />
                             </Stack>
-                        </Stack>
-                        <Stack spacing={1.25}>
-                            <Typography variant="subtitle2">What service will they provide?</Typography>
+                        </FormSection>
+                        <FormSection title="What will they do?" body="Describe the service in one sentence. This becomes the case context.">
                             <TextField required fullWidth multiline minRows={2} label="Service or product" value={form.servicesProvided} onChange={(event) => setForm({ ...form, servicesProvided: event.target.value })} helperText={!form.servicesProvided ? 'Required. Describe the work this third party will do.' : undefined} />
-                        </Stack>
-                        <Stack spacing={1.25}>
-                            <Typography variant="subtitle2">Who owns this relationship internally?</Typography>
+                        </FormSection>
+                        <FormSection title="Who owns this internally?" body="Supreme routes the next step to this person. The vendor is not invited yet.">
                             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
                                 <TextField select fullWidth label="Business owner" value={form.businessOwnerUserId} onChange={(event) => setForm({ ...form, businessOwnerUserId: event.target.value })}>
                                     <MenuItem value="">Assign after create</MenuItem>
@@ -121,21 +121,25 @@ export default function VendorOnboarding() {
                                 </TextField>
                                 <TextField fullWidth label="Business unit" value={form.businessUnit} onChange={(event) => setForm({ ...form, businessUnit: event.target.value })} />
                             </Stack>
-                        </Stack>
-                        <Stack spacing={1.25}>
-                            <Typography variant="subtitle2">Context only</Typography>
+                        </FormSection>
+                        <FormSection title="Optional context" body="Spend and start date do not change inherent or residual risk.">
                             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                                <TextField fullWidth type="number" label="Estimated annual spend" value={form.estimatedAnnualSpend} onChange={(event) => setForm({ ...form, estimatedAnnualSpend: event.target.value })} helperText="Context for the owner. Spend does not change inherent or residual risk." />
+                                <TextField fullWidth type="number" label="Estimated annual spend" value={form.estimatedAnnualSpend} onChange={(event) => setForm({ ...form, estimatedAnnualSpend: event.target.value })} />
                                 <TextField fullWidth type="date" label="Target start date" InputLabelProps={{ shrink: true }} value={form.targetStartDate} onChange={(event) => setForm({ ...form, targetStartDate: event.target.value })} />
                             </Stack>
+                        </FormSection>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }} justifyContent="space-between" sx={{ pt: 2.5 }}>
+                            <Typography variant="body2">Next: the named internal contact answers intake. Supreme scores inherent risk and recommends tier and packs.</Typography>
+                            <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided}>Submit request</Button>
                         </Stack>
-                        <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided}>Submit request</Button>
-                        <Typography variant="body2">Next: the named internal contact answers intake. Supreme scores inherent risk and recommends tier and packs.</Typography>
                     </Stack>
                 </Surface>
-                <Surface>
+                <Surface padded={false}>
+                    <Box sx={{ px: { xs: 2, md: 3 }, pt: 3 }}>
                     <SectionHeader title="Open work" body={CUSTOMER_STAGES.map((stage) => `${stage} ${rows.filter((row) => customerStage(row.stage) === stage).length}`).join(' · ')} />
+                    </Box>
                     <AppTable
+                        embedded
                         rows={rows}
                         rowKey={(row) => row.id}
                         onRowClick={(row) => navigate(`/vendor-onboarding/${row.publicId || row.id}`)}

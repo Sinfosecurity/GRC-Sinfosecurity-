@@ -16,7 +16,7 @@ type Props = {
 
 export default function PageHeader({ eyebrow, title, description, crumbs, actions, meta }: Props) {
     return (
-        <Box component="header" sx={{ mb: 3, pb: 2, borderBottom: `1px solid ${color.line}` }}>
+        <Box component="header" sx={{ mb: 2.5 }}>
             {crumbs && crumbs.length > 0 && (
                 <Breadcrumbs
                     aria-label="Breadcrumb"

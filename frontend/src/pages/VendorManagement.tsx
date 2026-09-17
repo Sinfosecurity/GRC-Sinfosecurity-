@@ -29,6 +29,7 @@ import Surface from '../components/design/Surface';
 import { ExecutiveMetric, PageShell } from '../components/experience/ExperienceKit';
 import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
+import { color } from '../design/tokens';
 import { humanizeLabel } from '../utils/humanizeLabel';
 
 interface Vendor {
@@ -295,19 +296,38 @@ export default function VendorManagement() {
                 }
             />
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ mb: 3, bgcolor: 'background.paper' }} useFlexGap flexWrap="wrap">
+            <Surface padded={false}>
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+                    '& > *': {
+                        px: { xs: 2, md: 3 },
+                        py: 2.25,
+                        borderRight: `1px solid ${color.line}`,
+                        borderBottom: { xs: `1px solid ${color.line}`, md: 'none' },
+                    },
+                    '& > *:nth-of-type(2n)': { borderRight: { xs: 'none', md: `1px solid ${color.line}` } },
+                    '& > *:nth-of-type(n+3)': { borderBottom: 0 },
+                    '& > *:last-child': { borderRight: 0 },
+                }}
+            >
                 <ExecutiveMetric emphasis label="Critical vendors" value={criticalVendors} hint="Highest dependency" />
                 <ExecutiveMetric label="High or critical" value={highVendors} />
                 <ExecutiveMetric label="Due for review" value={overdueAssessments} />
                 <ExecutiveMetric label="All third parties" value={vendors.length} />
-            </Stack>
+            </Box>
+            </Surface>
 
-            <Tabs value={tabValue} onChange={(_, value) => setTabValue(value)} sx={{ mb: 2 }}>
+            <Box sx={{ mt: 2.5 }}>
+            <Surface padded={false}>
+            <Box sx={{ px: { xs: 1.5, md: 2 }, borderBottom: `1px solid ${color.line}` }}>
+            <Tabs value={tabValue} onChange={(_, value) => setTabValue(value)}>
                 <Tab label="All" />
                 <Tab label="Needs action" />
                 <Tab label="Critical and high" />
             </Tabs>
-
+            </Box>
             <QueryState
                 loading={loading && vendors.length === 0}
                 error={error}
@@ -317,6 +337,7 @@ export default function VendorManagement() {
                 emptyAction={<Button variant="contained" onClick={() => setOpenDialog(true)}>Add vendor</Button>}
             >
                 <AppTable
+                    embedded
                     rows={filtered}
                     rowKey={(row) => String(row.id)}
                     onRowClick={handleViewVendor}
@@ -348,6 +369,8 @@ export default function VendorManagement() {
                     ]}
                 />
             </QueryState>
+            </Surface>
+            </Box>
 
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Add vendor</DialogTitle>
