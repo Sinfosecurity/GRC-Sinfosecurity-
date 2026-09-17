@@ -4,12 +4,13 @@ import { Alert, Box, Button, CircularProgress, MenuItem, Stack, TextField, Typog
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
-import MetricCard from '../components/design/MetricCard';
 import Surface from '../components/design/Surface';
-import { color } from '../design/tokens';
+import { PageShell, SectionHeader } from '../components/experience/ExperienceKit';
+import { color, type } from '../design/tokens';
 import { tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 type Brief = {
     id: string;
@@ -37,6 +38,19 @@ const decisions = [
     { value: 'REJECT', label: 'Reject' },
     { value: 'RISK_ACCEPTED', label: 'Accept residual risk' },
 ];
+
+function briefStatus(status?: string) {
+    const key = (status || '').toUpperCase();
+    if (key === 'DRAFT') return { label: 'Draft', tone: 'neutral' as const };
+    if (key === 'DECIDED') return { label: 'Decided', tone: 'success' as const };
+    if (key === 'SUPERSEDED') return { label: 'Superseded', tone: 'medium' as const };
+    return { label: humanizeLabel(status), tone: 'info' as const };
+}
+
+function recordedDecision(value?: string | null) {
+    if (!value) return 'Recorded';
+    return value.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
 export default function DecisionBriefs() {
     const [searchParams] = useSearchParams();
@@ -108,16 +122,17 @@ export default function DecisionBriefs() {
 
     const factors = selected?.immutableSnapshot?.score?.factors || [];
     const vendorName = selected?.immutableSnapshot?.vendor?.name || selected?.vendorId;
+    const status = briefStatus(selected?.status);
 
     return (
-        <Box sx={{ maxWidth: 1200 }}>
+        <PageShell>
             <PageHeader
                 crumbs={[{ label: 'Third-party risk' }, { label: 'Decisions' }]}
                 title="Decisions"
-                description="What needs a human decision, why it matters, and what happens after you record it. Supreme prepared the record. You decide."
+                description="What needs a human decision, why it matters, and what you will record. Supreme prepared the record."
                 actions={
-                    <Stack direction="row" spacing={1}>
-                        <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+                        <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: { sm: 220 } }}>
                             <MenuItem value="">Select vendor</MenuItem>
                             {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
                                 <MenuItem value={vendorId}>Selected vendor</MenuItem>
@@ -132,112 +147,182 @@ export default function DecisionBriefs() {
             />
 
             <QueryState loading={loading} error={error} empty={briefs.length === 0 && !selected} emptyTitle="No decisions yet" emptyBody="Generate a brief from a vendor with a persisted explainable score. The brief becomes the record for approval or rejection.">
-                <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} alignItems="flex-start">
-                    <Box sx={{ width: { xs: '100%', lg: 300 }, flexShrink: 0 }}>
-                        <Typography variant="overline" sx={{ mb: 1, display: 'block' }}>Briefs</Typography>
-                        <Stack spacing={0.75}>
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', lg: '260px minmax(0, 1fr)' },
+                        gap: 2.5,
+                        alignItems: 'start',
+                    }}
+                >
+                    <Surface padded={false}>
+                        <Box sx={{ px: 2, pt: 2, pb: 1.25, borderBottom: `1px solid ${color.line}` }}>
+                            <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: color.inkMuted }}>Decision history</Typography>
+                        </Box>
+                        <Stack spacing={0}>
                             {briefs.map((brief) => {
                                 const active = selected?.id === brief.id;
+                                const rowStatus = briefStatus(brief.status);
                                 return (
                                     <Box
                                         key={brief.id}
+                                        component="button"
+                                        type="button"
                                         onClick={() => setSelected(brief)}
                                         sx={{
+                                            display: 'block',
+                                            width: '100%',
+                                            textAlign: 'left',
+                                            px: 2,
                                             py: 1.5,
-                                            cursor: 'pointer',
                                             border: 0,
                                             borderBottom: `1px solid ${color.line}`,
                                             boxShadow: active ? `inset 3px 0 0 ${color.gold}` : 'none',
-                                            bgcolor: 'transparent',
+                                            bgcolor: active ? color.surfaceMuted : 'transparent',
+                                            cursor: 'pointer',
+                                            font: 'inherit',
+                                            color: 'inherit',
                                         }}
                                     >
-                                        <Typography variant="subtitle2">{brief.immutableSnapshot?.vendor?.name || brief.vendorId}</Typography>
-                                        <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+                                        <Typography sx={{ fontWeight: 700, fontSize: 14 }}>
+                                            {brief.immutableSnapshot?.vendor?.name || brief.vendorId}
+                                        </Typography>
+                                        {brief.engagementName && (
+                                            <Typography variant="caption" sx={{ display: 'block', mt: 0.25 }}>{brief.engagementName}</Typography>
+                                        )}
+                                        <Stack direction="row" spacing={0.75} sx={{ mt: 0.75 }} flexWrap="wrap" useFlexGap>
                                             <StatusBadge value={brief.riskBand} kind="severity" />
-                                            <StatusBadge value={brief.status} kind="plain" tone={brief.status === 'DRAFT' ? 'high' : 'success'} />
+                                            <StatusBadge kind="plain" tone={rowStatus.tone} label={rowStatus.label} />
                                         </Stack>
                                     </Box>
                                 );
                             })}
                         </Stack>
-                    </Box>
+                    </Surface>
 
                     {selected && (
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} sx={{ mb: 2 }}>
-                                <Box>
-                                    <Typography variant="overline">Decision brief</Typography>
-                                    <Typography variant="h3">{vendorName}</Typography>
-                                    <Typography variant="body2">What is being decided, why it needs a person, current residual risk, and the recorded evidence. Scores come from the deterministic engine.</Typography>
+                        <Stack spacing={2}>
+                            <Surface>
+                                <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2} alignItems={{ md: 'flex-start' }}>
+                                    <Box sx={{ minWidth: 0 }}>
+                                        <Typography variant="overline" sx={{ color: color.goldInk }}>Selected decision</Typography>
+                                        <Typography variant="h2" sx={{ mt: 0.25 }}>{vendorName}</Typography>
+                                        {selected.engagementName && <Typography variant="body2" sx={{ mt: 0.4 }}>{selected.engagementName}</Typography>}
+                                        <Typography variant="body2" sx={{ mt: 0.75, maxWidth: 560 }}>
+                                            What is being decided, why it needs a person, current residual risk, and the recorded evidence. Scores come from the deterministic engine.
+                                        </Typography>
+                                        <Stack direction="row" spacing={1} sx={{ mt: 1.25 }} flexWrap="wrap" useFlexGap>
+                                            <StatusBadge kind="plain" tone={status.tone} label={status.label} />
+                                            <StatusBadge value={selected.riskBand} kind="severity" />
+                                        </Stack>
+                                    </Box>
+                                    <Button variant="outlined" disabled={downloading} onClick={downloadPdf}>
+                                        {downloading ? <CircularProgress size={16} /> : 'Download PDF'}
+                                    </Button>
+                                </Stack>
+                                {downloadError && <Alert severity="error" sx={{ mt: 2 }}>{downloadError}</Alert>}
+                            </Surface>
+
+                            <Surface padded={false}>
+                                <Box
+                                    sx={{
+                                        display: 'grid',
+                                        gridTemplateColumns: { xs: '1fr 1fr', md: '1.2fr 1.2fr 1fr 1fr' },
+                                        '& > *': {
+                                            px: { xs: 2, md: 2.5 },
+                                            py: 2,
+                                            borderRight: { md: `1px solid ${color.line}` },
+                                            borderBottom: { xs: `1px solid ${color.line}`, md: 'none' },
+                                        },
+                                        '& > *:nth-of-type(2n)': { borderRight: { xs: 'none', md: `1px solid ${color.line}` } },
+                                        '& > *:nth-of-type(n+3)': { borderBottom: { xs: 'none' } },
+                                        '& > *:last-child': { borderRight: 0 },
+                                    }}
+                                >
+                                    <DecisionFact label="Inherent risk" value={selected.inherentRisk} />
+                                    <DecisionFact
+                                        label="Residual risk"
+                                        value={selected.residualRisk}
+                                        hint={selected.inherentRisk !== selected.residualRisk ? `Inherent ${selected.inherentRisk}` : undefined}
+                                    />
+                                    <DecisionFact label="Open findings" value={selected.openFindingsCount} />
+                                    <DecisionFact label="Monitoring alerts" value={selected.monitoringAlertCount} />
                                 </Box>
-                                <Button variant="outlined" disabled={downloading} onClick={downloadPdf}>
-                                    {downloading ? <CircularProgress size={16} /> : 'Download PDF'}
-                                </Button>
-                            </Stack>
-                            {downloadError && <Alert severity="error" sx={{ mb: 2 }}>{downloadError}</Alert>}
-                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }} useFlexGap flexWrap="wrap">
-                                <MetricCard label="Inherent" value={selected.inherentRisk} />
-                                <MetricCard label="Residual" value={selected.residualRisk} />
-                                <MetricCard label="Open findings" value={selected.openFindingsCount} />
-                                <MetricCard label="Monitoring alerts" value={selected.monitoringAlertCount} />
-                            </Stack>
-                            <Stack spacing={2}>
+                            </Surface>
+
+                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 220px' }, gap: 2 }}>
                                 <Surface>
-                                    <Typography variant="h5" sx={{ mb: 1 }}>Evidence confidence</Typography>
-                                    <Typography variant="body2">{selected.evidenceConfidence}. Findings and monitoring above are live counts from this tenant.</Typography>
-                                </Surface>
-                                <Surface>
-                                    <Typography variant="h5" sx={{ mb: 1 }}>Score factors</Typography>
+                                    <SectionHeader title="Why this score" body="Persisted factors from the deterministic engine. Supreme does not invent a new explanation." />
                                     {factors.length === 0 ? (
                                         <Typography variant="body2">No persisted factors on this brief.</Typography>
                                     ) : factors.map((factor) => (
-                                        <Stack key={factor.label} direction="row" justifyContent="space-between" sx={{ py: 0.75, borderBottom: `1px solid ${color.line}` }}>
-                                            <Box>
-                                                <Typography variant="subtitle2">{factor.label}</Typography>
-                                                <Typography variant="caption">{factor.rationale}</Typography>
-                                            </Box>
-                                            <Typography className="sr-metric" sx={{ fontFamily: '"IBM Plex Mono", monospace' }}>
-                                                {factor.points >= 0 ? '+' : ''}{factor.points}
-                                            </Typography>
-                                        </Stack>
+                                        <Box key={factor.label} sx={{ py: 1.25, borderBottom: `1px solid ${color.line}` }}>
+                                            <Stack direction="row" justifyContent="space-between" spacing={2} alignItems="baseline">
+                                                <Typography sx={{ fontWeight: 700 }}>{factor.label}</Typography>
+                                                <Typography className="sr-metric" sx={{ fontFamily: type.mono, fontSize: 15, color: color.ink }}>
+                                                    {factor.points >= 0 ? '+' : ''}{factor.points}
+                                                </Typography>
+                                            </Stack>
+                                            <Typography variant="body2" sx={{ mt: 0.4 }}>{factor.rationale}</Typography>
+                                        </Box>
                                     ))}
                                 </Surface>
                                 <Surface>
-                                    <Typography variant="h5" sx={{ mb: 1 }}>Recommendation</Typography>
-                                    <Alert severity={selected.aiSummaryStatus === 'SUCCESS' ? 'info' : 'warning'}>
-                                        {selected.aiSummaryStatus === 'SUCCESS'
-                                            ? (selected.aiSummary || 'A summary is available. AI does not own this score.')
-                                            : 'No model summary is available. AI does not own this score.'}
+                                    <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: color.inkMuted }}>Evidence confidence</Typography>
+                                    <Typography sx={{ fontFamily: type.display, fontSize: 28, fontWeight: 500, mt: 0.75 }}>{selected.evidenceConfidence}</Typography>
+                                    <Typography variant="body2" sx={{ mt: 0.75 }}>Findings and monitoring above are live counts from this tenant.</Typography>
+                                </Surface>
+                            </Box>
+
+                            <Surface>
+                                <SectionHeader title="Recommendation" body="A model summary is interpretation. It is not the score and not the decision." />
+                                <Alert severity={selected.aiSummaryStatus === 'SUCCESS' ? 'info' : 'warning'}>
+                                    {selected.aiSummaryStatus === 'SUCCESS'
+                                        ? (selected.aiSummary || 'A summary is available. AI does not own this score.')
+                                        : 'No model summary is available. AI does not own this score.'}
+                                </Alert>
+                            </Surface>
+
+                            <Surface>
+                                <SectionHeader
+                                    title={selected.status === 'DRAFT' ? 'Record the decision' : 'What was recorded'}
+                                    body={selected.status === 'DRAFT' ? 'The person with authority records the outcome. Historical briefs stay immutable after this.' : 'Historical briefs are immutable.'}
+                                />
+                                {selected.status === 'DRAFT' ? (
+                                    <Box component="form" onSubmit={decide}>
+                                        <Stack spacing={2}>
+                                            <TextField select label="Decision" value={decision} onChange={(e) => setDecision(e.target.value)}>
+                                                {decisions.map((option) => (
+                                                    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+                                                ))}
+                                            </TextField>
+                                            <TextField label="Conditions or residual-risk rationale" value={conditions} onChange={(e) => setConditions(e.target.value)} />
+                                            <TextField label="Reviewer analysis" multiline minRows={3} value={analysis} onChange={(e) => setAnalysis(e.target.value)} />
+                                            <Button type="submit" variant="contained">Record decision</Button>
+                                        </Stack>
+                                    </Box>
+                                ) : (
+                                    <Alert severity="success">
+                                        Recorded: {recordedDecision(selected.humanDecision)}. Historical briefs are immutable.
+                                        {selected.conditions ? ` Conditions: ${selected.conditions}` : ''}
                                     </Alert>
-                                </Surface>
-                                <Surface>
-                                    <Typography variant="h5" sx={{ mb: 1.5 }}>Human decision</Typography>
-                                    {selected.status === 'DRAFT' ? (
-                                        <Box component="form" onSubmit={decide}>
-                                            <Stack spacing={2}>
-                                                <TextField select label="Decision" value={decision} onChange={(e) => setDecision(e.target.value)}>
-                                                    {decisions.map((option) => (
-                                                        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-                                                    ))}
-                                                </TextField>
-                                                <TextField label="Conditions or residual-risk rationale" value={conditions} onChange={(e) => setConditions(e.target.value)} />
-                                                <TextField label="Reviewer analysis" multiline minRows={3} value={analysis} onChange={(e) => setAnalysis(e.target.value)} />
-                                                <Button type="submit" variant="contained">Record decision</Button>
-                                            </Stack>
-                                        </Box>
-                                    ) : (
-                                        <Alert severity="success">
-                                            Recorded: {selected.humanDecision?.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())}. Historical briefs are immutable.
-                                            {selected.conditions ? ` Conditions: ${selected.conditions}` : ''}
-                                        </Alert>
-                                    )}
-                                </Surface>
-                                <EntityRelationships sourceModel="RiskDecisionBrief" sourceId={selected.id} />
-                            </Stack>
-                        </Box>
+                                )}
+                            </Surface>
+                            <EntityRelationships sourceModel="RiskDecisionBrief" sourceId={selected.id} />
+                        </Stack>
                     )}
-                </Stack>
+                </Box>
             </QueryState>
+        </PageShell>
+    );
+}
+
+function DecisionFact({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
+    return (
+        <Box>
+            <Typography sx={{ fontFamily: type.display, fontSize: 32, lineHeight: 1, fontWeight: 500 }}>{value}</Typography>
+            <Typography sx={{ mt: 0.75, fontSize: 13, fontWeight: 700 }}>{label}</Typography>
+            {hint && <Typography variant="caption" sx={{ display: 'block', mt: 0.25 }}>{hint}</Typography>}
         </Box>
     );
 }
