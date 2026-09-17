@@ -199,15 +199,11 @@ async function assertReadyToInvite(organizationId: string, vendor: { id: string;
         where: { assessmentId: vendor.onboarding?.intakeAssessmentId || '' },
         select: { questionId: true, response: true },
     });
-    const recommendation = recommendTierFromIntake(answers.map((row) => ({ questionKey: row.questionId, response: row.response })));
     const plan = vendor.onboarding?.plan && typeof vendor.onboarding.plan === 'object'
-        ? vendor.onboarding.plan as { questionnairePlan?: { sendBlocked?: boolean; sendBlockMessage?: string; includedPackKeys?: string[] } }
+        ? vendor.onboarding.plan as { questionnairePlan?: { sendBlocked?: boolean; sendBlockMessage?: string } }
         : null;
     if (plan?.questionnairePlan?.sendBlocked) {
-        throw new ApiError(409, plan.questionnairePlan.sendBlockMessage || unresolvedScopeBlockMessage(recommendation.packs.unresolved));
-    }
-    if (recommendation.packs.unresolved.length) {
-        throw new ApiError(409, unresolvedScopeBlockMessage(recommendation.packs.unresolved));
+        throw new ApiError(409, plan.questionnairePlan.sendBlockMessage || 'Packs require scope confirmation before this questionnaire can be sent.');
     }
 }
 

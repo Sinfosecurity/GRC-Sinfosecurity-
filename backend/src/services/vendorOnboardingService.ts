@@ -672,9 +672,6 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
     if (plan.questionnairePlan?.sendBlocked) {
         throw new ApiError(409, plan.questionnairePlan.sendBlockMessage);
     }
-    if (plan.unresolved?.length) {
-        throw new ApiError(409, unresolvedScopeBlockMessage(plan.unresolved));
-    }
     for (const item of plan.assessments.filter((row: any) => row.key !== 'inherent-risk' && (row.requirement === 'Required' || row.requirement === 'Recommended'))) {
         if (!item.templateId) continue;
         try {
@@ -771,6 +768,12 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
         analystDecisions,
         workbookPackCounts(loadWorkbookCatalog()),
         loadWorkbookCatalog().catalogVersion,
+        result.packs.required.concat(result.packs.unresolved.map((row) => ({ key: row.packKey, name: row.packName } as any))).map((row: any) => ({
+            key: row.key || row.packKey,
+            included: result.packs.required.some((pack) => pack.key === (row.key || row.packKey)),
+            unresolved: result.packs.unresolved.some((pack) => pack.packKey === (row.key || row.packKey)),
+            reason: row.reason || row.question || result.packs.required.find((pack) => pack.key === (row.key || row.packKey))?.why.join(' ') || 'Confirm whether this pack applies.',
+        })),
     );
     const recommendedKeys = questionnairePlan.includedTemplateKeys;
     const extraKeys: string[] = [];
