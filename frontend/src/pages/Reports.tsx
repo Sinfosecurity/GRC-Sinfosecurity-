@@ -5,6 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { complianceAPI, ermAPI, sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
@@ -226,7 +227,7 @@ export default function Reports() {
     );
 
     return (
-        <Box sx={{ maxWidth: 1200 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 title="Reports"
                 description="Executive deliverables from this organization’s records. Each report names its audience, scope, and format. Unavailable actions explain why — they will not fail after you click."
@@ -283,7 +284,10 @@ export default function Reports() {
                     </Surface>
                 )}
             </Stack>
+            <Surface padded={false}>
             <AppTable
+                embedded
+                pageSize={10}
                 rows={catalog}
                 rowKey={(row) => row.id}
                 searchPlaceholder="Filter reports"
@@ -329,6 +333,7 @@ export default function Reports() {
                     } },
                 ]}
             />
-        </Box>
+            </Surface>
+        </WorkspaceFrame>
     );
 }

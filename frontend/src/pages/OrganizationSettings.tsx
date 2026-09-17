@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Alert, Box, Button, Grid, MenuItem, TextField } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import FormSection from '../components/design/FormSection';
 import { organizationAPI } from '../services/api';
@@ -68,7 +69,7 @@ export default function OrganizationSettings() {
     };
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Organization' }]}
                 title="Organization"
@@ -123,6 +124,6 @@ export default function OrganizationSettings() {
                     </Box>
                 </Surface>
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

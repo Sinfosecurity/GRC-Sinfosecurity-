@@ -22,7 +22,8 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
-import MetricCard from '../components/design/MetricCard';
+import AttentionStrip from '../components/design/AttentionStrip';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import WorkflowStepper from '../components/design/WorkflowStepper';
 import TemplateCard from '../components/design/TemplateCard';
 import { color } from '../design/tokens';
@@ -152,6 +153,7 @@ export default function Assessments() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
+    const [templateQuery, setTemplateQuery] = useState('');
     const draftRef = useRef('');
     const focusedQuestionKeyRef = useRef<string | null>(null);
 
@@ -354,6 +356,11 @@ export default function Assessments() {
     };
 
     const vendorMatches = vendors.filter((vendor) => vendor.name.toLowerCase().includes(vendorQuery.toLowerCase()));
+    const templateMatches = templates.filter((template) => {
+        const q = templateQuery.trim().toLowerCase();
+        if (!q) return true;
+        return `${template.name} ${template.framework} ${template.purpose || ''}`.toLowerCase().includes(q);
+    });
     const chosenVendor = vendors.find((vendor) => vendor.id === vendorId);
     const planGroups = [
         { title: 'Required', items: plan?.required || [] },
@@ -508,7 +515,7 @@ export default function Assessments() {
     }
 
     return (
-        <Box sx={{ maxWidth: 1280 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 title="Assessments"
                 description="Evaluate third parties using risk-based due diligence. Start from a recommended plan, not a blank form."
@@ -517,13 +524,15 @@ export default function Assessments() {
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>}
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
-                <MetricCard label="Active" value={summary.active} />
-                <MetricCard label="Due soon" value={summary.dueSoon} />
-                <MetricCard label="Overdue" value={summary.overdue} />
-                <MetricCard label="Awaiting review" value={summary.awaiting} />
-                <MetricCard label="Completed" value={summary.completed} />
-            </Stack>
+            <Box sx={{ mb: 2 }}>
+                <AttentionStrip items={[
+                    { label: 'Active', value: summary.active },
+                    { label: 'Due soon', value: summary.dueSoon },
+                    { label: 'Overdue', value: summary.overdue },
+                    { label: 'Awaiting review', value: summary.awaiting },
+                    { label: 'Completed', value: summary.completed },
+                ]} />
+            </Box>
 
             <Tabs value={tab} onChange={(_, value) => setTab(value)} sx={{ mb: 2 }}>
                 <Tab label="Active" />
@@ -533,12 +542,25 @@ export default function Assessments() {
             </Tabs>
 
             {tab === 3 ? (
-                <Surface>
-                    <Stack spacing={1.5}>
-                        {templates.map((template) => (
-                            <TemplateCard key={template.id} template={template} />
-                        ))}
-                    </Stack>
+                <Surface padded={false}>
+                    <AppTable
+                        embedded
+                        pageSize={8}
+                        rows={templates}
+                        rowKey={(row) => row.id}
+                        searchPlaceholder="Search templates"
+                        searchValue={(row) => `${row.name} ${row.framework} ${row.purpose || ''}`}
+                        columns={[
+                            { id: 'name', label: 'Template', sortValue: (row) => row.name, render: (row) => (
+                                <Box>
+                                    <Typography variant="subtitle2">{row.name}</Typography>
+                                    <Typography variant="body2">{row.purpose || row.framework}</Typography>
+                                </Box>
+                            ) },
+                            { id: 'questions', label: 'Questions', hideOnMobile: true, sortValue: (row) => row.questionCount || 0, render: (row) => row.questionCount ?? '—' },
+                            { id: 'source', label: 'Source', hideOnMobile: true, render: (row) => row.sourceLabel || row.source || '—' },
+                        ]}
+                    />
                 </Surface>
             ) : (
                 <QueryState
@@ -552,6 +574,7 @@ export default function Assessments() {
                     <Surface padded={false}>
                         <AppTable
                             embedded
+                            pageSize={12}
                             rows={filteredAssessments}
                             rowKey={(row) => row.id}
                             onRowClick={(row) => openAssessment(row)}
@@ -588,7 +611,7 @@ export default function Assessments() {
                                 InputProps={{ startAdornment: <InputAdornment position="start"> </InputAdornment> }}
                                 sx={{ mb: 2 }}
                             />
-                            <Stack spacing={1}>
+                            <Stack spacing={1} sx={{ maxHeight: 360, overflow: 'auto' }}>
                                 {vendorMatches.map((vendor) => (
                                     <ListItemButton
                                         key={vendor.id}
@@ -642,19 +665,42 @@ export default function Assessments() {
                         <Stack spacing={2} sx={{ mt: 1 }}>
                             <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
                             <Typography variant="body2">
-                                {selectedTemplateIds.length} questionnaire(s) selected. Add or remove templates below. Cloned organization templates are labeled separately from Supreme templates.
+                                {selectedTemplateIds.length} questionnaire(s) selected. Search or scroll the library. Cloned organization templates are labeled separately from Supreme templates.
                             </Typography>
-                            <Stack spacing={1}>
-                                {templates.map((template) => (
-                                    <TemplateCard
-                                        key={template.id}
-                                        template={template}
-                                        selected={selectedTemplateIds.includes(template.id)}
-                                        onSelect={() => setSelectedTemplateIds((current) => (
-                                            current.includes(template.id) ? current.filter((id) => id !== template.id) : [...current, template.id]
-                                        ))}
-                                    />
-                                ))}
+                            <TextField
+                                label="Search templates"
+                                value={templateQuery}
+                                onChange={(e) => setTemplateQuery(e.target.value)}
+                            />
+                            <Stack spacing={1} sx={{ maxHeight: 360, overflow: 'auto' }}>
+                                {templateMatches.map((template) => {
+                                    const checked = selectedTemplateIds.includes(template.id);
+                                    return (
+                                        <ListItemButton
+                                            key={template.id}
+                                            selected={checked}
+                                            onClick={() => setSelectedTemplateIds((current) => (
+                                                current.includes(template.id) ? current.filter((id) => id !== template.id) : [...current, template.id]
+                                            ))}
+                                            aria-label={`${checked ? 'Remove' : 'Add'} ${template.name}`}
+                                            sx={{
+                                                border: `1px solid ${checked ? color.navy800 : color.line}`,
+                                                borderRadius: '8px',
+                                                bgcolor: checked ? color.goldDim : color.surface,
+                                            }}
+                                        >
+                                            <Box>
+                                                <Typography variant="subtitle2">{template.name}</Typography>
+                                                <Typography variant="caption">
+                                                    {template.purpose || template.framework}
+                                                    {template.questionCount != null ? ` · ${template.questionCount} questions` : ''}
+                                                    {template.sourceLabel || template.source ? ` · ${template.sourceLabel || template.source}` : ''}
+                                                </Typography>
+                                            </Box>
+                                        </ListItemButton>
+                                    );
+                                })}
+                                {templateMatches.length === 0 && <Typography variant="body2">No templates match that search. Clear the filter to see the full library.</Typography>}
                             </Stack>
                         </Stack>
                     )}
@@ -692,6 +738,6 @@ export default function Assessments() {
                     )}
                 </DialogActions>
             </Dialog>
-        </Box>
+        </WorkspaceFrame>
     );
 }

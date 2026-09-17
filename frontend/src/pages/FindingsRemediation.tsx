@@ -4,10 +4,11 @@ import { Alert, Box, Button, Drawer, MenuItem, Stack, TextField, Typography } fr
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
-import MetricCard from '../components/design/MetricCard';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
 import FormSection from '../components/design/FormSection';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
+import AttentionStrip from '../components/design/AttentionStrip';
 import { tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 
@@ -36,6 +37,8 @@ export default function FindingsRemediation() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
+    const [createVendorId, setCreateVendorId] = useState(searchParams.get('vendorId') || '');
+    const [statusFilter, setStatusFilter] = useState('');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [severity, setSeverity] = useState('HIGH');
@@ -64,10 +67,10 @@ export default function FindingsRemediation() {
     }, []);
 
     const create = async () => {
-        if (!vendorId || !title) return;
+        if (!createVendorId || !title) return;
         setBusy(true);
         try {
-            await tprmAPI.createFinding(vendorId, { title, description, severity, category: 'Security', issueType: 'AUDIT_FINDING' });
+            await tprmAPI.createFinding(createVendorId, { title, description, severity, category: 'Security', issueType: 'AUDIT_FINDING' });
             setTitle('');
             setDescription('');
             await load();
@@ -92,45 +95,70 @@ export default function FindingsRemediation() {
         }
     };
 
-    const filtered = vendorId ? findings.filter((row) => row.vendor?.id === vendorId) : findings;
+    const now = Date.now();
+    const closed = new Set(['CLOSED', 'RISK_ACCEPTED', 'RESOLVED']);
+    const critical = findings.filter((row) => row.severity === 'CRITICAL').length;
+    const high = findings.filter((row) => row.severity === 'HIGH').length;
+    const overdue = findings.filter((row) => row.targetRemediationDate && new Date(row.targetRemediationDate).getTime() < now && !closed.has(row.status)).length;
+    const dueSoon = findings.filter((row) => {
+        if (!row.targetRemediationDate || closed.has(row.status)) return false;
+        const due = new Date(row.targetRemediationDate).getTime();
+        return due >= now && due <= now + 7 * 86400000;
+    }).length;
+    const filtered = findings.filter((row) => {
+        if (vendorId && row.vendor?.id !== vendorId) return false;
+        if (statusFilter && row.status !== statusFilter) return false;
+        return true;
+    });
 
     return (
-        <Box sx={{ maxWidth: 1200 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
+                crumbs={[{ label: 'Work' }, { label: 'Findings' }]}
                 title="Findings"
                 description="Remediate issues from assessments and monitoring. Severity uses tone plus a label — not color alone."
             />
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }} useFlexGap flexWrap="wrap">
-                <MetricCard label="Critical" value={findings.filter((row) => row.severity === 'CRITICAL').length} />
-                <MetricCard label="High" value={findings.filter((row) => row.severity === 'HIGH').length} />
-                <MetricCard label="Overdue" value={findings.filter((row) => row.targetRemediationDate && new Date(row.targetRemediationDate).getTime() < Date.now() && !['CLOSED', 'RISK_ACCEPTED', 'RESOLVED'].includes(row.status)).length} />
-                <MetricCard label="Due soon" value={findings.filter((row) => {
-                    if (!row.targetRemediationDate || ['CLOSED', 'RISK_ACCEPTED', 'RESOLVED'].includes(row.status)) return false;
-                    const due = new Date(row.targetRemediationDate).getTime();
-                    return due >= Date.now() && due <= Date.now() + 7 * 86400000;
-                }).length} />
-            </Stack>
+            <Box sx={{ mb: 2 }}>
+                <AttentionStrip items={[
+                    { label: 'Critical', value: critical },
+                    { label: 'High', value: high },
+                    { label: 'Overdue', value: overdue },
+                    { label: 'Due soon', value: dueSoon },
+                ]} />
+            </Box>
             <Surface>
-                <FormSection title="Record a finding" body="Use this when an issue is not already created by an assessment or monitoring signal.">
+                <FormSection title="Record a finding" body="Use this when an issue is not already created by an assessment or monitoring signal. The register filter stays independent.">
                     <Stack spacing={1.5}>
                         <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
-                                <MenuItem value="">All vendors</MenuItem>
-                                {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
-                                    <MenuItem value={vendorId}>Selected vendor</MenuItem>
-                                )}
+                            <TextField select label="Vendor for new finding" value={createVendorId} onChange={(e) => setCreateVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                                <MenuItem value="">Select vendor</MenuItem>
                                 {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                             </TextField>
                             <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />
                             <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 140 }}>
                                 {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
                             </TextField>
-                            <Button variant="contained" disabled={!vendorId || !title || busy} onClick={create}>Create finding</Button>
+                            <Button variant="contained" disabled={!createVendorId || !title || busy} onClick={create}>Create finding</Button>
                         </Stack>
                         <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
                     </Stack>
                 </FormSection>
             </Surface>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 2, mb: 1.5 }}>
+                <TextField select label="Filter by vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                    <MenuItem value="">All vendors</MenuItem>
+                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                        <MenuItem value={vendorId}>Selected vendor</MenuItem>
+                    )}
+                    {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                </TextField>
+                <TextField select label="Filter by status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} sx={{ minWidth: 200 }}>
+                    <MenuItem value="">All statuses</MenuItem>
+                    {Array.from(new Set(findings.map((row) => row.status))).map((value) => (
+                        <MenuItem key={value} value={value}>{value}</MenuItem>
+                    ))}
+                </TextField>
+            </Stack>
             <Box sx={{ mt: 2 }}>
             <QueryState
                 loading={loading}
@@ -142,6 +170,7 @@ export default function FindingsRemediation() {
                 <Surface padded={false}>
                 <AppTable
                     embedded
+                    pageSize={12}
                     rows={filtered}
                     rowKey={(row) => row.id}
                     onRowClick={(row) => {
@@ -212,6 +241,6 @@ export default function FindingsRemediation() {
                     </Box>
                 )}
             </Drawer>
-        </Box>
+        </WorkspaceFrame>
     );
 }

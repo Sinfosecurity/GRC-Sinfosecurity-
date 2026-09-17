@@ -109,33 +109,55 @@ Marketing (`/`, `/pricing`, `/trust`, …), auth (`/login`, `/register`, …), v
 
 ---
 
-## After remediation
+## After Phase 2 workspace remediation
 
-Customer routes now classify as **UI 2.0**, **UI 2.0 — SPECIAL PURPOSE**, or **BLOCKED**. No unexplained MIXED or LEGACY remains.
+The first after-state (`302785b`) wrapped pages in paper chrome but left Assessments / Notifications / Assessment Library as unbounded lists, Billing IDs as hero facts, and several admin pages as Surface shells. This pass implements purpose-specific workspaces. Classifications below replace MIXED / LEGACY for reachable customer routes.
 
-| Route | After | Validation |
+Shared additions (backward-compatible; PageShell maxWidth 1180 unchanged):
+
+- `WorkspaceFrame` — register = full workspace width; admin = 960; reading = 760
+- `AttentionStrip` — compact live-count strip, not decorative KPIs
+
+| Route | Previous | Final | Changes implemented | Hosted validation | Remaining issue |
+|---|---|---|---|---|---|
+| `/dashboard` | UI 2.0 | UI 2.0 | Protected. Unchanged. | Pending this SHA | — |
+| `/risks*` | UI 2.0 | UI 2.0 | Protected. Unchanged. | Pending this SHA | — |
+| `/compliance*` | UI 2.0 | UI 2.0 | Protected. Unchanged. | Pending this SHA | — |
+| `/decision-briefs` | UI 2.0 | UI 2.0 | Protected (`628cd8c` / `d61064d`). Unchanged. | Pending this SHA | — |
+| `/vendor-management` | UI 2.0 | UI 2.0 | Protected. Unchanged. | Pending this SHA | — |
+| `/vendor-onboarding*` | UI 2.0 | UI 2.0 | Protected. Unchanged. | Pending this SHA | — |
+| `/findings` | MIXED | UI 2.0 | Register workspace: AttentionStrip from live findings, create form in Surface, independent vendor/status filters, AppTable pageSize 12, drawer `h2` | Pending this SHA | — |
+| `/assessments` | MIXED | UI 2.0 | AttentionStrip from live assessments; Active / Needs attention / Completed / Templates tabs; AppTable pageSize 12/8; wizard vendor + customize lists scroll-capped (360px) with search | Pending this SHA | Detail questionnaire remains a long workflow by design |
+| `/user-management` | MIXED | UI 2.0 | Team summary strip, Members / Invitations / Roles tabs, professional tables, invite dialog. RBAC unchanged. | Pending this SHA | — |
+| `/settings` | LEGACY | UI 2.0 | Admin workspace, `h1`, This session + Password FormSections, labeled save, success/error alerts. No invented session list or MFA. | Pending this SHA | — |
+| `/billing` | LEGACY / MIXED | UI 2.0 | Plan / interval / subscription / org as hero FactList. Customer and subscription IDs in Technical identifiers. Test-mode honesty preserved. No invented MRR/ARR. | Pending this SHA | — |
+| `/settings/identity` | MIXED | UI 2.0 | Admin workspace + FactList overview. Not configured remains Not configured. #21 architecture unchanged. | Pending this SHA | Live IdP still untested (#21 PARTIAL) |
+| `/integrations` | MIXED | UI 2.0 | Operational rows: configured / not configured / error from server status only | Pending this SHA | Coming-soon providers do not exist in this API |
+| `/intelligence` | MIXED (this mandate) | UI 2.0 | Board grouping via tabs; one AppTable pageSize 8 per group. Honesty alerts unchanged. | Pending this SHA | — |
+| `/reports` | MIXED (density) | UI 2.0 | Register-width catalog AppTable pageSize 10. Generate/download unchanged. | Pending this SHA | — |
+| `/documents` | MIXED (table-first) | UI 2.0 | Evidence library workspace: upload/link Surface + paginated register pageSize 12 | Pending this SHA | — |
+| `/control-center` | MIXED | UI 2.0 | AttentionStrip from live summary (`—` while loading), filters, AppTable pageSize 12 | Pending this SHA | — |
+| `/privacy-ops` | MIXED (hierarchy) | UI 2.0 | Attention-first, live AttentionStrip, secondary nav Surface. No fabricated privacy KPIs. | Pending this SHA | Child privacy routes were already UI 2.0 |
+| `/ai-governance` | MIXED (composition) | UI 2.0 | Attention table first, live AttentionStrip, secondary nav. No invented AI-risk scores. | Pending this SHA | Child AI routes were already UI 2.0 |
+| `/automation` | MIXED (chrome) | UI 2.0 | Register WorkspaceFrame around existing tabs/tables. Execution semantics unchanged. | Pending this SHA | — |
+| `/questionnaires` | MIXED | UI 2.0 | Library: group filter + AppTable pageSize 8. ScoringMethodologyEditor preserved. | Pending this SHA | Methodology editor is a second workspace on the same route |
+| `/notifications` | MIXED (unbounded) | UI 2.0 | Unread / All tabs, AppTable pageSize 8, Open the work. State/actions preserved. | Pending this SHA | API still returns its existing list; paging is client-side |
+| `/monitoring` | MIXED | UI 2.0 — SPECIAL PURPOSE | Signal register + live counts. No invented health. | Pending this SHA | Intentionally not a dashboard |
+| `/activity-log` | MIXED | UI 2.0 — SPECIAL PURPOSE | Register WorkspaceFrame; existing server pageSize 25 | Pending this SHA | — |
+| `/help` | MIXED | UI 2.0 — SPECIAL PURPOSE | Admin-width form + ticket list. Submit labels preserved. | Pending this SHA | Ticket list is not paginated (typically short) |
+| `/organization-settings` | MIXED | UI 2.0 | Admin WorkspaceFrame + Surface form | Pending this SHA | — |
+| `/environment` | MIXED | UI 2.0 — SPECIAL PURPOSE | Provider FactList. Not configured ≠ Connected. | Pending this SHA | — |
+| `/ai-insights` | MIXED | UI 2.0 — SPECIAL PURPOSE | Analyst prompt on paper. Provider status honest. | Pending this SHA | — |
+| `/governance-graph` | UI 2.0 | UI 2.0 | Unchanged special explorer | Pending this SHA | Busy on small screens (accepted) |
+| `/framework-coverage`, `/control-center/:id` | UI 2.0 | UI 2.0 | Unchanged this pass | Pending this SHA | — |
+| Quarantined mock routes | BLOCKED | BLOCKED | LegacyQuarantine uses reading WorkspaceFrame. Not a production path. | Pending this SHA | Enable flag only for internal review |
+
+Long-page target (client pagination / grouping; API contracts unchanged):
+
+| Page | Prior hosted height | After intent |
 |---|---|---|
-| `/dashboard`, `/risks*`, `/compliance*` | UI 2.0 | Intentionally unchanged (protected baseline) |
-| `/vendor-management`, `/vendor-onboarding*` | UI 2.0 | Unchanged |
-| `/decision-briefs` | UI 2.0 | Workspace already on `d61064d` |
-| `/assessments` | UI 2.0 | AppTable + keyboard vendor picker |
-| `/findings` | UI 2.0 | Record form + register on paper; drawer `h2` |
-| `/control-center`, `/monitoring` | UI 2.0 | Filters/table on Surface |
-| `/documents`, `/reports`, `/framework-coverage`, `/control-center/:id` | UI 2.0 | Already paper; left structurally intact |
-| `/privacy-ops*`, `/ai-governance*`, `/intelligence*`, `/automation*` | UI 2.0 | Already paper; AI test awaits honesty copy |
-| `/ai-insights` | UI 2.0 | Surface + labeled provider status |
-| `/governance-graph` | UI 2.0 | Unchanged |
-| `/settings` | UI 2.0 | PageHeader + Surface + FormSection |
-| `/organization-settings` | UI 2.0 | Surface form, no navy card |
-| `/settings/identity` | UI 2.0 | FactList overview; no KPI Cards |
-| `/user-management` | UI 2.0 | Tables on Surface |
-| `/billing` | UI 2.0 | FactList subscription + test checkout |
-| `/integrations` | UI 2.0 | Operational rows; customer “Not configured” |
-| `/activity-log` | UI 2.0 | AppTable + server paging |
-| `/notifications` | UI 2.0 | Unchanged |
-| `/environment` | UI 2.0 — SPECIAL PURPOSE | Provider facts on paper |
-| `/help` | UI 2.0 | FormSection + paper tickets |
-| `/questionnaires` | UI 2.0 | Grouped Surfaces |
-| Quarantined mock routes | BLOCKED | LegacyQuarantine is UI 2.0 — SPECIAL PURPOSE |
+| Assessments | ~13,173 px | Register + 12-row table; templates 8-row table; wizard lists max-height 360 |
+| Notifications | ~6,700 px | 8-row table + Unread/All |
+| Assessment library | ~5,400 px | 8-row table + group filter |
 
-Hosted walk (2026-09-17): frontend `302785b429b0a8cc4db3f51db824af6d164c6b61` on `supreme-risk-staging.onrender.com`. 61 list/hub/admin routes plus quarantine screens at 1440; remediations also sampled at 375/768/1024/1920. Every walked page had an `h1`, no horizontal overflow, no leftover navy cards, no crash copy. Detail routes that require a record id were not opened unless already linked from a list. This file does not declare UI 2.0 accepted.
+Hosted walk for this SHA is recorded after staging deploy. This file does not declare UI 2.0 accepted. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW until the hosted walk of this SHA is complete.

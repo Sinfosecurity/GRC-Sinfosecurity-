@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
-import MetricCard from '../components/design/MetricCard';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
+import AttentionStrip from '../components/design/AttentionStrip';
 import QueryState from '../components/QueryState';
 import { sccAPI } from '../services/api';
 
@@ -77,21 +78,23 @@ export default function ControlCenter() {
     const domains = useMemo(() => Array.from(new Set(rows.map((row) => row.domain))).sort(), [rows]);
 
     return (
-        <Box sx={{ maxWidth: 1280 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Controls' }, { label: 'Control Center' }]}
                 title="Control Center"
                 description="Implement and test a control once. Mapping decides where it contributes. These counts are readiness, not certification."
             />
             {summary && <Alert severity="info" sx={{ mb: 2 }}>{summary.honesty}</Alert>}
-            <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap" sx={{ mb: 3 }}>
-                <MetricCard label="Controls" value={summary?.controlCount ?? '—'} />
-                <MetricCard label="Implemented" value={summary?.implemented ?? '—'} hint="Implementation is not effectiveness" />
-                <MetricCard label="Tested" value={summary?.tested ?? '—'} />
-                <MetricCard label="Ineffective" value={summary?.ineffective ?? '—'} />
-                <MetricCard label="Expiring evidence" value={summary?.needsReview ?? '—'} />
-                <MetricCard label="With findings" value={summary?.withFindings ?? '—'} />
-            </Stack>
+            <Box sx={{ mb: 2 }}>
+                <AttentionStrip items={[
+                    { label: 'Controls', value: summary?.controlCount ?? '—' },
+                    { label: 'Implemented', value: summary?.implemented ?? '—', hint: 'Implementation is not effectiveness' },
+                    { label: 'Tested', value: summary?.tested ?? '—' },
+                    { label: 'Ineffective', value: summary?.ineffective ?? '—' },
+                    { label: 'Expiring evidence', value: summary?.needsReview ?? '—' },
+                    { label: 'With findings', value: summary?.withFindings ?? '—' },
+                ]} />
+            </Box>
             <Surface>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
                 <TextField select label="Domain" value={domain} onChange={(event) => setDomain(event.target.value)} sx={{ minWidth: 220 }}>
@@ -115,6 +118,7 @@ export default function ControlCenter() {
             <QueryState loading={loading} error={error} empty={rows.length === 0} emptyTitle="No controls match" emptyBody="Clear filters or wait for the common control library to adopt into this organization.">
                 <AppTable
                     embedded
+                    pageSize={12}
                     rows={rows}
                     rowKey={(row) => row.id}
                     onRowClick={(row) => navigate(`/control-center/${row.id}`)}
@@ -140,6 +144,6 @@ export default function ControlCenter() {
                 />
             </QueryState>
             </Surface>
-        </Box>
+        </WorkspaceFrame>
     );
 }

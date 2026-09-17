@@ -3,6 +3,7 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { integrationAPI } from '../services/api';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import StatusBadge from '../components/design/StatusBadge';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -35,7 +36,7 @@ export default function Integrations() {
     }, []);
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Integrations' }]}
                 title="Integrations"
@@ -83,6 +84,6 @@ export default function Integrations() {
                     })}
                 </Stack>
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

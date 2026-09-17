@@ -16,10 +16,11 @@ import {
 } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
-import MetricCard from '../components/design/MetricCard';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
+import AttentionStrip from '../components/design/AttentionStrip';
 import { usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { deliveryLabel } from './invitationDelivery';
@@ -194,8 +195,9 @@ export default function UserManagement() {
     const selectedRole = ASSIGNABLE_ROLES.find((item) => item.value === role);
 
     return (
-        <Box sx={{ maxWidth: 1200 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
+                crumbs={[{ label: 'Administration' }, { label: 'Team' }]}
                 title="Team"
                 description="Manage who can access Supreme and what they can do."
                 actions={<Button variant="contained" onClick={() => { setInviteOpen(true); setError(null); }}>Invite member</Button>}
@@ -207,11 +209,13 @@ export default function UserManagement() {
                 </Alert>
             )}
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }} useFlexGap flexWrap="wrap">
-                <MetricCard label="Active users" value={users.filter((row) => row.status === 'ACTIVE').length} />
-                <MetricCard label="Pending invitations" value={pending.length} />
-                <MetricCard label="Admins" value={admins.length} />
-            </Stack>
+            <Box sx={{ mb: 2 }}>
+                <AttentionStrip items={[
+                    { label: 'Active users', value: users.filter((row) => row.status === 'ACTIVE').length },
+                    { label: 'Pending invitations', value: pending.length },
+                    { label: 'Admins', value: admins.length },
+                ]} />
+            </Box>
 
             <Tabs value={tab} onChange={(_, value) => setTab(value)} sx={{ mb: 2 }}>
                 <Tab label="Members" />
@@ -323,6 +327,6 @@ export default function UserManagement() {
                     </DialogActions>
                 </Box>
             </Dialog>
-        </Box>
+        </WorkspaceFrame>
     );
 }

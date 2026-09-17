@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import FactList from '../components/design/FactList';
 import StatusBadge from '../components/design/StatusBadge';
@@ -36,7 +36,7 @@ export default function EnvironmentStatus() {
         : [];
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Environment' }]}
                 title="Environment status"
@@ -47,6 +47,6 @@ export default function EnvironmentStatus() {
                     <FactList columns={2} items={items} />
                 </Surface>
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

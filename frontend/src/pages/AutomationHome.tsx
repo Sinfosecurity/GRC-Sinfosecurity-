@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Box, Button, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Alert, Button, Stack, Tab, Tabs, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import AppTable from '../components/design/AppTable';
@@ -24,7 +25,7 @@ export default function AutomationHome({ initialTab = 0 }: { initialTab?: number
     }, []);
 
     return (
-        <Box>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Automation' }, { label: 'Overview' }]}
                 title="Supreme Automation"
@@ -135,6 +136,6 @@ export default function AutomationHome({ initialTab = 0 }: { initialTab?: number
                     </Stack>
                 )}
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Button, MenuItem, Stack, TextField } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import StatusBadge from '../components/design/StatusBadge';
@@ -60,7 +61,7 @@ export default function ActivityLog() {
     const pages = Math.max(1, Math.ceil(total / pageSize));
 
     return (
-        <Box sx={{ maxWidth: 1200 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Audit Log' }]}
                 title="Audit log"
@@ -118,6 +119,6 @@ export default function ActivityLog() {
                     </Box>
                 </QueryState>
             </Surface>
-        </Box>
+        </WorkspaceFrame>
     );
 }

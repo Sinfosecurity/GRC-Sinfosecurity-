@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Alert, Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import FormSection from '../components/design/FormSection';
 import StatusBadge from '../components/design/StatusBadge';
@@ -62,7 +63,7 @@ export default function HelpSupport() {
     useEffect(() => { load(); }, []);
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Support' }, { label: 'Help & Support' }]}
                 title="Help and support"
@@ -172,6 +173,6 @@ export default function HelpSupport() {
                     </Stack>
                 )}
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

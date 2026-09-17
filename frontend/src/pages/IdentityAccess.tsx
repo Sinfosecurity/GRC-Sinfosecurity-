@@ -4,7 +4,7 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import FactList from '../components/design/FactList';
 import QueryState from '../components/QueryState';
-import { PageShell } from '../components/experience/ExperienceKit';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { identityAPI } from '../services/api';
 
 const ROLES = ['VIEWER', 'AUDITOR', 'BUSINESS_OWNER', 'APPROVER', 'ASSESSOR', 'RISK_MANAGER', 'ORGANIZATION_ADMIN'];
@@ -92,7 +92,7 @@ export default function IdentityAccess() {
     };
 
     return (
-        <PageShell>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Identity & Access' }]}
                 title="Identity & Access"
@@ -284,6 +284,6 @@ export default function IdentityAccess() {
                 )}
             </Surface>
             </QueryState>
-        </PageShell>
+        </WorkspaceFrame>
     );
 }

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import { Alert, Button, Stack, Tab, Tabs, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import AppTable from '../components/design/AppTable';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { intelligenceAPI } from '../services/api';
 import { downloadBinaryResponse } from '../services/download';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -13,6 +14,8 @@ function ItemTable({ rows, emptyTitle, emptyBody }: { rows: any[]; emptyTitle: s
     const navigate = useNavigate();
     return (
         <AppTable
+            embedded
+            pageSize={8}
             rows={rows}
             rowKey={(row: any) => row.publicId}
             emptyTitle={emptyTitle}
@@ -33,6 +36,7 @@ export default function IntelligenceDashboard() {
     const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [tab, setTab] = useState(0);
 
     useEffect(() => {
         intelligenceAPI.workspace()
@@ -42,7 +46,7 @@ export default function IntelligenceDashboard() {
     }, []);
 
     return (
-        <Box>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Intelligence' }, { label: 'Overview' }]}
                 title="Supreme Intelligence"
@@ -61,33 +65,47 @@ export default function IntelligenceDashboard() {
                         <Alert severity="info">{data.honesty}</Alert>
                         <Alert severity="warning">External intelligence: {data.externalIntelligence?.message}</Alert>
                         <Typography variant="body2">{data.period?.label || 'Trend not yet established'}</Typography>
-                        <Surface>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>Critical attention</Typography>
-                            <ItemTable rows={data.criticalAttention || []} emptyTitle="No critical attention" emptyBody="No recorded condition currently requires critical attention." />
-                        </Surface>
-                        <Surface>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>What changed</Typography>
-                            <ItemTable rows={data.whatChanged || []} emptyTitle="No material change" emptyBody="Intelligence does not surface every edit." />
-                        </Surface>
-                        <Surface>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>Cross-platform impact</Typography>
-                            <ItemTable rows={data.crossPlatform || []} emptyTitle="No connected impact" emptyBody="Impact is shown only when recorded relationships exist." />
-                        </Surface>
-                        <Surface>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>Decisions to watch</Typography>
-                            <ItemTable rows={data.decisionsToWatch || []} emptyTitle="No pending decisions" emptyBody="Intelligence cannot approve or reject these records." />
-                        </Surface>
-                        <Surface>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>Positive movement</Typography>
-                            <ItemTable rows={data.positiveMovement || []} emptyTitle="No positive movement" emptyBody="Praise is not generated. Closed findings and passing tests appear here when recorded." />
-                        </Surface>
-                        <Surface>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>Evidence and control signals</Typography>
-                            <ItemTable rows={data.evidenceAndControl || []} emptyTitle="No evidence or control signals" emptyBody="Signals come from recorded tests and evidence freshness only." />
-                        </Surface>
+                        <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" allowScrollButtonsMobile aria-label="Intelligence groups">
+                            <Tab label="Critical attention" />
+                            <Tab label="What changed" />
+                            <Tab label="Cross-platform" />
+                            <Tab label="Decisions" />
+                            <Tab label="Positive movement" />
+                            <Tab label="Evidence and controls" />
+                        </Tabs>
+                        {tab === 0 && (
+                            <Surface padded={false}>
+                                <ItemTable rows={data.criticalAttention || []} emptyTitle="No critical attention" emptyBody="No recorded condition currently requires critical attention." />
+                            </Surface>
+                        )}
+                        {tab === 1 && (
+                            <Surface padded={false}>
+                                <ItemTable rows={data.whatChanged || []} emptyTitle="No material change" emptyBody="Intelligence does not surface every edit." />
+                            </Surface>
+                        )}
+                        {tab === 2 && (
+                            <Surface padded={false}>
+                                <ItemTable rows={data.crossPlatform || []} emptyTitle="No connected impact" emptyBody="Impact is shown only when recorded relationships exist." />
+                            </Surface>
+                        )}
+                        {tab === 3 && (
+                            <Surface padded={false}>
+                                <ItemTable rows={data.decisionsToWatch || []} emptyTitle="No pending decisions" emptyBody="Intelligence cannot approve or reject these records." />
+                            </Surface>
+                        )}
+                        {tab === 4 && (
+                            <Surface padded={false}>
+                                <ItemTable rows={data.positiveMovement || []} emptyTitle="No positive movement" emptyBody="Praise is not generated. Closed findings and passing tests appear here when recorded." />
+                            </Surface>
+                        )}
+                        {tab === 5 && (
+                            <Surface padded={false}>
+                                <ItemTable rows={data.evidenceAndControl || []} emptyTitle="No evidence or control signals" emptyBody="Signals come from recorded tests and evidence freshness only." />
+                            </Surface>
+                        )}
                     </Stack>
                 )}
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

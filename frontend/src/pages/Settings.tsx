@@ -6,6 +6,8 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import FormSection from '../components/design/FormSection';
 import FactList from '../components/design/FactList';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
+import { humanizeLabel } from '../utils/humanizeLabel';
 
 export default function Settings() {
     const { user } = useAuth();
@@ -33,26 +35,26 @@ export default function Settings() {
     };
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Settings' }]}
                 title="Settings"
-                description="Session identity and password change. Notification toggles and MFA enrollment are not mocked here."
+                description="Security for this signed-in session. Notification toggles and MFA enrollment are not mocked here."
             />
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             <Surface>
-                <FormSection title="Signed-in account" body="Who is using this session. Role changes happen in Team.">
+                <FormSection title="This session" body="Who is signed in. Role changes happen in Team. A session list is not available in this release.">
                     <FactList
                         columns={1}
                         items={[
                             { label: 'Name', value: user ? `${user.firstName} ${user.lastName}` : '—' },
                             { label: 'Email', value: user?.email || '—' },
-                            { label: 'Role', value: user?.role || '—' },
+                            { label: 'Role', value: humanizeLabel(user?.role) },
                         ]}
                     />
                 </FormSection>
-                <FormSection title="Change password" body="Must meet the server password policy.">
+                <FormSection title="Password" body="Must meet the server password policy.">
                     <Box component="form" onSubmit={changePassword}>
                         <Stack spacing={2}>
                             <TextField
@@ -82,6 +84,6 @@ export default function Settings() {
                     Identity provider, billing, and organization profile have their own Administration pages.
                 </Typography>
             </Surface>
-        </Box>
+        </WorkspaceFrame>
     );
 }

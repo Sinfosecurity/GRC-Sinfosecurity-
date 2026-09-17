@@ -5,8 +5,8 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
-import MetricCard from '../components/design/MetricCard';
-import { Stack } from '@mui/material';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
+import AttentionStrip from '../components/design/AttentionStrip';
 import { tprmAPI } from '../services/api';
 
 type Signal = {
@@ -40,17 +40,19 @@ export default function ContinuousMonitoring() {
     const actionable = signals.filter((row) => row.requiresAction).length;
 
     return (
-        <Box sx={{ maxWidth: 1200 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Third-party risk' }, { label: 'Monitoring' }]}
                 title="Continuous monitoring"
                 description="Only recorded vendor signals are shown. External rating feeds are not simulated or backfilled."
                 meta={<StatusBadge kind="plain" tone={providerStatus === 'CONNECTED' ? 'success' : providerStatus === 'NOT_CONFIGURED' ? 'medium' : 'high'} label={providerStatus === 'CONNECTED' ? 'Provider connected' : signals.length ? 'Signals detected' : providerStatus === 'NOT_CONFIGURED' ? 'Not configured' : 'No signals'} />}
             />
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 3 }}>
-                <MetricCard label="Recorded signals" value={signalCount} />
-                <MetricCard label="Require action" value={actionable} />
-            </Stack>
+            <Box sx={{ mb: 2 }}>
+                <AttentionStrip items={[
+                    { label: 'Recorded signals', value: signalCount },
+                    { label: 'Require action', value: actionable },
+                ]} />
+            </Box>
             <QueryState
                 loading={loading}
                 error={error}
@@ -78,6 +80,6 @@ export default function ContinuousMonitoring() {
                 />
                 </Surface>
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

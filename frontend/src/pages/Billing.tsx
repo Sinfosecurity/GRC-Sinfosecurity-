@@ -6,6 +6,7 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import FactList from '../components/design/FactList';
 import StatusBadge from '../components/design/StatusBadge';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { humanizeLabel } from '../utils/humanizeLabel';
 
 const PLANS = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE'] as const;
@@ -46,7 +47,7 @@ export default function Billing() {
     }
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Administration' }, { label: 'Billing' }]}
                 title="Billing"
@@ -64,15 +65,13 @@ export default function Billing() {
             </Alert>
             <QueryState loading={loading} error={error} notConfigured={status?.provider === 'NOT_CONFIGURED'}>
                 <Surface>
-                    <Typography variant="overline">Current subscription</Typography>
+                    <Typography variant="overline">Subscription</Typography>
                     <FactList
                         items={[
                             { label: 'Plan', value: `Plan: ${status?.plan}` },
                             { label: 'Interval', value: `Interval: ${status?.billingInterval || 'Not set'}` },
                             { label: 'Subscription', value: `Subscription: ${status?.subscriptionStatus || 'Not configured'}` },
                             { label: 'Organization status', value: `Organization status: ${status?.organizationStatus}` },
-                            { label: 'Customer', value: `Customer: ${status?.billingCustomerId || 'None'}` },
-                            { label: 'Subscription ID', value: `Subscription ID: ${status?.billingSubscriptionId || 'None'}` },
                         ]}
                     />
                     {status?.cancelAtPeriodEnd && (
@@ -81,6 +80,18 @@ export default function Billing() {
                     {status?.provider === 'NOT_CONFIGURED' && (
                         <Alert severity="info" sx={{ mt: 2 }}>Stripe is not configured. Card collection is disabled.</Alert>
                     )}
+                    <Box component="details" sx={{ mt: 2 }}>
+                        <Typography component="summary" variant="body2" sx={{ cursor: 'pointer', fontWeight: 650 }}>
+                            Technical identifiers
+                        </Typography>
+                        <FactList
+                            columns={1}
+                            items={[
+                                { label: 'Customer', value: `Customer: ${status?.billingCustomerId || 'None'}` },
+                                { label: 'Subscription ID', value: `Subscription ID: ${status?.billingSubscriptionId || 'None'}` },
+                            ]}
+                        />
+                    </Box>
                     {status?.provider === 'CONNECTED' && (
                         <Box sx={{ mt: 3 }}>
                             <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>Start or change a test subscription</Typography>
@@ -118,6 +129,6 @@ export default function Billing() {
                     )}
                 </Surface>
             </QueryState>
-        </Box>
+        </WorkspaceFrame>
     );
 }

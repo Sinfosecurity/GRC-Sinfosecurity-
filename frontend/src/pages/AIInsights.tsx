@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Alert, Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import Surface from '../components/design/Surface';
 import StatusBadge from '../components/design/StatusBadge';
 import { aiAPI } from '../services/api';
@@ -48,7 +49,7 @@ export default function AIInsights() {
     };
 
     return (
-        <Box sx={{ maxWidth: 880 }}>
+        <WorkspaceFrame purpose="admin">
             <PageHeader
                 crumbs={[{ label: 'Intelligence' }, { label: 'AI Analyst' }]}
                 title="AI analyst"
@@ -101,6 +102,6 @@ export default function AIInsights() {
                     Configure OPENAI_API_KEY or AI_API_KEY to enable analysis. Supreme Risk will not invent SOC opinions or evidence.
                 </Typography>
             )}
-        </Box>
+        </WorkspaceFrame>
     );
 }

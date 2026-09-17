@@ -6,6 +6,7 @@ import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
+import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -115,7 +116,7 @@ export default function DocumentManagement() {
     };
 
     return (
-        <Box sx={{ maxWidth: 1280 }}>
+        <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Governance' }, { label: 'Evidence' }]}
                 title="Evidence Library"
@@ -217,7 +218,10 @@ export default function DocumentManagement() {
                 emptyTitle="No evidence uploaded"
                 emptyBody="Uploads appear here with source, freshness, reuse, and a customer-safe review state. Reuse a Ready file before asking for another copy."
             >
+                <Surface padded={false}>
                 <AppTable
+                    embedded
+                    pageSize={12}
                     rows={items}
                     rowKey={(row) => row.id}
                     onRowClick={(row) => showImpact(row.id)}
@@ -239,6 +243,7 @@ export default function DocumentManagement() {
                         { id: 'when', label: 'Uploaded', hideOnMobile: true, sortValue: (row) => row.uploadedAt, render: (row) => row.uploadedAt?.slice(0, 10) || '—' },
                     ]}
                 />
+                </Surface>
             </QueryState>
             {vendorId && (
                 <Box sx={{ display: { xs: 'none', md: 'block' }, mt: 2 }}>
@@ -250,6 +255,6 @@ export default function DocumentManagement() {
                     <EntityRelationships sourceModel="StoredObject" sourceId={selectedId} compact />
                 </Box>
             )}
-        </Box>
+        </WorkspaceFrame>
     );
 }
