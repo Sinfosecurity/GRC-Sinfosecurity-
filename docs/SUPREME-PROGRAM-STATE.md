@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. H-5 and H-6 remain OPEN and were not started. #21 remains PAUSED.
 
-**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING IN PROGRESS. Starting documentation head `0f165c1c6d54dd992f09ec6f802c57d8365772a7`. Authoritative tested product `f78580555bc9a39f1f843fe03a68f971ec36678c`. H-4 is CLOSED by Product Leadership. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 authorized, commercial GO, or production ready. Hosted AFTER proof and staging certification remain open until CI and staging deploy of this work.
+**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL. Implementation / hosted frontend / hosted API `ac7e1beff1ae6d1d6c9caf489e02274f5fa9815b`. CI `35174706857` PASS (457 backend / 189 frontend). BEFORE and AFTER shots recorded. Fresh two-user approval walk and TPRM golden journey were not completed. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 authorized, commercial GO, or production ready.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 

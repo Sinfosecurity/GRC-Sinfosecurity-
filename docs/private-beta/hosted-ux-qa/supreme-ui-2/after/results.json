@@ -1,0 +1,228 @@
+{
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/home-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/home-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/third-party-register-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/third-party-register-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/decision-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/decision-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/evidence-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/evidence-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/risk-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/risk-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/compliance-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/compliance-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/privacy-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/privacy-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/ai-governance-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/ai-governance-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/intelligence-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/intelligence-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/automation-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/automation-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/governance-graph-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/governance-graph-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/reports-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/reports-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/administration-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/administration-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/vendor-portal-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/vendor-portal-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/vendor-workspace-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/review-decide-375.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/vendor-workspace-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/review-decide-1440.png",
+    "docs/private-beta/hosted-ux-qa/supreme-ui-2/after/approver-home-1440.png"
+  ],
+  "checks": [
+    {
+      "name": "user-a-login",
+      "status": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "user-b-login",
+      "status": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "home-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "home-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "third-party-register-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "third-party-register-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "decision-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "evidence-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "risk-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "risk-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "compliance-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "compliance-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "privacy-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "privacy-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "ai-governance-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "ai-governance-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "intelligence-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "automation-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "automation-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "governance-graph-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "governance-graph-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "reports-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "reports-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "administration-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "administration-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-portal-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-portal-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "workspace-copy",
+      "status": "PASS",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content  SUPREME  GOVERNANCE \u00b7 STAGING  Work  Home Third Parties Onboard "
+    },
+    {
+      "name": "vendor-workspace-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "review-decide-375",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "vendor-workspace-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "review-decide-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    },
+    {
+      "name": "user-b-attention",
+      "status": "PASS",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content  SUPREME  GOVERNANCE \u00b7 STAGING  Work  Home Third Parties Onboard "
+    },
+    {
+      "name": "approver-home-1440",
+      "status": "PASS",
+      "detail": "overflow=False"
+    }
+  ],
+  "sha": {
+    "error": "Not Found",
+    "message": "Route /api/v1/health not found"
+  }
+}

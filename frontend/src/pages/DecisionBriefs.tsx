@@ -205,8 +205,9 @@ export default function DecisionBriefs() {
                                 <Surface>
                                     <Typography variant="h5" sx={{ mb: 1 }}>Recommendation</Typography>
                                     <Alert severity={selected.aiSummaryStatus === 'SUCCESS' ? 'info' : 'warning'}>
-                                        AI summary status: {selected.aiSummaryStatus}.
-                                        {selected.aiSummary ? ` ${selected.aiSummary}` : ' No model output. AI does not own this score.'}
+                                        {selected.aiSummaryStatus === 'SUCCESS'
+                                            ? (selected.aiSummary || 'A summary is available. AI does not own this score.')
+                                            : 'No model summary is available. AI does not own this score.'}
                                     </Alert>
                                 </Surface>
                                 <Surface>
