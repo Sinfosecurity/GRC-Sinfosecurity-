@@ -125,6 +125,7 @@ router.post('/:id/plan/confirm', requirePermission(PERMISSIONS['vendor.update'],
             data: await confirmPlan(req.user!.organizationId, req.params.id, actor(req), {
                 includeKeys: Array.isArray(req.body?.includeKeys) ? req.body.includeKeys : undefined,
                 excludeKeys: Array.isArray(req.body?.excludeKeys) ? req.body.excludeKeys : undefined,
+                packDecisions: Array.isArray(req.body?.packDecisions) ? req.body.packDecisions : undefined,
                 reason: req.body?.reason,
             }),
         });

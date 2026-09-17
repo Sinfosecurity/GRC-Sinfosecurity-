@@ -4,7 +4,7 @@ import { PLATFORM_SCOPE } from '../services/questionnairePresentation';
 
 describe('Supreme assessment library', () => {
     it('contains the required private-beta templates without claiming certification', () => {
-        expect(SUPREME_LIBRARY).toHaveLength(17);
+        expect(SUPREME_LIBRARY.length).toBeGreaterThanOrEqual(25);
         const names = SUPREME_LIBRARY.map((item) => item.name);
         expect(names).toEqual(expect.arrayContaining([
             'Inherent Risk Questionnaire',

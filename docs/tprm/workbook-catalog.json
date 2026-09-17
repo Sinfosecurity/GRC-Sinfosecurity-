@@ -1,0 +1,1345 @@
+{
+  "catalogVersion": "workbook-1.0.0",
+  "source": "docs/tprm/Vendor_Risk_Assessment_Workbook.xlsx",
+  "inherentRisk": [
+    {
+      "id": "IR-01",
+      "topic": "Service criticality",
+      "question": "Would an outage materially disrupt critical operations or customer commitments?"
+    },
+    {
+      "id": "IR-02",
+      "topic": "Sensitive data",
+      "question": "Will the vendor store or process confidential, regulated, authentication, payment, or health information?"
+    },
+    {
+      "id": "IR-03",
+      "topic": "Data volume",
+      "question": "Will the vendor process a large or rapidly growing volume of organizational or customer records?"
+    },
+    {
+      "id": "IR-04",
+      "topic": "Privileged access",
+      "question": "Will the vendor have administrative or privileged access to systems, networks, or cloud environments?"
+    },
+    {
+      "id": "IR-05",
+      "topic": "System integration",
+      "question": "Will the service connect directly to production systems or trusted networks?"
+    },
+    {
+      "id": "IR-06",
+      "topic": "Customer-facing",
+      "question": "Is the service directly used by customers or embedded in a customer-facing product?"
+    },
+    {
+      "id": "IR-07",
+      "topic": "Financial impact",
+      "question": "Could service failure, fraud, or misuse create material financial loss?"
+    },
+    {
+      "id": "IR-08",
+      "topic": "Regulatory impact",
+      "question": "Could the service affect compliance with a law, regulation, license, or supervisory commitment?"
+    },
+    {
+      "id": "IR-09",
+      "topic": "Geographic exposure",
+      "question": "Will data or service delivery depend on higher-risk or legally complex jurisdictions?"
+    },
+    {
+      "id": "IR-10",
+      "topic": "Subcontracting",
+      "question": "Will important service components or data processing be delegated to other providers?"
+    },
+    {
+      "id": "IR-11",
+      "topic": "Concentration",
+      "question": "Would replacement be difficult because of unique technology, data, skills, or market concentration?"
+    },
+    {
+      "id": "IR-12",
+      "topic": "Operational dependency",
+      "question": "Is the vendor required for time-sensitive or high-volume operations?"
+    },
+    {
+      "id": "IR-13",
+      "topic": "Artificial intelligence",
+      "question": "Will the service train, operate, or make decisions using machine-learning or generative-AI capabilities?"
+    },
+    {
+      "id": "IR-14",
+      "topic": "Public exposure",
+      "question": "Is the service reachable from the public internet or responsible for externally accessible infrastructure?"
+    },
+    {
+      "id": "IR-15",
+      "topic": "Brand impact",
+      "question": "Could failure or misuse create significant customer harm or reputational damage?"
+    }
+  ],
+  "scopePacks": [
+    {
+      "pack": "Baseline",
+      "useWhen": "All vendors. Covers governance, workforce, identity, vulnerability management, monitoring, incident response, and supplier oversight.",
+      "questions": 45
+    },
+    {
+      "pack": "Personal and Sensitive Data",
+      "useWhen": "The service stores, processes, transmits, or can access customer, confidential, personal, regulated, authentication, payment, or health information.",
+      "questions": 13
+    },
+    {
+      "pack": "Software and API",
+      "useWhen": "The vendor supplies software, a hosted application, an API, custom code, or develops code used by the organization.",
+      "questions": 7
+    },
+    {
+      "pack": "Cloud Hosting",
+      "useWhen": "The vendor hosts systems or data, operates cloud infrastructure, or provides a platform used to deliver the service.",
+      "questions": 13
+    },
+    {
+      "pack": "Privileged and Network Access",
+      "useWhen": "The vendor connects to a trusted network or receives administrative, remote, service-account, or production-system access.",
+      "questions": 6
+    },
+    {
+      "pack": "Critical Operations",
+      "useWhen": "An outage, recovery failure, or loss of the vendor would materially disrupt critical operations or customer commitments.",
+      "questions": 6
+    },
+    {
+      "pack": "Regulated Service",
+      "useWhen": "The service supports a regulated activity or creates specific legal, contractual, audit, or certification obligations.",
+      "questions": 6
+    },
+    {
+      "pack": "Physical Delivery",
+      "useWhen": "The service depends on vendor facilities, physical records, equipment handling, on-site access, or physical protection of systems or media.",
+      "questions": 6
+    }
+  ],
+  "questions": [
+    {
+      "controlId": "VRA-001",
+      "domain": "Governance and Risk",
+      "topic": "Governance",
+      "question": "Has management assigned accountable owners for information-security and technology-risk decisions?",
+      "guidance": "Provide the role or committee responsible for oversight.",
+      "expectedEvidence": "Governance charter or responsibility matrix",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-002",
+      "domain": "Governance and Risk",
+      "topic": "Risk assessment",
+      "question": "Does the organization complete documented technology and security risk assessments on a defined schedule?",
+      "guidance": "State the frequency and the date of the most recent assessment.",
+      "expectedEvidence": "Risk assessment report",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-003",
+      "domain": "Governance and Risk",
+      "topic": "Risk treatment",
+      "question": "Are identified risks assigned an owner, treatment decision, target date, and tracked status?",
+      "guidance": "Describe the system used to monitor remediation.",
+      "expectedEvidence": "Risk register",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-004",
+      "domain": "Governance and Risk",
+      "topic": "Policy management",
+      "question": "Are security policies approved, reviewed at least annually, and communicated to relevant personnel?",
+      "guidance": "Include review and exception procedures.",
+      "expectedEvidence": "Policy governance standard",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-005",
+      "domain": "Governance and Risk",
+      "topic": "Exceptions",
+      "question": "Are policy exceptions documented, risk-assessed, time-limited, and approved by an authorized owner?",
+      "guidance": "Describe expiry and renewal controls.",
+      "expectedEvidence": "Exception register",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-006",
+      "domain": "Governance and Risk",
+      "topic": "Metrics",
+      "question": "Does leadership receive recurring measures covering material security risks, incidents, and remediation?",
+      "guidance": "Identify reporting frequency and audience.",
+      "expectedEvidence": "Security metrics report",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-007",
+      "domain": "Governance and Risk",
+      "topic": "Independent review",
+      "question": "Is the security program independently assessed by internal audit or a qualified external party?",
+      "guidance": "Provide the latest review date and scope.",
+      "expectedEvidence": "Audit or assessment report",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-008",
+      "domain": "Asset and Data Management",
+      "topic": "Asset inventory",
+      "question": "Is an inventory maintained for systems, applications, cloud services, and infrastructure used to deliver the service?",
+      "guidance": "Include accountable owners and lifecycle status.",
+      "expectedEvidence": "Asset inventory extract",
+      "weight": 4,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-009",
+      "domain": "Asset and Data Management",
+      "topic": "Data inventory",
+      "question": "Does the organization document the categories of customer and regulated data it receives, stores, processes, and transmits?",
+      "guidance": "Identify data owners and processing locations.",
+      "expectedEvidence": "Data inventory or record of processing",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-010",
+      "domain": "Asset and Data Management",
+      "topic": "Classification",
+      "question": "Is information classified according to sensitivity and handling requirements?",
+      "guidance": "Describe classification levels and required protections.",
+      "expectedEvidence": "Data classification standard",
+      "weight": 4,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-011",
+      "domain": "Asset and Data Management",
+      "topic": "Retention",
+      "question": "Are retention periods defined and enforced for customer data, logs, backups, and business records?",
+      "guidance": "Explain how legal holds override deletion.",
+      "expectedEvidence": "Retention schedule",
+      "weight": 4,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-012",
+      "domain": "Asset and Data Management",
+      "topic": "Secure disposal",
+      "question": "Is data securely deleted or destroyed when no longer required, including copies held in backups and removable media?",
+      "guidance": "State methods and validation practices.",
+      "expectedEvidence": "Media disposal procedure",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-013",
+      "domain": "Asset and Data Management",
+      "topic": "Data flow",
+      "question": "Are material data flows and external transfers documented and reviewed after significant service changes?",
+      "guidance": "Include subprocessors and integration points.",
+      "expectedEvidence": "Data-flow diagram",
+      "weight": 4,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-014",
+      "domain": "Identity and Access",
+      "topic": "Access governance",
+      "question": "Are access rights approved by data or system owners before they are granted?",
+      "guidance": "Describe approval and provisioning controls.",
+      "expectedEvidence": "Access control procedure",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-015",
+      "domain": "Identity and Access",
+      "topic": "Least privilege",
+      "question": "Are user and service-account permissions limited to job responsibilities and reviewed periodically?",
+      "guidance": "State the review frequency.",
+      "expectedEvidence": "Access review evidence",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-016",
+      "domain": "Identity and Access",
+      "topic": "Authentication",
+      "question": "Is multi-factor authentication required for administrative access, remote access, and access to sensitive customer data?",
+      "guidance": "List any excluded systems and compensating controls.",
+      "expectedEvidence": "Authentication standard",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-017",
+      "domain": "Identity and Access",
+      "topic": "Joiner-mover-leaver",
+      "question": "Are access changes completed promptly when personnel join, change roles, or leave?",
+      "guidance": "Provide target completion times.",
+      "expectedEvidence": "User lifecycle procedure",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-018",
+      "domain": "Identity and Access",
+      "topic": "Privileged access",
+      "question": "Are privileged credentials separately controlled, monitored, and protected from routine user activity?",
+      "guidance": "Describe vaulting, session controls, or equivalent safeguards.",
+      "expectedEvidence": "Privileged access standard",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-019",
+      "domain": "Identity and Access",
+      "topic": "Service accounts",
+      "question": "Are service accounts inventoried, assigned owners, restricted from interactive use, and rotated or otherwise protected?",
+      "guidance": "Explain credential management.",
+      "expectedEvidence": "Service-account inventory",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-020",
+      "domain": "Identity and Access",
+      "topic": "Access logging",
+      "question": "Are authentication and privileged-access events logged and reviewed for suspicious activity?",
+      "guidance": "State retention and alerting coverage.",
+      "expectedEvidence": "Access monitoring evidence",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-021",
+      "domain": "Human Resources Security",
+      "topic": "Screening",
+      "question": "Are personnel screened before receiving access, consistent with law, role sensitivity, and contractual obligations?",
+      "guidance": "Describe screening standards by role.",
+      "expectedEvidence": "Screening policy",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-022",
+      "domain": "Human Resources Security",
+      "topic": "Confidentiality",
+      "question": "Do personnel acknowledge confidentiality and acceptable-use obligations before accessing company or customer information?",
+      "guidance": "Describe renewal requirements.",
+      "expectedEvidence": "Agreement template",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-023",
+      "domain": "Human Resources Security",
+      "topic": "Training",
+      "question": "Do personnel complete security and privacy awareness training at hire and at least annually?",
+      "guidance": "Provide completion metrics for the latest cycle.",
+      "expectedEvidence": "Training report",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-024",
+      "domain": "Human Resources Security",
+      "topic": "Role training",
+      "question": "Do administrators, developers, responders, and privacy personnel receive training tailored to their responsibilities?",
+      "guidance": "Identify roles and frequency.",
+      "expectedEvidence": "Role-based training plan",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-025",
+      "domain": "Human Resources Security",
+      "topic": "Discipline",
+      "question": "Is there a documented process for investigating and addressing violations of security requirements?",
+      "guidance": "Describe coordination with HR and Legal.",
+      "expectedEvidence": "Disciplinary process",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-026",
+      "domain": "Human Resources Security",
+      "topic": "Termination",
+      "question": "Does the termination process include rapid access revocation and recovery of company assets?",
+      "guidance": "State normal and urgent revocation targets.",
+      "expectedEvidence": "Termination checklist",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-027",
+      "domain": "Physical Security",
+      "topic": "Facility access",
+      "question": "Are facilities hosting systems or sensitive records protected by controlled entry and visitor procedures?",
+      "guidance": "Describe access authorization and logging.",
+      "expectedEvidence": "Physical security procedure",
+      "weight": 4,
+      "pack": "Physical Delivery",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-028",
+      "domain": "Physical Security",
+      "topic": "Restricted areas",
+      "question": "Are data centers, network rooms, and other sensitive areas subject to additional access restrictions?",
+      "guidance": "Identify monitoring and review controls.",
+      "expectedEvidence": "Restricted-area access report",
+      "weight": 4,
+      "pack": "Physical Delivery",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-029",
+      "domain": "Physical Security",
+      "topic": "Environmental protection",
+      "question": "Are critical facilities protected against power loss, fire, water, temperature, and other environmental hazards?",
+      "guidance": "Summarize redundancy and testing.",
+      "expectedEvidence": "Facility controls report",
+      "weight": 4,
+      "pack": "Physical Delivery",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-030",
+      "domain": "Physical Security",
+      "topic": "Equipment protection",
+      "question": "Are devices and media protected during use, transport, storage, maintenance, and disposal?",
+      "guidance": "Cover off-site equipment where applicable.",
+      "expectedEvidence": "Equipment handling procedure",
+      "weight": 3,
+      "pack": "Physical Delivery",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-031",
+      "domain": "Physical Security",
+      "topic": "Visitor management",
+      "question": "Are visitors identified, logged, authorized, and escorted in non-public areas?",
+      "guidance": "State log retention.",
+      "expectedEvidence": "Visitor procedure",
+      "weight": 3,
+      "pack": "Physical Delivery",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-032",
+      "domain": "Physical Security",
+      "topic": "Surveillance",
+      "question": "Are security alarms or surveillance controls monitored and retained in accordance with risk and law?",
+      "guidance": "Describe coverage and retention.",
+      "expectedEvidence": "Monitoring standard",
+      "weight": 3,
+      "pack": "Physical Delivery",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-033",
+      "domain": "Secure Configuration",
+      "topic": "Baselines",
+      "question": "Are secure configuration baselines defined for operating systems, databases, network devices, cloud services, and endpoints?",
+      "guidance": "Identify baseline sources and exception handling.",
+      "expectedEvidence": "Configuration standard",
+      "weight": 4,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-034",
+      "domain": "Secure Configuration",
+      "topic": "Hardening",
+      "question": "Are default credentials, unnecessary services, and insecure protocols removed or disabled before production use?",
+      "guidance": "Describe build validation.",
+      "expectedEvidence": "Build checklist",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-035",
+      "domain": "Secure Configuration",
+      "topic": "Configuration monitoring",
+      "question": "Are material deviations from approved configurations detected and remediated?",
+      "guidance": "State monitoring coverage and cadence.",
+      "expectedEvidence": "Configuration compliance report",
+      "weight": 4,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-036",
+      "domain": "Secure Configuration",
+      "topic": "Change control",
+      "question": "Do production changes require testing, documented approval, rollback planning, and segregation of duties?",
+      "guidance": "Describe emergency-change review.",
+      "expectedEvidence": "Change management procedure",
+      "weight": 4,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-037",
+      "domain": "Secure Configuration",
+      "topic": "Infrastructure as code",
+      "question": "Where infrastructure is automated, are templates reviewed, version-controlled, and scanned before deployment?",
+      "guidance": "Describe approval and security checks.",
+      "expectedEvidence": "Pipeline evidence",
+      "weight": 3,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-038",
+      "domain": "Secure Configuration",
+      "topic": "Time synchronization",
+      "question": "Are system clocks synchronized to approved time sources to support reliable logging and investigation?",
+      "guidance": "Identify authoritative sources.",
+      "expectedEvidence": "Time configuration evidence",
+      "weight": 2,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-039",
+      "domain": "Vulnerability Management",
+      "topic": "Scanning",
+      "question": "Are internal and external vulnerability scans performed at a frequency based on asset exposure and criticality?",
+      "guidance": "State coverage and frequency.",
+      "expectedEvidence": "Recent scan summary",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-040",
+      "domain": "Vulnerability Management",
+      "topic": "Prioritization",
+      "question": "Are vulnerabilities prioritized using severity, exploitability, exposure, asset value, and available threat information?",
+      "guidance": "Describe the risk-rating method.",
+      "expectedEvidence": "Vulnerability procedure",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-041",
+      "domain": "Vulnerability Management",
+      "topic": "Remediation",
+      "question": "Are remediation deadlines defined by risk and are overdue items escalated and formally accepted when necessary?",
+      "guidance": "Provide targets by severity.",
+      "expectedEvidence": "Remediation SLA",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-042",
+      "domain": "Vulnerability Management",
+      "topic": "Penetration testing",
+      "question": "Is independent penetration testing completed at least annually and after material architectural changes?",
+      "guidance": "State scope and retest practices.",
+      "expectedEvidence": "Penetration-test executive summary",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-043",
+      "domain": "Vulnerability Management",
+      "topic": "Patch management",
+      "question": "Are security patches tested and deployed within risk-based deadlines across supported assets?",
+      "guidance": "Describe emergency patching.",
+      "expectedEvidence": "Patch compliance report",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-044",
+      "domain": "Vulnerability Management",
+      "topic": "Unsupported assets",
+      "question": "Are unsupported or end-of-life technologies prohibited or subject to documented compensating controls and replacement plans?",
+      "guidance": "Provide current exceptions.",
+      "expectedEvidence": "Technology lifecycle register",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-045",
+      "domain": "Vulnerability Management",
+      "topic": "Disclosure",
+      "question": "Is there a documented channel and process for receiving, triaging, and responding to externally reported vulnerabilities?",
+      "guidance": "Identify response ownership.",
+      "expectedEvidence": "Vulnerability disclosure policy",
+      "weight": 3,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-046",
+      "domain": "Application Security",
+      "topic": "Secure development",
+      "question": "Does the development lifecycle define security activities from design through deployment and maintenance?",
+      "guidance": "Describe required activities by change risk.",
+      "expectedEvidence": "Secure development standard",
+      "weight": 5,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-047",
+      "domain": "Application Security",
+      "topic": "Design review",
+      "question": "Are security requirements and threat scenarios reviewed for new systems and material changes?",
+      "guidance": "Explain when threat modeling is required.",
+      "expectedEvidence": "Threat-model example",
+      "weight": 4,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-048",
+      "domain": "Application Security",
+      "topic": "Code review",
+      "question": "Are source-code changes peer-reviewed and protected by branch, approval, and repository-access controls?",
+      "guidance": "Describe exceptions for urgent changes.",
+      "expectedEvidence": "Repository control evidence",
+      "weight": 4,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-049",
+      "domain": "Application Security",
+      "topic": "Security testing",
+      "question": "Are code, dependencies, secrets, and running applications tested for security weaknesses before release?",
+      "guidance": "List testing methods and release gates.",
+      "expectedEvidence": "Security pipeline report",
+      "weight": 5,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-050",
+      "domain": "Application Security",
+      "topic": "Environment separation",
+      "question": "Are development, test, and production environments separated with controlled promotion paths?",
+      "guidance": "Describe production-data restrictions outside production.",
+      "expectedEvidence": "Environment architecture",
+      "weight": 4,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-051",
+      "domain": "Application Security",
+      "topic": "Secrets",
+      "question": "Are application secrets stored outside source code, access-controlled, and rotated based on risk?",
+      "guidance": "Identify secret-management tooling.",
+      "expectedEvidence": "Secrets management standard",
+      "weight": 5,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-052",
+      "domain": "Application Security",
+      "topic": "API security",
+      "question": "Are APIs authenticated, authorized, rate-limited where appropriate, validated, and monitored for misuse?",
+      "guidance": "Describe gateway and testing controls.",
+      "expectedEvidence": "API security standard",
+      "weight": 5,
+      "pack": "Software and API",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-053",
+      "domain": "Logging and Monitoring",
+      "topic": "Logging standard",
+      "question": "Are security-relevant events defined and logged consistently across critical systems and cloud services?",
+      "guidance": "Include authentication, privilege, configuration, and data-access events.",
+      "expectedEvidence": "Logging standard",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-054",
+      "domain": "Logging and Monitoring",
+      "topic": "Centralization",
+      "question": "Are critical logs protected and centralized to support monitoring, investigation, and retention?",
+      "guidance": "Describe integrity and access controls.",
+      "expectedEvidence": "Logging architecture",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-055",
+      "domain": "Logging and Monitoring",
+      "topic": "Detection",
+      "question": "Are detection rules maintained for credible threats to the service and customer data?",
+      "guidance": "Describe rule review and tuning.",
+      "expectedEvidence": "Detection catalogue",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-056",
+      "domain": "Logging and Monitoring",
+      "topic": "Alert handling",
+      "question": "Are security alerts triaged under documented severity and response targets?",
+      "guidance": "Provide operating hours and escalation paths.",
+      "expectedEvidence": "Alert response procedure",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-057",
+      "domain": "Logging and Monitoring",
+      "topic": "Retention",
+      "question": "Are log-retention periods based on investigation, contractual, regulatory, and operational needs?",
+      "guidance": "State online and archive retention.",
+      "expectedEvidence": "Log retention schedule",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-058",
+      "domain": "Logging and Monitoring",
+      "topic": "Monitoring assurance",
+      "question": "Is monitoring coverage tested to confirm that expected events generate usable alerts?",
+      "guidance": "Describe testing frequency.",
+      "expectedEvidence": "Detection test evidence",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-059",
+      "domain": "Incident Response",
+      "topic": "Response plan",
+      "question": "Is there an approved incident-response plan with defined roles, severity levels, communications, and decision authority?",
+      "guidance": "Provide the latest approval date.",
+      "expectedEvidence": "Incident-response plan",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-060",
+      "domain": "Incident Response",
+      "topic": "Readiness",
+      "question": "Are response contacts, tools, access, forensic capabilities, and external support arrangements maintained?",
+      "guidance": "Describe readiness checks.",
+      "expectedEvidence": "Response contact list",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-061",
+      "domain": "Incident Response",
+      "topic": "Testing",
+      "question": "Is the incident-response plan exercised at least annually using scenarios relevant to the service?",
+      "guidance": "Provide the latest exercise summary.",
+      "expectedEvidence": "Exercise report",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-062",
+      "domain": "Incident Response",
+      "topic": "Customer notification",
+      "question": "Does the response process identify contractual and legal customer-notification requirements and deadlines?",
+      "guidance": "Describe approval and delivery ownership.",
+      "expectedEvidence": "Breach notification procedure",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-063",
+      "domain": "Incident Response",
+      "topic": "Evidence handling",
+      "question": "Are investigation records and evidence collected, protected, and retained using documented practices?",
+      "guidance": "Address chain of custody where necessary.",
+      "expectedEvidence": "Evidence handling procedure",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-064",
+      "domain": "Incident Response",
+      "topic": "Lessons learned",
+      "question": "Are material incidents followed by root-cause analysis, corrective actions, and verification of completion?",
+      "guidance": "Describe tracking and governance.",
+      "expectedEvidence": "Post-incident review example",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-065",
+      "domain": "Business Continuity",
+      "topic": "Impact analysis",
+      "question": "Does a business-impact analysis identify critical services, dependencies, recovery objectives, and maximum tolerable disruption?",
+      "guidance": "Provide the latest review date.",
+      "expectedEvidence": "Business-impact analysis",
+      "weight": 5,
+      "pack": "Critical Operations",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-066",
+      "domain": "Business Continuity",
+      "topic": "Continuity plans",
+      "question": "Are continuity and technology-recovery plans maintained for services supporting customers?",
+      "guidance": "Identify plan owners and review frequency.",
+      "expectedEvidence": "Continuity and recovery plans",
+      "weight": 5,
+      "pack": "Critical Operations",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-067",
+      "domain": "Business Continuity",
+      "topic": "Recovery testing",
+      "question": "Are recovery capabilities tested at least annually against documented recovery time and recovery point objectives?",
+      "guidance": "Provide the latest results and gaps.",
+      "expectedEvidence": "Recovery test report",
+      "weight": 5,
+      "pack": "Critical Operations",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-068",
+      "domain": "Business Continuity",
+      "topic": "Backup",
+      "question": "Are backups protected, monitored, periodically restored, and separated from normal administrative compromise paths?",
+      "guidance": "Describe immutability or equivalent controls.",
+      "expectedEvidence": "Backup and restore evidence",
+      "weight": 5,
+      "pack": "Critical Operations",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-069",
+      "domain": "Business Continuity",
+      "topic": "Crisis communication",
+      "question": "Are internal, customer, regulatory, and supplier communications addressed in crisis procedures?",
+      "guidance": "Describe message approval and alternate channels.",
+      "expectedEvidence": "Crisis communication plan",
+      "weight": 4,
+      "pack": "Critical Operations",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-070",
+      "domain": "Business Continuity",
+      "topic": "Dependency resilience",
+      "question": "Are critical personnel, facilities, utilities, technology providers, and suppliers included in resilience planning?",
+      "guidance": "Describe single-point-of-failure reviews.",
+      "expectedEvidence": "Dependency assessment",
+      "weight": 4,
+      "pack": "Critical Operations",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-071",
+      "domain": "Third-Party Management",
+      "topic": "Due diligence",
+      "question": "Are suppliers evaluated for security, privacy, resilience, and compliance risk before access or service commencement?",
+      "guidance": "Describe assessment depth by risk tier.",
+      "expectedEvidence": "Supplier due-diligence procedure",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-072",
+      "domain": "Third-Party Management",
+      "topic": "Contract controls",
+      "question": "Do supplier contracts include applicable security, confidentiality, incident, audit, data handling, and termination obligations?",
+      "guidance": "Describe required clauses and exceptions.",
+      "expectedEvidence": "Contract requirements",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-073",
+      "domain": "Third-Party Management",
+      "topic": "Subprocessors",
+      "question": "Are subprocessors that handle customer data identified, approved as required, and subject to appropriate safeguards?",
+      "guidance": "Provide the current list or notification process.",
+      "expectedEvidence": "Subprocessor register",
+      "weight": 5,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-074",
+      "domain": "Third-Party Management",
+      "topic": "Monitoring",
+      "question": "Are critical suppliers reassessed and monitored throughout the relationship?",
+      "guidance": "State review frequency and trigger events.",
+      "expectedEvidence": "Supplier monitoring report",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-075",
+      "domain": "Third-Party Management",
+      "topic": "Concentration risk",
+      "question": "Are geographic, technology, and provider concentration risks considered for critical services?",
+      "guidance": "Describe mitigation or contingency plans.",
+      "expectedEvidence": "Concentration-risk assessment",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-076",
+      "domain": "Third-Party Management",
+      "topic": "Termination",
+      "question": "Does supplier offboarding cover access revocation, data return or deletion, asset recovery, and continuity needs?",
+      "guidance": "Describe verification practices.",
+      "expectedEvidence": "Supplier exit checklist",
+      "weight": 4,
+      "pack": "Baseline",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-077",
+      "domain": "Privacy",
+      "topic": "Privacy governance",
+      "question": "Are privacy responsibilities, policies, and escalation routes defined for processing personal information?",
+      "guidance": "Identify the accountable function.",
+      "expectedEvidence": "Privacy governance policy",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-078",
+      "domain": "Privacy",
+      "topic": "Legal basis",
+      "question": "Is personal-information processing documented with purpose, data categories, individuals, recipients, location, and applicable legal basis?",
+      "guidance": "Provide a representative record.",
+      "expectedEvidence": "Processing inventory",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-079",
+      "domain": "Privacy",
+      "topic": "Minimization",
+      "question": "Is collection and use of personal information limited to defined and necessary purposes?",
+      "guidance": "Describe design and review controls.",
+      "expectedEvidence": "Data minimization standard",
+      "weight": 4,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-080",
+      "domain": "Privacy",
+      "topic": "Individual rights",
+      "question": "Are requests concerning access, correction, deletion, portability, or objection authenticated and completed within applicable deadlines?",
+      "guidance": "Describe request tracking.",
+      "expectedEvidence": "Rights request procedure",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-081",
+      "domain": "Privacy",
+      "topic": "Privacy incidents",
+      "question": "Are suspected personal-data incidents assessed for notification duties and documented decisions?",
+      "guidance": "Describe coordination with incident response.",
+      "expectedEvidence": "Privacy incident procedure",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-082",
+      "domain": "Privacy",
+      "topic": "Cross-border transfer",
+      "question": "Are international personal-data transfers identified and supported by required transfer mechanisms and assessments?",
+      "guidance": "List transfer safeguards where applicable.",
+      "expectedEvidence": "Transfer assessment",
+      "weight": 5,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-083",
+      "domain": "Privacy",
+      "topic": "Privacy by design",
+      "question": "Are privacy impacts assessed before material changes to products, data uses, or processing locations?",
+      "guidance": "State assessment triggers.",
+      "expectedEvidence": "Privacy impact assessment",
+      "weight": 4,
+      "pack": "Personal and Sensitive Data",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-084",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Architecture",
+      "question": "Is the service architecture documented with trust boundaries, network paths, administrative planes, and security dependencies?",
+      "guidance": "Provide a current high-level diagram.",
+      "expectedEvidence": "Architecture diagram",
+      "weight": 4,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-085",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Network controls",
+      "question": "Are network connections restricted according to business need and protected by layered controls?",
+      "guidance": "Describe segmentation and rule review.",
+      "expectedEvidence": "Network security standard",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-086",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Cloud governance",
+      "question": "Are cloud accounts, subscriptions, and projects provisioned under centralized governance and security baselines?",
+      "guidance": "Describe guardrails and ownership.",
+      "expectedEvidence": "Cloud governance standard",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-087",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Tenant isolation",
+      "question": "For shared services, are tenant data and operations isolated and tested against unauthorized cross-tenant access?",
+      "guidance": "Describe isolation design and testing.",
+      "expectedEvidence": "Isolation test evidence",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-088",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Encryption in transit",
+      "question": "Is sensitive and customer data encrypted across untrusted networks using currently supported protocols?",
+      "guidance": "List exceptions and compensating controls.",
+      "expectedEvidence": "Cryptography standard",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-089",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Encryption at rest",
+      "question": "Is sensitive and customer data encrypted at rest in production, backups, and portable media where applicable?",
+      "guidance": "Describe key ownership and scope.",
+      "expectedEvidence": "Encryption configuration evidence",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-090",
+      "domain": "Cloud and Infrastructure",
+      "topic": "Key management",
+      "question": "Are cryptographic keys generated, stored, accessed, rotated, revoked, and destroyed under documented controls?",
+      "guidance": "Describe separation of duties.",
+      "expectedEvidence": "Key-management procedure",
+      "weight": 5,
+      "pack": "Cloud Hosting",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-091",
+      "domain": "Endpoint and Network Security",
+      "topic": "Endpoint management",
+      "question": "Are company-managed endpoints enrolled in centralized configuration, inventory, and security monitoring?",
+      "guidance": "State coverage and exceptions.",
+      "expectedEvidence": "Endpoint compliance report",
+      "weight": 4,
+      "pack": "Privileged and Network Access",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-092",
+      "domain": "Endpoint and Network Security",
+      "topic": "Malware protection",
+      "question": "Are preventive and detective controls deployed against malicious software and unauthorized execution?",
+      "guidance": "Describe coverage and response.",
+      "expectedEvidence": "Endpoint protection report",
+      "weight": 5,
+      "pack": "Privileged and Network Access",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-093",
+      "domain": "Endpoint and Network Security",
+      "topic": "Device encryption",
+      "question": "Is full-disk encryption enforced on portable devices that may access company or customer information?",
+      "guidance": "State enforcement coverage.",
+      "expectedEvidence": "Encryption compliance report",
+      "weight": 4,
+      "pack": "Privileged and Network Access",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-094",
+      "domain": "Endpoint and Network Security",
+      "topic": "Remote access",
+      "question": "Is remote administrative and workforce access authenticated, encrypted, monitored, and restricted by role and device posture?",
+      "guidance": "Describe access architecture.",
+      "expectedEvidence": "Remote access standard",
+      "weight": 5,
+      "pack": "Privileged and Network Access",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-095",
+      "domain": "Endpoint and Network Security",
+      "topic": "Email security",
+      "question": "Are email threats reduced through authentication, filtering, attachment or link controls, and user reporting?",
+      "guidance": "Describe major controls.",
+      "expectedEvidence": "Email security configuration",
+      "weight": 4,
+      "pack": "Privileged and Network Access",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-096",
+      "domain": "Endpoint and Network Security",
+      "topic": "Wireless security",
+      "question": "Are wireless networks securely configured, segmented, and periodically reviewed?",
+      "guidance": "Cover corporate and guest networks.",
+      "expectedEvidence": "Wireless standard",
+      "weight": 3,
+      "pack": "Privileged and Network Access",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-097",
+      "domain": "Compliance and Assurance",
+      "topic": "Obligations",
+      "question": "Are legal, regulatory, contractual, and industry security obligations identified and assigned to accountable owners?",
+      "guidance": "Describe the obligation inventory.",
+      "expectedEvidence": "Compliance register",
+      "weight": 4,
+      "pack": "Regulated Service",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-098",
+      "domain": "Compliance and Assurance",
+      "topic": "Control testing",
+      "question": "Are key controls tested at planned intervals and are deficiencies tracked to closure?",
+      "guidance": "Describe test independence and frequency.",
+      "expectedEvidence": "Control test plan",
+      "weight": 4,
+      "pack": "Regulated Service",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-099",
+      "domain": "Compliance and Assurance",
+      "topic": "External assurance",
+      "question": "Does the organization maintain independent assurance appropriate to the service and customer risk?",
+      "guidance": "Identify current reports or certifications.",
+      "expectedEvidence": "Assurance report or certificate",
+      "weight": 4,
+      "pack": "Regulated Service",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-100",
+      "domain": "Compliance and Assurance",
+      "topic": "Customer audit",
+      "question": "Is there a defined process for responding to customer assurance requests and contractual audit rights?",
+      "guidance": "Describe coordination and evidence protection.",
+      "expectedEvidence": "Customer assurance procedure",
+      "weight": 3,
+      "pack": "Regulated Service",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-101",
+      "domain": "Compliance and Assurance",
+      "topic": "Records",
+      "question": "Are compliance and assurance records protected, retained, and retrievable for required periods?",
+      "guidance": "State retention requirements.",
+      "expectedEvidence": "Records management procedure",
+      "weight": 3,
+      "pack": "Regulated Service",
+      "evidenceId": null
+    },
+    {
+      "controlId": "VRA-102",
+      "domain": "Compliance and Assurance",
+      "topic": "Corrective actions",
+      "question": "Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?",
+      "guidance": "Describe overdue escalation.",
+      "expectedEvidence": "Findings register",
+      "weight": 4,
+      "pack": "Regulated Service",
+      "evidenceId": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-001",
+      "request": "Provide current supporting evidence for Governance and Risk.",
+      "domain": "Governance and Risk",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-002",
+      "request": "Provide current supporting evidence for Asset and Data Management.",
+      "domain": "Asset and Data Management",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-003",
+      "request": "Provide current supporting evidence for Identity and Access.",
+      "domain": "Identity and Access",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-004",
+      "request": "Provide current supporting evidence for Human Resources Security.",
+      "domain": "Human Resources Security",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-005",
+      "request": "Provide current supporting evidence for Physical Security.",
+      "domain": "Physical Security",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-006",
+      "request": "Provide current supporting evidence for Secure Configuration.",
+      "domain": "Secure Configuration",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-007",
+      "request": "Provide current supporting evidence for Vulnerability Management.",
+      "domain": "Vulnerability Management",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-008",
+      "request": "Provide current supporting evidence for Application Security.",
+      "domain": "Application Security",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-009",
+      "request": "Provide current supporting evidence for Logging and Monitoring.",
+      "domain": "Logging and Monitoring",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-010",
+      "request": "Provide current supporting evidence for Incident Response.",
+      "domain": "Incident Response",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-011",
+      "request": "Provide current supporting evidence for Business Continuity.",
+      "domain": "Business Continuity",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-012",
+      "request": "Provide current supporting evidence for Third-Party Management.",
+      "domain": "Third-Party Management",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-013",
+      "request": "Provide current supporting evidence for Privacy.",
+      "domain": "Privacy",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-014",
+      "request": "Provide current supporting evidence for Cloud and Infrastructure.",
+      "domain": "Cloud and Infrastructure",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-015",
+      "request": "Provide current supporting evidence for Endpoint and Network Security.",
+      "domain": "Endpoint and Network Security",
+      "required": "Yes"
+    },
+    {
+      "id": "EV-016",
+      "request": "Provide current supporting evidence for Compliance and Assurance.",
+      "domain": "Compliance and Assurance",
+      "required": "Yes"
+    }
+  ]
+}

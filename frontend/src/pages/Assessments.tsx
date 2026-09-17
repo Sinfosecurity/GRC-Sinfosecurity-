@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -25,9 +25,9 @@ import AppTable from '../components/design/AppTable';
 import AttentionStrip from '../components/design/AttentionStrip';
 import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import WorkflowStepper from '../components/design/WorkflowStepper';
-import TemplateCard from '../components/design/TemplateCard';
+import QuestionnairePlan from '../components/tprm/QuestionnairePlan';
 import { color } from '../design/tokens';
-import { tprmAPI, vendorAPI } from '../services/api';
+import { tprmAPI, vendorAPI, vendorOnboardingAPI } from '../services/api';
 import AssessmentAnswerInput from '../components/AssessmentAnswerInput';
 import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
@@ -85,22 +85,6 @@ type Assessment = {
     }>;
 };
 
-type PlanItem = {
-    id: string;
-    name: string;
-    version: string;
-    reason?: string;
-    purpose?: string;
-    source?: string;
-    sourceLabel?: string;
-    category?: string;
-    questionCount?: number;
-    domainCount?: number;
-    estimatedMinutes?: number;
-    evidenceRequired?: boolean;
-    framework?: string;
-};
-
 type VendorRow = {
     id: string;
     name: string;
@@ -130,9 +114,10 @@ function customerError(err: any) {
     return message;
 }
 
-const WIZARD_STEPS = ['Select third party', 'Recommended plan', 'Customize', 'Review'];
+const WIZARD_STEPS = ['Third party', 'Questionnaire plan', 'Review & send'];
 
 export default function Assessments() {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [vendors, setVendors] = useState<VendorRow[]>([]);
     const [templates, setTemplates] = useState<Template[]>([]);
@@ -143,8 +128,8 @@ export default function Assessments() {
     const [vendorQuery, setVendorQuery] = useState('');
     const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
     const [dueDate, setDueDate] = useState('');
-    const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>([]);
-    const [plan, setPlan] = useState<{ required: PlanItem[]; recommended: PlanItem[]; optional: PlanItem[]; rationale?: string; vendor?: VendorRow } | null>(null);
+    const [onboarding, setOnboarding] = useState<any | null>(null);
+    const [onboardingError, setOnboardingError] = useState<string | null>(null);
     const [selected, setSelected] = useState<Assessment | null>(null);
     const [sectionIndex, setSectionIndex] = useState(0);
     const [questionIndex, setQuestionIndex] = useState(0);
@@ -153,7 +138,8 @@ export default function Assessments() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
-    const [templateQuery, setTemplateQuery] = useState('');
+    const [contact, setContact] = useState({ name: '', email: '', title: '', phone: '' });
+    const [copiedLink, setCopiedLink] = useState('');
     const draftRef = useRef('');
     const focusedQuestionKeyRef = useRef<string | null>(null);
 
@@ -187,14 +173,24 @@ export default function Assessments() {
 
     useEffect(() => {
         if (!vendorId || !wizardOpen) return;
-        tprmAPI.assessmentRecommendations(vendorId)
+        setOnboardingError(null);
+        vendorOnboardingAPI.get(vendorId)
             .then((response) => {
-                const data = response.data.data;
-                setPlan(data);
-                const defaults = [...(data.required || []), ...(data.recommended || [])].map((row: PlanItem) => row.id);
-                setSelectedTemplateIds(defaults);
+                setOnboarding(response.data.data);
+                const next = response.data.data?.contact;
+                if (next) {
+                    setContact({
+                        name: next.name || '',
+                        email: next.email || '',
+                        title: next.title || '',
+                        phone: next.phone || '',
+                    });
+                }
             })
-            .catch(() => setPlan(null));
+            .catch((err: any) => {
+                setOnboarding(null);
+                setOnboardingError(err?.message || 'This third party does not have an onboarding workspace yet.');
+            });
     }, [vendorId, wizardOpen]);
 
     const templateById = useMemo(() => Object.fromEntries(templates.map((row) => [row.id, row])), [templates]);
@@ -263,29 +259,23 @@ export default function Assessments() {
         setError(null);
     };
 
-    const create = async () => {
-        if (!vendorId || selectedTemplateIds.length === 0) return;
+    const openOnboarding = () => {
+        if (!vendorId) return;
+        setWizardOpen(false);
+        navigate(`/vendor-onboarding/${vendorId}`);
+    };
+
+    const confirmAndContinue = async () => {
+        if (!vendorId) return;
         setBusy(true);
         setMessage(null);
         try {
-            const primary = selectedTemplateIds[0];
-            const created = await tprmAPI.createAssessment(vendorId, {
-                assessmentType: 'INITIAL_DUE_DILIGENCE',
-                templateId: primary,
-                dueDate: dueDate || undefined,
-            });
-            for (const extra of selectedTemplateIds.slice(1)) {
-                await tprmAPI.createAssessment(vendorId, {
-                    assessmentType: 'INITIAL_DUE_DILIGENCE',
-                    templateId: extra,
-                    dueDate: dueDate || undefined,
-                });
+            if (onboarding?.stageKey === 'DUE_DILIGENCE_PLAN') {
+                await vendorOnboardingAPI.confirmPlan(vendorId);
             }
-            await load();
-            await openAssessment(created.data.data);
-            setMessage(selectedTemplateIds.length > 1
-                ? 'Assessments created. Continue the first questionnaire now; the others appear in Assessment Center.'
-                : 'Assessment created. Complete one question at a time.');
+            const refreshed = await vendorOnboardingAPI.get(vendorId);
+            setOnboarding(refreshed.data.data);
+            setWizardStep(2);
         } catch (err: any) {
             setError(customerError(err));
         } finally {
@@ -356,17 +346,9 @@ export default function Assessments() {
     };
 
     const vendorMatches = vendors.filter((vendor) => vendor.name.toLowerCase().includes(vendorQuery.toLowerCase()));
-    const templateMatches = templates.filter((template) => {
-        const q = templateQuery.trim().toLowerCase();
-        if (!q) return true;
-        return `${template.name} ${template.framework} ${template.purpose || ''}`.toLowerCase().includes(q);
-    });
     const chosenVendor = vendors.find((vendor) => vendor.id === vendorId);
-    const planGroups = [
-        { title: 'Required', items: plan?.required || [] },
-        { title: 'Recommended', items: plan?.recommended || [] },
-        { title: 'Optional', items: plan?.optional || [] },
-    ];
+    const intakeReady = Boolean(onboarding?.intake?.completed);
+    const sendBlocked = Boolean(onboarding?.questionnairePlan?.sendBlocked);
 
     if (selected) {
         const [prompt, ...guidance] = (currentQuestion?.questionText || '').split('\n');
@@ -518,7 +500,7 @@ export default function Assessments() {
         <WorkspaceFrame purpose="register">
             <PageHeader
                 title="Assessments"
-                description="Evaluate third parties using risk-based due diligence. Start from a recommended plan, not a blank form."
+                description="Standard third-party assessments are generated from intake, inherent risk, and analyst-confirmed packs. The questionnaire library does not choose the TPRM questionnaire."
                 actions={<Button variant="contained" onClick={startWizard}>New assessment</Button>}
             />
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
@@ -538,11 +520,17 @@ export default function Assessments() {
                 <Tab label="Active" />
                 <Tab label="Needs attention" />
                 <Tab label="Completed" />
-                <Tab label="Templates" />
+                <Tab label="Library" />
             </Tabs>
 
             {tab === 3 ? (
                 <Surface padded={false}>
+                    <Box sx={{ px: 2, pt: 2 }}>
+                        <Typography variant="subtitle1">Questionnaire library</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            Administrative and specialized templates. This catalog does not choose the standard TPRM questionnaire. Use New assessment to review the generated questionnaire plan.
+                        </Typography>
+                    </Box>
                     <AppTable
                         embedded
                         pageSize={8}
@@ -637,104 +625,109 @@ export default function Assessments() {
                         </Box>
                     )}
                     {wizardStep === 1 && (
-                        <Box>
+                        <Stack spacing={2} sx={{ mt: 1 }}>
                             <Typography variant="h5">{chosenVendor?.name || 'Selected vendor'}</Typography>
-                            <Typography variant="body2" sx={{ mb: 2 }}>{plan?.rationale || 'Recommendations use the recorded risk tier for this vendor.'}</Typography>
-                            {planGroups.map((group) => (
-                                <Box key={group.title} sx={{ mb: 2 }}>
-                                    <Typography variant="overline">{group.title}</Typography>
-                                    {group.items.map((item) => {
-                                        const checked = selectedTemplateIds.includes(item.id);
-                                        return (
-                                            <Box key={item.id} sx={{ mt: 1 }}>
-                                                <TemplateCard
-                                                    template={{ ...item, purpose: item.reason || item.purpose }}
-                                                    selected={checked}
-                                                    onSelect={() => setSelectedTemplateIds((current) => (
-                                                        current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id]
-                                                    ))}
-                                                />
-                                            </Box>
-                                        );
-                                    })}
-                                </Box>
-                            ))}
-                        </Box>
+                            {onboardingError && (
+                                <Alert severity="warning">
+                                    {onboardingError} Create the third-party request first.
+                                    <Button sx={{ display: 'block', mt: 1 }} onClick={() => navigate('/vendor-onboarding')}>Open vendor onboarding</Button>
+                                </Alert>
+                            )}
+                            {onboarding && !intakeReady && (
+                                <Alert severity="info">
+                                    Internal intake is not complete. The internal contact answers vendor profile, seven scope questions, and IR-01 to IR-15 before Supreme can prepare a questionnaire plan.
+                                    <Button sx={{ display: 'block', mt: 1 }} onClick={openOnboarding}>Continue intake</Button>
+                                </Alert>
+                            )}
+                            {onboarding && intakeReady && (
+                                <QuestionnairePlan
+                                    plan={onboarding.questionnairePlan || onboarding.plan?.questionnairePlan}
+                                    recommendedTier={onboarding.tierReview?.confirmedTier || onboarding.tierReview?.recommendedTier || onboarding.tier}
+                                    explanation={onboarding.tierReview?.explanation}
+                                    readOnly
+                                />
+                            )}
+                        </Stack>
                     )}
                     {wizardStep === 2 && (
                         <Stack spacing={2} sx={{ mt: 1 }}>
-                            <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                            <Typography variant="h5">{chosenVendor?.name}</Typography>
                             <Typography variant="body2">
-                                {selectedTemplateIds.length} questionnaire(s) selected. Search or scroll the library. Cloned organization templates are labeled separately from Supreme templates.
+                                After the analyst confirms tier and packs, send the same invitation by email or copy the secure link. The vendor never sees intake, inherent-risk, or pack-selection mechanics.
                             </Typography>
-                            <TextField
-                                label="Search templates"
-                                value={templateQuery}
-                                onChange={(e) => setTemplateQuery(e.target.value)}
-                            />
-                            <Stack spacing={1} sx={{ maxHeight: 360, overflow: 'auto' }}>
-                                {templateMatches.map((template) => {
-                                    const checked = selectedTemplateIds.includes(template.id);
-                                    return (
-                                        <ListItemButton
-                                            key={template.id}
-                                            selected={checked}
-                                            onClick={() => setSelectedTemplateIds((current) => (
-                                                current.includes(template.id) ? current.filter((id) => id !== template.id) : [...current, template.id]
-                                            ))}
-                                            aria-label={`${checked ? 'Remove' : 'Add'} ${template.name}`}
-                                            sx={{
-                                                border: `1px solid ${checked ? color.navy800 : color.line}`,
-                                                borderRadius: '8px',
-                                                bgcolor: checked ? color.goldDim : color.surface,
-                                            }}
-                                        >
-                                            <Box>
-                                                <Typography variant="subtitle2">{template.name}</Typography>
-                                                <Typography variant="caption">
-                                                    {template.purpose || template.framework}
-                                                    {template.questionCount != null ? ` · ${template.questionCount} questions` : ''}
-                                                    {template.sourceLabel || template.source ? ` · ${template.sourceLabel || template.source}` : ''}
-                                                </Typography>
-                                            </Box>
-                                        </ListItemButton>
-                                    );
-                                })}
-                                {templateMatches.length === 0 && <Typography variant="body2">No templates match that search. Clear the filter to see the full library.</Typography>}
+                            {sendBlocked && (
+                                <Alert severity="warning">{onboarding?.questionnairePlan?.sendBlockMessage || 'Scope confirmation is still required before send.'}</Alert>
+                            )}
+                            <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                            <TextField required label="Vendor security contact" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
+                            <TextField required type="email" label="Vendor security contact email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+                            {copiedLink && <Alert severity="success">Link copied. Not emailed. Mark it sent after you share it through your approved channel.</Alert>}
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                <Button
+                                    variant="contained"
+                                    disabled={busy || sendBlocked || !contact.name || !contact.email}
+                                    onClick={() => {
+                                        setBusy(true);
+                                        vendorOnboardingAPI.send(vendorId, { ...contact, dueDate: dueDate || undefined })
+                                            .then(() => {
+                                                setMessage('Invitation email sent.');
+                                                setWizardOpen(false);
+                                                load();
+                                            })
+                                            .catch((err: any) => setError(customerError(err)))
+                                            .finally(() => setBusy(false));
+                                    }}
+                                >
+                                    Send invitation email
+                                </Button>
+                                <Button
+                                    disabled={busy || sendBlocked || !contact.name || !contact.email}
+                                    onClick={() => {
+                                        setBusy(true);
+                                        vendorOnboardingAPI.activationLink(vendorId, contact)
+                                            .then(async (response) => {
+                                                const url = response.data.data.activationUrl;
+                                                if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
+                                                setCopiedLink(url || 'copied');
+                                            })
+                                            .catch((err: any) => setError(customerError(err)))
+                                            .finally(() => setBusy(false));
+                                    }}
+                                >
+                                    Copy secure invitation link
+                                </Button>
+                                {copiedLink && (
+                                    <Button
+                                        disabled={busy}
+                                        onClick={() => {
+                                            setBusy(true);
+                                            vendorOnboardingAPI.markInvitationShared(vendorId)
+                                                .then(() => setMessage('Invitation marked as sent through an external channel.'))
+                                                .catch((err: any) => setError(customerError(err)))
+                                                .finally(() => setBusy(false));
+                                        }}
+                                    >
+                                        Mark as sent
+                                    </Button>
+                                )}
                             </Stack>
+                            <Button onClick={openOnboarding}>Open full onboarding workspace</Button>
                         </Stack>
-                    )}
-                    {wizardStep === 3 && (
-                        <Box>
-                            <Typography variant="subtitle1">{chosenVendor?.name}</Typography>
-                            <Typography variant="body2" sx={{ mb: 1 }}>Due {dueDate || 'not set'}</Typography>
-                            <Stack spacing={1}>
-                                {selectedTemplateIds.map((id) => {
-                                    const template = templates.find((row) => row.id === id);
-                                    return template
-                                        ? <TemplateCard key={id} template={template} selected />
-                                        : <Typography key={id} variant="body2">• {id}</Typography>;
-                                })}
-                            </Stack>
-                        </Box>
                     )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setWizardOpen(false)}>Cancel</Button>
                     {wizardStep > 0 && <Button onClick={() => setWizardStep((value) => value - 1)}>Back</Button>}
-                    {wizardStep < 3 && (
-                        <Button
-                            variant="contained"
-                            disabled={wizardStep === 0 && !vendorId}
-                            onClick={() => setWizardStep((value) => value + 1)}
-                        >
-                            Continue
+                    {wizardStep === 0 && (
+                        <Button variant="contained" disabled={!vendorId} onClick={() => setWizardStep(1)}>Continue</Button>
+                    )}
+                    {wizardStep === 1 && intakeReady && (
+                        <Button variant="contained" disabled={busy || sendBlocked} onClick={confirmAndContinue}>
+                            {sendBlocked ? 'Resolve scope to continue' : 'Confirm and review send'}
                         </Button>
                     )}
-                    {wizardStep === 3 && (
-                        <Button variant="contained" disabled={!vendorId || selectedTemplateIds.length === 0 || busy} onClick={create}>
-                            Start assessment
-                        </Button>
+                    {wizardStep === 1 && !intakeReady && (
+                        <Button variant="contained" onClick={openOnboarding}>Continue intake</Button>
                     )}
                 </DialogActions>
             </Dialog>

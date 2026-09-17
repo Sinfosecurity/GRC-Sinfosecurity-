@@ -6,6 +6,7 @@ import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import { EntitySummary, LifecycleProgress, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
 import ReviewDecidePanel from '../components/experience/ReviewDecidePanel';
+import QuestionnairePlan from '../components/tprm/QuestionnairePlan';
 import { approvalStatusCopy } from '../experience/approvalCopy';
 import { customerStage, customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
@@ -36,6 +37,7 @@ export default function VendorOnboardingWorkspace() {
     const [acceptance, setAcceptance] = useState<Record<string, { rationale: string; conditions: string }>>({});
     const [customizePlan, setCustomizePlan] = useState(false);
     const [excludedPacks, setExcludedPacks] = useState<string[]>([]);
+    const [includedPacks, setIncludedPacks] = useState<string[]>([]);
     const [packReason, setPackReason] = useState('');
     const [copiedLink, setCopiedLink] = useState('');
     const [exitNotes, setExitNotes] = useState('');
@@ -131,7 +133,7 @@ export default function VendorOnboardingWorkspace() {
                             ? approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status
                             : humanizeLabel(data.workflowStatus || data.stage)}
                     />
-                    <LifecycleProgress active={customerStageIndex(data.stageKey || data.stage)} blocked={(data.unresolvedScope || []).length > 0 && !data.intake?.completed} />
+                    <LifecycleProgress active={customerStageIndex(data.stageKey || data.stage)} blocked={(data.questionnairePlan?.sendBlocked || (data.unresolvedScope || []).length > 0) && Boolean(data.intake?.completed)} />
                     <NextActionCard
                         label={dominantNextAction({ ...data, actorId: data.actorId }).label}
                         detail={`${dominantNextAction({ ...data, actorId: data.actorId }).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
@@ -213,8 +215,8 @@ export default function VendorOnboardingWorkspace() {
                                 {' '}Estimated spend, if asked, is context only and does not change inherent or residual risk.
                             </Typography>
                             {unresolvedScope.length > 0 && !data.intake.completed && (
-                                <Alert severity="warning" sx={{ mb: 2 }}>
-                                    {unresolvedScope.map((row) => row.message).join(' ')} You can save and resume later. Submit intake stays blocked until these facts are resolved.
+                                <Alert severity="info" sx={{ mb: 2 }}>
+                                    Unknown scope answers are saved honestly. The analyst must confirm those packs before this questionnaire can be sent.
                                 </Alert>
                             )}
                             <Stack component="form" spacing={2.5} onSubmit={data.intake.completed ? saveIntake : completeIntake}>
@@ -257,7 +259,7 @@ export default function VendorOnboardingWorkspace() {
                                         <FormControlLabel control={<Checkbox checked={attested} onChange={(event) => setAttested(event.target.checked)} />} label="I attest that this intake is accurate for this engagement." />
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                                             <Button onClick={saveIntake} disabled={saving}>Save and resume later</Button>
-                                            <Button type="submit" variant="contained" disabled={saving || !attested || unresolvedScope.length > 0}>Submit intake</Button>
+                                            <Button type="submit" variant="contained" disabled={saving || !attested}>Submit intake</Button>
                                         </Stack>
                                     </>
                                 )}
@@ -274,7 +276,7 @@ export default function VendorOnboardingWorkspace() {
                                     <Typography variant="h5">Recommended tier {data.tierReview.recommendedTier}</Typography>
                                     <Typography>Why Supreme recommends this: {data.tierReview.explanation}</Typography>
                                     {data.inherentRiskScore != null && <Fact label="Inherent risk" value={String(data.inherentRiskScore)} />}
-                                    {data.tierReview.score != null && <Fact label="Intake score" value={`${data.tierReview.score} of ${data.tierReview.maxScore || 60} · secondary to inherent risk`} />}
+                                    {data.tierReview.score != null && <Fact label="Intake score" value={`${data.tierReview.score} of ${data.tierReview.maxScore || 3} · secondary to inherent risk`} />}
                                     <Typography variant="subtitle2">Important exposure factors</Typography>
                                     {(data.tierReview.factors || []).map((factor: any) => (
                                         <Typography key={factor.code || factor.label}>{factor.label}: {factor.rationale}{factor.points ? ` (${factor.points})` : ''}</Typography>
@@ -305,34 +307,20 @@ export default function VendorOnboardingWorkspace() {
 
                     {tab === 1 && (
                         <Stack spacing={1.5}>
-                            <Surface>
-                                <Typography variant="h6">Recommended due-diligence package</Typography>
-                                <Typography variant="body2">{data.plan?.rationale || 'Confirm the tier to generate the package. Nothing is sent to the vendor in this phase.'}</Typography>
-                            </Surface>
-                            {unresolvedScope.length > 0 && (
-                                <Alert severity="warning">
-                                    {unresolvedScope.map((row) => row.message).join(' ')} Package confirmation and invitation stay blocked until intake is completed with those facts resolved.
-                                    <Button sx={{ display: 'block', mt: 1 }} onClick={() => setTab(1)}>Complete intake</Button>
-                                </Alert>
-                            )}
-                            <Surface>
-                                <Typography variant="subtitle1">Required</Typography>
-                                {(data.plan?.package?.required || data.plan?.assessments || []).filter((item: any) => item.requirement !== 'Recommended' && item.requirement !== 'Optional').map((item: any) => (
-                                    <Stack key={item.key || item.name} spacing={0.5} sx={{ mt: 1 }}>
-                                        <Typography><strong>{item.name || item.packName}</strong></Typography>
-                                        <Typography variant="body2">Included because: {(item.why || [item.rationale]).filter(Boolean).join(' ')}</Typography>
-                                        {customizePlan && item.templateKey !== 'information-security' && item.key !== 'information-security' && item.key !== 'baseline' && (
-                                            <FormControlLabel
-                                                control={<Checkbox checked={!excludedPacks.includes(item.templateKey || item.key)} onChange={(event) => {
-                                                    const key = item.templateKey || item.key;
-                                                    setExcludedPacks(event.target.checked ? excludedPacks.filter((row) => row !== key) : [...excludedPacks, key]);
-                                                }} />}
-                                                label="Include this pack"
-                                            />
-                                        )}
-                                    </Stack>
-                                ))}
-                            </Surface>
+                            <QuestionnairePlan
+                                plan={data.questionnairePlan || data.plan?.questionnairePlan}
+                                recommendedTier={humanizeLabel(data.tierReview?.confirmedTier || data.tierReview?.recommendedTier || 'Not calculated')}
+                                explanation={data.tierReview?.explanation || data.plan?.rationale}
+                                readOnly={!customizePlan || !data.canReviewTier || data.stageKey !== 'DUE_DILIGENCE_PLAN'}
+                                onInclude={(pack) => {
+                                    setExcludedPacks(excludedPacks.filter((row) => row !== pack.key));
+                                    setIncludedPacks([...includedPacks.filter((row) => row !== pack.key), pack.key]);
+                                }}
+                                onExclude={(pack) => {
+                                    setIncludedPacks(includedPacks.filter((row) => row !== pack.key));
+                                    setExcludedPacks([...excludedPacks.filter((row) => row !== pack.key), pack.key]);
+                                }}
+                            />
                             {(data.plan?.package?.recommended || []).length > 0 && (
                                 <Surface>
                                     <Typography variant="subtitle1">Recommended</Typography>
@@ -352,12 +340,26 @@ export default function VendorOnboardingWorkspace() {
                             {data.plan?.override && <Alert severity="info">Package customized: {data.plan.override.reason}</Alert>}
                             {data.canReviewTier && data.stageKey === 'DUE_DILIGENCE_PLAN' && (
                                 <Stack spacing={1.5}>
-                                    <Button variant="contained" disabled={saving || unresolvedScope.length > 0} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}>Confirm package</Button>
-                                    <Button disabled={saving} onClick={() => setCustomizePlan(!customizePlan)}>Customize</Button>
+                                    <Button
+                                        variant="contained"
+                                        disabled={saving || Boolean(data.questionnairePlan?.sendBlocked)}
+                                        onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id))}
+                                    >
+                                        Confirm package
+                                    </Button>
+                                    <Button disabled={saving} onClick={() => setCustomizePlan(!customizePlan)}>Resolve or override packs</Button>
                                     {customizePlan && (
                                         <>
-                                            <TextField required fullWidth multiline minRows={2} label="Customization rationale" value={packReason} onChange={(event) => setPackReason(event.target.value)} helperText="Required. Actor and time are recorded in the audit trail." />
-                                            <Button disabled={saving || !packReason} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id, { excludeKeys: excludedPacks, reason: packReason }))}>Save customized package</Button>
+                                            <TextField required fullWidth multiline minRows={2} label="Override or confirmation rationale" value={packReason} onChange={(event) => setPackReason(event.target.value)} helperText="Required. Original internal-contact answers and this analyst decision stay independently auditable." />
+                                            <Button disabled={saving || !packReason} onClick={() => run(() => vendorOnboardingAPI.confirmPlan(id, {
+                                                excludeKeys: excludedPacks,
+                                                includeKeys: includedPacks,
+                                                packDecisions: [
+                                                    ...excludedPacks.map((key) => ({ key, state: 'EXCLUDED', reason: packReason })),
+                                                    ...includedPacks.map((key) => ({ key, state: 'INCLUDED', reason: packReason })),
+                                                ],
+                                                reason: packReason,
+                                            }))}>Save confirmed scope</Button>
                                         </>
                                     )}
                                 </Stack>
@@ -390,7 +392,7 @@ export default function VendorOnboardingWorkspace() {
                                     <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
                                     <TextField label="Title / role" value={contact.title} onChange={(event) => setContact({ ...contact, title: event.target.value })} />
                                     <TextField label="Phone" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} />
-                                    {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && unresolvedScope.length === 0 && (
+                                    {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && !data.questionnairePlan?.sendBlocked && (
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                                             <Button variant="contained" disabled={saving || !contact.name || !contact.email} onClick={() => run(() => vendorOnboardingAPI.send(id, contact))}>Send invitation email</Button>
                                             <Button disabled={saving || !contact.name || !contact.email} onClick={() => run(async () => {
@@ -542,7 +544,7 @@ export default function VendorOnboardingWorkspace() {
                                 <Fact label="Inherent risk" value={data.inherentRiskScore != null ? String(data.inherentRiskScore) : data.inherentRisk != null ? String(data.inherentRisk) : 'Not scored'} />
                                 <Fact label="Residual risk" value={data.residualRiskScore != null ? String(data.residualRiskScore) : data.lifecycle?.residualRisk != null ? String(data.lifecycle.residualRisk) : 'Not scored'} />
                                 {data.tierReview?.score != null && (
-                                    <Fact label="Intake score" value={`${data.tierReview.score} of ${data.tierReview.maxScore || 60}`} />
+                                    <Fact label="Intake score" value={`${data.tierReview.score} of ${data.tierReview.maxScore || 3}`} />
                                 )}
                                 <Fact label="Business owner" value={data.owner} />
                                 <Fact label="Contract posture" value={data.lifecycle?.contractAttestedAt ? 'Required controls attested' : 'Not attested'} />

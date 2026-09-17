@@ -6,6 +6,9 @@ import {
     presentQuestionnaireTemplate,
     templateScopeKey,
 } from './questionnairePresentation';
+import { workbookLibraryTemplates } from '../tprm/workbookLibrary';
+import { SCOPE_QUESTIONS, SCOPE_RESPONSE_OPTIONS } from '../tprm/packDerivation';
+import { WORKBOOK_PACK_KEYS } from '../tprm/workbookCatalog';
 
 export type LibraryQuestion = {
     id: string;
@@ -32,7 +35,7 @@ export type LibraryTemplate = {
 
 const YN = ['Yes', 'Partial', 'No', 'Not applicable', 'Unknown'];
 const YN_DOC = ['Yes — current document available', 'Yes — document exists but outdated', 'In progress', 'No', 'Not applicable'];
-const IR_RATING = ['High', 'Moderate', 'Low', 'Unknown'];
+const IR_RATING = ['Low', 'Moderate', 'Medium', 'High', 'Unknown'];
 
 function q(
     id: string,
@@ -44,26 +47,41 @@ function q(
     return { id, question, category, weight: extras.weight ?? 8, options, ...extras };
 }
 
-export const SUPREME_LIBRARY: LibraryTemplate[] = [
+const SPECIALIZED_LIBRARY: LibraryTemplate[] = [
     {
         key: 'inherent-risk',
         name: 'Inherent Risk Questionnaire',
         framework: 'Supreme Inherent Risk',
-        version: '3.0.0',
-        purpose: 'Internal intake and inherent exposure before due diligence is scoped. Completed by the business owner, not the vendor. Canonical IR-01 to IR-15 from the approved Vendor Risk Assessment Workbook.',
+        version: '4.0.0',
+        purpose: 'Internal intake and inherent exposure before due diligence is scoped. Completed by the internal contact, not the vendor. Canonical IR-01 to IR-15 and seven scope questions from the approved Vendor Risk Assessment Workbook.',
         sections: [
             {
-                title: 'Engagement details',
+                title: 'Vendor profile',
                 questions: [
-                    q('ir_eng_what', 'What will this third party do for the organization?', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'Describe the service or product in business language.' }),
-                    q('ir_eng_category', 'What is the service category?', 'Engagement', ['SaaS', 'Professional services', 'Hosting or cloud', 'Staffing', 'Hardware', 'Payment or financial operations', 'Software or API', 'Other'], { weight: 0, guidance: 'Used to derive Cloud Hosting and Software and API packs. Unknown is not allowed at Ready to Send.' }),
-                    q('ir_eng_data', 'What types of organization data will the vendor access, store, or process?', 'Engagement', ['None', 'Internal only', 'Confidential', 'Personal data', 'PHI / highly sensitive', 'Cardholder (PCI)'], { weight: 0, guidance: 'Commercial and floor context. Hard floors apply for PHI and cardholder data.' }),
-                    q('ir_physical', 'Does the service depend on vendor facilities, physical records, on-site access, or physical protection of systems or media?', 'Engagement', ['No', 'Yes', 'Unknown'], { weight: 0, guidance: 'Workbook Physical Delivery pack trigger. Not a sixteenth inherent-risk score factor.' }),
+                    q('ir_eng_what', 'What service or product will this third party provide?', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'Describe the service or product in business language.' }),
+                    q('ir_eng_description', 'Service description', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'What the third party will do, in enough detail for intake and later review.' }),
+                    q('ir_eng_category', 'What is the service category?', 'Engagement', ['SaaS', 'Professional services', 'Hosting or cloud', 'Staffing', 'Hardware', 'Payment or financial operations', 'Software or API', 'Other'], { weight: 0, guidance: 'Profile context. Pack inclusion is decided by the seven scope questions.' }),
+                    q('ir_eng_data', 'Customer data involved', 'Engagement', ['None', 'Internal only', 'Confidential', 'Personal data', 'PHI / highly sensitive', 'Cardholder (PCI)'], { weight: 0, guidance: 'Commercial and floor context. Hard floors apply for PHI and cardholder data.' }),
+                    q('ir_eng_hosting', 'Hosting model', 'Engagement', ['Vendor-hosted / SaaS', 'Customer-hosted', 'Hybrid', 'On vendor premises', 'Not yet known'], { weight: 0 }),
+                    q('ir_eng_locations', 'Processing locations', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'Countries or regions where data or service delivery will occur.' }),
+                    q('ir_eng_subcontractors', 'Critical subcontractors', 'Engagement', [], { weight: 0, questionType: 'TEXT', guidance: 'Name any critical subprocessors or record None.' }),
+                    q('ir_eng_renewal', 'Contract renewal date', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
                     q('ir_eng_contract', 'What contract type or term is expected?', 'Engagement', ['Master services agreement', 'Statement of work', 'Subscription', 'Purchase order only', 'Not yet known'], { weight: 0 }),
                     q('ir_spend', 'What is the estimated annual spend?', 'Engagement', ['Under $25k', '$25k–$250k', 'More than $250k'], { weight: 0, guidance: 'Commercial context only. Not part of inherent-risk scoring.' }),
                     q('ir_eng_contact', 'Who is the primary vendor contact?', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
-                    q('ir_eng_security', 'Who is the vendor security or privacy contact, if known?', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
+                    q('ir_eng_security', 'Vendor security contact name', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
+                    q('ir_eng_security_email', 'Vendor security contact email', 'Engagement', [], { weight: 0, questionType: 'TEXT' }),
                 ],
+            },
+            {
+                title: 'Questionnaire scope',
+                questions: SCOPE_QUESTIONS.map((row) => q(
+                    row.key,
+                    row.question,
+                    'Scope',
+                    [...SCOPE_RESPONSE_OPTIONS],
+                    { weight: 0, guidance: `${row.useWhen} Baseline is always included and is not asked here. These answers are internal and are not sent to the vendor.` },
+                )),
             },
             {
                 title: 'Inherent risk',
@@ -386,6 +404,15 @@ export const SUPREME_LIBRARY: LibraryTemplate[] = [
     },
 ];
 
+export const SUPREME_LIBRARY: LibraryTemplate[] = [
+    ...SPECIALIZED_LIBRARY,
+    ...workbookLibraryTemplates(),
+];
+
+function itemIsSpecialized(key: string) {
+    return !key.startsWith('tprm-') && key !== 'inherent-risk';
+}
+
 function isUniqueViolation(error: unknown) {
     return typeof error === 'object' && error !== null && 'code' in error && (error as { code?: string }).code === 'P2002';
 }
@@ -557,6 +584,14 @@ const PLAN_REASON: Record<string, string> = {
     bcdr: 'Critical Operations pack — material outage or critical dependency.',
     regulatory: 'Regulated Service pack — regulated activity or legal/audit obligation.',
     'physical-delivery': 'Physical Delivery pack — facilities, physical records, on-site access, or media.',
+    'tprm-baseline': 'Required for every third party.',
+    'tprm-personal-sensitive-data': 'Included from the internal Personal and Sensitive Data scope answer.',
+    'tprm-software-api': 'Included from the internal Software and API scope answer.',
+    'tprm-cloud-hosting': 'Included from the internal Cloud Hosting scope answer.',
+    'tprm-privileged-network': 'Included from the internal Privileged and Network Access scope answer.',
+    'tprm-critical-operations': 'Included from the internal Critical Operations scope answer.',
+    'tprm-regulated-service': 'Included from the internal Regulated Service scope answer.',
+    'tprm-physical-delivery': 'Included from the internal Physical Delivery scope answer.',
     incident: 'Recommended because incident notice may be required for this engagement.',
     'fourth-party': 'Recommended because subcontracting was recorded.',
     soc2: 'Optional assurance review. Not a SOC 2 examination.',
@@ -604,8 +639,13 @@ export async function recommendAssessments(organizationId: string, vendorId: str
     if (!vendor) throw new ApiError(404, 'Vendor not found');
     await ensureSupremeLibrary();
     const tier = tierOverride || vendor.tier;
-    const requiredKeys = new Set<string>(['inherent-risk', 'information-security', ...(signals?.requiredTemplateKeys || [])]);
-    const recommendedKeys = new Set<string>([...(signals?.recommendedTemplateKeys || [])].filter((key) => !requiredKeys.has(key)));
+    const tprmKeys = new Set<string>(WORKBOOK_PACK_KEYS.map((pack) => pack.templateKey));
+    const incoming = (signals?.requiredTemplateKeys || []).filter((key) => key !== 'inherent-risk');
+    const tprmPath = incoming.some((key) => tprmKeys.has(key) || key.startsWith('tprm-'));
+    const requiredKeys = new Set<string>(tprmPath
+        ? incoming.filter((key) => key !== 'inherent-risk')
+        : ['information-security', ...incoming]);
+    const recommendedKeys = new Set<string>((signals?.recommendedTemplateKeys || []).filter((key) => !requiredKeys.has(key) && key !== 'inherent-risk'));
     if (!signals?.requiredTemplateKeys?.length) {
         if (signals?.personalData) requiredKeys.add('privacy');
         if (signals?.softwareOrApi) requiredKeys.add('software-api');
@@ -618,7 +658,9 @@ export async function recommendAssessments(organizationId: string, vendorId: str
         if (signals?.aiInvolved) recommendedKeys.add('incident');
     }
     const wanted = new Set([...requiredKeys, ...recommendedKeys]);
-    const optionalKeys = SUPREME_LIBRARY.map((item) => item.key).filter((key) => !wanted.has(key));
+    const optionalKeys = tprmPath
+        ? []
+        : SUPREME_LIBRARY.map((item) => item.key).filter((key) => !wanted.has(key) && itemIsSpecialized(key));
     const allKeys = [...requiredKeys, ...recommendedKeys, ...optionalKeys];
     const names = SUPREME_LIBRARY.filter((item) => allKeys.includes(item.key)).map((item) => item.name);
     const templates = await prisma.questionnaireTemplate.findMany({

@@ -1,4 +1,9 @@
 import { VendorTier } from '@prisma/client';
+import {
+    deriveQuestionnairePlan,
+    confirmScopeBlockMessage,
+} from '../tprm/packDerivation';
+import { WORKBOOK_PACK_KEYS, loadWorkbookCatalog, workbookPackCounts } from '../tprm/workbookCatalog';
 
 export type IntakeAnswer = { questionKey: string; response?: string | null };
 
@@ -78,16 +83,11 @@ export const CANONICAL_IR_KEYS = [
     'ir_08', 'ir_09', 'ir_10', 'ir_11', 'ir_12', 'ir_13', 'ir_14', 'ir_15',
 ] as const;
 
-export const WORKBOOK_PACKS = [
-    { key: 'baseline', name: 'Baseline', templateKey: 'information-security' },
-    { key: 'personal-sensitive-data', name: 'Personal and Sensitive Data', templateKey: 'privacy' },
-    { key: 'software-api', name: 'Software and API', templateKey: 'software-api' },
-    { key: 'cloud-hosting', name: 'Cloud Hosting', templateKey: 'cloud-saas' },
-    { key: 'privileged-network', name: 'Privileged and Network Access', templateKey: 'identity' },
-    { key: 'critical-operations', name: 'Critical Operations', templateKey: 'bcdr' },
-    { key: 'regulated-service', name: 'Regulated Service', templateKey: 'regulatory' },
-    { key: 'physical-delivery', name: 'Physical Delivery', templateKey: 'physical-delivery' },
-] as const;
+export const WORKBOOK_PACKS = WORKBOOK_PACK_KEYS.map((pack) => ({
+    key: pack.key,
+    name: pack.name,
+    templateKey: pack.templateKey,
+}));
 
 const RATING_POINTS: Record<string, number> = {
     high: 4,
@@ -136,8 +136,8 @@ function ratingOf(value?: string | null): 'High' | 'Moderate' | 'Low' | 'Unknown
 }
 
 function pointsFor(rating: string) {
-    if (rating === 'High') return 4;
-    if (rating === 'Moderate') return 3;
+    if (rating === 'High' || rating === 'Unknown') return 3;
+    if (rating === 'Moderate') return 2;
     if (rating === 'Low') return 1;
     return 0;
 }
@@ -212,9 +212,9 @@ function physical(answers: IntakeAnswer[]) {
     return answer(answers, 'ir_physical', 'ir_onsite');
 }
 
-export function recommendDueDiligencePacks(answers: IntakeAnswer[], signals: IntakeSignals): PackRecommendation {
+function historicalPackFallback(answers: IntakeAnswer[], signals: IntakeSignals) {
     const facts: ScopeFact[] = [];
-    const why: Record<string, string[]> = { baseline: ['All vendors receive the Baseline pack.'] };
+    const why: Record<string, string[]> = {};
 
     const add = (packKey: string, fact: string) => {
         why[packKey] = [...(why[packKey] || []), fact];
@@ -274,56 +274,54 @@ export function recommendDueDiligencePacks(answers: IntakeAnswer[], signals: Int
         add('physical-delivery', `Physical delivery fact: ${phys || ratingOf(phys)}.`);
     }
 
-    const unresolved = facts.filter((fact) => {
+    const unresolvedFacts = facts.filter((fact) => {
         if (fact.resolved) return false;
         if (fact.packKey === 'cloud-hosting' || fact.packKey === 'software-api') return !cat;
         if (fact.packKey === 'physical-delivery') return isUnknown(ratingOf(phys));
         return true;
     }).filter((fact, index, rows) => rows.findIndex((row) => row.code === fact.code) === index);
 
-    const required: DueDiligencePack[] = [{
-        key: 'baseline',
-        name: 'Baseline',
-        templateKey: 'information-security',
-        requirement: 'Required',
-        why: why.baseline,
-    }];
-    const recommended: DueDiligencePack[] = [];
-    for (const pack of WORKBOOK_PACKS) {
-        if (pack.key === 'baseline') continue;
-        if (!why[pack.key]?.length) continue;
-        required.push({
+    return WORKBOOK_PACKS.filter((pack) => pack.key !== 'baseline').map((pack) => ({
+        key: pack.key,
+        included: Boolean(why[pack.key]?.length),
+        unresolved: unresolvedFacts.some((fact) => fact.packKey === pack.key && !why[pack.key]?.length),
+        reason: why[pack.key]?.join(' ') || unresolvedFacts.find((fact) => fact.packKey === pack.key)?.question || 'Confirm whether this pack applies.',
+        raw: unresolvedFacts.find((fact) => fact.packKey === pack.key)?.answer,
+    }));
+}
+
+export function recommendDueDiligencePacks(answers: IntakeAnswer[], signals: IntakeSignals): PackRecommendation {
+    const plan = deriveQuestionnairePlan(
+        answers,
+        [],
+        workbookPackCounts(loadWorkbookCatalog()),
+        loadWorkbookCatalog().catalogVersion,
+        historicalPackFallback(answers, signals),
+    );
+    const required: DueDiligencePack[] = plan.packs
+        .filter((pack) => pack.state === 'INCLUDED' || pack.state === 'INCLUDED_REQUIRED')
+        .map((pack) => ({
             key: pack.key,
             name: pack.name,
             templateKey: pack.templateKey,
             requirement: 'Required',
-            why: why[pack.key],
-        });
-    }
-    if (signals.fourthParty) {
-        recommended.push({
-            key: 'fourth-party',
-            name: 'Fourth-Party / Subcontractor',
-            templateKey: 'fourth-party',
-            requirement: 'Recommended',
-            why: ['Subcontracting was recorded. This is additional scope, not a workbook eighth pack.'],
-        });
-    }
-    if (signals.aiInvolved) {
-        recommended.push({
-            key: 'incident',
-            name: 'Incident Response',
-            templateKey: 'incident',
-            requirement: 'Recommended',
-            why: ['AI processing of organization data was recorded.'],
-        });
-    }
-
+            why: [pack.reason],
+        }));
+    const unresolved: ScopeFact[] = plan.packs
+        .filter((pack) => pack.state === 'CONFIRM_SCOPE')
+        .map((pack) => ({
+            code: pack.key.toUpperCase(),
+            packKey: pack.key,
+            packName: pack.name,
+            question: pack.reason,
+            answer: pack.scopeAnswer || 'Unknown',
+            resolved: false,
+        }));
     return {
         required,
-        recommended,
+        recommended: [],
         unresolved,
-        selectedKeys: [...required, ...recommended].map((row) => row.templateKey),
+        selectedKeys: plan.includedTemplateKeys,
     };
 }
 
@@ -346,9 +344,8 @@ export function describeUnresolvedScope(unresolved: ScopeFact[]) {
 }
 
 export function unresolvedScopeBlockMessage(unresolved: ScopeFact[]) {
-    const described = describeUnresolvedScope(unresolved);
-    if (!described.length) return '';
-    return `${described.map((row) => row.message).join(' ')} Complete intake. Unknown is not treated as No.`;
+    if (!unresolved.length) return '';
+    return confirmScopeBlockMessage(unresolved.length);
 }
 
 export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierResult {
@@ -406,7 +403,10 @@ export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierRe
         rationale: spend ? `${spend} (commercial context only; not scored)` : 'Spend not recorded. Commercial context only; not scored.',
     });
 
-    const score = factors.reduce((sum, factor) => sum + factor.points, 0);
+    const scored = factors.filter((factor) => factor.code.startsWith('IR-') && factor.points > 0);
+    const score = scored.length
+        ? Math.round((scored.reduce((sum, factor) => sum + factor.points, 0) / scored.length) * 100) / 100
+        : 0;
     const cardholder = /cardholder|pci/i.test(data);
     const phi = /\bphi\b|highly sensitive|health/i.test(data);
     const privilegedAccess = ratings.ir_04.rating === 'High' || /privileged|admin/i.test(ratings.ir_04.raw);
@@ -431,17 +431,16 @@ export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierRe
         },
     ];
 
-    let recommendedTier: VendorTier = VendorTier.LOW;
-    if (score >= 16) recommendedTier = VendorTier.MEDIUM;
-    if (score >= 28) recommendedTier = VendorTier.HIGH;
-    if (score >= 40) recommendedTier = VendorTier.CRITICAL;
+    let recommendedTier: VendorTier = VendorTier.HIGH;
+    if (score < 1.5) recommendedTier = VendorTier.LOW;
+    else if (score < 2.4) recommendedTier = VendorTier.MEDIUM;
     if (hardFloors.some((floor) => floor.applies)) recommendedTier = VendorTier.CRITICAL;
 
-    const inherentRisk = Math.min(100, Math.max(hardFloors.some((floor) => floor.applies) ? 80 : 0, Math.round((score / 60) * 100)));
+    const inherentRisk = Math.min(100, Math.max(hardFloors.some((floor) => floor.applies) ? 80 : 0, Math.round((score / 3) * 100)));
     const appliedFloors = hardFloors.filter((floor) => floor.applies).map((floor) => floor.label);
     const explanation = appliedFloors.length
-        ? `Supreme recommends ${recommendedTier.toLowerCase()} because a minimum floor applies: ${appliedFloors.join(', ')}. Intake score ${score} of 60.`
-        : `Supreme recommends ${recommendedTier.toLowerCase()} from the recorded intake score of ${score} of 60.`;
+        ? `Supreme recommends ${recommendedTier.toLowerCase()} because a minimum floor applies: ${appliedFloors.join(', ')}. Inherent-risk average ${score} of 3.`
+        : `Supreme recommends ${recommendedTier.toLowerCase()} from the recorded inherent-risk average of ${score} of 3.`;
 
     const cat = category(answers);
     const phys = physical(answers);
@@ -467,7 +466,7 @@ export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierRe
 
     return {
         score,
-        maxScore: 60,
+        maxScore: 3,
         inherentRisk,
         recommendedTier,
         factors,
@@ -537,10 +536,10 @@ export function workbookControlGap(rows: Array<{ weight?: number | null; respons
     }
     if (!max) return { percent: null as number | null, band: 'Not rated' as const, formula: 'Workbook residual % = (Partial×2 + No×4) / (4 × applicable weights). Not Answered excluded. N/A adds 0.' };
     const percent = Math.round((risk / max) * 1000) / 10;
-    const band = percent < 15 ? 'Low' : percent < 35 ? 'Moderate' : percent < 60 ? 'High' : 'Critical';
+    const band = percent < 15 ? 'Low' : percent < 35 ? 'Medium' : percent < 60 ? 'High' : 'Critical';
     return {
         percent,
-        band: band as 'Low' | 'Moderate' | 'High' | 'Critical',
+        band: band as 'Low' | 'Medium' | 'High' | 'Critical',
         formula: 'Workbook residual % = (Partial×2 + No×4) / (4 × applicable weights). Not Answered excluded. N/A adds 0.',
     };
 }

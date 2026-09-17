@@ -24,6 +24,8 @@ import { hashToken, randomToken } from './passwordService';
 import { portalFrontendUrl, publicFrontendUrl } from './publicFrontendUrl';
 import { scoreAssessmentResponse } from './vendorAssessmentService';
 import { addBusinessDays, recommendTierFromIntake, unresolvedScopeBlockMessage, workbookControlGap } from './vendorOnboardingScoring';
+import { loadWorkbookCatalog, workbookControlIdsForPacks, workbookDomainsForPacks, workbookEvidenceForDomains } from '../tprm/workbookCatalog';
+import { presentVendorQuestion, sanitizeVendorPayload, sanitizeVendorQuestions } from '../tprm/vendorPayload';
 import { getOnboarding } from './vendorOnboardingService';
 import { explainableRiskService } from './explainableRiskService';
 import {
@@ -197,10 +199,39 @@ async function assertReadyToInvite(organizationId: string, vendor: { id: string;
         where: { assessmentId: vendor.onboarding?.intakeAssessmentId || '' },
         select: { questionId: true, response: true },
     });
-    const unresolved = recommendTierFromIntake(answers.map((row) => ({ questionKey: row.questionId, response: row.response }))).packs.unresolved;
-    if (unresolved.length) {
-        throw new ApiError(409, unresolvedScopeBlockMessage(unresolved));
+    const recommendation = recommendTierFromIntake(answers.map((row) => ({ questionKey: row.questionId, response: row.response })));
+    const plan = vendor.onboarding?.plan && typeof vendor.onboarding.plan === 'object'
+        ? vendor.onboarding.plan as { questionnairePlan?: { sendBlocked?: boolean; sendBlockMessage?: string; includedPackKeys?: string[] } }
+        : null;
+    if (plan?.questionnairePlan?.sendBlocked) {
+        throw new ApiError(409, plan.questionnairePlan.sendBlockMessage || unresolvedScopeBlockMessage(recommendation.packs.unresolved));
     }
+    if (recommendation.packs.unresolved.length) {
+        throw new ApiError(409, unresolvedScopeBlockMessage(recommendation.packs.unresolved));
+    }
+}
+
+async function pinCatalogAtSend(organizationId: string, vendorId: string, plan: unknown) {
+    const current = plan && typeof plan === 'object' ? { ...(plan as Record<string, unknown>) } : {};
+    if (current.pin && typeof current.pin === 'object') return current;
+    const catalog = loadWorkbookCatalog();
+    const includedPackKeys = Array.isArray((current.questionnairePlan as { includedPackKeys?: string[] } | undefined)?.includedPackKeys)
+        ? (current.questionnairePlan as { includedPackKeys: string[] }).includedPackKeys
+        : [];
+    const controlIds = workbookControlIdsForPacks(includedPackKeys, catalog);
+    const domains = workbookDomainsForPacks(includedPackKeys, catalog);
+    current.pin = {
+        catalogVersion: catalog.catalogVersion,
+        includedPacks: includedPackKeys,
+        controlIds,
+        evidenceRequests: workbookEvidenceForDomains(domains, catalog).map((row) => row.id),
+        pinnedAt: new Date().toISOString(),
+    };
+    await prisma.vendorOnboarding.update({
+        where: { vendorId },
+        data: { plan: current as object },
+    });
+    return current;
 }
 
 async function issueInvitation(organizationId: string, vendorId: string, contactId: string, actorId: string) {
@@ -234,6 +265,7 @@ export async function sendDueDiligence(organizationId: string, vendorKey: string
     if (!canSend(actor.role)) throw new ApiError(403, 'Only a risk reviewer can send due diligence.');
     const vendor = await loadVendor(organizationId, vendorKey);
     await assertReadyToInvite(organizationId, vendor);
+    await pinCatalogAtSend(organizationId, vendor.id, vendor.onboarding?.plan);
     const contact = await upsertAssessmentContact(organizationId, vendor.id, actor, input);
     const dueAt = input.dueDate ? new Date(input.dueDate) : addBusinessDays(new Date(), dueDays(vendor.onboarding!.confirmedTier || vendor.tier));
     const assessments = await vendorFacingAssessments(organizationId, vendor.id, vendor.onboarding!.intakeAssessmentId);
@@ -345,6 +377,7 @@ export async function activationLink(organizationId: string, vendorKey: string, 
     if (!canSend(actor.role)) throw new ApiError(403, 'Only a risk reviewer can copy the activation link.');
     const vendor = await loadVendor(organizationId, vendorKey);
     await assertReadyToInvite(organizationId, vendor);
+    await pinCatalogAtSend(organizationId, vendor.id, vendor.onboarding?.plan);
     const contact = vendor.contacts.find((row) => row.id === vendor.onboarding?.assessmentContactId)
         || vendor.contacts.find((row) => row.isAssessmentContact);
     const assigned = (input.email && input.name)
@@ -504,23 +537,23 @@ async function templateMap(templateId?: string | null) {
     return map;
 }
 
-function presentQuestion(row: { questionId: string; questionText: string; response: string | null; evidenceRequired: boolean; hasEvidence: boolean }, meta: { text?: string; required: boolean; evidenceRequired: boolean; options: string[]; section: string; type: string; guidance?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null } | undefined, answers: Map<string, string>, evidenceStatus?: string) {
+function presentQuestion(row: { questionId: string; questionText: string; questionCategory?: string | null; response: string | null; evidenceRequired: boolean; hasEvidence: boolean; notes?: string | null }, meta: { text?: string; required: boolean; evidenceRequired: boolean; options: string[]; section: string; type: string; guidance?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null } | undefined, answers: Map<string, string>, evidenceStatus?: string) {
     const visible = questionVisible({ questionId: row.questionId, conditionalOnKey: meta?.conditionalOnKey, conditionalValue: meta?.conditionalValue }, answers);
-    return {
+    return presentVendorQuestion({
         key: row.questionId,
         question: meta?.text || row.questionText,
+        domain: row.questionCategory || meta?.section || 'Assessment',
         guidance: meta?.guidance || null,
-        section: meta?.section || 'Assessment',
-        type: meta?.type || 'SINGLE_CHOICE',
-        options: meta?.options || [],
+        options: meta?.options?.length ? meta.options : ['Yes', 'Partial', 'No', 'N/A'],
         required: meta?.required !== false && visible,
         evidenceRequired: (meta?.evidenceRequired || row.evidenceRequired) && visible,
         response: row.response || '',
+        comment: row.notes || '',
         hasEvidence: row.hasEvidence,
         evidenceStatus: evidenceStatus || null,
         visible,
         locked: false,
-    };
+    });
 }
 
 export async function vendorWorkspace(actor: VendorActor) {
@@ -551,7 +584,7 @@ export async function vendorWorkspace(actor: VendorActor) {
             submittedAt: assessment.submittedAt,
         });
     }
-    return {
+    return sanitizeVendorPayload({
         organizationName: vendor.organization.name,
         vendorName: vendor.name,
         publicId: vendor.publicId,
@@ -559,7 +592,7 @@ export async function vendorWorkspace(actor: VendorActor) {
         progress: total ? Math.round((answered / total) * 100) : 0,
         assessments: presented,
         contactName: actor.name,
-    };
+    });
 }
 
 export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: string) {
@@ -580,7 +613,11 @@ export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: s
         return presentQuestion(row, meta.get(row.questionId), answers, link ? scanLabel(link.storedObject.scanStatus) : undefined);
     });
     const clarification = Array.isArray(assessment.clarificationQuestionIds) ? assessment.clarificationQuestionIds as string[] : [];
-    return {
+    const vendorQuestions = sanitizeVendorQuestions(questions.map((row) => ({
+        ...row,
+        locked: Boolean(assessment.submittedAt) && !clarification.includes(row.key),
+    })));
+    return sanitizeVendorPayload({
         id: assessment.id,
         name: assessment.frameworkUsed || 'Assessment',
         templateVersion: assessment.templateVersion,
@@ -589,10 +626,7 @@ export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: s
         lastSaved: assessment.updatedAt,
         dueDate: assessment.dueDate,
         attestation: ATTESTATION_STATEMENT,
-        questions: questions.map((row) => ({
-            ...row,
-            locked: Boolean(assessment.submittedAt) && !clarification.includes(row.key),
-        })),
+        questions: vendorQuestions,
         vendorEvidence: links
             .filter((link) => link.storedObject)
             .map((link) => ({
@@ -602,7 +636,7 @@ export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: s
                 usable: isUsableEvidence(link.storedObject.scanStatus),
                 questionId: link.questionId,
             })),
-    };
+    });
 }
 
 export async function saveVendorResponse(actor: VendorActor, assessmentId: string, input: { questionKey: string; response?: string; notes?: string }) {
@@ -616,6 +650,9 @@ export async function saveVendorResponse(actor: VendorActor, assessmentId: strin
     }
     const response = String(input.response || '').trim();
     if (!response) throw new ApiError(400, 'A response is required.');
+    if (/^(partial|no|n\/a|not applicable)/i.test(response) && !String(input.notes || '').trim()) {
+        throw new ApiError(400, 'A comment is required for Partial, No, or N/A.');
+    }
     const existing = assessment.responses.find((row) => row.questionId === input.questionKey);
     if (!existing) throw new ApiError(404, 'Question not found.');
     await prisma.assessmentResponse.update({

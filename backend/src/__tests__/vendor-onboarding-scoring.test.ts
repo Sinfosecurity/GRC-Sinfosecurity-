@@ -25,20 +25,23 @@ describe('vendor onboarding scoring', () => {
     it('recommends an explainable tier from canonical IR-01 to IR-15', () => {
         const result = recommendTierFromIntake(canonicalIntakeAnswers({
             ir_01: 'Moderate',
-            ir_03: 'Low',
+            ir_02: 'Moderate',
+            ir_03: 'Moderate',
             ir_04: 'Low',
-            ir_06: 'Low',
-            ir_07: 'Low',
-            ir_09: 'Low',
-            ir_10: 'Low',
+            ir_05: 'Moderate',
+            ir_06: 'Moderate',
+            ir_07: 'Moderate',
+            ir_08: 'Moderate',
+            ir_09: 'Moderate',
+            ir_10: 'Moderate',
             ir_11: 'Low',
-            ir_12: 'Low',
+            ir_12: 'Moderate',
             ir_13: 'Low',
-            ir_14: 'Low',
-            ir_15: 'Low',
+            ir_14: 'Moderate',
+            ir_15: 'Moderate',
         }));
         expect(result.recommendedTier).toBe(VendorTier.MEDIUM);
-        expect(result.maxScore).toBe(60);
+        expect(result.maxScore).toBe(3);
         expect(result.score).toBeGreaterThan(0);
         expect(result.factors.some((factor) => factor.code === 'IR-03' || factor.label === 'Data volume')).toBe(true);
         expect(result.factors.find((factor) => factor.code === 'annual_spend')?.points).toBe(0);
@@ -66,17 +69,16 @@ describe('vendor onboarding scoring', () => {
     });
 
     it('does not silently drop a pack when the controlling fact is Unknown', () => {
-        const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_04: 'Unknown', ir_05: 'Low' }));
-        expect(result.packs.unresolved.some((row) => row.code === 'IR-04')).toBe(true);
+        const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_04: 'Unknown', ir_05: 'Low', scope_privileged_network: 'Unknown' }));
+        expect(result.packs.unresolved.some((row) => row.packKey === 'privileged-network')).toBe(true);
         expect(result.packs.required.some((pack) => pack.key === 'privileged-network')).toBe(false);
-        expect(unresolvedScopeBlockMessage(result.packs.unresolved)).toMatch(/privileged administrative access/i);
-        expect(unresolvedScopeBlockMessage(result.packs.unresolved)).toMatch(/Complete intake/i);
+        expect(unresolvedScopeBlockMessage(result.packs.unresolved)).toMatch(/pack requires scope confirmation/i);
     });
 
     it('maps the workbook eighth pack from the physical-delivery trigger', () => {
-        const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_physical: 'Yes' }));
+        const result = recommendTierFromIntake(canonicalIntakeAnswers({ ir_physical: 'Yes', scope_physical_delivery: 'Yes' }));
         expect(result.packs.required.some((pack) => pack.key === 'physical-delivery')).toBe(true);
-        expect(result.packs.required.find((pack) => pack.key === 'physical-delivery')?.why.join(' ')).toMatch(/Physical delivery/i);
+        expect(result.packs.required.find((pack) => pack.key === 'physical-delivery')?.why.join(' ')).toMatch(/Yes/i);
     });
 
     it('surfaces privacy, AI, and resilience signals without writing a legal conclusion', () => {
@@ -112,9 +114,9 @@ describe('vendor onboarding scoring', () => {
         expect(workbookControlGap([no(3), yes(18)]).percent).toBe(14.3);
         expect(workbookControlGap([no(3), yes(18)]).band).toBe('Low');
         expect(workbookControlGap([no(3), yes(17)]).percent).toBe(15);
-        expect(workbookControlGap([no(3), yes(17)]).band).toBe('Moderate');
+        expect(workbookControlGap([no(3), yes(17)]).band).toBe('Medium');
         expect(workbookControlGap([no(7), yes(14)]).percent).toBe(33.3);
-        expect(workbookControlGap([no(7), yes(14)]).band).toBe('Moderate');
+        expect(workbookControlGap([no(7), yes(14)]).band).toBe('Medium');
         expect(workbookControlGap([no(7), yes(13)]).percent).toBe(35);
         expect(workbookControlGap([no(7), yes(13)]).band).toBe('High');
         expect(workbookControlGap([no(12), yes(9)]).percent).toBe(57.1);

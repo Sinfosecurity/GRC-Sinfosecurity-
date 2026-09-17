@@ -768,10 +768,12 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **DEFINITION OF DONE:** Product Leadership independently inspects repository, hosted application, before/after screenshots, seamless approval workflow, CI, and security regression. Cursor may report ENGINEERING COMPLETE or HOSTED UX CERTIFICATION COMPLETE. Cursor does not declare SUPREME UI 2.0 PRODUCT LEADERSHIP ACCEPTED.
 
-**CURRENT STATUS:** ENGINEERING PARTIAL — PRODUCT LEADERSHIP ACCEPTANCE PENDING
+**CURRENT STATUS:** ENGINEERING PARTIAL — PRODUCT LEADERSHIP ACCEPTANCE PENDING / PRODUCT LEADERSHIP REVIEW OPEN
 
 **CERTIFICATION SHA:** Implementation / hosted `ac7e1beff1ae6d1d6c9caf489e02274f5fa9815b`. Documentation `428a2ae862f74520d24432bddf30508fc667b305`. CI `35174706857` PASS.
 
 **EVIDENCE:** `docs/SUPREME-UI-2-DESIGN-SYSTEM.md`, `docs/private-beta/SUPREME-UI-2-CERTIFICATION.md`, `docs/private-beta/hosted-ux-qa/supreme-ui-2/before/`
 
-**NEXT ACTION:** Product Leadership reviews UI 2.0 on staging. H-5/H-6 remediations are engineering-complete on the transformation branch and remain OPEN until hosted proof. #21 remains PARTIAL. Do not merge `main`. Do not deploy production. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, or #21 PASS.
+**PRODUCT LEADERSHIP ACCEPTANCE FINDING:** TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow.
+
+**NEXT ACTION:** Product Leadership re-reviews the corrected risk-driven Questionnaire Plan on staging after hosted golden-journey evidence. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW. Do not merge `main`. Do not deploy production. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, or #21 PASS.

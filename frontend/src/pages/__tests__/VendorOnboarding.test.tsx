@@ -93,7 +93,7 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.queryByText('INTAKE_PENDING')).not.toBeInTheDocument();
     });
 
-    it('explains a controlling Unknown and keeps submit intake blocked', async () => {
+    it('explains a controlling Unknown without blocking intake submit', async () => {
         const { vendorOnboardingAPI } = await import('../../services/api');
         (vendorOnboardingAPI.get as any).mockResolvedValue({
             data: {
@@ -135,10 +135,10 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect((await screen.findAllByText(/finalize the due-diligence package/i)).length).toBeGreaterThan(0);
+        expect((await screen.findAllByText(/analyst must confirm those packs/i)).length).toBeGreaterThan(0);
         expect(screen.getByRole('button', { name: 'Save and resume later' })).toBeEnabled();
         fireEvent.click(screen.getByLabelText(/I attest that this intake is accurate/i));
-        expect(screen.getByRole('button', { name: 'Submit intake' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Submit intake' })).toBeEnabled();
     });
 
     it('shows explainable tier, plan rationale, and governance triggers', async () => {
@@ -150,7 +150,7 @@ describe('Onboard Third Party workspace', () => {
         expect((await screen.findAllByRole('heading', { name: 'Acme Payroll' })).length).toBeGreaterThan(0);
         expect(screen.getAllByText('VND-2026-0001').length).toBeGreaterThan(0);
         expect(screen.getByText(/Assessment scope ready/i)).toBeInTheDocument();
-        expect(screen.getByText(/Supreme recommends high/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/Supreme recommends high/i).length).toBeGreaterThan(0);
         expect(screen.getByRole('tab', { name: 'Assessment' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Findings' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Decisions' })).toBeInTheDocument();

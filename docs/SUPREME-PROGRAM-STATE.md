@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-16
+**LAST UPDATED:** 2026-09-17
 
-**CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. H-5 and H-6 have engineering remediations on the transformation branch and remain OPEN pending hosted proof. #21 remains PARTIAL. Live IdP not tested.
+**CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. Product Leadership hosted review found the Assessments New Assessment path exposed generic template selection instead of risk-driven pack composition. H-5 and H-6 remain OPEN pending hosted proof. #21 remains PARTIAL.
 
-**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL. Visual baseline `766f0a9`. H-5/H-6 remediations follow on this continuation. Fresh two-user approval walk and TPRM golden journey were not completed. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Finding: TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 

@@ -5,6 +5,8 @@
 **Visual reference:** Home / Risk / Compliance boardroom-paper system.  
 **Not an acceptance of UI 2.0.**
 
+Product Leadership acceptance finding (hosted UI 2.0 review): TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow. `/assessments` New assessment now maps to the onboarding Questionnaire Plan. `/questionnaires` remains the administrative library. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW.
+
 Classifications are from actual JSX, not filenames.
 
 Legend:

@@ -19,6 +19,16 @@ import {
     unresolvedScopeBlockMessage,
     type IntakeAnswer,
 } from './vendorOnboardingScoring';
+import {
+    analystDecisionsFromCustomization,
+    deriveQuestionnairePlan,
+    missingScopeQuestions,
+    type AnalystPackDecision,
+} from '../tprm/packDerivation';
+import {
+    loadWorkbookCatalog,
+    workbookPackCounts,
+} from '../tprm/workbookCatalog';
 import { assertTierMeetsFloor, parseVendorTier, resolveMinimumTier } from './vendorTierIntegrity';
 
 export const INTAKE_SLA_DAYS = 5;
@@ -518,8 +528,12 @@ async function completeIntake(organizationId: string, vendorId: string, actor: A
     const missing = missingCanonicalIntake(answers);
     if (missing.length) throw new ApiError(400, `Complete the inherent-risk questions before submitting intake. Still needed: ${missing.map((key) => key.toUpperCase().replace('_', '-')).join(', ')}.`);
     const result = recommendTierFromIntake(answers);
-    if (result.packs.unresolved.length) {
-        throw new ApiError(400, unresolvedScopeBlockMessage(result.packs.unresolved));
+    const templateHasScope = (assessment?.responses || []).some((row) => String(row.questionId || '').startsWith('scope_'));
+    if (templateHasScope) {
+        const missingScope = missingScopeQuestions(answers);
+        if (missingScope.length) {
+            throw new ApiError(400, `Complete the seven internal scope questions before submitting intake. Still needed: ${missingScope.length}.`);
+        }
     }
     const tierReviewDueAt = addBusinessDays(new Date(), TIER_REVIEW_SLA_DAYS);
     await prisma.vendor.update({
@@ -646,6 +660,7 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
     includeKeys?: string[];
     excludeKeys?: string[];
     reason?: string;
+    packDecisions?: AnalystPackDecision[];
 } = {}) {
     if (!canReviewTier(actor.role)) throw new ApiError(403, 'Only a risk reviewer can confirm the due-diligence plan.');
     const vendor = await loadWorkspace(organizationId, vendorKey);
@@ -653,7 +668,10 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
         throw new ApiError(409, 'The due-diligence plan is not waiting for confirmation.');
     }
     const confirmedTier = vendor.onboarding.confirmedTier || vendor.tier;
-    const plan = await buildPlan(organizationId, vendor.id, confirmedTier, input);
+    const plan = await buildPlan(organizationId, vendor.id, confirmedTier, { ...input, actorId: actor.id });
+    if (plan.questionnairePlan?.sendBlocked) {
+        throw new ApiError(409, plan.questionnairePlan.sendBlockMessage);
+    }
     if (plan.unresolved?.length) {
         throw new ApiError(409, unresolvedScopeBlockMessage(plan.unresolved));
     }
@@ -671,7 +689,7 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
             if (!(error instanceof ApiError) || error.statusCode !== 409) throw error;
         }
     }
-    const customized = Boolean(input.includeKeys?.length || input.excludeKeys?.length);
+    const customized = Boolean(input.includeKeys?.length || input.excludeKeys?.length || input.packDecisions?.length);
     await prisma.vendorOnboarding.update({
         where: { vendorId: vendor.id },
         data: {
@@ -688,6 +706,8 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
         reason: input.reason || null,
         includeKeys: input.includeKeys || [],
         excludeKeys: input.excludeKeys || [],
+        packDecisions: input.packDecisions || [],
+        originalScopeAnswers: (plan as { questionnairePlan?: { packs?: unknown } }).questionnairePlan?.packs || [],
     });
     return presentOnboarding(organizationId, vendor.id, actor);
 }
@@ -726,6 +746,8 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
     excludeKeys?: string[];
     reason?: string;
     actorName?: string;
+    actorId?: string;
+    packDecisions?: AnalystPackDecision[];
 } = {}) {
     const onboarding = await prisma.vendorOnboarding.findFirst({ where: { vendorId, organizationId } });
     const factors = Array.isArray(onboarding?.recommendedFactors) ? onboarding?.recommendedFactors : [];
@@ -734,22 +756,38 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
         select: { questionId: true, response: true },
     });
     const result = recommendTierFromIntake(answers.map((row) => ({ questionKey: row.questionId, response: row.response })));
-    const recommendedKeys = result.packs.required.map((row) => row.templateKey);
-    const extraKeys = result.packs.recommended.map((row) => row.templateKey);
+    const persistedDecisions = Array.isArray((onboarding?.plan as { analystDecisions?: AnalystPackDecision[] } | null)?.analystDecisions)
+        ? (onboarding?.plan as { analystDecisions?: AnalystPackDecision[] }).analystDecisions || []
+        : [];
+    const analystDecisions = analystDecisionsFromCustomization({
+        includeKeys: customization.includeKeys,
+        excludeKeys: customization.excludeKeys,
+        packDecisions: customization.packDecisions?.length ? customization.packDecisions : persistedDecisions,
+        reason: customization.reason,
+        actorId: customization.actorId,
+    });
+    const questionnairePlan = deriveQuestionnairePlan(
+        answers.map((row) => ({ questionKey: row.questionId, response: row.response })),
+        analystDecisions,
+        workbookPackCounts(loadWorkbookCatalog()),
+        loadWorkbookCatalog().catalogVersion,
+    );
+    const recommendedKeys = questionnairePlan.includedTemplateKeys;
+    const extraKeys: string[] = [];
     const exclude = new Set(customization.excludeKeys || []);
-    const include = new Set([...(customization.includeKeys || []), ...recommendedKeys.filter((key) => !exclude.has(key))]);
-    const customized = Boolean(customization.includeKeys?.length || customization.excludeKeys?.length);
+    const include = new Set(recommendedKeys.filter((key) => !exclude.has(key)));
+    const customized = Boolean(customization.includeKeys?.length || customization.excludeKeys?.length || customization.packDecisions?.length);
     if (customized && !String(customization.reason || '').trim()) {
         throw new ApiError(400, 'Customizing the recommended package requires a reason.');
     }
     const packReasons: Record<string, string[]> = {};
-    for (const pack of [...result.packs.required, ...result.packs.recommended]) {
-        packReasons[pack.templateKey] = pack.why;
+    for (const pack of questionnairePlan.packs) {
+        packReasons[pack.templateKey] = [pack.reason];
     }
     const recommendation = await recommendAssessments(organizationId, vendorId, {
         ...result.signals,
         requiredTemplateKeys: [...include],
-        recommendedTemplateKeys: extraKeys.filter((key) => !exclude.has(key) && !include.has(key)),
+        recommendedTemplateKeys: extraKeys,
         packReasons,
     }, tier);
     const evidence = await reusableEvidence(organizationId, vendorId);
@@ -768,16 +806,23 @@ async function buildPlan(organizationId: string, vendorId: string, tier: VendorT
         questionCount: item.questionCount,
     }));
     return {
-        rationale: recommendation.rationale,
+        rationale: 'Supreme prepared this questionnaire from the third party\'s intake and inherent-risk assessment. Review the recommended scope before sending it.',
+        catalogVersion: questionnairePlan.catalogVersion,
+        questionnairePlan,
+        analystDecisions,
+        scopeAnswers: Object.fromEntries(
+            questionnairePlan.packs.map((pack) => [pack.key, pack.originalScopeAnswer])
+        ),
         package: {
-            required: result.packs.required,
-            recommended: result.packs.recommended,
+            required: questionnairePlan.packs.filter((pack) => pack.state === 'INCLUDED' || pack.state === 'INCLUDED_REQUIRED'),
+            recommended: [],
         },
         unresolved: describeUnresolvedScope(result.packs.unresolved),
         override: customized ? {
             reason: String(customization.reason).trim(),
             includeKeys: customization.includeKeys || [],
             excludeKeys: customization.excludeKeys || [],
+            packDecisions: analystDecisions,
             at: new Date().toISOString(),
         } : null,
         assessments,
@@ -890,14 +935,22 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
             recommendedTierKey: vendor.onboarding.recommendedTier,
             confirmedTier: vendor.onboarding.confirmedTier ? TIER_LABEL[vendor.onboarding.confirmedTier] : null,
             score: vendor.onboarding.recommendedScore,
-            maxScore: 60,
-            explanation: `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from the recorded intake score of ${vendor.onboarding.recommendedScore} of 60` : ''}.`,
+            maxScore: 3,
+            explanation: `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from the recorded inherent-risk average of ${vendor.onboarding.recommendedScore} of 3` : ''}.`,
             factors: vendor.onboarding.recommendedFactors,
             hardFloors: vendor.onboarding.hardFloors,
             overrideReason: vendor.onboarding.overrideReason,
             confirmedBy: users.get(vendor.onboarding.tierConfirmedBy || '')?.name || null,
         } : null,
         unresolvedScope,
+        questionnairePlan: (plan as { questionnairePlan?: unknown } | null)?.questionnairePlan || deriveQuestionnairePlan(
+            (assessment?.responses || []).map((row) => ({ questionKey: row.questionId, response: row.response })),
+            Array.isArray((plan as { analystDecisions?: AnalystPackDecision[] } | null)?.analystDecisions)
+                ? (plan as { analystDecisions?: AnalystPackDecision[] }).analystDecisions || []
+                : [],
+            workbookPackCounts(loadWorkbookCatalog()),
+            loadWorkbookCatalog().catalogVersion,
+        ),
         plan,
         history: history.map((event) => ({
             at: event.timestamp,
