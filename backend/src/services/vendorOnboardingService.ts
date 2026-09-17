@@ -16,7 +16,6 @@ import {
     missingCanonicalIntake,
     namesLikelyDuplicate,
     recommendTierFromIntake,
-    unresolvedScopeBlockMessage,
     type IntakeAnswer,
 } from './vendorOnboardingScoring';
 import {

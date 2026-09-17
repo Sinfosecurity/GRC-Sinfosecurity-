@@ -23,7 +23,7 @@ import { deliverEmail, notifyUser } from './notificationDeliveryService';
 import { hashToken, randomToken } from './passwordService';
 import { portalFrontendUrl, publicFrontendUrl } from './publicFrontendUrl';
 import { scoreAssessmentResponse } from './vendorAssessmentService';
-import { addBusinessDays, recommendTierFromIntake, unresolvedScopeBlockMessage, workbookControlGap } from './vendorOnboardingScoring';
+import { addBusinessDays, workbookControlGap } from './vendorOnboardingScoring';
 import { loadWorkbookCatalog, workbookControlIdsForPacks, workbookDomainsForPacks, workbookEvidenceForDomains } from '../tprm/workbookCatalog';
 import { presentVendorQuestion, sanitizeVendorPayload, sanitizeVendorQuestions } from '../tprm/vendorPayload';
 import { getOnboarding } from './vendorOnboardingService';
