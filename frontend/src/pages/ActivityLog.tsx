@@ -29,7 +29,7 @@ export default function ActivityLog() {
     const [result, setResult] = useState('');
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const pageSize = 25;
+    const pageSize = 12;
 
     const load = async (nextPage = page) => {
         setLoading(true);

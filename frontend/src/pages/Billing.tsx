@@ -70,8 +70,8 @@ export default function Billing() {
                         items={[
                             { label: 'Plan', value: `Plan: ${status?.plan}` },
                             { label: 'Interval', value: `Interval: ${status?.billingInterval || 'Not set'}` },
-                            { label: 'Subscription', value: `Subscription: ${status?.subscriptionStatus || 'Not configured'}` },
-                            { label: 'Organization status', value: `Organization status: ${status?.organizationStatus}` },
+                            { label: 'Subscription', value: `Subscription: ${humanizeLabel(status?.subscriptionStatus) || 'Not configured'}` },
+                            { label: 'Organization status', value: `Organization status: ${humanizeLabel(status?.organizationStatus)}` },
                         ]}
                     />
                     {status?.cancelAtPeriodEnd && (

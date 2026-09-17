@@ -152,12 +152,16 @@ Shared additions (backward-compatible; PageShell maxWidth 1180 unchanged):
 | `/framework-coverage`, `/control-center/:id` | UI 2.0 | UI 2.0 | Unchanged this pass | Pending this SHA | — |
 | Quarantined mock routes | BLOCKED | BLOCKED | LegacyQuarantine uses reading WorkspaceFrame. Not a production path. | Pending this SHA | Enable flag only for internal review |
 
-Long-page target (client pagination / grouping; API contracts unchanged):
+Long-page hosted results (client pagination / grouping; API contracts unchanged):
 
-| Page | Prior hosted height | After intent |
-|---|---|---|
-| Assessments | ~13,173 px | Register + 12-row table; templates 8-row table; wizard lists max-height 360 |
-| Notifications | ~6,700 px | 8-row table + Unread/All |
-| Assessment library | ~5,400 px | 8-row table + group filter |
+| Page | Prior hosted height | After (1440) | After (375) |
+|---|---|---|---|
+| Assessments | ~13,173 px | 1,406 px | 3,171 px (compact 12-row cards + paging) |
+| Notifications | ~6,700 px | 1,618 px | 4,421 px (compact 8-row cards + paging) |
+| Assessment library | ~5,400 px | 2,678 px then collapsed methodology | Methodology starts closed; templates remain 8-row paged |
 
-Hosted walk for this SHA is recorded after staging deploy. This file does not declare UI 2.0 accepted. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW until the hosted walk of this SHA is complete.
+First hosted walk: frontend `a6ce92a068ebddf48faea8046703c05aafd385e2` on `supreme-risk-staging.onrender.com`. 22 remediated routes. Every walked viewport had an `h1`, no horizontal overflow, no crash copy. Identity showed Not configured and no Connected. Billing plan/interval were hero facts; Stripe IDs sat under Technical identifiers. Settings is paper with a real `h1`. Assessments register uses the full workspace at 1440/1920.
+
+Follow-up on the same pass: scoring methodology on `/questionnaires` starts collapsed; audit log server pageSize is 12 so mobile compact cards are not a 25-row dump.
+
+This file does not declare UI 2.0 accepted. H-6 limiter and #21 remain PARTIAL and were not rewritten.

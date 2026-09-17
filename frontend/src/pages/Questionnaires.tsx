@@ -127,7 +127,14 @@ export default function Questionnaires() {
                 </Surface>
             </QueryState>
             {!loading && methodology && (
-                <Box sx={{ mt: 3 }}>
+                <Box
+                    component="details"
+                    sx={{
+                        mt: 3,
+                        '& > summary': { cursor: 'pointer', fontWeight: 700, mb: 1.5, listStylePosition: 'outside' },
+                    }}
+                >
+                    <Typography component="summary" variant="subtitle1">Scoring methodology</Typography>
                     <ScoringMethodologyEditor methodology={methodology} onPublished={() => load(true)} canManage={canManage} />
                 </Box>
             )}
