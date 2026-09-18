@@ -77,7 +77,7 @@ export default function RequesterIra() {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: color.canvas, px: 2, py: 6 }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: color.workspace, px: 2, py: 6 }}>
             <Stack spacing={2} sx={{ maxWidth: 720, mx: 'auto' }}>
                 <Typography variant="overline" sx={{ color: color.goldInk, fontWeight: 700 }}>Supreme Third Party</Typography>
                 <Typography variant="h4">Inherent risk questions</Typography>
