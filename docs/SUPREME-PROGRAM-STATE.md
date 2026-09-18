@@ -10,11 +10,21 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. Product Leadership hosted review found the Assessments New Assessment path exposed generic template selection instead of risk-driven pack composition. Product Leadership authorized Version 3 risk-driven IRA (2026-09-18): GRC creates the record, requester completes Part A/B via hashed task link, Supreme calculates tier and packs, analyst confirms, then vendor questionnaire. H-5 and H-6 remain OPEN pending hosted proof. #21 remains PARTIAL.
 
-**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Version 3 IRA ADRs `docs/ADR-TPRM-INHERENT-RISK-SCORING.md` and `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md` are ACCEPTED. Local implementation is in the working tree. Not hosted. Not UI 2.0 accepted. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Version 3 IRA ADRs `docs/ADR-TPRM-INHERENT-RISK-SCORING.md` and `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md` are ACCEPTED. Version 3 flow-closure implementation `a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973` is hosted on staging frontend and API. Product Leadership Version 3 operating-path findings were walked on fresh vendors `VND-2026-0036` (4b) and `VND-2026-0037` (4a). Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
+
+**VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
+
+**VERSION 3 FLOW-CLOSURE SHA:** `a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973`
+
+**VERSION 3 HOSTED API SHA:** `a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973`
+
+**VERSION 3 HOSTED FRONTEND SHA:** `a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973`
+
+**VERSION 3 FLOW-CLOSURE CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35354391818 PASS on `a9a39e1`
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 
-**#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED (workbook / lifecycle reconciliation). Starting SHA `2904038f5607a3ed791eb9c2162fab6f70effafa`. Lifecycle `c7fc99527bfaf2a8f096168fad59890120b7b33d`. Email `e6fd30c794058767e6a7698ff3b47766ef7c8156`. Hosted API / CI `e250493c7dba98d882701acd83907f8cfaff1886`. Hosted frontend `980f717d19d527acc9567eb330c03a540841e4b4`. Hosted golden vendor `VND-2026-0013`. Hosted email previews captured; Gmail/Outlook/Apple Mail not tested. Cursor does not declare #12 PASS. Do not alter leftover #12 working-tree files.
+**#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Version 3 flow-closure SHA and hosted frontend/API `a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973`. Hosted golden vendors `VND-2026-0036` (4b) and `VND-2026-0037` (4a). Evidence `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 
@@ -339,6 +349,13 @@ Marketing preview pages are not implementation.
 Concise accepted-status history. Do not fabricate unsubstantiated history. Older certification docs used different local numbering; this log uses the **master punch list** numbers.
 
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
+
+### 2026-09-18
+
+**ITEM:** UNNUMBERED Supreme UI 2.0 / Version 3 staging candidate  
+**STATUS CHANGE:** none — documentation only. Version 3 is no longer described as working-tree-only. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12, H-6, and #21 are unchanged.  
+**SHA:** checkpoint `d7692ab011356c51582e4de89573b9580bb85be9` (not rewritten). Hosted API `d7692ab`. Hosted frontend remains `706100c` after Render frontend build_failed.  
+**EVIDENCE:** Remote `supreme-risk-transformation` HEAD `d7692ab`. GitHub resolves https://github.com/Sinfosecurity/GRC-Sinfosecurity-/commit/d7692ab011356c51582e4de89573b9580bb85be9. Render API deploy `dep-damdrjoae00c73bj1vrg` live. Migration `20260918020000_requester_task_links` applied. Frontend deploy `dep-damdrjoae00c73bj1vng` build_failed. Cursor does not declare UI 2.0 accepted, #12 PASS, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
 
 ### 2026-09-15
 
