@@ -231,6 +231,26 @@ describe('deterministic rate-limit abuse', () => {
         }
     });
 
+    it('throttles public API clients by credential and organization, not login limits', async () => {
+        delete process.env.REDIS_URL;
+        overrideRateLimitPolicy({ public_api: { max: 2, windowMs: 60_000 } });
+        expect(getRateLimitSpec('public_api').max).toBe(2);
+        resetMemoryRateLimitStore();
+        const app = express();
+        app.set('trust proxy', 1);
+        app.use(express.json());
+        app.get('/x', (req, _res, next) => {
+            (req as any).user = { id: String(req.headers['x-client'] || 'client-a'), organizationId: 'org-a' };
+            next();
+        }, createCategoryLimiter('public_api'), (_req, res) => res.json({ ok: true }));
+        await request(app).get('/x').set('X-Client', 'client-a').expect(200);
+        await request(app).get('/x').set('X-Client', 'client-a').expect(200);
+        const limited = await request(app).get('/x').set('X-Client', 'client-a');
+        expect(limited.status).toBe(429);
+        expect(limited.headers['retry-after']).toBeTruthy();
+        await request(app).get('/x').set('X-Client', 'client-b').expect(200);
+    });
+
     it('throttles repeated invalid activation attempts', async () => {
         delete process.env.REDIS_URL;
         overrideRateLimitPolicy({ activation: { max: 2, windowMs: 60_000 } });

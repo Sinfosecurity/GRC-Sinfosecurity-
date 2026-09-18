@@ -217,6 +217,13 @@ model Organization {
   scimGroups                  ScimGroup[]
   scimGroupMembers            ScimGroupMember[]
   identityBreakGlassGrants    IdentityBreakGlassGrant[]
+  publicApiClients            PublicApiClient[]
+  webhookEndpoints            WebhookEndpoint[]
+  webhookDeliveries           WebhookDelivery[]
+  webhookSinkReceipts         WebhookSinkReceipt[]
+  idempotencyRecords          IdempotencyRecord[]
+  externalResourceLinks       ExternalResourceLink[]
+  providerObservations        ProviderObservation[]
 
   @@index([slug])
   @@index([status])
@@ -2333,6 +2340,7 @@ enum ScanStatus {
 
 enum IntegrationStatus {
   NOT_CONFIGURED
+  CONFIGURED
   CONNECTED
   DISCONNECTED
   ERROR
@@ -2621,6 +2629,129 @@ model IntegrationConnection {
 
   @@unique([organizationId, provider])
   @@index([organizationId])
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  DEAD
+}
+
+model PublicApiClient {
+  id             String       @id @default(uuid())
+  publicId       String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  name           String
+  scopes         String[]
+  tokenHash      String       @unique
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  lastUsedAt     DateTime?
+  createdById    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+model WebhookEndpoint {
+  id             String            @id @default(uuid())
+  publicId       String            @unique
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  name           String
+  url            String
+  events         String[]
+  enabled        Boolean           @default(true)
+  secretEnc      String
+  description    String?
+  lastDeliveryAt DateTime?
+  lastStatus     String?
+  createdById    String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  deliveries     WebhookDelivery[]
+
+  @@index([organizationId])
+}
+
+model WebhookDelivery {
+  id              String                 @id @default(uuid())
+  organization    Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String
+  endpoint        WebhookEndpoint        @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  endpointId      String
+  eventId         String
+  eventType       String
+  attempt         Int                    @default(1)
+  status          WebhookDeliveryStatus  @default(PENDING)
+  httpStatus      Int?
+  durationMs      Int?
+  nextRetryAt     DateTime?
+  payload         Json
+  responseSummary String?
+  createdAt       DateTime               @default(now())
+  sentAt          DateTime?
+
+  @@index([organizationId, eventId])
+  @@index([endpointId, createdAt])
+}
+
+model WebhookSinkReceipt {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  sinkPublicId   String
+  eventId        String?
+  headers        Json?
+  body           Json?
+  receivedAt     DateTime     @default(now())
+
+  @@index([organizationId, sinkPublicId, receivedAt])
+}
+
+model IdempotencyRecord {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  key            String
+  method         String
+  path           String
+  statusCode     Int
+  response       Json
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, key])
+}
+
+model ExternalResourceLink {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  provider       String
+  localType      String
+  localId        String
+  externalId     String
+  externalUrl    String?
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, provider, localType, localId])
+}
+
+model ProviderObservation {
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  vendorId       String?
+  provider       String
+  observedAt     DateTime     @default(now())
+  score          Int?
+  summary        String
+  payload        Json?
+
+  @@index([organizationId, provider, observedAt])
 }
 
 model AiOperationLog {

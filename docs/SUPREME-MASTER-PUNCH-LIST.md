@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Version 3 UX-correction walk A–H `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Copy link is not email sent. Real inbox not tested. Viewer RBAC not hosted-tested.
 
-**NEXT ACTION:** Keep current-stage acceptance. Reopen only if Product Leadership revises #12. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 is the authorized active item. #22 is not authorized.
+**NEXT ACTION:** Keep current-stage acceptance. Reopen only if Product Leadership revises #12. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20 and #21 are accepted for the current stage. #22 is the authorized active item.
 
 ---
 
@@ -379,13 +379,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Corporate IdP on the admin plane; customer SSO/SCIM as designed. Coming Soon remains truthful until then.
 
-**CURRENT STATUS:** PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. Not PASS. Hosted SAML metadata previously exposed localhost ACS / SP entity ID because `apiBase()` defaulted to `http://localhost:3001` when `API_PUBLIC_URL` / `BACKEND_URL` were unset. Correction uses `publicApiUrl()` / `identityServiceUrls()`. Live Entra / Okta / Google federation is NOT TESTED.
+**CURRENT STATUS:** ACCEPTED FOR CURRENT STAGE / LIVE FEDERATION DEFERRED. Product Leadership 2026-09-18. Live Entra / Okta / Google federation remains a later provider/environment validation gate. Not commercial GO. Not production deployment.
 
 **CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Origin-correction implementation and hosted frontend/API `e19f8bde268d668518b848acd6086d7723f7177d`. Prior implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd` / `b01609aa7c45414bf3c3a2ca08249bf574366952` remains historical.
 
 **EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Hosted walk `docs/private-beta/hosted-ux-qa/enterprise-identity/`. CI `35374688343` PASS on `e19f8bd`. Hosted ACS `https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_72c720cec866`. Hosted SP entity ID `https://supreme-risk-staging-api.onrender.com/saml/sp/idp_72c720cec866`. Metadata matches. No localhost. Live Entra/Okta/Google NOT TESTED. Domain verify without DNS correctly failed. Cursor does not declare #21 PASS.
 
-**NEXT ACTION:** Product Leadership hosted review of the identity origin correction. Do not start #22. Do not merge `main` or deploy commercial production. Do not declare #21 PASS. Do not reopen #12.
+**NEXT ACTION:** Keep current-stage acceptance. Live IdP federation remains deferred. Do not reopen #21 in this gate. #22 is the authorized active item. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -397,13 +397,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Documented external API with tenant auth; integrations are NOT_CONFIGURED when keys are absent.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** ACTIVE / ENGINEERING IN PROGRESS. Not PASS.
 
 **CERTIFICATION SHA:** —
 
-**EVIDENCE:** Internal `/api/v1` and stubbed integration providers are not this program item.
+**EVIDENCE:** Architecture `docs/API-INTEGRATIONS.md`. Hosted evidence `docs/private-beta/hosted-ux-qa/api-integrations/`. Internal `/api/v1` session routes are not this item.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Hosted staging proof of the public API, signed webhooks, and honest integration states. Do not start #23–#38 or #40. Do not merge `main` or deploy commercial production. Do not declare #22 PASS.
 
 ---
 
@@ -729,13 +729,13 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 - **Shared assessment / automated risk-profile network — #39 + #40 strategic gap:** Supreme does not currently have an industry-scale shared vendor-assessment/risk-profile exchange. Do not fabricate one. Product Leadership must decide build/partner/data-provider strategy before any new roadmap number is created.
 - **Supreme differentiators to preserve:** #13 Governance Graph, #14 shared Control/Evidence layer, #15 Risk, #16 Compliance, #17 Privacy, #18 AI Governance, #19 Intelligence, and #20 Automation should remain a unified governance architecture rather than being reduced to a TPRM clone.
 
-**PRIORITY INTERPRETATION:** After current #12 / UI 2.0 closure, the competitive audit reinforces #21 then #22 as the most immediate existing roadmap gaps. #39 should maintain evidence-based competitor mapping; #40 should later operationalize continuous measurement. This statement does not authorize #22 or #40.
+**PRIORITY INTERPRETATION:** After current #12 / UI 2.0 closure, the competitive audit reinforces #21 then #22 as the most immediate existing roadmap gaps. #22 is now the authorized active item. #39 should maintain evidence-based competitor mapping; #40 should later operationalize continuous measurement. This statement does not authorize #40.
 
 **CERTIFICATION SHA:** —
 
 **EVIDENCE:** Initial ProcessUnity benchmark completed by Product Leadership on 2026-09-18 from public pricing/capability material. This is strategic comparison evidence, not product certification and not a claim of feature parity.
 
-**NEXT ACTION:** Maintain the first evidence-based matrix using columns: Capability | Supreme | Competitor | Evidence | Gap | Existing Punch-List Item | Priority. Add ProcessUnity to the formal competitor set. Do not invent scores or percentages. Do not start #22/#40 without explicit Product Leadership authorization.
+**NEXT ACTION:** Maintain the first evidence-based matrix using columns: Capability | Supreme | Competitor | Evidence | Gap | Existing Punch-List Item | Priority. Add ProcessUnity to the formal competitor set. Do not invent scores or percentages. Do not start #40 without explicit Product Leadership authorization.
 
 ---
 

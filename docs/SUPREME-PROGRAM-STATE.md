@@ -8,9 +8,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-18
 
-**CURRENT ITEM:** #21 Enterprise Identity — SSO / SCIM / JIT final correction and hosted certification. #12 is ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #22 is not authorized.
+**CURRENT ITEM:** #22 API / Webhooks / Integrations. #12 and #21 are ACCEPTED FOR CURRENT STAGE. #21 live IdP federation is deferred. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #23–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #21 PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Version 3 IRA ADRs `docs/ADR-TPRM-INHERENT-RISK-SCORING.md` and `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md` remain ACCEPTED. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #22 ACTIVE / ENGINEERING IN PROGRESS. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -28,7 +28,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **VERSION 3 UX-CORRECTION CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35365774120 PASS on `b00ad12`
 
-**#21:** PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Origin-correction / hosted frontend and API `e19f8bde268d668518b848acd6086d7723f7177d`. CI `35374688343` PASS. Hosted ACS and SP entity ID use `https://supreme-risk-staging-api.onrender.com`. Live IdP federation: NOT TESTED. Cursor does not declare #21 PASS. #22 is not authorized.
+**#21:** ACCEPTED FOR CURRENT STAGE / LIVE FEDERATION DEFERRED (Product Leadership 2026-09-18). Hosted origin correction `e19f8bde268d668518b848acd6086d7723f7177d`. Live IdP federation remains a later gate. Cursor does not declare #21 PASS.
+
+**#22:** ACTIVE / ENGINEERING IN PROGRESS. Architecture `docs/API-INTEGRATIONS.md`. Cursor does not declare #22 PASS. #23–#38 and #40 are not authorized.
 
 **#12:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED (Product Leadership 2026-09-18). Not commercial GO. Not production deployment. Not immutable. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495`. Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
 

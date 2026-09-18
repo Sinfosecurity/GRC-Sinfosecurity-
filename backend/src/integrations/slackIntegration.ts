@@ -42,11 +42,11 @@ class SlackIntegration {
     }
 
     status() {
-        return providerState('slack');
+        return this.config ? 'CONFIGURED' : providerState('slack');
     }
 
     async sendMessage(message: SlackMessage): Promise<IntegrationResult<{ delivered: boolean }>> {
-        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+        if (!this.config) {
             return { status: 'NOT_CONFIGURED' };
         }
         const payload = {

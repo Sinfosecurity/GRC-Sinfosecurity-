@@ -28,7 +28,8 @@ export type RateLimitCategory =
     | 'mfa'
     | 'sso'
     | 'bulk'
-    | 'strict';
+    | 'strict'
+    | 'public_api';
 
 export type RateLimitFailurePolicy = 'fail-closed' | 'fail-open';
 
@@ -37,7 +38,7 @@ export type RateLimitSpec = {
     windowMs: number;
     skipSuccessfulRequests: boolean;
     failurePolicy: RateLimitFailurePolicy;
-    keying: 'ip' | 'email+ip' | 'user+org' | 'user+org+ip';
+    keying: 'ip' | 'email+ip' | 'user+org' | 'user+org+ip' | 'client+org';
 };
 
 const DEFAULTS: Record<RateLimitCategory, RateLimitSpec> = {
@@ -62,6 +63,7 @@ const DEFAULTS: Record<RateLimitCategory, RateLimitSpec> = {
     sso: { max: 10, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-closed', keying: 'ip' },
     bulk: { max: 5, windowMs: 60 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'user+org' },
     strict: { max: 3, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-closed', keying: 'user+org' },
+    public_api: { max: 120, windowMs: 15 * 60 * 1000, skipSuccessfulRequests: false, failurePolicy: 'fail-open', keying: 'client+org' },
 };
 
 let overrides: Partial<Record<RateLimitCategory, Partial<RateLimitSpec>>> = {};
@@ -120,6 +122,9 @@ export function limiterKey(category: RateLimitCategory, req: Request): string {
     }
     if (spec.keying === 'user+org+ip' && user?.organizationId && user?.id) {
         return `${category}:org:${user.organizationId}:user:${user.id}:ip:${ip}`;
+    }
+    if (spec.keying === 'client+org' && user?.organizationId && user?.id) {
+        return `${category}:org:${user.organizationId}:client:${user.id}`;
     }
     return `${category}:ip:${ip}`;
 }

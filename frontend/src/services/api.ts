@@ -368,6 +368,27 @@ export const integrationAPI = {
     test: (provider: string) => api.post(`/integrations/${provider}/test`),
 };
 
+export const developerAPI = {
+    overview: () => api.get('/developer/overview'),
+    clients: () => api.get('/developer/clients'),
+    createClient: (data: unknown) => api.post('/developer/clients', data),
+    rotateClient: (id: string) => api.post(`/developer/clients/${id}/rotate`),
+    revokeClient: (id: string) => api.post(`/developer/clients/${id}/revoke`),
+    webhooks: () => api.get('/developer/webhooks'),
+    webhookEvents: () => api.get('/developer/webhooks/events'),
+    createWebhook: (data: unknown) => api.post('/developer/webhooks', data),
+    updateWebhook: (id: string, data: unknown) => api.patch(`/developer/webhooks/${id}`, data),
+    testWebhook: (id: string) => api.post(`/developer/webhooks/${id}/test`),
+    rotateWebhook: (id: string) => api.post(`/developer/webhooks/${id}/rotate`),
+    deliveries: (id: string) => api.get(`/developer/webhooks/${id}/deliveries`),
+    retryDelivery: (id: string, deliveryId: string) => api.post(`/developer/webhooks/${id}/deliveries/${deliveryId}/retry`),
+    integrations: () => api.get('/developer/integrations'),
+    configureIntegration: (provider: string, data: unknown) => api.post(`/developer/integrations/${provider}`, data),
+    testIntegration: (provider: string) => api.post(`/developer/integrations/${provider}/test`),
+    disableIntegration: (provider: string) => api.post(`/developer/integrations/${provider}/disable`),
+    activity: () => api.get('/developer/activity'),
+};
+
 export const questionnaireAPI = {
     list: () => api.get('/questionnaires'),
 };

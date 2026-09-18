@@ -41,7 +41,7 @@ class JiraIntegration {
     }
 
     status() {
-        return providerState('jira');
+        return this.config ? 'CONFIGURED' : providerState('jira');
     }
 
     private headers() {
@@ -53,7 +53,7 @@ class JiraIntegration {
     }
 
     async createIssue(issue: JiraIssue): Promise<IntegrationResult<{ key: string }>> {
-        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+        if (!this.config) {
             return { status: 'NOT_CONFIGURED' };
         }
         const response = await fetch(`${this.config.host.replace(/\/$/, '')}/rest/api/3/issue`, {
@@ -90,7 +90,7 @@ class JiraIntegration {
     }
 
     async testConnection() {
-        if (!this.config || this.status() === 'NOT_CONFIGURED') {
+        if (!this.config) {
             return { status: 'NOT_CONFIGURED' as const };
         }
         const response = await fetch(`${this.config.host.replace(/\/$/, '')}/rest/api/3/myself`, {

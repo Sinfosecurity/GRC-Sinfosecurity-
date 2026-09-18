@@ -64,6 +64,9 @@ import iraRoutes from './routes/ira.routes';
 import identityRoutes from './routes/identity.routes';
 import ssoRoutes from './routes/sso.routes';
 import scimRoutes from './routes/scim.routes';
+import developerRoutes from './routes/developer.routes';
+import publicApiRoutes from './publicApi/public.routes';
+import { startWebhookRetryWorker } from './publicApi/webhookService';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -270,6 +273,8 @@ app.use(`${API_PREFIX}/exports`, ...tenantContent, exportRoutes);
 app.use(`${API_PREFIX}/organization`, ...tenantContent, organizationSaasRoutes);
 app.use(`${API_PREFIX}/system`, systemRoutes);
 app.use(`${API_PREFIX}/integrations`, ...tenantContent, integrationRoutes);
+app.use(`${API_PREFIX}/developer`, ...tenantContent, developerRoutes);
+app.use('/public/v1', publicApiRoutes);
 app.use(`${API_PREFIX}/questionnaires`, ...tenantContent, questionnaireRoutes);
 app.use(`${API_PREFIX}/tprm`, ...tenantContent, tprmRoutes);
 app.use(`${API_PREFIX}/governance`, ...tenantContent, governanceRoutes);
@@ -335,6 +340,7 @@ async function startServer() {
                     
                     try {
                         await scheduleRecurringJobs();
+                        startWebhookRetryWorker();
                         logger.info('✅ Background jobs scheduled');
                     } catch (jobError) {
                         logger.warn('⚠️  Failed to schedule background jobs:', jobError);
