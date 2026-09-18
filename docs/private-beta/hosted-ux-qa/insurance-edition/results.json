@@ -1,0 +1,374 @@
+{
+  "checks": [
+    {
+      "name": "api-health",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "6a8b0e1514172796e1f4aa9308262b2343274244"
+    },
+    {
+      "name": "isolated-org",
+      "result": "PASS",
+      "detail": "ce64d661"
+    },
+    {
+      "name": "catalog",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "nigeria-types",
+      "result": "PASS",
+      "detail": "catalog includes takaful"
+    },
+    {
+      "name": "activate",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "honest-recommend",
+      "result": "PASS",
+      "detail": "NYDFS not auto-applied"
+    },
+    {
+      "name": "group-entity",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "nigeria-entity",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "us-entity",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "nigeria-license",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "us-license",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "graph-nigeria",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "graph-us",
+      "result": "PASS",
+      "detail": "state regulator placeholder"
+    },
+    {
+      "name": "graph-process",
+      "result": "PASS",
+      "detail": "claims process node"
+    },
+    {
+      "name": "revise",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "history",
+      "result": "PASS",
+      "detail": "2"
+    },
+    {
+      "name": "overview-live",
+      "result": "PASS",
+      "detail": "3"
+    },
+    {
+      "name": "no-fake-percent",
+      "result": "PASS",
+      "detail": "no invented score"
+    },
+    {
+      "name": "public-read",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "public-not-session",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "ui-honesty",
+      "result": "PASS",
+      "detail": "honesty copy"
+    },
+    {
+      "name": "ui-no-100",
+      "result": "PASS",
+      "detail": "no fake KPI"
+    },
+    {
+      "name": "ui-entities",
+      "result": "PASS",
+      "detail": "NG+US visible"
+    },
+    {
+      "name": "ui-not-second-register",
+      "result": "PASS",
+      "detail": "contextual risk"
+    },
+    {
+      "name": "ui-history",
+      "result": "PASS",
+      "detail": "version 1 retained"
+    },
+    {
+      "name": "hard-refresh",
+      "result": "PASS",
+      "detail": "history after refresh"
+    },
+    {
+      "name": "overflow:overview-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:entities-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:licenses-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:entities-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:licenses-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:entities-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:licenses-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:entities-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:licenses-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:entities-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:licenses-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    }
+  ],
+  "shots": [
+    "overview-1440",
+    "entities-1440",
+    "licenses-1440",
+    "risk-1440",
+    "third-parties-1440",
+    "ai-1440",
+    "configuration-1440",
+    "configuration-refresh-1440",
+    "overview-375",
+    "entities-375",
+    "licenses-375",
+    "configuration-375",
+    "overview-768",
+    "entities-768",
+    "licenses-768",
+    "configuration-768",
+    "overview-1024",
+    "entities-1024",
+    "licenses-1024",
+    "configuration-1024",
+    "overview-1440",
+    "entities-1440",
+    "licenses-1440",
+    "configuration-1440",
+    "overview-1920",
+    "entities-1920",
+    "licenses-1920",
+    "configuration-1920"
+  ],
+  "overflows": [
+    {
+      "name": "overview-375",
+      "extra": 0
+    },
+    {
+      "name": "entities-375",
+      "extra": 0
+    },
+    {
+      "name": "licenses-375",
+      "extra": 0
+    },
+    {
+      "name": "configuration-375",
+      "extra": 0
+    },
+    {
+      "name": "overview-768",
+      "extra": 0
+    },
+    {
+      "name": "entities-768",
+      "extra": 0
+    },
+    {
+      "name": "licenses-768",
+      "extra": 0
+    },
+    {
+      "name": "configuration-768",
+      "extra": 0
+    },
+    {
+      "name": "overview-1024",
+      "extra": 0
+    },
+    {
+      "name": "entities-1024",
+      "extra": 0
+    },
+    {
+      "name": "licenses-1024",
+      "extra": 0
+    },
+    {
+      "name": "configuration-1024",
+      "extra": 0
+    },
+    {
+      "name": "overview-1440",
+      "extra": 0
+    },
+    {
+      "name": "entities-1440",
+      "extra": 0
+    },
+    {
+      "name": "licenses-1440",
+      "extra": 0
+    },
+    {
+      "name": "configuration-1440",
+      "extra": 0
+    },
+    {
+      "name": "overview-1920",
+      "extra": 0
+    },
+    {
+      "name": "entities-1920",
+      "extra": 0
+    },
+    {
+      "name": "licenses-1920",
+      "extra": 0
+    },
+    {
+      "name": "configuration-1920",
+      "extra": 0
+    }
+  ],
+  "sha": {
+    "api": "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2",
+    "frontend": "6a8b0e1514172796e1f4aa9308262b2343274244",
+    "requiredFrontend": "6a8b0e1514172796e1f4aa9308262b2343274244",
+    "requiredApi": [
+      "6a8b0e1514172796e1f4aa9308262b2343274244",
+      "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2"
+    ],
+    "health": 200,
+    "note": "6a8b0e1 is frontend/CI-flake only. Insurance backend lives on c096ecb."
+  },
+  "notes": [],
+  "summary": {
+    "pass": 48,
+    "fail": 0,
+    "org": "ce64d661-9b96-4778-851a-c266119820a8",
+    "email": "ins23-admin-1789765780@example.test"
+  }
+}

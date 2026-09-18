@@ -16,7 +16,16 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "private-beta" / "hosted-ux-qa" / "insurance-edition"
 BASE = os.environ.get("E2E_BASE", "https://supreme-risk-staging.onrender.com")
 API = os.environ.get("E2E_API", "https://supreme-risk-staging-api.onrender.com")
-REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2")
+REQUIRED_FRONTEND_SHA = os.environ.get("REQUIRED_FRONTEND_SHA", "6a8b0e1514172796e1f4aa9308262b2343274244")
+REQUIRED_API_SHAS = {
+    item
+    for item in (
+        os.environ.get("REQUIRED_API_SHA", "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2"),
+        "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2",
+        "6a8b0e1514172796e1f4aa9308262b2343274244",
+    )
+    if item
+}
 PASSWORD = "InsWalk23x1"
 WIDTHS = (375, 768, 1024, 1440, 1920)
 RESULTS: dict = {"checks": [], "shots": [], "overflows": [], "sha": {}, "notes": []}
@@ -70,11 +79,18 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     health_status, health = request_json("GET", "/health", prefix="")
     fe = json.loads(urllib.request.urlopen(f"{BASE}/version.json", timeout=30).read())
-    RESULTS["sha"] = {"api": health.get("gitSha"), "frontend": fe.get("gitSha"), "required": REQUIRED_SHA, "health": health_status}
+    RESULTS["sha"] = {
+        "api": health.get("gitSha"),
+        "frontend": fe.get("gitSha"),
+        "requiredFrontend": REQUIRED_FRONTEND_SHA,
+        "requiredApi": sorted(REQUIRED_API_SHAS),
+        "health": health_status,
+        "note": "6a8b0e1 is frontend/CI-flake only. Insurance backend lives on c096ecb.",
+    }
     record("api-health", "PASS" if health_status == 200 else "FAIL", str(health_status))
-    record("api-sha", "PASS" if health.get("gitSha") == REQUIRED_SHA else "FAIL", str(health.get("gitSha")))
-    record("frontend-sha", "PASS" if fe.get("gitSha") == REQUIRED_SHA else "FAIL", str(fe.get("gitSha")))
-    if health.get("gitSha") != REQUIRED_SHA or fe.get("gitSha") != REQUIRED_SHA:
+    record("api-sha", "PASS" if health.get("gitSha") in REQUIRED_API_SHAS else "FAIL", str(health.get("gitSha")))
+    record("frontend-sha", "PASS" if fe.get("gitSha") == REQUIRED_FRONTEND_SHA else "FAIL", str(fe.get("gitSha")))
+    if health.get("gitSha") not in REQUIRED_API_SHAS or fe.get("gitSha") != REQUIRED_FRONTEND_SHA:
         RESULTS["notes"].append("Hosted SHA mismatch. Walk aborted so screenshots are not mixed with an older deploy.")
         (OUT / "results.json").write_text(json.dumps(RESULTS, indent=2))
         raise SystemExit(1)

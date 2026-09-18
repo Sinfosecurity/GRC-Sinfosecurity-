@@ -2,7 +2,7 @@
 
 Authoritative #23 Phase A design. Insurance Edition is a **configurable industry layer** on Supreme. It is not a separate application, tenant model, risk engine, control engine, evidence store, TPRM engine, or API framework.
 
-**Status:** ACTIVE — GLOBAL FOUNDATION. Not #23 PASS.
+**Status:** GLOBAL FOUNDATION READY FOR PRODUCT LEADERSHIP REVIEW. Not #23 PASS.
 
 ## Reuse
 

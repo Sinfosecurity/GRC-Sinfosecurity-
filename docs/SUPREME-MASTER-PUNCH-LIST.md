@@ -415,13 +415,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Edition configuration, not a fork.
 
-**CURRENT STATUS:** ACTIVE — GLOBAL FOUNDATION / ENGINEERING IN PROGRESS. Not PASS.
+**CURRENT STATUS:** ACTIVE — GLOBAL FOUNDATION READY FOR PRODUCT LEADERSHIP REVIEW. Not PASS.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Implementation / hosted API `c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2`. Hosted frontend and CI `6a8b0e1514172796e1f4aa9308262b2343274244`. Not a PASS SHA.
 
-**EVIDENCE:** `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Hosted proof pending.
+**EVIDENCE:** Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Hosted walk `docs/private-beta/hosted-ux-qa/insurance-edition/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35393726716 SUCCESS on `6a8b0e1`. Walk 48 PASS / 0 FAIL. Regulatory packs remain metadata/placeholder only.
 
-**NEXT ACTION:** Complete Phase A hosted staging walk. Do not start #24–#38 or #40. Do not declare #23 PASS.
+**NEXT ACTION:** Product Leadership review of the Insurance Edition global foundation. Do not start #24–#38 or #40. Do not declare #23 PASS.
 
 ---
 
