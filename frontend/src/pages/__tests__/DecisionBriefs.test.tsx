@@ -199,8 +199,8 @@ describe('Decision briefs workspace', () => {
     it('keeps download PDF secondary and EntityRelationships mounted', async () => {
         renderPage();
         await screen.findByRole('heading', { name: 'Decisions' });
-        expect(screen.getByRole('button', { name: 'Download decision brief PDF' })).toBeInTheDocument();
-        expect(screen.getByText('Related connections brief-1')).toBeInTheDocument();
-        expect(within(screen.getByRole('navigation', { name: 'Decision history' })).getByText(/Residual 79/)).toBeInTheDocument();
+        expect(await screen.findByRole('button', { name: 'Download decision brief PDF' })).toBeInTheDocument();
+        expect(await screen.findByText('Related connections brief-1')).toBeInTheDocument();
+        expect(within(await screen.findByRole('navigation', { name: 'Decision history' })).getByText(/Residual 79/)).toBeInTheDocument();
     });
 });
