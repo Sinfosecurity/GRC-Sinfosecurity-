@@ -33,7 +33,7 @@ Proved on hosted staging SHA `340f908`:
 1. Create HTTPS sink endpoint — `whsec_…` shown once, not re-listed
 2. Subscribe to `third_party.created`
 3. Public API vendor create emitted the event
-4. Delivery `DELIVERED`, HTTP 200, duration recorded, event id `evt_fef6f9979ccf`
+4. Delivery `DELIVERED`, HTTP 200, duration recorded, event id `evt_a2db604811a0`
 5. Signature headers present (`X-Supreme-Signature`, timestamp, event id)
 6. Forced `failOnce=1` produced FAILED
 7. Manual retry kept the same logical event id

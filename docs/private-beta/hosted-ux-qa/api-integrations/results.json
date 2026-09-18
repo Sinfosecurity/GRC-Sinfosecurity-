@@ -28,7 +28,7 @@
     {
       "name": "isolated-org",
       "result": "PASS",
-      "detail": "3a709619"
+      "detail": "e2801b1f"
     },
     {
       "name": "second-org",
@@ -88,7 +88,7 @@
     {
       "name": "webhook-delivery",
       "result": "PASS",
-      "detail": "200 {'id': 'a04dfc30-be1c-44c1-9316-9f46ae7e5b8d', 'eventId': 'evt_fef6f9979ccf', 'eventType': 'third_party.created', 'attempt': 1, 'status': 'DELIVERED', 'httpStatus': 200, 'durationMs': 97, 'nextRetryAt': None, 'createdAt': '2026-09-18T19:22:27.927Z', 'sentAt': '2026-09-18T19:22:27.926Z', 'responseSummary': 'HTTP 200'}"
+      "detail": "200 {'id': '1a949d76-56ea-430f-be7e-30a490ff6711', 'eventId': 'evt_a2db604811a0', 'eventType': 'third_party.created', 'attempt': 1, 'status': 'DELIVERED', 'httpStatus': 200, 'durationMs': 205, 'nextRetryAt': None, 'createdAt': '2026-09-18T19:30:02.792Z', 'sentAt': '2026-09-18T19:30:02.791Z', 'responseSummary': 'HTTP 200'}"
     },
     {
       "name": "webhook-forced-failure",
@@ -108,7 +108,7 @@
     {
       "name": "stable-event-id",
       "result": "PASS",
-      "detail": "evt_fef6f9979ccf"
+      "detail": "evt_a2db604811a0"
     },
     {
       "name": "slack-not-configured",
@@ -181,7 +181,6 @@
     "health": 200
   },
   "notes": [
-    "LIVE PROVIDER TEST: NOT TESTED \u2014 no Slack or Jira staging credentials were supplied.",
-    "Webhook signature headers were present on sink receipts. Byte-exact HMAC re-hash of parsed stored JSON did not match; unit tests cover HMAC and replay. Customer receivers must verify the raw body."
+    "LIVE PROVIDER TEST: NOT TESTED \u2014 no Slack or Jira staging credentials were supplied."
   ]
 }
