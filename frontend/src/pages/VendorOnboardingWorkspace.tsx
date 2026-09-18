@@ -112,15 +112,27 @@ export default function VendorOnboardingWorkspace() {
     const requireVendorContact = () => {
         if (contact.name && contact.email) return true;
         setError('Add vendor security contact — name and email are required before the questionnaire can be sent.');
-        document.getElementById('vendor-security-contact')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        (document.getElementById('vendor-security-contact-tab') || document.getElementById('vendor-security-contact'))?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return false;
     };
 
     const focusSendSection = () => {
-        const el = document.getElementById('send-questionnaire');
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        el?.focus();
-        document.getElementById('vendor-security-contact')?.focus();
+        setTab(1);
+        window.setTimeout(() => {
+            const el = document.getElementById('send-questionnaire-tab') || document.getElementById('send-questionnaire');
+            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            el?.focus();
+            (document.getElementById('vendor-security-contact-tab') || document.getElementById('vendor-security-contact'))?.focus();
+        }, 50);
+    };
+
+    const startVendorSend = () => {
+        focusSendSection();
+        if (contact.name && contact.email) {
+            void sendQuestionnaire();
+            return;
+        }
+        setError('Add vendor security contact — name and email are required before the questionnaire can be sent.');
     };
 
     const sendQuestionnaire = async () => {
@@ -213,7 +225,7 @@ export default function VendorOnboardingWorkspace() {
                                 data.canReviewTier && data.stageKey === 'TIER_REVIEW' && data.tierReview?.recommendedTier
                                     ? confirmRecommendation
                                     : data.stageKey === 'READY_TO_SEND'
-                                        ? focusSendSection
+                                        ? startVendorSend
                                         : data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && !data.ira?.sent
                                             ? () => run(() => vendorOnboardingAPI.sendIra(id))
                                             : () => setTab(defaultTab(data.stage))
@@ -350,6 +362,47 @@ export default function VendorOnboardingWorkspace() {
                             {(data.lifecycle?.documents || data.evidence || []).length === 0 && <Typography>No evidence is recorded for this vendor yet.</Typography>}
                             {(data.lifecycle?.documents || data.evidence || []).map((row: any) => (
                                 <Typography key={row.id || row.filename}>{row.title || row.filename} · {humanizeLabel(row.scanStatus || row.status)}</Typography>
+                            ))}
+                        </Stack>
+                    )}
+
+                    {tab === 1 && (data.stageKey === 'READY_TO_SEND' || data.stageKey === 'AWAITING_VENDOR' || ['Vendor Review', 'Review & Decide', 'Monitor'].includes(customerStage(data.stageKey || data.stage))) && (
+                        <Stack spacing={1.5} id="send-questionnaire-tab" tabIndex={-1}>
+                            <Surface>
+                                <Typography variant="h6">Send questionnaire to vendor</Typography>
+                                <Typography variant="body2">
+                                    Send the prepared questionnaire to the vendor. Copy alone does not mark it sent.
+                                </Typography>
+                            </Surface>
+                            {data.invitation && (
+                                <Alert severity="info">
+                                    {data.invitation.status}. {data.invitation.deliveryMethod === 'LINK' ? 'Secure link path.' : data.invitation.deliveryMethod === 'EMAIL' ? `Email ${data.invitation.emailStatus}.` : ''} {data.invitation.emailTruth}
+                                </Alert>
+                            )}
+                            {copiedLink && <Alert severity="success">Activation link copied. Still READY TO SEND until you mark it sent.</Alert>}
+                            {data.stageKey === 'READY_TO_SEND' && (
+                            <Surface>
+                                <Stack spacing={1.5}>
+                                    <TextField id="vendor-security-contact-tab" required label="Vendor security contact" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} />
+                                    <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
+                                    <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={contactDue} onChange={(event) => setContactDue(event.target.value)} />
+                                    <Typography variant="subtitle2">4a — Send email</Typography>
+                                    <Button variant="contained" disabled={saving || Boolean(data.questionnairePlan?.sendBlocked)} onClick={sendQuestionnaire}>Send questionnaire</Button>
+                                    <Typography variant="subtitle2">4b — Copy link</Typography>
+                                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                        <Button disabled={saving} onClick={copyActivationLink}>Copy activation link</Button>
+                                        {(copiedLink || data.invitation?.deliveryMethod === 'LINK') && (
+                                            <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as sent</Button>
+                                        )}
+                                    </Stack>
+                                </Stack>
+                            </Surface>
+                            )}
+                            {(data.vendorAssessments || []).map((item: any) => (
+                                <Surface key={item.id}>
+                                    <Typography variant="subtitle1">{item.name}</Typography>
+                                    <Typography>{item.status} · {item.answered} / {item.total} answered</Typography>
+                                </Surface>
                             ))}
                         </Stack>
                     )}
@@ -558,49 +611,8 @@ export default function VendorOnboardingWorkspace() {
                         </Stack>
                     )}
 
-                    {tab === 1 && ['Vendor Review', 'Review & Decide', 'Monitor'].includes(customerStage(data.stageKey || data.stage)) && (
-                        <Stack spacing={1.5}>
-                            <Surface>
-                                <Typography variant="h6">Review and send</Typography>
-                                <Typography variant="body2">
-                                    {data.name} · {data.request?.servicesProvided || 'Service recorded'} · due {formatShortDate(data.dueDate)}.
-                                    {' '}Included: {(data.plan?.package?.required || data.plan?.assessments || []).map((item: any) => item.name || item.packName).filter(Boolean).join(', ') || 'Confirm packs first'}.
-                                </Typography>
-                                <Typography variant="body2" sx={{ mt: 1 }}>Send invitation emails the named contact. Copying a secure link is not email. Queued is not Delivered.</Typography>
-                            </Surface>
-                            {data.invitation && (
-                                <Alert severity="info">
-                                    {data.invitation.status}. {data.invitation.deliveryMethod === 'LINK' ? 'Secure link path.' : data.invitation.deliveryMethod === 'EMAIL' ? `Email ${data.invitation.emailStatus}.` : ''} {data.invitation.emailTruth}
-                                </Alert>
-                            )}
-                            {copiedLink && <Alert severity="success">Link copied. Not emailed. Share this secure invitation through your approved channel.</Alert>}
-                            <Surface>
-                                <Stack spacing={1.5}>
-                                    <TextField required label="Primary assessment contact" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} />
-                                    <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
-                                    <TextField label="Title / role" value={contact.title} onChange={(event) => setContact({ ...contact, title: event.target.value })} />
-                                    <TextField label="Phone" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} />
-                                    {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && !data.questionnairePlan?.sendBlocked && (
-                                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                            <Button variant="contained" disabled={saving} onClick={sendQuestionnaire}>Send questionnaire</Button>
-                                            <Button disabled={saving} onClick={copyActivationLink}>Copy activation link</Button>
-                                            {(copiedLink || data.invitation?.deliveryMethod === 'LINK') && data.stageKey === 'READY_TO_SEND' && (
-                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as sent</Button>
-                                            )}
-                                        </Stack>
-                                    )}
-                                </Stack>
-                            </Surface>
-                            {(data.vendorAssessments || []).map((item: any) => (
-                                <Surface key={item.id}>
-                                    <Typography variant="subtitle1">{item.name}</Typography>
-                                    <Typography>{item.status} · {item.answered} / {item.total} answered</Typography>
-                                </Surface>
-                            ))}
-                            {data.canReviewTier && data.invitation?.deliveryMethod === 'EMAIL' && (
-                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.resend(id))}>Resend invitation</Button>
-                            )}
-                        </Stack>
+                    {tab === 1 && data.canReviewTier && data.invitation?.deliveryMethod === 'EMAIL' && (
+                        <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.resend(id))}>Resend invitation</Button>
                     )}
 
                     {tab === 4 && (

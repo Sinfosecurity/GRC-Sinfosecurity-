@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../marketing/routerFuture';
 import VendorOnboarding from '../VendorOnboarding';
@@ -291,19 +291,56 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect(await screen.findByText('Send questionnaire to vendor')).toBeInTheDocument();
+        expect((await screen.findAllByText('Send questionnaire to vendor')).length).toBeGreaterThan(0);
         expect(screen.getAllByRole('button', { name: 'Send questionnaire' }).length).toBeGreaterThan(0);
         expect(screen.getAllByRole('button', { name: 'Copy activation link' }).length).toBeGreaterThan(0);
         expect(screen.queryByRole('button', { name: 'Confirm recommended tier' })).not.toBeInTheDocument();
         expect(screen.getByText(/Questionnaire ready · now/)).toBeInTheDocument();
         expect(screen.queryByText(/Vendor Review · now/)).not.toBeInTheDocument();
-        const sendSection = document.getElementById('send-questionnaire');
+        expect(screen.getAllByText('Send questionnaire to vendor').length).toBeGreaterThan(0);
+        const sendSection = document.getElementById('send-questionnaire-tab') || document.getElementById('send-questionnaire');
         const focus = vi.fn();
         if (sendSection) sendSection.focus = focus;
         fireEvent.click(screen.getAllByRole('button', { name: 'Send questionnaire' })[0]);
-        expect(focus).toHaveBeenCalled();
-        expect(screen.getByText('4a — Send email')).toBeInTheDocument();
-        expect(screen.getByText('4b — Copy link')).toBeInTheDocument();
+        await waitFor(() => expect(focus).toHaveBeenCalled());
+        expect(screen.getAllByText('4a — Send email').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('4b — Copy link').length).toBeGreaterThan(0);
+        expect(screen.getByText(/name and email are required/i)).toBeInTheDocument();
+    });
+
+    it('sends from the top CTA once vendor contact is present', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v-cta',
+                    publicId: 'VND-2026-0044',
+                    name: 'CTA Vendor',
+                    stage: 'Ready to send',
+                    stageKey: 'READY_TO_SEND',
+                    canReviewTier: true,
+                    contact: { name: 'Vendor Security', email: 'vendor@example.test' },
+                    ira: { required: true, sent: true, submitted: true, status: 'IRA_SUBMITTED' },
+                    intake: { completed: true, sections: [] },
+                    history: [],
+                },
+            },
+        });
+        let resolveSend: (value?: unknown) => void = () => undefined;
+        (vendorOnboardingAPI.send as any).mockImplementationOnce(() => new Promise((resolve) => {
+            resolveSend = () => resolve({ data: { data: { stageKey: 'AWAITING_VENDOR' } } });
+        }));
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0044']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect((await screen.findAllByText('Send questionnaire to vendor')).length).toBeGreaterThan(0);
+        fireEvent.click(screen.getAllByRole('button', { name: 'Send questionnaire' })[0]);
+        expect(screen.getByText('Sending questionnaire…')).toBeInTheDocument();
+        expect(vendorOnboardingAPI.send).toHaveBeenCalled();
+        resolveSend();
+        expect(await screen.findByText('Questionnaire sent successfully.')).toBeInTheDocument();
     });
 
     it('shows send pending, success, and error without a silent failure', async () => {
@@ -333,7 +370,7 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect(await screen.findByText('Send questionnaire to vendor')).toBeInTheDocument();
+        expect((await screen.findAllByText('Send questionnaire to vendor')).length).toBeGreaterThan(0);
         fireEvent.click(screen.getAllByRole('button', { name: 'Send questionnaire' })[1]);
         expect(screen.getByText('Sending questionnaire…')).toBeInTheDocument();
         finishSend();
@@ -387,11 +424,11 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect(await screen.findByText('Send questionnaire to vendor')).toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: 'Copy activation link' }));
+        expect((await screen.findAllByText('Send questionnaire to vendor')).length).toBeGreaterThan(0);
+        fireEvent.click(screen.getAllByRole('button', { name: 'Copy activation link' })[0]);
         expect(await screen.findByText('Activation link copied.')).toBeInTheDocument();
-        expect(screen.getByText('Send questionnaire to vendor')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Mark as sent' })).toBeInTheDocument();
+        expect(screen.getAllByText('Send questionnaire to vendor').length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button', { name: 'Mark as sent' }).length).toBeGreaterThan(0);
     });
 
     it('tells the operator an offboarding vendor is not a new assessment', async () => {
