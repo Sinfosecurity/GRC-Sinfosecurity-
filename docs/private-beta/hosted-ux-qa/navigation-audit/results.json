@@ -1,0 +1,1772 @@
+{
+  "sha": {
+    "frontend": "548cd19a893c35b9fb06059213c99fbfd0b9e495",
+    "api": "b00ad1274908a27a2253d6e5050420e2c10b8f39",
+    "expected": "548cd19a893c35b9fb06059213c99fbfd0b9e495",
+    "frontendRaw": {
+      "gitSha": "548cd19a893c35b9fb06059213c99fbfd0b9e495",
+      "builtAt": "2026-09-18T16:25:04.088Z"
+    },
+    "apiHealth": {
+      "status": "degraded",
+      "gitSha": "b00ad1274908a27a2253d6e5050420e2c10b8f39",
+      "environment": "staging"
+    }
+  },
+  "vendors": {},
+  "routes": [
+    {
+      "section": "Work",
+      "label": "Home",
+      "expected": "/dashboard",
+      "actual": "/dashboard",
+      "h1": "Good afternoon, Report",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Work",
+      "label": "Third Parties",
+      "expected": "/vendor-management",
+      "actual": "/vendor-management",
+      "h1": "Third Parties",
+      "tabs": [
+        "All",
+        "Needs action",
+        "Critical and high"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Work",
+      "label": "Onboard",
+      "expected": "/vendor-onboarding",
+      "actual": "/vendor-onboarding",
+      "h1": "Open a third-party record",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Work",
+      "label": "Assessments",
+      "expected": "/assessments",
+      "actual": "/assessments",
+      "h1": "Assessments",
+      "tabs": [
+        "Active",
+        "Needs attention",
+        "Completed",
+        "Library"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Work",
+      "label": "Findings",
+      "expected": "/findings",
+      "actual": "/findings",
+      "h1": "Findings",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Work",
+      "label": "Decisions",
+      "expected": "/decision-briefs",
+      "actual": "/decision-briefs",
+      "h1": "Decisions",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        },
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        }
+      ],
+      "network": [
+        {
+          "status": 404,
+          "url": "https://supreme-risk-staging-api.onrender.com/api/v1/governance/nodes/lookup?sourceModel=RiskDecisionBrief&sourceId=f1daea84-7c73-4d3a-817e-088a055e1d94",
+          "method": "GET"
+        }
+      ],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Monitoring",
+      "expected": "/monitoring",
+      "actual": "/monitoring",
+      "h1": "Continuous monitoring",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Risk",
+      "expected": "/risks",
+      "actual": "/risks",
+      "h1": "Supreme Risk",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Risk register",
+      "expected": "/risks/register",
+      "actual": "/risks/register",
+      "h1": "Supreme Risk",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Compliance",
+      "expected": "/compliance",
+      "actual": "/compliance",
+      "h1": "Supreme Compliance",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Frameworks",
+      "expected": "/compliance/frameworks",
+      "actual": "/compliance/frameworks",
+      "h1": "Framework catalog",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Gaps",
+      "expected": "/compliance/gaps",
+      "actual": "/compliance/gaps",
+      "h1": "Gaps",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Privacy",
+      "expected": "/privacy-ops",
+      "actual": "/privacy-ops",
+      "h1": "Supreme Privacy",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Activities",
+      "expected": "/privacy-ops/activities",
+      "actual": "/privacy-ops/activities",
+      "h1": "Processing activities",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Rights",
+      "expected": "/privacy-ops/rights",
+      "actual": "/privacy-ops/rights",
+      "h1": "Rights requests",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "Transfers",
+      "expected": "/privacy-ops/transfers",
+      "actual": "/privacy-ops/transfers",
+      "h1": "International transfers",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "AI Governance",
+      "expected": "/ai-governance",
+      "actual": "/ai-governance",
+      "h1": "Supreme AI Governance",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "AI systems",
+      "expected": "/ai-governance/systems",
+      "actual": "/ai-governance/systems",
+      "h1": "AI system register",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "AI approvals",
+      "expected": "/ai-governance/approvals",
+      "actual": "/ai-governance/approvals",
+      "h1": "AI approvals",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Programs",
+      "label": "AI testing",
+      "expected": "/ai-governance/testing",
+      "actual": "/ai-governance/testing",
+      "h1": "Model / system testing",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Intelligence",
+      "label": "Intelligence",
+      "expected": "/intelligence",
+      "actual": "/intelligence",
+      "h1": "Supreme Intelligence",
+      "tabs": [
+        "Critical attention",
+        "What changed",
+        "Cross-platform",
+        "Decisions",
+        "Positive movement",
+        "Evidence and controls"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Intelligence",
+        "What changed",
+        "Executive"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Intelligence",
+      "label": "What changed",
+      "expected": "/intelligence/changes",
+      "actual": "/intelligence/changes",
+      "h1": "What changed",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Intelligence",
+        "What changed",
+        "Executive"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Intelligence",
+      "label": "Executive",
+      "expected": "/intelligence/executive",
+      "actual": "/intelligence/executive",
+      "h1": "Executive intelligence",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Intelligence",
+        "What changed",
+        "Executive"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Automation",
+      "label": "Automations",
+      "expected": "/automation",
+      "actual": "/automation",
+      "h1": "Supreme Automation",
+      "tabs": [
+        "Active automations",
+        "Needs attention",
+        "Recent runs",
+        "Failed runs",
+        "Templates"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Automations",
+        "Runs"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Automation",
+      "label": "Runs",
+      "expected": "/automation/runs",
+      "actual": "/automation/runs",
+      "h1": "Supreme Automation",
+      "tabs": [
+        "Active automations",
+        "Needs attention",
+        "Recent runs",
+        "Failed runs",
+        "Templates"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Automations",
+        "Runs"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Automation",
+      "label": "Templates",
+      "expected": "/automation/templates",
+      "actual": "/automation/templates",
+      "h1": "Supreme Automation",
+      "tabs": [
+        "Active automations",
+        "Needs attention",
+        "Recent runs",
+        "Failed runs",
+        "Templates"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Automations",
+        "Runs"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Governance",
+      "label": "Controls",
+      "expected": "/control-center",
+      "actual": "/control-center",
+      "h1": "Control Center",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Controls"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Governance",
+      "label": "Evidence",
+      "expected": "/documents",
+      "actual": "/documents",
+      "h1": "Evidence Library",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Controls"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Governance",
+      "label": "Graph",
+      "expected": "/governance-graph",
+      "actual": "/governance-graph",
+      "h1": "Governance Graph",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Controls"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Reports",
+      "label": "Reports",
+      "expected": "/reports",
+      "actual": "/reports",
+      "h1": "Reports",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Administration",
+      "label": "Team",
+      "expected": "/user-management",
+      "actual": "/user-management",
+      "h1": "Team",
+      "tabs": [
+        "Members",
+        "Invitations",
+        "Roles & permissions"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Administration",
+      "label": "Identity & Access",
+      "expected": "/settings/identity",
+      "actual": "/settings/identity",
+      "h1": "Identity & Access",
+      "tabs": [
+        "Overview",
+        "Single Sign-On",
+        "Domains",
+        "Provisioning",
+        "Role Mapping",
+        "Security Policy",
+        "Activity"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Administration",
+      "label": "Assessment Library",
+      "expected": "/questionnaires",
+      "actual": "/questionnaires",
+      "h1": "Assessment library",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Administration",
+      "label": "Integrations",
+      "expected": "/integrations",
+      "actual": "/integrations",
+      "h1": "Integrations",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Administration",
+      "label": "Billing",
+      "expected": "/billing",
+      "actual": "/billing",
+      "h1": "Billing",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Administration",
+      "label": "Audit",
+      "expected": "/activity-log",
+      "actual": "/activity-log",
+      "h1": "Audit log",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Header",
+      "label": "Notifications",
+      "expected": "/notifications",
+      "actual": "/notifications",
+      "h1": "Notifications",
+      "tabs": [
+        "Unread (100)",
+        "All (100)"
+      ],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Header",
+      "label": "Help",
+      "expected": "/help",
+      "actual": "/help",
+      "h1": "Help and support",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Account",
+      "label": "Organization",
+      "expected": "/organization-settings",
+      "actual": "/organization-settings",
+      "h1": "Organization",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Route",
+      "label": "Settings",
+      "expected": "/settings",
+      "actual": "/settings",
+      "h1": "Settings",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Route",
+      "label": "Environment",
+      "expected": "/environment",
+      "actual": "/environment",
+      "h1": "Environment status",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Intelligence",
+        "Automation",
+        "Governance",
+        "Reports"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Route",
+      "label": "Exceptions",
+      "expected": "/compliance/exceptions",
+      "actual": "/compliance/exceptions",
+      "h1": "Exceptions",
+      "tabs": [],
+      "buttons": [
+        "Skip to content",
+        "Home",
+        "Third Parties",
+        "Onboard",
+        "Assessments",
+        "Findings",
+        "Decisions",
+        "Programs",
+        "Monitoring",
+        "Risk",
+        "Risk register",
+        "Compliance"
+      ],
+      "result": "PASS",
+      "class": "",
+      "detail": "SUPREME \u2014 STAGING Isolated staging environment. Not production. Do not use production tenant data. Skip to content Supreme Governance \u00b7 Staging Work Home Third ",
+      "console": [
+        {
+          "type": "error",
+          "text": "The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element."
+        }
+      ],
+      "network": [],
+      "renders": true
+    },
+    {
+      "section": "Legacy",
+      "label": "/legacy/compliance",
+      "expected": "/legacy/compliance",
+      "actual": "/legacy/compliance",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/controls",
+      "expected": "/controls",
+      "actual": "/controls",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/incidents",
+      "expected": "/incidents",
+      "actual": "/incidents",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/policies",
+      "expected": "/policies",
+      "actual": "/policies",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/analytics",
+      "expected": "/analytics",
+      "actual": "/analytics",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/tasks",
+      "expected": "/tasks",
+      "actual": "/tasks",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/workflows",
+      "expected": "/workflows",
+      "actual": "/workflows",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/business-continuity",
+      "expected": "/business-continuity",
+      "actual": "/business-continuity",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/predictive-analytics",
+      "expected": "/predictive-analytics",
+      "actual": "/predictive-analytics",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/soc-reports",
+      "expected": "/soc-reports",
+      "actual": "/soc-reports",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/onboarding",
+      "expected": "/onboarding",
+      "actual": "/onboarding",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/iso27001",
+      "expected": "/iso27001",
+      "actual": "/iso27001",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/tisax",
+      "expected": "/tisax",
+      "actual": "/tisax",
+      "h1": "This legacy GRC page is not in the production path",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    },
+    {
+      "section": "Legacy",
+      "label": "/platform",
+      "expected": "/platform",
+      "actual": "/unauthorized",
+      "h1": "",
+      "result": "QUARANTINED",
+      "class": "L",
+      "detail": "Intentional"
+    }
+  ],
+  "readyToSend": [
+    {
+      "name": "assessment-contact-fields",
+      "result": "PASS",
+      "detail": "contact fields"
+    },
+    {
+      "name": "top-cta-label",
+      "result": "PASS",
+      "detail": "top CTA"
+    },
+    {
+      "name": "progress-not-vendor-review",
+      "result": "PASS",
+      "detail": "progress"
+    },
+    {
+      "name": "missing-contact-error",
+      "result": "PASS",
+      "detail": "visible error"
+    },
+    {
+      "name": "top-cta-pending",
+      "result": "PASS",
+      "detail": "Sending questionnaire\u2026"
+    },
+    {
+      "name": "top-cta-send-api",
+      "result": "PASS",
+      "detail": "AWAITING_VENDOR"
+    },
+    {
+      "name": "top-cta-success",
+      "result": "PASS",
+      "detail": "success visible or stage advanced"
+    },
+    {
+      "name": "refresh-awaiting",
+      "result": "PASS",
+      "detail": "AWAITING_VENDOR"
+    },
+    {
+      "name": "copy-stays-ready",
+      "result": "PASS",
+      "detail": "READY_TO_SEND"
+    },
+    {
+      "name": "mark-sent-awaiting",
+      "result": "PASS",
+      "detail": "AWAITING_VENDOR"
+    }
+  ],
+  "controls": [
+    {
+      "name": "hosted-sha",
+      "result": "PASS",
+      "detail": "fe=548cd19a893c35b9fb06059213c99fbfd0b9e495 api=b00ad1274908a27a2253d6e5050420e2c10b8f39"
+    },
+    {
+      "name": "Onboard row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-onboarding/VND-2026-0041"
+    },
+    {
+      "name": "Risk register row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/risks/RISK-00002"
+    },
+    {
+      "name": "AI systems row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/ai-governance/systems/AI-00002"
+    },
+    {
+      "name": "Intelligence row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/intelligence/INT-00005"
+    },
+    {
+      "name": "What changed row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/intelligence/INT-00386"
+    },
+    {
+      "name": "Executive row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/intelligence/INT-00386"
+    },
+    {
+      "name": "Controls row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/control-center/35461f9d-b75e-443c-8d3d-c82addab09d1"
+    },
+    {
+      "name": "Notifications row-click",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/dashboard"
+    },
+    {
+      "name": "responsive-home-375",
+      "result": "PASS",
+      "detail": "h1=Good afternoon, Report"
+    },
+    {
+      "name": "responsive-home-768",
+      "result": "PASS",
+      "detail": "h1=Good afternoon, Report"
+    },
+    {
+      "name": "responsive-home-1024",
+      "result": "PASS",
+      "detail": "h1=Good afternoon, Report"
+    },
+    {
+      "name": "responsive-home-1920",
+      "result": "PASS",
+      "detail": "h1=Good afternoon, Report"
+    },
+    {
+      "name": "header-search-findings",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/findings"
+    }
+  ],
+  "console": [],
+  "network": [],
+  "failures": [],
+  "shots": [
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/pass-home.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/pass-onboard.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/pass-assessments.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/pass-findings.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/pass-reports.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/pass-team.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/responsive-home-375.png",
+    "docs/private-beta/hosted-ux-qa/navigation-audit/screenshots/responsive-onboard-375.png"
+  ],
+  "summary": {
+    "routes": 56,
+    "ready": {
+      "pass": 10,
+      "fail": 0
+    },
+    "pass": 42,
+    "fail": 0,
+    "quarantined": 14,
+    "blocked": 0,
+    "role": "ORGANIZATION_ADMIN",
+    "vendors": {}
+  },
+  "role": "ORGANIZATION_ADMIN",
+  "remaining": [
+    {
+      "id": "D-1",
+      "class": "D",
+      "severity": "MEDIUM",
+      "detail": "Decisions graph node lookup 404"
+    },
+    {
+      "id": "LOW-1",
+      "severity": "LOW",
+      "detail": "/settings not in sidebar"
+    },
+    {
+      "id": "RBAC-1",
+      "detail": "Viewer session not hosted-tested"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. Product Leadership hosted review found the Assessments New Assessment path exposed generic template selection instead of risk-driven pack composition. Product Leadership authorized Version 3 risk-driven IRA (2026-09-18): GRC creates the record, requester completes Part A/B via hashed task link, Supreme calculates tier and packs, analyst confirms, then vendor questionnaire. H-5 and H-6 remain OPEN pending hosted proof. #21 remains PARTIAL.
 
-**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Version 3 IRA ADRs `docs/ADR-TPRM-INHERENT-RISK-SCORING.md` and `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md` are ACCEPTED. Version 3 hosted UX correction `b00ad1274908a27a2253d6e5050420e2c10b8f39` is hosted on staging frontend and API. Product Leadership hosted UX defects were walked on fresh vendors `VND-2026-0039` (4b) and `VND-2026-0040` (4a). Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Version 3 IRA ADRs `docs/ADR-TPRM-INHERENT-RISK-SCORING.md` and `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md` are ACCEPTED. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495` (send-button fix). Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Hosted navigation audit recorded at `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -20,7 +20,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **VERSION 3 HOSTED API SHA:** `b00ad1274908a27a2253d6e5050420e2c10b8f39`
 
-**VERSION 3 HOSTED FRONTEND SHA:** `b00ad1274908a27a2253d6e5050420e2c10b8f39`
+**VERSION 3 HOSTED FRONTEND SHA:** `548cd19a893c35b9fb06059213c99fbfd0b9e495`
+
+**NAVIGATION AUDIT CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35368202589 PASS on `548cd19`
 
 **VERSION 3 FLOW-CLOSURE CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35354391818 PASS on `a9a39e1`
 
@@ -28,7 +30,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 
-**#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Version 3 hosted UX-correction SHA and hosted frontend/API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Hosted UX-correction vendors `VND-2026-0039` (4b) and `VND-2026-0040` (4a). Evidence `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Cursor does not declare #12 PASS.
+**#12:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495`. Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

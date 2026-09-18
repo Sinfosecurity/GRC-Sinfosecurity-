@@ -1,0 +1,62 @@
+[
+  {
+    "name": "onboard-primary",
+    "result": "FAIL",
+    "detail": "no request CTA"
+  },
+  {
+    "name": "assessments-request",
+    "result": "PASS",
+    "detail": "https://supreme-risk-staging.onrender.com/vendor-onboarding"
+  },
+  {
+    "name": "invite-open",
+    "result": "PASS",
+    "detail": "dialog"
+  },
+  {
+    "name": "invite-escape",
+    "result": "PASS",
+    "detail": "escape"
+  },
+  {
+    "name": "reports-actions-visible",
+    "result": "PASS",
+    "detail": "count=14 body=SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nSkip to content\n\nSupreme\n\nGovernance \u00b7 Staging\n\nWork\n\nHome\nTh"
+  },
+  {
+    "name": "findings-tab",
+    "result": "PASS",
+    "detail": "no extra tabs"
+  },
+  {
+    "name": "breadcrumb-visible",
+    "result": "PASS",
+    "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use produ"
+  },
+  {
+    "name": "breadcrumb-parent",
+    "result": "PASS",
+    "detail": "https://supreme-risk-staging.onrender.com/vendor-management"
+  },
+  {
+    "name": "notifications-h1",
+    "result": "PASS",
+    "detail": "Notifications"
+  },
+  {
+    "name": "settings-renders",
+    "result": "PASS",
+    "detail": "Settings"
+  },
+  {
+    "name": "mobile-onboard-cta",
+    "result": "FAIL",
+    "detail": "375"
+  },
+  {
+    "name": "keyboard-tab",
+    "result": "PASS",
+    "detail": "Home"
+  }
+]
