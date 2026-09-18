@@ -12,6 +12,17 @@ type Question = {
     options: Array<{ value: string; label: string }>;
 };
 
+function formatSubmittedAt(value?: string | Date | null) {
+    if (!value) return null;
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function optionLabel(question: Question, raw: string) {
+    return raw.split('|').filter(Boolean).map((value) => question.options.find((option) => option.value === value)?.label || value).join(', ');
+}
+
 export default function RequesterIra() {
     const [params] = useSearchParams();
     const token = params.get('token') || '';
@@ -20,6 +31,7 @@ export default function RequesterIra() {
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [attested, setAttested] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [showResponses, setShowResponses] = useState(false);
 
     useEffect(() => {
         if (!token) return;
@@ -33,6 +45,7 @@ export default function RequesterIra() {
 
     const questions: Question[] = data?.questions || [];
     const readOnly = Boolean(data?.readOnly || data?.submitted);
+    const submittedAt = formatSubmittedAt(data?.submittedAt);
 
     const setValue = (key: string, value: string, multiple?: boolean) => {
         if (readOnly) return;
@@ -74,8 +87,10 @@ export default function RequesterIra() {
                 ...payload,
                 submitted: true,
                 readOnly: true,
-                confirmation: payload.confirmation || 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.',
+                submittedAt: payload.submittedAt || new Date().toISOString(),
+                confirmation: payload.confirmation || 'Your Inherent Risk Assessment has been submitted successfully.',
             });
+            setShowResponses(false);
         } catch (err: any) {
             setError(err.message || 'Could not submit.');
         } finally {
@@ -87,62 +102,88 @@ export default function RequesterIra() {
         <Box sx={{ minHeight: '100vh', bgcolor: color.workspace, px: 2, py: 6 }}>
             <Stack spacing={2} sx={{ maxWidth: 720, mx: 'auto' }}>
                 <Typography variant="overline" sx={{ color: color.goldInk, fontWeight: 700 }}>Supreme Third Party</Typography>
-                <Typography variant="h4">Inherent risk questions</Typography>
-                <Typography>
-                    {data?.vendorName || 'This engagement'} — answer only what you know. Don&apos;t know is allowed. The vendor will not see this.
-                </Typography>
-                {error && <Alert severity="error">{error}</Alert>}
-                {saving && !data?.submitted && <Alert severity="info">Submitting…</Alert>}
-                {data?.submitted && (
-                    <Alert severity="success">
-                        {data.confirmation || 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'}
-                    </Alert>
-                )}
-                <Stack component="form" spacing={3} onSubmit={submit}>
-                    {['A', 'B'].map((part) => (
-                        <Box key={part}>
-                            <Typography variant="h6" sx={{ mb: 1.5 }}>
-                                {part === 'A' ? 'What will this vendor do?' : 'How bad if it fails?'}
-                            </Typography>
-                            <Stack spacing={1.5}>
-                                {questions.filter((question) => question.part === part).map((question) => (
-                                    question.multiple ? (
-                                        <Box key={question.key}>
-                                            <Typography variant="subtitle2">{question.question}</Typography>
-                                            {question.options.map((option) => (
-                                                <FormControlLabel
-                                                    key={option.value}
-                                                    control={<Checkbox
-                                                        checked={String(answers[question.key] || '').split('|').includes(option.value)}
-                                                        disabled={readOnly}
-                                                        onChange={() => setValue(question.key, option.value, true)}
-                                                    />}
-                                                    label={option.label}
-                                                />
+                {data?.submitted ? (
+                    <>
+                        <Typography variant="h3">Thank you</Typography>
+                        <Alert severity="success">
+                            <Typography sx={{ fontWeight: 700 }}>✓ Submitted{submittedAt ? ` · ${submittedAt}` : ''}</Typography>
+                            <Typography sx={{ mt: 1 }}>Your Inherent Risk Assessment has been submitted successfully.</Typography>
+                            <Typography sx={{ mt: 1 }}>The Governance, Risk & Compliance team has received your responses and will contact you if clarification is required.</Typography>
+                            <Typography sx={{ mt: 1 }}>You may now close this page.</Typography>
+                        </Alert>
+                        <Button onClick={() => setShowResponses(!showResponses)}>
+                            {showResponses ? 'Hide submitted responses' : 'View submitted responses'}
+                        </Button>
+                        {showResponses && (
+                            <Stack spacing={2}>
+                                {['A', 'B'].map((part) => (
+                                    <Box key={part}>
+                                        <Typography variant="h6" sx={{ mb: 1.5 }}>
+                                            {part === 'A' ? 'What will this vendor do?' : 'How bad if it fails?'}
+                                        </Typography>
+                                        <Stack spacing={1}>
+                                            {questions.filter((question) => question.part === part).map((question) => (
+                                                <Typography key={question.key} variant="body2">
+                                                    <strong>{question.question}</strong> {optionLabel(question, answers[question.key] || 'Not recorded')}
+                                                </Typography>
                                             ))}
-                                        </Box>
-                                    ) : (
-                                        <TextField
-                                            key={question.key}
-                                            select
-                                            fullWidth
-                                            label={question.question}
-                                            value={answers[question.key] || ''}
-                                            disabled={readOnly}
-                                            onChange={(event) => setValue(question.key, event.target.value)}
-                                        >
-                                            <MenuItem value="">Not recorded</MenuItem>
-                                            {question.options.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-                                            ))}
-                                        </TextField>
-                                    )
+                                        </Stack>
+                                    </Box>
                                 ))}
                             </Stack>
-                        </Box>
-                    ))}
-                    {!readOnly && (
-                        <>
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <Typography variant="h4">Inherent risk questions</Typography>
+                        <Typography>
+                            {data?.vendorName || 'This engagement'} — answer only what you know. Don&apos;t know is allowed. The vendor will not see this.
+                        </Typography>
+                        {error && <Alert severity="error">{error}</Alert>}
+                        {saving && <Alert severity="info">Submitting…</Alert>}
+                        <Stack component="form" spacing={3} onSubmit={submit}>
+                            {['A', 'B'].map((part) => (
+                                <Box key={part}>
+                                    <Typography variant="h6" sx={{ mb: 1.5 }}>
+                                        {part === 'A' ? 'What will this vendor do?' : 'How bad if it fails?'}
+                                    </Typography>
+                                    <Stack spacing={1.5}>
+                                        {questions.filter((question) => question.part === part).map((question) => (
+                                            question.multiple ? (
+                                                <Box key={question.key}>
+                                                    <Typography variant="subtitle2">{question.question}</Typography>
+                                                    {question.options.map((option) => (
+                                                        <FormControlLabel
+                                                            key={option.value}
+                                                            control={<Checkbox
+                                                                checked={String(answers[question.key] || '').split('|').includes(option.value)}
+                                                                disabled={readOnly}
+                                                                onChange={() => setValue(question.key, option.value, true)}
+                                                            />}
+                                                            label={option.label}
+                                                        />
+                                                    ))}
+                                                </Box>
+                                            ) : (
+                                                <TextField
+                                                    key={question.key}
+                                                    select
+                                                    fullWidth
+                                                    label={question.question}
+                                                    value={answers[question.key] || ''}
+                                                    disabled={readOnly}
+                                                    onChange={(event) => setValue(question.key, event.target.value)}
+                                                >
+                                                    <MenuItem value="">Not recorded</MenuItem>
+                                                    {question.options.map((option) => (
+                                                        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+                                                    ))}
+                                                </TextField>
+                                            )
+                                        ))}
+                                    </Stack>
+                                </Box>
+                            ))}
                             <FormControlLabel
                                 control={<Checkbox checked={attested} onChange={(event) => setAttested(event.target.checked)} />}
                                 label="I confirm these answers are accurate for this engagement."
@@ -151,9 +192,10 @@ export default function RequesterIra() {
                                 <Button disabled={saving} onClick={save}>Save and continue later</Button>
                                 <Button type="submit" variant="contained" disabled={saving || !attested}>Submit</Button>
                             </Stack>
-                        </>
-                    )}
-                </Stack>
+                        </Stack>
+                    </>
+                )}
+                {error && data?.submitted && <Alert severity="error">{error}</Alert>}
             </Stack>
         </Box>
     );

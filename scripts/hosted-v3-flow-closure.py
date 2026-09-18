@@ -19,7 +19,7 @@ BASE = os.environ.get("E2E_BASE", "https://supreme-risk-staging.onrender.com")
 API = os.environ.get("E2E_API", "https://supreme-risk-staging-api.onrender.com")
 EMAIL = os.environ.get("E2E_EMAIL", "report-proof-20260913@staging.supremerisk.test")
 PASSWORD = os.environ.get("E2E_PASSWORD", "ReportProof1x")
-EXPECTED = os.environ.get("E2E_EXPECTED_SHA", "a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973")
+EXPECTED = os.environ.get("E2E_EXPECTED_SHA", "")
 RESULTS: dict = {"checks": [], "shots": [], "sha": {}, "vendors": {}, "discrepancies": []}
 
 IRA_PICKS = [
@@ -171,7 +171,7 @@ def main():
 
         status, copied = api("POST", f"/api/v1/vendors/onboarding/{vendor_b['publicId']}/ira/link", token, {})
         ira_url = ((copied.get("data") or {}).get("iraLink") or {}).get("url")
-        record("ira-copy", "PASS" if ira_url else "FAIL", str(ira_url))
+        record("ira-copy", "PASS" if ira_url else "FAIL", "IRA link issued")
         requester = browser.new_context(viewport={"width": 1280, "height": 900})
         ira = requester.new_page()
         ira.goto(ira_url if str(ira_url).startswith("http") else f"{BASE}{ira_url}", wait_until="networkidle")
@@ -196,10 +196,12 @@ def main():
         ira.reload(wait_until="networkidle")
         ira.wait_for_timeout(1500)
         body = ira.inner_text("body")
-        record("ira-submit-copy", "PASS" if "submitted successfully to the Governance, Risk & Compliance team" in body else "FAIL", body[:400])
-        shot(ira, "05-ira-submitted")
+        record("ira-submit-copy", "PASS" if "Thank you" in body and "You may now close this page" in body else "FAIL", body[:400])
+        shot(ira, "A-ira-thank-you")
         ira.reload(wait_until="networkidle")
-        record("ira-refresh-submitted", "PASS" if "submitted successfully" in ira.inner_text("body") else "FAIL", "refresh")
+        ira.wait_for_timeout(1000)
+        record("ira-refresh-submitted", "PASS" if "Thank you" in ira.inner_text("body") and "You may now close this page" in ira.inner_text("body") else "FAIL", "refresh")
+        shot(ira, "B-ira-thank-you-refresh")
         requester.close()
 
         notices, payload = api("GET", "/api/v1/notifications", token)
@@ -215,8 +217,13 @@ def main():
         page.wait_for_timeout(3000)
         ws = workspace(token, vendor_b["publicId"])
         record("ready-after-confirm", "PASS" if ws.get("stageKey") == "READY_TO_SEND" else "FAIL", str(ws.get("stageKey")))
-        record("4ab-visible", "PASS" if page.get_by_role("button", name="Send questionnaire").count() and page.get_by_role("button", name="Copy activation link").count() else "FAIL", page.inner_text("body")[:300])
-        shot(page, "07-ready-to-send")
+        record("ready-progress", "PASS" if "Questionnaire ready" in page.inner_text("body") and "Vendor Review · now" not in page.inner_text("body") else "FAIL", "progress")
+        shot(page, "C-ready-to-send-top")
+        shot(page, "D-send-questionnaire-cta")
+        page.get_by_role("button", name="Send questionnaire").first.click()
+        page.wait_for_timeout(800)
+        record("4ab-visible", "PASS" if page.get_by_text("4a — Send email").count() and page.get_by_text("4b — Copy link").count() else "FAIL", page.inner_text("body")[:300])
+        shot(page, "E-send-controls-after-cta")
 
         page.get_by_label("Vendor security contact").first.fill("Vendor Security")
         page.get_by_label("Email").first.fill(f"vendor-copy-{stamp}@vendor.test")
@@ -224,12 +231,12 @@ def main():
         page.wait_for_timeout(2500)
         ws = workspace(token, vendor_b["publicId"])
         record("copy-stays-ready", "PASS" if ws.get("stageKey") == "READY_TO_SEND" else "FAIL", str(ws.get("stageKey")))
-        shot(page, "08-copy-still-ready")
+        shot(page, "G-copy-still-ready")
         page.get_by_role("button", name="Mark as sent").first.click()
         page.wait_for_timeout(2500)
         ws = workspace(token, vendor_b["publicId"])
         record("mark-sent-awaiting", "PASS" if ws.get("stageKey") == "AWAITING_VENDOR" else "FAIL", str(ws.get("stageKey")))
-        shot(page, "09-awaiting-vendor-4b")
+        shot(page, "H-mark-sent")
 
         status, copied = api("POST", f"/api/v1/vendors/onboarding/{vendor_a['publicId']}/ira/link", token, {})
         raw = parse_qs(urlparse(((copied.get("data") or {}).get("iraLink") or {}).get("url", "")).query).get("token", [""])[0]
@@ -247,16 +254,11 @@ def main():
         page.wait_for_timeout(1500)
         page.locator("#send-questionnaire").get_by_label("Vendor security contact").fill("Vendor Security")
         page.locator("#send-questionnaire").get_by_label("Email").fill(f"vendor-email-{stamp}@vendor.test")
-        sent = api("POST", f"/api/v1/vendors/onboarding/{vendor_a['publicId']}/send", token, {
-            "name": "Vendor Security",
-            "email": f"vendor-email-{stamp}@vendor.test",
-        })
-        record("email-send-api", "PASS" if sent[0] in (200, 201) else "FAIL", f"{sent[0]} {str(sent[1])[:240]}")
-        page.reload(wait_until="networkidle")
-        page.wait_for_timeout(2000)
+        page.locator("#send-questionnaire").get_by_role("button", name="Send questionnaire").click()
+        page.wait_for_timeout(3500)
         ws = workspace(token, vendor_a["publicId"])
         record("email-send-awaiting", "PASS" if ws.get("stageKey") == "AWAITING_VENDOR" else "FAIL", str(ws.get("stageKey")))
-        shot(page, "10-awaiting-vendor-4a")
+        shot(page, "F-4a-sent")
 
         status, link = api("POST", f"/api/v1/vendors/onboarding/{vendor_b['publicId']}/invitation/link", token, {
             "name": "Vendor Security",

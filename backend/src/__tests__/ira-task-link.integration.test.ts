@@ -196,7 +196,8 @@ describe('Version 3 requester IRA path', () => {
             answers: completeAnswers({ a2: 'personal' }),
         });
         expect(submitted.status).toBe(200);
-        expect(submitted.body.data.confirmation).toMatch(/submitted successfully to the Governance, Risk & Compliance team/);
+        expect(submitted.body.data.confirmation).toMatch(/submitted successfully/);
+        expect(submitted.body.data.submittedAt || submitted.body.data.submitted).toBeTruthy();
         const before = await request(app)
             .get(`${API}/vendors/onboarding/${created.body.data.publicId}`)
             .set('Authorization', `Bearer ${token}`);

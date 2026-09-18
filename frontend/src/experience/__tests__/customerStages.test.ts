@@ -1,10 +1,11 @@
-import { customerStage, customerStageIndex, dominantNextAction, workspaceSection } from '../customerStages';
+import { customerStage, customerStageIndex, dominantNextAction, version3OperatingSteps, workspaceSection } from '../customerStages';
 
 describe('five-stage customer mapping', () => {
     it('maps governed states without creating a second lifecycle', () => {
         expect(customerStage('INTAKE')).toBe('Assess');
         expect(customerStage('TIER_REVIEW')).toBe('Assess');
-        expect(customerStage('READY_TO_SEND')).toBe('Vendor Review');
+        expect(customerStage('READY_TO_SEND')).toBe('Assess');
+        expect(customerStage('AWAITING_VENDOR')).toBe('Vendor Review');
         expect(customerStage('SUBMITTED')).toBe('Review & Decide');
         expect(customerStage('ACTIVE')).toBe('Monitor');
         expect(customerStageIndex('INTAKE')).toBe(1);
@@ -43,5 +44,13 @@ describe('five-stage customer mapping', () => {
         }).label).toBe('Waiting on requester');
         expect(dominantNextAction({ stageKey: 'READY_TO_SEND' }).label).toBe('Send questionnaire');
         expect(dominantNextAction({ stageKey: 'TIER_REVIEW', tierReview: {} }).label).toBe('Not yet rated');
+    });
+
+    it('treats READY_TO_SEND as questionnaire ready, not vendor review', () => {
+        const steps = version3OperatingSteps({ stageKey: 'READY_TO_SEND', ira: { required: true, sent: true, submitted: true } });
+        expect(steps.find((row) => row.key === 'QUESTIONNAIRE_READY')?.state).toBe('current');
+        expect(steps.find((row) => row.key === 'QUESTIONNAIRE_SENT')?.state).toBe('upcoming');
+        expect(customerStage('READY_TO_SEND')).not.toBe('Vendor Review');
+        expect(customerStage('AWAITING_VENDOR')).toBe('Vendor Review');
     });
 });

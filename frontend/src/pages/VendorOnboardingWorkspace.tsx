@@ -4,11 +4,11 @@ import { Alert, Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, 
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import { EntitySummary, LifecycleProgress, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
+import { EntitySummary, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
 import ReviewDecidePanel from '../components/experience/ReviewDecidePanel';
 import QuestionnairePlan from '../components/tprm/QuestionnairePlan';
 import { approvalStatusCopy } from '../experience/approvalCopy';
-import { customerStage, customerStageIndex, dominantNextAction, version3OperatingSteps, workspaceSection } from '../experience/customerStages';
+import { customerStage, dominantNextAction, version3OperatingSteps, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
@@ -42,6 +42,7 @@ export default function VendorOnboardingWorkspace() {
     const [packReason, setPackReason] = useState('');
     const [copiedLink, setCopiedLink] = useState('');
     const [copiedIraLink, setCopiedIraLink] = useState('');
+    const [sendNotice, setSendNotice] = useState<string | null>(null);
     const [exitNotes, setExitNotes] = useState('');
     const [acknowledgeOutstanding, setAcknowledgeOutstanding] = useState(false);
     const [reassessment, setReassessment] = useState<any>(null);
@@ -115,9 +116,28 @@ export default function VendorOnboardingWorkspace() {
         return false;
     };
 
-    const sendQuestionnaire = () => {
+    const focusSendSection = () => {
+        const el = document.getElementById('send-questionnaire');
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el?.focus();
+        document.getElementById('vendor-security-contact')?.focus();
+    };
+
+    const sendQuestionnaire = async () => {
         if (!requireVendorContact()) return;
-        run(() => vendorOnboardingAPI.send(id, { ...contact, dueDate: contactDue || undefined }));
+        setSaving(true);
+        setError(null);
+        setSendNotice('Sending questionnaire…');
+        try {
+            await vendorOnboardingAPI.send(id, { ...contact, dueDate: contactDue || undefined });
+            setSendNotice('Questionnaire sent successfully.');
+            load();
+        } catch (err: any) {
+            setSendNotice(null);
+            setError(err.message || 'Unable to send the questionnaire');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const copyActivationLink = async () => {
@@ -129,8 +149,10 @@ export default function VendorOnboardingWorkspace() {
             const url = response.data.data.activationUrl;
             if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
             setCopiedLink(url || 'copied');
+            setSendNotice('Activation link copied.');
             load();
         } catch (err: any) {
+            setSendNotice(null);
             setError(err.message || 'Unable to copy the activation link');
         } finally {
             setSaving(false);
@@ -164,27 +186,18 @@ export default function VendorOnboardingWorkspace() {
                             ? approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status
                             : humanizeLabel(data.workflowStatus || data.stage)}
                     />
-                    {data.ira?.required ? (
-                        <Stack component="ol" aria-label="Version 3 operating path" spacing={0.75} sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1.25 }}>
-                            {version3OperatingSteps(data).map((step) => (
-                                <Typography
-                                    component="li"
-                                    key={step.key}
-                                    variant="caption"
-                                    sx={{ fontWeight: step.state === 'current' ? 700 : 500, color: step.state === 'upcoming' ? 'text.disabled' : 'text.primary' }}
-                                >
-                                    {step.state === 'complete' ? '✓ ' : ''}{step.label}{step.state === 'current' ? ' · now' : ''}
-                                </Typography>
-                            ))}
-                        </Stack>
-                    ) : (
-                    <LifecycleProgress
-                        active={customerStageIndex(data.stageKey || data.stage)}
-                        blocked={(data.questionnairePlan?.sendBlocked || (data.unresolvedScope || []).length > 0)
-                            && Boolean(data.intake?.completed)
-                            && customerStage(data.stageKey || data.stage) !== 'Monitor'}
-                    />
-                    )}
+                    <Stack component="ol" aria-label="Version 3 operating path" spacing={0.75} sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1.25 }}>
+                        {version3OperatingSteps(data).map((step) => (
+                            <Typography
+                                component="li"
+                                key={step.key}
+                                variant="caption"
+                                sx={{ fontWeight: step.state === 'current' ? 700 : 500, color: step.state === 'upcoming' ? 'text.disabled' : 'text.primary' }}
+                            >
+                                {step.state === 'complete' ? '✓ ' : ''}{step.label}{step.state === 'current' ? ' · now' : ''}
+                            </Typography>
+                        ))}
+                    </Stack>
                     {customerStage(data.stageKey || data.stage) === 'Monitor' ? (
                         <Alert
                             severity="info"
@@ -200,7 +213,7 @@ export default function VendorOnboardingWorkspace() {
                                 data.canReviewTier && data.stageKey === 'TIER_REVIEW' && data.tierReview?.recommendedTier
                                     ? confirmRecommendation
                                     : data.stageKey === 'READY_TO_SEND'
-                                        ? () => document.getElementById('send-questionnaire')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                        ? focusSendSection
                                         : data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && !data.ira?.sent
                                             ? () => run(() => vendorOnboardingAPI.sendIra(id))
                                             : () => setTab(defaultTab(data.stage))
@@ -257,12 +270,13 @@ export default function VendorOnboardingWorkspace() {
                             <Button variant="contained" disabled={saving} onClick={confirmRecommendation}>Confirm recommended tier</Button>
                         </Surface>
                     )}
+                    {sendNotice && <Alert severity={sendNotice === 'Sending questionnaire…' ? 'info' : 'success'}>{sendNotice}</Alert>}
                     {data.stageKey === 'READY_TO_SEND' && (
-                        <div id="send-questionnaire">
+                        <div id="send-questionnaire" tabIndex={-1}>
                         <Surface>
                             <Typography variant="h6">Send questionnaire to vendor</Typography>
                             <Typography variant="body2" sx={{ mb: 1.5 }}>
-                                Tier is confirmed. Send the generated questionnaire or copy the activation link. Copy alone does not mark it sent.
+                                Send the prepared questionnaire to the vendor. Copy alone does not mark it sent.
                             </Typography>
                             {!contact.name || !contact.email ? (
                                 <Alert severity="warning" sx={{ mb: 1.5 }} action={<Button color="inherit" onClick={() => document.getElementById('vendor-security-contact')?.focus()}>Add vendor security contact</Button>}>
@@ -274,8 +288,10 @@ export default function VendorOnboardingWorkspace() {
                                 <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
                                 <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={contactDue} onChange={(event) => setContactDue(event.target.value)} />
                                 {copiedLink && <Alert severity="success">Activation URL: {copiedLink}. Still READY TO SEND until you mark it sent.</Alert>}
+                                <Typography variant="subtitle2">4a — Send email</Typography>
+                                <Button variant="contained" disabled={saving} onClick={sendQuestionnaire}>Send questionnaire</Button>
+                                <Typography variant="subtitle2">4b — Copy link</Typography>
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                    <Button variant="contained" disabled={saving} onClick={sendQuestionnaire}>Send questionnaire</Button>
                                     <Button disabled={saving} onClick={copyActivationLink}>Copy activation link</Button>
                                     {(copiedLink || data.invitation?.deliveryMethod === 'LINK') && data.stageKey === 'READY_TO_SEND' && (
                                         <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as sent</Button>
@@ -287,9 +303,12 @@ export default function VendorOnboardingWorkspace() {
                     )}
                     {data.stageKey === 'AWAITING_VENDOR' && (
                         <Alert severity="success">
+                            {sendNotice === 'Questionnaire sent successfully.' ? 'Questionnaire sent successfully. ' : ''}
                             {data.invitation?.deliveryMethod === 'LINK' ? 'Questionnaire shared' : 'Questionnaire sent'}
-                            {data.invitation?.emailStatus ? ` · ${data.invitation.emailStatus}` : ''}
+                            {data.contact?.name || data.contact?.email ? ` · ${[data.contact?.name, data.contact?.email].filter(Boolean).join(' ')}` : ''}
+                            {data.invitation?.sentAt ? ` · sent ${formatShortDate(data.invitation.sentAt)}` : ''}
                             {data.dueDate ? ` · due ${formatShortDate(data.dueDate)}` : ''}
+                            {data.invitation?.emailStatus ? ` · ${data.invitation.emailStatus}` : ''}
                         </Alert>
                     )}
                     {data.ira?.unknownMessage && <Alert severity="warning">{data.ira.unknownMessage}</Alert>}

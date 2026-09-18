@@ -77,6 +77,7 @@ function publicIra(vendor: { name: string; publicId: string | null; onboarding: 
         answers,
         submitted,
         readOnly: submitted,
+        submittedAt: link.submittedAt || vendor.onboarding?.intakeCompletedAt || null,
         confirmation: submitted
             ? 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'
             : null,

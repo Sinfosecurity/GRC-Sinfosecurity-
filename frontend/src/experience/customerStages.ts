@@ -12,8 +12,8 @@ const GOVERNED_TO_CUSTOMER: Record<string, CustomerStage> = {
     TIER_REVIEW: 'Assess',
     'Due diligence': 'Assess',
     DUE_DILIGENCE_PLAN: 'Assess',
-    'Ready to send': 'Vendor Review',
-    READY_TO_SEND: 'Vendor Review',
+    'Ready to send': 'Assess',
+    READY_TO_SEND: 'Assess',
     'Awaiting vendor': 'Vendor Review',
     AWAITING_VENDOR: 'Vendor Review',
     'Vendor in progress': 'Vendor Review',
@@ -103,7 +103,9 @@ export function dominantNextAction(data: {
         return { label: 'Confirm recommended tier', detail: data.nextAction || 'Supreme already scored inherent risk. Confirm to make the questionnaire ready to send.' };
     }
     if (stage === 'DUE_DILIGENCE_PLAN' || stage === 'Due diligence') return { label: 'Confirm recommended packs', detail: data.nextAction || 'Baseline is required. Other packs come from intake facts.' };
-    if (stage === 'READY_TO_SEND' || stage === 'Ready to send') return { label: 'Send questionnaire', detail: data.nextAction || 'Send the questionnaire or copy the activation link. Copy alone is not sent.' };
+    if (stage === 'READY_TO_SEND' || stage === 'Ready to send') {
+        return { label: 'Send questionnaire', detail: 'Send the prepared questionnaire to the vendor.' };
+    }
     if (['AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'Awaiting vendor', 'Vendor in progress'].includes(String(stage))) {
         return { label: 'Waiting on vendor', detail: data.nextAction || 'Supreme is tracking vendor progress.' };
     }

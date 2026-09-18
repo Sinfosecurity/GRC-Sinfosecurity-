@@ -198,8 +198,8 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.getByRole('tab', { name: 'Decisions' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Overview' })).toBeInTheDocument();
         expect(screen.getByText(/Inherent is intake exposure/)).toBeInTheDocument();
-        expect(screen.getByRole('list', { name: 'Third party stages' })).toHaveTextContent('Request');
-        expect(screen.getByRole('list', { name: 'Third party stages' })).toHaveTextContent('Assess');
+        expect(screen.getByRole('list', { name: 'Version 3 operating path' })).toHaveTextContent('Request');
+        expect(screen.getByRole('list', { name: 'Version 3 operating path' })).toHaveTextContent('Tier review');
     });
 
     it('groups Review & Decide exceptions instead of listing every response', async () => {
@@ -295,6 +295,103 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.getAllByRole('button', { name: 'Send questionnaire' }).length).toBeGreaterThan(0);
         expect(screen.getAllByRole('button', { name: 'Copy activation link' }).length).toBeGreaterThan(0);
         expect(screen.queryByRole('button', { name: 'Confirm recommended tier' })).not.toBeInTheDocument();
+        expect(screen.getByText(/Questionnaire ready · now/)).toBeInTheDocument();
+        expect(screen.queryByText(/Vendor Review · now/)).not.toBeInTheDocument();
+        const sendSection = document.getElementById('send-questionnaire');
+        const focus = vi.fn();
+        if (sendSection) sendSection.focus = focus;
+        fireEvent.click(screen.getAllByRole('button', { name: 'Send questionnaire' })[0]);
+        expect(focus).toHaveBeenCalled();
+        expect(screen.getByText('4a — Send email')).toBeInTheDocument();
+        expect(screen.getByText('4b — Copy link')).toBeInTheDocument();
+    });
+
+    it('shows send pending, success, and error without a silent failure', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v-send',
+                    publicId: 'VND-2026-0042',
+                    name: 'Send Vendor',
+                    stage: 'Ready to send',
+                    stageKey: 'READY_TO_SEND',
+                    canReviewTier: true,
+                    contact: { name: 'Vendor Security', email: 'vendor@example.test' },
+                    ira: { required: true, sent: true, submitted: true, status: 'IRA_SUBMITTED' },
+                    intake: { completed: true, sections: [] },
+                    history: [],
+                },
+            },
+        });
+        let finishSend: (value?: unknown) => void = () => undefined;
+        (vendorOnboardingAPI.send as any).mockImplementationOnce(() => new Promise((_, reject) => {
+            finishSend = () => reject(new Error('Provider rejected the message'));
+        }));
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0042']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText('Send questionnaire to vendor')).toBeInTheDocument();
+        fireEvent.click(screen.getAllByRole('button', { name: 'Send questionnaire' })[1]);
+        expect(screen.getByText('Sending questionnaire…')).toBeInTheDocument();
+        finishSend();
+        expect(await screen.findByText('Provider rejected the message')).toBeInTheDocument();
+        (vendorOnboardingAPI.send as any).mockResolvedValueOnce({ data: { data: { stageKey: 'AWAITING_VENDOR' } } });
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v-send',
+                    publicId: 'VND-2026-0042',
+                    name: 'Send Vendor',
+                    stage: 'Awaiting vendor',
+                    stageKey: 'AWAITING_VENDOR',
+                    canReviewTier: true,
+                    contact: { name: 'Vendor Security', email: 'vendor@example.test' },
+                    invitation: { deliveryMethod: 'EMAIL', emailStatus: 'Queued', sentAt: '2026-09-18T15:20:00.000Z' },
+                    dueDate: '2026-09-25',
+                    ira: { required: true, sent: true, submitted: true, status: 'IRA_SUBMITTED' },
+                    intake: { completed: true, sections: [] },
+                    history: [],
+                },
+            },
+        });
+        fireEvent.click(screen.getAllByRole('button', { name: 'Send questionnaire' })[1]);
+        expect(await screen.findByText('Questionnaire sent successfully.')).toBeInTheDocument();
+    });
+
+    it('keeps copy-link ready to send until mark as sent', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v-copy',
+                    publicId: 'VND-2026-0043',
+                    name: 'Copy Vendor',
+                    stage: 'Ready to send',
+                    stageKey: 'READY_TO_SEND',
+                    canReviewTier: true,
+                    contact: { name: 'Vendor Security', email: 'vendor@example.test' },
+                    ira: { required: true, sent: true, submitted: true, status: 'IRA_SUBMITTED' },
+                    intake: { completed: true, sections: [] },
+                    history: [],
+                },
+            },
+        });
+        (vendorOnboardingAPI.activationLink as any).mockResolvedValue({
+            data: { data: { activationUrl: 'https://example.test/activate?token=redacted', stageKey: 'READY_TO_SEND' } },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0043']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText('Send questionnaire to vendor')).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Copy activation link' }));
+        expect(await screen.findByText('Activation link copied.')).toBeInTheDocument();
+        expect(screen.getByText('Send questionnaire to vendor')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Mark as sent' })).toBeInTheDocument();
     });
 
     it('tells the operator an offboarding vendor is not a new assessment', async () => {

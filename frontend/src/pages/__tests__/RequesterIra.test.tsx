@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { routerFuture } from '../../marketing/routerFuture';
 import RequesterIra from '../RequesterIra';
@@ -65,9 +65,18 @@ describe('Requester IRA', () => {
                     vendorName: 'Acme Payroll',
                     submitted: true,
                     readOnly: true,
-                    confirmation: 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.',
+                    submittedAt: '2026-09-18T15:10:00.000Z',
+                    confirmation: 'Your Inherent Risk Assessment has been submitted successfully.',
                     answers: { a2: 'personal' },
-                    questions: [],
+                    questions: [
+                        {
+                            key: 'a2',
+                            part: 'A',
+                            question: 'What information will the vendor store, process, or be able to see?',
+                            multiple: true,
+                            options: [{ value: 'personal', label: 'Personal data about employees or customers' }],
+                        },
+                    ],
                 },
             },
         });
@@ -78,7 +87,12 @@ describe('Requester IRA', () => {
                 </Routes>
             </MemoryRouter>
         );
-        expect(await screen.findByText(/submitted successfully to the Governance, Risk & Compliance team/)).toBeInTheDocument();
+        expect(await screen.findByText('Thank you')).toBeInTheDocument();
+        expect(screen.getByText(/✓ Submitted/)).toBeInTheDocument();
+        expect(screen.getByText(/You may now close this page/)).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Submit' })).not.toBeInTheDocument();
+        expect(screen.queryByText('Inherent risk questions')).not.toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'View submitted responses' }));
+        expect(screen.getByText(/Personal data about employees or customers/)).toBeInTheDocument();
     });
 });
