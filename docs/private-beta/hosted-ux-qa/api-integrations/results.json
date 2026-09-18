@@ -1,0 +1,187 @@
+{
+  "checks": [
+    {
+      "name": "api-health",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "340f90818d9278a5173be3ca7be8eabba585f0cd"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "340f90818d9278a5173be3ca7be8eabba585f0cd"
+    },
+    {
+      "name": "public-docs",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "public-openapi",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "isolated-org",
+      "result": "PASS",
+      "detail": "3a709619"
+    },
+    {
+      "name": "second-org",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "api-client-create",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "secret-not-relisted",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "missing-scope-403",
+      "result": "PASS",
+      "detail": "403"
+    },
+    {
+      "name": "vendor-create-201",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "idempotency",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "cross-tenant-404",
+      "result": "PASS",
+      "detail": "404"
+    },
+    {
+      "name": "revoked-401",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "overview",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "webhook-create",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "webhook-secret-not-relisted",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "webhook-delivery",
+      "result": "PASS",
+      "detail": "200 {'id': 'a04dfc30-be1c-44c1-9316-9f46ae7e5b8d', 'eventId': 'evt_fef6f9979ccf', 'eventType': 'third_party.created', 'attempt': 1, 'status': 'DELIVERED', 'httpStatus': 200, 'durationMs': 97, 'nextRetryAt': None, 'createdAt': '2026-09-18T19:22:27.927Z', 'sentAt': '2026-09-18T19:22:27.926Z', 'responseSummary': 'HTTP 200'}"
+    },
+    {
+      "name": "webhook-forced-failure",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "webhook-retry-same-event",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "webhook-disabled-no-delivery",
+      "result": "PASS",
+      "detail": "3->3"
+    },
+    {
+      "name": "stable-event-id",
+      "result": "PASS",
+      "detail": "evt_fef6f9979ccf"
+    },
+    {
+      "name": "slack-not-configured",
+      "result": "PASS",
+      "detail": "{'key': 'not_configured', 'label': 'Not configured'}"
+    },
+    {
+      "name": "siem-coming-later",
+      "result": "PASS",
+      "detail": "{'key': 'not_configured', 'label': 'Coming later'}"
+    },
+    {
+      "name": "slack-test-without-config",
+      "result": "PASS",
+      "detail": "409"
+    },
+    {
+      "name": "audit-api-client",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "audit-webhook",
+      "result": "PASS",
+      "detail": "api.client.created,api.client.revoked,webhook.delivery.retried,webhook.endpoint.created,webhook.endpoint.disabled,webhook.endpoint.updated"
+    },
+    {
+      "name": "ui-heading",
+      "result": "PASS",
+      "detail": "API & Integrations"
+    },
+    {
+      "name": "axe:overview",
+      "result": "SKIP",
+      "detail": "CSP blocked inline axe"
+    },
+    {
+      "name": "ui-coming-later",
+      "result": "PASS",
+      "detail": "SIEM/risk providers"
+    },
+    {
+      "name": "ui-no-connected-without-test",
+      "result": "PASS",
+      "detail": "proof tenant cards"
+    }
+  ],
+  "shots": [
+    "overview-375",
+    "overview-768",
+    "overview-1024",
+    "overview-1440",
+    "overview-1920",
+    "clients-1440",
+    "webhooks-1440",
+    "integrations-1440",
+    "activity-1440"
+  ],
+  "axe": [
+    {
+      "name": "overview",
+      "skipped": true,
+      "reason": "Page.add_script_tag: Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-TKlyr"
+    }
+  ],
+  "sha": {
+    "api": "340f90818d9278a5173be3ca7be8eabba585f0cd",
+    "frontend": "340f90818d9278a5173be3ca7be8eabba585f0cd",
+    "required": "340f90818d9278a5173be3ca7be8eabba585f0cd",
+    "health": 200
+  },
+  "notes": [
+    "LIVE PROVIDER TEST: NOT TESTED \u2014 no Slack or Jira staging credentials were supplied.",
+    "Webhook signature headers were present on sink receipts. Byte-exact HMAC re-hash of parsed stored JSON did not match; unit tests cover HMAC and replay. Customer receivers must verify the raw body."
+  ]
+}
