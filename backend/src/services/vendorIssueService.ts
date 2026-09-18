@@ -33,6 +33,9 @@ export interface CreateVendorIssueInput {
     assignedTo?: string;
     targetRemediationDate?: Date;
     assessmentId?: string;
+    questionId?: string;
+    responsibility?: string;
+    sourceSnapshot?: Prisma.InputJsonValue;
 }
 
 class VendorIssueService {
@@ -60,6 +63,9 @@ class VendorIssueService {
             assignedTo: data.assignedTo,
             targetRemediationDate: data.targetRemediationDate,
             assessmentId: data.assessmentId,
+            questionId: data.questionId,
+            responsibility: data.responsibility,
+            sourceSnapshot: data.sourceSnapshot,
             status: VendorIssueStatus.OPEN,
             identifiedDate: new Date(),
         };
@@ -85,6 +91,26 @@ class VendorIssueService {
         await this.notifyIssueStakeholders(issue);
 
         logger.info(`Created issue: ${issue.title} for ${issue.vendor.name}`);
+        const { recordAudit } = await import('./auditEventService');
+        await recordAudit({
+            organizationId: issue.organizationId,
+            actorUserId: data.identifiedBy,
+            action: 'finding.created',
+            resourceType: 'VendorIssue',
+            resourceId: issue.id,
+            result: 'success',
+            metadata: { source: issue.source, responsibility: issue.responsibility },
+        });
+        const { ensureFindingGraph } = await import('../findings/findingWorkspaceService');
+        await ensureFindingGraph({
+            organizationId: issue.organizationId,
+            actorUserId: data.identifiedBy,
+            issueId: issue.id,
+            title: issue.title,
+            vendorId: issue.vendorId,
+            vendorName: issue.vendor.name,
+            assessmentId: issue.assessmentId,
+        }).catch(() => undefined);
         const { emitSupremeAutomationEvent } = await import('./supremeAutomationBus');
         await emitSupremeAutomationEvent({
             organizationId: issue.organizationId,
@@ -156,25 +182,12 @@ class VendorIssueService {
         });
     }
 
-    async listOrganizationIssues(organizationId: string, filters?: { status?: VendorIssueStatus; severity?: IssueSeverity; vendorId?: string }) {
+    async listOrganizationIssues(organizationId: string, filters?: { status?: VendorIssueStatus; severity?: IssueSeverity; vendorId?: string; sourceKind?: string; owner?: string; overdue?: boolean }) {
         if (filters?.vendorId) {
             await requireVendorForOrganization(organizationId, filters.vendorId);
         }
-        const rows = await prisma.vendorIssue.findMany({
-            where: {
-                organizationId,
-                ...(filters?.status ? { status: filters.status } : {}),
-                ...(filters?.severity ? { severity: filters.severity } : {}),
-                ...(filters?.vendorId ? { vendorId: filters.vendorId } : {}),
-            },
-            include: { vendor: { select: { id: true, name: true, tier: true, organizationId: true } } },
-            orderBy: [{ severity: 'desc' }, { identifiedDate: 'desc' }],
-            take: 300,
-        });
-        return rows.map((row) => ({
-            ...row,
-            vendor: omitForeignParent(organizationId, row.vendor),
-        }));
+        const { listFindingSummaries } = await import('../findings/findingWorkspaceService');
+        return listFindingSummaries(organizationId, filters);
     }
 
     /**
@@ -200,6 +213,15 @@ class VendorIssueService {
         });
         const issue = await this.getIssueById(issueId, organizationId);
         if (issue) {
+            const { recordAudit } = await import('./auditEventService');
+            await recordAudit({
+                organizationId,
+                actorUserId: issue.assignedTo || issue.identifiedBy,
+                action: 'finding.plan_recorded',
+                resourceType: 'VendorIssue',
+                resourceId: issue.id,
+                result: 'success',
+            });
             const mail = remediationRequestedEmail({
                 title: issue.title,
                 vendorName: issue.vendor?.name,
@@ -281,6 +303,15 @@ class VendorIssueService {
 
         const record = await this.getIssueById(issueId, organizationId);
         if (record) {
+            const { recordAudit } = await import('./auditEventService');
+            await recordAudit({
+                organizationId,
+                actorUserId: validatedBy,
+                action: approved ? 'finding.verified' : 'finding.verification_returned',
+                resourceType: 'VendorIssue',
+                resourceId: record.id,
+                result: 'success',
+            });
             const mail = remediationRequestedEmail({
                 title: record.title,
                 vendorName: record.vendor?.name,

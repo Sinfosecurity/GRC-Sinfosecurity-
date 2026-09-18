@@ -864,12 +864,26 @@ async function generateDraftFindings(organizationId: string, vendorId: string, a
             created.push(existing);
             continue;
         }
+        const { buildSnapshot, displayTitleFor } = await import('../findings/findingWorkspace');
+        const snapshot = buildSnapshot({
+            kind: /privacy/i.test(row.questionCategory || '') ? 'PRIVACY' : 'ASSESSMENT',
+            questionId: row.questionId,
+            questionText: question?.text || row.questionText,
+            answer: row.response || null,
+            assessmentId,
+            assessmentType: assessment.assessmentType,
+            section: question?.section || row.questionCategory,
+            pack: question?.section || row.questionCategory,
+            draftRuleCode: rule,
+            title: evidenceMissing ? `Evidence still required: ${question?.text || row.questionText}` : `Response needs review: ${question?.text || row.questionText}`,
+            category: row.questionCategory || 'Security',
+        });
         const issue = await prisma.vendorIssue.create({
             data: {
                 organizationId,
                 vendorId,
-                title: evidenceMissing ? `Evidence still required: ${question?.text || row.questionText}` : `Response needs review: ${question?.text || row.questionText}`,
-                description: `${row.response || 'No response recorded'}. Supreme drafted this from the submitted answer.`,
+                title: displayTitleFor({ title: snapshot.displayTitle || question?.text || row.questionText, category: row.questionCategory, draftRuleCode: rule, sourceSnapshot: snapshot, status: 'OPEN' }),
+                description: `${row.response?.trim() || 'No response recorded'}. Supreme drafted this from the submitted answer.`,
                 issueType: VendorIssueType.CONTROL_FAILURE,
                 severity: severityFor(assessment.vendor.tier, score, evidenceMissing),
                 priority: 'MEDIUM' as const,
@@ -879,10 +893,23 @@ async function generateDraftFindings(organizationId: string, vendorId: string, a
                 status: 'OPEN',
                 assessmentId,
                 questionId: row.questionId,
+                sourceSnapshot: snapshot as Prisma.InputJsonValue,
+                responsibility: 'VENDOR',
                 reviewState: IssueReviewState.DRAFT,
                 draftRuleCode: rule,
             },
         });
+        const { ensureFindingGraph } = await import('../findings/findingWorkspaceService');
+        await ensureFindingGraph({
+            organizationId,
+            actorUserId: identifiedBy,
+            issueId: issue.id,
+            title: issue.title,
+            vendorId,
+            vendorName: assessment.vendor.name,
+            assessmentId,
+            assessmentLabel: assessment.assessmentType,
+        }).catch(() => undefined);
         created.push(issue);
     }
     if (created.length) {

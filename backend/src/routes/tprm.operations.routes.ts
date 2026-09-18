@@ -266,7 +266,20 @@ router.get('/findings', requirePermission(PERMISSIONS['finding.read']), async (r
             status: typeof req.query.status === 'string' ? (req.query.status as VendorIssueStatus) : undefined,
             severity: typeof req.query.severity === 'string' ? (req.query.severity as IssueSeverity) : undefined,
             vendorId: typeof req.query.vendorId === 'string' ? req.query.vendorId : undefined,
+            sourceKind: typeof req.query.sourceKind === 'string' ? req.query.sourceKind : undefined,
+            owner: typeof req.query.owner === 'string' ? req.query.owner : undefined,
+            overdue: req.query.overdue === 'true',
         });
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/findings/:issueId/workspace', requirePermission(PERMISSIONS['finding.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { getFindingWorkspace } = await import('../findings/findingWorkspaceService');
+        const data = await getFindingWorkspace(req.user!.organizationId, req.params.issueId, req.user!.id);
         res.json({ success: true, data });
     } catch (error) {
         next(error);
@@ -282,6 +295,20 @@ router.post('/vendors/:vendorId/findings', requirePermission(PERMISSIONS['findin
         if (!vendor) {
             throw new ApiError(404, 'Vendor not found');
         }
+        if (!String(req.body.description || '').trim()) {
+            throw new ApiError(400, 'Describe what was observed and why this is a finding.');
+        }
+        const { buildSnapshot } = await import('../findings/findingWorkspace');
+        const source = req.body.source || (req.body.assessmentId ? 'INTERNAL_ASSESSMENT' : 'OTHER');
+        const snapshot = buildSnapshot({
+            kind: req.body.assessmentId ? 'ASSESSMENT' : 'MANUAL',
+            questionText: req.body.title,
+            answer: req.body.observedCondition || null,
+            assessmentId: typeof req.body.assessmentId === 'string' ? req.body.assessmentId : null,
+            draftRuleCode: null,
+            title: req.body.title,
+            category: req.body.category || 'Security',
+        });
         const data = await vendorIssueService.createIssue({
             vendorId: vendor.id,
             organizationId: req.user!.organizationId,
@@ -290,12 +317,14 @@ router.post('/vendors/:vendorId/findings', requirePermission(PERMISSIONS['findin
             issueType: req.body.issueType || 'AUDIT_FINDING',
             severity: req.body.severity,
             priority: req.body.priority || 'MEDIUM',
-            source: req.body.source || 'INTERNAL_ASSESSMENT',
+            source,
             identifiedBy: req.user!.id,
             category: req.body.category || 'Security',
             assignedTo: req.body.assignedTo,
             targetRemediationDate: req.body.targetRemediationDate ? new Date(req.body.targetRemediationDate) : undefined,
             assessmentId: typeof req.body.assessmentId === 'string' ? req.body.assessmentId : undefined,
+            responsibility: req.body.responsibility || (req.body.assessmentId ? 'VENDOR' : 'INTERNAL'),
+            sourceSnapshot: snapshot,
         });
         res.status(201).json({ success: true, data });
     } catch (error) {
@@ -320,11 +349,14 @@ router.post('/findings/:issueId/cap', requirePermission(PERMISSIONS['finding.upd
 
 router.post('/findings/:issueId/validate', requirePermission(PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        if (!String(req.body.validationNotes || '').trim()) {
+            throw new ApiError(400, 'Record what was checked before marking verification complete.');
+        }
         await vendorIssueService.validateRemediation(
             req.params.issueId,
             req.user!.organizationId,
             req.user!.id,
-            req.body.validationNotes || '',
+            req.body.validationNotes,
             req.body.approved !== false
         );
         const data = await vendorIssueService.getIssueById(req.params.issueId, req.user!.organizationId);

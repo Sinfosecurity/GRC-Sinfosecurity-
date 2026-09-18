@@ -429,6 +429,7 @@ export const tprmAPI = {
     completeAssessment: (vendorId: string, assessmentId: string) =>
         api.post(`/tprm/vendors/${vendorId}/assessments/${assessmentId}/complete`),
     listFindings: (params?: unknown) => api.get('/tprm/findings', { params }),
+    findingWorkspace: (issueId: string) => api.get(`/tprm/findings/${issueId}/workspace`),
     createFinding: (vendorId: string, data: unknown) => api.post(`/tprm/vendors/${vendorId}/findings`, data),
     updateFindingCap: (issueId: string, data: unknown) => api.post(`/tprm/findings/${issueId}/cap`, data),
     validateFinding: (issueId: string, data: unknown) => api.post(`/tprm/findings/${issueId}/validate`, data),

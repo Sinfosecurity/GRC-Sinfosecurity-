@@ -1246,6 +1246,8 @@ model VendorIssue {
 
   assessmentId          String?
   questionId            String?
+  sourceSnapshot        Json?
+  responsibility        String?
   reviewState           IssueReviewState    @default(CONFIRMED)
   draftRuleCode         String?
   dismissReason         String?
