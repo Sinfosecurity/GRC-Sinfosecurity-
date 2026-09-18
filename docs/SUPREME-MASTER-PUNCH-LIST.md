@@ -415,13 +415,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Edition configuration, not a fork.
 
-**CURRENT STATUS:** ACTIVE — GLOBAL FOUNDATION READY FOR PRODUCT LEADERSHIP REVIEW. Not PASS.
+**CURRENT STATUS:** ACTIVE — PHASE B IMPLEMENTATION. Phase A global foundation remains accepted for the current stage. Not PASS.
 
-**CERTIFICATION SHA:** Implementation / hosted API `c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2`. Hosted frontend and CI `6a8b0e1514172796e1f4aa9308262b2343274244`. Not a PASS SHA.
+**CERTIFICATION SHA:** Phase A implementation / hosted API `c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2`. Phase A hosted frontend and CI `6a8b0e1514172796e1f4aa9308262b2343274244`. Phase B SHAs are recorded after implementation commit and hosted recertification. Not a PASS SHA.
 
-**EVIDENCE:** Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Hosted walk `docs/private-beta/hosted-ux-qa/insurance-edition/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35393726716 SUCCESS on `6a8b0e1`. Walk 48 PASS / 0 FAIL. Regulatory packs remain metadata/placeholder only.
+**EVIDENCE:** Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Phase A hosted walk `docs/private-beta/hosted-ux-qa/insurance-edition/`. Phase B evidence `docs/private-beta/hosted-ux-qa/insurance-edition/phase-b/`. Nigeria and US/NY exist only as #23 reference jurisdictions. #27 and #30 are not started.
 
-**NEXT ACTION:** Product Leadership review of the Insurance Edition global foundation. Do not start #24–#38 or #40. Do not declare #23 PASS.
+**NEXT ACTION:** Complete Phase B hosted staging golden walk, then Product Leadership review of Phase B. Do not start #24–#38, #27, #30, or #40. Do not declare #23 PASS.
 
 ---
 

@@ -689,6 +689,19 @@ export const insuranceAPI = {
     risks: () => api.get('/insurance/risks'),
     graph: () => api.get('/insurance/graph'),
     aiContexts: () => api.get('/insurance/ai-contexts'),
+    upsertAiContext: (data: unknown) => api.post('/insurance/ai-contexts', data),
+    regulatory: () => api.get('/insurance/regulatory'),
+    reviewApplicability: (data: unknown) => api.post('/insurance/regulatory/applicability', data),
+    claims: () => api.get('/insurance/claims'),
+    underwriting: () => api.get('/insurance/underwriting'),
+    reinsurance: () => api.get('/insurance/reinsurance'),
+    createDelegatedAuthority: (data: unknown) => api.post('/insurance/delegated-authority', data),
+    createCounterparty: (data: unknown) => api.post('/insurance/counterparties', data),
+    concentration: () => api.get('/insurance/concentration'),
+    licenseAttention: () => api.get('/insurance/license-attention'),
+    signals: () => api.get('/insurance/signals'),
+    reports: () => api.get('/insurance/reports'),
+    complaints: () => api.get('/insurance/complaints'),
 };
 
 export default api;

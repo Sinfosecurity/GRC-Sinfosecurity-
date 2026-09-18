@@ -424,6 +424,14 @@ export const enterprisePrivacyService = {
             rightsTypes: Object.values(PrivacyRightsType).map((kind) => ({ key: kind, label: humanPrivacyLabel(kind) })),
             screening: DPIA_SCREENING,
             consentCollector: { status: 'Not configured / manual', honesty: 'Supreme is not a cookie-consent platform unless a collector is implemented.' },
+            insuranceContext: {
+                honesty: 'Insurance data categories are Privacy inventory context. Country packs supply legal context. This is not a second privacy module.',
+                categories: [
+                    'Policyholder', 'Beneficiary', 'Claimant', 'Health/medical', 'Financial', 'Payment',
+                    'Driver', 'Vehicle', 'Property', 'Telematics', 'Location', 'Fraud/investigation',
+                    'Third-party consumer data', 'Biometric',
+                ],
+            },
         };
     },
 

@@ -177,4 +177,14 @@ router.get('/insurance/risks', scope('insurance:read'), async (req: PublicReques
     catch (error) { next(error); }
 });
 
+router.get('/insurance/regulatory-packs', scope('insurance:read'), async (req: PublicRequest, res, next) => {
+    try { res.json({ success: true, data: await publicResources.insuranceRegulatoryPacks(req.publicClient!.organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/insurance/models', scope('insurance:read'), async (req: PublicRequest, res, next) => {
+    try { res.json({ success: true, data: await publicResources.insuranceModels(req.publicClient!.organizationId) }); }
+    catch (error) { next(error); }
+});
+
 export default router;

@@ -153,4 +153,27 @@ export const publicResources = {
         const { insuranceService } = await import('../insurance/insuranceService');
         return insuranceService.riskSummary(organizationId);
     },
+
+    async insuranceRegulatoryPacks(organizationId: string) {
+        const { insuranceOperations } = await import('../insurance/operationsService');
+        const workspace = await insuranceOperations.regulatoryWorkspace(organizationId);
+        return {
+            honesty: workspace.honesty,
+            packs: workspace.packs.map((pack) => ({
+                key: pack.key,
+                label: pack.label,
+                jurisdiction: pack.jurisdiction,
+                regulator: pack.regulator,
+                version: pack.version,
+                sourceUrl: pack.sourceUrl,
+                applicabilityState: pack.applicabilityState,
+                overlay: pack.overlay,
+            })),
+        };
+    },
+
+    async insuranceModels(organizationId: string) {
+        const { insuranceService } = await import('../insurance/insuranceService');
+        return insuranceService.aiContexts(organizationId);
+    },
 };

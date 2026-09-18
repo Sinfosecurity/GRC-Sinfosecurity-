@@ -1,3 +1,5 @@
+import { REGULATORY_PACKS, recommendRegulatoryPacks } from './regulatoryCatalog';
+
 export const INSURANCE_EDITION_KEY = 'INSURANCE' as const;
 
 export type CatalogItem = { key: string; label: string; countries?: string[]; note?: string };
@@ -154,9 +156,9 @@ export const INSURANCE_PACKS: PackDefinition[] = [
     { key: 'cloud-technology', label: 'Cloud / Technology', family: 'technology', status: 'METADATA_ONLY', recommendationTriggers: ['INSURTECH'], relatedControlKeys: ['INS-OUT-01'], evidenceCategories: ['soc-iso-cyber'], honesty: 'Recommended based on your configuration. Not legally required by this product.' },
     { key: 'regulatory-outsourcing', label: 'Regulatory Outsourcing', family: 'outsourcing', status: 'METADATA_ONLY', recommendationTriggers: ['OUTSOURCING', 'TPA'], relatedControlKeys: ['INS-OUT-01'], evidenceCategories: ['delegated-authority'], honesty: 'Recommended based on your configuration. Not legally required by this product.' },
     { key: 'market-conduct', label: 'Market Conduct', family: 'conduct', status: 'METADATA_ONLY', recommendationTriggers: ['COMPLAINTS', 'CUSTOMER_SERVICE'], relatedControlKeys: ['INS-COND-01'], evidenceCategories: ['market-conduct'], honesty: 'Recommended based on your configuration. Not legally required by this product.' },
-    { key: 'naicom-placeholder', label: 'NAICOM pack (placeholder)', family: 'jurisdiction', status: 'METADATA_ONLY', recommendationTriggers: ['NG'], relatedControlKeys: ['INS-LIC-01'], evidenceCategories: ['regulatory-filing'], countries: ['NG'], honesty: 'Placeholder for later authoritative NAICOM content. Not a statement of legal applicability.' },
-    { key: 'naic-placeholder', label: 'NAIC-related pack (placeholder)', family: 'jurisdiction', status: 'METADATA_ONLY', recommendationTriggers: ['US'], relatedControlKeys: ['INS-LIC-01'], evidenceCategories: ['regulatory-filing'], countries: ['US'], honesty: 'Placeholder for later NAIC-related content. Not automatically applicable.' },
-    { key: 'nydfs-overlay', label: 'New York / NYDFS overlay (optional)', family: 'jurisdiction', status: 'METADATA_ONLY', recommendationTriggers: ['US-NY'], relatedControlKeys: ['INS-LIC-01'], evidenceCategories: ['regulatory-filing'], countries: ['US'], overlay: true, honesty: 'Optional overlay. Not applied to all U.S. insurers.' },
+        { key: 'naicom-placeholder', label: 'NAICOM pack (historical placeholder)', family: 'jurisdiction', status: 'METADATA_ONLY', recommendationTriggers: [], relatedControlKeys: ['INS-LIC-01'], evidenceCategories: ['regulatory-filing'], countries: ['NG'], honesty: 'Superseded by reviewed NIIRA 2025 packs. Kept for history only.' },
+    { key: 'naic-placeholder', label: 'NAIC-related pack (historical placeholder)', family: 'jurisdiction', status: 'METADATA_ONLY', recommendationTriggers: [], relatedControlKeys: ['INS-LIC-01'], evidenceCategories: ['regulatory-filing'], countries: ['US'], honesty: 'Superseded by NAIC model-reference packs. Not automatically applicable.' },
+    { key: 'nydfs-overlay', label: 'New York / NYDFS overlay (see nydfs-500)', family: 'jurisdiction', status: 'METADATA_ONLY', recommendationTriggers: [], relatedControlKeys: ['INS-LIC-01'], evidenceCategories: ['regulatory-filing'], countries: ['US'], overlay: true, honesty: 'Superseded by reviewed 23 NYCRR 500 pack. Not applied to all U.S. insurers.' },
 ];
 
 export const RISK_TAXONOMY = [
@@ -265,13 +267,27 @@ export function recommendPacks(input: { organizationType?: string; activities?: 
         ...(input.subJurisdictions || []),
         '*',
     ]);
-    return INSURANCE_PACKS.filter((pack) => pack.recommendationTriggers.some((trigger) => haystack.has(trigger))).map((pack) => ({
+    const operational = INSURANCE_PACKS.filter((pack) => pack.recommendationTriggers.some((trigger) => haystack.has(trigger))).map((pack) => ({
         key: pack.key,
         label: pack.label,
         reason: pack.honesty,
         overlay: Boolean(pack.overlay),
         status: pack.status,
+        family: pack.family,
     }));
+    const regulatory = recommendRegulatoryPacks(input).map((pack) => ({
+        key: pack.key,
+        label: pack.label,
+        reason: pack.honesty,
+        overlay: pack.overlay,
+        status: pack.status,
+        family: pack.family,
+        version: pack.version,
+        jurisdiction: pack.jurisdiction,
+        regulator: pack.regulator,
+        sourceUrl: pack.sourceUrl,
+    }));
+    return [...operational, ...regulatory];
 }
 
 export function insuranceCatalog() {
@@ -287,9 +303,11 @@ export function insuranceCatalog() {
         authorities: AUTHORITIES,
         licenseTypeHooks: LICENSE_TYPE_HOOKS,
         packs: INSURANCE_PACKS,
+        regulatoryPacks: REGULATORY_PACKS,
         riskTaxonomy: RISK_TAXONOMY,
         vendorServiceCategories: VENDOR_SERVICE_CATEGORIES,
         evidenceCategories: EVIDENCE_CATEGORIES,
         controlExtensions: CONTROL_EXTENSIONS,
+        iraOverlay: 'ins1-ins14. Overlay floors only when Yes is recorded. Don\'t know does not fabricate a tier.',
     };
 }

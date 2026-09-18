@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #23 Insurance Edition. #12, #21, and #22 are ACCEPTED FOR CURRENT STAGE. #22 live provider validation is deferred. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #23 ACTIVE — GLOBAL FOUNDATION READY FOR PRODUCT LEADERSHIP REVIEW. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, #23 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #23 ACTIVE — PHASE B IMPLEMENTATION. Phase A global foundation remains accepted for the current stage. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, #23 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -32,7 +32,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#22:** ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED (Product Leadership 2026-09-18). Honesty/UI implementation and hosted frontend `7feb92de70cacfc954dc6632dbf862b61549ca53`. Hosted API `340f90818d9278a5173be3ca7be8eabba585f0cd`. Live Slack/Jira remain NOT TESTED. Cursor does not declare #22 PASS.
 
-**#23:** ACTIVE — GLOBAL FOUNDATION READY FOR PRODUCT LEADERSHIP REVIEW. Implementation / hosted API `c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2`. Hosted frontend / CI `6a8b0e1514172796e1f4aa9308262b2343274244`. Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Hosted walk `docs/private-beta/hosted-ux-qa/insurance-edition/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35393726716 SUCCESS. Cursor does not declare #23 PASS. #24–#38 and #40 are not authorized.
+**#23:** ACTIVE — PHASE B IMPLEMENTATION. Phase A implementation / hosted API `c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2`. Phase A hosted frontend / CI `6a8b0e1514172796e1f4aa9308262b2343274244`. Phase B adds authoritative NG/US/NY packs and insurance operations on the same engines. Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Phase B evidence `docs/private-beta/hosted-ux-qa/insurance-edition/phase-b/`. #27 and #30 are not started as independent items. Cursor does not declare #23 PASS. #24–#38 and #40 are not authorized.
 
 **#12:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED (Product Leadership 2026-09-18). Not commercial GO. Not production deployment. Not immutable. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495`. Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
 

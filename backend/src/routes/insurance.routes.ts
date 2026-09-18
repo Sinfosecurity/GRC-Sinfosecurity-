@@ -2,6 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { AuthRequest, authenticate, requirePermission } from '../middleware/auth';
 import { PERMISSIONS } from '../security/rbac';
 import { insuranceService } from '../insurance/insuranceService';
+import { insuranceOperations } from '../insurance/operationsService';
 
 const router = Router();
 router.use(authenticate);
@@ -87,6 +88,66 @@ router.get('/risks', requirePermission(PERMISSIONS['insurance.read']), async (re
 
 router.get('/graph', requirePermission(PERMISSIONS['governanceGraph.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try { res.json({ success: true, data: await insuranceService.graphLinks(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/regulatory', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.regulatoryWorkspace(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.post('/regulatory/applicability', requirePermission(PERMISSIONS['insurance.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.status(201).json({ success: true, data: await insuranceOperations.reviewApplicability(actor(req).organizationId, actor(req).userId, req.body || {}) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/claims', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.claimsWorkspace(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/underwriting', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.underwritingWorkspace(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/reinsurance', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.reinsuranceWorkspace(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.post('/delegated-authority', requirePermission(PERMISSIONS['insurance.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.status(201).json({ success: true, data: await insuranceOperations.createDelegatedAuthority(actor(req).organizationId, actor(req).userId, req.body || {}) }); }
+    catch (error) { next(error); }
+});
+
+router.post('/counterparties', requirePermission(PERMISSIONS['insurance.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.status(201).json({ success: true, data: await insuranceOperations.createCounterparty(actor(req).organizationId, actor(req).userId, req.body || {}) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/concentration', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.concentration(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/license-attention', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.licenseAttention(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/signals', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.signals(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/reports', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.reports(actor(req).organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/complaints', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.json({ success: true, data: await insuranceOperations.complaintContext(actor(req).organizationId) }); }
     catch (error) { next(error); }
 });
 

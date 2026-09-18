@@ -50,7 +50,7 @@ export default function PrivacyActivities() {
                         </Stack>
                     </Surface>
                     <Surface>
-                        <Alert severity="info" sx={{ mb: 2 }}>Selecting a data category records inventory metadata. It does not conclude that processing is lawful.</Alert>
+                        <Alert severity="info" sx={{ mb: 2 }}>Selecting a data category records inventory metadata. It does not conclude that processing is lawful. Insurance policyholder, claimant, telematics, and related categories stay in this Privacy module.</Alert>
                         <AppTable
                             rows={rows}
                             rowKey={(row) => row.publicId}

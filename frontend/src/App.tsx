@@ -248,6 +248,9 @@ export default function App() {
                     <Route path="insurance/licenses" element={<InsuranceHome />} />
                     <Route path="insurance/risk" element={<InsuranceHome />} />
                     <Route path="insurance/third-parties" element={<InsuranceHome />} />
+                    <Route path="insurance/claims" element={<InsuranceHome />} />
+                    <Route path="insurance/underwriting" element={<InsuranceHome />} />
+                    <Route path="insurance/reinsurance" element={<InsuranceHome />} />
                     <Route path="insurance/controls" element={<InsuranceHome />} />
                     <Route path="insurance/ai" element={<InsuranceHome />} />
                     <Route path="insurance/regulatory" element={<InsuranceHome />} />

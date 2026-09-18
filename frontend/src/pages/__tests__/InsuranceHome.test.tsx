@@ -21,7 +21,22 @@ vi.mock('../../services/api', () => ({
         risks: vi.fn(),
         graph: vi.fn(),
         aiContexts: vi.fn(),
+        upsertAiContext: vi.fn(),
+        regulatory: vi.fn(),
+        reviewApplicability: vi.fn(),
+        claims: vi.fn(),
+        underwriting: vi.fn(),
+        reinsurance: vi.fn(),
+        createDelegatedAuthority: vi.fn(),
+        createCounterparty: vi.fn(),
+        concentration: vi.fn(),
+        licenseAttention: vi.fn(),
+        signals: vi.fn(),
+        reports: vi.fn(),
+        complaints: vi.fn(),
     },
+    vendorAPI: { getAll: vi.fn() },
+    aiGovernanceAPI: { systems: vi.fn() },
 }));
 
 vi.mock('../../contexts/AuthContext', () => ({
@@ -42,6 +57,18 @@ describe('Insurance Edition workspace', () => {
         (insuranceAPI.risks as any).mockResolvedValue({ data: { data: { categories: [] } } });
         (insuranceAPI.graph as any).mockResolvedValue({ data: { data: [] } });
         (insuranceAPI.vendors as any).mockResolvedValue({ data: { data: [] } });
+        (insuranceAPI.aiContexts as any).mockResolvedValue({ data: { data: [] } });
+        (insuranceAPI.regulatory as any).mockResolvedValue({ data: { data: { honesty: 'Recommended is not applicable.', packs: [] } } });
+        (insuranceAPI.claims as any).mockResolvedValue({ data: { data: { honesty: 'Claims governance only.', entities: [], vendors: [], delegatedAuthority: [], models: [] } } });
+        (insuranceAPI.underwriting as any).mockResolvedValue({ data: { data: { honesty: 'Not a quoting or rating engine.', entities: [], vendors: [], delegatedAuthority: [], models: [] } } });
+        (insuranceAPI.reinsurance as any).mockResolvedValue({ data: { data: { honesty: 'Not placement.', counterparties: [] } } });
+        (insuranceAPI.licenseAttention as any).mockResolvedValue({ data: { data: [] } });
+        (insuranceAPI.signals as any).mockResolvedValue({ data: { data: [] } });
+        (insuranceAPI.reports as any).mockResolvedValue({ data: { data: { honesty: 'Live tenant records only.', reports: [] } } });
+        (insuranceAPI.concentration as any).mockResolvedValue({ data: { data: { honesty: 'Counts of recorded relationships.', vendorCategories: [] } } });
+        const { vendorAPI, aiGovernanceAPI } = await import('../../services/api');
+        (vendorAPI.getAll as any).mockResolvedValue({ data: { vendors: [] } });
+        (aiGovernanceAPI.systems as any).mockResolvedValue({ data: { data: [] } });
     });
 
     it('shows the activation wizard and honest empty language', async () => {
@@ -65,5 +92,17 @@ describe('Insurance Edition workspace', () => {
             </MemoryRouter>,
         );
         expect(await screen.findByText(/not a second register/i)).toBeInTheDocument();
+    });
+
+    it('shows claims governance honesty and not a processing system', async () => {
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/insurance/claims']}>
+                <Routes>
+                    <Route path="/insurance/claims" element={<InsuranceHome />} />
+                </Routes>
+            </MemoryRouter>,
+        );
+        expect(await screen.findByText(/Claims governance only/i)).toBeInTheDocument();
+        expect(screen.queryByText('100%')).not.toBeInTheDocument();
     });
 });

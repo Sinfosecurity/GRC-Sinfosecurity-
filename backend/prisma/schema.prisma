@@ -229,6 +229,9 @@ model Organization {
   insuranceLicenses           InsuranceLicense[]
   insuranceVendorClasses      InsuranceVendorClassification[]
   insuranceAiContexts         InsuranceAiContext[]
+  insuranceApplicability      InsuranceApplicabilityDecision[]
+  insuranceDelegatedAuthority InsuranceDelegatedAuthority[]
+  insuranceCounterparties     InsuranceCounterparty[]
 
   @@index([slug])
   @@index([status])
@@ -5942,6 +5945,22 @@ enum InsuranceLicenseStatus {
   UNKNOWN
 }
 
+enum InsuranceApplicabilityState {
+  RECOMMENDED
+  NEEDS_REVIEW
+  APPLICABLE
+  NOT_APPLICABLE
+  ENABLED
+  DISABLED
+  SUPERSEDED
+}
+
+enum InsuranceLicenseVerification {
+  CUSTOMER_RECORDED
+  DOCUMENT_VERIFIED
+  EXTERNAL_SOURCE_VERIFIED
+}
+
 model OrganizationEditionConfig {
   id                       String               @id @default(uuid())
   organization             Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -6015,6 +6034,8 @@ model InsuranceLicense {
   restrictions      String?
   ownerUserId       String?
   evidenceObjectId  String?
+  verificationBasis InsuranceLicenseVerification @default(CUSTOMER_RECORDED)
+  reviewDueAt       DateTime?
   notes             String?
   createdAt         DateTime               @default(now())
   updatedAt         DateTime               @updatedAt
@@ -6025,13 +6046,26 @@ model InsuranceLicense {
 }
 
 model InsuranceVendorClassification {
-  id              String       @id @default(uuid())
-  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId  String
-  vendorId        String
-  serviceCategory String
-  notes           String?
-  createdAt       DateTime     @default(now())
+  id                      String       @id @default(uuid())
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId          String
+  vendorId                String
+  serviceCategory         String
+  jurisdictionCode        String?
+  entityId                String?
+  linesOfBusiness         Json?
+  claimsAuthority         Boolean      @default(false)
+  underwritingAuthority   Boolean      @default(false)
+  policyholderInteraction Boolean      @default(false)
+  premiumHandling         Boolean      @default(false)
+  criticality             String?
+  licenseRequired         Boolean      @default(false)
+  aiModelProvider         Boolean      @default(false)
+  regulatedOutsourcing    Boolean      @default(false)
+  fourthPartyUse          Boolean      @default(false)
+  notes                   String?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
 
   @@unique([organizationId, vendorId, serviceCategory])
   @@index([organizationId, serviceCategory])
@@ -6042,6 +6076,8 @@ model InsuranceAiContext {
   organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId        String
   aiSystemId            String
+  entityId              String?
+  jurisdictionCode      String?
   insuranceUseCase      String?
   lineOfBusiness        String?
   underwritingInfluence Boolean      @default(false)
@@ -6061,4 +6097,66 @@ model InsuranceAiContext {
   updatedAt             DateTime     @updatedAt
 
   @@unique([organizationId, aiSystemId])
+}
+
+model InsuranceApplicabilityDecision {
+  id             String                       @id @default(uuid())
+  organization   Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  packKey        String
+  packVersion    String
+  state          InsuranceApplicabilityState
+  reason         String?
+  actorUserId    String?
+  snapshot       Json?
+  createdAt      DateTime                     @default(now())
+
+  @@index([organizationId, packKey, createdAt])
+}
+
+model InsuranceDelegatedAuthority {
+  id               String       @id @default(uuid())
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId   String
+  publicId         String
+  kind             String
+  delegateName     String
+  vendorId         String?
+  entityId         String?
+  jurisdictionCode String?
+  linesOfBusiness  Json?
+  scope            String?
+  limits           String?
+  effectiveFrom    DateTime?
+  effectiveTo      DateTime?
+  evidenceObjectId String?
+  ownerUserId      String?
+  reviewDueAt      DateTime?
+  notes            String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, kind])
+}
+
+model InsuranceCounterparty {
+  id               String       @id @default(uuid())
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId   String
+  publicId         String
+  name             String
+  vendorId         String?
+  relationshipType String
+  entityId         String?
+  jurisdictionCode String?
+  linesOfBusiness  Json?
+  criticality      String?
+  reviewDueAt      DateTime?
+  notes            String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, relationshipType])
 }

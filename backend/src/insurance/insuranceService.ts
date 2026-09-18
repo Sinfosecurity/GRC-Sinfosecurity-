@@ -397,6 +397,8 @@ export const insuranceService = {
                 expiryDate: input.expiryDate ? new Date(String(input.expiryDate)) : null,
                 restrictions: input.restrictions ? String(input.restrictions) : null,
                 ownerUserId: actorUserId,
+                verificationBasis: (String(input.verificationBasis || 'CUSTOMER_RECORDED') as 'CUSTOMER_RECORDED' | 'DOCUMENT_VERIFIED' | 'EXTERNAL_SOURCE_VERIFIED'),
+                reviewDueAt: input.reviewDueAt ? new Date(String(input.reviewDueAt)) : null,
                 notes: input.notes ? String(input.notes) : 'Recorded metadata. Not a legal determination.',
             },
         });
@@ -437,6 +439,8 @@ export const insuranceService = {
                 status: input.status ? String(input.status) as typeof existing.status : existing.status,
                 reference: input.reference !== undefined ? String(input.reference || '') || null : existing.reference,
                 expiryDate: input.expiryDate ? new Date(String(input.expiryDate)) : existing.expiryDate,
+                reviewDueAt: input.reviewDueAt ? new Date(String(input.reviewDueAt)) : existing.reviewDueAt,
+                verificationBasis: input.verificationBasis ? String(input.verificationBasis) as typeof existing.verificationBasis : existing.verificationBasis,
                 notes: input.notes !== undefined ? String(input.notes) : existing.notes,
             },
         });
@@ -450,8 +454,47 @@ export const insuranceService = {
         if (!vendor) throw new ApiError(404, 'Vendor not found in this organization.');
         const created = await prisma.insuranceVendorClassification.upsert({
             where: { organizationId_vendorId_serviceCategory: { organizationId, vendorId, serviceCategory: String(input.serviceCategory || 'OTHER') } },
-            create: { organizationId, vendorId, serviceCategory: String(input.serviceCategory || 'OTHER'), notes: input.notes ? String(input.notes) : null },
-            update: { notes: input.notes ? String(input.notes) : null },
+            create: {
+                organizationId,
+                vendorId,
+                serviceCategory: String(input.serviceCategory || 'OTHER'),
+                jurisdictionCode: input.jurisdictionCode ? String(input.jurisdictionCode) : null,
+                entityId: input.entityId ? String(input.entityId) : null,
+                linesOfBusiness: asStringArray(input.linesOfBusiness),
+                claimsAuthority: Boolean(input.claimsAuthority),
+                underwritingAuthority: Boolean(input.underwritingAuthority),
+                policyholderInteraction: Boolean(input.policyholderInteraction),
+                premiumHandling: Boolean(input.premiumHandling),
+                criticality: input.criticality ? String(input.criticality) : null,
+                licenseRequired: Boolean(input.licenseRequired),
+                aiModelProvider: Boolean(input.aiModelProvider),
+                regulatedOutsourcing: Boolean(input.regulatedOutsourcing),
+                fourthPartyUse: Boolean(input.fourthPartyUse),
+                notes: input.notes ? String(input.notes) : null,
+            },
+            update: {
+                jurisdictionCode: input.jurisdictionCode ? String(input.jurisdictionCode) : null,
+                entityId: input.entityId ? String(input.entityId) : null,
+                linesOfBusiness: asStringArray(input.linesOfBusiness),
+                claimsAuthority: Boolean(input.claimsAuthority),
+                underwritingAuthority: Boolean(input.underwritingAuthority),
+                policyholderInteraction: Boolean(input.policyholderInteraction),
+                premiumHandling: Boolean(input.premiumHandling),
+                criticality: input.criticality ? String(input.criticality) : null,
+                licenseRequired: Boolean(input.licenseRequired),
+                aiModelProvider: Boolean(input.aiModelProvider),
+                regulatedOutsourcing: Boolean(input.regulatedOutsourcing),
+                fourthPartyUse: Boolean(input.fourthPartyUse),
+                notes: input.notes ? String(input.notes) : null,
+            },
+        });
+        await governanceGraphService.ensureNode({
+            organizationId,
+            actorUserId,
+            nodeType: 'VENDOR',
+            sourceModel: 'Vendor',
+            sourceId: vendorId,
+            displayLabel: vendor.name,
         });
         await audit(organizationId, actorUserId, 'insurance.vendor.classified', 'InsuranceVendorClassification', created.id, { vendorId });
         return created;
@@ -470,6 +513,8 @@ export const insuranceService = {
             create: {
                 organizationId,
                 aiSystemId,
+                entityId: input.entityId ? String(input.entityId) : null,
+                jurisdictionCode: input.jurisdictionCode ? String(input.jurisdictionCode) : null,
                 insuranceUseCase: input.insuranceUseCase ? String(input.insuranceUseCase) : null,
                 lineOfBusiness: input.lineOfBusiness ? String(input.lineOfBusiness) : null,
                 underwritingInfluence: Boolean(input.underwritingInfluence),
@@ -487,6 +532,8 @@ export const insuranceService = {
                 nextReviewAt: input.nextReviewAt ? new Date(String(input.nextReviewAt)) : null,
             },
             update: {
+                entityId: input.entityId ? String(input.entityId) : null,
+                jurisdictionCode: input.jurisdictionCode ? String(input.jurisdictionCode) : null,
                 insuranceUseCase: input.insuranceUseCase ? String(input.insuranceUseCase) : null,
                 lineOfBusiness: input.lineOfBusiness ? String(input.lineOfBusiness) : null,
                 underwritingInfluence: Boolean(input.underwritingInfluence),
@@ -495,7 +542,22 @@ export const insuranceService = {
                 fraudInfluence: Boolean(input.fraudInfluence),
                 consumerImpact: Boolean(input.consumerImpact),
                 externalData: Boolean(input.externalData),
+                thirdPartyProvider: input.thirdPartyProvider ? String(input.thirdPartyProvider) : null,
+                validationStatus: input.validationStatus ? String(input.validationStatus) : null,
+                biasReviewStatus: input.biasReviewStatus ? String(input.biasReviewStatus) : null,
+                explainability: input.explainability ? String(input.explainability) : null,
+                humanOversight: input.humanOversight ? String(input.humanOversight) : null,
+                lastReviewAt: input.lastReviewAt ? new Date(String(input.lastReviewAt)) : null,
+                nextReviewAt: input.nextReviewAt ? new Date(String(input.nextReviewAt)) : null,
             },
+        });
+        await governanceGraphService.ensureNode({
+            organizationId,
+            actorUserId,
+            nodeType: 'AI_SYSTEM',
+            sourceModel: 'AiSystem',
+            sourceId: aiSystemId,
+            displayLabel: system.name,
         });
         await audit(organizationId, actorUserId, 'insurance.ai.context.updated', 'InsuranceAiContext', saved.id, { aiSystemId });
         return saved;
@@ -519,7 +581,7 @@ export const insuranceService = {
 
     async graphLinks(organizationId: string) {
         return prisma.governanceNode.findMany({
-            where: { organizationId, nodeType: { in: ['INSURANCE_ENTITY', 'INSURANCE_LICENSE', 'JURISDICTION', 'REGULATOR', 'LINE_OF_BUSINESS', 'BUSINESS_PROCESS', 'CRITICAL_SERVICE'] } },
+            where: { organizationId, nodeType: { in: ['INSURANCE_ENTITY', 'INSURANCE_LICENSE', 'JURISDICTION', 'REGULATOR', 'LINE_OF_BUSINESS', 'BUSINESS_PROCESS', 'CRITICAL_SERVICE', 'VENDOR', 'AI_SYSTEM'] } },
             select: { id: true, nodeType: true, displayLabel: true, sourceModel: true, sourceId: true },
         });
     },

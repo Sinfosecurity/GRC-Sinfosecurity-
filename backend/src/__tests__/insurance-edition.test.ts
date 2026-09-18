@@ -37,8 +37,9 @@ describe('Insurance Edition Phase A', () => {
         expect(typesForCountry('GB').length).toBeGreaterThan(typesForCountry('NG').length);
         const recommended = recommendPacks({ organizationType: 'INSURER', activities: ['CLAIMS'], countries: ['NG'], dataHandled: [] });
         expect(recommended.some((row) => row.key === 'claims-operations')).toBe(true);
-        expect(recommended.find((row) => row.key === 'naicom-placeholder')?.reason).toMatch(/Not a statement of legal applicability/);
-        expect(recommendPacks({ organizationType: 'INSURER', activities: [], countries: ['US'] }).some((row) => row.key === 'nydfs-overlay')).toBe(false);
+        expect(recommended.some((row) => row.key === 'ng-insurer-core')).toBe(true);
+        expect(recommended.some((row) => row.key === 'ng-broker-core')).toBe(false);
+        expect(recommendPacks({ organizationType: 'INSURER', activities: [], countries: ['US'] }).some((row) => row.key === 'nydfs-500')).toBe(false);
     });
 
     it('does not change baseline IRA scoring when insurance answers are absent', () => {

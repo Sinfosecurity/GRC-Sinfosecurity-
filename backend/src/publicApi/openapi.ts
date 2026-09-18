@@ -104,6 +104,8 @@ export function publicOpenApi() {
             '/insurance/entities': { get: op('List insurance entities', 'insurance:read') },
             '/insurance/licenses': { get: op('List insurance license records', 'insurance:read') },
             '/insurance/risks': { get: op('Get insurance risk taxonomy summary', 'insurance:read') },
+            '/insurance/regulatory-packs': { get: op('List insurance regulatory pack applicability (read-only)', 'insurance:read') },
+            '/insurance/models': { get: op('List insurance AI/model context records', 'insurance:read') },
         },
         'x-scopes': PUBLIC_API_SCOPES,
         'x-webhook-events': WEBHOOK_EVENTS,
