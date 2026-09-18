@@ -37,6 +37,14 @@ export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
     GovernanceNodeType.RIGHTS_REQUEST,
     GovernanceNodeType.RETENTION_RULE,
     GovernanceNodeType.CONSENT_RECORD,
+    GovernanceNodeType.INSURANCE_ENTITY,
+    GovernanceNodeType.INSURANCE_LICENSE,
+    GovernanceNodeType.JURISDICTION,
+    GovernanceNodeType.REGULATOR,
+    GovernanceNodeType.LINE_OF_BUSINESS,
+    GovernanceNodeType.PRODUCT,
+    GovernanceNodeType.BUSINESS_PROCESS,
+    GovernanceNodeType.CRITICAL_SERVICE,
     GovernanceNodeType.AI_SYSTEM,
     GovernanceNodeType.AI_USE_CASE,
     GovernanceNodeType.AI_MODEL,
@@ -83,6 +91,8 @@ export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { ve
     AiAssessment: () => '/ai-governance/assessments',
     AiApproval: () => '/ai-governance/approvals',
     AiIncident: () => '/ai-governance/incidents',
+    InsuranceEntity: () => '/insurance/entities',
+    InsuranceLicense: () => '/insurance/licenses',
 };
 
 export function publicNode(node: {

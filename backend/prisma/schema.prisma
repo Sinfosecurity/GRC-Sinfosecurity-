@@ -224,6 +224,11 @@ model Organization {
   idempotencyRecords          IdempotencyRecord[]
   externalResourceLinks       ExternalResourceLink[]
   providerObservations        ProviderObservation[]
+  editionConfigs              OrganizationEditionConfig[]
+  insuranceEntities           InsuranceEntity[]
+  insuranceLicenses           InsuranceLicense[]
+  insuranceVendorClasses      InsuranceVendorClassification[]
+  insuranceAiContexts         InsuranceAiContext[]
 
   @@index([slug])
   @@index([status])
@@ -3188,6 +3193,14 @@ enum GovernanceNodeType {
   RIGHTS_REQUEST
   RETENTION_RULE
   CONSENT_RECORD
+  INSURANCE_ENTITY
+  INSURANCE_LICENSE
+  JURISDICTION
+  REGULATOR
+  LINE_OF_BUSINESS
+  PRODUCT
+  BUSINESS_PROCESS
+  CRITICAL_SERVICE
 }
 
 enum GovernanceRelationshipType {
@@ -5909,4 +5922,143 @@ model IdentityBreakGlassGrant {
   createdAt      DateTime     @default(now())
 
   @@index([organizationId, userId, expiresAt])
+}
+
+enum IndustryEditionKey {
+  INSURANCE
+}
+
+enum EditionConfigStatus {
+  DRAFT
+  ACTIVE
+  SUPERSEDED
+}
+
+enum InsuranceLicenseStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  UNKNOWN
+}
+
+model OrganizationEditionConfig {
+  id                       String               @id @default(uuid())
+  organization             Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId           String
+  editionKey               IndustryEditionKey
+  version                  Int
+  status                   EditionConfigStatus  @default(DRAFT)
+  organizationType         String
+  domicileCountryCode      String
+  domicileSubJurisdiction  String?
+  operatingJurisdictions   Json
+  linesOfBusiness          Json
+  activities               Json
+  dataHandled              Json
+  aiUsage                  Json
+  thirdPartyEcosystem      Json
+  enabledPacks             Json
+  recommendedPacks         Json
+  recommendationDecisions  Json
+  effectiveFrom            DateTime             @default(now())
+  supersededAt             DateTime?
+  createdByUserId          String?
+  snapshot                 Json
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+
+  @@unique([organizationId, editionKey, version])
+  @@index([organizationId, editionKey, status])
+}
+
+model InsuranceEntity {
+  id                       String                     @id @default(uuid())
+  publicId                 String
+  organization             Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId           String
+  parentEntity             InsuranceEntity?           @relation("InsuranceGroup", fields: [parentEntityId], references: [id])
+  parentEntityId           String?
+  children                 InsuranceEntity[]          @relation("InsuranceGroup")
+  name                     String
+  organizationType         String
+  domicileCountryCode      String
+  domicileSubJurisdiction  String?
+  operatingJurisdictions   Json
+  linesOfBusiness          Json
+  isGroup                  Boolean                    @default(false)
+  notes                    String?
+  createdUnderConfigId     String?
+  licenses                 InsuranceLicense[]
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, parentEntityId])
+}
+
+model InsuranceLicense {
+  id                String                 @id @default(uuid())
+  publicId          String
+  organization      Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId    String
+  entity            InsuranceEntity        @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  entityId          String
+  authorityKey      String
+  jurisdictionCode  String
+  licenseType       String
+  reference         String?
+  classes           Json
+  status            InsuranceLicenseStatus @default(UNKNOWN)
+  effectiveDate     DateTime?
+  expiryDate        DateTime?
+  restrictions      String?
+  ownerUserId       String?
+  evidenceObjectId  String?
+  notes             String?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, entityId])
+  @@index([organizationId, expiryDate])
+}
+
+model InsuranceVendorClassification {
+  id              String       @id @default(uuid())
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String
+  vendorId        String
+  serviceCategory String
+  notes           String?
+  createdAt       DateTime     @default(now())
+
+  @@unique([organizationId, vendorId, serviceCategory])
+  @@index([organizationId, serviceCategory])
+}
+
+model InsuranceAiContext {
+  id                    String       @id @default(uuid())
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  aiSystemId            String
+  insuranceUseCase      String?
+  lineOfBusiness        String?
+  underwritingInfluence Boolean      @default(false)
+  pricingInfluence      Boolean      @default(false)
+  claimsInfluence       Boolean      @default(false)
+  fraudInfluence        Boolean      @default(false)
+  consumerImpact        Boolean      @default(false)
+  externalData          Boolean      @default(false)
+  thirdPartyProvider    String?
+  validationStatus      String?
+  biasReviewStatus      String?
+  explainability        String?
+  humanOversight        String?
+  lastReviewAt          DateTime?
+  nextReviewAt          DateTime?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  @@unique([organizationId, aiSystemId])
 }

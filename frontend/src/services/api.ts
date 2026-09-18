@@ -673,4 +673,22 @@ export const notificationAPI = {
     markRead: (id: string) => api.post(`/notifications/${id}/read`),
 };
 
+export const insuranceAPI = {
+    catalog: () => api.get('/insurance/catalog'),
+    overview: () => api.get('/insurance/overview'),
+    configuration: () => api.get('/insurance/configuration'),
+    recommend: (data: unknown) => api.post('/insurance/recommend', data),
+    activate: (data: unknown) => api.post('/insurance/activate', data),
+    entities: () => api.get('/insurance/entities'),
+    createEntity: (data: unknown) => api.post('/insurance/entities', data),
+    licenses: () => api.get('/insurance/licenses'),
+    createLicense: (data: unknown) => api.post('/insurance/licenses', data),
+    updateLicense: (publicId: string, data: unknown) => api.patch(`/insurance/licenses/${publicId}`, data),
+    vendors: () => api.get('/insurance/vendors'),
+    classifyVendor: (data: unknown) => api.post('/insurance/vendors', data),
+    risks: () => api.get('/insurance/risks'),
+    graph: () => api.get('/insurance/graph'),
+    aiContexts: () => api.get('/insurance/ai-contexts'),
+};
+
 export default api;

@@ -66,6 +66,7 @@ import ssoRoutes from './routes/sso.routes';
 import scimRoutes from './routes/scim.routes';
 import developerRoutes from './routes/developer.routes';
 import publicApiRoutes from './publicApi/public.routes';
+import insuranceRoutes from './routes/insurance.routes';
 import { startWebhookRetryWorker } from './publicApi/webhookService';
 
 // Import middleware
@@ -284,6 +285,7 @@ app.use(`${API_PREFIX}/privacy`, ...tenantContent, privacyRoutes);
 app.use(`${API_PREFIX}/ai-governance`, ...tenantContent, aiGovernanceRoutes);
 app.use(`${API_PREFIX}/intelligence`, ...tenantContent, intelligenceRoutes);
 app.use(`${API_PREFIX}/automation`, ...tenantContent, automationRoutes);
+app.use(`${API_PREFIX}/insurance`, ...tenantContent, insuranceRoutes);
 app.use(`${API_PREFIX}/demo-requests`, demoRoutes);
 app.use(`${API_PREFIX}/platform`, platformRoutes);
 app.use(`${API_PREFIX}/support`, supportRoutes);

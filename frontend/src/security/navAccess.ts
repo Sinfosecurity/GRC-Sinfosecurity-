@@ -18,6 +18,8 @@ export type NavPermission =
     | 'ai.read'
     | 'intelligence.read'
     | 'automation.read'
+    | 'insurance.read'
+    | 'insurance.manage'
     | 'organization.manage'
     | 'user.manage'
     | 'identity.manage'
@@ -28,36 +30,36 @@ export type NavPermission =
     | 'platform';
 
 const ROLE_NAV: Record<string, NavPermission[]> = {
-    VIEWER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    USER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    ASSESSOR: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    COMPLIANCE_OFFICER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    APPROVER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    BUSINESS_OWNER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    DEPARTMENT_MANAGER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
-    AUDITOR: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read'],
+    VIEWER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read'],
+    USER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read'],
+    ASSESSOR: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage'],
+    COMPLIANCE_OFFICER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage'],
+    APPROVER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read'],
+    BUSINESS_OWNER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read'],
+    DEPARTMENT_MANAGER: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read'],
+    AUDITOR: ['always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read', 'approval.read', 'report.read', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read'],
     RISK_MANAGER: [
         'always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read',
-        'approval.read', 'report.read', 'questionnaire.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read',
+        'approval.read', 'report.read', 'questionnaire.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage',
     ],
     MANAGER: [
         'always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read',
-        'approval.read', 'report.read', 'questionnaire.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read',
+        'approval.read', 'report.read', 'questionnaire.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage',
     ],
     ORGANIZATION_ADMIN: [
         'always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read',
         'approval.read', 'report.read', 'organization.manage', 'user.manage', 'questionnaire.manage',
-        'integration.manage', 'billing.manage', 'identity.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read',
+        'integration.manage', 'billing.manage', 'identity.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage',
     ],
     ADMIN: [
         'always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read',
         'approval.read', 'report.read', 'organization.manage', 'user.manage', 'questionnaire.manage',
-        'integration.manage', 'billing.manage', 'identity.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read',
+        'integration.manage', 'billing.manage', 'identity.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage',
     ],
     ORG_ADMIN: [
         'always', 'vendor.read', 'assessment.read', 'evidence.read', 'finding.read', 'monitoring.read',
         'approval.read', 'report.read', 'organization.manage', 'user.manage', 'questionnaire.manage',
-        'integration.manage', 'billing.manage', 'identity.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read',
+        'integration.manage', 'billing.manage', 'identity.manage', 'audit.read', 'governanceGraph.read', 'risk.read', 'control.read', 'framework.read', 'compliance.read', 'privacy.read', 'ai.read', 'intelligence.read', 'automation.read', 'insurance.read', 'insurance.manage',
     ],
 };
 

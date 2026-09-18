@@ -129,4 +129,28 @@ export const publicResources = {
         ]);
         return pageResult(items, total, page, pageSize);
     },
+
+    async insuranceConfiguration(organizationId: string) {
+        const { insuranceService } = await import('../insurance/insuranceService');
+        return insuranceService.configuration(organizationId);
+    },
+
+    async insuranceEntities(organizationId: string, query: Record<string, unknown>) {
+        const { page, pageSize } = pageParams(query);
+        const { insuranceService } = await import('../insurance/insuranceService');
+        const items = await insuranceService.entities(organizationId);
+        return pageResult(items.slice((page - 1) * pageSize, page * pageSize), items.length, page, pageSize);
+    },
+
+    async insuranceLicenses(organizationId: string, query: Record<string, unknown>) {
+        const { page, pageSize } = pageParams(query);
+        const { insuranceService } = await import('../insurance/insuranceService');
+        const items = await insuranceService.licenses(organizationId);
+        return pageResult(items.slice((page - 1) * pageSize, page * pageSize), items.length, page, pageSize);
+    },
+
+    async insuranceRiskSummary(organizationId: string) {
+        const { insuranceService } = await import('../insurance/insuranceService');
+        return insuranceService.riskSummary(organizationId);
+    },
 };

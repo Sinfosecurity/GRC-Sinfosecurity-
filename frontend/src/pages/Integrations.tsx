@@ -7,7 +7,7 @@ import QueryState from '../components/QueryState';
 import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { developerAPI } from '../services/api';
 
-const SCOPES = ['vendors:read', 'vendors:write', 'assessments:read', 'findings:read', 'evidence:read', 'risks:read', 'webhooks:manage'];
+const SCOPES = ['vendors:read', 'vendors:write', 'assessments:read', 'findings:read', 'evidence:read', 'risks:read', 'webhooks:manage', 'insurance:read'];
 
 export default function Integrations() {
     const [tab, setTab] = useState(0);

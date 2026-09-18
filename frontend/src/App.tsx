@@ -54,6 +54,7 @@ const Activate = lazy(() => import('./pages/Activate'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Billing = lazy(() => import('./pages/Billing'));
 const Integrations = lazy(() => import('./pages/Integrations'));
+const InsuranceHome = lazy(() => import('./pages/InsuranceHome'));
 const DecisionBriefs = lazy(() => import('./pages/DecisionBriefs'));
 const ContinuousMonitoring = lazy(() => import('./pages/ContinuousMonitoring'));
 const Assessments = lazy(() => import('./pages/Assessments'));
@@ -242,6 +243,17 @@ export default function App() {
                     <Route path="automation/runs/:publicId" element={<AutomationRunDetail />} />
                     <Route path="automation/:publicId/edit" element={<AutomationBuilder />} />
                     <Route path="automation/:publicId" element={<AutomationDetail />} />
+                    <Route path="insurance" element={<InsuranceHome />} />
+                    <Route path="insurance/entities" element={<InsuranceHome />} />
+                    <Route path="insurance/licenses" element={<InsuranceHome />} />
+                    <Route path="insurance/risk" element={<InsuranceHome />} />
+                    <Route path="insurance/third-parties" element={<InsuranceHome />} />
+                    <Route path="insurance/controls" element={<InsuranceHome />} />
+                    <Route path="insurance/ai" element={<InsuranceHome />} />
+                    <Route path="insurance/regulatory" element={<InsuranceHome />} />
+                    <Route path="insurance/reports" element={<InsuranceHome />} />
+                    <Route path="insurance/configuration" element={<InsuranceHome />} />
+                    <Route path="insurance/activate" element={<InsuranceHome />} />
                     <Route path="controls" element={LEGACY_ENABLED ? <ControlsManagement /> : <LegacyQuarantine />} />
                     <Route path="incidents" element={LEGACY_ENABLED ? <IncidentManagement /> : <LegacyQuarantine />} />
                     <Route path="policies" element={LEGACY_ENABLED ? <PolicyManagement /> : <LegacyQuarantine />} />

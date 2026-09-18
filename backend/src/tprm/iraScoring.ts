@@ -7,6 +7,7 @@ import {
     type QuestionnairePlan,
 } from './packDerivation';
 import { loadWorkbookCatalog, workbookPackCounts } from './workbookCatalog';
+import { insuranceIraFloors } from '../insurance/iraOverlay';
 
 export type IraAnswer = { questionKey: string; response?: string | null };
 
@@ -148,6 +149,7 @@ export function scoreIra(
         { code: 'regulatory-high', label: 'Regulatory or contractual obligation', tier: VendorTier.HIGH, applies: b3 === 'yes', rationale: 'Regulated-service floor.' },
         { code: 'write-api-high', label: 'Automated connection that changes our data', tier: VendorTier.HIGH, applies: a4 === 'write', rationale: 'Write integration floor.' },
         { code: 'financial-high', label: 'Material financial loss', tier: VendorTier.HIGH, applies: b2 === 'material', rationale: 'Financial-impact floor.' },
+        ...insuranceIraFloors(answers),
     ];
 
     const catalog = loadWorkbookCatalog();

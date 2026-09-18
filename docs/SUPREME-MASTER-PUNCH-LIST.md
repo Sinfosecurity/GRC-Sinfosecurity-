@@ -223,7 +223,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Version 3 UX-correction walk A–H `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Copy link is not email sent. Real inbox not tested. Viewer RBAC not hosted-tested.
 
-**NEXT ACTION:** Keep current-stage acceptance. Reopen only if Product Leadership revises #12. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20 and #21 are accepted for the current stage. #22 is the authorized active item.
+**NEXT ACTION:** Keep current-stage acceptance. Reopen only if Product Leadership revises #12. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20, #21, and #22 are accepted for the current stage. #23 is the authorized active item.
 
 ---
 
@@ -385,7 +385,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Hosted walk `docs/private-beta/hosted-ux-qa/enterprise-identity/`. CI `35374688343` PASS on `e19f8bd`. Hosted ACS `https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_72c720cec866`. Hosted SP entity ID `https://supreme-risk-staging-api.onrender.com/saml/sp/idp_72c720cec866`. Metadata matches. No localhost. Live Entra/Okta/Google NOT TESTED. Domain verify without DNS correctly failed. Cursor does not declare #21 PASS.
 
-**NEXT ACTION:** Keep current-stage acceptance. Live IdP federation remains deferred. Do not reopen #21 in this gate. #22 is the authorized active item. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep current-stage acceptance. Live IdP federation remains deferred. Do not reopen #21 in this gate. #23 is the authorized active item. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -397,13 +397,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Documented external API with tenant auth; integrations are NOT_CONFIGURED when keys are absent.
 
-**CURRENT STATUS:** ACTIVE — PRODUCT LEADERSHIP REVIEW REQUIRED. Hosted recertification recorded. Not PASS.
+**CURRENT STATUS:** ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED. Not PASS.
 
 **CERTIFICATION SHA:** Honesty/UI implementation and hosted frontend `7feb92de70cacfc954dc6632dbf862b61549ca53`. Hosted API `340f90818d9278a5173be3ca7be8eabba585f0cd`. SHA split is legitimate (`7feb92d` is frontend/QA only). Not a PASS SHA.
 
 **EVIDENCE:** Architecture `docs/API-INTEGRATIONS.md`. Hosted recertification `docs/private-beta/hosted-ux-qa/api-integrations/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35387085923 SUCCESS. Public token ≠ session/admin/platform. Live Slack/Jira NOT TESTED. Viewer hosted RBAC SKIPPED.
 
-**NEXT ACTION:** Product Leadership review of the hosted public API, webhook, and honest integration proof. Do not start #23–#38 or #40. Do not merge `main` or deploy commercial production. Do not declare #22 PASS.
+**NEXT ACTION:** Keep current-stage acceptance. Live Slack/Jira remain deferred. Do not reopen #22 in this gate. #23 is the authorized active item. Do not merge `main` or deploy commercial production. Do not declare #22 PASS.
 
 ---
 
@@ -415,13 +415,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Edition configuration, not a fork.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** ACTIVE — GLOBAL FOUNDATION / ENGINEERING IN PROGRESS. Not PASS.
 
 **CERTIFICATION SHA:** —
 
-**EVIDENCE:** None.
+**EVIDENCE:** `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Hosted proof pending.
 
-**NEXT ACTION:** Not authorized.
+**NEXT ACTION:** Complete Phase A hosted staging walk. Do not start #24–#38 or #40. Do not declare #23 PASS.
 
 ---
 

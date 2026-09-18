@@ -35,6 +35,7 @@ import {
     HubOutlined,
     InsightsOutlined,
     PlayCircleOutline,
+    ShieldOutlined,
     Menu as MenuIcon,
     MonitorHeartOutlined,
     NotificationsNone,
@@ -85,6 +86,7 @@ const menuSections: NavSection[] = [
             { text: 'AI systems', path: '/ai-governance/systems', icon: <AssessmentOutlined fontSize="small" />, permission: 'ai.read' },
             { text: 'AI approvals', path: '/ai-governance/approvals', icon: <GavelOutlined fontSize="small" />, permission: 'ai.read' },
             { text: 'AI testing', path: '/ai-governance/testing', icon: <FactCheckOutlined fontSize="small" />, permission: 'ai.read' },
+            { text: 'Insurance', path: '/insurance', icon: <ShieldOutlined fontSize="small" />, permission: 'insurance.read' },
         ],
     },
     {

@@ -199,8 +199,8 @@ export function splitValues(value?: string | null) {
         .filter(Boolean);
 }
 
-export function missingIraQuestions(answers: Array<{ questionKey: string; response?: string | null }>) {
-    return IRA_QUESTIONS.filter((question) => !String(answers.find((row) => row.questionKey === question.key)?.response || '').trim())
+export function missingIraQuestions(answers: Array<{ questionKey: string; response?: string | null }>, questions: IraQuestion[] = IRA_QUESTIONS) {
+    return questions.filter((question) => !String(answers.find((row) => row.questionKey === question.key)?.response || '').trim())
         .map((question) => question.key);
 }
 

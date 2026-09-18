@@ -8,6 +8,7 @@ export const PUBLIC_API_SCOPES = [
     'risks:read',
     'reports:read',
     'webhooks:manage',
+    'insurance:read',
 ] as const;
 
 export type PublicApiScope = (typeof PUBLIC_API_SCOPES)[number];

@@ -1,7 +1,9 @@
 import { RequesterTaskPurpose, RequesterTaskStatus, VendorOnboardingStage, VendorTier } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
-import { IRA_QUESTIONS, missingIraQuestions } from '../tprm/iraCatalog';
+import { missingIraQuestions } from '../tprm/iraCatalog';
+import { iraQuestionsForEdition } from '../insurance/iraOverlay';
+import { editionIsInsurance } from '../insurance/insuranceService';
 import { iraForm, scoreIra } from '../tprm/iraScoring';
 import { hashToken, randomToken } from './passwordService';
 import { recordAudit } from './auditEventService';
@@ -64,16 +66,17 @@ async function issueIraToken(organizationId: string, vendorId: string, email: st
     return { row, raw, url: customerAppUrl(`/ira?token=${raw}`) };
 }
 
-function publicIra(vendor: { name: string; publicId: string | null; onboarding: { engagementPublicId?: string | null; iraAnswers?: unknown; intakeCompletedAt?: Date | null; requesterName?: string | null } | null }, link: { status: RequesterTaskStatus; expiresAt: Date; submittedAt: Date | null }) {
+function publicIra(vendor: { name: string; publicId: string | null; onboarding: { engagementPublicId?: string | null; iraAnswers?: unknown; intakeCompletedAt?: Date | null; requesterName?: string | null } | null }, link: { status: RequesterTaskStatus; expiresAt: Date; submittedAt: Date | null }, insuranceActive = false) {
     const answers = (vendor.onboarding?.iraAnswers && typeof vendor.onboarding.iraAnswers === 'object')
         ? vendor.onboarding.iraAnswers as Record<string, string>
         : {};
     const submitted = Boolean(link.submittedAt || vendor.onboarding?.intakeCompletedAt);
+    const questions = iraQuestionsForEdition(insuranceActive);
     return {
         vendorName: vendor.name,
         publicId: vendor.onboarding?.engagementPublicId || vendor.publicId,
         requesterName: vendor.onboarding?.requesterName || null,
-        form: iraForm(),
+        form: iraForm(questions),
         answers,
         submitted,
         readOnly: submitted,
@@ -82,7 +85,7 @@ function publicIra(vendor: { name: string; publicId: string | null; onboarding: 
             ? 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'
             : null,
         expiresAt: link.expiresAt,
-        questions: IRA_QUESTIONS,
+        questions,
     };
 }
 
@@ -209,7 +212,7 @@ export async function getIraForm(token: string) {
             metadata: { summary: 'Requester opened the inherent-risk form.' },
         }).catch(() => undefined);
     }
-    return publicIra(link.vendor, link);
+    return publicIra(link.vendor, link, await editionIsInsurance(link.organizationId));
 }
 
 export async function saveIraForm(token: string, answers: Record<string, string>) {
@@ -221,7 +224,7 @@ export async function saveIraForm(token: string, answers: Record<string, string>
         where: { vendorId: link.vendorId },
         data: { iraAnswers: answers, intakeStartedAt: new Date() },
     });
-    return publicIra({ ...link.vendor, onboarding: { ...link.vendor.onboarding!, iraAnswers: answers } }, link);
+    return publicIra({ ...link.vendor, onboarding: { ...link.vendor.onboarding!, iraAnswers: answers } }, link, await editionIsInsurance(link.organizationId));
 }
 
 export async function submitIraForm(token: string, answers: Record<string, string>, attested: boolean) {
@@ -230,8 +233,10 @@ export async function submitIraForm(token: string, answers: Record<string, strin
     if (link.submittedAt || link.vendor.onboarding?.intakeCompletedAt) {
         throw new ApiError(409, 'This inherent-risk form has already been submitted.');
     }
-    const payload = IRA_QUESTIONS.map((question) => ({ questionKey: question.key, response: answers[question.key] || '' }));
-    const missing = missingIraQuestions(payload);
+    const insuranceActive = await editionIsInsurance(link.organizationId);
+    const questions = iraQuestionsForEdition(insuranceActive);
+    const payload = questions.map((question) => ({ questionKey: question.key, response: answers[question.key] || '' }));
+    const missing = missingIraQuestions(payload, questions);
     if (missing.length) throw new ApiError(400, `Answer every question. Don't know is allowed. Still needed: ${missing.length}.`);
     const rating = link.vendor.onboarding?.externalRating && typeof link.vendor.onboarding.externalRating === 'object'
         ? link.vendor.onboarding.externalRating as { provider?: string; grade?: string; score?: number | null; assessedAt?: string }
@@ -298,7 +303,7 @@ export async function submitIraForm(token: string, answers: Record<string, strin
     }
     await notifyIraSubmitted(link.organizationId, link.vendor, scored.ready ? scored.recommendedTier : null).catch(() => undefined);
     return {
-        ...publicIra({ ...link.vendor, onboarding: { ...link.vendor.onboarding!, iraAnswers: answers, intakeCompletedAt: new Date() } }, { ...link, submittedAt: new Date(), status: RequesterTaskStatus.SUBMITTED }),
+        ...publicIra({ ...link.vendor, onboarding: { ...link.vendor.onboarding!, iraAnswers: answers, intakeCompletedAt: new Date() } }, { ...link, submittedAt: new Date(), status: RequesterTaskStatus.SUBMITTED }, insuranceActive),
         confirmation: 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.',
         rating: scored.ready ? { tier: scored.recommendedTier, percent: scored.percent, explanation: scored.explanation } : { tier: null, message: scored.message },
         autoConfirmed: autoConfirm,

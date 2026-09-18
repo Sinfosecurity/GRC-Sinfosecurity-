@@ -157,4 +157,24 @@ router.get('/evidence', scope('evidence:read'), async (req: PublicRequest, res, 
     } catch (error) { next(error); }
 });
 
+router.get('/insurance/configuration', scope('insurance:read'), async (req: PublicRequest, res, next) => {
+    try { res.json({ success: true, data: await publicResources.insuranceConfiguration(req.publicClient!.organizationId) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/insurance/entities', scope('insurance:read'), async (req: PublicRequest, res, next) => {
+    try { res.json({ success: true, data: await publicResources.insuranceEntities(req.publicClient!.organizationId, req.query) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/insurance/licenses', scope('insurance:read'), async (req: PublicRequest, res, next) => {
+    try { res.json({ success: true, data: await publicResources.insuranceLicenses(req.publicClient!.organizationId, req.query) }); }
+    catch (error) { next(error); }
+});
+
+router.get('/insurance/risks', scope('insurance:read'), async (req: PublicRequest, res, next) => {
+    try { res.json({ success: true, data: await publicResources.insuranceRiskSummary(req.publicClient!.organizationId) }); }
+    catch (error) { next(error); }
+});
+
 export default router;
