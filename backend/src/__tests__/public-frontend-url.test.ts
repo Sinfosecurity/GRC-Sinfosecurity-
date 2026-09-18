@@ -1,9 +1,12 @@
 import {
+    identityServiceUrls,
     invitationEmailBody,
     maskEmail,
     passwordResetEmailBody,
+    publicApiUrl,
     publicFrontendUrl,
 } from '../services/publicFrontendUrl';
+import { identityEventLabel } from '../identity/core';
 import { smtpAuthConfigured } from '../services/smtpClient';
 import { invitationApiPayload } from '../services/identityUserService';
 
@@ -58,6 +61,58 @@ describe('public frontend URLs and invitation payload safety', () => {
             } as NodeJS.ProcessEnv)
         ).toBe(true);
         expect(smtpAuthConfigured({ SMTP_HOST: 'smtp.resend.com' } as NodeJS.ProcessEnv)).toBe(false);
+    });
+
+    it('lets local development emit localhost identity URLs', () => {
+        const local = { NODE_ENV: 'development', PORT: '4000' } as NodeJS.ProcessEnv;
+        expect(publicApiUrl(local)).toBe('http://localhost:4000');
+        const urls = identityServiceUrls('idp_local', local);
+        expect(urls.acsUrl).toBe('http://localhost:4000/api/v1/auth/sso/saml/acs/idp_local');
+        expect(urls.spEntityId).toBe('http://localhost:4000/saml/sp/idp_local');
+        expect(urls.metadataUrl).toContain('http://localhost:4000/api/v1/auth/sso/saml/metadata/idp_local');
+        expect(urls.scimBaseUrl).toBe('http://localhost:4000/scim/v2');
+    });
+
+    it('derives hosted ACS, entity ID, metadata, and SCIM from the public API origin', () => {
+        const hosted = {
+            NODE_ENV: 'production',
+            APP_ENVIRONMENT: 'staging',
+            API_PUBLIC_URL: 'https://supreme-risk-staging-api.onrender.com',
+            APP_BASE_URL: 'http://localhost:3001',
+            BACKEND_URL: 'http://127.0.0.1:3001',
+        } as NodeJS.ProcessEnv;
+        expect(publicApiUrl(hosted)).toBe('https://supreme-risk-staging-api.onrender.com');
+        const urls = identityServiceUrls('idp_hosted', hosted);
+        expect(urls.acsUrl).toBe('https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_hosted');
+        expect(urls.spEntityId).toBe('https://supreme-risk-staging-api.onrender.com/saml/sp/idp_hosted');
+        expect(urls.metadataUrl).toBe('https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/metadata/idp_hosted');
+        expect(urls.oidcRedirect).toBe('https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/oidc/callback');
+        expect(urls.scimBaseUrl).toBe('https://supreme-risk-staging-api.onrender.com/scim/v2');
+        expect(JSON.stringify(urls)).not.toMatch(/localhost|127\.0\.0\.1/);
+    });
+
+    it('fails hosted configuration instead of silently using localhost', () => {
+        const hosted = {
+            NODE_ENV: 'production',
+            APP_ENVIRONMENT: 'staging',
+            API_PUBLIC_URL: 'http://localhost:3001',
+            APP_BASE_URL: 'http://127.0.0.1:4000',
+            BACKEND_URL: 'http://[::1]:4000',
+        } as NodeJS.ProcessEnv;
+        expect(() => publicApiUrl(hosted)).toThrow(/public origin/);
+    });
+
+    it('humanizes identity activity without rewriting the immutable action', () => {
+        expect(identityEventLabel('identity.provider.created')).toBe('Identity provider created');
+        expect(identityEventLabel('identity.role_mapping.changed')).toBe('Role mapping changed');
+        expect(identityEventLabel('identity.sso.test_succeeded')).toBe('Identity provider test succeeded');
+    });
+
+    it('fails production when no public API origin is configured', () => {
+        expect(() => publicApiUrl({
+            NODE_ENV: 'production',
+            APP_ENVIRONMENT: 'production',
+        } as NodeJS.ProcessEnv)).toThrow(/API_PUBLIC_URL/);
     });
 
     it('omits invitation tokens from API payloads outside test', () => {

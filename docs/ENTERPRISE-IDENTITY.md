@@ -35,7 +35,21 @@ Each organization may configure one SAML or OIDC identity provider (`IdentityPro
 
 `Connected` is never shown unless a real verification or enablement happened. Configuration without a successful test is not verified.
 
-Login discovery: the user enters a work email. If that domain is **verified** and the provider is TESTED or ENABLED, Supreme returns `{ ssoAvailable, publicId, continueLabel }`. Discovery does not return organization name, tenant UUID, protocol, or ACS details.
+Login discovery uses work-email domain lookup. There are no decorative Microsoft / Okta / Google buttons.
+
+1. Administrator configures SAML, tests successfully, verifies a domain, then enables Company SSO.
+2. At `/login`, the user enters a work email and chooses Continue.
+3. Supreme calls `POST /api/v1/auth/sso/discover`. If that domain is **verified** and the provider is TESTED or ENABLED, the response is `{ ssoAvailable, publicId, continueLabel }`.
+4. The page then shows **Continue with Company SSO**, which starts `/api/v1/auth/sso/start/:publicId`.
+5. If discovery finds no ready provider, the page stays on work-email / password. That is the correct unconfigured state.
+
+Discovery does not return organization name, tenant UUID, protocol, or ACS details.
+
+## Public service-provider origin
+
+Customer-visible SAML ACS, SP entity ID, metadata XML, OIDC redirect, and SCIM base URL are derived from one helper: `publicApiUrl()` / `identityServiceUrls()` in `backend/src/services/publicFrontendUrl.ts`.
+
+Resolution order: `API_PUBLIC_URL`, `BACKEND_URL`, `RENDER_EXTERNAL_URL`, `APP_BASE_URL`. Hosted environments skip localhost candidates and do not read an untrusted `Host` / `X-Forwarded-Host` header. Local development may use `http://localhost:${PORT}`. A hosted environment without a public origin fails instead of silently emitting localhost. Production must set a real public origin; this document does not invent one.
 
 ## SAML flow
 

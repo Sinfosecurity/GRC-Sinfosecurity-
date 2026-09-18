@@ -101,7 +101,7 @@ export default function Login() {
                                     autoComplete="current-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    required={!sso}
+                                    required={checked && !sso}
                                 />
                             </div>
                             {error && <p role="alert">{error}</p>}

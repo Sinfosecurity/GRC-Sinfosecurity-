@@ -14,13 +14,14 @@ import { authService } from '../services/authService';
 import { hashPassword, hashToken, randomToken } from '../services/passwordService';
 import { encryptSecret, decryptSecret } from '../security/secretBox';
 import { CUSTOMER_PLANE } from '../security/sessionPlane';
-import { portalFrontendUrl } from '../services/publicFrontendUrl';
+import { identityServiceUrls, portalFrontendUrl } from '../services/publicFrontendUrl';
 import {
     IdentityError,
     assertMappableRole,
     customerSafeStatus,
     emailDomain,
     identityAudit,
+    identityEventLabel,
     lowestMappedRole,
     normalizeDomain,
     normalizeEmail,
@@ -29,20 +30,16 @@ import {
 import { buildAuthnRequest, buildSpMetadata, parseAndValidateSamlResponse } from './saml';
 import { createPkce, discoverOidc, exchangeOidcCode, oidcAuthorizeUrl, verifyOidcIdToken } from './oidc';
 
-function apiBase() {
-    return (process.env.API_PUBLIC_URL || process.env.BACKEND_URL || 'http://localhost:3001').replace(/\/$/, '');
-}
-
 function acsUrl(publicId: string) {
-    return `${apiBase()}/api/v1/auth/sso/saml/acs/${publicId}`;
+    return identityServiceUrls(publicId).acsUrl;
 }
 
 function oidcRedirect() {
-    return `${apiBase()}/api/v1/auth/sso/oidc/callback`;
+    return identityServiceUrls('unused').oidcRedirect;
 }
 
 function spEntityId(publicId: string) {
-    return `${apiBase()}/saml/sp/${publicId}`;
+    return identityServiceUrls(publicId).spEntityId;
 }
 
 async function providerForOrg(organizationId: string, id: string) {
@@ -84,6 +81,7 @@ export const identityService = {
                     : { key: 'not_configured', label: 'Not configured' },
             jit: provider?.jitEnabled ? 'Enabled' : 'Disabled',
             scim: token ? { key: 'configured', label: 'Token created' } : { key: 'not_configured', label: 'Not configured' },
+            scimBaseUrl: identityServiceUrls('unused').scimBaseUrl,
             ssoEnforcement: provider?.ssoEnforcement === SsoEnforcement.REQUIRED ? 'Required' : 'Optional',
             provisionedUsers: provisioned,
             lastSuccessfulSso: provider?.lastSsoAt,
@@ -158,9 +156,9 @@ export const identityService = {
                 idpEntityId: row.idpEntityId,
                 ssoUrl: row.ssoUrl,
                 certificateConfigured: Boolean(row.idpCertificate),
-                spEntityId: row.spEntityId || spEntityId(row.publicId),
+                spEntityId: spEntityId(row.publicId),
                 acsUrl: acsUrl(row.publicId),
-                metadataUrl: `${apiBase()}/api/v1/auth/sso/saml/metadata/${row.publicId}`,
+                metadataUrl: identityServiceUrls(row.publicId).metadataUrl,
             } : null,
             oidc: row.protocol === IdentityProtocol.OIDC ? {
                 issuer: row.issuer,
@@ -182,13 +180,14 @@ export const identityService = {
     },
 
     async createProvider(organizationId: string, actorUserId: string, input: { displayName: string; protocol: IdentityProtocol }) {
+        const publicId = publicIdentityId('idp');
         const provider = await prisma.identityProvider.create({
             data: {
-                publicId: publicIdentityId('idp'),
+                publicId,
                 organizationId,
                 displayName: input.displayName.trim() || (input.protocol === IdentityProtocol.SAML ? 'Company SAML' : 'Company OIDC'),
                 protocol: input.protocol,
-                spEntityId: undefined,
+                spEntityId: spEntityId(publicId),
             },
         });
         await identityAudit({
@@ -339,7 +338,18 @@ export const identityService = {
                 // Not verified.
             }
         }
-        if (!verified) throw new IdentityError('unverified_domain', 400);
+        if (!verified) {
+            await identityAudit({
+                organizationId,
+                actorUserId,
+                action: 'identity.domain.failed',
+                resourceType: 'IdentityDomain',
+                resourceId: row.id,
+                result: 'failure',
+                metadata: { domain: row.domain },
+            });
+            throw new IdentityError('unverified_domain', 400);
+        }
         const updated = await prisma.identityDomain.update({
             where: { id: row.id },
             data: { status: DomainVerificationStatus.VERIFIED, verifiedAt: new Date() },
@@ -418,12 +428,21 @@ export const identityService = {
                 resourceId: providerId,
                 result: 'success',
             });
+        } else if (input.ssoEnforcement === SsoEnforcement.OPTIONAL) {
+            await identityAudit({
+                organizationId,
+                actorUserId,
+                action: 'identity.sso.optional',
+                resourceType: 'IdentityProvider',
+                resourceId: providerId,
+                result: 'success',
+            });
         }
         if (typeof input.jitEnabled === 'boolean') {
             await identityAudit({
                 organizationId,
                 actorUserId,
-                action: input.jitEnabled ? 'identity.provider.updated' : 'identity.provider.updated',
+                action: input.jitEnabled ? 'identity.jit.enabled' : 'identity.jit.disabled',
                 resourceType: 'IdentityProvider',
                 resourceId: providerId,
                 result: 'success',
@@ -552,8 +571,18 @@ export const identityService = {
         });
         if (provider.protocol === IdentityProtocol.SAML) {
             if (!provider.ssoUrl) throw new IdentityError('configuration_error', 409);
+            if (purpose === 'test') {
+                await identityAudit({
+                    organizationId: provider.organizationId,
+                    actorUserId,
+                    action: 'identity.sso.test_started',
+                    resourceType: 'IdentityProvider',
+                    resourceId: provider.id,
+                    result: 'success',
+                });
+            }
             const samlRequest = buildAuthnRequest({
-                issuer: provider.spEntityId || spEntityId(provider.publicId),
+                issuer: spEntityId(provider.publicId),
                 acsUrl: acsUrl(provider.publicId),
                 destination: provider.ssoUrl,
                 requestId,
@@ -588,14 +617,29 @@ export const identityService = {
         if (pending && (pending.consumedAt || pending.expiresAt < new Date() || pending.providerId !== provider.id)) {
             throw new IdentityError('state_mismatch');
         }
-        const assertion = parseAndValidateSamlResponse({
-            samlResponseB64: samlResponse,
-            idpCertificate: provider.idpCertificate,
-            expectedIssuer: provider.idpEntityId,
-            expectedAudience: provider.spEntityId || spEntityId(provider.publicId),
-            expectedDestination: acsUrl(provider.publicId),
-            expectedInResponseTo: pending?.requestId,
-        });
+        let assertion;
+        try {
+            assertion = parseAndValidateSamlResponse({
+                samlResponseB64: samlResponse,
+                idpCertificate: provider.idpCertificate,
+                expectedIssuer: provider.idpEntityId,
+                expectedAudience: spEntityId(provider.publicId),
+                expectedDestination: acsUrl(provider.publicId),
+                expectedInResponseTo: pending?.requestId,
+            });
+        } catch (error) {
+            if (pending?.purpose === 'test') {
+                await identityAudit({
+                    organizationId: provider.organizationId,
+                    actorUserId: pending.actorUserId,
+                    action: 'identity.sso.test_failed',
+                    resourceType: 'IdentityProvider',
+                    resourceId: provider.id,
+                    result: 'failure',
+                });
+            }
+            throw error;
+        }
         await this.assertFreshAssertion(provider.id, provider.organizationId, assertion.assertionId, assertion.notOnOrAfter);
         if (pending) {
             await prisma.ssoLoginState.update({ where: { id: pending.id }, data: { consumedAt: new Date() } });
@@ -861,7 +905,7 @@ export const identityService = {
     },
 
     async activity(organizationId: string) {
-        return prisma.auditEvent.findMany({
+        const rows = await prisma.auditEvent.findMany({
             where: {
                 organizationId,
                 action: { startsWith: 'identity.' },
@@ -875,8 +919,18 @@ export const identityService = {
                 timestamp: true,
                 resourceType: true,
                 resourceId: true,
-                metadata: true,
+                actor: { select: { email: true } },
             },
         });
+        return rows.map((row) => ({
+            id: row.id,
+            action: row.action,
+            label: identityEventLabel(row.action),
+            result: row.result,
+            timestamp: row.timestamp,
+            actor: row.actor?.email || null,
+            resourceType: row.resourceType,
+            resourceId: row.resourceId,
+        }));
     },
 };

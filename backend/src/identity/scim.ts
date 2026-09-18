@@ -2,6 +2,7 @@ import { Role, UserAccountStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 import { hashToken, randomToken } from '../services/passwordService';
 import { identityAudit, normalizeEmail, publicIdentityId } from './core';
+import { identityServiceUrls } from '../services/publicFrontendUrl';
 import { identityService, revokeUserAccess } from './service';
 import { assertMappableRole } from './core';
 
@@ -150,7 +151,7 @@ export const scimService = {
             publicId: row.publicId,
             label: row.label,
             token: raw,
-            baseUrl: '/scim/v2',
+            baseUrl: identityServiceUrls('unused').scimBaseUrl,
             createdAt: row.createdAt,
         };
     },
@@ -198,6 +199,7 @@ export const scimService = {
             createdAt: row.createdAt,
             lastUsedAt: row.lastUsedAt,
             revoked: Boolean(row.revokedAt),
+            baseUrl: identityServiceUrls('unused').scimBaseUrl,
         }));
     },
 

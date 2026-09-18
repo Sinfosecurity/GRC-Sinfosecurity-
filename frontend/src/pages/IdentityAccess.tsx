@@ -15,6 +15,7 @@ type Overview = {
     domain: { key: string; label: string; value?: string };
     jit: string;
     scim: { key: string; label: string };
+    scimBaseUrl?: string;
     ssoEnforcement: string;
     provisionedUsers: number;
     lastSuccessfulSso: string | null;
@@ -37,6 +38,7 @@ export default function IdentityAccess() {
     const [group, setGroup] = useState('');
     const [role, setRole] = useState('VIEWER');
     const provider = providers[0];
+    const scimBaseUrl = overview?.scimBaseUrl || tokens[0]?.baseUrl || '';
 
     const load = async () => {
         setLoading(true);
@@ -198,7 +200,8 @@ export default function IdentityAccess() {
                                 <Button type="submit" variant="contained">Start domain verification</Button>
                                 {domainToken && (
                                     <Alert severity="info">
-                                        Add this TXT record, then verify: {domainToken}
+                                        Create a DNS TXT record on that domain with this exact value, then verify.
+                                        Verification fails until the record is published: {domainToken}
                                     </Alert>
                                 )}
                                 {provider?.domains?.map((row: any) => (
@@ -215,7 +218,15 @@ export default function IdentityAccess() {
 
                 {tab === 3 && (
                     <Box>
-                            <Typography sx={{ mb: 2 }}>SCIM 2.0 base URL: <code>/scim/v2</code></Typography>
+                            <Typography sx={{ mb: 1 }}>SCIM 2.0 base URL</Typography>
+                            <TextField
+                                fullWidth
+                                label="SCIM 2.0 base URL"
+                                value={scimBaseUrl}
+                                InputProps={{ readOnly: true }}
+                                helperText="Use this full URL in your identity provider. Token existence does not mean provisioning traffic is active."
+                                sx={{ mb: 2 }}
+                            />
                             <Button variant="contained" onClick={() => run(async () => {
                                 const created = await identityAPI.createScimToken({ label: 'IdP provisioning', providerId: provider?.id });
                                 setOnceToken(created.data.data.token);
@@ -278,7 +289,15 @@ export default function IdentityAccess() {
                     <Box>
                             {activity.length === 0 && <Typography>No identity activity yet.</Typography>}
                             {activity.map((row) => (
-                                <Typography key={row.id} sx={{ mb: 1 }}>{new Date(row.timestamp || row.createdAt).toLocaleString()} — {row.action} — {row.result}</Typography>
+                                <Box key={row.id} sx={{ mb: 1.5 }}>
+                                    <Typography>
+                                        {new Date(row.timestamp || row.createdAt).toLocaleString()} — {row.label || row.action} — {row.result}
+                                        {row.actor ? ` — ${row.actor}` : ''}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" title={row.action}>
+                                        {row.action}
+                                    </Typography>
+                                </Box>
                             ))}
                     </Box>
                 )}

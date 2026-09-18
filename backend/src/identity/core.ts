@@ -99,6 +99,38 @@ export async function identityAudit(input: {
     });
 }
 
+export function identityEventLabel(action: string) {
+    const labels: Record<string, string> = {
+        'identity.provider.created': 'Identity provider created',
+        'identity.provider.updated': 'Identity provider updated',
+        'identity.provider.enabled': 'Identity provider enabled',
+        'identity.provider.disabled': 'Identity provider disabled',
+        'identity.provider.tested': 'Identity provider test completed',
+        'identity.provider.test_failed': 'Identity provider test failed',
+        'identity.sso.test_started': 'Identity provider test started',
+        'identity.sso.test_succeeded': 'Identity provider test succeeded',
+        'identity.sso.test_failed': 'Identity provider test failed',
+        'identity.domain.started': 'Domain verification started',
+        'identity.domain.verification_started': 'Domain verification started',
+        'identity.domain.verified': 'Domain verified',
+        'identity.domain.failed': 'Domain verification failed',
+        'identity.break_glass.used': 'Recovery access used',
+        'identity.account.linked': 'Identity account linked',
+        'identity.jit.user_created': 'Just-in-time user created',
+        'identity.scim.user_created': 'Provisioned user created',
+        'identity.scim.token_created': 'Provisioning token created',
+        'identity.scim.token_rotated': 'Provisioning token rotated',
+        'identity.scim.token_revoked': 'Provisioning token revoked',
+        'identity.role_mapping.changed': 'Role mapping changed',
+        'identity.jit.enabled': 'Just-in-time provisioning enabled',
+        'identity.jit.disabled': 'Just-in-time provisioning disabled',
+        'identity.sso.enforced': 'Company SSO required',
+        'identity.sso.optional': 'Company SSO optional',
+    };
+    if (labels[action]) return labels[action];
+    return action.replace(/^identity\./, '').replace(/[._]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 export function customerSafeStatus(status: string) {
     if (status === 'ENABLED') return { key: 'enabled', label: 'Enabled' };
     if (status === 'TESTED') return { key: 'tested', label: 'Configured — verified' };

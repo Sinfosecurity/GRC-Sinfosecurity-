@@ -315,3 +315,97 @@ describe('enterprise identity', () => {
         expect(hashToken('x')).not.toBe('x');
     });
 });
+
+describe('enterprise identity gates and public origin', () => {
+    const hostedOrigin = 'https://supreme-risk-staging-api.onrender.com';
+
+    afterEach(() => {
+        delete process.env.API_PUBLIC_URL;
+        delete process.env.APP_ENVIRONMENT;
+        delete process.env.IDENTITY_ALLOW_TOKEN_VERIFY;
+    });
+
+    it('keeps SAML metadata, ACS, and entity ID on the same public origin', () => {
+        process.env.NODE_ENV = 'test';
+        process.env.APP_ENVIRONMENT = 'staging';
+        process.env.API_PUBLIC_URL = hostedOrigin;
+        const xml = identityService.samlMetadata('idp_meta');
+        expect(xml).toContain(`entityID="${hostedOrigin}/saml/sp/idp_meta"`);
+        expect(xml).toContain(`Location="${hostedOrigin}/api/v1/auth/sso/saml/acs/idp_meta"`);
+        expect(xml).not.toMatch(/localhost|127\.0\.0\.1/);
+    });
+
+    it('rejects incomplete enable, untested require-SSO, unknown-group elevation, and platform role mapping', async () => {
+        await prisma.$queryRaw`SELECT 1`;
+        const suffix = `${Date.now()}-gates`;
+        const org = await prisma.organization.create({ data: { name: `IdGates ${suffix}`, country: 'US' } });
+        const admin = await prisma.user.create({
+            data: {
+                email: `admin-gates-${suffix}@a.test`,
+                hashedPassword: await hashPassword('ValidPass1x'),
+                firstName: 'Gia',
+                lastName: 'Gates',
+                role: Role.ORGANIZATION_ADMIN,
+                organizationId: org.id,
+            },
+        });
+        const provider = await identityService.createProvider(org.id, admin.id, { displayName: 'Draft SAML', protocol: IdentityProtocol.SAML });
+        expect(provider.status.key).toBe('not_configured');
+        await expect(identityService.enableProvider(org.id, provider.id, admin.id, true)).rejects.toThrow(/successful test/i);
+        await expect(identityService.setPolicy(org.id, provider.id, admin.id, { ssoEnforcement: 'REQUIRED' as any })).rejects.toThrow(/successful test/i);
+
+        await identityService.updateProvider(org.id, provider.id, admin.id, {
+            idpEntityId: 'https://idp.example',
+            ssoUrl: 'https://idp.example/sso',
+        });
+        const afterPartial = await identityService.listProviders(org.id);
+        expect(afterPartial[0].status.key).toBe('not_configured');
+
+        await identityService.updateProvider(org.id, provider.id, admin.id, {
+            idpCertificate: 'CERT',
+        });
+        const configured = await identityService.listProviders(org.id);
+        expect(configured[0].status.key).toBe('configured');
+        expect(configured[0].status.label).toMatch(/not verified/i);
+        expect(configured[0].saml.acsUrl).toMatch(/\/api\/v1\/auth\/sso\/saml\/acs\//);
+        expect(configured[0].saml.spEntityId).toMatch(/\/saml\/sp\//);
+
+        await expect(identityService.replaceMappings(org.id, provider.id, admin.id, [
+            { idpGroup: 'Platform', supremeRole: Role.PLATFORM_OWNER },
+        ])).rejects.toThrow(/cannot be assigned/i);
+        await expect(identityService.replaceMappings(org.id, provider.id, admin.id, [
+            { idpGroup: 'Platform', supremeRole: Role.PLATFORM_ADMIN },
+        ])).rejects.toThrow(/cannot be assigned/i);
+
+        await identityService.replaceMappings(org.id, provider.id, admin.id, [
+            { idpGroup: 'Acme-Viewers', supremeRole: Role.VIEWER },
+        ]);
+        await expect(identityService.resolveRole(provider.id, ['Unknown-Admins'], Role.VIEWER)).resolves.toBe(Role.VIEWER);
+        await expect(identityService.resolveRole(provider.id, ['Acme-Viewers'], Role.VIEWER)).resolves.toBe(Role.VIEWER);
+
+        const claimed = await identityService.startDomain(org.id, admin.id, `unverified-${suffix}.example`);
+        delete process.env.IDENTITY_ALLOW_TOKEN_VERIFY;
+        await expect(identityService.verifyDomain(org.id, claimed.id, admin.id)).rejects.toThrow(/not verified/i);
+        const pending = await prisma.identityDomain.findUniqueOrThrow({ where: { id: claimed.id } });
+        expect(pending.status).toBe('PENDING');
+        const failed = await prisma.auditEvent.findFirst({ where: { organizationId: org.id, action: 'identity.domain.failed' } });
+        expect(failed?.result).toBe('failure');
+
+        await prisma.identityProvider.update({
+            where: { id: provider.id },
+            data: { status: 'TESTED', lastTestResult: 'success', lastTestedAt: new Date() },
+        });
+        await expect(identityService.setPolicy(org.id, provider.id, admin.id, { ssoEnforcement: 'REQUIRED' as any })).rejects.toThrow(/Verify a domain/i);
+
+        process.env.IDENTITY_ALLOW_TOKEN_VERIFY = 'true';
+        const verified = await identityService.verifyDomain(org.id, claimed.id, admin.id, claimed.tokenShownOnce);
+        expect(verified.status).toBe('Verified');
+        await identityService.setPolicy(org.id, provider.id, admin.id, { jitEnabled: true, ssoEnforcement: 'OPTIONAL' as any });
+        const events = await identityService.activity(org.id);
+        expect(events.some((row) => row.action === 'identity.domain.verification_started' && row.label === 'Domain verification started')).toBe(true);
+        expect(events.some((row) => row.action === 'identity.role_mapping.changed' && row.label === 'Role mapping changed')).toBe(true);
+        expect(events.some((row) => row.action === 'identity.jit.enabled' && row.label === 'Just-in-time provisioning enabled')).toBe(true);
+        expect(events.some((row) => row.action === 'identity.sso.optional' && row.label === 'Company SSO optional')).toBe(true);
+        expect(JSON.stringify(events)).not.toMatch(/tokenShownOnce|supreme-domain-verification=/);
+    });
+});

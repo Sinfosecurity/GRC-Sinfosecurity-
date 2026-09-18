@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership accepted #12 on 2026-09-14. Commercial production remains NO-GO.
+**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership accepted #12 on 2026-09-14. On 2026-09-18 Product Leadership recorded **ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED**. That is not commercial production GO, not immutable closure, and not production-deployment authorization. Commercial production remains NO-GO.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Prior private-testing acceptance (2026-09-14, SHA `97d79fffcd38b59527bd1d9f926bb613766de998`) remains historical. Hosted send-button fix `548cd19a893c35b9fb06059213c99fbfd0b9e495` is on staging frontend; API remains parent `b00ad1274908a27a2253d6e5050420e2c10b8f39`. READY_TO_SEND top CTA now sends when contact is present. Hosted navigation audit: 42 live routes PASS, 14 intentional quarantine/unauthorized, 0 route FAIL, 0 BLOCKER/HIGH. Cursor does not declare #12 PASS.
+**CURRENT STATUS:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED. Product Leadership disposition 2026-09-18. Not commercial GO. Not production deployment. Not immutable / never-reopen. Prior private-testing acceptance (2026-09-14, SHA `97d79fffcd38b59527bd1d9f926bb613766de998`) remains historical. Hosted send-button fix `548cd19a893c35b9fb06059213c99fbfd0b9e495` is on staging frontend; API remains parent `b00ad1274908a27a2253d6e5050420e2c10b8f39`. READY_TO_SEND top CTA now sends when contact is present. Hosted navigation audit: 42 live routes PASS, 14 intentional quarantine/unauthorized, 0 route FAIL, 0 BLOCKER/HIGH. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
 
 **CERTIFICATION SHA:** Hosted send fix / navigation-audit baseline `548cd19a893c35b9fb06059213c99fbfd0b9e495`. API hosted `b00ad1274908a27a2253d6e5050420e2c10b8f39`. CI `35368202589` PASS on `548cd19`. Prior UX-correction SHA `b00ad12` remains historical.
 
 **EVIDENCE:** Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Version 3 UX-correction walk A–H `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Copy link is not email sent. Real inbox not tested. Viewer RBAC not hosted-tested.
 
-**NEXT ACTION:** Product Leadership review of the hosted UX correction and navigation audit. Do not start H-5, H-6, or #21. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 remains PAUSED.
+**NEXT ACTION:** Keep current-stage acceptance. Reopen only if Product Leadership revises #12. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20 is accepted. #21 is the authorized active item. #22 is not authorized.
 
 ---
 
@@ -379,13 +379,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Corporate IdP on the admin plane; customer SSO/SCIM as designed. Coming Soon remains truthful until then.
 
-**CURRENT STATUS:** PARTIAL — PRODUCT LEADERSHIP FINAL REVIEW REQUIRED. Not PASS.
+**CURRENT STATUS:** PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. Not PASS. Hosted SAML metadata previously exposed localhost ACS / SP entity ID because `apiBase()` defaulted to `http://localhost:3001` when `API_PUBLIC_URL` / `BACKEND_URL` were unset. Correction uses `publicApiUrl()` / `identityServiceUrls()`. Live Entra / Okta / Google federation is NOT TESTED.
 
 **CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. Login-field follow-up / CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`.
 
 **EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Hosted walk `docs/private-beta/hosted-ux-qa/enterprise-identity/`. CI `34930403949` PASS on `b01609a` (416 backend / 174 frontend). Live Entra/Okta/Google not tested. Domain verify without DNS correctly failed. Cursor does not declare #21 PASS.
 
-**NEXT ACTION:** Product Leadership hosted review. Do not start #22. Do not merge `main` or deploy commercial production. Do not alter #12 uncommitted leftovers.
+**NEXT ACTION:** Product Leadership hosted review of the identity origin correction. Do not start #22. Do not merge `main` or deploy commercial production. Do not declare #21 PASS. Do not reopen #12.
 
 ---
 

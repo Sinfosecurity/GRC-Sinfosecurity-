@@ -1,7 +1,29 @@
 const STAGING_FRONTEND = 'https://supreme-risk-staging.onrender.com';
 
 function isLocalHost(hostname: string) {
-    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+    const host = hostname.replace(/^\[|\]$/g, '');
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+}
+
+export function isHostedEnvironment(env: NodeJS.ProcessEnv = process.env) {
+    const app = String(env.APP_ENVIRONMENT || '').toLowerCase();
+    return env.NODE_ENV === 'production' || app === 'staging' || app === 'production';
+}
+
+function firstPublicOrigin(candidates: Array<string | undefined>, hosted: boolean) {
+    for (const raw of candidates) {
+        if (!raw) continue;
+        const first = raw.split(',')[0]?.trim();
+        if (!first) continue;
+        try {
+            const url = new URL(first.includes('://') ? first : `https://${first}`);
+            if (hosted && isLocalHost(url.hostname)) continue;
+            return url.origin;
+        } catch {
+            // Try the next candidate.
+        }
+    }
+    return null;
 }
 
 export function publicFrontendUrl(env: NodeJS.ProcessEnv = process.env): string {
@@ -9,25 +31,43 @@ export function publicFrontendUrl(env: NodeJS.ProcessEnv = process.env): string 
 }
 
 export function portalFrontendUrl(plane: 'CUSTOMER' | 'PLATFORM' | 'VENDOR', env: NodeJS.ProcessEnv = process.env): string {
-    const hosted = env.NODE_ENV === 'production' || env.APP_ENVIRONMENT === 'staging';
+    const hosted = isHostedEnvironment(env);
     const candidates = plane === 'PLATFORM'
         ? [env.ADMIN_FRONTEND_URL, env.FRONTEND_BASE_URL, env.FRONTEND_URL, env.CORS_ORIGIN]
         : [env.CUSTOMER_FRONTEND_URL, env.FRONTEND_BASE_URL, env.FRONTEND_URL, env.CORS_ORIGIN];
-    for (const raw of candidates) {
-        if (!raw) continue;
-        const first = raw.split(',')[0]?.trim();
-        if (!first) continue;
-        try {
-            const url = new URL(first);
-            if (hosted && isLocalHost(url.hostname)) {
-                continue;
-            }
-            return url.origin;
-        } catch {
-            // Try the next candidate.
-        }
+    return firstPublicOrigin(candidates, hosted) || (hosted ? STAGING_FRONTEND : 'http://localhost:3000');
+}
+
+export function publicApiUrl(env: NodeJS.ProcessEnv = process.env): string {
+    const hosted = isHostedEnvironment(env);
+    const app = String(env.APP_ENVIRONMENT || '').toLowerCase();
+    const origin = firstPublicOrigin([
+        env.API_PUBLIC_URL,
+        env.BACKEND_URL,
+        env.RENDER_EXTERNAL_URL,
+        env.APP_BASE_URL,
+    ], hosted);
+    if (origin) return origin;
+    if (hosted) {
+        throw new Error(
+            app === 'production'
+                ? 'API_PUBLIC_URL must be a non-localhost public origin when APP_ENVIRONMENT=production.'
+                : 'API_PUBLIC_URL, APP_BASE_URL, BACKEND_URL, or RENDER_EXTERNAL_URL must be a non-localhost public origin in a hosted environment.'
+        );
     }
-    return hosted ? STAGING_FRONTEND : 'http://localhost:3000';
+    return `http://localhost:${env.PORT || '4000'}`;
+}
+
+export function identityServiceUrls(publicId: string, env: NodeJS.ProcessEnv = process.env) {
+    const origin = publicApiUrl(env);
+    return {
+        origin,
+        acsUrl: `${origin}/api/v1/auth/sso/saml/acs/${publicId}`,
+        spEntityId: `${origin}/saml/sp/${publicId}`,
+        metadataUrl: `${origin}/api/v1/auth/sso/saml/metadata/${publicId}`,
+        oidcRedirect: `${origin}/api/v1/auth/sso/oidc/callback`,
+        scimBaseUrl: `${origin}/scim/v2`,
+    };
 }
 
 export function maskEmail(email: string) {
