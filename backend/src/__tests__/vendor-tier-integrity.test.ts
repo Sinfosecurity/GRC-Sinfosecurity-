@@ -20,6 +20,14 @@ describe('vendor tier hard floors', () => {
         expect(applyHardFloorToTier(VendorTier.LOW, resolveMinimumTier({ dataTypesAccessed: ['Public'] }))).toBe(VendorTier.LOW);
     });
 
+    it('treats an IRA personal-data floor as Medium, not Critical', () => {
+        expect(resolveMinimumTier({
+            hardFloors: [{ applies: true, tier: VendorTier.MEDIUM }],
+        })).toBe(VendorTier.MEDIUM);
+        expect(applyHardFloorToTier(VendorTier.MEDIUM, VendorTier.MEDIUM)).toBe(VendorTier.MEDIUM);
+        expect(() => applyHardFloorToTier(VendorTier.LOW, VendorTier.MEDIUM)).toThrow(/at least MEDIUM/);
+    });
+
     it('rejects ordinary updates once canonical onboarding owns the tier', () => {
         expect(() => assertLegacyUpdateMaySetTier(true)).toThrow(/onboarding review/);
         expect(() => assertLegacyUpdateMaySetTier(false)).not.toThrow();

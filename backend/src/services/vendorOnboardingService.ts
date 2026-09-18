@@ -23,6 +23,7 @@ import {
     deriveQuestionnairePlan,
     missingScopeQuestions,
     type AnalystPackDecision,
+    type QuestionnairePlan,
 } from '../tprm/packDerivation';
 import {
     loadWorkbookCatalog,
@@ -30,6 +31,7 @@ import {
 } from '../tprm/workbookCatalog';
 import { assertTierMeetsFloor, parseVendorTier, resolveMinimumTier } from './vendorTierIntegrity';
 import { IRA_QUESTIONS } from '../tprm/iraCatalog';
+import { scoreIra } from '../tprm/iraScoring';
 
 export const INTAKE_SLA_DAYS = 5;
 export const TIER_REVIEW_SLA_DAYS = 2;
@@ -63,6 +65,9 @@ const TIER_LABEL: Record<VendorTier, string> = {
 const HISTORY_ACTIONS: Record<string, string> = {
     'vendor.requested': 'Vendor requested',
     'vendor.owner_assigned': 'Business owner assigned',
+    'vendor.ira_sent': 'Requester IRA sent',
+    'vendor.ira_opened': 'Requester IRA opened',
+    'vendor.ira_submitted': 'Requester IRA submitted',
     'vendor.intake_started': 'Intake started',
     'vendor.intake_completed': 'Intake completed',
     'vendor.inherent_risk_calculated': 'Inherent risk calculated',
@@ -95,6 +100,8 @@ const HISTORY_ACTIONS: Record<string, string> = {
 
 const MILESTONE_ACTIONS = new Set([
     'vendor.requested',
+    'vendor.ira_sent',
+    'vendor.ira_submitted',
     'vendor.intake_completed',
     'vendor.tier_confirmed',
     'vendor.tier_overridden',
@@ -461,7 +468,7 @@ function nextAction(stage: VendorOnboardingStage, ira?: { required?: boolean; se
         case VendorOnboardingStage.DUE_DILIGENCE_PLAN:
             return 'Confirm due-diligence plan';
         case VendorOnboardingStage.READY_TO_SEND:
-            return 'Send due diligence to the vendor contact';
+            return 'Send the questionnaire to the vendor';
         case VendorOnboardingStage.AWAITING_VENDOR:
             return 'Waiting for the vendor to start';
         case VendorOnboardingStage.VENDOR_IN_PROGRESS:
@@ -624,6 +631,196 @@ async function completeIntake(organizationId: string, vendorId: string, actor: A
     return presentOnboarding(organizationId, vendor.id, actor);
 }
 
+function applyIraPackCustomization(packs: QuestionnairePlan, customization: {
+    includeKeys?: string[];
+    excludeKeys?: string[];
+    packDecisions?: AnalystPackDecision[];
+    reason?: string;
+    actorId?: string;
+} = {}): QuestionnairePlan {
+    const decisions = analystDecisionsFromCustomization({
+        includeKeys: customization.includeKeys,
+        excludeKeys: customization.excludeKeys,
+        packDecisions: customization.packDecisions,
+        reason: customization.reason,
+        actorId: customization.actorId,
+    });
+    if (!decisions.length) return packs;
+    const byKey = Object.fromEntries(decisions.filter((row) => row?.key).map((row) => [row.key, row]));
+    const next = packs.packs.map((pack) => {
+        const decision = byKey[pack.key] || byKey[pack.templateKey];
+        if (!decision || (decision.state !== 'INCLUDED' && decision.state !== 'EXCLUDED')) return pack;
+        if (pack.key === 'baseline' && decision.state === 'EXCLUDED') return pack;
+        return {
+            ...pack,
+            state: decision.state === 'EXCLUDED' ? 'EXCLUDED' as const : 'INCLUDED' as const,
+            analystDecision: decision,
+            reason: `${pack.reason}. Analyst ${decision.state === 'EXCLUDED' ? 'excluded' : 'included'} this pack${decision.reason ? `: ${decision.reason}` : ''}.`,
+        };
+    });
+    const included = next.filter((row) => row.state === 'INCLUDED' || row.state === 'INCLUDED_REQUIRED');
+    return {
+        ...packs,
+        packs: next,
+        includedPackKeys: included.map((row) => row.key),
+        includedTemplateKeys: included.map((row) => row.templateKey),
+        includedQuestionCount: included.reduce((sum, row) => sum + (Number(row.questionCount) || 0), 0),
+        confirmScopeCount: 0,
+        sendBlocked: false,
+        sendBlockMessage: '',
+    };
+}
+
+async function buildIraPlan(organizationId: string, vendorId: string, confirmed: VendorTier, customization: {
+    includeKeys?: string[];
+    excludeKeys?: string[];
+    reason?: string;
+    actorId?: string;
+    packDecisions?: AnalystPackDecision[];
+} = {}) {
+    const onboarding = await prisma.vendorOnboarding.findFirst({ where: { vendorId, organizationId } });
+    const answers = onboarding?.iraAnswers && typeof onboarding.iraAnswers === 'object'
+        ? onboarding.iraAnswers as Record<string, string>
+        : {};
+    const payload = IRA_QUESTIONS.map((question) => ({ questionKey: question.key, response: answers[question.key] || '' }));
+    const rating = onboarding?.externalRating && typeof onboarding.externalRating === 'object'
+        ? onboarding.externalRating as { provider?: string; grade?: string; score?: number | null; assessedAt?: string }
+        : null;
+    const scored = scoreIra(payload, { externalRating: rating });
+    const catalog = loadWorkbookCatalog();
+    const baselineCount = Number(workbookPackCounts(catalog).baseline) || 45;
+    let packs = scored.packs;
+    if (confirmed !== VendorTier.LOW) {
+        packs = {
+            ...packs,
+            packs: packs.packs.map((row) => row.key === 'baseline'
+                ? { ...row, questionCount: baselineCount, reason: 'Full Baseline for Medium and above' }
+                : row),
+            includedQuestionCount: packs.packs.reduce((sum, row) => {
+                const count = row.key === 'baseline' ? baselineCount : row.questionCount;
+                return row.state === 'INCLUDED' || row.state === 'INCLUDED_REQUIRED' ? sum + count : sum;
+            }, 0),
+        };
+    }
+    packs = applyIraPackCustomization(packs, customization);
+    if (!scored.ready) {
+        return {
+            rationale: scored.message,
+            catalogVersion: packs.catalogVersion,
+            questionnairePlan: { ...packs, sendBlocked: true, sendBlockMessage: scored.message },
+            analystDecisions: analystDecisionsFromCustomization(customization),
+            ira: scored,
+            assessments: [],
+            unresolved: [{ code: 'IRA', message: scored.message }],
+            triggers: { privacy: scored.signals.privacyPack, aiGovernance: scored.signals.aiInvolved, resilience: false },
+            factors: scored.factors,
+        };
+    }
+    const recommendation = await recommendAssessments(organizationId, vendorId, {
+        personalData: scored.signals.personalData,
+        aiInvolved: scored.signals.aiInvolved,
+        requiredTemplateKeys: packs.includedTemplateKeys,
+        packReasons: Object.fromEntries(packs.packs.map((pack) => [pack.templateKey, [pack.reason]])),
+    }, confirmed);
+    const evidence = await reusableEvidence(organizationId, vendorId);
+    const assessments = [...recommendation.required, ...recommendation.recommended].map((item: any) => ({
+        templateId: item.id,
+        key: item.key,
+        name: item.name,
+        packName: packs.packs.find((row) => row.templateKey === item.key)?.name || item.name,
+        requirement: item.requirement || 'Required',
+        rationale: item.reason,
+        why: [packs.packs.find((row) => row.templateKey === item.key)?.reason || item.reason],
+        expectedEvidence: item.expectedEvidence,
+        reusableEvidence: evidence,
+        framework: item.framework,
+        version: item.version,
+        questionCount: item.questionCount,
+    }));
+    return {
+        rationale: scored.explanation,
+        catalogVersion: packs.catalogVersion,
+        questionnairePlan: packs,
+        analystDecisions: analystDecisionsFromCustomization(customization),
+        ira: scored,
+        scopeAnswers: Object.fromEntries(packs.packs.map((pack) => [pack.key, pack.originalScopeAnswer])),
+        package: {
+            required: packs.packs.filter((pack) => pack.state === 'INCLUDED' || pack.state === 'INCLUDED_REQUIRED'),
+            recommended: [],
+        },
+        unresolved: [],
+        override: customization.includeKeys?.length || customization.excludeKeys?.length || customization.packDecisions?.length
+            ? {
+                reason: String(customization.reason || '').trim(),
+                includeKeys: customization.includeKeys || [],
+                excludeKeys: customization.excludeKeys || [],
+                packDecisions: analystDecisionsFromCustomization(customization),
+                at: new Date().toISOString(),
+            }
+            : null,
+        assessments,
+        triggers: {
+            privacy: scored.signals.privacyPack,
+            aiGovernance: scored.signals.aiInvolved,
+            resilience: false,
+        },
+        factors: scored.factors,
+    };
+}
+
+async function composeReadyPlan(organizationId: string, vendorId: string, confirmed: VendorTier, customization: {
+    includeKeys?: string[];
+    excludeKeys?: string[];
+    reason?: string;
+    actorId?: string;
+    packDecisions?: AnalystPackDecision[];
+} = {}) {
+    const onboarding = await prisma.vendorOnboarding.findFirst({ where: { vendorId, organizationId } });
+    const iraAnswers = onboarding?.iraAnswers && typeof onboarding.iraAnswers === 'object'
+        ? onboarding.iraAnswers as Record<string, string>
+        : null;
+    if (iraAnswers && Object.keys(iraAnswers).length) {
+        return buildIraPlan(organizationId, vendorId, confirmed, customization);
+    }
+    return buildPlan(organizationId, vendorId, confirmed, customization);
+}
+
+async function createAssessmentsFromPlan(organizationId: string, vendorId: string, plan: { assessments?: Array<{ key?: string; requirement?: string; framework?: string; templateId?: string }> }) {
+    for (const item of (plan.assessments || []).filter((row) => row.key !== 'inherent-risk' && (row.requirement === 'Required' || row.requirement === 'Recommended'))) {
+        if (!item.templateId) continue;
+        try {
+            await vendorAssessmentService.createAssessment({
+                vendorId,
+                organizationId,
+                assessmentType: AssessmentType.INITIAL_DUE_DILIGENCE,
+                frameworkUsed: item.framework,
+                templateId: item.templateId,
+            });
+        } catch (error) {
+            if (!(error instanceof ApiError) || error.statusCode !== 409) throw error;
+        }
+    }
+}
+
+export async function materializeReadyPlan(organizationId: string, vendorId: string, actorId?: string | null) {
+    const vendor = await loadWorkspace(organizationId, vendorId);
+    const confirmed = vendor.onboarding?.confirmedTier;
+    if (!confirmed) return null;
+    const plan = await composeReadyPlan(organizationId, vendor.id, confirmed);
+    if (plan.questionnairePlan?.sendBlocked) return plan;
+    await createAssessmentsFromPlan(organizationId, vendor.id, plan);
+    await prisma.vendorOnboarding.update({
+        where: { vendorId: vendor.id },
+        data: {
+            stage: VendorOnboardingStage.READY_TO_SEND,
+            plan: plan as object,
+            planConfirmedAt: vendor.onboarding.planConfirmedAt || new Date(),
+            planConfirmedBy: vendor.onboarding.planConfirmedBy || actorId || undefined,
+        },
+    });
+    return plan;
+}
+
 export async function confirmTier(organizationId: string, vendorKey: string, actor: Actor, input: { confirm?: boolean; overrideTier?: VendorTier; reason?: string }) {
     if (!canReviewTier(actor.role)) throw new ApiError(403, 'Only a risk reviewer can confirm the recommended tier.');
     const vendor = await loadWorkspace(organizationId, vendorKey);
@@ -631,7 +828,7 @@ export async function confirmTier(organizationId: string, vendorKey: string, act
         throw new ApiError(409, 'This vendor is not waiting for tier confirmation.');
     }
     const recommended = vendor.onboarding.recommendedTier;
-    if (!recommended) throw new ApiError(409, 'Inherent risk has not been calculated.');
+    if (!recommended) throw new ApiError(409, 'Not yet rated — answers still need confirmation. Questionnaire send stays blocked.');
     const requestedOverride = parseVendorTier(input.overrideTier);
     if (input.overrideTier && !requestedOverride) {
         throw new ApiError(400, 'Override tier must be Critical, High, Medium, or Low.');
@@ -649,16 +846,27 @@ export async function confirmTier(organizationId: string, vendorKey: string, act
     const actorName = users.get(actor.id)?.name || actor.name || 'Analyst';
     await prisma.vendor.update({
         where: { id: vendor.id },
-        data: { tier: confirmed, criticalityLevel: confirmed === VendorTier.CRITICAL ? 'CRITICAL' : confirmed === VendorTier.HIGH ? 'HIGH' : confirmed === VendorTier.LOW ? 'LOW' : 'MEDIUM' },
+        data: {
+            tier: confirmed,
+            inherentRiskScore: vendor.onboarding.recommendedScore ?? vendor.inherentRiskScore,
+            criticalityLevel: confirmed === VendorTier.CRITICAL ? 'CRITICAL' : confirmed === VendorTier.HIGH ? 'HIGH' : confirmed === VendorTier.LOW ? 'LOW' : 'MEDIUM',
+        },
     });
-    const plan = await buildPlan(organizationId, vendor.id, confirmed);
+    const plan = await composeReadyPlan(organizationId, vendor.id, confirmed);
+    const sendBlocked = Boolean(plan.questionnairePlan?.sendBlocked);
+    if (!sendBlocked) {
+        await createAssessmentsFromPlan(organizationId, vendor.id, plan);
+    }
+    const now = new Date();
     await prisma.vendorOnboarding.update({
         where: { vendorId: vendor.id },
         data: {
-            stage: VendorOnboardingStage.DUE_DILIGENCE_PLAN,
+            stage: sendBlocked ? VendorOnboardingStage.DUE_DILIGENCE_PLAN : VendorOnboardingStage.READY_TO_SEND,
             confirmedTier: confirmed,
-            tierConfirmedAt: new Date(),
+            tierConfirmedAt: now,
             tierConfirmedBy: actor.id,
+            planConfirmedAt: sendBlocked ? null : now,
+            planConfirmedBy: sendBlocked ? null : actor.id,
             overrideReason: override ? String(input.reason).trim() : null,
             previousRecommendedTier: override ? recommended : null,
             plan: plan as object,
@@ -672,8 +880,10 @@ export async function confirmTier(organizationId: string, vendorKey: string, act
         recommendedTier: recommended,
         confirmedTier: confirmed,
     });
-    await writeHistory(organizationId, actor.id, 'vendor.plan_generated', vendor.id, {
-        summary: 'Due-diligence plan generated from the confirmed tier.',
+    await writeHistory(organizationId, actor.id, sendBlocked ? 'vendor.plan_generated' : 'vendor.plan_confirmed', vendor.id, {
+        summary: sendBlocked
+            ? 'Due-diligence plan generated. Packs still need scope confirmation before send.'
+            : 'Tier confirmed. Questionnaire is ready to send to the vendor.',
     });
     await explainableRiskService.recalculate(organizationId, vendor.id);
     return presentOnboarding(organizationId, vendor.id, actor);
@@ -687,28 +897,16 @@ export async function confirmPlan(organizationId: string, vendorKey: string, act
 } = {}) {
     if (!canReviewTier(actor.role)) throw new ApiError(403, 'Only a risk reviewer can confirm the due-diligence plan.');
     const vendor = await loadWorkspace(organizationId, vendorKey);
-    if (vendor.onboarding?.stage !== VendorOnboardingStage.DUE_DILIGENCE_PLAN) {
+    const planStages: VendorOnboardingStage[] = [VendorOnboardingStage.DUE_DILIGENCE_PLAN, VendorOnboardingStage.READY_TO_SEND];
+    if (!vendor.onboarding?.stage || !planStages.includes(vendor.onboarding.stage)) {
         throw new ApiError(409, 'The due-diligence plan is not waiting for confirmation.');
     }
     const confirmedTier = vendor.onboarding.confirmedTier || vendor.tier;
-    const plan = await buildPlan(organizationId, vendor.id, confirmedTier, { ...input, actorId: actor.id });
+    const plan = await composeReadyPlan(organizationId, vendor.id, confirmedTier, { ...input, actorId: actor.id });
     if (plan.questionnairePlan?.sendBlocked) {
         throw new ApiError(409, plan.questionnairePlan.sendBlockMessage);
     }
-    for (const item of plan.assessments.filter((row: any) => row.key !== 'inherent-risk' && (row.requirement === 'Required' || row.requirement === 'Recommended'))) {
-        if (!item.templateId) continue;
-        try {
-            await vendorAssessmentService.createAssessment({
-                vendorId: vendor.id,
-                organizationId,
-                assessmentType: AssessmentType.INITIAL_DUE_DILIGENCE,
-                frameworkUsed: item.framework,
-                templateId: item.templateId,
-            });
-        } catch (error) {
-            if (!(error instanceof ApiError) || error.statusCode !== 409) throw error;
-        }
-    }
+    await createAssessmentsFromPlan(organizationId, vendor.id, plan);
     const customized = Boolean(input.includeKeys?.length || input.excludeKeys?.length || input.packDecisions?.length);
     await prisma.vendorOnboarding.update({
         where: { vendorId: vendor.id },
@@ -903,7 +1101,11 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         questionKey: row.questionId,
         response: row.response,
     })));
-    const unresolvedScope = describeUnresolvedScope(liveRecommendation.packs.unresolved);
+    const unresolvedScope = vendor.onboarding?.iraAnswers
+        ? (vendor.onboarding.iraUnknownCount
+            ? [{ code: 'IRA', message: `Not yet rated — ${vendor.onboarding.iraUnknownCount} answer${vendor.onboarding.iraUnknownCount === 1 ? '' : 's'} need confirmation.` }]
+            : [])
+        : describeUnresolvedScope(liveRecommendation.packs.unresolved);
     const plan = vendor.onboarding?.plan && typeof vendor.onboarding.plan === 'object'
         ? vendor.onboarding.plan
         : vendor.onboarding?.recommendedTier
@@ -913,8 +1115,13 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         id: vendor.id,
         publicId: vendor.publicId,
         name: vendor.name,
-        tier: TIER_LABEL[vendor.tier],
-        tierKey: vendor.tier,
+        tier: vendor.onboarding?.confirmedTier
+            ? TIER_LABEL[vendor.onboarding.confirmedTier]
+            : vendor.onboarding?.recommendedTier
+                ? `${TIER_LABEL[vendor.onboarding.recommendedTier]} recommended`
+                : 'Not confirmed',
+        tierKey: vendor.onboarding?.confirmedTier || null,
+        tierAuthoritative: Boolean(vendor.onboarding?.confirmedTier),
         inherentRiskScore: vendor.inherentRiskScore,
         residualRiskScore: vendor.residualRiskScore,
         legalName: vendor.legalName,
@@ -932,7 +1139,9 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         relationshipOwner: users.get(vendor.relationshipOwnerUserId || '')?.name || vendor.relationshipOwner || 'Not assigned',
         dueDate: due?.toISOString() || null,
         overdue,
-        nextAction: nextAction(vendor.onboarding!.stage, {
+        nextAction: vendor.onboarding!.stage === VendorOnboardingStage.TIER_REVIEW && !vendor.onboarding?.recommendedTier
+            ? `Not yet rated — ${vendor.onboarding?.iraUnknownCount || 0} answers need confirmation.`
+            : nextAction(vendor.onboarding!.stage, {
             required: Boolean(vendor.onboarding?.requesterEmail),
             sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
             submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
@@ -955,8 +1164,20 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         screeningStatus: vendor.onboarding?.screeningStatus || 'CLEAR',
         ira: {
             required: Boolean(vendor.onboarding?.requesterEmail),
+            status: vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers
+                ? 'IRA_SUBMITTED'
+                : iraLink?.status === 'OPENED' && vendor.onboarding?.iraAnswers && Object.keys(vendor.onboarding.iraAnswers as object).length
+                    ? 'IRA_IN_PROGRESS'
+                    : iraLink?.openedAt || iraLink?.status === 'OPENED'
+                        ? 'IRA_OPENED'
+                        : iraLink?.emailSentAt || iraLink?.markedSentAt
+                            ? 'IRA_SENT'
+                            : 'IRA_NOT_SENT',
             sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
             submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
+            sentAt: iraLink?.emailSentAt || iraLink?.markedSentAt || null,
+            openedAt: iraLink?.openedAt || null,
+            submittedAt: iraLink?.submittedAt || vendor.onboarding?.intakeCompletedAt || null,
             unknownCount: vendor.onboarding?.iraUnknownCount || 0,
             unknownMessage: vendor.onboarding?.iraUnknownCount
                 ? `Not yet rated — ${vendor.onboarding.iraUnknownCount} answer${vendor.onboarding.iraUnknownCount === 1 ? '' : 's'} need confirmation.`

@@ -252,6 +252,51 @@ describe('Onboard Third Party workspace', () => {
         expect(screen.getAllByText(/Privileged access is recorded as High/).length).toBeGreaterThan(0);
     });
 
+    it('does not show vendor-send controls during tier review', async () => {
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0001']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect((await screen.findAllByRole('button', { name: 'Confirm recommended tier' })).length).toBeGreaterThan(0);
+        expect(screen.queryByRole('button', { name: 'Send questionnaire' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Copy activation link' })).not.toBeInTheDocument();
+    });
+
+    it('shows 4a and 4b after the case is ready to send', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v-ready',
+                    publicId: 'VND-2026-0041',
+                    name: 'Ready Vendor',
+                    stage: 'Ready to send',
+                    stageKey: 'READY_TO_SEND',
+                    owner: 'Ava Owner',
+                    canReviewTier: true,
+                    requesterName: 'Jordan Request',
+                    requesterEmail: 'jordan@example.test',
+                    request: { name: 'Ready Vendor', servicesProvided: 'Payroll' },
+                    ira: { required: true, sent: true, submitted: true, status: 'IRA_SUBMITTED' },
+                    intake: { completed: true, sections: [] },
+                    tierReview: { recommendedTier: 'Medium', confirmedTier: 'Medium', explanation: 'Confirmed.' },
+                    invitation: null,
+                    history: [],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0041']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText('Send questionnaire to vendor')).toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: 'Send questionnaire' }).length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button', { name: 'Copy activation link' }).length).toBeGreaterThan(0);
+        expect(screen.queryByRole('button', { name: 'Confirm recommended tier' })).not.toBeInTheDocument();
+    });
+
     it('tells the operator an offboarding vendor is not a new assessment', async () => {
         const { vendorOnboardingAPI } = await import('../../services/api');
         (vendorOnboardingAPI.get as any).mockResolvedValue({

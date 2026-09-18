@@ -396,7 +396,6 @@ export async function activationLink(organizationId: string, vendorKey: string, 
     await prisma.vendorOnboarding.update({
         where: { vendorId: vendor.id },
         data: {
-            stage: VendorOnboardingStage.AWAITING_VENDOR,
             assessmentContactId: assigned.id,
             invitationId: issued.invitation.id,
             dueDiligenceDueAt: dueAt,
@@ -425,6 +424,16 @@ export async function markInvitationShared(organizationId: string, vendorKey: st
     await prisma.vendorAssessmentInvitation.update({
         where: { id: invitation.id },
         data: { emailDeliveryStatus: 'MARKED_SHARED' },
+    });
+    await pinCatalogAtSend(organizationId, vendor.id, vendor.onboarding?.plan);
+    await prisma.vendorOnboarding.update({
+        where: { vendorId: vendor.id },
+        data: {
+            stage: VendorOnboardingStage.AWAITING_VENDOR,
+            invitationId: invitation.id,
+            dueDiligenceSentAt: vendor.onboarding?.dueDiligenceSentAt || new Date(),
+            dueDiligenceSentBy: actor.id,
+        },
     });
     await writeHistory(organizationId, actor.id, 'vendor.secure_link_marked_shared', vendor.id, 'Customer marked the secure invitation as shared through their own channel. This is not email delivery.');
     return presentDueDiligence(organizationId, vendor.id, actor);

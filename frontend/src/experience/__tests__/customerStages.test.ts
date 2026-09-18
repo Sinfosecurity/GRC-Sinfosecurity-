@@ -13,7 +13,7 @@ describe('five-stage customer mapping', () => {
     });
 
     it('names one next human action', () => {
-        expect(dominantNextAction({ stageKey: 'TIER_REVIEW' }).label).toMatch(/Confirm recommended tier/);
+        expect(dominantNextAction({ stageKey: 'TIER_REVIEW', tierReview: { recommendedTier: 'High' } }).label).toMatch(/Confirm recommended tier/);
         expect(dominantNextAction({ stageKey: 'SUBMITTED', review: { potentialFindings: 4 } }).label).toBe('Review 4 material issues');
         expect(dominantNextAction({
             stageKey: 'APPROVAL',
@@ -41,5 +41,7 @@ describe('five-stage customer mapping', () => {
             stageKey: 'INTAKE',
             ira: { required: true, sent: true, submitted: false },
         }).label).toBe('Waiting on requester');
+        expect(dominantNextAction({ stageKey: 'READY_TO_SEND' }).label).toBe('Send questionnaire');
+        expect(dominantNextAction({ stageKey: 'TIER_REVIEW', tierReview: {} }).label).toBe('Not yet rated');
     });
 });

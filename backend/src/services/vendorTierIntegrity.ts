@@ -18,11 +18,12 @@ export function parseVendorTier(value: unknown): VendorTier | undefined {
 }
 
 export function resolveMinimumTier(input: {
-    hardFloors?: Array<{ applies?: boolean }> | null;
+    hardFloors?: Array<{ applies?: boolean; tier?: VendorTier | string }> | null;
     dataTypesAccessed?: string[];
     privilegedAccess?: boolean;
 }): VendorTier | null {
-    if (minTierFromFloors(input.hardFloors)) return VendorTier.CRITICAL;
+    const fromFloors = minTierFromFloors(input.hardFloors);
+    if (fromFloors) return fromFloors;
     if (criticalFloorAppliesFromFacts(input.dataTypesAccessed, input.privilegedAccess)) return VendorTier.CRITICAL;
     return null;
 }

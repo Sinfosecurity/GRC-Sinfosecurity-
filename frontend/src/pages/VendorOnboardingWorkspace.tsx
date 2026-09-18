@@ -8,7 +8,7 @@ import { EntitySummary, LifecycleProgress, NextActionCard, PageShell } from '../
 import ReviewDecidePanel from '../components/experience/ReviewDecidePanel';
 import QuestionnairePlan from '../components/tprm/QuestionnairePlan';
 import { approvalStatusCopy } from '../experience/approvalCopy';
-import { customerStage, customerStageIndex, dominantNextAction, workspaceSection } from '../experience/customerStages';
+import { customerStage, customerStageIndex, dominantNextAction, version3OperatingSteps, workspaceSection } from '../experience/customerStages';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate, humanizeLabel } from '../utils/humanizeLabel';
 
@@ -31,6 +31,7 @@ export default function VendorOnboardingWorkspace() {
     const [overrideTier, setOverrideTier] = useState('');
     const [overrideReason, setOverrideReason] = useState('');
     const [contact, setContact] = useState({ name: '', email: '', title: '', phone: '' });
+    const [contactDue, setContactDue] = useState('');
     const [saving, setSaving] = useState(false);
     const [clauses, setClauses] = useState<Record<string, boolean>>({});
     const [approval, setApproval] = useState({ decision: 'APPROVE', conditions: '', rationale: '' });
@@ -107,6 +108,35 @@ export default function VendorOnboardingWorkspace() {
         run(() => vendorOnboardingAPI.completeIntake(id, payload, attested));
     };
 
+    const requireVendorContact = () => {
+        if (contact.name && contact.email) return true;
+        setError('Add vendor security contact — name and email are required before the questionnaire can be sent.');
+        document.getElementById('vendor-security-contact')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    };
+
+    const sendQuestionnaire = () => {
+        if (!requireVendorContact()) return;
+        run(() => vendorOnboardingAPI.send(id, { ...contact, dueDate: contactDue || undefined }));
+    };
+
+    const copyActivationLink = async () => {
+        if (!requireVendorContact()) return;
+        setSaving(true);
+        setError(null);
+        try {
+            const response = await vendorOnboardingAPI.activationLink(id, contact);
+            const url = response.data.data.activationUrl;
+            if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
+            setCopiedLink(url || 'copied');
+            load();
+        } catch (err: any) {
+            setError(err.message || 'Unable to copy the activation link');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const confirmRecommendation = () => run(() => vendorOnboardingAPI.confirmTier(id, { confirm: true }));
     const overrideRecommendation = (event: FormEvent) => {
         event.preventDefault();
@@ -134,12 +164,27 @@ export default function VendorOnboardingWorkspace() {
                             ? approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status
                             : humanizeLabel(data.workflowStatus || data.stage)}
                     />
+                    {data.ira?.required ? (
+                        <Stack component="ol" aria-label="Version 3 operating path" spacing={0.75} sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 1.25 }}>
+                            {version3OperatingSteps(data).map((step) => (
+                                <Typography
+                                    component="li"
+                                    key={step.key}
+                                    variant="caption"
+                                    sx={{ fontWeight: step.state === 'current' ? 700 : 500, color: step.state === 'upcoming' ? 'text.disabled' : 'text.primary' }}
+                                >
+                                    {step.state === 'complete' ? '✓ ' : ''}{step.label}{step.state === 'current' ? ' · now' : ''}
+                                </Typography>
+                            ))}
+                        </Stack>
+                    ) : (
                     <LifecycleProgress
                         active={customerStageIndex(data.stageKey || data.stage)}
                         blocked={(data.questionnairePlan?.sendBlocked || (data.unresolvedScope || []).length > 0)
                             && Boolean(data.intake?.completed)
                             && customerStage(data.stageKey || data.stage) !== 'Monitor'}
                     />
+                    )}
                     {customerStage(data.stageKey || data.stage) === 'Monitor' ? (
                         <Alert
                             severity="info"
@@ -151,30 +196,101 @@ export default function VendorOnboardingWorkspace() {
                         <NextActionCard
                             label={dominantNextAction({ ...data, actorId: data.actorId }).label}
                             detail={`${dominantNextAction({ ...data, actorId: data.actorId }).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
-                            onAction={() => setTab(defaultTab(data.stage))}
+                            onAction={
+                                data.canReviewTier && data.stageKey === 'TIER_REVIEW' && data.tierReview?.recommendedTier
+                                    ? confirmRecommendation
+                                    : data.stageKey === 'READY_TO_SEND'
+                                        ? () => document.getElementById('send-questionnaire')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                        : data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && !data.ira?.sent
+                                            ? () => run(() => vendorOnboardingAPI.sendIra(id))
+                                            : () => setTab(defaultTab(data.stage))
+                            }
                         />
                     )}
                     {error && <Alert severity="error">{error}</Alert>}
+                    {data.ira?.required && (
+                        <Alert severity={data.ira.submitted ? 'success' : data.ira.sent ? 'info' : 'warning'}>
+                            {(data.ira.status || 'IRA_NOT_SENT').replace(/_/g, ' ')}
+                            {data.ira.sentAt ? ` · sent ${formatShortDate(data.ira.sentAt)}` : ''}
+                            {data.ira.submittedAt ? ` · submitted ${formatShortDate(data.ira.submittedAt)}` : ''}
+                            {data.ira.unknownMessage ? ` · ${data.ira.unknownMessage}` : ''}
+                        </Alert>
+                    )}
                     {data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && (
                         <Surface>
                             <Typography variant="h6">Send the inherent-risk form</Typography>
                             <Typography variant="body2" sx={{ mb: 1.5 }}>
                                 {data.requesterName || 'The requester'} ({data.requesterEmail}) does not need a Supreme login. Email the link or copy it and mark it sent. The 5-day clock starts then.
                             </Typography>
-                            {copiedIraLink && <Alert severity="success" sx={{ mb: 1.5 }}>Link copied. Not emailed until you mark it sent.</Alert>}
+                            {copiedIraLink && (
+                                <Alert severity="success" sx={{ mb: 1.5 }}>
+                                    Secure URL: {copiedIraLink}. Not emailed until you mark it sent.
+                                </Alert>
+                            )}
                             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                                 <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.sendIra(id))}>Email IRA link</Button>
-                                <Button disabled={saving} onClick={() => run(async () => {
-                                    const response = await vendorOnboardingAPI.iraLink(id);
-                                    const url = response.data.data.iraLink?.url;
-                                    if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
-                                    setCopiedIraLink(url || 'copied');
-                                })}>Copy IRA link</Button>
+                                <Button disabled={saving} onClick={async () => {
+                                    setSaving(true);
+                                    setError(null);
+                                    try {
+                                        const response = await vendorOnboardingAPI.iraLink(id);
+                                        const url = response.data.data.iraLink?.url;
+                                        if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
+                                        setCopiedIraLink(url || 'copied');
+                                        load();
+                                    } catch (err: any) {
+                                        setError(err.message || 'Unable to copy the IRA link');
+                                    } finally {
+                                        setSaving(false);
+                                    }
+                                }}>Copy IRA link</Button>
                                 {copiedIraLink && (
                                     <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markIraShared(id))}>Mark as sent</Button>
                                 )}
                             </Stack>
                         </Surface>
+                    )}
+                    {data.canReviewTier && data.stageKey === 'TIER_REVIEW' && data.tierReview?.recommendedTier && (
+                        <Surface>
+                            <Typography variant="h6">Confirm recommended tier</Typography>
+                            <Typography variant="body2" sx={{ mb: 1.5 }}>{data.tierReview.explanation}</Typography>
+                            <Button variant="contained" disabled={saving} onClick={confirmRecommendation}>Confirm recommended tier</Button>
+                        </Surface>
+                    )}
+                    {data.stageKey === 'READY_TO_SEND' && (
+                        <div id="send-questionnaire">
+                        <Surface>
+                            <Typography variant="h6">Send questionnaire to vendor</Typography>
+                            <Typography variant="body2" sx={{ mb: 1.5 }}>
+                                Tier is confirmed. Send the generated questionnaire or copy the activation link. Copy alone does not mark it sent.
+                            </Typography>
+                            {!contact.name || !contact.email ? (
+                                <Alert severity="warning" sx={{ mb: 1.5 }} action={<Button color="inherit" onClick={() => document.getElementById('vendor-security-contact')?.focus()}>Add vendor security contact</Button>}>
+                                    Add vendor security contact before send.
+                                </Alert>
+                            ) : null}
+                            <Stack spacing={1.5}>
+                                <TextField id="vendor-security-contact" required label="Vendor security contact" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} />
+                                <TextField required type="email" label="Email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} />
+                                <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={contactDue} onChange={(event) => setContactDue(event.target.value)} />
+                                {copiedLink && <Alert severity="success">Activation URL: {copiedLink}. Still READY TO SEND until you mark it sent.</Alert>}
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                    <Button variant="contained" disabled={saving} onClick={sendQuestionnaire}>Send questionnaire</Button>
+                                    <Button disabled={saving} onClick={copyActivationLink}>Copy activation link</Button>
+                                    {(copiedLink || data.invitation?.deliveryMethod === 'LINK') && data.stageKey === 'READY_TO_SEND' && (
+                                        <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as sent</Button>
+                                    )}
+                                </Stack>
+                            </Stack>
+                        </Surface>
+                        </div>
+                    )}
+                    {data.stageKey === 'AWAITING_VENDOR' && (
+                        <Alert severity="success">
+                            {data.invitation?.deliveryMethod === 'LINK' ? 'Questionnaire shared' : 'Questionnaire sent'}
+                            {data.invitation?.emailStatus ? ` · ${data.invitation.emailStatus}` : ''}
+                            {data.dueDate ? ` · due ${formatShortDate(data.dueDate)}` : ''}
+                        </Alert>
                     )}
                     {data.ira?.unknownMessage && <Alert severity="warning">{data.ira.unknownMessage}</Alert>}
                     <Typography variant="body2">Inherent is intake exposure. Residual is current posture.</Typography>
@@ -343,7 +459,7 @@ export default function VendorOnboardingWorkspace() {
                                     {data.tierReview.confirmedTier && <Alert severity="info">Confirmed tier: {data.tierReview.confirmedTier}{data.tierReview.overrideReason ? `. Override reason: ${data.tierReview.overrideReason}` : ''}</Alert>}
                                     {data.canReviewTier && data.stageKey === 'TIER_REVIEW' && (
                                         <>
-                                            <Button variant="contained" disabled={saving} onClick={confirmRecommendation}>Confirm recommendation</Button>
+                                            <Button variant="contained" disabled={saving} onClick={confirmRecommendation}>Confirm recommended tier</Button>
                                             <Stack component="form" spacing={1.5} onSubmit={overrideRecommendation}>
                                                 <TextField select label="Override tier" value={overrideTier} onChange={(event) => setOverrideTier(event.target.value)}>
                                                     {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((tier) => <MenuItem key={tier} value={tier}>{humanizeLabel(tier)}</MenuItem>)}
@@ -417,7 +533,7 @@ export default function VendorOnboardingWorkspace() {
                                     )}
                                 </Stack>
                             )}
-                            {data.stageKey === 'READY_TO_SEND' && <Alert severity="success">Package confirmed. Choose Send invitation email or Copy secure invitation link.</Alert>}
+                            {data.stageKey === 'READY_TO_SEND' && <Alert severity="success">Questionnaire ready. Send the questionnaire or copy the activation link above.</Alert>}
                             {data.plan?.triggers?.privacy && <Button onClick={() => navigate(`/privacy-ops/vendors/${data.id}`)}>Open privacy</Button>}
                             {data.plan?.triggers?.aiGovernance && <Button onClick={() => navigate('/ai-governance')}>Open AI Governance</Button>}
                         </Stack>
@@ -447,15 +563,10 @@ export default function VendorOnboardingWorkspace() {
                                     <TextField label="Phone" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} />
                                     {data.canReviewTier && ['READY_TO_SEND', 'AWAITING_VENDOR'].includes(data.stageKey) && !data.questionnairePlan?.sendBlocked && (
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                            <Button variant="contained" disabled={saving || !contact.name || !contact.email} onClick={() => run(() => vendorOnboardingAPI.send(id, contact))}>Send invitation email</Button>
-                                            <Button disabled={saving || !contact.name || !contact.email} onClick={() => run(async () => {
-                                                const response = await vendorOnboardingAPI.activationLink(id, contact);
-                                                const url = response.data.data.activationUrl;
-                                                if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
-                                                setCopiedLink(url || 'copied');
-                                            })}>Copy secure invitation link</Button>
-                                            {data.invitation?.deliveryMethod === 'LINK' && (
-                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as shared</Button>
+                                            <Button variant="contained" disabled={saving} onClick={sendQuestionnaire}>Send questionnaire</Button>
+                                            <Button disabled={saving} onClick={copyActivationLink}>Copy activation link</Button>
+                                            {(copiedLink || data.invitation?.deliveryMethod === 'LINK') && data.stageKey === 'READY_TO_SEND' && (
+                                                <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markInvitationShared(id))}>Mark as sent</Button>
                                             )}
                                         </Stack>
                                     )}

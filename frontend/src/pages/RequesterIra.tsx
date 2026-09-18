@@ -68,7 +68,14 @@ export default function RequesterIra() {
         setError(null);
         try {
             const response = await iraAPI.submit(token, answers, attested);
-            setData(response.data.data);
+            const payload = { ...response.data.data };
+            delete payload.rating;
+            setData({
+                ...payload,
+                submitted: true,
+                readOnly: true,
+                confirmation: payload.confirmation || 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.',
+            });
         } catch (err: any) {
             setError(err.message || 'Could not submit.');
         } finally {
@@ -85,7 +92,12 @@ export default function RequesterIra() {
                     {data?.vendorName || 'This engagement'} — answer only what you know. Don&apos;t know is allowed. The vendor will not see this.
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
-                {data?.submitted && <Alert severity="success">Submitted. GRC will review and confirm the tier. You can close this page.</Alert>}
+                {saving && !data?.submitted && <Alert severity="info">Submitting…</Alert>}
+                {data?.submitted && (
+                    <Alert severity="success">
+                        {data.confirmation || 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'}
+                    </Alert>
+                )}
                 <Stack component="form" spacing={3} onSubmit={submit}>
                     {['A', 'B'].map((part) => (
                         <Box key={part}>

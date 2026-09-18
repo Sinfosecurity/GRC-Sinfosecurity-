@@ -485,8 +485,15 @@ export const TIER_RANK: Record<VendorTier, number> = {
     CRITICAL: 4,
 };
 
-export function minTierFromFloors(floors: Array<{ applies?: boolean }> | null | undefined): VendorTier | null {
-    return floors?.some((floor) => floor.applies) ? VendorTier.CRITICAL : null;
+export function minTierFromFloors(floors: Array<{ applies?: boolean; tier?: VendorTier | string }> | null | undefined): VendorTier | null {
+    const applying = (floors || []).filter((floor) => floor.applies);
+    if (!applying.length) return null;
+    let minimum: VendorTier | null = null;
+    for (const floor of applying) {
+        const tier = floor.tier && TIER_RANK[floor.tier as VendorTier] != null ? floor.tier as VendorTier : VendorTier.CRITICAL;
+        if (!minimum || TIER_RANK[tier] > TIER_RANK[minimum]) minimum = tier;
+    }
+    return minimum;
 }
 
 export function criticalFloorAppliesFromFacts(dataTypes: string[] = [], privilegedAccess = false): boolean {

@@ -4,9 +4,10 @@ import { ApiError } from '../middleware/errorHandler';
 import { IRA_QUESTIONS, missingIraQuestions } from '../tprm/iraCatalog';
 import { iraForm, scoreIra } from '../tprm/iraScoring';
 import { hashToken, randomToken } from './passwordService';
-import { deliverEmail } from './notificationDeliveryService';
+import { recordAudit } from './auditEventService';
+import { deliverEmail, notifyUser } from './notificationDeliveryService';
 import { customerAppUrl, renderTransactionalEmail } from './transactionalEmail';
-import { presentOnboarding, type Actor } from './vendorOnboardingService';
+import { materializeReadyPlan, presentOnboarding, type Actor } from './vendorOnboardingService';
 
 const IRA_TTL_DAYS = 14;
 
@@ -76,6 +77,9 @@ function publicIra(vendor: { name: string; publicId: string | null; onboarding: 
         answers,
         submitted,
         readOnly: submitted,
+        confirmation: submitted
+            ? 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'
+            : null,
         expiresAt: link.expiresAt,
         questions: IRA_QUESTIONS,
     };
@@ -123,6 +127,15 @@ export async function sendIraLink(organizationId: string, vendorKey: string, act
             where: { vendorId: vendor.id },
             data: { intakeDueAt: vendor.onboarding.intakeDueAt || new Date(Date.now() + 5 * 86400000) },
         });
+        await recordAudit({
+            organizationId,
+            actorUserId: actor.id,
+            action: 'vendor.ira_sent',
+            resourceType: 'VendorOnboarding',
+            resourceId: vendor.id,
+            result: 'success',
+            metadata: { summary: 'Inherent-risk link emailed to the requester.', delivery },
+        });
     } else {
         await prisma.requesterTaskLink.update({
             where: { id: issued.row.id },
@@ -154,6 +167,15 @@ export async function markIraShared(organizationId: string, vendorKey: string, a
             data: { intakeDueAt: new Date(Date.now() + 5 * 86400000) },
         });
     }
+    await recordAudit({
+        organizationId,
+        actorUserId: actor.id,
+        action: 'vendor.ira_sent',
+        resourceType: 'VendorOnboarding',
+        resourceId: vendor.id,
+        result: 'success',
+        metadata: { summary: 'Inherent-risk link marked sent. This is not email delivery.' },
+    });
     return presentOnboarding(organizationId, vendor.id, actor);
 }
 
@@ -176,6 +198,15 @@ export async function getIraForm(token: string) {
             where: { id: link.id },
             data: { status: RequesterTaskStatus.OPENED, openedAt: new Date() },
         });
+        await recordAudit({
+            organizationId: link.organizationId,
+            actorUserId: null,
+            action: 'vendor.ira_opened',
+            resourceType: 'VendorOnboarding',
+            resourceId: link.vendorId,
+            result: 'success',
+            metadata: { summary: 'Requester opened the inherent-risk form.' },
+        }).catch(() => undefined);
     }
     return publicIra(link.vendor, link);
 }
@@ -224,7 +255,7 @@ export async function submitIraForm(token: string, answers: Record<string, strin
             planConfirmedAt: autoConfirm ? new Date() : null,
         },
     });
-    if (scored.recommendedTier) {
+    if (autoConfirm && scored.recommendedTier) {
         await prisma.vendor.update({
             where: { id: link.vendorId },
             data: {
@@ -233,14 +264,106 @@ export async function submitIraForm(token: string, answers: Record<string, strin
                 dataTypesAccessed: scored.signals.personalData ? ['Personal data'] : [],
             },
         });
+        await materializeReadyPlan(link.organizationId, link.vendorId, link.createdBy).catch(() => undefined);
+    } else if (scored.signals.personalData) {
+        await prisma.vendor.update({
+            where: { id: link.vendorId },
+            data: { dataTypesAccessed: ['Personal data'] },
+        });
     }
     await prisma.requesterTaskLink.update({
         where: { id: link.id },
         data: { status: RequesterTaskStatus.SUBMITTED, submittedAt: new Date() },
     });
+    await recordAudit({
+        organizationId: link.organizationId,
+        actorUserId: null,
+        action: 'vendor.ira_submitted',
+        resourceType: 'VendorOnboarding',
+        resourceId: link.vendorId,
+        result: 'success',
+        metadata: { summary: 'Requester submitted the inherent-risk form.' },
+    }).catch(() => undefined);
+    if (scored.ready) {
+        await recordAudit({
+            organizationId: link.organizationId,
+            actorUserId: null,
+            action: 'vendor.inherent_risk_calculated',
+            resourceType: 'VendorOnboarding',
+            resourceId: link.vendorId,
+            result: 'success',
+            metadata: { summary: scored.explanation, recommendedTier: scored.recommendedTier },
+        }).catch(() => undefined);
+    }
+    await notifyIraSubmitted(link.organizationId, link.vendor, scored.ready ? scored.recommendedTier : null).catch(() => undefined);
     return {
         ...publicIra({ ...link.vendor, onboarding: { ...link.vendor.onboarding!, iraAnswers: answers, intakeCompletedAt: new Date() } }, { ...link, submittedAt: new Date(), status: RequesterTaskStatus.SUBMITTED }),
+        confirmation: 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.',
         rating: scored.ready ? { tier: scored.recommendedTier, percent: scored.percent, explanation: scored.explanation } : { tier: null, message: scored.message },
         autoConfirmed: autoConfirm,
     };
+}
+
+async function notifyIraSubmitted(organizationId: string, vendor: { id: string; name: string; publicId: string | null; onboarding: { requesterEmail?: string | null; requesterName?: string | null; engagementPublicId?: string | null } | null }, recommendedTier: VendorTier | null) {
+    const requesterEmail = vendor.onboarding?.requesterEmail;
+    if (requesterEmail) {
+        const mail = renderTransactionalEmail({
+            templateKey: 'vendor.ira_submitted',
+            audience: 'internal',
+            heading: 'Inherent risk questions received',
+            intro: 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.',
+            greeting: vendor.onboarding?.requesterName ? `Hello ${vendor.onboarding.requesterName}` : undefined,
+            context: [
+                { label: 'Vendor', value: vendor.name },
+                { label: 'Engagement', value: vendor.onboarding?.engagementPublicId || vendor.publicId || vendor.id },
+            ],
+            nextSteps: ['You can close this message.', 'Do not send this form to the vendor.'],
+            securityNote: 'This confirmation does not invite the vendor and does not include a risk score.',
+        }, `Received: Inherent risk questions for ${vendor.name}`);
+        await deliverEmail({
+            to: requesterEmail,
+            subject: mail.subject,
+            body: mail.text,
+            html: mail.html,
+            fromName: mail.fromName,
+            eventType: 'assessment.assigned',
+            organizationId,
+            resourceType: 'VendorOnboarding',
+            resourceId: vendor.id,
+        });
+    }
+    const analysts = await prisma.user.findMany({
+        where: { organizationId, status: 'ACTIVE' },
+        select: { id: true, role: true },
+    });
+    const title = recommendedTier
+        ? `Inherent risk submitted — ${vendor.name}`
+        : `Inherent risk submitted — not yet rated — ${vendor.name}`;
+    const body = recommendedTier
+        ? `The requester submitted inherent-risk answers for ${vendor.name}. Review and confirm the recommended tier before sending the vendor questionnaire.`
+        : `The requester submitted inherent-risk answers for ${vendor.name}. Don't know answers are recorded. No tier is stored. Confirm the unknowns before sending a questionnaire.`;
+    const ctaUrl = customerAppUrl(`/vendor-onboarding/${vendor.publicId || vendor.id}`);
+    const analystMail = renderTransactionalEmail({
+        templateKey: 'vendor.ira_ready_for_review',
+        audience: 'internal',
+        heading: title,
+        intro: body,
+        context: [{ label: 'Vendor', value: vendor.name }],
+        cta: { label: 'Open the workspace', url: ctaUrl },
+        nextSteps: ['Confirm the tier if rateable.', 'Do not send the vendor questionnaire until the case is ready to send.'],
+    }, title);
+    for (const analyst of analysts.filter((user) => ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR', 'ADMIN', 'COMPLIANCE_OFFICER'].includes(user.role))) {
+        await notifyUser({
+            organizationId,
+            userId: analyst.id,
+            eventType: 'approval.requested',
+            title,
+            body,
+            resourceType: 'VendorOnboarding',
+            resourceId: vendor.id,
+            emailBody: analystMail.text,
+            emailHtml: analystMail.html,
+            fromName: analystMail.fromName,
+        });
+    }
 }

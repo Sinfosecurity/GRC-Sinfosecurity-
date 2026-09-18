@@ -63,7 +63,8 @@ export function dominantNextAction(data: {
     canEditIntake?: boolean;
     canReviewTier?: boolean;
     intake?: { completed?: boolean };
-    ira?: { required?: boolean; sent?: boolean; submitted?: boolean };
+    ira?: { required?: boolean; sent?: boolean; submitted?: boolean; unknownCount?: number; unknownMessage?: string };
+    tierReview?: { recommendedTier?: string | null; confirmedTier?: string | null };
     actorId?: string;
     lifecycle?: {
         readyForIndependentApproval?: boolean;
@@ -95,9 +96,14 @@ export function dominantNextAction(data: {
             : { label: 'Send the inherent-risk form', detail: 'Email the link or copy it and mark it sent. The 5-day clock starts then.' };
     }
     if (stage === 'INTAKE' || stage === 'Intake') return { label: 'Complete intake', detail: data.nextAction || 'Answer the inherent-risk questions.' };
-    if (stage === 'TIER_REVIEW' || stage === 'Tier review') return { label: 'Confirm recommended tier', detail: data.nextAction || 'Supreme already scored inherent risk.' };
+    if (stage === 'TIER_REVIEW' || stage === 'Tier review') {
+        if (!data.tierReview?.recommendedTier) {
+            return { label: 'Not yet rated', detail: data.ira?.unknownMessage || 'Answers still need confirmation. Questionnaire send stays blocked.' };
+        }
+        return { label: 'Confirm recommended tier', detail: data.nextAction || 'Supreme already scored inherent risk. Confirm to make the questionnaire ready to send.' };
+    }
     if (stage === 'DUE_DILIGENCE_PLAN' || stage === 'Due diligence') return { label: 'Confirm recommended packs', detail: data.nextAction || 'Baseline is required. Other packs come from intake facts.' };
-    if (stage === 'READY_TO_SEND' || stage === 'Ready to send') return { label: 'Send assessment', detail: data.nextAction || 'Send invitation or copy the secure link.' };
+    if (stage === 'READY_TO_SEND' || stage === 'Ready to send') return { label: 'Send questionnaire', detail: data.nextAction || 'Send the questionnaire or copy the activation link. Copy alone is not sent.' };
     if (['AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'Awaiting vendor', 'Vendor in progress'].includes(String(stage))) {
         return { label: 'Waiting on vendor', detail: data.nextAction || 'Supreme is tracking vendor progress.' };
     }
@@ -128,4 +134,40 @@ export function dominantNextAction(data: {
         return { label: 'Make decision', detail: data.nextAction || 'Approve, approve with conditions, or reject.' };
     }
     return { label: data.nextAction || 'Continue', detail: 'Supreme prepared the next eligible step.' };
+}
+
+function pathState(done: boolean, isCurrent: boolean): 'complete' | 'current' | 'upcoming' {
+    if (isCurrent) return 'current';
+    if (done) return 'complete';
+    return 'upcoming';
+}
+
+const PAST_TIER = ['READY_TO_SEND', 'AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'SUBMITTED', 'UNDER_REVIEW', 'FINDINGS_OPEN', 'REMEDIATION', 'RISK_ACCEPTANCE', 'CONTRACT_REVIEW', 'APPROVAL', 'ACTIVE', 'REASSESSMENT', 'OFFBOARDING'];
+const PAST_READY = ['AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'SUBMITTED', 'UNDER_REVIEW', 'FINDINGS_OPEN', 'REMEDIATION', 'RISK_ACCEPTANCE', 'CONTRACT_REVIEW', 'APPROVAL', 'ACTIVE', 'REASSESSMENT', 'OFFBOARDING'];
+const PAST_SENT = ['VENDOR_IN_PROGRESS', 'SUBMITTED', 'UNDER_REVIEW', 'FINDINGS_OPEN', 'REMEDIATION', 'RISK_ACCEPTANCE', 'CONTRACT_REVIEW', 'APPROVAL', 'ACTIVE', 'REASSESSMENT', 'OFFBOARDING'];
+const PAST_VENDOR = ['SUBMITTED', 'UNDER_REVIEW', 'FINDINGS_OPEN', 'REMEDIATION', 'RISK_ACCEPTANCE', 'CONTRACT_REVIEW', 'APPROVAL', 'ACTIVE', 'REASSESSMENT', 'OFFBOARDING'];
+const PAST_REVIEW = ['CONTRACT_REVIEW', 'APPROVAL', 'ACTIVE', 'REASSESSMENT', 'OFFBOARDING'];
+const AT_REVIEW = ['SUBMITTED', 'UNDER_REVIEW', 'FINDINGS_OPEN', 'REMEDIATION', 'RISK_ACCEPTANCE'];
+const AT_DECISION = ['CONTRACT_REVIEW', 'APPROVAL'];
+const AT_MONITOR = ['ACTIVE', 'REASSESSMENT', 'OFFBOARDING'];
+
+export function version3OperatingSteps(data: {
+    stageKey?: string;
+    ira?: { required?: boolean; sent?: boolean; submitted?: boolean; status?: string };
+}) {
+    const stage = String(data.stageKey || '');
+    const iraSent = Boolean(data.ira?.sent || data.ira?.submitted || ['IRA_SENT', 'IRA_OPENED', 'IRA_IN_PROGRESS', 'IRA_SUBMITTED'].includes(String(data.ira?.status || '')));
+    const iraSubmitted = Boolean(data.ira?.submitted || data.ira?.status === 'IRA_SUBMITTED');
+    return [
+        { key: 'REQUEST', label: 'Request', state: pathState(true, false) },
+        { key: 'IRA_SENT', label: 'IRA sent', state: pathState(iraSent, !iraSent && (stage === 'INTAKE' || stage === 'REQUEST')) },
+        { key: 'IRA_SUBMITTED', label: 'IRA submitted', state: pathState(iraSubmitted, iraSent && !iraSubmitted) },
+        { key: 'TIER_REVIEW', label: 'Tier review', state: pathState(PAST_TIER.includes(stage), stage === 'TIER_REVIEW') },
+        { key: 'QUESTIONNAIRE_READY', label: 'Questionnaire ready', state: pathState(PAST_READY.includes(stage), stage === 'READY_TO_SEND') },
+        { key: 'QUESTIONNAIRE_SENT', label: 'Questionnaire sent', state: pathState(PAST_SENT.includes(stage), stage === 'AWAITING_VENDOR') },
+        { key: 'VENDOR_RESPONDING', label: 'Vendor responding', state: pathState(PAST_VENDOR.includes(stage), stage === 'VENDOR_IN_PROGRESS') },
+        { key: 'REVIEW', label: 'Review', state: pathState(PAST_REVIEW.includes(stage), AT_REVIEW.includes(stage)) },
+        { key: 'DECISION', label: 'Decision', state: pathState(AT_MONITOR.includes(stage), AT_DECISION.includes(stage)) },
+        { key: 'MONITOR', label: 'Monitor', state: pathState(false, AT_MONITOR.includes(stage)) },
+    ];
 }

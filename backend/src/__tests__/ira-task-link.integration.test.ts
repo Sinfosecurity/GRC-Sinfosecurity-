@@ -118,6 +118,17 @@ describe('Version 3 requester IRA path', () => {
         expect(workspace.body.data.ira.submitted).toBe(true);
         expect(workspace.body.data.tierReview).toBeNull();
         expect(workspace.body.data.stageKey).toBe('TIER_REVIEW');
+        expect(workspace.body.data.tierAuthoritative).toBe(false);
+        expect(workspace.body.data.ira.unknownMessage).toMatch(/Not yet rated/);
+        const stored = await prisma.vendor.findUnique({ where: { id: vendorId } });
+        expect(stored?.tier).toBe('MEDIUM');
+        expect(workspace.body.data.tierKey).toBeNull();
+        const blocked = await request(app)
+            .post(`${API}/vendors/onboarding/${publicId}/tier/confirm`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ confirm: true });
+        expect(blocked.status).toBe(409);
+        expect(JSON.stringify(blocked.body)).toMatch(/Not yet rated|need confirmation/i);
     });
 
     it('auto-confirms Low only after a current external rating is present', async () => {
@@ -160,5 +171,117 @@ describe('Version 3 requester IRA path', () => {
             .get(`${API}/vendors/onboarding/${second.body.data.publicId}`)
             .set('Authorization', `Bearer ${token}`);
         expect(workspace.body.data.stageKey).toBe('READY_TO_SEND');
+    });
+
+    it('confirms a rateable IRA into READY_TO_SEND and only marks copy sent after Mark as sent', async () => {
+        const created = await request(app)
+            .post(`${API}/vendors/onboarding`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: `IRA Confirm ${suffix}`,
+                servicesProvided: 'Customer payroll processing',
+                requesterName: 'Jordan Request',
+                requesterEmail: `confirm-${suffix}@ira.test`,
+                acknowledgeDuplicate: true,
+            });
+        expect(created.status).toBe(201);
+        const copied = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/ira/link`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({});
+        const raw = new URL(copied.body.data.iraLink.url, 'https://app.example').searchParams.get('token') || '';
+        const submitted = await request(app).post(`${API}/ira/submit`).send({
+            token: raw,
+            attested: true,
+            answers: completeAnswers({ a2: 'personal' }),
+        });
+        expect(submitted.status).toBe(200);
+        expect(submitted.body.data.confirmation).toMatch(/submitted successfully to the Governance, Risk & Compliance team/);
+        const before = await request(app)
+            .get(`${API}/vendors/onboarding/${created.body.data.publicId}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(before.body.data.stageKey).toBe('TIER_REVIEW');
+        expect(before.body.data.tierAuthoritative).toBe(false);
+        expect(before.body.data.tierReview.confirmedTier).toBeNull();
+        const beforeVendor = await prisma.vendor.findUnique({ where: { id: created.body.data.id } });
+        expect(beforeVendor?.tier).toBe('MEDIUM');
+        const notices = await prisma.inAppNotification.findMany({
+            where: { organizationId: beforeVendor?.organizationId, resourceId: created.body.data.id },
+        });
+        expect(notices.some((row) => /inherent risk submitted/i.test(row.title))).toBe(true);
+
+        const confirmed = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/tier/confirm`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ confirm: true });
+        expect(confirmed.status).toBe(200);
+        expect(confirmed.body.data.stageKey).toBe('READY_TO_SEND');
+        expect(confirmed.body.data.tierReview.confirmedTier).toBeTruthy();
+        expect(confirmed.body.data.tierAuthoritative).toBe(true);
+
+        const link = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/invitation/link`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ name: 'Vendor Security', email: `vendor-${suffix}@vendor.test` });
+        expect(link.status).toBe(200);
+        expect(link.body.data.stageKey || link.body.data.stage).toMatch(/READY_TO_SEND|Ready to send/i);
+        expect(link.body.data.activationUrl).toMatch(/vendor-assessment\/activate/);
+
+        const afterCopy = await request(app)
+            .get(`${API}/vendors/onboarding/${created.body.data.publicId}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(afterCopy.body.data.stageKey).toBe('READY_TO_SEND');
+
+        const marked = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/invitation/shared`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({});
+        expect(marked.status).toBe(200);
+        const afterMark = await request(app)
+            .get(`${API}/vendors/onboarding/${created.body.data.publicId}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(afterMark.body.data.stageKey).toBe('AWAITING_VENDOR');
+        expect(afterMark.body.data.plan?.pin || afterMark.body.data.questionnairePlan).toBeTruthy();
+        const pinned = await prisma.vendorOnboarding.findFirst({ where: { vendorId: created.body.data.id } });
+        expect((pinned?.plan as { pin?: { catalogVersion?: string } } | null)?.pin?.catalogVersion).toBeTruthy();
+    });
+
+    it('sends the vendor questionnaire by email and enters AWAITING_VENDOR', async () => {
+        const created = await request(app)
+            .post(`${API}/vendors/onboarding`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: `IRA Email ${suffix}`,
+                servicesProvided: 'Customer payroll processing',
+                requesterName: 'Jordan Request',
+                requesterEmail: `email-${suffix}@ira.test`,
+                acknowledgeDuplicate: true,
+            });
+        expect(created.status).toBe(201);
+        const copied = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/ira/link`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({});
+        const raw = new URL(copied.body.data.iraLink.url, 'https://app.example').searchParams.get('token') || '';
+        await request(app).post(`${API}/ira/submit`).send({
+            token: raw,
+            attested: true,
+            answers: completeAnswers({ a2: 'personal' }),
+        });
+        const confirmed = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/tier/confirm`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ confirm: true });
+        expect(confirmed.status).toBe(200);
+        expect(confirmed.body.data.stageKey).toBe('READY_TO_SEND');
+        const sent = await request(app)
+            .post(`${API}/vendors/onboarding/${created.body.data.publicId}/send`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ name: 'Vendor Security', email: `email-vendor-${suffix}@vendor.test` });
+        expect(sent.status).toBe(201);
+        const after = await request(app)
+            .get(`${API}/vendors/onboarding/${created.body.data.publicId}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(after.body.data.stageKey).toBe('AWAITING_VENDOR');
     });
 });
