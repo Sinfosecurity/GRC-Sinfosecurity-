@@ -19,7 +19,7 @@ BASE = os.environ.get("E2E_BASE", "https://supreme-risk-staging.onrender.com")
 API = os.environ.get("E2E_API", "https://supreme-risk-staging-api.onrender.com")
 EMAIL = os.environ.get("E2E_EMAIL", "report-proof-20260913@staging.supremerisk.test")
 PASSWORD = os.environ.get("E2E_PASSWORD", "ReportProof1x")
-REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "b01609aa7c45414bf3c3a2ca08249bf574366952")
+REQUIRED_SHA = os.environ.get("REQUIRED_SHA", "e19f8bde268d668518b848acd6086d7723f7177d")
 RESULTS: dict = {"checks": [], "shots": [], "axe": [], "sha": {}, "notes": []}
 WIDTHS = (375, 768, 1024, 1440, 1920)
 
@@ -120,7 +120,24 @@ def main() -> None:
 
     created_status, created = request_json("POST", "/identity/providers", walk_token, {"protocol": "SAML", "displayName": "Company SAML"})
     record("create-provider", "PASS" if created_status == 201 else "FAIL", str(created_status))
-    provider_id = (created.get("data") or {}).get("id")
+    provider = created.get("data") or {}
+    provider_id = provider.get("id")
+    saml = provider.get("saml") or {}
+    RESULTS["saml"] = {
+        "acsUrl": saml.get("acsUrl") or "",
+        "spEntityId": saml.get("spEntityId") or "",
+        "metadataUrl": saml.get("metadataUrl") or "",
+    }
+    record("api-acs-origin", "PASS" if str(saml.get("acsUrl") or "").startswith(f"{API}/") and "localhost" not in str(saml.get("acsUrl")) else "FAIL", str(saml.get("acsUrl") or "missing"))
+    record("api-entity-origin", "PASS" if str(saml.get("spEntityId") or "").startswith(f"{API}/") and "localhost" not in str(saml.get("spEntityId")) else "FAIL", str(saml.get("spEntityId") or "missing"))
+    if saml.get("metadataUrl"):
+        try:
+            xml = urllib.request.urlopen(saml["metadataUrl"], timeout=30).read().decode("utf-8", "replace")
+            RESULTS["saml"]["metadataXmlHasAcs"] = saml.get("acsUrl") in xml
+            RESULTS["saml"]["metadataXmlHasEntity"] = saml.get("spEntityId") in xml
+            record("api-metadata-matches", "PASS" if saml.get("acsUrl") in xml and saml.get("spEntityId") in xml and "localhost" not in xml else "FAIL", saml["metadataUrl"])
+        except Exception as exc:
+            record("api-metadata-matches", "FAIL", str(exc))
     if provider_id:
         request_json(
             "PATCH",
@@ -176,6 +193,18 @@ def main() -> None:
         record("scim-deactivate", "PASS" if deactivated.get("active") is False else "FAIL", str(deactivated.get("active")))
         other_status, _ = request_json("GET", "/scim/v2/Users", admin_token, prefix="")
         record("scim-cross-tenant-admin-jwt", "DENIED" if other_status in {401, 403} else "FAIL", str(other_status))
+        token_id = (token_payload.get("data") or {}).get("id")
+        if token_id:
+            revoke_status, _ = request_json("POST", f"/identity/scim/tokens/{token_id}/revoke", walk_token, {})
+            record("scim-token-revoked", "PASS" if revoke_status in {200, 204} else "FAIL", str(revoke_status))
+            denied_status, _ = request_json("GET", "/scim/v2/Users", prefix="")
+            # After revoke, the old bearer must fail. Use the raw secret against SCIM.
+            denied = urllib.request.Request(f"{API}/scim/v2/Users", headers={"Authorization": f"Bearer {scim_secret}"})
+            try:
+                urllib.request.urlopen(denied, timeout=30)
+                record("scim-revoked-denied", "FAIL", "revoked token still accepted")
+            except urllib.error.HTTPError as exc:
+                record("scim-revoked-denied", "PASS" if exc.code in {401, 403} else "FAIL", str(exc.code))
 
     viewer_status, viewer = request_json(
         "POST",
@@ -185,13 +214,13 @@ def main() -> None:
     )
     if viewer_status in {200, 201}:
         RESULTS["notes"].append("viewer create returned a user; mutation check uses admin token role denial via forged viewer login if available")
-    deny_status, _ = request_json("POST", "/identity/providers", admin_token if False else walk_token, {"protocol": "OIDC"})
-    # Walk user is org admin; use Elite Claims viewer path via login of a known non-admin if present is skipped.
-    # Direct RBAC: attempt with Elite Claims admin is allowed. Create a passwordless check by logging in is not available.
     record("viewer-route-exists", "PASS" if overview_status == 200 else "FAIL", "admin can read; viewer mutation covered by CI")
 
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
+        try:
+            browser = playwright.chromium.launch(headless=True)
+        except Exception:
+            browser = playwright.chromium.launch(channel="chrome", headless=True)
         context = browser.new_context(viewport={"width": 1440, "height": 900}, bypass_csp=True)
         page = context.new_page()
         page.goto(f"{BASE}/login", wait_until="domcontentloaded")
@@ -200,7 +229,7 @@ def main() -> None:
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(user));
             }""",
-            [admin_token, admin_user],
+            [walk_token, walk_user],
         )
         page.goto(f"{BASE}/settings/identity", wait_until="networkidle", timeout=90000)
         time.sleep(1.2)
@@ -220,10 +249,39 @@ def main() -> None:
             ("Provisioning", "provisioning"),
             ("Role Mapping", "mapping"),
             ("Security Policy", "policy"),
+            ("Activity", "activity"),
         ]:
             page.get_by_role("tab", name=label).click()
-            time.sleep(0.4)
+            time.sleep(0.5)
             shot(page, f"identity-{extra}-1440")
+            tab_text = page.inner_text("body")
+            if extra == "sso":
+                acs = page.get_by_label("Assertion Consumer Service URL")
+                entity = page.get_by_label("Service provider entity ID")
+                acs_value = acs.input_value() if acs.count() else ""
+                entity_value = entity.input_value() if entity.count() else ""
+                RESULTS["saml"] = {"acsUrl": acs_value, "spEntityId": entity_value}
+                record("hosted-acs-origin", "PASS" if acs_value.startswith(f"{API}/") and "localhost" not in acs_value else "FAIL", acs_value or "missing")
+                record("hosted-entity-origin", "PASS" if entity_value.startswith(f"{API}/") and "localhost" not in entity_value else "FAIL", entity_value or "missing")
+                record("hosted-sso-no-localhost", "PASS" if "localhost" not in tab_text and "127.0.0.1" not in tab_text else "FAIL", "SSO tab")
+                metadata_link = page.get_by_role("link", name="Download service provider metadata")
+                if metadata_link.count():
+                    href = metadata_link.get_attribute("href") or ""
+                    RESULTS["saml"]["metadataUrl"] = href
+                    try:
+                        xml = urllib.request.urlopen(href, timeout=30).read().decode("utf-8", "replace")
+                        RESULTS["saml"]["metadataHasAcs"] = acs_value in xml
+                        RESULTS["saml"]["metadataHasEntity"] = entity_value in xml
+                        record("metadata-matches-ui", "PASS" if acs_value and entity_value and acs_value in xml and entity_value in xml and "localhost" not in xml else "FAIL", href)
+                    except Exception as exc:
+                        record("metadata-matches-ui", "FAIL", str(exc))
+            if extra == "provisioning":
+                scim = page.locator('input[value*="/scim/v2"]').first
+                scim_value = scim.input_value() if scim.count() else ""
+                RESULTS["scimBaseUrl"] = scim_value
+                record("hosted-scim-origin", "PASS" if scim_value.startswith(f"{API}/scim/v2") and "localhost" not in scim_value else "FAIL", scim_value or "missing")
+            if extra == "activity":
+                record("activity-human-label", "PASS" if "Identity provider" in tab_text or "No identity activity" in tab_text else "FAIL", "activity tab")
         page.goto(f"{BASE}/login", wait_until="domcontentloaded")
         shot(page, "login-sso-discovery")
         browser.close()

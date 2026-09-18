@@ -381,9 +381,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. Not PASS. Hosted SAML metadata previously exposed localhost ACS / SP entity ID because `apiBase()` defaulted to `http://localhost:3001` when `API_PUBLIC_URL` / `BACKEND_URL` were unset. Correction uses `publicApiUrl()` / `identityServiceUrls()`. Live Entra / Okta / Google federation is NOT TESTED.
 
-**CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. Login-field follow-up / CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`.
+**CERTIFICATION SHA:** Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Origin-correction implementation and hosted frontend/API `e19f8bde268d668518b848acd6086d7723f7177d`. Prior implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd` / `b01609aa7c45414bf3c3a2ca08249bf574366952` remains historical.
 
-**EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Hosted walk `docs/private-beta/hosted-ux-qa/enterprise-identity/`. CI `34930403949` PASS on `b01609a` (416 backend / 174 frontend). Live Entra/Okta/Google not tested. Domain verify without DNS correctly failed. Cursor does not declare #21 PASS.
+**EVIDENCE:** ADR `docs/ADR-ENTERPRISE-IDENTITY.md`. Architecture `docs/ENTERPRISE-IDENTITY.md`. Hosted walk `docs/private-beta/hosted-ux-qa/enterprise-identity/`. CI `35374688343` PASS on `e19f8bd`. Hosted ACS `https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_72c720cec866`. Hosted SP entity ID `https://supreme-risk-staging-api.onrender.com/saml/sp/idp_72c720cec866`. Metadata matches. No localhost. Live Entra/Okta/Google NOT TESTED. Domain verify without DNS correctly failed. Cursor does not declare #21 PASS.
 
 **NEXT ACTION:** Product Leadership hosted review of the identity origin correction. Do not start #22. Do not merge `main` or deploy commercial production. Do not declare #21 PASS. Do not reopen #12.
 

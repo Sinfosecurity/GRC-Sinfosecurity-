@@ -28,7 +28,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **VERSION 3 UX-CORRECTION CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35365774120 PASS on `b00ad12`
 
-**#21:** PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Prior implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. Prior hosted `b01609aa7c45414bf3c3a2ca08249bf574366952`. Hosted localhost SAML metadata is a blocking configuration defect under correction. Live IdP federation: NOT TESTED. Cursor does not declare #21 PASS. #22 is not authorized.
+**#21:** PARTIAL / ACTIVE — PRODUCT LEADERSHIP FINAL REVIEW. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Origin-correction / hosted frontend and API `e19f8bde268d668518b848acd6086d7723f7177d`. CI `35374688343` PASS. Hosted ACS and SP entity ID use `https://supreme-risk-staging-api.onrender.com`. Live IdP federation: NOT TESTED. Cursor does not declare #21 PASS. #22 is not authorized.
 
 **#12:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED (Product Leadership 2026-09-18). Not commercial GO. Not production deployment. Not immutable. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495`. Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
 

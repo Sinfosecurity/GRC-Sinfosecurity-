@@ -3,12 +3,12 @@
     {
       "name": "api-sha",
       "result": "PASS",
-      "detail": "b01609aa7c45414bf3c3a2ca08249bf574366952"
+      "detail": "e19f8bde268d668518b848acd6086d7723f7177d"
     },
     {
       "name": "frontend-sha",
       "result": "PASS",
-      "detail": "b01609aa7c45414bf3c3a2ca08249bf574366952"
+      "detail": "e19f8bde268d668518b848acd6086d7723f7177d"
     },
     {
       "name": "admin-overview",
@@ -23,7 +23,7 @@
     {
       "name": "isolated-org",
       "result": "PASS",
-      "detail": "7250d714"
+      "detail": "b52fc63c"
     },
     {
       "name": "create-provider",
@@ -31,9 +31,24 @@
       "detail": "201"
     },
     {
+      "name": "api-acs-origin",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_72c720cec866"
+    },
+    {
+      "name": "api-entity-origin",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/saml/sp/idp_72c720cec866"
+    },
+    {
+      "name": "api-metadata-matches",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/metadata/idp_72c720cec866"
+    },
+    {
       "name": "enable-before-test",
       "result": "PASS",
-      "detail": "409 {'success': False, 'error': {'type': 'ApiError', 'message': 'Complete a successful test before enabling Company SSO.', 'statusCode': 409, 'timestamp': '2026-09-15T05:06:12.971Z', 'requestId': 'a9662753-b7eb-44bc-bf58-64e188a55396'}}"
+      "detail": "409 {'success': False, 'error': {'type': 'ApiError', 'message': 'Complete a successful test before enabling Company SSO.', 'statusCode': 409, 'timestamp': '2026-09-18T18:07:26.140Z', 'requestId': 'd74e8a01-96f7-46e1-89f4-da554c59ed0f'}}"
     },
     {
       "name": "require-before-test",
@@ -68,7 +83,7 @@
     {
       "name": "scim-retry",
       "result": "PASS",
-      "detail": "de722af1-8f5d-49d2-8adc-3fd04799b6f6"
+      "detail": "e9e692d7-f03f-43a5-8640-70b89d40ffc7"
     },
     {
       "name": "scim-deactivate",
@@ -78,6 +93,16 @@
     {
       "name": "scim-cross-tenant-admin-jwt",
       "result": "DENIED",
+      "detail": "401"
+    },
+    {
+      "name": "scim-token-revoked",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "scim-revoked-denied",
+      "result": "PASS",
       "detail": "401"
     },
     {
@@ -124,6 +149,36 @@
       "name": "viewport-1920",
       "result": "PASS",
       "detail": "1920 captured"
+    },
+    {
+      "name": "hosted-acs-origin",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_72c720cec866"
+    },
+    {
+      "name": "hosted-entity-origin",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/saml/sp/idp_72c720cec866"
+    },
+    {
+      "name": "hosted-sso-no-localhost",
+      "result": "PASS",
+      "detail": "SSO tab"
+    },
+    {
+      "name": "metadata-matches-ui",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/metadata/idp_72c720cec866"
+    },
+    {
+      "name": "hosted-scim-origin",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging-api.onrender.com/scim/v2"
+    },
+    {
+      "name": "activity-human-label",
+      "result": "PASS",
+      "detail": "activity tab"
     }
   ],
   "shots": [
@@ -138,6 +193,7 @@
     "identity-provisioning-1440",
     "identity-mapping-1440",
     "identity-policy-1440",
+    "identity-activity-1440",
     "login-sso-discovery"
   ],
   "axe": [
@@ -148,10 +204,18 @@
     }
   ],
   "sha": {
-    "api": "b01609aa7c45414bf3c3a2ca08249bf574366952",
-    "frontend": "b01609aa7c45414bf3c3a2ca08249bf574366952",
-    "required": "b01609aa7c45414bf3c3a2ca08249bf574366952",
+    "api": "e19f8bde268d668518b848acd6086d7723f7177d",
+    "frontend": "e19f8bde268d668518b848acd6086d7723f7177d",
+    "required": "e19f8bde268d668518b848acd6086d7723f7177d",
     "health": 200
   },
-  "notes": []
+  "notes": [],
+  "saml": {
+    "acsUrl": "https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/acs/idp_72c720cec866",
+    "spEntityId": "https://supreme-risk-staging-api.onrender.com/saml/sp/idp_72c720cec866",
+    "metadataUrl": "https://supreme-risk-staging-api.onrender.com/api/v1/auth/sso/saml/metadata/idp_72c720cec866",
+    "metadataHasAcs": true,
+    "metadataHasEntity": true
+  },
+  "scimBaseUrl": "https://supreme-risk-staging-api.onrender.com/scim/v2"
 }
