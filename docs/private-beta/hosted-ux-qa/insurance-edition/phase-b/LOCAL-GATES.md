@@ -1,14 +1,25 @@
-# Insurance Edition Phase B — local gates
+# Insurance Edition Phase B — local and hosted gates
 
-Staging golden walk is `scripts/hosted-insurance-edition-phase-b-qa.py` (writes `results.json` and screenshots here). It has not been run against a Phase B hosted SHA.
+Official hosted walk is `scripts/hosted-insurance-edition-phase-b-qa.py`.
 
-Local gates on 2026-09-18 against starting SHA `cd463017ee6e00ff1804ba691243c38fd104a72e` plus uncommitted Phase B work. Re-run after IRA/assessment-plan/privacy-context closure:
+## Local gates (2026-09-18)
 
-- `prisma migrate deploy` applied `20260918220000_insurance_phase_b` to local test Postgres `127.0.0.1:55433`
-- backend `tsc --noEmit` pass
-- frontend `tsc --noEmit` pass
-- `insurance-edition.test.ts` + `insurance-edition-phase-b.test.ts` 8/8 pass
-- `InsuranceHome.test.tsx` 3/3 pass
-- recovery-certification + supreme-automation-engine 14/14 pass
+Recorded against starting SHA `cd463017ee6e00ff1804ba691243c38fd104a72e` plus Phase B implementation `f87038fa160e935ae6b6f890a3124dd383c0b1ec`:
 
-Hosted CI, staging SHA recertification, and Phase B screenshots remain open. Do not treat this file as hosted proof.
+- `prisma validate` PASS; migration `20260918220000_insurance_phase_b` applied locally on `127.0.0.1:55433`
+- backend `tsc --noEmit` PASS
+- frontend `tsc --noEmit` PASS
+- `insurance-edition.test.ts` + `insurance-edition-phase-b.test.ts` 8/8 PASS
+- `InsuranceHome.test.tsx` 3/3 PASS
+- frontend suite 221/221 PASS
+- frontend production build + public-build-safety PASS
+- `ci-security` SECRET_SCAN=PASS MIGRATION_SAFETY=PASS
+- full backend suite: 1 pre-existing local intelligence flake (`ERROR` vs `NOT_CONFIGURED`); hosted CI backend suite PASS
+
+## Hosted gates (2026-09-18)
+
+- CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418 SUCCESS on `f87038fa160e935ae6b6f890a3124dd383c0b1ec`
+- Staging frontend `/version.json` and API `/health.gitSha` both `f87038f`
+- Official walk **38 PASS / 0 FAIL**
+- Supplemental hosted proofs **99 PASS / 0 FAIL / 1 SKIP** (viewer session)
+- Health: postgres/redis/stripe/automation/storage/malware up; mongodb/email/ai NOT_CONFIGURED or DEGRADED; memory high. Expected staging degraded profile. Production not touched.

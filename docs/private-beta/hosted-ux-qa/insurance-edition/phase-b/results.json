@@ -1,0 +1,979 @@
+{
+  "checks": [
+    {
+      "name": "api-health",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "f87038fa160e935ae6b6f890a3124dd383c0b1ec"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "f87038fa160e935ae6b6f890a3124dd383c0b1ec"
+    },
+    {
+      "name": "isolated-org",
+      "result": "PASS",
+      "detail": "d5ccd373"
+    },
+    {
+      "name": "activate-ng-insurer",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "ng-insurer-pack",
+      "result": "PASS",
+      "detail": "insurance-core,claims-operations,ng-insurer-core,ng-privacy-ndpa"
+    },
+    {
+      "name": "ng-broker-pack",
+      "result": "PASS",
+      "detail": "insurance-core,claims-operations,broker-intermediary,ng-broker-core,ng-privacy-ndpa"
+    },
+    {
+      "name": "ng-adjuster-pack",
+      "result": "PASS",
+      "detail": "insurance-core,claims-operations,loss-adjuster,ng-loss-adjuster-core,ng-privacy-ndpa"
+    },
+    {
+      "name": "us-non-ny",
+      "result": "PASS",
+      "detail": "insurance-core,claims-operations,us-base,naic-data-security-model,naic-ai-bulletin"
+    },
+    {
+      "name": "us-ny-overlay",
+      "result": "PASS",
+      "detail": "insurance-core,claims-operations,us-base,naic-data-security-model,naic-ai-bulletin,nydfs-500"
+    },
+    {
+      "name": "applicability-review",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "entity",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "license-honesty",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "regulatory-provenance",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "reports",
+      "result": "PASS",
+      "detail": "executive,third-parties,licenses,regulatory,models,concentration"
+    },
+    {
+      "name": "no-fake-percent",
+      "result": "PASS",
+      "detail": "no invented score"
+    },
+    {
+      "name": "ui-regulatory",
+      "result": "PASS",
+      "detail": "applicability honesty"
+    },
+    {
+      "name": "ui-claims",
+      "result": "PASS",
+      "detail": "claims honesty"
+    },
+    {
+      "name": "overflow:overview-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:regulatory-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:claims-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:regulatory-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:claims-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:regulatory-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:claims-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:regulatory-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:claims-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:overview-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:regulatory-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:claims-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:configuration-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    }
+  ],
+  "shots": [
+    "overview-1440",
+    "entities-1440",
+    "licenses-1440",
+    "regulatory-1440",
+    "claims-1440",
+    "underwriting-1440",
+    "reinsurance-1440",
+    "ai-1440",
+    "configuration-1440",
+    "overview-375",
+    "regulatory-375",
+    "claims-375",
+    "configuration-375",
+    "overview-768",
+    "regulatory-768",
+    "claims-768",
+    "configuration-768",
+    "overview-1024",
+    "regulatory-1024",
+    "claims-1024",
+    "configuration-1024",
+    "overview-1440",
+    "regulatory-1440",
+    "claims-1440",
+    "configuration-1440",
+    "overview-1920",
+    "regulatory-1920",
+    "claims-1920",
+    "configuration-1920"
+  ],
+  "overflows": [
+    {
+      "name": "overview-375",
+      "extra": 0
+    },
+    {
+      "name": "regulatory-375",
+      "extra": 0
+    },
+    {
+      "name": "claims-375",
+      "extra": 0
+    },
+    {
+      "name": "configuration-375",
+      "extra": 0
+    },
+    {
+      "name": "overview-768",
+      "extra": 0
+    },
+    {
+      "name": "regulatory-768",
+      "extra": 0
+    },
+    {
+      "name": "claims-768",
+      "extra": 0
+    },
+    {
+      "name": "configuration-768",
+      "extra": 0
+    },
+    {
+      "name": "overview-1024",
+      "extra": 0
+    },
+    {
+      "name": "regulatory-1024",
+      "extra": 0
+    },
+    {
+      "name": "claims-1024",
+      "extra": 0
+    },
+    {
+      "name": "configuration-1024",
+      "extra": 0
+    },
+    {
+      "name": "overview-1440",
+      "extra": 0
+    },
+    {
+      "name": "regulatory-1440",
+      "extra": 0
+    },
+    {
+      "name": "claims-1440",
+      "extra": 0
+    },
+    {
+      "name": "configuration-1440",
+      "extra": 0
+    },
+    {
+      "name": "overview-1920",
+      "extra": 0
+    },
+    {
+      "name": "regulatory-1920",
+      "extra": 0
+    },
+    {
+      "name": "claims-1920",
+      "extra": 0
+    },
+    {
+      "name": "configuration-1920",
+      "extra": 0
+    }
+  ],
+  "sha": {
+    "api": "f87038fa160e935ae6b6f890a3124dd383c0b1ec",
+    "frontend": "f87038fa160e935ae6b6f890a3124dd383c0b1ec",
+    "health": 200
+  },
+  "notes": [],
+  "summary": {
+    "officialPass": 38,
+    "officialFail": 0,
+    "supplementalPass": 99,
+    "supplementalFail": 0,
+    "supplementalSkip": 1,
+    "combinedFail": 0
+  },
+  "supplemental": {
+    "checks": [
+      {
+        "name": "scenario-broker-activate",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "scenario-broker-packs",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,broker-intermediary,ng-broker-core,ng-privacy-ndpa"
+      },
+      {
+        "name": "broker-no-rbc",
+        "result": "PASS",
+        "detail": "insurer pack excluded"
+      },
+      {
+        "name": "scenario-adjuster-activate",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "scenario-adjuster-packs",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,loss-adjuster,ng-loss-adjuster-core,ng-privacy-ndpa"
+      },
+      {
+        "name": "adjuster-no-capital",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,loss-adjuster,ng-loss-adjuster-core,ng-privacy-ndpa"
+      },
+      {
+        "name": "scenario-us-oh-activate",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "scenario-us-oh-packs",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,us-base,naic-data-security-model,naic-ai-bulletin"
+      },
+      {
+        "name": "us-oh-no-nydfs",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,us-base,naic-data-security-model,naic-ai-bulletin"
+      },
+      {
+        "name": "scenario-us-ny-activate",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "scenario-us-ny-packs",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,us-base,naic-data-security-model,naic-ai-bulletin,nydfs-500"
+      },
+      {
+        "name": "us-ny-has-base",
+        "result": "PASS",
+        "detail": "insurance-core,claims-operations,us-base,naic-data-security-model,naic-ai-bulletin,nydfs-500"
+      },
+      {
+        "name": "ops-org",
+        "result": "PASS",
+        "detail": "fd63737c"
+      },
+      {
+        "name": "ops-activate",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "ops-entity",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "license-current",
+        "result": "PASS",
+        "detail": "missing-evidence"
+      },
+      {
+        "name": "license-future",
+        "result": "PASS",
+        "detail": "expiring"
+      },
+      {
+        "name": "license-past",
+        "result": "PASS",
+        "detail": "expired-metadata"
+      },
+      {
+        "name": "license-no-illegal",
+        "result": "PASS",
+        "detail": "honesty retained"
+      },
+      {
+        "name": "vendor-create",
+        "result": "PASS",
+        "detail": "201 id=True"
+      },
+      {
+        "name": "vendor-classify",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "vendor-persist",
+        "result": "PASS",
+        "detail": "count=1"
+      },
+      {
+        "name": "vendor-identity",
+        "result": "PASS",
+        "detail": "Lagos TPA 1789774681"
+      },
+      {
+        "name": "ai-system-create",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "ai-context",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "ai-persist",
+        "result": "PASS",
+        "detail": "1"
+      },
+      {
+        "name": "ai-no-duplicate",
+        "result": "PASS",
+        "detail": "systems=1"
+      },
+      {
+        "name": "delegated-authority",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "reinsurance-counterparty",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "claims-workspace",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "claims-relationships",
+        "result": "PASS",
+        "detail": "tpa present"
+      },
+      {
+        "name": "underwriting-workspace",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "reinsurance-workspace",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "graph-nigeria",
+        "result": "PASS",
+        "detail": "AI_SYSTEM,BUSINESS_PROCESS,CRITICAL_SERVICE,INSURANCE_ENTITY,INSURANCE_LICENSE,JURISDICTION,LINE_OF_BUSINESS,REGULATOR,VENDOR"
+      },
+      {
+        "name": "us-entity",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "graph-us",
+        "result": "PASS",
+        "detail": "BUSINESS_PROCESS,INSURANCE_ENTITY,JURISDICTION,LINE_OF_BUSINESS,REGULATOR"
+      },
+      {
+        "name": "regulatory-ux-fields",
+        "result": "PASS",
+        "detail": "RECOMMENDED"
+      },
+      {
+        "name": "nydfs-not-auto",
+        "result": "PASS",
+        "detail": "AVAILABLE"
+      },
+      {
+        "name": "naic-model-kind",
+        "result": "PASS",
+        "detail": "NAIC model law. Not binding in a state unless that state has adopted it. Do not treat as nationwide law."
+      },
+      {
+        "name": "assessment-plan",
+        "result": "PASS",
+        "detail": "questions=11"
+      },
+      {
+        "name": "config-revise",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "config-superseded",
+        "result": "PASS",
+        "detail": "2"
+      },
+      {
+        "name": "signals",
+        "result": "PASS",
+        "detail": "ai-review-overdue,license-expired-metadata,license-expiring,license-missing-evidence,reinsurance-review"
+      },
+      {
+        "name": "automation-templates",
+        "result": "PASS",
+        "detail": "insurance-license-review-due,insurance-claims-vendor-finding,insurance-model-review-overdue,insurance-regulatory-pack-updated,insurance-evidence-expiring,insurance-vendor-risk-increased"
+      },
+      {
+        "name": "automation-create",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "automation-publish",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "automation-preview-no-write",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "reports-live",
+        "result": "PASS",
+        "detail": "executive,third-parties,licenses,regulatory,models,concentration"
+      },
+      {
+        "name": "reports-no-percent",
+        "result": "PASS",
+        "detail": "no invented score"
+      },
+      {
+        "name": "public-client",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "public-configuration",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "public-entities",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "public-licenses",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "public-packs",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "public-models",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "public-write-denied",
+        "result": "PASS",
+        "detail": "404"
+      },
+      {
+        "name": "public-not-session",
+        "result": "PASS",
+        "detail": "401"
+      },
+      {
+        "name": "public-insufficient-scope",
+        "result": "PASS",
+        "detail": "403"
+      },
+      {
+        "name": "public-tenant-isolation",
+        "result": "PASS",
+        "detail": "no broker names in insurer public read"
+      },
+      {
+        "name": "evidence-upload",
+        "result": "PASS",
+        "detail": "201 scan=CLEAN"
+      },
+      {
+        "name": "reuse-insurance-control",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "reuse-existing-control",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "reuse-lookup",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "reuse-no-duplicate-upload",
+        "result": "PASS",
+        "detail": "docs=1"
+      },
+      {
+        "name": "rbac-org-admin",
+        "result": "PASS",
+        "detail": "signup admin activated edition"
+      },
+      {
+        "name": "rbac-risk-manage",
+        "result": "PASS",
+        "detail": "same admin operated insurance.manage routes"
+      },
+      {
+        "name": "rbac-viewer",
+        "result": "SKIP",
+        "detail": "no hosted viewer token invite=201 activation=False"
+      },
+      {
+        "name": "ny-source",
+        "result": "PASS",
+        "detail": "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      },
+      {
+        "name": "ny-effective",
+        "result": "PASS",
+        "detail": "2023-11-01"
+      },
+      {
+        "name": "ny-human-review",
+        "result": "PASS",
+        "detail": "201"
+      },
+      {
+        "name": "broker-provenance",
+        "result": "PASS",
+        "detail": "200"
+      },
+      {
+        "name": "broker-no-solvency-text",
+        "result": "PASS",
+        "detail": "recommended packs"
+      },
+      {
+        "name": "ui-hard-refresh-ai",
+        "result": "PASS",
+        "detail": "ai page after refresh"
+      },
+      {
+        "name": "overflow:entities-375",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:licenses-375",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:underwriting-375",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:reinsurance-375",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:ai-375",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:entities-768",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:licenses-768",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:underwriting-768",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:reinsurance-768",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:ai-768",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:entities-1024",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:licenses-1024",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:underwriting-1024",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:reinsurance-1024",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:ai-1024",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:entities-1440",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:licenses-1440",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:underwriting-1440",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:reinsurance-1440",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:ai-1440",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:entities-1920",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:licenses-1920",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:underwriting-1920",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:reinsurance-1920",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "overflow:ai-1920",
+        "result": "PASS",
+        "detail": "extra=0"
+      },
+      {
+        "name": "js-errors",
+        "result": "PASS",
+        "detail": "[]"
+      },
+      {
+        "name": "network-failures",
+        "result": "PASS",
+        "detail": "[]"
+      }
+    ],
+    "shots": [
+      "entities-ops-1440",
+      "licenses-ops-1440",
+      "underwriting-ops-1440",
+      "reinsurance-ops-1440",
+      "ai-ops-1440",
+      "third-parties-ops-1440",
+      "entities-375",
+      "licenses-375",
+      "underwriting-375",
+      "reinsurance-375",
+      "ai-375",
+      "entities-768",
+      "licenses-768",
+      "underwriting-768",
+      "reinsurance-768",
+      "ai-768",
+      "entities-1024",
+      "licenses-1024",
+      "underwriting-1024",
+      "reinsurance-1024",
+      "ai-1024",
+      "entities-1440",
+      "licenses-1440",
+      "underwriting-1440",
+      "reinsurance-1440",
+      "ai-1440",
+      "entities-1920",
+      "licenses-1920",
+      "underwriting-1920",
+      "reinsurance-1920",
+      "ai-1920",
+      "scenario-broker-regulatory",
+      "scenario-adjuster-regulatory",
+      "scenario-us-oh-regulatory",
+      "scenario-us-ny-regulatory"
+    ],
+    "overflows": [
+      {
+        "name": "entities-375",
+        "extra": 0
+      },
+      {
+        "name": "licenses-375",
+        "extra": 0
+      },
+      {
+        "name": "underwriting-375",
+        "extra": 0
+      },
+      {
+        "name": "reinsurance-375",
+        "extra": 0
+      },
+      {
+        "name": "ai-375",
+        "extra": 0
+      },
+      {
+        "name": "entities-768",
+        "extra": 0
+      },
+      {
+        "name": "licenses-768",
+        "extra": 0
+      },
+      {
+        "name": "underwriting-768",
+        "extra": 0
+      },
+      {
+        "name": "reinsurance-768",
+        "extra": 0
+      },
+      {
+        "name": "ai-768",
+        "extra": 0
+      },
+      {
+        "name": "entities-1024",
+        "extra": 0
+      },
+      {
+        "name": "licenses-1024",
+        "extra": 0
+      },
+      {
+        "name": "underwriting-1024",
+        "extra": 0
+      },
+      {
+        "name": "reinsurance-1024",
+        "extra": 0
+      },
+      {
+        "name": "ai-1024",
+        "extra": 0
+      },
+      {
+        "name": "entities-1440",
+        "extra": 0
+      },
+      {
+        "name": "licenses-1440",
+        "extra": 0
+      },
+      {
+        "name": "underwriting-1440",
+        "extra": 0
+      },
+      {
+        "name": "reinsurance-1440",
+        "extra": 0
+      },
+      {
+        "name": "ai-1440",
+        "extra": 0
+      },
+      {
+        "name": "entities-1920",
+        "extra": 0
+      },
+      {
+        "name": "licenses-1920",
+        "extra": 0
+      },
+      {
+        "name": "underwriting-1920",
+        "extra": 0
+      },
+      {
+        "name": "reinsurance-1920",
+        "extra": 0
+      },
+      {
+        "name": "ai-1920",
+        "extra": 0
+      }
+    ],
+    "ids": {
+      "broker-org": "9ea2d884-e2ed-4e6a-b439-9376d02790d0",
+      "adjuster-org": "d34462d7-7c78-4b54-9461-df6da9c1dd1e",
+      "us-oh-org": "0208797f-1c92-4257-9079-af8796d15fa8",
+      "us-ny-org": "cd2a47d1-ab21-4349-958a-d460895efd45",
+      "ops-org": "fd63737c-bb18-4f45-a2ae-be4e05531baa",
+      "public-client": "d0938c4e-28e1-4fad-b124-f28830b2d30c",
+      "storedObject": "abc36325-d1a5-4faa-87f4-93e3b3e37a53"
+    },
+    "notes": [],
+    "summary": {
+      "pass": 99,
+      "fail": 0,
+      "skip": 1
+    }
+  }
+}
