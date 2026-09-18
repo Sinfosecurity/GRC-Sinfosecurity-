@@ -3,7 +3,7 @@
     {
       "name": "hosted-sha",
       "result": "PASS",
-      "detail": "frontend=a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973 api=a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973 expected=a9a39e1"
+      "detail": "frontend=b00ad1274908a27a2253d6e5050420e2c10b8f39 api=b00ad1274908a27a2253d6e5050420e2c10b8f39 expected=b00ad12"
     },
     {
       "name": "ira-not-sent",
@@ -18,7 +18,7 @@
     {
       "name": "ira-copy",
       "result": "PASS",
-      "detail": "https://supreme-risk-staging.onrender.com/ira?token=REDACTED"
+      "detail": "IRA link issued"
     },
     {
       "name": "ira-submit-api",
@@ -28,7 +28,7 @@
     {
       "name": "ira-submit-copy",
       "result": "PASS",
-      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nSUPREME THIRD PARTY\nInherent risk questions\n\nV3 Copy 1789740913 \u2014 answer only what you know. Don't know is allowed. The vendor will not see this.\n\nYour Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required"
+      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nSUPREME THIRD PARTY\nThank you\n\n\u2713 Submitted \u00b7 Sep 18, 2026, 12:14 PM\n\nYour Inherent Risk Assessment has been submitted successfully.\n\nThe Governance, Risk & Compliance team has received your responses and will contact you if clarification is required.\n\nYou may now close this page.\n\nView submitted resp"
     },
     {
       "name": "ira-refresh-submitted",
@@ -38,7 +38,7 @@
     {
       "name": "grc-notification",
       "result": "PASS",
-      "detail": "200 {\"success\": true, \"data\": [{\"id\": \"4c744606-6521-45d9-b62d-8c0446144591\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"userId\": \"e5fe1b60-a942-4127-b994-7206ea3cedbb\", \"eventType\": \"approval.requested\", \"title\": \"Inherent risk submitted \\u2014 V3 Copy 1789740913\", \"body\": \"The requeste"
+      "detail": "200 {\"success\": true, \"data\": [{\"id\": \"e7feaa34-b2ed-4293-ab07-ba6719d9d835\", \"organizationId\": \"05d7821b-cab1-44af-9f5c-1f528a2d0a0e\", \"userId\": \"e5fe1b60-a942-4127-b994-7206ea3cedbb\", \"eventType\": \"approval.requested\", \"title\": \"Inherent risk submitted \\u2014 V3 Copy 1789748021\", \"body\": \"The requeste"
     },
     {
       "name": "tier-review-state",
@@ -56,6 +56,11 @@
       "detail": "READY_TO_SEND"
     },
     {
+      "name": "ready-progress",
+      "result": "PASS",
+      "detail": "progress"
+    },
+    {
       "name": "4ab-visible",
       "result": "PASS",
       "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nSkip to content\n\nSupreme\n\nGovernance \u00b7 Staging\n\nWork\n\nHome\nThird Parties\nOnboard\nAssessments\nFindings\nDecisions\nPrograms\nIntelligence\nAutomation\nGovernance\nReports\nAdministration\n\nELITE CLAIMS\n\nReport\n"
@@ -71,11 +76,6 @@
       "detail": "AWAITING_VENDOR"
     },
     {
-      "name": "email-send-api",
-      "result": "PASS",
-      "detail": "201 {'success': True, 'data': {'id': 'bfee168f-a9d3-4e61-80e0-7e06caabf823', 'publicId': 'VND-2026-0037', 'name': 'V3 Email 1789740913', 'tier': 'Medium', 'tierKey': 'MEDIUM', 'tierAuthoritative': True, 'inherentRiskScore': 43, 'residualRiskSco"
-    },
-    {
       "name": "email-send-awaiting",
       "result": "PASS",
       "detail": "AWAITING_VENDOR"
@@ -83,36 +83,39 @@
     {
       "name": "vendor-isolation",
       "result": "PASS",
-      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nELITE CLAIMS IS REQUESTING THIS\n\nWhat you need to do\n\nAnswer the questions and attach the requested files for V3 Copy 1789740913. You will only see this assignment.\n\n0%\n\n0 of 58 answered\n\nDUE\n\n\u2014\n\nNEXT\n\nComplete 58 remaining questions\n\nBegin\nSupreme TPRM Workbook\n\nNot started \u00b7 0 / 45 answered\n\nBegin"
+      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\n\nELITE CLAIMS IS REQUESTING THIS\n\nWhat you need to do\n\nAnswer the questions and attach the requested files for V3 Copy 1789748021. You will only see this assignment.\n\n0%\n\n0 of 58 answered\n\nDUE\n\n\u2014\n\nNEXT\n\nComplete 58 remaining questions\n\nBegin\nSupreme TPRM Workbook\n\nNot started \u00b7 0 / 45 answered\n\nBegin"
     }
   ],
   "shots": [
     "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/01-ira-not-sent.png",
     "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/02-ira-sent.png",
     "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/03-ira-open.png",
-    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/05-ira-submitted.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/A-ira-thank-you.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/B-ira-thank-you-refresh.png",
     "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/06-tier-review.png",
-    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/07-ready-to-send.png",
-    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/08-copy-still-ready.png",
-    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/09-awaiting-vendor-4b.png",
-    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/10-awaiting-vendor-4a.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/C-ready-to-send-top.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/D-send-questionnaire-cta.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/E-send-controls-after-cta.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/G-copy-still-ready.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/H-mark-sent.png",
+    "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/F-4a-sent.png",
     "docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/11-vendor-questionnaire.png"
   ],
   "sha": {
-    "frontend": "a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973",
-    "api": "a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973",
+    "frontend": "b00ad1274908a27a2253d6e5050420e2c10b8f39",
+    "api": "b00ad1274908a27a2253d6e5050420e2c10b8f39",
     "frontendRaw": {
-      "gitSha": "a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973",
-      "builtAt": "2026-09-18T14:09:58.485Z"
+      "gitSha": "b00ad1274908a27a2253d6e5050420e2c10b8f39",
+      "builtAt": "2026-09-18T16:01:08.338Z"
     },
     "apiHealth": {
       "status": "degraded",
-      "gitSha": "a9a39e1f7481c34c1bf5b0f9855b9b370ac4f973"
+      "gitSha": "b00ad1274908a27a2253d6e5050420e2c10b8f39"
     }
   },
   "vendors": {
-    "copy": "VND-2026-0036",
-    "email": "VND-2026-0037"
+    "copy": "VND-2026-0039",
+    "email": "VND-2026-0040"
   },
   "discrepancies": [],
   "summary": {
