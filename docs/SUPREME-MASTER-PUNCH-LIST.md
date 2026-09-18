@@ -703,6 +703,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** A maintained matrix against at least:
 
+- ProcessUnity
 - OneTrust
 - ServiceNow
 - Vanta
@@ -716,11 +717,25 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **CURRENT STATUS:** STRATEGIC WORK REQUIRED
 
+**PROCESSUNITY GAP BASELINE — 2026-09-18:** Product Leadership reviewed ProcessUnity TPRM pricing/capability material as an external benchmark. This does **not** create new punch-list numbers and does **not** change authorization or acceptance status. Gaps are mapped to existing roadmap items:
+
+- **Enterprise identity proof — #21:** Supreme architecture exists, but live Entra / Okta / Google proof remains incomplete.
+- **Public API / signed webhooks / enterprise integrations — #22:** major competitive gap. Priority classes include ServiceNow/procurement/ticketing, collaboration, CRM/contract systems, and external cyber/risk-data providers. Internal `/api/v1` is not sufficient.
+- **External third-party intelligence / ratings — #22 + #40:** live SecurityScorecard / BitSight-style adapters and normalized provider observations are incomplete. External observations must remain distinct from Supreme's authoritative deterministic risk state.
+- **Continuous third-party monitoring / threat response — #19 + #20 + #40:** Supreme has Intelligence, Automation, Monitoring, and the Governance Graph, but not yet a mature live vendor-threat monitoring fabric comparable to established TPRM intelligence products.
+- **AI evidence review / assessment autofill — future extension of #19/#20, governed through #39 until explicitly authorized:** opportunity to extract control evidence, coverage periods, likely control mappings, missing evidence, and proposed questionnaire answers while keeping humans authoritative. Do not silently score or certify from AI output.
+- **Vendor-side questionnaire delegation — extension of #12:** evaluate the ability for a vendor primary contact to delegate domains/questions to colleagues without exposing the requester IRA, tier logic, GRC notes, or other vendors.
+- **Reporting depth — #39 benchmark against Reports:** compare Supreme's operational/executive report families against mature TPRM catalogs; do not create reports merely to match a competitor count.
+- **Shared assessment / automated risk-profile network — #39 + #40 strategic gap:** Supreme does not currently have an industry-scale shared vendor-assessment/risk-profile exchange. Do not fabricate one. Product Leadership must decide build/partner/data-provider strategy before any new roadmap number is created.
+- **Supreme differentiators to preserve:** #13 Governance Graph, #14 shared Control/Evidence layer, #15 Risk, #16 Compliance, #17 Privacy, #18 AI Governance, #19 Intelligence, and #20 Automation should remain a unified governance architecture rather than being reduced to a TPRM clone.
+
+**PRIORITY INTERPRETATION:** After current #12 / UI 2.0 closure, the competitive audit reinforces #21 then #22 as the most immediate existing roadmap gaps. #39 should maintain evidence-based competitor mapping; #40 should later operationalize continuous measurement. This statement does not authorize #22 or #40.
+
 **CERTIFICATION SHA:** —
 
-**EVIDENCE:** Objective stated here. Complete competitive research is **not** part of this documentation task.
+**EVIDENCE:** Initial ProcessUnity benchmark completed by Product Leadership on 2026-09-18 from public pricing/capability material. This is strategic comparison evidence, not product certification and not a claim of feature parity.
 
-**NEXT ACTION:** Product Leadership to commission the first matrix when ready. Do not invent scores or percentages.
+**NEXT ACTION:** Maintain the first evidence-based matrix using columns: Capability | Supreme | Competitor | Evidence | Gap | Existing Punch-List Item | Priority. Add ProcessUnity to the formal competitor set. Do not invent scores or percentages. Do not start #22/#40 without explicit Product Leadership authorization.
 
 ---
 
