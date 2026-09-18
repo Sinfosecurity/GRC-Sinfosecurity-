@@ -74,6 +74,7 @@ describe('API & Integrations', () => {
         expect(await screen.findByDisplayValue('srk_once')).toBeInTheDocument();
         await user.click(screen.getByRole('tab', { name: 'Integrations' }));
         expect(screen.getAllByText('Coming later').length).toBeGreaterThan(0);
+        expect(screen.queryByRole('button', { name: 'Test connection' })).not.toBeInTheDocument();
         expect(screen.queryByText('Connected')).not.toBeInTheDocument();
     });
 });

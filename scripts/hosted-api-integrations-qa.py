@@ -262,6 +262,25 @@ def main() -> None:
     record("slack-test-without-config", "PASS" if test_status in {400, 409} else "FAIL", str(test_status))
     RESULTS["notes"].append("LIVE PROVIDER TEST: NOT TESTED — no Slack or Jira staging credentials were supplied.")
 
+    session_status, _, _ = request_json("GET", "/developer/overview", writer_token)
+    record("public-token-session-denied", "PASS" if session_status in {401, 403} else "FAIL", str(session_status))
+    invite_status, invite, _ = request_json("POST", "/users/invite", walk_token, {"email": f"api22-viewer-{suffix}@example.test", "role": "VIEWER"})
+    activation = (invite.get("data") or {}).get("token") or ""
+    url = (invite.get("data") or {}).get("activationUrl") or ""
+    if "token=" in url and not activation:
+        activation = url.split("token=", 1)[1].split("&", 1)[0]
+    if invite_status in {200, 201} and activation:
+        act_status, activated, _ = request_json(
+            "POST",
+            "/auth/activate",
+            body={"token": activation, "password": "ApiWalk22x1", "firstName": "Vic", "lastName": "Viewer"},
+        )
+        viewer_token = (activated.get("data") or {}).get("token")
+        viewer_status, _, _ = request_json("GET", "/developer/overview", viewer_token)
+        record("viewer-admin-denied", "PASS" if act_status in {200, 201} and viewer_status == 403 else "FAIL", f"activate={act_status} developer={viewer_status}")
+    else:
+        record("viewer-admin-denied", "SKIP", f"invite={invite_status} no activation token")
+
     activity_status, activity, _ = request_json("GET", "/developer/activity", walk_token)
     actions = {row.get("action") for row in (activity.get("data") or [])}
     record("audit-api-client", "PASS" if "api.client.created" in actions else "FAIL", str(activity_status))
@@ -299,6 +318,7 @@ def main() -> None:
         page.wait_for_timeout(400)
         body = page.locator("body").inner_text()
         record("ui-coming-later", "PASS" if "Coming later" in body else "FAIL", "SIEM/risk providers")
+        record("ui-no-test-until-configured", "PASS" if page.get_by_role("button", name="Test connection").count() == 0 else "FAIL", "not-configured cards")
         record("ui-no-connected-without-test", "PASS" if "Status: Connected" not in body else "FAIL", "proof tenant cards")
         browser.close()
 

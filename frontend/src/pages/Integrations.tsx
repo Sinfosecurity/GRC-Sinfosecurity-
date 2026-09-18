@@ -226,8 +226,8 @@ export default function Integrations() {
                                         </Stack>
                                     )}
                                     <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                                        {row.configurable && (
-                                            <Button disabled={row.status?.key === 'not_configured'} onClick={() => run(async () => { await developerAPI.testIntegration(row.id); }, 'Test finished. Connected only appears after success.')}>Test connection</Button>
+                                        {row.configurable && row.status?.key !== 'not_configured' && !row.comingLater && (
+                                            <Button onClick={() => run(async () => { await developerAPI.testIntegration(row.id); }, 'Test finished. Connected only appears after success.')}>Test connection</Button>
                                         )}
                                         {row.status?.key === 'connected' && (
                                             <Button onClick={() => run(async () => { await developerAPI.disableIntegration(row.id); }, 'Integration disabled.')}>Disable</Button>
