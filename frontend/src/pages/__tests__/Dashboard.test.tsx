@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../marketing/routerFuture';
 import Dashboard from '../Dashboard';
+import { resetHomeDashboardLoads } from '../../experience/homeDashboardLoad';
 
 vi.mock('../../contexts/AuthContext', () => ({
     useAuth: () => ({ user: { firstName: 'Ava', role: 'ASSESSOR' } }),
@@ -44,6 +45,7 @@ const liveStats = {
 
 describe('Home command center', () => {
     beforeEach(async () => {
+        resetHomeDashboardLoads();
         const { tprmAPI, vendorAPI, intelligenceAPI } = await import('../../services/api');
         (tprmAPI.attention as any).mockResolvedValue(liveAttention);
         (vendorAPI.getStatistics as any).mockResolvedValue(liveStats);
@@ -62,6 +64,7 @@ describe('Home command center', () => {
         );
         expect(screen.getByText(/Checking what needs your attention/)).toBeInTheDocument();
         expect(screen.getByText(/Checking recorded work/)).toBeInTheDocument();
+        expect(screen.getAllByText('Checking recorded count…').length).toBeGreaterThan(0);
         expect(screen.getByLabelText('Critical vendors: checking')).toBeInTheDocument();
         expect(screen.getByLabelText('Decisions waiting: checking')).toBeInTheDocument();
         expect(screen.getByLabelText('Overdue findings: checking')).toBeInTheDocument();

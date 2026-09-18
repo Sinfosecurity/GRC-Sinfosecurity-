@@ -385,6 +385,7 @@ class VendorManagementService {
      * Get vendor dashboard statistics
      */
     async getVendorStatistics(organizationId: string) {
+        const inRegister = { organizationId, status: { not: VendorStatus.TERMINATED } };
         const [
             totalVendors,
             activeVendors,
@@ -393,6 +394,9 @@ class VendorManagementService {
             overdueReviews,
             activeIssues,
             expiringContracts,
+            tierDistribution,
+            categoryDistribution,
+            riskScores,
         ] = await Promise.all([
             prisma.vendor.count({ where: { organizationId } }),
             prisma.vendor.count({
@@ -426,32 +430,24 @@ class VendorManagementService {
                     },
                 },
             }),
+            prisma.vendor.groupBy({
+                by: ['tier'],
+                where: inRegister,
+                _count: true,
+            }),
+            prisma.vendor.groupBy({
+                by: ['category'],
+                where: inRegister,
+                _count: true,
+            }),
+            prisma.vendor.aggregate({
+                where: inRegister,
+                _avg: {
+                    inherentRiskScore: true,
+                    residualRiskScore: true,
+                },
+            }),
         ]);
-
-        const inRegister = { organizationId, status: { not: VendorStatus.TERMINATED } };
-
-        // Tier distribution — same population as Critical KPI / register (not ACTIVE-only)
-        const tierDistribution = await prisma.vendor.groupBy({
-            by: ['tier'],
-            where: inRegister,
-            _count: true,
-        });
-
-        // Category distribution
-        const categoryDistribution = await prisma.vendor.groupBy({
-            by: ['category'],
-            where: inRegister,
-            _count: true,
-        });
-
-        // Average risk scores
-        const riskScores = await prisma.vendor.aggregate({
-            where: inRegister,
-            _avg: {
-                inherentRiskScore: true,
-                residualRiskScore: true,
-            },
-        });
 
         return {
             summary: {

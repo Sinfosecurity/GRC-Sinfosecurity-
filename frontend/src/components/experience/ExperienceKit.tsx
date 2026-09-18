@@ -52,14 +52,26 @@ export function ExecutiveMetric({
             }}
         >
             {phase === 'loading' ? (
-                <Box aria-hidden sx={{ width: emphasis ? 72 : 48, height: emphasis ? 36 : 26, bgcolor: color.surfaceMuted, borderRadius: 0.5 }} />
+                <Box>
+                    <Box
+                        aria-hidden
+                        sx={{
+                            width: emphasis ? 72 : 48,
+                            height: emphasis ? 36 : 26,
+                            bgcolor: color.line,
+                            border: `1px solid ${color.lineStrong || color.line}`,
+                            borderRadius: 0.5,
+                        }}
+                    />
+                    <Typography variant="body2" sx={{ mt: 0.5, color: color.inkMuted }}>Checking recorded count…</Typography>
+                </Box>
             ) : (
                 <Typography sx={{ fontFamily: type.display, fontSize: emphasis ? 36 : 26, lineHeight: 1, fontWeight: 500 }}>
                     {phase === 'error' ? 'Unavailable' : value}
                 </Typography>
             )}
             <Typography sx={{ mt: 0.75, fontSize: 14, fontWeight: emphasis ? 700 : 600 }}>{label}</Typography>
-            {hint && <Typography variant="body2" sx={{ mt: 0.25 }}>{hint}</Typography>}
+            {hint && phase !== 'loading' && <Typography variant="body2" sx={{ mt: 0.25 }}>{hint}</Typography>}
         </Box>
     );
 }

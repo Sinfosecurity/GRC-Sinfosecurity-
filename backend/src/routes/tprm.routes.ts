@@ -21,7 +21,9 @@ router.use(enforceSubscriptionWrites);
 
 router.get('/attention', requirePermission(PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+        const started = Date.now();
         const data = await attentionService.whatNeedsAttentionToday(req.user!.organizationId);
+        res.setHeader('Server-Timing', `attention;dur=${Date.now() - started}`);
         res.json({ success: true, data });
     } catch (error) {
         next(error);

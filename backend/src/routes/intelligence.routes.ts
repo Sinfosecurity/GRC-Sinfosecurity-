@@ -47,7 +47,10 @@ router.get('/workspace', requirePermission(PERMISSIONS['intelligence.read']), as
 
 router.get('/teaser', requirePermission(PERMISSIONS['intelligence.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.json({ success: true, data: await enterpriseIntelligenceService.teaser(orgId(req), role(req), actor(req)) });
+        const started = Date.now();
+        const data = await enterpriseIntelligenceService.teaser(orgId(req), role(req), actor(req));
+        res.setHeader('Server-Timing', `teaser;dur=${Date.now() - started}`);
+        res.json({ success: true, data });
     } catch (error) { next(error); }
 });
 

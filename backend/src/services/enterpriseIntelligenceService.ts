@@ -703,8 +703,20 @@ export const enterpriseIntelligenceService = {
     },
 
     async teaser(organizationId: string, role: string, actorUserId?: string) {
-        const workspace = await this.workspace(organizationId, role, actorUserId);
-        return { honesty: workspace.honesty, items: workspace.teaser };
+        const rows = await prisma.intelligenceItem.findMany({
+            where: {
+                organizationId,
+                current: true,
+                priority: { in: ['CRITICAL_ATTENTION', 'HIGH_ATTENTION'] },
+            },
+            orderBy: { generatedAt: 'desc' },
+            take: 20,
+        });
+        const visible = visibleRows(rows, role, actorUserId);
+        return {
+            honesty: honestyCopy(),
+            items: visible.slice(0, 3).map(publicItem),
+        };
     },
 };
 

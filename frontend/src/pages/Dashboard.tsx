@@ -9,6 +9,7 @@ import { color } from '../design/tokens';
 import { useAuth } from '../contexts/AuthContext';
 import { humanizeLabel } from '../utils/humanizeLabel';
 import { intelligenceAPI, tprmAPI, vendorAPI } from '../services/api';
+import { loadHomeSlice } from '../experience/homeDashboardLoad';
 
 type LoadPhase = 'loading' | 'ready' | 'error';
 
@@ -75,7 +76,7 @@ export default function Dashboard() {
         setStats(null);
         setWork(null);
         setIntelligence([]);
-        const attention = tprmAPI.attention()
+        const attention = loadHomeSlice('tprm.attention', () => tprmAPI.attention())
             .then((response) => {
                 if (cancelled) return;
                 const payload = response.data.data || {};
@@ -94,7 +95,7 @@ export default function Dashboard() {
                 setAttentionPhase('error');
                 setWorkPhase('error');
             });
-        const statistics = vendorAPI.getStatistics()
+        const statistics = loadHomeSlice('vendors.statistics', () => vendorAPI.getStatistics())
             .then((response) => {
                 if (cancelled) return;
                 const body = response.data;
@@ -109,7 +110,7 @@ export default function Dashboard() {
                 setStatsError(err?.message || 'Portfolio statistics are unavailable.');
                 setStatsPhase('error');
             });
-        const teaser = intelligenceAPI.teaser()
+        const teaser = loadHomeSlice('intelligence.teaser', () => intelligenceAPI.teaser())
             .then((response) => {
                 if (cancelled) return;
                 setIntelligence(response.data.data?.items || []);
@@ -252,6 +253,14 @@ export default function Dashboard() {
             )}
             </Surface>
             </Box>
+            {intelligencePhase === 'loading' && (
+                <Box sx={{ mt: 2.5 }}>
+                    <Surface>
+                        <Typography variant="h5">What changed</Typography>
+                        <Typography role="status" aria-live="polite" sx={{ mt: 1 }}>Checking recorded intelligence…</Typography>
+                    </Surface>
+                </Box>
+            )}
             {intelligencePhase === 'ready' && intelligence.length > 0 && (
                 <Box sx={{ mt: 2.5 }}>
                     <Surface>

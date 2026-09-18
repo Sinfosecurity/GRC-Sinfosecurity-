@@ -61,14 +61,95 @@ export const attentionService = {
         const in45Days = new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000);
         const items: AttentionItem[] = [];
 
-        const onboarding = await prisma.vendorOnboarding.findMany({
-            where: {
-                organizationId,
-                stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN, VendorOnboardingStage.READY_TO_SEND, VendorOnboardingStage.AWAITING_VENDOR, VendorOnboardingStage.VENDOR_IN_PROGRESS, VendorOnboardingStage.SUBMITTED, VendorOnboardingStage.UNDER_REVIEW, VendorOnboardingStage.RISK_ACCEPTANCE, VendorOnboardingStage.CONTRACT_REVIEW, VendorOnboardingStage.APPROVAL] },
-            },
-            include: { vendor: { select: { id: true, name: true, publicId: true } } },
-            take: 25,
-        });
+        const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const [
+            onboarding,
+            overdueReviews,
+            pendingAssessments,
+            criticalFindings,
+            alerts,
+            expiringEvidence,
+            expiringContracts,
+            dueAssessments,
+            overdueFindings,
+            pendingBriefs,
+            pendingVendorApprovals,
+        ] = await Promise.all([
+            prisma.vendorOnboarding.findMany({
+                where: {
+                    organizationId,
+                    stage: { in: [VendorOnboardingStage.INTAKE, VendorOnboardingStage.TIER_REVIEW, VendorOnboardingStage.DUE_DILIGENCE_PLAN, VendorOnboardingStage.READY_TO_SEND, VendorOnboardingStage.AWAITING_VENDOR, VendorOnboardingStage.VENDOR_IN_PROGRESS, VendorOnboardingStage.SUBMITTED, VendorOnboardingStage.UNDER_REVIEW, VendorOnboardingStage.RISK_ACCEPTANCE, VendorOnboardingStage.CONTRACT_REVIEW, VendorOnboardingStage.APPROVAL] },
+                },
+                include: { vendor: { select: { id: true, name: true, publicId: true } } },
+                take: 25,
+            }),
+            prisma.vendor.findMany({
+                where: { organizationId, status: VendorStatus.ACTIVE, nextReviewDate: { lt: now } },
+                select: { id: true, name: true, residualRiskScore: true, nextReviewDate: true, tier: true },
+                take: 25,
+            }),
+            prisma.vendorAssessment.findMany({
+                where: {
+                    organizationId,
+                    status: { in: [AssessmentStatus.PENDING_APPROVAL, AssessmentStatus.OVERDUE] },
+                },
+                include: { vendor: { select: { id: true, name: true } } },
+                take: 25,
+            }),
+            prisma.vendorIssue.findMany({
+                where: {
+                    organizationId,
+                    severity: { in: ['CRITICAL', 'HIGH'] },
+                    status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS] },
+                },
+                include: { vendor: { select: { id: true, name: true } } },
+                take: 25,
+            }),
+            prisma.vendorMonitoring.findMany({
+                where: { organizationId, requiresAction: true },
+                include: { vendor: { select: { id: true, name: true } } },
+                orderBy: { detectedAt: 'desc' },
+                take: 25,
+            }),
+            prisma.vendorDocument.findMany({
+                where: { organizationId, validUntil: { gte: now, lte: in45Days } },
+                include: { vendor: { select: { id: true, name: true } } },
+                take: 25,
+            }),
+            prisma.vendorContract.findMany({
+                where: { organizationId, expirationDate: { gte: now, lte: in45Days } },
+                include: { vendor: { select: { id: true, name: true } } },
+                take: 25,
+            }),
+            prisma.vendorAssessment.count({
+                where: {
+                    organizationId,
+                    status: { not: AssessmentStatus.COMPLETED },
+                    OR: [{ dueDate: null }, { dueDate: { lte: in7Days } }],
+                },
+            }),
+            prisma.vendorIssue.count({
+                where: {
+                    organizationId,
+                    status: { notIn: [VendorIssueStatus.CLOSED, VendorIssueStatus.RISK_ACCEPTED, VendorIssueStatus.RESOLVED] },
+                    targetRemediationDate: { lt: now },
+                },
+            }),
+            prisma.riskDecisionBrief.count({
+                where: {
+                    organizationId,
+                    humanDecision: null,
+                    status: { not: DecisionBriefStatus.DECIDED },
+                },
+            }),
+            prisma.vendorOnboarding.count({
+                where: {
+                    organizationId,
+                    approvalPreparedBy: { not: null },
+                    approvalDecision: null,
+                },
+            }),
+        ]);
         for (const row of onboarding) {
             const due = row.dueDiligenceDueAt || (row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt);
             const overdue = Boolean(due && due < now);
@@ -104,11 +185,6 @@ export const attentionService = {
             });
         }
 
-        const overdueReviews = await prisma.vendor.findMany({
-            where: { organizationId, status: VendorStatus.ACTIVE, nextReviewDate: { lt: now } },
-            select: { id: true, name: true, residualRiskScore: true, nextReviewDate: true, tier: true },
-            take: 25,
-        });
         for (const vendor of overdueReviews) {
             items.push({
                 id: `review-${vendor.id}`,
@@ -122,14 +198,6 @@ export const attentionService = {
             });
         }
 
-        const pendingAssessments = await prisma.vendorAssessment.findMany({
-            where: {
-                organizationId,
-                status: { in: [AssessmentStatus.PENDING_APPROVAL, AssessmentStatus.OVERDUE] },
-            },
-            include: { vendor: { select: { id: true, name: true } } },
-            take: 25,
-        });
         for (const assessment of pendingAssessments) {
             items.push({
                 id: `assessment-${assessment.id}`,
@@ -143,15 +211,6 @@ export const attentionService = {
             });
         }
 
-        const criticalFindings = await prisma.vendorIssue.findMany({
-            where: {
-                organizationId,
-                severity: { in: ['CRITICAL', 'HIGH'] },
-                status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS] },
-            },
-            include: { vendor: { select: { id: true, name: true } } },
-            take: 25,
-        });
         for (const finding of criticalFindings) {
             items.push({
                 id: `finding-${finding.id}`,
@@ -165,12 +224,6 @@ export const attentionService = {
             });
         }
 
-        const alerts = await prisma.vendorMonitoring.findMany({
-            where: { organizationId, requiresAction: true },
-            include: { vendor: { select: { id: true, name: true } } },
-            orderBy: { detectedAt: 'desc' },
-            take: 25,
-        });
         for (const alert of alerts) {
             items.push({
                 id: `monitor-${alert.id}`,
@@ -184,11 +237,6 @@ export const attentionService = {
             });
         }
 
-        const expiringEvidence = await prisma.vendorDocument.findMany({
-            where: { organizationId, validUntil: { gte: now, lte: in45Days } },
-            include: { vendor: { select: { id: true, name: true } } },
-            take: 25,
-        });
         for (const doc of expiringEvidence) {
             items.push({
                 id: `evidence-${doc.id}`,
@@ -202,11 +250,6 @@ export const attentionService = {
             });
         }
 
-        const expiringContracts = await prisma.vendorContract.findMany({
-            where: { organizationId, expirationDate: { gte: now, lte: in45Days } },
-            include: { vendor: { select: { id: true, name: true } } },
-            take: 25,
-        });
         for (const contract of expiringContracts) {
             items.push({
                 id: `contract-${contract.id}`,
@@ -220,37 +263,6 @@ export const attentionService = {
             });
         }
 
-        const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        const [dueAssessments, overdueFindings, pendingBriefs, pendingVendorApprovals] = await Promise.all([
-            prisma.vendorAssessment.count({
-                where: {
-                    organizationId,
-                    status: { not: AssessmentStatus.COMPLETED },
-                    OR: [{ dueDate: null }, { dueDate: { lte: in7Days } }],
-                },
-            }),
-            prisma.vendorIssue.count({
-                where: {
-                    organizationId,
-                    status: { notIn: [VendorIssueStatus.CLOSED, VendorIssueStatus.RISK_ACCEPTED, VendorIssueStatus.RESOLVED] },
-                    targetRemediationDate: { lt: now },
-                },
-            }),
-            prisma.riskDecisionBrief.count({
-                where: {
-                    organizationId,
-                    humanDecision: null,
-                    status: { not: DecisionBriefStatus.DECIDED },
-                },
-            }),
-            prisma.vendorOnboarding.count({
-                where: {
-                    organizationId,
-                    approvalPreparedBy: { not: null },
-                    approvalDecision: null,
-                },
-            }),
-        ]);
         const pendingDecisions = pendingBriefs + pendingVendorApprovals;
 
         const rank: Record<AttentionSeverity, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2 };

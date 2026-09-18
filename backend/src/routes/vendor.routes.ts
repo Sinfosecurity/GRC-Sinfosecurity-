@@ -146,7 +146,9 @@ router.get('/', validateQuery(VendorListQuerySchema), async (req: any, res) => {
  */
 router.get('/statistics', async (req: any, res) => {
     try {
+        const started = Date.now();
         const stats = await vendorManagementService.getVendorStatistics(req.user.organizationId);
+        res.setHeader('Server-Timing', `statistics;dur=${Date.now() - started}`);
         res.json(stats);
     } catch (error: any) {
         res.status(500).json(publicServerErrorPayload(error));
