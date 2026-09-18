@@ -63,6 +63,7 @@ export function dominantNextAction(data: {
     canEditIntake?: boolean;
     canReviewTier?: boolean;
     intake?: { completed?: boolean };
+    ira?: { required?: boolean; sent?: boolean; submitted?: boolean };
     actorId?: string;
     lifecycle?: {
         readyForIndependentApproval?: boolean;
@@ -73,8 +74,25 @@ export function dominantNextAction(data: {
     };
 }) {
     const stage = data.stageKey || data.stage;
-    if ((data.unresolvedScope || []).length && !data.intake?.completed) {
+    if (['ACTIVE', 'REASSESSMENT', 'OFFBOARDING', 'Active', 'Reassessment', 'Offboarding'].includes(String(stage))) {
+        if (['OFFBOARDING', 'Offboarding'].includes(String(stage))) {
+            return {
+                label: 'This vendor is already onboarded',
+                detail: 'This page is monitoring and offboarding, not a new assessment. Request a different third party to start one.',
+            };
+        }
+        return {
+            label: data.nextAction || 'No action required',
+            detail: 'This third party is being monitored. To assess a new vendor, request a third party.',
+        };
+    }
+    if ((data.unresolvedScope || []).length && !data.intake?.completed && !data.ira?.required) {
         return { label: 'Complete intake', detail: 'A controlling fact is still Unknown. Save is allowed. Ready to send is not.' };
+    }
+    if ((stage === 'INTAKE' || stage === 'Intake') && data.ira?.required && !data.ira?.submitted) {
+        return data.ira.sent
+            ? { label: 'Waiting on requester', detail: 'The inherent-risk form is with the requester. They do not need a Supreme login.' }
+            : { label: 'Send the inherent-risk form', detail: 'Email the link or copy it and mark it sent. The 5-day clock starts then.' };
     }
     if (stage === 'INTAKE' || stage === 'Intake') return { label: 'Complete intake', detail: data.nextAction || 'Answer the inherent-risk questions.' };
     if (stage === 'TIER_REVIEW' || stage === 'Tier review') return { label: 'Confirm recommended tier', detail: data.nextAction || 'Supreme already scored inherent risk.' };
@@ -108,9 +126,6 @@ export function dominantNextAction(data: {
     }
     if (['CONTRACT_REVIEW', 'APPROVAL', 'Contract review', 'Approval'].includes(String(stage))) {
         return { label: 'Make decision', detail: data.nextAction || 'Approve, approve with conditions, or reject.' };
-    }
-    if (['ACTIVE', 'REASSESSMENT', 'Active', 'Reassessment'].includes(String(stage))) {
-        return { label: data.nextAction || 'No action required', detail: 'This third party is being monitored.' };
     }
     return { label: data.nextAction || 'Continue', detail: 'Supreme prepared the next eligible step.' };
 }

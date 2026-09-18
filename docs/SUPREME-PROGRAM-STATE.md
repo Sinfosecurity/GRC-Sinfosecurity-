@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-17
+**LAST UPDATED:** 2026-09-18
 
-**CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. Product Leadership hosted review found the Assessments New Assessment path exposed generic template selection instead of risk-driven pack composition. H-5 and H-6 remain OPEN pending hosted proof. #21 remains PARTIAL.
+**CURRENT ITEM:** Supreme UI 2.0 — platform-wide visual design system and premium experience transformation. Product Leadership hosted review found the Assessments New Assessment path exposed generic template selection instead of risk-driven pack composition. Product Leadership authorized Version 3 risk-driven IRA (2026-09-18): GRC creates the record, requester completes Part A/B via hashed task link, Supreme calculates tier and packs, analyst confirms, then vendor questionnaire. H-5 and H-6 remain OPEN pending hosted proof. #21 remains PARTIAL.
 
-**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Finding: TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Version 3 IRA ADRs `docs/ADR-TPRM-INHERENT-RISK-SCORING.md` and `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md` are ACCEPTED. Local implementation is in the working tree. Not hosted. Not UI 2.0 accepted. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, H-5 CLOSED, H-6 CLOSED, #21 PASS, commercial GO, or production ready.
 
 **#21:** PAUSED — PARTIAL pending Product Leadership. Starting SHA `7b3f9018930549aa67a6790fcfd9862115b55315`. Implementation `e8306677d6678506eb24dcd18c1aa39308ed1fbd`. CI / hosted frontend and API `b01609aa7c45414bf3c3a2ca08249bf574366952`. CI `34930403949` PASS. Live IdP not tested. Cursor does not declare #21 PASS.
 

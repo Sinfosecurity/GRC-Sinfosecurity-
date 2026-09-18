@@ -12,6 +12,7 @@ import {
     listOwnerDirectory,
     saveIntake,
 } from '../services/vendorOnboardingService';
+import { markIraShared, sendIraLink } from '../services/requesterTaskLinkService';
 import {
     activationLink,
     markInvitationShared,
@@ -137,6 +138,30 @@ router.post('/:id/plan/confirm', requirePermission(PERMISSIONS['vendor.update'],
 router.post('/:id/contact', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await upsertAssessmentContact(req.user!.organizationId, req.params.id, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/ira/send', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await sendIraLink(req.user!.organizationId, req.params.id, actor(req), 'email') });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/ira/link', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await sendIraLink(req.user!.organizationId, req.params.id, actor(req), 'copy') });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:id/ira/shared', requirePermission(PERMISSIONS['vendor.update'], PERMISSIONS['assessment.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await markIraShared(req.user!.organizationId, req.params.id, actor(req)) });
     } catch (error) {
         next(error);
     }

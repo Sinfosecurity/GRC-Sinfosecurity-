@@ -22,6 +22,9 @@ vi.mock('../../services/api', () => ({
         activationLink: vi.fn(),
         markInvitationShared: vi.fn(),
         reviewFinding: vi.fn(),
+        sendIra: vi.fn(),
+        iraLink: vi.fn(),
+        markIraShared: vi.fn(),
         reassessment: vi.fn().mockResolvedValue({ data: { data: { recommendation: 'Targeted reassessment' } } }),
     },
 }));
@@ -30,7 +33,10 @@ describe('Onboard Third Party workspace', () => {
     beforeEach(async () => {
         const { vendorOnboardingAPI } = await import('../../services/api');
         (vendorOnboardingAPI.list as any).mockResolvedValue({
-            data: { data: [{ id: 'v1', publicId: 'VND-2026-0001', name: 'Acme Payroll', stage: 'Intake', owner: 'Ava Owner', dueDate: '2026-09-18', nextAction: 'Complete vendor intake' }] },
+            data: { data: [
+                { id: 'v1', publicId: 'VND-2026-0001', name: 'Acme Payroll', stage: 'Intake', owner: 'Ava Owner', dueDate: '2026-09-18', nextAction: 'Complete vendor intake' },
+                { id: 'v17', publicId: 'VND-2026-0017', name: 'Experience Two', stage: 'Offboarding', owner: 'Report Proof', nextAction: 'Close the relationship' },
+            ] },
         });
         (vendorOnboardingAPI.owners as any).mockResolvedValue({
             data: { data: [{ id: 'u1', name: 'Ava Owner', email: 'ava@example.test' }] },
@@ -86,11 +92,47 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboarding />
             </MemoryRouter>
         );
-        expect(await screen.findByText('Request a third party')).toBeInTheDocument();
-        expect(screen.getByText('Assess')).toBeInTheDocument();
+        expect(await screen.findByText('Open a third-party record')).toBeInTheDocument();
+        expect(screen.getByText(/1 in progress/)).toBeInTheDocument();
         expect(screen.getByText('VND-2026-0001')).toBeInTheDocument();
         expect(screen.getByText('Complete vendor intake')).toBeInTheDocument();
+        expect(screen.queryByText('Experience Two')).not.toBeInTheDocument();
         expect(screen.queryByText('INTAKE_PENDING')).not.toBeInTheDocument();
+        expect(screen.getByText('Who asked for this vendor?')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Create record' })).toBeDisabled();
+    });
+
+    it('asks GRC to send the inherent-risk form instead of filling in-app intake', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v-ira',
+                    publicId: 'VND-2026-0040',
+                    name: 'Requester Path Vendor',
+                    stage: 'Intake',
+                    stageKey: 'INTAKE',
+                    owner: 'Ava Owner',
+                    requesterName: 'Jordan Request',
+                    requesterEmail: 'jordan@example.test',
+                    canEditIntake: true,
+                    request: { name: 'Requester Path Vendor', servicesProvided: 'Payroll' },
+                    ira: { required: true, sent: false, submitted: false, answers: {}, questions: [] },
+                    intake: { completed: false, sections: [{ title: 'Inherent risk', questions: [{ key: 'ir_04', question: 'Privileged access?', type: 'SINGLE_CHOICE', options: ['High'], response: '' }] }] },
+                    history: [],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0040']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect((await screen.findAllByText('Send the inherent-risk form')).length).toBeGreaterThan(0);
+        expect(screen.getByRole('button', { name: 'Email IRA link' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Copy IRA link' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Submit intake' })).not.toBeInTheDocument();
+        expect(screen.getByText(/Do not fill the old in-app intake/)).toBeInTheDocument();
     });
 
     it('explains a controlling Unknown without blocking intake submit', async () => {
@@ -208,5 +250,34 @@ describe('Onboard Third Party workspace', () => {
         fireEvent.click(screen.getByRole('button', { name: 'View full assessment' }));
         expect(screen.getByRole('heading', { name: 'Full assessment' })).toBeInTheDocument();
         expect(screen.getAllByText(/Privileged access is recorded as High/).length).toBeGreaterThan(0);
+    });
+
+    it('tells the operator an offboarding vendor is not a new assessment', async () => {
+        const { vendorOnboardingAPI } = await import('../../services/api');
+        (vendorOnboardingAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    id: 'v4',
+                    publicId: 'VND-2026-0017',
+                    name: 'Experience Two',
+                    stage: 'Offboarding',
+                    stageKey: 'OFFBOARDING',
+                    owner: 'Report Proof',
+                    request: { name: 'Experience Two', servicesProvided: 'Hosted claims review' },
+                    intake: { completed: true, sections: [] },
+                    review: { potentialFindings: 18, items: [] },
+                    lifecycle: { vendorStatus: 'OFFBOARDING', residualRisk: 100, findings: [], monitoring: { openFindings: 0 } },
+                    history: [],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/vendor-onboarding/VND-2026-0017']}>
+                <VendorOnboardingWorkspace />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText(/already onboarded/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Request a different third party' })).toBeInTheDocument();
+        expect(screen.queryByText(/Review 18 material issues/)).not.toBeInTheDocument();
     });
 });

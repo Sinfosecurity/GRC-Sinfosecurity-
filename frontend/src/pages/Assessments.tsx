@@ -1,21 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     Alert,
     Box,
     Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    InputAdornment,
     LinearProgress,
     Stack,
     Tab,
     Tabs,
-    TextField,
     Typography,
-    ListItemButton,
 } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
@@ -24,10 +17,8 @@ import Surface from '../components/design/Surface';
 import AppTable from '../components/design/AppTable';
 import AttentionStrip from '../components/design/AttentionStrip';
 import WorkspaceFrame from '../components/design/WorkspaceFrame';
-import WorkflowStepper from '../components/design/WorkflowStepper';
-import QuestionnairePlan from '../components/tprm/QuestionnairePlan';
 import { color } from '../design/tokens';
-import { tprmAPI, vendorAPI, vendorOnboardingAPI } from '../services/api';
+import { tprmAPI } from '../services/api';
 import AssessmentAnswerInput from '../components/AssessmentAnswerInput';
 import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
@@ -85,15 +76,6 @@ type Assessment = {
     }>;
 };
 
-type VendorRow = {
-    id: string;
-    name: string;
-    tier?: string;
-    vendorType?: string;
-    inherentRiskScore?: number | null;
-    residualRiskScore?: number | null;
-};
-
 function visibleQuestions(template: Template | undefined, answers: Record<string, string>) {
     if (!template) return [];
     return template.sections.flatMap((section) =>
@@ -114,22 +96,11 @@ function customerError(err: any) {
     return message;
 }
 
-const WIZARD_STEPS = ['Third party', 'Questionnaire plan', 'Review & send'];
-
 export default function Assessments() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const [vendors, setVendors] = useState<VendorRow[]>([]);
     const [templates, setTemplates] = useState<Template[]>([]);
     const [assessments, setAssessments] = useState<Assessment[]>([]);
     const [tab, setTab] = useState(0);
-    const [wizardOpen, setWizardOpen] = useState(false);
-    const [wizardStep, setWizardStep] = useState(0);
-    const [vendorQuery, setVendorQuery] = useState('');
-    const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
-    const [dueDate, setDueDate] = useState('');
-    const [onboarding, setOnboarding] = useState<any | null>(null);
-    const [onboardingError, setOnboardingError] = useState<string | null>(null);
     const [selected, setSelected] = useState<Assessment | null>(null);
     const [sectionIndex, setSectionIndex] = useState(0);
     const [questionIndex, setQuestionIndex] = useState(0);
@@ -138,8 +109,7 @@ export default function Assessments() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
-    const [contact, setContact] = useState({ name: '', email: '', title: '', phone: '' });
-    const [copiedLink, setCopiedLink] = useState('');
+    const startNewAssessment = () => navigate('/vendor-onboarding');
     const draftRef = useRef('');
     const focusedQuestionKeyRef = useRef<string | null>(null);
 
@@ -147,17 +117,10 @@ export default function Assessments() {
         setLoading(true);
         setError(null);
         try {
-            const [vendorRes, templateRes, assessmentRes] = await Promise.all([
-                vendorAPI.getAll({ pageSize: 100 }),
+            const [templateRes, assessmentRes] = await Promise.all([
                 tprmAPI.questionnaires(),
                 tprmAPI.listAssessments(),
             ]);
-            const vendorRows = vendorRes.data.vendors || vendorRes.data.data || vendorRes.data || [];
-            setVendors(Array.isArray(vendorRows) ? vendorRows : []);
-            const requested = searchParams.get('vendorId');
-            if (requested && Array.isArray(vendorRows) && vendorRows.some((row: { id: string }) => row.id === requested)) {
-                setVendorId(requested);
-            }
             setTemplates(templateRes.data.data || []);
             setAssessments(assessmentRes.data.data || []);
         } catch (err: any) {
@@ -170,28 +133,6 @@ export default function Assessments() {
     useEffect(() => {
         load();
     }, []);
-
-    useEffect(() => {
-        if (!vendorId || !wizardOpen) return;
-        setOnboardingError(null);
-        vendorOnboardingAPI.get(vendorId)
-            .then((response) => {
-                setOnboarding(response.data.data);
-                const next = response.data.data?.contact;
-                if (next) {
-                    setContact({
-                        name: next.name || '',
-                        email: next.email || '',
-                        title: next.title || '',
-                        phone: next.phone || '',
-                    });
-                }
-            })
-            .catch((err: any) => {
-                setOnboarding(null);
-                setOnboardingError(err?.message || 'This third party does not have an onboarding workspace yet.');
-            });
-    }, [vendorId, wizardOpen]);
 
     const templateById = useMemo(() => Object.fromEntries(templates.map((row) => [row.id, row])), [templates]);
     const selectedTemplate = selected?.templateId ? templateById[selected.templateId] : undefined;
@@ -249,38 +190,6 @@ export default function Assessments() {
         setSelected(detail.data.data);
         setSectionIndex(0);
         setQuestionIndex(0);
-        setWizardOpen(false);
-    };
-
-    const startWizard = () => {
-        setWizardOpen(true);
-        setWizardStep(vendorId ? 1 : 0);
-        setMessage(null);
-        setError(null);
-    };
-
-    const openOnboarding = () => {
-        if (!vendorId) return;
-        setWizardOpen(false);
-        navigate(`/vendor-onboarding/${vendorId}`);
-    };
-
-    const confirmAndContinue = async () => {
-        if (!vendorId) return;
-        setBusy(true);
-        setMessage(null);
-        try {
-            if (onboarding?.stageKey === 'DUE_DILIGENCE_PLAN') {
-                await vendorOnboardingAPI.confirmPlan(vendorId);
-            }
-            const refreshed = await vendorOnboardingAPI.get(vendorId);
-            setOnboarding(refreshed.data.data);
-            setWizardStep(2);
-        } catch (err: any) {
-            setError(customerError(err));
-        } finally {
-            setBusy(false);
-        }
     };
 
     const persist = async (questionId: string, response: string) => {
@@ -344,11 +253,6 @@ export default function Assessments() {
             setBusy(false);
         }
     };
-
-    const vendorMatches = vendors.filter((vendor) => vendor.name.toLowerCase().includes(vendorQuery.toLowerCase()));
-    const chosenVendor = vendors.find((vendor) => vendor.id === vendorId);
-    const intakeReady = Boolean(onboarding?.intake?.completed);
-    const sendBlocked = Boolean(onboarding?.questionnairePlan?.sendBlocked);
 
     if (selected) {
         const [prompt, ...guidance] = (currentQuestion?.questionText || '').split('\n');
@@ -500,8 +404,8 @@ export default function Assessments() {
         <WorkspaceFrame purpose="register">
             <PageHeader
                 title="Assessments"
-                description="Standard third-party assessments are generated from intake, inherent risk, and analyst-confirmed packs. The questionnaire library does not choose the TPRM questionnaire."
-                actions={<Button variant="contained" onClick={startWizard}>New assessment</Button>}
+                description="To start a new assessment, request a third party. Intake and inherent risk create the questionnaire. Do not open an existing offboarding vendor to start a new one."
+                actions={<Button variant="contained" onClick={startNewAssessment}>Request a third party</Button>}
             />
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>}
@@ -528,7 +432,7 @@ export default function Assessments() {
                     <Box sx={{ px: 2, pt: 2 }}>
                         <Typography variant="subtitle1">Questionnaire library</Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
-                            Administrative and specialized templates. This catalog does not choose the standard TPRM questionnaire. Use New assessment to review the generated questionnaire plan.
+                            Administrative and specialized templates. The standard TPRM questionnaire is generated after you request a third party and complete intake.
                         </Typography>
                     </Box>
                     <AppTable
@@ -556,8 +460,8 @@ export default function Assessments() {
                     error={null}
                     empty={filteredAssessments.length === 0}
                     emptyTitle="No active assessments"
-                    emptyBody="Start a risk-based assessment to evaluate a third party's security, privacy and operational controls."
-                    emptyAction={<Button variant="contained" onClick={startWizard}>New assessment</Button>}
+                    emptyBody="Request a third party, complete intake, then send the generated questionnaire."
+                    emptyAction={<Button variant="contained" onClick={startNewAssessment}>Request a third party</Button>}
                 >
                     <Surface padded={false}>
                         <AppTable
@@ -584,153 +488,6 @@ export default function Assessments() {
                     </Surface>
                 </QueryState>
             )}
-
-            <Dialog open={wizardOpen} onClose={() => setWizardOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle>New assessment</DialogTitle>
-                <DialogContent>
-                    <WorkflowStepper steps={WIZARD_STEPS} active={wizardStep} />
-                    {wizardStep === 0 && (
-                        <Box>
-                            <TextField
-                                fullWidth
-                                label="Search third parties"
-                                value={vendorQuery}
-                                onChange={(e) => setVendorQuery(e.target.value)}
-                                InputProps={{ startAdornment: <InputAdornment position="start"> </InputAdornment> }}
-                                sx={{ mb: 2 }}
-                            />
-                            <Stack spacing={1} sx={{ maxHeight: 360, overflow: 'auto' }}>
-                                {vendorMatches.map((vendor) => (
-                                    <ListItemButton
-                                        key={vendor.id}
-                                        selected={vendor.id === vendorId}
-                                        onClick={() => setVendorId(vendor.id)}
-                                        aria-label={`Select ${vendor.name}`}
-                                        sx={{
-                                            border: `1px solid ${vendor.id === vendorId ? color.navy800 : color.line}`,
-                                            borderRadius: '8px',
-                                            bgcolor: vendor.id === vendorId ? color.goldDim : color.surface,
-                                        }}
-                                    >
-                                        <Box>
-                                            <Typography variant="subtitle2">{vendor.name}</Typography>
-                                            <Typography variant="caption">
-                                                {vendor.tier || 'Tier pending'} · residual {vendor.residualRiskScore ?? '—'} · inherent {vendor.inherentRiskScore ?? '—'}
-                                            </Typography>
-                                        </Box>
-                                    </ListItemButton>
-                                ))}
-                                {vendorMatches.length === 0 && <Typography variant="body2">No third parties match. Add one from the Vendors page first.</Typography>}
-                            </Stack>
-                        </Box>
-                    )}
-                    {wizardStep === 1 && (
-                        <Stack spacing={2} sx={{ mt: 1 }}>
-                            <Typography variant="h5">{chosenVendor?.name || 'Selected vendor'}</Typography>
-                            {onboardingError && (
-                                <Alert severity="warning">
-                                    {onboardingError} Create the third-party request first.
-                                    <Button sx={{ display: 'block', mt: 1 }} onClick={() => navigate('/vendor-onboarding')}>Open vendor onboarding</Button>
-                                </Alert>
-                            )}
-                            {onboarding && !intakeReady && (
-                                <Alert severity="info">
-                                    Internal intake is not complete. The internal contact answers vendor profile, seven scope questions, and IR-01 to IR-15 before Supreme can prepare a questionnaire plan.
-                                    <Button sx={{ display: 'block', mt: 1 }} onClick={openOnboarding}>Continue intake</Button>
-                                </Alert>
-                            )}
-                            {onboarding && intakeReady && (
-                                <QuestionnairePlan
-                                    plan={onboarding.questionnairePlan || onboarding.plan?.questionnairePlan}
-                                    recommendedTier={onboarding.tierReview?.confirmedTier || onboarding.tierReview?.recommendedTier || onboarding.tier}
-                                    explanation={onboarding.tierReview?.explanation}
-                                    readOnly
-                                />
-                            )}
-                        </Stack>
-                    )}
-                    {wizardStep === 2 && (
-                        <Stack spacing={2} sx={{ mt: 1 }}>
-                            <Typography variant="h5">{chosenVendor?.name}</Typography>
-                            <Typography variant="body2">
-                                After the analyst confirms tier and packs, send the same invitation by email or copy the secure link. The vendor never sees intake, inherent-risk, or pack-selection mechanics.
-                            </Typography>
-                            {sendBlocked && (
-                                <Alert severity="warning">{onboarding?.questionnairePlan?.sendBlockMessage || 'Scope confirmation is still required before send.'}</Alert>
-                            )}
-                            <TextField type="date" label="Due date" InputLabelProps={{ shrink: true }} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-                            <TextField required label="Vendor security contact" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
-                            <TextField required type="email" label="Vendor security contact email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
-                            {copiedLink && <Alert severity="success">Link copied. Not emailed. Mark it sent after you share it through your approved channel.</Alert>}
-                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                <Button
-                                    variant="contained"
-                                    disabled={busy || sendBlocked || !contact.name || !contact.email}
-                                    onClick={() => {
-                                        setBusy(true);
-                                        vendorOnboardingAPI.send(vendorId, { ...contact, dueDate: dueDate || undefined })
-                                            .then(() => {
-                                                setMessage('Invitation email sent.');
-                                                setWizardOpen(false);
-                                                load();
-                                            })
-                                            .catch((err: any) => setError(customerError(err)))
-                                            .finally(() => setBusy(false));
-                                    }}
-                                >
-                                    Send invitation email
-                                </Button>
-                                <Button
-                                    disabled={busy || sendBlocked || !contact.name || !contact.email}
-                                    onClick={() => {
-                                        setBusy(true);
-                                        vendorOnboardingAPI.activationLink(vendorId, contact)
-                                            .then(async (response) => {
-                                                const url = response.data.data.activationUrl;
-                                                if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
-                                                setCopiedLink(url || 'copied');
-                                            })
-                                            .catch((err: any) => setError(customerError(err)))
-                                            .finally(() => setBusy(false));
-                                    }}
-                                >
-                                    Copy secure invitation link
-                                </Button>
-                                {copiedLink && (
-                                    <Button
-                                        disabled={busy}
-                                        onClick={() => {
-                                            setBusy(true);
-                                            vendorOnboardingAPI.markInvitationShared(vendorId)
-                                                .then(() => setMessage('Invitation marked as sent through an external channel.'))
-                                                .catch((err: any) => setError(customerError(err)))
-                                                .finally(() => setBusy(false));
-                                        }}
-                                    >
-                                        Mark as sent
-                                    </Button>
-                                )}
-                            </Stack>
-                            <Button onClick={openOnboarding}>Open full onboarding workspace</Button>
-                        </Stack>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setWizardOpen(false)}>Cancel</Button>
-                    {wizardStep > 0 && <Button onClick={() => setWizardStep((value) => value - 1)}>Back</Button>}
-                    {wizardStep === 0 && (
-                        <Button variant="contained" disabled={!vendorId} onClick={() => setWizardStep(1)}>Continue</Button>
-                    )}
-                    {wizardStep === 1 && intakeReady && (
-                        <Button variant="contained" disabled={busy || sendBlocked} onClick={confirmAndContinue}>
-                            {sendBlocked ? 'Resolve scope to continue' : 'Confirm and review send'}
-                        </Button>
-                    )}
-                    {wizardStep === 1 && !intakeReady && (
-                        <Button variant="contained" onClick={openOnboarding}>Continue intake</Button>
-                    )}
-                </DialogActions>
-            </Dialog>
         </WorkspaceFrame>
     );
 }

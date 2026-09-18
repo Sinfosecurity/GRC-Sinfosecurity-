@@ -180,6 +180,7 @@ model Organization {
   vendors                     Vendor[]
   vendorOnboardings           VendorOnboarding[]
   vendorAssessmentInvitations VendorAssessmentInvitation[]
+  requesterTaskLinks          RequesterTaskLink[]
   vendorPortalSessions        VendorPortalSession[]
   vendorAssessments           VendorAssessment[]
   vendorContracts             VendorContract[]
@@ -609,6 +610,7 @@ model Vendor {
   documents             VendorDocument[]
   contacts              VendorContact[]
   assessmentInvitations VendorAssessmentInvitation[]
+  requesterTaskLinks    RequesterTaskLink[]
   portalSessions        VendorPortalSession[]
   monitoringRecords     VendorMonitoring[]
   reviews               VendorReview[]
@@ -700,6 +702,13 @@ model VendorOnboarding {
   vendorSubmittedAt     DateTime?
   lastReminderAt        DateTime?
   reminderCount         Int                    @default(0)
+  requesterName         String?
+  requesterEmail        String?
+  engagementPublicId    String?
+  iraAnswers            Json?
+  iraUnknownCount       Int?
+  screeningStatus       String                 @default("CLEAR")
+  externalRating        Json?
   contractChecklist     Json?
   contractAttestedAt    DateTime?
   contractAttestedBy    String?
@@ -824,6 +833,49 @@ enum VendorInvitationStatus {
   EXPIRED
   REVOKED
   COMPLETED
+}
+
+enum RequesterTaskPurpose {
+  IRA
+  CLARIFICATION
+  FINDING_DECISION
+  SCOPE_CHANGE
+  ATTESTATION
+  OFFBOARDING
+}
+
+enum RequesterTaskStatus {
+  PENDING
+  OPENED
+  SUBMITTED
+  EXPIRED
+  REVOKED
+}
+
+model RequesterTaskLink {
+  id                  String               @id @default(uuid())
+  organization        Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId      String
+  vendor              Vendor               @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId            String
+  purpose             RequesterTaskPurpose
+  email               String
+  tokenHash           String               @unique
+  status              RequesterTaskStatus  @default(PENDING)
+  expiresAt           DateTime
+  openedAt            DateTime?
+  submittedAt         DateTime?
+  revokedAt           DateTime?
+  createdBy           String
+  deliveryMethod      String?
+  emailDeliveryStatus String?
+  emailSentAt         DateTime?
+  markedSentAt        DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([organizationId, vendorId, purpose])
+  @@index([email])
 }
 
 model VendorAssessmentInvitation {

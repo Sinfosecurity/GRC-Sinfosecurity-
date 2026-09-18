@@ -520,6 +520,20 @@ export const vendorOnboardingAPI = {
     reassessment: (id: string) => api.get(`/vendors/onboarding/${id}/reassessment`),
     startReassessment: (id: string, data?: unknown) => api.post(`/vendors/onboarding/${id}/reassessment`, data || {}),
     offboard: (id: string, data: unknown) => api.post(`/vendors/onboarding/${id}/offboard`, data),
+    sendIra: (id: string) => api.post(`/vendors/onboarding/${id}/ira/send`),
+    iraLink: (id: string) => api.post(`/vendors/onboarding/${id}/ira/link`),
+    markIraShared: (id: string) => api.post(`/vendors/onboarding/${id}/ira/shared`),
+};
+
+const iraApi = axios.create({
+    baseURL: API_BASE_URL || '/api/v1',
+    headers: { 'Content-Type': 'application/json' },
+});
+
+export const iraAPI = {
+    get: (token: string) => iraApi.get('/ira', { params: { token } }),
+    save: (token: string, answers: Record<string, string>) => iraApi.patch('/ira', { token, answers }),
+    submit: (token: string, answers: Record<string, string>, attested: boolean) => iraApi.post('/ira/submit', { token, answers, attested }),
 };
 
 const vendorApi = axios.create({

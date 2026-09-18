@@ -26,6 +26,7 @@ import { scoreAssessmentResponse } from './vendorAssessmentService';
 import { addBusinessDays, workbookControlGap } from './vendorOnboardingScoring';
 import { loadWorkbookCatalog, workbookControlIdsForPacks, workbookDomainsForPacks, workbookEvidenceForDomains } from '../tprm/workbookCatalog';
 import { presentVendorQuestion, sanitizeVendorPayload, sanitizeVendorQuestions } from '../tprm/vendorPayload';
+import { isBaselineLiteQuestion } from '../tprm/iraCatalog';
 import { getOnboarding } from './vendorOnboardingService';
 import { explainableRiskService } from './explainableRiskService';
 import {
@@ -533,6 +534,12 @@ async function templateMap(templateId?: string | null) {
     return map;
 }
 
+function liteQuestions<T extends { key: string }>(tier: VendorTier | undefined, frameworkUsed: string | null | undefined, questions: T[]) {
+    if (tier !== VendorTier.LOW || !/baseline/i.test(String(frameworkUsed || ''))) return questions;
+    const lite = questions.filter((row) => isBaselineLiteQuestion(row.key));
+    return lite.length ? lite : questions;
+}
+
 function presentQuestion(row: { questionId: string; questionText: string; questionCategory?: string | null; response: string | null; evidenceRequired: boolean; hasEvidence: boolean; notes?: string | null }, meta: { text?: string; required: boolean; evidenceRequired: boolean; options: string[]; section: string; type: string; guidance?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null } | undefined, answers: Map<string, string>, evidenceStatus?: string) {
     const visible = questionVisible({ questionId: row.questionId, conditionalOnKey: meta?.conditionalOnKey, conditionalValue: meta?.conditionalValue }, answers);
     return presentVendorQuestion({
@@ -565,7 +572,7 @@ export async function vendorWorkspace(actor: VendorActor) {
     for (const assessment of assessments) {
         const meta = await templateMap(assessment.templateId);
         const answers = new Map(assessment.responses.map((row) => [row.questionId, row.response || '']));
-        const questions = assessment.responses.map((row) => presentQuestion(row, meta.get(row.questionId), answers));
+        const questions = liteQuestions(vendor.tier, assessment.frameworkUsed, assessment.responses.map((row) => presentQuestion(row, meta.get(row.questionId), answers)));
         const visible = questions.filter((row) => row.visible);
         const done = visible.filter((row) => row.response).length;
         answered += done;
@@ -594,6 +601,7 @@ export async function vendorWorkspace(actor: VendorActor) {
 export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: string) {
     const assessment = (await assignedAssessments(actor)).find((row) => row.id === assessmentId);
     if (!assessment) throw new ApiError(404, 'Assessment not found.');
+    const vendor = await prisma.vendor.findFirst({ where: { id: actor.vendorId, organizationId: actor.organizationId }, select: { tier: true } });
     const meta = await templateMap(assessment.templateId);
     const answers = new Map(assessment.responses.map((row) => [row.questionId, row.response || '']));
     const evidenceByQuestion = new Map<string, string>();
@@ -609,7 +617,7 @@ export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: s
         return presentQuestion(row, meta.get(row.questionId), answers, link ? scanLabel(link.storedObject.scanStatus) : undefined);
     });
     const clarification = Array.isArray(assessment.clarificationQuestionIds) ? assessment.clarificationQuestionIds as string[] : [];
-    const vendorQuestions = sanitizeVendorQuestions(questions.map((row) => ({
+    const vendorQuestions = sanitizeVendorQuestions(liteQuestions(vendor?.tier, assessment.frameworkUsed, questions).map((row) => ({
         ...row,
         locked: Boolean(assessment.submittedAt) && !clarification.includes(row.key),
     })));

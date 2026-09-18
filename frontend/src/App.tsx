@@ -31,6 +31,7 @@ const VendorManagement = lazy(() => import('./pages/VendorManagement'));
 const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
 const VendorOnboardingWorkspace = lazy(() => import('./pages/VendorOnboardingWorkspace'));
 const VendorAssessmentActivate = lazy(() => import('./pages/VendorAssessmentActivate'));
+const RequesterIra = lazy(() => import('./pages/RequesterIra'));
 const VendorAssessmentPortal = lazy(() => import('./pages/VendorAssessmentPortal'));
 const VendorAssessmentQuestionnaire = lazy(() => import('./pages/VendorAssessmentQuestionnaire'));
 const SOCReports = lazy(() => import('./pages/SOCReports'));
@@ -169,6 +170,7 @@ export default function App() {
                     <Route path="/subprocessors" element={<LegalDraft />} />
                     <Route path="/status" element={<PublicStatus />} />
                     <Route path="/vendor-assessment/activate" element={<VendorAssessmentActivate />} />
+                    <Route path="/ira" element={<RequesterIra />} />
                     <Route path="/vendor-assessment" element={<VendorAssessmentPortal />} />
                     <Route path="/vendor-assessment/:assessmentId" element={<VendorAssessmentQuestionnaire />} />
                     <Route path="/connected-platform" element={<PlatformStory />} />

@@ -40,6 +40,7 @@ export default function VendorOnboardingWorkspace() {
     const [includedPacks, setIncludedPacks] = useState<string[]>([]);
     const [packReason, setPackReason] = useState('');
     const [copiedLink, setCopiedLink] = useState('');
+    const [copiedIraLink, setCopiedIraLink] = useState('');
     const [exitNotes, setExitNotes] = useState('');
     const [acknowledgeOutstanding, setAcknowledgeOutstanding] = useState(false);
     const [reassessment, setReassessment] = useState<any>(null);
@@ -133,13 +134,49 @@ export default function VendorOnboardingWorkspace() {
                             ? approvalStatusCopy({ ...data.lifecycle, actorId: data.actorId }).status
                             : humanizeLabel(data.workflowStatus || data.stage)}
                     />
-                    <LifecycleProgress active={customerStageIndex(data.stageKey || data.stage)} blocked={(data.questionnairePlan?.sendBlocked || (data.unresolvedScope || []).length > 0) && Boolean(data.intake?.completed)} />
-                    <NextActionCard
-                        label={dominantNextAction({ ...data, actorId: data.actorId }).label}
-                        detail={`${dominantNextAction({ ...data, actorId: data.actorId }).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
-                        onAction={() => setTab(defaultTab(data.stage))}
+                    <LifecycleProgress
+                        active={customerStageIndex(data.stageKey || data.stage)}
+                        blocked={(data.questionnairePlan?.sendBlocked || (data.unresolvedScope || []).length > 0)
+                            && Boolean(data.intake?.completed)
+                            && customerStage(data.stageKey || data.stage) !== 'Monitor'}
                     />
+                    {customerStage(data.stageKey || data.stage) === 'Monitor' ? (
+                        <Alert
+                            severity="info"
+                            action={<Button color="inherit" onClick={() => navigate('/vendor-onboarding')}>Request a different third party</Button>}
+                        >
+                            This third party is already onboarded. This page is monitoring, not a new assessment.
+                        </Alert>
+                    ) : (
+                        <NextActionCard
+                            label={dominantNextAction({ ...data, actorId: data.actorId }).label}
+                            detail={`${dominantNextAction({ ...data, actorId: data.actorId }).detail}${data.dueDate ? ` Due ${formatShortDate(data.dueDate)}.` : ''}`}
+                            onAction={() => setTab(defaultTab(data.stage))}
+                        />
+                    )}
                     {error && <Alert severity="error">{error}</Alert>}
+                    {data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && (
+                        <Surface>
+                            <Typography variant="h6">Send the inherent-risk form</Typography>
+                            <Typography variant="body2" sx={{ mb: 1.5 }}>
+                                {data.requesterName || 'The requester'} ({data.requesterEmail}) does not need a Supreme login. Email the link or copy it and mark it sent. The 5-day clock starts then.
+                            </Typography>
+                            {copiedIraLink && <Alert severity="success" sx={{ mb: 1.5 }}>Link copied. Not emailed until you mark it sent.</Alert>}
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.sendIra(id))}>Email IRA link</Button>
+                                <Button disabled={saving} onClick={() => run(async () => {
+                                    const response = await vendorOnboardingAPI.iraLink(id);
+                                    const url = response.data.data.iraLink?.url;
+                                    if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
+                                    setCopiedIraLink(url || 'copied');
+                                })}>Copy IRA link</Button>
+                                {copiedIraLink && (
+                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markIraShared(id))}>Mark as sent</Button>
+                                )}
+                            </Stack>
+                        </Surface>
+                    )}
+                    {data.ira?.unknownMessage && <Alert severity="warning">{data.ira.unknownMessage}</Alert>}
                     <Typography variant="body2">Inherent is intake exposure. Residual is current posture.</Typography>
                     <Tabs value={tab} onChange={(_, value) => setTab(value)} variant="scrollable" scrollButtons="auto">
                         <Tab label="Overview" />
@@ -201,11 +238,27 @@ export default function VendorOnboardingWorkspace() {
                         </Surface>
                     )}
 
-                    {tab === 1 && data.intake?.completed && !showCompletedIntake && (
+                    {tab === 1 && data.ira?.required && (
+                        <Surface>
+                            <Typography variant="h6">Requester inherent-risk answers</Typography>
+                            <Typography variant="body2" sx={{ mb: 1.5 }}>
+                                {data.ira.submitted
+                                    ? 'The requester completed this form. The vendor does not see it.'
+                                    : 'Do not fill the old in-app intake. Send the inherent-risk link above. The requester answers business-context questions only.'}
+                            </Typography>
+                            {data.ira.submitted && (data.ira.questions || []).map((question: { key: string; question: string; options?: Array<{ value: string; label: string }> }) => {
+                                const raw = String((data.ira.answers || {})[question.key] || '');
+                                const label = raw.split('|').map((value: string) => question.options?.find((option) => option.value === value)?.label || value).filter(Boolean).join(', ') || 'Not recorded';
+                                return <Typography key={question.key} variant="body2">{question.question} — {label}</Typography>;
+                            })}
+                        </Surface>
+                    )}
+
+                    {tab === 1 && data.intake?.completed && !showCompletedIntake && !data.ira?.required && (
                         <Button onClick={() => setShowCompletedIntake(true)}>Review intake answers</Button>
                     )}
 
-                    {tab === 1 && (!data.intake?.completed || showCompletedIntake) && (
+                    {tab === 1 && (!data.intake?.completed || showCompletedIntake) && !data.ira?.required && (
                         <Surface>
                             <Typography variant="h6">Internal intake</Typography>
                             <Typography variant="body2" sx={{ mb: 1 }}>Completed by the business owner. This is not sent to the vendor.</Typography>
@@ -598,7 +651,10 @@ export default function VendorOnboardingWorkspace() {
                     {tab === 0 && data.stage && ['Active', 'Reassessment', 'Offboarding'].includes(String(data.stage)) && (
                         <Stack spacing={1.5}>
                             {['Active', 'Reassessment'].includes(String(data.stage)) && (
-                                <Alert severity="success">Onboarding is complete. This workspace is now lifecycle management.</Alert>
+                                <Alert severity="success">Onboarding is complete. This workspace is now lifecycle management. To assess a new vendor, request a different third party.</Alert>
+                            )}
+                            {String(data.stage) === 'Offboarding' && (
+                                <Alert severity="warning">This vendor is offboarding. This is not a new assessment. Request a different third party to start one.</Alert>
                             )}
                             <Surface>
                                 <Typography variant="h6">Active relationship</Typography>

@@ -713,6 +713,7 @@ export function legacyControlFailureEmail(input: {
 
 export const EMAIL_TEMPLATE_INVENTORY = [
     { key: 'vendor.intake_assigned', name: 'Internal vendor intake assignment', present: true },
+    { key: 'vendor.ira_assigned', name: 'Requester inherent-risk task link', present: true },
     { key: 'vendor.tier_review', name: 'Analyst tier confirmation', present: true },
     { key: 'vendor.invitation', name: 'Vendor due-diligence invitation', present: true },
     { key: 'vendor.invitation_reminder', name: 'Vendor invitation reminder / resend', present: true },

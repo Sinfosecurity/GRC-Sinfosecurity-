@@ -29,6 +29,7 @@ import {
     workbookPackCounts,
 } from '../tprm/workbookCatalog';
 import { assertTierMeetsFloor, parseVendorTier, resolveMinimumTier } from './vendorTierIntegrity';
+import { IRA_QUESTIONS } from '../tprm/iraCatalog';
 
 export const INTAKE_SLA_DAYS = 5;
 export const TIER_REVIEW_SLA_DAYS = 2;
@@ -111,7 +112,7 @@ const MILESTONE_ACTIONS = new Set([
     'vendor.offboarding_started',
 ]);
 
-type Actor = { id: string; role: string; name?: string };
+export type Actor = { id: string; role: string; name?: string };
 
 function canRequest(role: string) {
     return canonicalRoleIn(role, ['ORGANIZATION_ADMIN', 'RISK_MANAGER', 'ASSESSOR', 'BUSINESS_OWNER']);
@@ -287,6 +288,8 @@ export async function createOnboardingRequest(organizationId: string, actor: Act
     relationshipOwnerUserId?: string;
     businessOwner?: string;
     relationshipOwner?: string;
+    requesterName?: string;
+    requesterEmail?: string;
     businessUnit?: string;
     estimatedAnnualSpend?: number;
     targetStartDate?: string;
@@ -354,7 +357,11 @@ export async function createOnboardingRequest(organizationId: string, actor: Act
             organizationId,
             stage: VendorOnboardingStage.INTAKE,
             intakeAssessmentId: assessment.id,
-            intakeDueAt,
+            intakeDueAt: input.requesterEmail ? null : intakeDueAt,
+            requesterName: String(input.requesterName || '').trim() || null,
+            requesterEmail: String(input.requesterEmail || '').trim().toLowerCase() || null,
+            engagementPublicId: `ENG-${publicId.replace('VND-', '')}-01`,
+            screeningStatus: 'CLEAR',
         },
     });
     await writeHistory(organizationId, actor.id, 'vendor.requested', vendor.id, {
@@ -367,22 +374,24 @@ export async function createOnboardingRequest(organizationId: string, actor: Act
             ownerName: owner.name,
             summary: `${owner.name} was named business owner.`,
         });
-        const intakeMail = vendorIntakeAssignedEmail({
-            vendorName: name,
-            publicId,
-            requesterName: actor.name || 'A colleague',
-            dueAt: intakeDueAt,
-            ctaUrl: customerAppUrl(`/vendor-onboarding/${publicId}`),
-        });
-        await notify(
-            organizationId,
-            owner.userId,
-            'assessment.assigned',
-            intakeMail.subject,
-            intakeMail.text,
-            vendor.id,
-            { emailBody: intakeMail.text, emailHtml: intakeMail.html, fromName: intakeMail.fromName },
-        );
+        if (!input.requesterEmail) {
+            const intakeMail = vendorIntakeAssignedEmail({
+                vendorName: name,
+                publicId,
+                requesterName: actor.name || 'A colleague',
+                dueAt: intakeDueAt,
+                ctaUrl: customerAppUrl(`/vendor-onboarding/${publicId}`),
+            });
+            await notify(
+                organizationId,
+                owner.userId,
+                'assessment.assigned',
+                intakeMail.subject,
+                intakeMail.text,
+                vendor.id,
+                { emailBody: intakeMail.text, emailHtml: intakeMail.html, fromName: intakeMail.fromName },
+            );
+        }
     }
     return presentOnboarding(organizationId, vendor.id, actor);
 }
@@ -413,7 +422,15 @@ export async function listOwnerDirectory(organizationId: string) {
     }));
 }
 
-function summarize(row: { stage: VendorOnboardingStage; intakeDueAt: Date | null; tierReviewDueAt: Date | null; vendor: { id: string; publicId: string | null; name: string; businessOwner: string | null; businessOwnerUserId: string | null; requesterUserId: string | null } }, users: Map<string, { name: string }>) {
+function summarize(row: {
+    stage: VendorOnboardingStage;
+    intakeDueAt: Date | null;
+    tierReviewDueAt: Date | null;
+    requesterEmail?: string | null;
+    intakeCompletedAt?: Date | null;
+    iraAnswers?: unknown;
+    vendor: { id: string; publicId: string | null; name: string; businessOwner: string | null; businessOwnerUserId: string | null; requesterUserId: string | null };
+}, users: Map<string, { name: string }>) {
     const owner = row.vendor.businessOwnerUserId ? users.get(row.vendor.businessOwnerUserId)?.name : row.vendor.businessOwner;
     return {
         id: row.vendor.id,
@@ -423,11 +440,18 @@ function summarize(row: { stage: VendorOnboardingStage; intakeDueAt: Date | null
         stageKey: row.stage,
         owner: owner || 'Not assigned',
         dueDate: (row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt)?.toISOString() || null,
-        nextAction: nextAction(row.stage),
+        nextAction: nextAction(row.stage, {
+            required: Boolean(row.requesterEmail),
+            sent: Boolean(row.intakeDueAt),
+            submitted: Boolean(row.intakeCompletedAt && row.iraAnswers),
+        }),
     };
 }
 
-function nextAction(stage: VendorOnboardingStage) {
+function nextAction(stage: VendorOnboardingStage, ira?: { required?: boolean; sent?: boolean; submitted?: boolean }) {
+    if ((stage === VendorOnboardingStage.REQUEST || stage === VendorOnboardingStage.INTAKE) && ira?.required && !ira.submitted) {
+        return ira.sent ? 'Wait for the requester to complete the inherent-risk form' : 'Send the inherent-risk form';
+    }
     switch (stage) {
         case VendorOnboardingStage.REQUEST:
         case VendorOnboardingStage.INTAKE:
@@ -871,6 +895,10 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         ? vendor.onboarding.tierReviewDueAt
         : vendor.onboarding?.intakeDueAt;
     const overdue = Boolean(due && due < new Date() && vendor.onboarding?.stage !== VendorOnboardingStage.READY_TO_SEND);
+    const iraLink = await prisma.requesterTaskLink.findFirst({
+        where: { organizationId, vendorId: vendor.id, purpose: 'IRA' },
+        orderBy: { createdAt: 'desc' },
+    }).catch(() => null);
     const liveRecommendation = recommendTierFromIntake((assessment?.responses || []).map((row) => ({
         questionKey: row.questionId,
         response: row.response,
@@ -904,7 +932,11 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         relationshipOwner: users.get(vendor.relationshipOwnerUserId || '')?.name || vendor.relationshipOwner || 'Not assigned',
         dueDate: due?.toISOString() || null,
         overdue,
-        nextAction: nextAction(vendor.onboarding!.stage),
+        nextAction: nextAction(vendor.onboarding!.stage, {
+            required: Boolean(vendor.onboarding?.requesterEmail),
+            sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
+            submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
+        }),
         canEditIntake: actor ? canCompleteIntake(actor.role, actor.id, vendor.businessOwnerUserId) : false,
         canReviewTier: actor ? canReviewTier(actor.role) : false,
         request: {
@@ -916,6 +948,21 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
             businessUnit: vendor.businessUnit,
             estimatedAnnualSpend: vendor.estimatedAnnualSpend,
             targetStartDate: vendor.targetStartDate,
+        },
+        requesterName: vendor.onboarding?.requesterName || users.get(vendor.requesterUserId || '')?.name || null,
+        requesterEmail: vendor.onboarding?.requesterEmail || null,
+        engagementPublicId: vendor.onboarding?.engagementPublicId || null,
+        screeningStatus: vendor.onboarding?.screeningStatus || 'CLEAR',
+        ira: {
+            required: Boolean(vendor.onboarding?.requesterEmail),
+            sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
+            submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
+            unknownCount: vendor.onboarding?.iraUnknownCount || 0,
+            unknownMessage: vendor.onboarding?.iraUnknownCount
+                ? `Not yet rated — ${vendor.onboarding.iraUnknownCount} answer${vendor.onboarding.iraUnknownCount === 1 ? '' : 's'} need confirmation.`
+                : null,
+            answers: vendor.onboarding?.iraAnswers && typeof vendor.onboarding.iraAnswers === 'object' ? vendor.onboarding.iraAnswers : {},
+            questions: IRA_QUESTIONS.map((question) => ({ key: question.key, part: question.part, question: question.question, options: question.options })),
         },
         intake: {
             sections: (template?.sections || []).map((section) => ({
@@ -938,7 +985,9 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
             confirmedTier: vendor.onboarding.confirmedTier ? TIER_LABEL[vendor.onboarding.confirmedTier] : null,
             score: vendor.onboarding.recommendedScore,
             maxScore: 3,
-            explanation: `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from the recorded inherent-risk average of ${vendor.onboarding.recommendedScore} of 3` : ''}.`,
+            explanation: vendor.onboarding.iraAnswers
+                ? `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from inherent-risk score ${vendor.onboarding.recommendedScore}%` : ''}.`
+                : `Supreme recommends ${TIER_LABEL[vendor.onboarding.recommendedTier]}${vendor.onboarding.recommendedScore != null ? ` from the recorded inherent-risk average of ${vendor.onboarding.recommendedScore} of 3` : ''}.`,
             factors: vendor.onboarding.recommendedFactors,
             hardFloors: vendor.onboarding.hardFloors,
             overrideReason: vendor.onboarding.overrideReason,

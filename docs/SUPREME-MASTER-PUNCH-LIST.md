@@ -776,4 +776,4 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **PRODUCT LEADERSHIP ACCEPTANCE FINDING:** TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow.
 
-**NEXT ACTION:** Product Leadership re-reviews the corrected risk-driven Questionnaire Plan on staging after hosted golden-journey evidence. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW. Do not merge `main`. Do not deploy production. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, or #21 PASS.
+**NEXT ACTION:** Finish local Version 3 IRA verification, then host the golden journey on staging when Product Leadership authorizes staging. Product Leadership re-reviews the risk-driven Questionnaire Plan after hosted evidence. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW. Do not merge `main`. Do not deploy production. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, or #21 PASS. Authoritative flow: `docs/tprm/TPRM_Onboarding_Flow_Instructions.pdf`. ADRs: `docs/ADR-TPRM-INHERENT-RISK-SCORING.md`, `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md`.

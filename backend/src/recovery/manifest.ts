@@ -8,6 +8,7 @@ export const AUTHORITATIVE_TABLES = [
     'VendorOnboarding',
     'VendorContact',
     'VendorAssessmentInvitation',
+    'RequesterTaskLink',
     'VendorPortalSession',
     'VendorAssessment',
     'AssessmentResponse',

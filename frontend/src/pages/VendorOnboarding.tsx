@@ -9,7 +9,7 @@ import QueryState from '../components/QueryState';
 import StatusBadge from '../components/design/StatusBadge';
 import { vendorOnboardingAPI } from '../services/api';
 import { formatShortDate } from '../utils/humanizeLabel';
-import { CUSTOMER_STAGES, customerStage } from '../experience/customerStages';
+import { customerStage } from '../experience/customerStages';
 import { PageShell, SectionHeader } from '../components/experience/ExperienceKit';
 
 type Owner = { id: string; name: string; email: string };
@@ -23,6 +23,8 @@ const empty = {
     country: '',
     servicesProvided: '',
     businessOwnerUserId: '',
+    requesterName: '',
+    requesterEmail: '',
     businessUnit: '',
     estimatedAnnualSpend: '',
     targetStartDate: '',
@@ -71,6 +73,8 @@ export default function VendorOnboarding() {
                 country: form.country || undefined,
                 servicesProvided: form.servicesProvided.trim(),
                 businessOwnerUserId: form.businessOwnerUserId || undefined,
+                requesterName: form.requesterName.trim() || undefined,
+                requesterEmail: form.requesterEmail.trim() || undefined,
                 businessUnit: form.businessUnit || undefined,
                 estimatedAnnualSpend: form.estimatedAnnualSpend ? Number(form.estimatedAnnualSpend) : undefined,
                 targetStartDate: form.targetStartDate || undefined,
@@ -89,15 +93,15 @@ export default function VendorOnboarding() {
             <PageShell>
             <PageHeader
                 crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Request' }]}
-                title="Request a third party"
-                description="Name the vendor, the service, and the internal owner. Supreme then opens Assess. No questionnaire is sent to the vendor yet."
+                title="Open a third-party record"
+                description="GRC creates the vendor. Then you email or copy a secure inherent-risk link to the requester. The vendor is not invited yet."
             />
             <Stack spacing={2.5} sx={{ minWidth: 0 }}>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Surface>
                     <Box sx={{ pb: 2, mb: 0.5, borderBottom: '1px solid', borderColor: 'divider' }}>
                         <Typography sx={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.secondary' }}>New request</Typography>
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>Ask only what is needed now. After you submit, Supreme opens Assess for the internal contact. The vendor is not invited yet.</Typography>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>Create the record from the requester&apos;s email. Next you send them the inherent-risk form — email or copy link. They do not need a Supreme login.</Typography>
                     </Box>
                     <Stack component="form" onSubmit={(event) => submit(event)} spacing={0}>
                         <FormSection title="Who is this vendor?" body="Name the company. Legal name and website help Supreme recognize a duplicate.">
@@ -113,10 +117,14 @@ export default function VendorOnboarding() {
                         <FormSection title="What will they do?" body="Describe the service in one sentence. This becomes the case context.">
                             <TextField required fullWidth multiline minRows={2} label="Service or product" value={form.servicesProvided} onChange={(event) => setForm({ ...form, servicesProvided: event.target.value })} helperText={!form.servicesProvided ? 'Required. Describe the work this third party will do.' : undefined} />
                         </FormSection>
-                        <FormSection title="Who owns this internally?" body="Supreme routes the next step to this person. The vendor is not invited yet.">
+                        <FormSection title="Who asked for this vendor?" body="This person receives the inherent-risk link. They do not need a Supreme account.">
+                            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>
+                                <TextField required fullWidth label="Requester name" value={form.requesterName} onChange={(event) => setForm({ ...form, requesterName: event.target.value })} />
+                                <TextField required fullWidth type="email" label="Requester email" value={form.requesterEmail} onChange={(event) => setForm({ ...form, requesterEmail: event.target.value })} />
+                            </Stack>
                             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                                <TextField select fullWidth label="Business owner" value={form.businessOwnerUserId} onChange={(event) => setForm({ ...form, businessOwnerUserId: event.target.value })}>
-                                    <MenuItem value="">Assign after create</MenuItem>
+                                <TextField select fullWidth label="Business owner (optional)" value={form.businessOwnerUserId} onChange={(event) => setForm({ ...form, businessOwnerUserId: event.target.value })}>
+                                    <MenuItem value="">Assign later</MenuItem>
                                     {owners.map((owner) => <MenuItem key={owner.id} value={owner.id}>{owner.name}</MenuItem>)}
                                 </TextField>
                                 <TextField fullWidth label="Business unit" value={form.businessUnit} onChange={(event) => setForm({ ...form, businessUnit: event.target.value })} />
@@ -129,18 +137,21 @@ export default function VendorOnboarding() {
                             </Stack>
                         </FormSection>
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }} justifyContent="space-between" sx={{ pt: 2.5 }}>
-                            <Typography variant="body2">Next: the named internal contact answers intake. Supreme scores inherent risk and recommends tier and packs.</Typography>
-                            <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided}>Submit request</Button>
+                            <Typography variant="body2">Next: email or copy the inherent-risk link to the requester. Spend does not change the score.</Typography>
+                            <Button type="submit" variant="contained" disabled={saving || !form.name || !form.servicesProvided || !form.requesterName || !form.requesterEmail}>Create record</Button>
                         </Stack>
                     </Stack>
                 </Surface>
                 <Surface padded={false}>
                     <Box sx={{ px: { xs: 2, md: 3 }, pt: 3 }}>
-                    <SectionHeader title="Open work" body={CUSTOMER_STAGES.map((stage) => `${stage} ${rows.filter((row) => customerStage(row.stage) === stage).length}`).join(' · ')} />
+                    <SectionHeader
+                        title="Open work"
+                        body={`${rows.filter((row) => customerStage(row.stage) !== 'Monitor').length} in progress. Already onboarded vendors are under Third Parties, not a new assessment.`}
+                    />
                     </Box>
                     <AppTable
                         embedded
-                        rows={rows}
+                        rows={rows.filter((row) => customerStage(row.stage) !== 'Monitor')}
                         rowKey={(row) => row.id}
                         onRowClick={(row) => navigate(`/vendor-onboarding/${row.publicId || row.id}`)}
                         emptyTitle="No open onboarding"

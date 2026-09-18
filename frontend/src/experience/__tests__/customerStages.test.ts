@@ -29,5 +29,17 @@ describe('five-stage customer mapping', () => {
                 ],
             },
         }).label).toBe('Review 1 material issue');
+        expect(dominantNextAction({
+            stageKey: 'OFFBOARDING',
+            review: { potentialFindings: 18 },
+        }).label).toBe('This vendor is already onboarded');
+        expect(dominantNextAction({
+            stageKey: 'INTAKE',
+            ira: { required: true, sent: false, submitted: false },
+        }).label).toBe('Send the inherent-risk form');
+        expect(dominantNextAction({
+            stageKey: 'INTAKE',
+            ira: { required: true, sent: true, submitted: false },
+        }).label).toBe('Waiting on requester');
     });
 });
