@@ -397,11 +397,11 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Documented external API with tenant auth; integrations are NOT_CONFIGURED when keys are absent.
 
-**CURRENT STATUS:** ACTIVE / ENGINEERING IN PROGRESS. Hosted staging proof recorded. Not PASS.
+**CURRENT STATUS:** ACTIVE — PRODUCT LEADERSHIP REVIEW REQUIRED. Hosted recertification recorded. Not PASS.
 
-**CERTIFICATION SHA:** Implementation and hosted frontend/API `340f90818d9278a5173be3ca7be8eabba585f0cd`. Not a PASS SHA.
+**CERTIFICATION SHA:** Honesty/UI implementation and hosted frontend `7feb92de70cacfc954dc6632dbf862b61549ca53`. Hosted API `340f90818d9278a5173be3ca7be8eabba585f0cd`. SHA split is legitimate (`7feb92d` is frontend/QA only). Not a PASS SHA.
 
-**EVIDENCE:** Architecture `docs/API-INTEGRATIONS.md`. Hosted walk `docs/private-beta/hosted-ux-qa/api-integrations/`. Internal `/api/v1` session routes are not this item. Live Slack/Jira NOT TESTED.
+**EVIDENCE:** Architecture `docs/API-INTEGRATIONS.md`. Hosted recertification `docs/private-beta/hosted-ux-qa/api-integrations/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35387085923 SUCCESS. Public token ≠ session/admin/platform. Live Slack/Jira NOT TESTED. Viewer hosted RBAC SKIPPED.
 
 **NEXT ACTION:** Product Leadership review of the hosted public API, webhook, and honest integration proof. Do not start #23–#38 or #40. Do not merge `main` or deploy commercial production. Do not declare #22 PASS.
 

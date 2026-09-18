@@ -6,16 +6,6 @@
       "detail": "200"
     },
     {
-      "name": "api-sha",
-      "result": "PASS",
-      "detail": "340f90818d9278a5173be3ca7be8eabba585f0cd"
-    },
-    {
-      "name": "frontend-sha",
-      "result": "PASS",
-      "detail": "340f90818d9278a5173be3ca7be8eabba585f0cd"
-    },
-    {
       "name": "public-docs",
       "result": "PASS",
       "detail": "200"
@@ -28,7 +18,7 @@
     {
       "name": "isolated-org",
       "result": "PASS",
-      "detail": "e2801b1f"
+      "detail": "0e1a27ce"
     },
     {
       "name": "second-org",
@@ -88,7 +78,7 @@
     {
       "name": "webhook-delivery",
       "result": "PASS",
-      "detail": "200 {'id': '1a949d76-56ea-430f-be7e-30a490ff6711', 'eventId': 'evt_a2db604811a0', 'eventType': 'third_party.created', 'attempt': 1, 'status': 'DELIVERED', 'httpStatus': 200, 'durationMs': 205, 'nextRetryAt': None, 'createdAt': '2026-09-18T19:30:02.792Z', 'sentAt': '2026-09-18T19:30:02.791Z', 'responseSummary': 'HTTP 200'}"
+      "detail": "200 {'id': 'b93ac6e8-9ff0-4979-acd5-595caf03e9de', 'eventId': 'evt_de3660cdd7f1', 'eventType': 'third_party.created', 'attempt': 1, 'status': 'DELIVERED', 'httpStatus': 200, 'durationMs': 173, 'nextRetryAt': None, 'createdAt': '2026-09-18T19:56:49.367Z', 'sentAt': '2026-09-18T19:56:49.366Z', 'responseSummary': 'HTTP 200'}"
     },
     {
       "name": "webhook-forced-failure",
@@ -108,7 +98,7 @@
     {
       "name": "stable-event-id",
       "result": "PASS",
-      "detail": "evt_a2db604811a0"
+      "detail": "evt_de3660cdd7f1"
     },
     {
       "name": "slack-not-configured",
@@ -124,6 +114,16 @@
       "name": "slack-test-without-config",
       "result": "PASS",
       "detail": "409"
+    },
+    {
+      "name": "public-token-session-denied",
+      "result": "PASS",
+      "detail": "401"
+    },
+    {
+      "name": "viewer-admin-denied",
+      "result": "SKIP",
+      "detail": "invite=201 no activation token"
     },
     {
       "name": "audit-api-client",
@@ -151,9 +151,64 @@
       "detail": "SIEM/risk providers"
     },
     {
+      "name": "ui-no-test-until-configured",
+      "result": "PASS",
+      "detail": "not-configured cards"
+    },
+    {
       "name": "ui-no-connected-without-test",
       "result": "PASS",
       "detail": "proof tenant cards"
+    },
+    {
+      "name": "public-token-identity-denied",
+      "result": "PASS",
+      "detail": "401 rid=5ce2e3db-42ad-435b-9702-142e7099c6c8"
+    },
+    {
+      "name": "public-token-users-invite-denied",
+      "result": "PASS",
+      "detail": "401 rid=00ff80f0-430f-4fc3-a649-a6a0e368a0a6"
+    },
+    {
+      "name": "public-token-platform-denied",
+      "result": "PASS",
+      "detail": "401 rid=daabbc3b-a3f4-4be0-aed1-78a233c61d99"
+    },
+    {
+      "name": "public-token-support-denied",
+      "result": "PASS",
+      "detail": "401 rid=75659257-55a7-4cd7-b0ec-912bbd3c6787"
+    },
+    {
+      "name": "ssrf-loopback",
+      "result": "PASS",
+      "detail": "400 rid=b72367fd-8d9a-4b00-9e1d-0eb22ac00db6"
+    },
+    {
+      "name": "ssrf-metadata",
+      "result": "PASS",
+      "detail": "400 rid=3c5ea4b3-49f0-4bb0-beff-365b7458e181"
+    },
+    {
+      "name": "ssrf-http",
+      "result": "PASS",
+      "detail": "400 rid=7d24dd99-7ad6-4cbe-b1d0-b63e55d54ace"
+    },
+    {
+      "name": "ssrf-localhost",
+      "result": "PASS",
+      "detail": "400 rid=0bf69710-0772-413b-a2db-67cc2e5f75ad"
+    },
+    {
+      "name": "ui-integrations-375-no-test",
+      "result": "PASS",
+      "detail": "test-connection-buttons=0 overflow=false"
+    },
+    {
+      "name": "expired-credential",
+      "result": "SKIP",
+      "detail": "no safe hosted expiry without waiting or mutating TTL"
     }
   ],
   "shots": [
@@ -165,7 +220,8 @@
     "clients-1440",
     "webhooks-1440",
     "integrations-1440",
-    "activity-1440"
+    "activity-1440",
+    "integrations-375"
   ],
   "axe": [
     {
@@ -176,11 +232,15 @@
   ],
   "sha": {
     "api": "340f90818d9278a5173be3ca7be8eabba585f0cd",
-    "frontend": "340f90818d9278a5173be3ca7be8eabba585f0cd",
-    "required": "340f90818d9278a5173be3ca7be8eabba585f0cd",
+    "frontend": "7feb92de70cacfc954dc6632dbf862b61549ca53",
+    "required": "",
     "health": 200
   },
   "notes": [
-    "LIVE PROVIDER TEST: NOT TESTED \u2014 no Slack or Jira staging credentials were supplied."
+    "LIVE SLACK VALIDATION: NOT TESTED — no Slack staging credentials were supplied.",
+    "LIVE JIRA VALIDATION: NOT TESTED — no Jira staging credentials were supplied.",
+    "VIEWER HOSTED RBAC: NOT TESTED / SKIPPED — invite returned 201 with email sent; no activation token.",
+    "SHA split is legitimate: 7feb92d is frontend/QA honesty only; API remains 340f908.",
+    "Redirect-follow bypass was not re-hosted; delivery uses redirect:error and SSRF URL checks."
   ]
 }

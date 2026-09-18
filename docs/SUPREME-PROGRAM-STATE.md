@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #22 API / Webhooks / Integrations. #12 and #21 are ACCEPTED FOR CURRENT STAGE. #21 live IdP federation is deferred. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #23–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #22 ACTIVE / ENGINEERING IN PROGRESS. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #22 ACTIVE — PRODUCT LEADERSHIP REVIEW REQUIRED. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -30,7 +30,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#21:** ACCEPTED FOR CURRENT STAGE / LIVE FEDERATION DEFERRED (Product Leadership 2026-09-18). Hosted origin correction `e19f8bde268d668518b848acd6086d7723f7177d`. Live IdP federation remains a later gate. Cursor does not declare #21 PASS.
 
-**#22:** ACTIVE / ENGINEERING IN PROGRESS. Implementation and hosted frontend/API `340f90818d9278a5173be3ca7be8eabba585f0cd`. Architecture `docs/API-INTEGRATIONS.md`. Hosted walk `docs/private-beta/hosted-ux-qa/api-integrations/`. Live Slack/Jira NOT TESTED. Cursor does not declare #22 PASS. #23–#38 and #40 are not authorized.
+**#22:** ACTIVE — PRODUCT LEADERSHIP REVIEW REQUIRED. Honesty/UI implementation and hosted frontend `7feb92de70cacfc954dc6632dbf862b61549ca53`. Hosted API `340f90818d9278a5173be3ca7be8eabba585f0cd`. Architecture `docs/API-INTEGRATIONS.md`. Hosted recertification `docs/private-beta/hosted-ux-qa/api-integrations/`. Live Slack/Jira NOT TESTED. Viewer hosted RBAC SKIPPED. Cursor does not declare #22 PASS. #23–#38 and #40 are not authorized.
 
 **#12:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED (Product Leadership 2026-09-18). Not commercial GO. Not production deployment. Not immutable. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495`. Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
 
