@@ -25,7 +25,7 @@ Identity, source/provenance, observed fact, why the record exists, business/risk
 
 | Domain | Current implementation | Known gap |
 | --- | --- | --- |
-| Findings | Workspace drawer with source snapshot | Hosted memoryless review still Product Leadership |
+| Findings | Workspace drawer with source snapshot | Hosted walk 39 PASS / 0 FAIL; Product Leadership review still open |
 | Assessments | Review summary for a completed assessment | In-progress assessments still use the questionnaire runner |
 | Evidence | Organization-owned upload allowed; detail panel | Full non-vendor linkage matrix is progressive |
 | Compliance requirement | Provenance + next action | Jurisdiction is not invented when the framework definition has none |

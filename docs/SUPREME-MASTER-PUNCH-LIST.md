@@ -785,7 +785,7 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **CURRENT STATUS:** ENGINEERING PARTIAL — PRODUCT LEADERSHIP ACCEPTANCE PENDING / PRODUCT LEADERSHIP REVIEW OPEN. Enterprise Record Standard / Product Depth Remediation is ready for Product Leadership review. Finding Workspace Context Closure remains in the same unnumbered stream. UI 2.0 as a whole is not accepted.
 
-**CERTIFICATION SHA:** Record after hosted CI on this remediation. Prior Finding workspace implementation / hosted `9852e87f6016d68b907572fccf0d141f3be3a469`.
+**CERTIFICATION SHA:** Enterprise Record Standard implementation `c6b2e6e2ce13cc3e7d93321c1dc479596804b00e`. Hosted frontend `84ccf1b5daf72e62e301cd2c65e484e30fbdcb0b`. Hosted API `c6b2e6e2ce13cc3e7d93321c1dc479596804b00e`. Hosted walk 39 PASS / 0 FAIL. Prior Finding workspace implementation `9852e87f6016d68b907572fccf0d141f3be3a469` remains in the same unnumbered stream.
 
 **EVIDENCE:** `docs/product/SUPREME-ENTERPRISE-RECORD-STANDARD.md`, `docs/private-beta/hosted-ux-qa/enterprise-record-standard/`, Finding workspace `docs/private-beta/hosted-ux-qa/finding-workspace/`.
 

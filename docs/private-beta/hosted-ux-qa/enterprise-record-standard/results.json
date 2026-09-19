@@ -1,0 +1,274 @@
+{
+  "checks": [
+    {
+      "name": "api-health",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "c6b2e6e2ce13cc3e7d93321c1dc479596804b00e"
+    },
+    {
+      "name": "fe-sha",
+      "result": "PASS",
+      "detail": "84ccf1b5daf72e62e301cd2c65e484e30fbdcb0b"
+    },
+    {
+      "name": "signup",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "vendor-create-unrated",
+      "result": "PASS",
+      "detail": "201 UNRATED"
+    },
+    {
+      "name": "vendor-no-fake-compliance",
+      "result": "PASS",
+      "detail": "None"
+    },
+    {
+      "name": "finding-create",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "finding-workspace",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "finding-no-evidence-honesty",
+      "result": "PASS",
+      "detail": "missing evidence is not control failed"
+    },
+    {
+      "name": "finding-source-present",
+      "result": "PASS",
+      "detail": "source snapshot"
+    },
+    {
+      "name": "privacy-activity-create",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "privacy-no-silent-gdpr",
+      "result": "PASS",
+      "detail": "201 regimes=['UNSPECIFIED']"
+    },
+    {
+      "name": "open:vendors",
+      "result": "PASS",
+      "detail": "/vendor-management"
+    },
+    {
+      "name": "honesty:not-rated",
+      "result": "PASS",
+      "detail": "missing tier stays Not rated"
+    },
+    {
+      "name": "honesty:no-fake-compliance",
+      "result": "PASS",
+      "detail": "no invented compliance %"
+    },
+    {
+      "name": "open:findings",
+      "result": "PASS",
+      "detail": "/findings"
+    },
+    {
+      "name": "findings:distinguishable-title",
+      "result": "PASS",
+      "detail": "generated title visible"
+    },
+    {
+      "name": "open:assessments",
+      "result": "PASS",
+      "detail": "/assessments"
+    },
+    {
+      "name": "open:evidence",
+      "result": "PASS",
+      "detail": "/documents"
+    },
+    {
+      "name": "open:compliance",
+      "result": "PASS",
+      "detail": "/compliance"
+    },
+    {
+      "name": "open:decisions",
+      "result": "PASS",
+      "detail": "/decision-briefs"
+    },
+    {
+      "name": "open:risks",
+      "result": "PASS",
+      "detail": "/risks"
+    },
+    {
+      "name": "open:controls",
+      "result": "PASS",
+      "detail": "/control-center"
+    },
+    {
+      "name": "open:privacy",
+      "result": "PASS",
+      "detail": "/privacy-ops/activities"
+    },
+    {
+      "name": "honesty:no-insurance-purpose-default",
+      "result": "PASS",
+      "detail": "no insurance purpose default on generic privacy"
+    },
+    {
+      "name": "open:ai",
+      "result": "PASS",
+      "detail": "/ai-governance"
+    },
+    {
+      "name": "finding-drawer-memoryless",
+      "result": "PASS",
+      "detail": "drawer stands alone"
+    },
+    {
+      "name": "privacy-detail-no-gdpr-default",
+      "result": "PASS",
+      "detail": "regime visible as undetermined, not GDPR"
+    },
+    {
+      "name": "privacy-detail-no-claims-default",
+      "result": "PASS",
+      "detail": "purpose is not insurance default"
+    },
+    {
+      "name": "overflow:vendors-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:findings-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendors-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:findings-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendors-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:findings-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendors-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:findings-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendors-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:findings-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    }
+  ],
+  "shots": [
+    "vendors-1440",
+    "findings-1440",
+    "assessments-1440",
+    "evidence-1440",
+    "compliance-1440",
+    "decisions-1440",
+    "risks-1440",
+    "controls-1440",
+    "privacy-1440",
+    "ai-1440",
+    "finding-drawer-1440",
+    "privacy-detail-1440",
+    "vendors-375",
+    "findings-375",
+    "vendors-768",
+    "findings-768",
+    "vendors-1024",
+    "findings-1024",
+    "vendors-1440",
+    "findings-1440",
+    "vendors-1920",
+    "findings-1920"
+  ],
+  "overflows": [
+    {
+      "name": "vendors-375",
+      "extra": 0
+    },
+    {
+      "name": "findings-375",
+      "extra": 0
+    },
+    {
+      "name": "vendors-768",
+      "extra": 0
+    },
+    {
+      "name": "findings-768",
+      "extra": 0
+    },
+    {
+      "name": "vendors-1024",
+      "extra": 0
+    },
+    {
+      "name": "findings-1024",
+      "extra": 0
+    },
+    {
+      "name": "vendors-1440",
+      "extra": 0
+    },
+    {
+      "name": "findings-1440",
+      "extra": 0
+    },
+    {
+      "name": "vendors-1920",
+      "extra": 0
+    },
+    {
+      "name": "findings-1920",
+      "extra": 0
+    }
+  ],
+  "sha": {
+    "api": "c6b2e6e2ce13cc3e7d93321c1dc479596804b00e",
+    "frontend": "84ccf1b5daf72e62e301cd2c65e484e30fbdcb0b"
+  },
+  "notes": [],
+  "summary": {
+    "pass": 39,
+    "fail": 0
+  }
+}
