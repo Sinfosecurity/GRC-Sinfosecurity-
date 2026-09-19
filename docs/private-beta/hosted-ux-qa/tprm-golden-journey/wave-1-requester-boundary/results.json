@@ -1,0 +1,192 @@
+{
+  "item": "#12",
+  "wave": "1-requester-boundary",
+  "declaredPass": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "wave2Started": false,
+  "iraScoringChanged": false,
+  "steps": {
+    "lead.signup": {
+      "status": 201,
+      "detail": {
+        "nextPath": "/dashboard"
+      }
+    },
+    "invite.requester": {
+      "status": 201,
+      "detail": {
+        "hasToken": false,
+        "hasActivationUrl": false,
+        "delivery": "sent"
+      }
+    },
+    "invite.analyst": {
+      "status": 201,
+      "detail": {
+        "hasToken": false,
+        "hasActivationUrl": false,
+        "delivery": "sent"
+      }
+    },
+    "activate.requester": {
+      "status": null,
+      "detail": null
+    },
+    "activate.analyst": {
+      "status": null,
+      "detail": null
+    },
+    "requester.only.session": {
+      "status": "SKIP",
+      "detail": "Invite token was not returned after delivery=sent. Staging does not expose activation secrets. Requester-only hosted login was not fabricated."
+    },
+    "dual-role.fallback": {
+      "status": "PASS",
+      "detail": "ORG_ADMIN lead used for requester APIs plus GRC queue. This is dual-role, not requester-only."
+    },
+    "requester.create": {
+      "status": 201,
+      "detail": {
+        "publicId": "INT-2026-0001",
+        "requesterStatus": "Submitted",
+        "hasAssignmentHistory": false
+      }
+    },
+    "requester.my-requests": {
+      "status": 200,
+      "detail": {
+        "count": 1
+      }
+    },
+    "requester.denials": {
+      "status": "SKIP",
+      "detail": "No requester-only session. CI suite tprm-requester-workspace.integration.test.ts remains the authoritative denial proof."
+    },
+    "lead.queue": {
+      "status": 200,
+      "detail": {
+        "count": 1
+      }
+    },
+    "lead.assign": {
+      "status": 200,
+      "detail": {
+        "status": "ASSIGNED"
+      }
+    },
+    "analyst.request-info": {
+      "status": 200,
+      "detail": {
+        "status": "NEEDS_INFORMATION"
+      }
+    },
+    "requester.actions": {
+      "status": 200,
+      "detail": {
+        "count": 1
+      }
+    },
+    "requester.respond": {
+      "status": 200,
+      "detail": {
+        "requesterStatus": "Under review"
+      }
+    },
+    "analyst.third-party": {
+      "status": 201,
+      "detail": {
+        "status": "VENDOR_MATCHED"
+      }
+    },
+    "analyst.engagement": {
+      "status": 201,
+      "detail": {
+        "engagement": "ENG-2026-0001"
+      }
+    },
+    "requester.updated-status": {
+      "status": 200,
+      "detail": {
+        "requesterStatus": "Risk assessment required",
+        "hasAssignmentHistory": false,
+        "hasMatchCandidates": false
+      }
+    },
+    "vendor.session": {
+      "status": "SKIP",
+      "detail": "No hosted vendor portal session was created for this correction."
+    }
+  },
+  "ids": {
+    "organizationId": "c332945b-866e-4ff9-9d06-ab1c322cf492",
+    "leadEmail": "bound-lead-1789790804@wave1.example",
+    "intake": "INT-2026-0001"
+  },
+  "hosting": {
+    "frontend": {
+      "url": "https://supreme-risk-staging.onrender.com/version.json",
+      "gitSha": "5a159b474f44960c528d2249f4c2fc308eb16a08"
+    },
+    "api": {
+      "url": "https://supreme-risk-staging-api.onrender.com/health",
+      "gitSha": "5a159b474f44960c528d2249f4c2fc308eb16a08",
+      "status": "degraded",
+      "environment": "staging",
+      "postgres": "up"
+    }
+  },
+  "implementationSha": "1168f8e5e0203b1972bb9b7dbf2b089da7d4ba51",
+  "runtimeSha": "5a159b474f44960c528d2249f4c2fc308eb16a08",
+  "wave1FoundationSha": "778b870d01e0946b93c14e5d10d19e2f04cbb79f",
+  "ci": {
+    "url": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35419722854",
+    "headSha": "5a159b474f44960c528d2249f4c2fc308eb16a08",
+    "conclusion": "success"
+  },
+  "hostedWalks": {
+    "requesterOnlyLogin": "SKIP",
+    "dualRoleRequesterWorkspace": "PASS",
+    "requesterCreateMicrosoftAzure": "PASS",
+    "confirmationMinimized": "PASS",
+    "myRequests": "PASS",
+    "grcLeadQueueAssign": "PASS",
+    "needsInformationRoundTrip": "PASS",
+    "thirdPartyAndEngagement": "PASS",
+    "requesterFriendlyStatus": "PASS",
+    "noInternalFieldsInRequesterPayload": "PASS",
+    "requesterOnlyDirectUrl": "SKIP",
+    "vendorSession": "SKIP",
+    "responsive375": "PASS",
+    "responsive768Home": "PASS",
+    "responsive1024Home": "PASS",
+    "responsive1440": "PASS",
+    "responsive1920Home": "PASS",
+    "responsive768MyRequestsActions": "SKIP",
+    "responsive1024MyRequestsActions": "SKIP",
+    "responsive1920MyRequestsActions": "SKIP"
+  },
+  "overflow": {
+    "home375": false,
+    "home768": false,
+    "home1024": false,
+    "home1440": false,
+    "home1920": false,
+    "new375": false,
+    "my375": false,
+    "actions375": false
+  },
+  "screenshots": [
+    "screenshots/requester-home-375.png",
+    "screenshots/requester-home-768.png",
+    "screenshots/requester-home-1024.png",
+    "screenshots/requester-home-1440.png",
+    "screenshots/requester-home-1920.png",
+    "screenshots/requester-new-375.png",
+    "screenshots/requester-new-1440.png",
+    "screenshots/requester-my-requests-375.png",
+    "screenshots/requester-my-requests-1440.png",
+    "screenshots/requester-actions-375.png",
+    "screenshots/requester-actions-1440.png"
+  ]
+}

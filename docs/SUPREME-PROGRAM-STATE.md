@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 REQUESTER-EXPERIENCE BOUNDARY CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f` preserved. Boundary correction `1168f8e5e0203b1972bb9b7dbf2b089da7d4ba51`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 REQUESTER-EXPERIENCE BOUNDARY CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f` preserved. Boundary correction `1168f8e5e0203b1972bb9b7dbf2b089da7d4ba51`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35419722854 PASS on `5a159b4`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 
