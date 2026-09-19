@@ -12,5 +12,6 @@ describe('portal detection', () => {
         expect(postLoginPath({ plane: 'PLATFORM', nextPath: '/platform' })).toBe('/platform');
         expect(postLoginPath({ enrollOnly: true })).toBe('/admin/mfa/enroll');
         expect(postLoginPath({ plane: 'CUSTOMER' })).toBe('/dashboard');
+        expect(postLoginPath({ plane: 'CUSTOMER', role: 'BUSINESS_OWNER' })).toBe('/request');
     });
 });

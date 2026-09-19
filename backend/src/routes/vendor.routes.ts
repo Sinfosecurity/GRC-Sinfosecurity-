@@ -116,7 +116,7 @@ router.use('/onboarding', vendorOnboardingRoutes);
  *       429:
  *         $ref: '#/components/responses/RateLimitExceeded'
  */
-router.get('/', validateQuery(VendorListQuerySchema), async (req: any, res) => {
+router.get('/', requirePermission(PERMISSIONS['vendor.read']), validateQuery(VendorListQuerySchema), async (req: any, res) => {
     try {
         const { tier, status, vendorType, category, search, hasOverdueReview, page = 1, pageSize = 20 } = req.query;
 
@@ -174,7 +174,7 @@ router.get('/attention', async (req: any, res) => {
  * GET /api/vendors/:id
  * Get vendor by ID with all relations
  */
-router.get('/:id', validateUUID('id'), async (req: any, res) => {
+router.get('/:id', requirePermission(PERMISSIONS['vendor.read']), validateUUID('id'), async (req: any, res) => {
     try {
         const vendor = await vendorManagementService.getVendorById(
             req.params.id,
@@ -295,7 +295,7 @@ router.post('/:id/offboard', requirePermission(PERMISSIONS['vendor.update']), va
  * GET /api/vendors/:id/assessments
  * List assessments for vendor
  */
-router.get('/:id/assessments', async (req: any, res) => {
+router.get('/:id/assessments', requirePermission(PERMISSIONS['assessment.read']), async (req: any, res) => {
     try {
         const assessments = await vendorAssessmentService.listVendorAssessments(
             req.params.id,

@@ -516,6 +516,16 @@ export const governanceAPI = {
     exportGraph: () => api.get('/governance/export'),
 };
 
+export const requesterAPI = {
+    home: () => api.get('/tprm/requester/home'),
+    list: () => api.get('/tprm/requester/intakes'),
+    actions: () => api.get('/tprm/requester/actions'),
+    colleagues: () => api.get('/tprm/requester/colleagues'),
+    create: (data: unknown) => api.post('/tprm/requester/intakes', data),
+    get: (id: string) => api.get(`/tprm/requester/intakes/${id}`),
+    respond: (id: string, data: unknown) => api.post(`/tprm/requester/intakes/${id}/information-response`, data),
+};
+
 export const intakeAPI = {
     create: (data: unknown) => api.post('/tprm/intakes', data),
     list: (params?: unknown) => api.get('/tprm/intakes', { params }),

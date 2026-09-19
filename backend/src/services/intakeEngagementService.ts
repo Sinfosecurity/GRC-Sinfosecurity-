@@ -46,7 +46,19 @@ const ROUTING_KEYS = [
 const INFO_FIELDS = ['proposedThirdPartyName', 'proposedServiceName', 'businessPurpose', 'businessOwner', 'targetStartDate', 'procurementReference', 'other'] as const;
 
 function canCreate(actor: Actor) {
+    return hasPermission(actor.role, PERMISSIONS['intake.create']) || hasPermission(actor.role, PERMISSIONS['intake.create_own']);
+}
+
+function canCreatePractitioner(actor: Actor) {
     return hasPermission(actor.role, PERMISSIONS['intake.create']);
+}
+
+function canReadOwn(actor: Actor) {
+    return hasPermission(actor.role, PERMISSIONS['intake.read_own']) || canCreate(actor);
+}
+
+function canRespondOwn(actor: Actor) {
+    return hasPermission(actor.role, PERMISSIONS['intake.respond_own']) || canCreate(actor);
 }
 
 function canRead(actor: Actor) {
@@ -62,7 +74,13 @@ function canTriage(actor: Actor) {
 }
 
 function canSeeQueue(actor: Actor) {
-    return canAssign(actor) || canTriage(actor) || (canRead(actor) && !canCreate(actor));
+    return canAssign(actor) || canTriage(actor) || (canRead(actor) && !canCreatePractitioner(actor) && !hasPermission(actor.role, PERMISSIONS['intake.create_own']));
+}
+
+function assertRequesterOwn(actor: Actor) {
+    if (!canReadOwn(actor) && !canRespondOwn(actor)) {
+        throw new ApiError(403, 'You cannot use the requester workspace.');
+    }
 }
 
 function statusIn(status: IntakeStatus, allowed: IntakeStatus[]) {
@@ -324,6 +342,66 @@ function statusLabel(status: IntakeStatus) {
     }
 }
 
+function requesterStatus(status: IntakeStatus, engagementStatus?: EngagementStatus | null) {
+    switch (status) {
+        case IntakeStatus.SUBMITTED:
+        case IntakeStatus.UNASSIGNED: return 'Submitted';
+        case IntakeStatus.ASSIGNED: return 'Assigned for review';
+        case IntakeStatus.IN_REVIEW: return 'Under review';
+        case IntakeStatus.NEEDS_INFORMATION: return 'More information needed';
+        case IntakeStatus.READY_FOR_MATCH:
+        case IntakeStatus.VENDOR_MATCHED: return 'Third party identified';
+        case IntakeStatus.ENGAGEMENT_CREATED:
+            return engagementStatus === EngagementStatus.READY_FOR_IRA ? 'Risk assessment required' : 'Engagement created';
+        case IntakeStatus.CANCELLED: return 'Cancelled';
+        case IntakeStatus.REJECTED: return 'Rejected';
+        case IntakeStatus.DUPLICATE: return 'Closed as duplicate';
+        default: return 'Completed';
+    }
+}
+
+function presentRequesterIntake(row: Parameters<typeof presentIntake>[0]) {
+    const openAction = (row.informationRequests || []).find((item) => !item.respondedAt);
+    return {
+        id: row.id,
+        publicId: row.publicId,
+        proposedThirdPartyName: row.proposedThirdPartyName,
+        proposedServiceName: row.proposedServiceName,
+        businessPurpose: row.businessPurpose,
+        requesterName: row.requesterName,
+        requesterEmail: row.requesterEmail,
+        requesterBusinessUnit: row.requesterBusinessUnit,
+        businessOwnerName: row.businessOwnerName,
+        businessOwnerEmail: row.businessOwnerEmail,
+        vendorWebsite: row.vendorWebsite,
+        targetStartDate: row.targetStartDate,
+        procurementReference: row.procurementReference,
+        submittedAt: row.submittedAt,
+        updatedAt: row.updatedAt,
+        completedAt: row.completedAt,
+        requesterStatus: requesterStatus(row.status, row.createdEngagement?.status),
+        actionRequired: row.status === IntakeStatus.NEEDS_INFORMATION || Boolean(openAction),
+        actionType: openAction ? 'INTAKE_INFORMATION_REQUEST' : null,
+        nextStep: row.status === IntakeStatus.NEEDS_INFORMATION
+            ? 'GRC asked for more information.'
+            : row.status === IntakeStatus.ENGAGEMENT_CREATED
+                ? 'The TPRM team created an engagement. They will contact you if a risk assessment is needed.'
+                : 'The TPRM team will review your request and contact you if more information is needed.',
+        matchedThirdPartyName: row.matchedVendor?.name || null,
+        engagementPublicId: row.createdEngagement?.publicId || null,
+        informationRequests: (row.informationRequests || []).map((item) => ({
+            id: item.id,
+            type: 'INTAKE_INFORMATION_REQUEST',
+            fields: item.fields,
+            requestNote: item.requestNote,
+            requestedBy: 'GRC team',
+            requestedAt: item.requestedAt,
+            response: item.response,
+            respondedAt: item.respondedAt,
+        })),
+    };
+}
+
 function nextIntakeAction(status: IntakeStatus) {
     switch (status) {
         case IntakeStatus.SUBMITTED:
@@ -504,6 +582,11 @@ export async function createIntakeRequest(organizationId: string, actor: Actor, 
 }) {
     assertNotVendorPlane(actor);
     if (!canCreate(actor)) throw new ApiError(403, 'You cannot submit a third-party request.');
+    const ownerName = String(input.businessOwnerName || '').trim();
+    const ownerEmail = String(input.businessOwnerEmail || '').trim();
+    if ((ownerName && !ownerEmail) || (ownerEmail && !ownerName)) {
+        throw new ApiError(400, 'If a business owner is known, include both name and work email.');
+    }
     const proposedThirdPartyName = String(input.proposedThirdPartyName || '').trim();
     const proposedServiceName = String(input.proposedServiceName || '').trim();
     const businessPurpose = String(input.businessPurpose || '').trim();
@@ -551,7 +634,7 @@ export async function createIntakeRequest(organizationId: string, actor: Actor, 
     const ackMail = genericOperationalEmail({
         subject: `We received your third-party request ${created.publicId}`,
         body: `Thank you. Your third-party request has been submitted.\n\nReference: ${created.publicId}\nProposed third party: ${proposedThirdPartyName}\nService: ${proposedServiceName}\nCurrent status: Submitted for GRC review.`,
-        cta: { label: 'View request', url: customerAppUrl(`/third-parties/intake/${created.id}`) },
+        cta: { label: 'View request', url: customerAppUrl(`/request/${created.publicId}`) },
     });
     const requesterAck = await notifyActor(organizationId, actor.id, 'intake.submitted', ackMail.subject, ackMail.text, 'IntakeRequest', created.id, { emailBody: ackMail.text, emailHtml: ackMail.html, fromName: ackMail.fromName });
     const leads = await leadUsers(organizationId);
@@ -591,7 +674,7 @@ export async function listIntakeRequests(organizationId: string, actor: Actor, q
     sort?: string;
 }) {
     assertNotVendorPlane(actor);
-    if (!canRead(actor) && !canCreate(actor)) throw new ApiError(403, 'You cannot view intake requests.');
+    if (!canSeeQueue(actor)) throw new ApiError(403, 'You cannot view the GRC intake queue.');
     const page = Math.max(1, Number(query.page || 1));
     const pageSize = Math.min(100, Math.max(1, Number(query.pageSize || 25)));
     const filter = String(query.filter || '').toLowerCase();
@@ -657,7 +740,7 @@ export async function getIntakeRequest(organizationId: string, actor: Actor, key
 
 export async function listMyTprmWork(organizationId: string, actor: Actor) {
     assertNotVendorPlane(actor);
-    if (!canRead(actor) && !canCreate(actor)) throw new ApiError(403, 'You cannot view TPRM work.');
+    if (!canTriage(actor) && !canAssign(actor) && !canSeeQueue(actor)) throw new ApiError(403, 'You cannot view TPRM work.');
     const now = new Date();
     const ownOrAssigned: Prisma.IntakeRequestWhereInput = canTriage(actor) || canAssign(actor)
         ? { organizationId, OR: [{ assignedAnalystUserId: actor.id }, { status: { in: [IntakeStatus.SUBMITTED, IntakeStatus.UNASSIGNED] } }] }
@@ -826,11 +909,11 @@ export async function requestIntakeInformation(organizationId: string, actor: Ac
         informationRequestId: created.id,
         fields,
     });
-    const ctaUrl = customerAppUrl(`/intake-info?token=${rawToken}`);
+    const ctaUrl = customerAppUrl(`/request/actions`);
     const mail = genericOperationalEmail({
         subject: `Action required: more information for ${updated.publicId}`,
-        body: `GRC needs more information about ${updated.proposedThirdPartyName} · ${updated.proposedServiceName}.\n\n${note}`,
-        cta: { label: 'Respond securely', url: ctaUrl },
+        body: `GRC needs more information about ${updated.proposedThirdPartyName} · ${updated.proposedServiceName}.\n\n${note}\n\nSign in to your requester workspace to respond.`,
+        cta: { label: 'Open Actions Required', url: ctaUrl },
     });
     if (updated.requesterUserId) {
         await notifyActor(organizationId, updated.requesterUserId, 'intake.information_requested', mail.subject, mail.text, 'IntakeRequest', updated.id, { emailBody: mail.text, emailHtml: mail.html, fromName: mail.fromName });
@@ -924,6 +1007,11 @@ async function applyInformationResponse(organizationId: string, intakeId: string
     await audit(organizationId, respondedBy, 'intake.information_received', 'IntakeRequest', intake.id, {
         informationRequestId: pending.id,
     });
+    if (respondedBy) {
+        await audit(organizationId, respondedBy, 'requester.information_response.submitted', 'IntakeRequest', intake.id, {
+            informationRequestId: pending.id,
+        });
+    }
     await notifyActor(
         organizationId,
         updated.assignedAnalystUserId,
@@ -1212,6 +1300,100 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
     });
     if (!row) throw new ApiError(404, 'Engagement not found.');
     return presentEngagement(row, await usersByIds(organizationId, [row.assignedAnalystUserId, row.requesterUserId]));
+}
+
+export async function createRequesterIntake(organizationId: string, actor: Actor, input: Parameters<typeof createIntakeRequest>[2]) {
+    assertRequesterOwn(actor);
+    const created = await createIntakeRequest(organizationId, actor, input);
+    const intake = await loadIntake(organizationId, created.id);
+    if (!intake) throw new ApiError(404, 'Intake request not found.');
+    return {
+        ...presentRequesterIntake(intake),
+        confirmation: created.confirmation,
+        requesterAcknowledgement: created.requesterAcknowledgement,
+        whatHappensNext: 'The TPRM team will review your request and contact you if more information is needed.',
+    };
+}
+
+export async function listRequesterIntakes(organizationId: string, actor: Actor) {
+    assertNotVendorPlane(actor);
+    assertRequesterOwn(actor);
+    const rows = await prisma.intakeRequest.findMany({
+        where: {
+            organizationId,
+            OR: [{ requesterUserId: actor.id }, { requesterEmail: { equals: actor.email, mode: 'insensitive' } }],
+        },
+        include: intakeInclude,
+        orderBy: { submittedAt: 'desc' },
+        take: 100,
+    });
+    return { items: rows.map((row) => presentRequesterIntake(row)) };
+}
+
+export async function getRequesterIntake(organizationId: string, actor: Actor, key: string) {
+    assertNotVendorPlane(actor);
+    assertRequesterOwn(actor);
+    const intake = await loadIntake(organizationId, key);
+    if (!intake || !isOwn(intake, actor)) throw new ApiError(404, 'Request not found.');
+    await audit(organizationId, actor.id, 'requester.intake.viewed', 'IntakeRequest', intake.id, { publicId: intake.publicId });
+    return presentRequesterIntake(intake);
+}
+
+export async function listRequesterActions(organizationId: string, actor: Actor) {
+    const { items } = await listRequesterIntakes(organizationId, actor);
+    return {
+        items: items.flatMap((row) => row.informationRequests.filter((item) => !item.respondedAt).map((item) => ({
+            id: item.id,
+            type: item.type,
+            intakeId: row.id,
+            publicId: row.publicId,
+            proposedThirdPartyName: row.proposedThirdPartyName,
+            proposedServiceName: row.proposedServiceName,
+            requestNote: item.requestNote,
+            fields: item.fields,
+            requestedBy: item.requestedBy,
+            requestedAt: item.requestedAt,
+            dueAt: null,
+        }))),
+    };
+}
+
+export async function requesterHome(organizationId: string, actor: Actor) {
+    await audit(organizationId, actor.id, 'requester.workspace.opened', 'Organization', organizationId, {});
+    const [requests, actions] = await Promise.all([
+        listRequesterIntakes(organizationId, actor),
+        listRequesterActions(organizationId, actor),
+    ]);
+    return {
+        recent: requests.items.slice(0, 8),
+        actions: actions.items,
+        counts: {
+            requests: requests.items.length,
+            actionsRequired: actions.items.length,
+        },
+    };
+}
+
+export async function respondRequesterInformation(organizationId: string, actor: Actor, key: string, input: { informationRequestId?: string; response?: string; updates?: Record<string, unknown> }) {
+    assertRequesterOwn(actor);
+    if (!canRespondOwn(actor)) throw new ApiError(403, 'You cannot respond to this request.');
+    await respondIntakeInformation(organizationId, actor, key, input);
+    return getRequesterIntake(organizationId, actor, key);
+}
+
+export async function listRequesterColleagues(organizationId: string, actor: Actor) {
+    assertRequesterOwn(actor);
+    const users = await prisma.user.findMany({
+        where: { organizationId, status: 'ACTIVE' },
+        select: { id: true, firstName: true, lastName: true, email: true },
+        orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
+        take: 100,
+    });
+    return users.map((user) => ({
+        id: user.id,
+        name: `${user.firstName} ${user.lastName}`.trim() || user.email,
+        email: user.email,
+    }));
 }
 
 export async function backfillLegacyEngagements(organizationId?: string) {

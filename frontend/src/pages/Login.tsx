@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { environmentLabel } from '../components/DevPreviewBanner';
 import MarketingLayout from '../marketing/MarketingLayout';
 import { authAPI } from '../services/api';
+import { postLoginPath } from '../platform/portal';
 
 export default function Login() {
     const { login } = useAuth();
@@ -45,7 +46,7 @@ export default function Login() {
                 navigate('/admin/mfa/enroll');
                 return;
             }
-            navigate(typeof result.nextPath === 'string' ? result.nextPath : '/dashboard');
+            navigate(postLoginPath(result.user as { role?: string; nextPath?: string; plane?: string; enrollOnly?: boolean; permissions?: string[] } | undefined));
         } catch (err: any) {
             setError(err.status === 429
                 ? 'Too many requests were made in a short period. Please wait a moment and try again.'

@@ -56,4 +56,31 @@ describe('ProtectedRoute', () => {
             expect(screen.getByText('Protected Content')).toBeInTheDocument();
         });
     });
+
+    it('keeps a requester-only session out of the GRC workspace', async () => {
+        localStorage.setItem(
+            'user',
+            JSON.stringify({
+                id: 'req-1',
+                email: 'pat@example.test',
+                firstName: 'Pat',
+                lastName: 'Requester',
+                role: 'BUSINESS_OWNER',
+                organizationId: 'org1',
+                permissions: ['intake.create_own', 'intake.read_own', 'intake.respond_own'],
+            })
+        );
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/dashboard']}>
+                <AuthProvider>
+                    <ProtectedRoute workspace="grc">
+                        <div>GRC shell</div>
+                    </ProtectedRoute>
+                </AuthProvider>
+            </MemoryRouter>
+        );
+        await waitFor(() => {
+            expect(screen.queryByText('GRC shell')).not.toBeInTheDocument();
+        });
+    });
 });

@@ -9,9 +9,14 @@ export const PERMISSIONS = {
     'vendor.update': 'vendor.update',
     'vendor.delete': 'vendor.delete',
     'intake.create': 'intake.create',
+    'intake.create_own': 'intake.create_own',
     'intake.read': 'intake.read',
+    'intake.read_own': 'intake.read_own',
+    'intake.respond_own': 'intake.respond_own',
     'intake.assign': 'intake.assign',
     'intake.triage': 'intake.triage',
+    'ira.complete_own': 'ira.complete_own',
+    'ira.clarify_own': 'ira.clarify_own',
     'assessment.read': 'assessment.read',
     'assessment.create': 'assessment.create',
     'assessment.respond': 'assessment.respond',
@@ -197,6 +202,52 @@ const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['intake.read'],
 ];
 
+const REQUESTER_OWN: Permission[] = [
+    PERMISSIONS['intake.create_own'],
+    PERMISSIONS['intake.read_own'],
+    PERMISSIONS['intake.respond_own'],
+    PERMISSIONS['ira.complete_own'],
+    PERMISSIONS['ira.clarify_own'],
+    PERMISSIONS['notification.read'],
+];
+
+export const PRACTITIONER_WORKSPACE_PERMISSIONS: Permission[] = [
+    PERMISSIONS['vendor.read'],
+    PERMISSIONS['intake.read'],
+    PERMISSIONS['intake.assign'],
+    PERMISSIONS['intake.triage'],
+    PERMISSIONS['assessment.read'],
+    PERMISSIONS['finding.read'],
+    PERMISSIONS['approval.read'],
+    PERMISSIONS['risk.read'],
+    PERMISSIONS['compliance.read'],
+    PERMISSIONS['intelligence.read'],
+    PERMISSIONS['automation.read'],
+    PERMISSIONS['organization.manage'],
+    PERMISSIONS['user.manage'],
+    PERMISSIONS['identity.manage'],
+];
+
+export function hasRequesterWorkspace(role: string | undefined | null): boolean {
+    return hasAnyPermission(role, [
+        PERMISSIONS['intake.create_own'],
+        PERMISSIONS['intake.read_own'],
+        PERMISSIONS['intake.respond_own'],
+        PERMISSIONS['intake.create'],
+    ]);
+}
+
+export function hasPractitionerWorkspace(role: string | undefined | null): boolean {
+    return hasAnyPermission(role, PRACTITIONER_WORKSPACE_PERMISSIONS);
+}
+
+export function customerLandingPath(role: string | undefined | null): string {
+    const requester = hasRequesterWorkspace(role);
+    const practitioner = hasPractitionerWorkspace(role);
+    if (requester && !practitioner) return '/request';
+    return '/dashboard';
+}
+
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
     PLATFORM_OWNER: PLATFORM_OWNER_PERMS,
     PLATFORM_ADMIN: PLATFORM_OWNER_PERMS,
@@ -273,6 +324,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['automation.retry'],
         PERMISSIONS['insurance.manage'],
         PERMISSIONS['intake.create'],
+        ...REQUESTER_OWN,
         PERMISSIONS['intake.assign'],
         PERMISSIONS['intake.triage'],
     ],
@@ -306,6 +358,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['intelligence.report'],
         PERMISSIONS['insurance.manage'],
         PERMISSIONS['intake.create'],
+        ...REQUESTER_OWN,
         PERMISSIONS['intake.triage'],
     ],
     APPROVER: [
@@ -332,13 +385,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['intelligence.report'],
     ],
     BUSINESS_OWNER: [
-        ...READ_PORTFOLIO,
-        PERMISSIONS['vendor.create'],
-        PERMISSIONS['vendor.update'],
-        PERMISSIONS['assessment.respond'],
-        PERMISSIONS['evidence.upload'],
-        PERMISSIONS['finding.read'],
-        PERMISSIONS['intake.create'],
+        ...REQUESTER_OWN,
     ],
     AUDITOR: [
         ...READ_PORTFOLIO,

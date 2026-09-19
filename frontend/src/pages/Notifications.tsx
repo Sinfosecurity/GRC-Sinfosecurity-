@@ -9,6 +9,8 @@ import QueryState from '../components/QueryState';
 import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { formatDateTime, humanizeEventType } from '../utils/humanizeLabel';
 import { notificationAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import { hasPractitionerWorkspace, hasRequesterWorkspace } from '../requester/workspace';
 
 type Notice = {
     id: string;
@@ -21,8 +23,12 @@ type Notice = {
     createdAt: string;
 };
 
-function destination(row: Notice) {
-    if (row.resourceType === 'IntakeRequest' && row.resourceId) return `/third-parties/intake/${row.resourceId}`;
+function destination(row: Notice, permissions?: string[], role?: string) {
+    if (row.resourceType === 'IntakeRequest' && row.resourceId) {
+        return hasRequesterWorkspace(permissions, role) && !hasPractitionerWorkspace(permissions)
+            ? `/request/${row.resourceId}`
+            : `/third-parties/intake/${row.resourceId}`;
+    }
     if (row.resourceType === 'Engagement' && row.resourceId) return `/third-parties/engagements/${row.resourceId}`;
     if (row.resourceType === 'Vendor' && row.resourceId) return `/vendor-onboarding/${row.resourceId}`;
     if (row.resourceType === 'VendorAssessment') return '/assessments';
@@ -34,6 +40,7 @@ function destination(row: Notice) {
 
 export default function Notifications() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [items, setItems] = useState<Notice[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -60,7 +67,7 @@ export default function Notifications() {
                 // Opening the destination still matters if mark-read fails.
             }
         }
-        navigate(destination(row));
+        navigate(destination(row, user?.permissions, user?.role));
     };
 
     return (

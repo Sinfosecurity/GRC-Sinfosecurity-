@@ -48,6 +48,7 @@ import {
 } from '@mui/icons-material';
 import { color } from '../design/tokens';
 import { canSeeNav, type NavPermission } from '../security/navAccess';
+import { hasRequesterWorkspace, rememberWorkspace } from '../requester/workspace';
 import { healthCheck, organizationAPI } from '../services/api';
 
 const EXPANDED = 248;
@@ -63,9 +64,8 @@ const menuSections: NavSection[] = [
         items: [
             { text: 'Home', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' },
             { text: 'Third Parties', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
-            { text: 'Request', path: '/third-parties/request', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.create' },
             { text: 'Intake', path: '/third-parties/intake', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.read' },
-            { text: 'My Work', path: '/third-parties/my-work', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.create' },
+            { text: 'My Work', path: '/third-parties/my-work', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.triage' },
             { text: 'Onboard', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
             { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
@@ -399,6 +399,9 @@ export default function Layout() {
                     </Typography>
                     <Menu anchorEl={menuEl} open={Boolean(menuEl)} onClose={() => setMenuEl(null)}>
                         <MenuItem disabled>{user?.email}</MenuItem>
+                        {hasRequesterWorkspace(user?.permissions, user?.role) && (
+                            <MenuItem onClick={() => { setMenuEl(null); rememberWorkspace('requester'); navigate('/request'); }}>Open requester workspace</MenuItem>
+                        )}
                         <MenuItem onClick={() => { setMenuEl(null); navigate('/organization-settings'); }}>Organization</MenuItem>
                         <MenuItem onClick={() => { setCollapsed((value) => !value); setMenuEl(null); }}>
                             {collapsed ? 'Expand navigation' : 'Collapse navigation'}

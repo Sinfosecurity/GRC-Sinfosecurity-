@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-19 (#12 Wave 1 hosted Golden Walk recorded; not #12 PASS)
+**LAST UPDATED:** 2026-09-19 (#12 Wave 1 requester-experience boundary correction; not #12 PASS)
 
-**CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 1. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
+**CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 1 requester-experience boundary. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW. Phase 0 lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 stops at Engagement creation. Wave 2 not started. IRA scoring not changed. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 REQUESTER-EXPERIENCE BOUNDARY CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. Phase 0 lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f` preserved. Wave 2 not started. IRA scoring not changed. Cursor does not declare #12 PASS, Wave 1 accepted, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW. Wave 1 implementation / hosted runtime `778b870d01e0946b93c14e5d10d19e2f04cbb79f`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35417211492 PASS. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 REQUESTER-EXPERIENCE BOUNDARY CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f` preserved. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

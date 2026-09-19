@@ -2,9 +2,12 @@ import React from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import LockIcon from '@mui/icons-material/Lock';
+import { useAuth } from '../contexts/AuthContext';
+import { customerLandingPath } from '../requester/workspace';
 
 const Unauthorized: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <Container maxWidth="sm">
@@ -25,10 +28,10 @@ const Unauthorized: React.FC = () => {
         </Typography>
         <Button
           variant="contained"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(customerLandingPath(user))}
           sx={{ mt: 2 }}
         >
-          Return to Dashboard
+          Return to your workspace
         </Button>
       </Box>
     </Container>

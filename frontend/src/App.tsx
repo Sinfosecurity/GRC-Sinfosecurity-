@@ -32,7 +32,13 @@ const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
 const VendorOnboardingWorkspace = lazy(() => import('./pages/VendorOnboardingWorkspace'));
 const VendorAssessmentActivate = lazy(() => import('./pages/VendorAssessmentActivate'));
 const RequesterIra = lazy(() => import('./pages/RequesterIra'));
-const ThirdPartyIntakeForm = lazy(() => import('./pages/ThirdPartyIntakeForm'));
+const RequesterLayout = lazy(() => import('./requester/RequesterLayout'));
+const RequesterHome = lazy(() => import('./requester/RequesterHome'));
+const RequesterNewRequest = lazy(() => import('./requester/RequesterNewRequest'));
+const RequesterMyRequests = lazy(() => import('./requester/RequesterMyRequests'));
+const RequesterActions = lazy(() => import('./requester/RequesterActions'));
+const RequesterRequestDetail = lazy(() => import('./requester/RequesterRequestDetail'));
+const RequesterHelp = lazy(() => import('./requester/RequesterHelp'));
 const ThirdPartyIntakeQueue = lazy(() => import('./pages/ThirdPartyIntakeQueue'));
 const ThirdPartyMyWork = lazy(() => import('./pages/ThirdPartyMyWork'));
 const ThirdPartyIntakeDetail = lazy(() => import('./pages/ThirdPartyIntakeDetail'));
@@ -197,7 +203,16 @@ export default function App() {
                     <Route path="/activate" element={<Activate />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />
-                <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                    <Route path="/third-parties/request" element={<Navigate to="/request/new" replace />} />
+                <Route element={<ProtectedRoute workspace="requester"><RequesterLayout /></ProtectedRoute>}>
+                    <Route path="/request" element={<RequesterHome />} />
+                    <Route path="/request/new" element={<RequesterNewRequest />} />
+                    <Route path="/request/my-requests" element={<RequesterMyRequests />} />
+                    <Route path="/request/actions" element={<RequesterActions />} />
+                    <Route path="/request/help" element={<RequesterHelp />} />
+                    <Route path="/request/:publicId" element={<RequesterRequestDetail />} />
+                </Route>
+                <Route element={<ProtectedRoute workspace="grc"><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/notifications" element={<Notifications />} />
                     <Route path="risk-management" element={LEGACY_ENABLED ? <RiskManagement /> : <Navigate to="/risks" replace />} />
@@ -280,7 +295,6 @@ export default function App() {
                     <Route path="predictive-analytics" element={LEGACY_ENABLED ? <PredictiveAnalytics /> : <LegacyQuarantine />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="vendor-management" element={<VendorManagement />} />
-                    <Route path="third-parties/request" element={<ThirdPartyIntakeForm />} />
                     <Route path="third-parties/intake" element={<ThirdPartyIntakeQueue />} />
                     <Route path="third-parties/my-work" element={<ThirdPartyMyWork />} />
                     <Route path="third-parties/intake/:id" element={<ThirdPartyIntakeDetail />} />

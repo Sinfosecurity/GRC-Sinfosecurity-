@@ -98,7 +98,11 @@ describe('RBAC', () => {
         expect(hasPermission('VIEWER', PERMISSIONS['intake.assign'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['intake.create'])).toBe(false);
         expect(hasPermission('VIEWER', PERMISSIONS['intake.read'])).toBe(true);
-        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.create'])).toBe(true);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.create'])).toBe(false);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.create_own'])).toBe(true);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.read'])).toBe(false);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['vendor.read'])).toBe(false);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['finding.read'])).toBe(false);
         expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.assign'])).toBe(false);
         expect(hasPermission('ASSESSOR', PERMISSIONS['intake.triage'])).toBe(true);
         expect(hasPermission('ASSESSOR', PERMISSIONS['intake.assign'])).toBe(false);

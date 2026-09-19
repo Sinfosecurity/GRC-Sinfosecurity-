@@ -2,7 +2,7 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { Role, UserAccountStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 import { getEnv } from '../config/env';
-import { canonicalizeRole, isPlatformStaffRole, permissionsForRole } from '../security/rbac';
+import { canonicalizeRole, customerLandingPath, isPlatformStaffRole, permissionsForRole } from '../security/rbac';
 import { AuthPlane, CUSTOMER_PLANE, MFA_REQUIRED_ROLES, PLATFORM_PLANE } from '../security/sessionPlane';
 import { hashPassword, hashToken, randomToken, validatePasswordPolicy, verifyPassword } from './passwordService';
 import { recordAudit } from './auditEventService';
@@ -56,7 +56,7 @@ function toPublicUser(user: {
         mfaEnabled: user.mfaEnabled === true,
         mfaSatisfied: session?.mfaSatisfied === true,
         enrollOnly: session?.enrollOnly === true,
-        nextPath: plane === PLATFORM_PLANE ? '/platform' : '/dashboard',
+        nextPath: plane === PLATFORM_PLANE ? '/platform' : customerLandingPath(user.role),
     };
 }
 

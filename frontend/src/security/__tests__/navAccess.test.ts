@@ -16,6 +16,9 @@ describe('canSeeNav', () => {
         expect(canSeeNav('ASSESSOR', 'identity.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'billing.manage')).toBe(false);
         expect(canSeeNav('VIEWER', 'platform')).toBe(false);
+        expect(canSeeNav('BUSINESS_OWNER', 'vendor.read')).toBe(false);
+        expect(canSeeNav('BUSINESS_OWNER', 'intake.read')).toBe(false);
+        expect(canSeeNav('BUSINESS_OWNER', 'finding.read')).toBe(false);
     });
 
     it('shows tenant administration to organization admins only', () => {

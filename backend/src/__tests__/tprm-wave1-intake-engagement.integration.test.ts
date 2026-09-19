@@ -102,8 +102,15 @@ describe('#12 Wave 1 intake assignment and engagement foundation', () => {
         const requesterQueue = await request(app)
             .get(`${API}/tprm/intakes`)
             .set('Authorization', `Bearer ${requesterToken}`);
-        expect(requesterQueue.status).toBe(200);
-        expect(requesterQueue.body.data.items.every((row: { id: string }) => row.id === intakeId)).toBe(true);
+        expect(requesterQueue.status).toBe(403);
+
+        const own = await request(app)
+            .get(`${API}/tprm/requester/intakes`)
+            .set('Authorization', `Bearer ${requesterToken}`);
+        expect(own.status).toBe(200);
+        expect(own.body.data.items.every((row: { id: string }) => row.id === intakeId)).toBe(true);
+        expect(own.body.data.items[0].assignmentHistory).toBeUndefined();
+        expect(own.body.data.items[0].status).toBeUndefined();
 
         const viewerCreate = await request(app)
             .post(`${API}/tprm/intakes`)

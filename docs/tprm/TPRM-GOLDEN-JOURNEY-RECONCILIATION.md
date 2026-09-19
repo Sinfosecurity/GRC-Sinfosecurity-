@@ -629,7 +629,17 @@ Sequence is required by FK/data dependencies. Do not start Wave 4–8 first.
 
 ### Wave 1 access model
 
-Authenticated tenant users only. The form requires an existing Supreme session (employee / SSO / invited user). No anonymous public intake form. Requesters need `intake.create` (BUSINESS_OWNER and above). GRC queue needs `intake.read` without being requester-only. Assignment needs `intake.assign` (RISK_MANAGER / ORGANIZATION_ADMIN). Analyst work needs `intake.triage` (ASSESSOR+). Vendors have no intake access. Information-request email uses a hashed capability token scoped to one request — the same security pattern as requester IRA links, not an open tenant form.
+Authenticated tenant users only. The form requires an existing Supreme session (employee / SSO / invited user). No anonymous public intake form.
+
+**Requester capabilities (own records only):** `intake.create_own`, `intake.read_own`, `intake.respond_own`. Future-ready, unused in Wave 1 scoring: `ira.complete_own`, `ira.clarify_own`.
+
+**Not implied by requester access:** `intake.list_all` / `intake.read`, `intake.assign`, `intake.manage`, `vendor.read`, `engagement.read_all`, `assessment.read`, `finding.read`, `approval.read`, `risk.read`, `compliance.read`, `intelligence.read`, `automation.read`, administration.
+
+`BUSINESS_OWNER` / `DEPARTMENT_MANAGER` receive only requester-own capabilities plus `notification.read`. They do not receive the GRC practitioner portfolio.
+
+GRC queue needs `intake.read` (or assign/triage). Assignment needs `intake.assign` (RISK_MANAGER / ORGANIZATION_ADMIN). Analyst work needs `intake.triage` (ASSESSOR+). Dual-role users (ASSESSOR / RISK_MANAGER / ORGANIZATION_ADMIN) keep both requester-own and practitioner permissions and may switch workspaces. Vendors have no intake or requester-workspace access. Information-request email uses a hashed capability token scoped to one request — the same security pattern as requester IRA links, not an open tenant form.
+
+Primary requester routes: `/request`, `/request/new`, `/request/my-requests`, `/request/actions`, `/request/:publicId`. `/third-parties/request` redirects to `/request/new`. Practitioner GRC routes stay under `/third-parties/intake` and `/third-parties/my-work`. Requester APIs: `/api/v1/tprm/requester/*` return minimized fields only (`requesterStatus`, no assignment history, no match candidates, no raw enums).
 
 ### Graph contract
 
@@ -648,3 +658,23 @@ Runtime SHA `778b870d01e0946b93c14e5d10d19e2f04cbb79f` on staging frontend and A
 ### Intentionally not in Wave 1
 
 Requester IRA operating flow, Tier Review clarification loop, vendor assessment / questionnaire changes, ServiceNow / Jira / email ingestion, Vendor → ThirdParty table rename, Insurance move to Engagement.
+
+---
+
+## Wave 1 requester-experience boundary correction (not Wave 2)
+
+**Why:** Hosted `/third-parties/request` rendered the business requester inside the GRC practitioner shell. Authentication is not GRC membership. This correction is a Wave 1 product-boundary fix. It does not authorize Wave 2.
+
+**Preserved Wave 1 model:** `IntakeRequest`, `IntakeAssignment`, `IntakeInformationRequest`, `Engagement`, Third Party matching, multi-Engagement, Intake Queue, leadership assignment, My Work, audit, notifications, graph lineage, Wave 1 migration. IRA scoring unchanged. Tier Review clarification not started. Vendor questionnaire unchanged. Insurance unchanged.
+
+**Three experiences:**
+
+1. **Requester Workspace** (`/request/*`) — submit and view own requests, respond to GRC information requests, future IRA / Tier Review tasks. Dedicated `RequesterLayout`. No practitioner sidebar.
+2. **GRC Practitioner Workspace** — queue, assignment, triage, match, Engagement, findings, decisions.
+3. **Vendor Workspace** — questionnaire / evidence. Unchanged. Vendor plane cannot read requester or intake-queue APIs.
+
+**Landing:** requester-only → `/request`. GRC-only → `/dashboard`. Dual-role → last remembered authorized workspace, otherwise `/dashboard`. Vendor → vendor portal.
+
+**Wave 2 readiness (not implemented):** Actions Required already uses typed tasks (`INTAKE_INFORMATION_REQUEST`). Future `IRA_REQUIRED` / `IRA_CLARIFICATION_REQUIRED` must render inside Requester Workspace, not the GRC shell.
+
+**#12 status remains ACTIVE.** Wave 1 is not accepted until Product Leadership reviews hosted proof of this boundary. Wave 2 is not authorized.
