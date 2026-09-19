@@ -118,7 +118,7 @@ export default function VendorManagement() {
     } | null>(null);
     const [riskExplanationError, setRiskExplanationError] = useState<string | null>(null);
     const [aiLinks, setAiLinks] = useState<any>(null);
-    const [engagements, setEngagements] = useState<Array<{ id: string; publicId: string; serviceName: string; statusLabel: string }>>([]);
+    const [engagements, setEngagements] = useState<Array<{ id: string; publicId: string; serviceName: string; statusLabel: string; residual?: { band?: string | null } }>>([]);
     const [saving, setSaving] = useState(false);
     const [newVendor, setNewVendor] = useState({
         name: '',
@@ -246,8 +246,15 @@ export default function VendorManagement() {
         setRiskExplanationError(null);
         setAiLinks(null);
         setEngagements([]);
-        intakeAPI.listEngagements({ vendorId: String(vendor.id), pageSize: 50 })
-            .then((response) => setEngagements(response.data.data.items || []))
+        Promise.all([
+            intakeAPI.listEngagements({ vendorId: String(vendor.id), pageSize: 50 }),
+            intakeAPI.vendorEngagementRisk(String(vendor.id)).catch(() => null),
+        ])
+            .then(([response, rollup]) => {
+                const items = response.data.data.items || [];
+                const residual = new Map((rollup?.data?.data?.engagements || []).map((row: any) => [row.id, row.residual]));
+                setEngagements(items.map((row: any) => ({ ...row, residual: residual.get(row.id) })));
+            })
             .catch(() => setEngagements([]));
         tprmAPI.riskExplanation(String(vendor.id))
             .then((response) => setRiskExplanation(response.data.data))
@@ -482,10 +489,11 @@ export default function VendorManagement() {
                                 )}
                                 <Surface>
                                     <Typography variant="h6" sx={{ mb: 1 }}>Engagements</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1 }}>Engagement residual risk is authoritative. The Vendor residual below is legacy compatibility only.</Typography>
                                     {engagements.length === 0 && <Typography variant="body2">No engagements recorded yet.</Typography>}
                                     {engagements.map((row) => (
                                         <Button key={row.id} onClick={() => navigate(`/third-parties/engagements/${row.id}`)}>
-                                            {row.publicId} · {row.serviceName} · {row.statusLabel}
+                                            {row.publicId} · {row.serviceName} · {row.statusLabel}{row.residual?.band ? ` · residual ${row.residual.band}` : ''}
                                         </Button>
                                     ))}
                                 </Surface>

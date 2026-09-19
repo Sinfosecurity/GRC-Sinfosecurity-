@@ -633,7 +633,11 @@ export async function completeSpecialistReview(organizationId: string, actor: Ac
     if (open === 0) {
         await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.SPECIALIST_REVIEW } });
     }
-    await audit(organizationId, actor.id, 'assessment.review.completed', 'EngagementAssessmentReview', review.id, { engagementId: engagement.id, conclusion, wave4Started: false });
+    await audit(organizationId, actor.id, 'assessment.review.completed', 'EngagementAssessmentReview', review.id, { engagementId: engagement.id, conclusion, wave4Started: true });
+    if (open === 0) {
+        const { seedFindingCandidates } = await import('./engagementRiskService');
+        await seedFindingCandidates(organizationId, actor, engagement.id);
+    }
     return presentAssessmentReview(organizationId, actor, engagement.id);
 }
 
@@ -781,7 +785,7 @@ async function presentAssessmentReview(organizationId: string, actor: Actor, key
         include: { storedObject: { select: { filename: true, scanStatus: true, uploadedAt: true } } },
     });
     const findings = await prisma.vendorIssue.count({
-        where: { organizationId, vendorId: engagement.vendorId, assessmentId: { in: assessments.map((row) => row.id) }, reviewState: { not: 'DRAFT' } },
+        where: { organizationId, engagementId: engagement.id, reviewState: 'CONFIRMED' },
     });
     return {
         what: `${engagement.publicId} · ${engagement.serviceName}`,
@@ -791,7 +795,7 @@ async function presentAssessmentReview(organizationId: string, actor: Actor, key
         stateLabel: engagementStatusLabel(engagement.status),
         owner: 'Assigned specialist / TPRM analyst',
         nextAction: reviews.every((row) => row.status === EngagementReviewStatus.COMPLETE)
-            ? 'Specialist review complete. Wave 4 findings are not started.'
+            ? 'Specialist review complete. Review finding candidates. No candidate is an authoritative finding until confirmed.'
             : 'Review vendor answers and evidence, request clarification, or mark review complete.',
         history: reviews,
         thirdParty: { id: engagement.vendor.id, name: engagement.vendor.name },
@@ -820,7 +824,7 @@ async function presentAssessmentReview(organizationId: string, actor: Actor, key
             select: { action: true, timestamp: true, actorUserId: true, metadata: true },
             take: 50,
         }),
-        wave4Started: false,
+        wave4Started: reviews.some((row) => row.status === EngagementReviewStatus.COMPLETE),
         authoritativeFindings: findings,
         residualRiskCalculated: false,
     };
@@ -834,6 +838,8 @@ export function engagementStatusLabel(status: EngagementStatus) {
         case EngagementStatus.VENDOR_IN_PROGRESS: return 'Vendor in progress';
         case EngagementStatus.VENDOR_SUBMITTED: return 'Vendor submitted';
         case EngagementStatus.SPECIALIST_REVIEW: return 'Specialist review';
+        case EngagementStatus.FINDING_REVIEW: return 'Finding review';
+        case EngagementStatus.RESIDUAL_READY: return 'Residual risk ready';
         default: return status.replace(/_/g, ' ').toLowerCase();
     }
 }
@@ -852,7 +858,11 @@ export function nextDueDiligenceAction(status: EngagementStatus, hasInvitation =
         case EngagementStatus.VENDOR_SUBMITTED:
             return 'Open specialist review';
         case EngagementStatus.SPECIALIST_REVIEW:
-            return 'Complete specialist review. Wave 4 is not started.';
+            return 'Complete specialist review, then review finding candidates.';
+        case EngagementStatus.FINDING_REVIEW:
+            return 'Review finding candidates and record control effectiveness.';
+        case EngagementStatus.RESIDUAL_READY:
+            return 'Risk treatment decision pending. Wave 5 is not started.';
         default:
             return 'Review this engagement';
     }

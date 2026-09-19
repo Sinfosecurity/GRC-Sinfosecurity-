@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
@@ -10,6 +10,7 @@ import { intakeAPI } from '../services/api';
 
 export default function AssessmentReview() {
     const { id = '' } = useParams();
+    const navigate = useNavigate();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -54,7 +55,7 @@ export default function AssessmentReview() {
 
     const complete = (event: FormEvent) => {
         event.preventDefault();
-        run(() => intakeAPI.completeSpecialistReview(id, { conclusion, observation }), 'Specialist review recorded. No finding was created.');
+        run(() => intakeAPI.completeSpecialistReview(id, { conclusion, observation }), 'Specialist review recorded. Candidates are not findings until confirmed.');
     };
 
     return (
@@ -79,7 +80,8 @@ export default function AssessmentReview() {
                             <Typography><strong>Why:</strong> {data.why}</Typography>
                             <Typography><strong>Confirmed tier:</strong> {data.confirmedTier}</Typography>
                             <Typography><strong>Authoritative findings:</strong> {data.authoritativeFindings || 0}</Typography>
-                            <Typography><strong>Residual risk calculated:</strong> No</Typography>
+                            <Typography><strong>Residual risk calculated:</strong> No until Engagement risk is calculated</Typography>
+                            <Button sx={{ mt: 1 }} onClick={() => navigate(`/third-parties/engagements/${id}/risk`)}>Open Engagement risk</Button>
                         </Surface>
                         {(data.items || []).map((item: any) => (
                             <Surface key={`${item.assessmentId}-${item.questionKey}`}>

@@ -64,8 +64,14 @@ export default function EngagementDetail() {
                             {(data.dueDiligence || data.ira?.confirmedTier || ['INHERENT_TIER_CONFIRMED', 'DUE_DILIGENCE_PLANNING', 'READY_TO_SEND', 'AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'VENDOR_SUBMITTED', 'SPECIALIST_REVIEW'].includes(data.status)) && (
                                 <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/due-diligence`)}>Review due-diligence scope</Button>
                             )}
-                            {['VENDOR_SUBMITTED', 'SPECIALIST_REVIEW'].includes(data.status) && (
+                            {['VENDOR_SUBMITTED', 'SPECIALIST_REVIEW', 'FINDING_REVIEW', 'RESIDUAL_READY'].includes(data.status) && (
                                 <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/assessment-review`)}>Open specialist review</Button>
+                            )}
+                            {['SPECIALIST_REVIEW', 'FINDING_REVIEW', 'RESIDUAL_READY'].includes(data.status) && (
+                                <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/risk`)}>Open Engagement risk</Button>
+                            )}
+                            {data.risk && (
+                                <Typography sx={{ mt: 1 }}>Residual: {data.risk.residual?.residualBand || (data.risk.residualReady ? 'Ready to calculate' : 'Not ready')} · {data.risk.nextAction}</Typography>
                             )}
                         </Surface>
                         <Surface>

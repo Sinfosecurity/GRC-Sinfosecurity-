@@ -13,6 +13,10 @@ vi.mock('../../services/api', () => ({
         validateFinding: vi.fn(),
         closeFinding: vi.fn(),
     },
+    intakeAPI: {
+        confirmFinding: vi.fn(),
+        dismissCandidate: vi.fn(),
+    },
     vendorAPI: {
         getAll: vi.fn(),
     },
@@ -30,6 +34,8 @@ const FINDING = {
     assignedTo: null,
     identifiedDate: '2026-09-18T00:00:00.000Z',
     vendor: { id: 'v1', name: 'Acme Cloud' },
+    engagement: { id: 'e1', publicId: 'ENG-1', serviceName: 'Azure Hosting' },
+    responsibility: 'VENDOR',
 };
 
 const WORKSPACE = {
@@ -67,6 +73,7 @@ describe('Findings workspace', () => {
             </MemoryRouter>
         );
         expect(await screen.findByText(/Privacy — Personal-data breach notification process/)).toBeInTheDocument();
+        expect(screen.getAllByText(/Azure Hosting/).length).toBeGreaterThan(0);
         expect(screen.queryByText(/^Response needs review:/)).not.toBeInTheDocument();
         fireEvent.click(screen.getByText(/Privacy — Personal-data breach notification process/));
         expect(await screen.findByText(/Vendor Assessment → Privacy/)).toBeInTheDocument();

@@ -1312,6 +1312,7 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
         ...presentEngagement(row, await usersByIds(organizationId, [row.assignedAnalystUserId, row.requesterUserId])),
         ira: row.ira,
         dueDiligence: row.dueDiligencePlan,
+        risk: await import('./engagementRiskService').then((mod) => mod.getEngagementRisk(organizationId, actor, row.id)).catch(() => null),
     };
 }
 

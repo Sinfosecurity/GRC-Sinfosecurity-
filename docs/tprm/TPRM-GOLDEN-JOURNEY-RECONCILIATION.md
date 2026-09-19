@@ -611,8 +611,8 @@ Sequence is required by FK/data dependencies. Do not start Wave 4–8 first.
 
 **Phase 0 lock SHA:** `e0784550abf7c806de74993baa5a73386702ef81`  
 **Wave 1:** implemented on `supreme-risk-transformation`.  
-**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 ACCEPTED FOR CURRENT STAGE · WAVE 2 ACTIVE.  
-**Wave 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). Not PASS.** Wave 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). Wave 3 Engagement due diligence + vendor assessment + evidence + specialist review is implemented and ready for Product Leadership review. Wave 4 not started. Version 3 scoring preserved.
+**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVES 1–3 ACCEPTED FOR CURRENT STAGE · WAVE 4 IMPLEMENTED.  
+**Wave 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). Not PASS.** Wave 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). Wave 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). Wave 4 findings + control effectiveness + Engagement residual risk is implemented and ready for Product Leadership review. Wave 5 not started. Version 3 scoring preserved.
 
 ### What Wave 1 shipped
 
@@ -728,7 +728,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Shipped:** authenticated Requester Workspace IRA (`/request/ira/:id`), question-specific clarification (`/request/ira/:id/clarification`), GRC Tier Review (`/third-parties/engagements/:id/tier-review`) with Confirm / Override / Request clarification, immutable submission + clarification rounds, recalculation snapshots, business-friendly requester statuses, graph `Engagement → ASSESSMENT(EngagementIra)`.
 
-**Not started:** Wave 4 findings, control effectiveness, residual risk, treatment, contract, activation, monitoring.
+**Not started:** Wave 5 treatment, acceptance, contract, activation; Wave 6+ monitoring.
 
 ---
 
@@ -739,7 +739,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35442535799 PASS on `680b40f`  
 **Hosted:** staging frontend/API `680b40f`. Production untouched.  
 **Implementation:** Engagement-scoped `EngagementDueDiligencePlan` (1:1 Engagement). Legacy `VendorOnboarding.vendorId @unique` remains readable and is **not** Golden Journey authority.  
-**Wave 4:** NOT STARTED. No authoritative Findings. No residual-risk recalculation on Wave 3 submit.
+**Wave 4:** ACCEPTED FOR CURRENT STAGE as the prior wave. Authoritative Findings and Engagement residual risk are Wave 4.
 
 **Ownership:** Due diligence, questionnaire, evidence requests, assessment instances, vendor due dates, specialist reviewers, and review history belong to the Engagement. Microsoft Azure Hosting and Microsoft Professional Services receive independent plans and assessment IDs on one Third Party master.
 
@@ -754,3 +754,24 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Specialist review:** Domain tasks (Cybersecurity, Privacy, Operational Resilience, Compliance, AI Governance, Financial Risk). Wave 3 conclusions: Response sufficient / Needs clarification / Evidence sufficient / Evidence missing / Review complete. Observations may be recorded for Wave 4. Question → Response → Evidence → Review. Finding is later.
 
 **Preserved:** Wave 1 persona isolation, Wave 2 IRA/Tier Review, Version 3 scoring, 4a/4b honesty, #3 malware fail-closed, #14 shared evidence, #23 Insurance on Vendor, Finding Workspace for legacy vendor-centric assessments.
+
+---
+
+## Wave 4 — Findings + control effectiveness + Engagement residual risk
+
+**Starting SHA:** `627dfbcc3459ab4b718aaef25acbc9a0fbbcd9a8` (Wave 3 evidence HEAD)  
+**Wave 3 implementation:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
+**Implementation:** Engagement-aware `VendorIssue.engagementId` (no second finding register). New `EngagementControlEffectiveness`, `EngagementCompensatingControl`, and `EngagementResidualRiskAssessment`.  
+**Wave 5:** NOT STARTED. No new risk acceptance, contract gate, or Engagement ACTIVE transition.
+
+**Finding principle:** Question ≠ Finding. Answer ≠ Finding. Missing evidence ≠ automatic Finding. Low score ≠ automatic Finding. Wave 3 review outcomes may seed a **candidate** (`IssueReviewState.DRAFT`). Only a GRC reviewer confirm creates an authoritative finding. Dismissal preserves history.
+
+**Ownership:** Authoritative Golden Journey findings, control effectiveness, compensating controls, and residual risk belong to the Engagement. Microsoft Azure Hosting and Microsoft Professional Services keep independent finding sets, CE judgments, and residual records on one Third Party master. Third Party rollup shows highest active Engagement residual and does not overwrite Engagement results.
+
+**Control effectiveness:** Human-governed Engagement judgment (`EFFECTIVE` / `PARTIALLY_EFFECTIVE` / `INEFFECTIVE` / `NOT_APPLICABLE` / `NOT_ASSESSED`). Reuses Shared Control identity. N/A requires rationale. NOT_ASSESSED does not become Effective. Non-CLEAN evidence cannot support Effective.
+
+**Residual methodology:** `supreme-risk-engagement-1.0.0` adapter. Confirmed Wave 2 `EngagementIra` tier maps to documented `tierBase`. Haircut and finding points reuse `supreme-risk-1.2.0` weights. Questionnaire numeric averages are not authoritative. Unconfirmed inherent or incomplete CE blocks calculation. Compensating controls influence residual only when reviewed and explicitly considered. History is append-only.
+
+**Legacy:** Vendor `inherentRiskScore` / `residualRiskScore` / `ScoreCalculation` remain readable compatibility. They are not Golden Journey authority.
+
+**Preserved:** Finding Workspace context closure, Shared Controls, Shared Evidence, Governance Graph (`HAS_FINDING`, `AFFECTS`, `HAS_RISK`, `SUPPORTS`), Version 3 IRA, #23 Insurance on Third Party, Wave 1 persona isolation.

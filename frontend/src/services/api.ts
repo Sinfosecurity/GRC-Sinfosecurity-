@@ -561,6 +561,15 @@ export const intakeAPI = {
     requestVendorClarification: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/assessment-review/clarification`, data),
     completeSpecialistReview: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/assessment-review/complete`, data),
     listEngagementAssessments: () => api.get('/tprm/assessments/engagements'),
+    getEngagementRisk: (id: string) => api.get(`/tprm/engagements/${id}/risk`),
+    seedFindingCandidates: (id: string) => api.post(`/tprm/engagements/${id}/finding-candidates/seed`, {}),
+    confirmFinding: (id: string, issueId: string, data: unknown) => api.post(`/tprm/engagements/${id}/findings/${issueId}/confirm`, data),
+    dismissCandidate: (id: string, issueId: string, data: unknown) => api.post(`/tprm/engagements/${id}/findings/${issueId}/dismiss`, data),
+    recordControlEffectiveness: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/control-effectiveness`, data),
+    recordCompensatingControl: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/compensating-controls`, data),
+    calculateResidual: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/residual-risk/calculate`, data || {}),
+    confirmResidual: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/residual-risk/confirm`, data || {}),
+    vendorEngagementRisk: (vendorId: string) => api.get(`/tprm/vendors/${vendorId}/engagement-risk`),
 };
 
 const intakeInfoApi = axios.create({

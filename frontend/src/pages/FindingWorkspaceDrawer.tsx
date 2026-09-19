@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Box, Button, Drawer, Stack, TextField, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import StatusBadge from '../components/design/StatusBadge';
-import { tprmAPI } from '../services/api';
+import { intakeAPI, tprmAPI } from '../services/api';
 import { color, type } from '../design/tokens';
 import { humanizeLabel } from '../utils/humanizeLabel';
 
@@ -13,14 +13,18 @@ type Workspace = {
     reason: string;
     control: { key?: string | null; href?: string | null; expected: string; riskDomain?: string | null };
     evidence: { requested: boolean; received: number; missing: boolean; items: Array<{ id: string; filename: string; status: string }>; empty: string | null };
-    risk: { vendorTier: string; residualScoreRecorded: number | null; residualHonesty: string; insuranceContext?: { serviceCategory: string; criticality?: string | null; jurisdictionCode?: string | null } | null };
+    risk: { vendorTier: string; residualScoreRecorded: number | null; residualHonesty: string; insuranceContext?: { serviceCategory: string; criticality?: string | null; jurisdictionCode?: string | null } | null; engagementLabel?: string | null };
     remediation: { plan?: string | null; targetDate?: string | null; ownerName?: string | null; responsibilityLabel: string; status: string };
     verification: { notes?: string | null; verifiedBy?: string | null; verifiedAt?: string | null; canMarkComplete: boolean };
-    nextAction: { key: string; label: string; detail: string; primary: 'plan' | 'await' | 'verify' | 'close' | 'none' };
+    nextAction: { key: string; label: string; detail: string; primary: 'plan' | 'await' | 'verify' | 'close' | 'none' | 'review' };
     related: Array<{ type: string; label: string; href?: string | null }>;
     history: Array<{ at: string; label: string; actor?: string | null }>;
     graphNodeId?: string;
     honesty: Record<string, string>;
+    reviewState?: string;
+    engagement?: { id: string; publicId: string; serviceName: string } | null;
+    recommendedSeverity?: string | null;
+    determinationNote?: string | null;
 };
 
 function Meta({ label, value }: { label: string; value?: string | null }) {
@@ -56,6 +60,7 @@ export default function FindingWorkspaceDrawer({
     const [cap, setCap] = useState('');
     const [target, setTarget] = useState('');
     const [notes, setNotes] = useState('');
+    const [determination, setDetermination] = useState('');
     const [busy, setBusy] = useState(false);
 
     const load = async (id: string) => {
@@ -120,9 +125,16 @@ export default function FindingWorkspaceDrawer({
                             Next: {workspace.nextAction.label}. {workspace.nextAction.detail}
                         </Alert>
 
+                        {workspace.engagement && (
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                                Engagement: {workspace.engagement.publicId} · {workspace.engagement.serviceName}
+                                {workspace.reviewState === 'DRAFT' ? ' · Candidate only until confirmed.' : ''}
+                            </Alert>
+                        )}
                         <Section title="Source">
                             <Typography variant="body2" sx={{ mb: 1 }}>{workspace.source.label}</Typography>
                             <Meta label="Vendor / affected record" value={workspace.source.vendorName} />
+                            {workspace.engagement && <Meta label="Engagement" value={`${workspace.engagement.publicId} · ${workspace.engagement.serviceName}`} />}
                             <Meta label="Assessment type" value={workspace.source.assessmentType ? humanizeLabel(workspace.source.assessmentType) : 'Not an assessment finding'} />
                             {workspace.source.section && <Meta label="Section / pack" value={workspace.source.section} />}
                         </Section>
@@ -161,9 +173,24 @@ export default function FindingWorkspaceDrawer({
                             <Typography variant="caption" display="block" sx={{ mt: 1 }}>{workspace.honesty.noEvidenceIsNotFailure}</Typography>
                         </Section>
 
+                        {workspace.reviewState === 'DRAFT' && workspace.engagement && (
+                            <Section title="Candidate determination">
+                                <TextField label="Reason" value={determination} onChange={(e) => setDetermination(e.target.value)} fullWidth multiline minRows={2} />
+                                <Stack direction="row" spacing={1} sx={{ mt: 1 }} useFlexGap flexWrap="wrap">
+                                    <Button variant="contained" disabled={busy} onClick={() => run(async () => {
+                                        await intakeAPI.confirmFinding(workspace.engagement!.id, workspace.header.id, { determinationNote: determination });
+                                    })}>Confirm finding</Button>
+                                    <Button disabled={busy || !determination} onClick={() => run(async () => {
+                                        await intakeAPI.dismissCandidate(workspace.engagement!.id, workspace.header.id, { reason: determination });
+                                    })}>Dismiss / no finding</Button>
+                                </Stack>
+                            </Section>
+                        )}
+
                         <Section title="Risk / business context">
                             <Meta label="Vendor tier" value={humanizeLabel(workspace.risk.vendorTier)} />
-                            <Meta label="Recorded residual score" value={workspace.risk.residualScoreRecorded == null ? 'Not scored' : String(workspace.risk.residualScoreRecorded)} />
+                            <Meta label="Engagement residual context" value={workspace.risk.engagementLabel || 'Not an Engagement finding'} />
+                            <Meta label="Legacy vendor residual" value={workspace.risk.residualScoreRecorded == null ? 'Not scored' : String(workspace.risk.residualScoreRecorded)} />
                             <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>{workspace.risk.residualHonesty}</Typography>
                             {workspace.risk.insuranceContext && (
                                 <Meta

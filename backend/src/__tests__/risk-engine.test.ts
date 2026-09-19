@@ -1,4 +1,4 @@
-import { calculateVendorRisk, RISK_SCORE_VERSION } from '../services/deterministicRiskEngine';
+import { calculateEngagementResidual, calculateVendorRisk, engagementResidualReadiness, RISK_SCORE_VERSION } from '../services/deterministicRiskEngine';
 
 describe('deterministic risk engine', () => {
     const base = {
@@ -103,5 +103,39 @@ describe('deterministic risk engine', () => {
         });
         expect(strong.residualRisk).toBeLessThanOrEqual(weak.residualRisk);
         expect(strong.controlEffectiveness).toBeGreaterThan(weak.controlEffectiveness);
+    });
+});
+
+describe('engagement residual adapter', () => {
+    it('blocks residual without confirmed inherent or assessed controls', () => {
+        expect(engagementResidualReadiness({ confirmedTier: null, controlRatings: [] }).ready).toBe(false);
+        expect(engagementResidualReadiness({
+            confirmedTier: 'CRITICAL',
+            controlRatings: [{ rating: 'NOT_ASSESSED' }],
+        }).ready).toBe(false);
+        expect(engagementResidualReadiness({
+            confirmedTier: 'CRITICAL',
+            controlRatings: [{ rating: 'NOT_APPLICABLE' }],
+        }).blockers.join(' ')).toMatch(/rationale|applicable/i);
+    });
+
+    it('does not treat unknown as effective and uses confirmed tier not questionnaire math', () => {
+        const azure = calculateEngagementResidual({
+            confirmedTier: 'CRITICAL',
+            controlRatings: [{ rating: 'PARTIALLY_EFFECTIVE', controlKey: 'Access Review', controlTitle: 'Access Review' }],
+            openFindings: [{ severity: 'HIGH', title: 'Azure Hosting — Privileged access review not demonstrated' }],
+            reviewedCompensatingCount: 1,
+        });
+        const services = calculateEngagementResidual({
+            confirmedTier: 'MEDIUM',
+            controlRatings: [{ rating: 'EFFECTIVE', controlKey: 'Access Review', controlTitle: 'Access Review' }],
+            openFindings: [],
+            reviewedCompensatingCount: 0,
+        });
+        expect(azure.residualRisk).toBeGreaterThan(services.residualRisk);
+        expect(azure.riskBand).not.toBe(services.riskBand);
+        expect(azure.explanation).toMatch(/Confirmed inherent CRITICAL/);
+        expect(azure.explanation).not.toMatch(/100 - /);
+        expect(azure.factors.some((row) => row.code === 'confirmed_inherent_tier')).toBe(true);
     });
 });

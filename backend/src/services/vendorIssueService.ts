@@ -34,6 +34,10 @@ export interface CreateVendorIssueInput {
     targetRemediationDate?: Date;
     assessmentId?: string;
     questionId?: string;
+    engagementId?: string;
+    controlId?: string;
+    recommendedSeverity?: IssueSeverity;
+    reviewState?: import('@prisma/client').IssueReviewState;
     responsibility?: string;
     sourceSnapshot?: Prisma.InputJsonValue;
 }
@@ -64,6 +68,10 @@ class VendorIssueService {
             targetRemediationDate: data.targetRemediationDate,
             assessmentId: data.assessmentId,
             questionId: data.questionId,
+            engagementId: data.engagementId,
+            controlId: data.controlId,
+            recommendedSeverity: data.recommendedSeverity,
+            reviewState: data.reviewState,
             responsibility: data.responsibility,
             sourceSnapshot: data.sourceSnapshot,
             status: VendorIssueStatus.OPEN,
@@ -182,7 +190,7 @@ class VendorIssueService {
         });
     }
 
-    async listOrganizationIssues(organizationId: string, filters?: { status?: VendorIssueStatus; severity?: IssueSeverity; vendorId?: string; sourceKind?: string; owner?: string; overdue?: boolean }) {
+    async listOrganizationIssues(organizationId: string, filters?: { status?: VendorIssueStatus; severity?: IssueSeverity; vendorId?: string; engagementId?: string; sourceKind?: string; owner?: string; overdue?: boolean; responsibility?: string; reviewState?: string }) {
         if (filters?.vendorId) {
             await requireVendorForOrganization(organizationId, filters.vendorId);
         }
@@ -401,6 +409,9 @@ class VendorIssueService {
         const existing = await this.getIssueById(issueId, organizationId);
         if (!existing) {
             throw new ApiError(404, 'Finding not found.');
+        }
+        if (existing.engagementId) {
+            throw new ApiError(409, 'Risk acceptance is Wave 5. This Engagement finding cannot be accepted in Wave 4.');
         }
         if (!existing.acceptanceRequestedBy) {
             throw new ApiError(409, 'Risk acceptance must be prepared before it can be approved.');

@@ -26,7 +26,10 @@ vi.mock('../../services/api', () => ({
     },
     tprmAPI: { riskExplanation: vi.fn(), offboardPreview: vi.fn(), offboard: vi.fn() },
     aiGovernanceAPI: { vendorLinks: vi.fn() },
-    intakeAPI: { listEngagements: vi.fn().mockResolvedValue({ data: { data: { items: [] } } }) },
+    intakeAPI: {
+        listEngagements: vi.fn().mockResolvedValue({ data: { data: { items: [] } } }),
+        vendorEngagementRisk: vi.fn().mockResolvedValue({ data: { data: { engagements: [] } } }),
+    },
 }));
 
 describe('VendorManagement honesty', () => {

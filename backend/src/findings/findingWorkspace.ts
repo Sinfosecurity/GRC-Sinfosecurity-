@@ -45,6 +45,7 @@ export type FindingLike = {
     closedAt?: Date | string | null;
     sourceSnapshot?: FindingSourceSnapshot | null;
     responsibility?: string | null;
+    reviewState?: string | null;
 };
 
 const GENERIC_PREFIXES = [/^Response needs review:\s*/i, /^Evidence still required:\s*/i];
@@ -147,7 +148,13 @@ export function whyFinding(issue: FindingLike): string {
     return 'Supreme drafted this finding from a recorded source. Review the observed condition before treating it as confirmed.';
 }
 
-export function nextAction(issue: FindingLike): { key: string; label: string; detail: string; primary: 'plan' | 'await' | 'verify' | 'close' | 'none' } {
+export function nextAction(issue: FindingLike): { key: string; label: string; detail: string; primary: 'plan' | 'await' | 'verify' | 'close' | 'none' | 'review' } {
+    if (issue.reviewState === 'DRAFT') {
+        return { key: 'review', label: 'Review candidate', detail: 'Confirm as a finding or dismiss with a reason. A candidate is not an authoritative finding.', primary: 'review' };
+    }
+    if (issue.reviewState === 'DISMISSED') {
+        return { key: 'dismissed', label: 'Dismissed', detail: 'This candidate was reviewed and is not a finding. History is preserved.', primary: 'none' };
+    }
     const status = issue.status;
     if (status === 'CLOSED' || status === 'RISK_ACCEPTED') {
         return { key: 'closed', label: 'Closed', detail: 'Reopen only if an authorized reviewer records a new observation.', primary: 'none' };

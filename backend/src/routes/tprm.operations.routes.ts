@@ -287,6 +287,9 @@ router.get('/findings', requirePermission(PERMISSIONS['finding.read']), async (r
             status: typeof req.query.status === 'string' ? (req.query.status as VendorIssueStatus) : undefined,
             severity: typeof req.query.severity === 'string' ? (req.query.severity as IssueSeverity) : undefined,
             vendorId: typeof req.query.vendorId === 'string' ? req.query.vendorId : undefined,
+            engagementId: typeof req.query.engagementId === 'string' ? req.query.engagementId : undefined,
+            responsibility: typeof req.query.responsibility === 'string' ? req.query.responsibility : undefined,
+            reviewState: typeof req.query.reviewState === 'string' ? req.query.reviewState : undefined,
             sourceKind: typeof req.query.sourceKind === 'string' ? req.query.sourceKind : undefined,
             owner: typeof req.query.owner === 'string' ? req.query.owner : undefined,
             overdue: req.query.overdue === 'true',
@@ -401,6 +404,10 @@ router.post('/findings/:issueId/close', requirePermission(PERMISSIONS['finding.c
             evidenceId: req.body?.closureEvidence || req.body?.evidenceId,
         });
         const data = await vendorIssueService.getIssueById(req.params.issueId, req.user!.organizationId);
+        if (data?.engagementId) {
+            const { afterFindingStateChange } = await import('../services/engagementRiskService');
+            await afterFindingStateChange(req.user!.organizationId, { id: req.user!.id, name: req.user!.name, email: req.user!.email, role: req.user!.role }, data.id, 'finding.closed');
+        }
         res.json({ success: true, data });
     } catch (error) {
         next(error);

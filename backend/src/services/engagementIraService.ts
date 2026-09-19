@@ -752,7 +752,11 @@ export function engagementIraNextAction(status: EngagementStatus) {
         case EngagementStatus.VENDOR_SUBMITTED:
             return 'Open specialist review';
         case EngagementStatus.SPECIALIST_REVIEW:
-            return 'Complete specialist review. Wave 4 is not started.';
+            return 'Complete specialist review, then review finding candidates.';
+        case EngagementStatus.FINDING_REVIEW:
+            return 'Review finding candidates and record control effectiveness.';
+        case EngagementStatus.RESIDUAL_READY:
+            return 'Risk treatment decision pending. Wave 5 is not started.';
         case EngagementStatus.INTAKE_COMPLETE:
             return 'Review this engagement';
         default:
@@ -773,6 +777,8 @@ export function engagementIraStatusLabel(status: EngagementStatus) {
         case EngagementStatus.VENDOR_IN_PROGRESS: return 'Vendor in progress';
         case EngagementStatus.VENDOR_SUBMITTED: return 'Vendor submitted';
         case EngagementStatus.SPECIALIST_REVIEW: return 'Specialist review';
+        case EngagementStatus.FINDING_REVIEW: return 'Finding review';
+        case EngagementStatus.RESIDUAL_READY: return 'Residual risk ready';
         case EngagementStatus.INTAKE_COMPLETE: return 'Intake complete';
         default: return 'Draft';
     }

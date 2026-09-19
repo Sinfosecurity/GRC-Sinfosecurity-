@@ -241,6 +241,9 @@ model Organization {
   engagementIraClarifications EngagementIraClarification[]
   engagementDueDiligencePlans EngagementDueDiligencePlan[]
   engagementAssessmentReviews EngagementAssessmentReview[]
+  engagementControlEffectiveness EngagementControlEffectiveness[]
+  engagementCompensatingControls EngagementCompensatingControl[]
+  engagementResidualAssessments EngagementResidualRiskAssessment[]
 
   @@index([slug])
   @@index([status])
@@ -809,6 +812,8 @@ enum EngagementStatus {
   VENDOR_IN_PROGRESS
   VENDOR_SUBMITTED
   SPECIALIST_REVIEW
+  FINDING_REVIEW
+  RESIDUAL_READY
 }
 
 enum EngagementDueDiligencePlanStatus {
@@ -822,6 +827,20 @@ enum EngagementReviewStatus {
   IN_REVIEW
   NEEDS_CLARIFICATION
   COMPLETE
+}
+
+enum EngagementControlRating {
+  EFFECTIVE
+  PARTIALLY_EFFECTIVE
+  INEFFECTIVE
+  NOT_APPLICABLE
+  NOT_ASSESSED
+}
+
+enum EngagementResidualStatus {
+  NOT_READY
+  CALCULATED
+  CONFIRMED
 }
 
 enum EngagementIraStatus {
@@ -960,6 +979,10 @@ model Engagement {
   assessmentReviews        EngagementAssessmentReview[]
   requesterTaskLinks       RequesterTaskLink[]
   evidenceLinks            EvidenceLink[]
+  findings                 VendorIssue[]
+  controlEffectiveness     EngagementControlEffectiveness[]
+  compensatingControls     EngagementCompensatingControl[]
+  residualAssessments      EngagementResidualRiskAssessment[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, vendorId])
@@ -1141,6 +1164,90 @@ model EngagementAssessmentReview {
 
   @@index([organizationId, engagementId])
   @@index([assessmentId])
+}
+
+model EngagementControlEffectiveness {
+  id                String                    @id @default(uuid())
+  organization      Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId    String
+  engagement        Engagement                @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId      String
+  vendorId          String
+  controlId         String
+  controlKey        String
+  controlTitle      String
+  domain            String
+  rating            EngagementControlRating   @default(NOT_ASSESSED)
+  rationale         String?
+  scopeNote         String?
+  evidenceObjectIds Json?
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  nextReviewAt      DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@unique([engagementId, controlId])
+  @@index([organizationId, engagementId])
+  @@index([controlId])
+}
+
+model EngagementCompensatingControl {
+  id                    String                    @id @default(uuid())
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  engagement            Engagement                @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId          String
+  vendorId              String
+  affectedControlId     String?
+  affectedControlKey    String?
+  description           String
+  owner                 String?
+  evidenceObjectId      String?
+  evidenceNote          String?
+  effectivenessJudgment EngagementControlRating   @default(NOT_ASSESSED)
+  reviewedBy            String?
+  reviewedAt            DateTime?
+  nextReviewAt          DateTime?
+  consideredInResidual  Boolean                   @default(false)
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+
+  @@index([organizationId, engagementId])
+}
+
+model EngagementResidualRiskAssessment {
+  id                         String                   @id @default(uuid())
+  organization               Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId             String
+  engagement                 Engagement               @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId               String
+  vendorId                   String
+  status                     EngagementResidualStatus @default(NOT_READY)
+  inherentTier               VendorTier?
+  inherentScore              Int?
+  inherentSource             String?
+  inherentConfirmedAt        DateTime?
+  inherentScoringVersion     String?
+  controlEffectivenessSnapshot Json?
+  openFindingSnapshot        Json?
+  compensatingSnapshot       Json?
+  methodologyVersion         String
+  calculationVersion         String
+  residualScore              Int?
+  residualBand               String?
+  explanation                String?
+  factors                    Json?
+  readiness                  Json?
+  triggerReason              String?
+  calculatedAt               DateTime?
+  calculatedBy               String?
+  reviewedAt                 DateTime?
+  reviewedBy                 String?
+  reviewNote                 String?
+  createdAt                  DateTime                 @default(now())
+
+  @@index([organizationId, engagementId, createdAt])
 }
 
 enum VendorStatus {
@@ -1616,6 +1723,11 @@ model VendorIssue {
   sourceSnapshot        Json?
   responsibility        String?
   reviewState           IssueReviewState    @default(CONFIRMED)
+  engagement            Engagement?         @relation(fields: [engagementId], references: [id])
+  engagementId          String?
+  controlId             String?
+  recommendedSeverity   IssueSeverity?
+  determinationNote     String?
   draftRuleCode         String?
   dismissReason         String?
   dismissedBy           String?
@@ -1636,6 +1748,7 @@ model VendorIssue {
   @@index([targetRemediationDate])
   @@index([reviewState])
   @@index([assessmentId])
+  @@index([engagementId])
 }
 
 enum VendorIssueType {

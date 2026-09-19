@@ -94,7 +94,7 @@ async function ensureFindingGraph(input: {
 
 export async function listFindingSummaries(
     organizationId: string,
-    filters?: { status?: string; severity?: string; vendorId?: string; sourceKind?: string; owner?: string; overdue?: boolean }
+    filters?: { status?: string; severity?: string; vendorId?: string; engagementId?: string; sourceKind?: string; owner?: string; overdue?: boolean; responsibility?: string; reviewState?: string }
 ) {
     const rows = await prisma.vendorIssue.findMany({
         where: {
@@ -102,9 +102,15 @@ export async function listFindingSummaries(
             ...(filters?.status ? { status: filters.status as never } : {}),
             ...(filters?.severity ? { severity: filters.severity as never } : {}),
             ...(filters?.vendorId ? { vendorId: filters.vendorId } : {}),
+            ...(filters?.engagementId ? { engagementId: filters.engagementId } : {}),
             ...(filters?.owner ? { assignedTo: filters.owner } : {}),
+            ...(filters?.responsibility ? { responsibility: filters.responsibility } : {}),
+            ...(filters?.reviewState ? { reviewState: filters.reviewState as never } : {}),
         },
-        include: { vendor: { select: { id: true, name: true, tier: true, organizationId: true } } },
+        include: {
+            vendor: { select: { id: true, name: true, tier: true, organizationId: true } },
+            engagement: { select: { id: true, publicId: true, serviceName: true } },
+        },
         orderBy: [{ severity: 'desc' }, { identifiedDate: 'desc' }],
         take: 300,
     });
@@ -119,6 +125,7 @@ export async function listFindingSummaries(
             return {
                 ...row,
                 vendor: omitForeignParent(organizationId, row.vendor),
+                engagement: row.engagement,
                 displayTitle: displayTitleFor(issue),
                 sourceKind: kind,
                 sourceLabel: sourceLabel(kind, snapshot),
@@ -138,7 +145,7 @@ export async function listFindingSummaries(
 export async function getFindingWorkspace(organizationId: string, issueId: string, actorUserId?: string) {
     const issue = await prisma.vendorIssue.findFirst({
         where: { id: issueId, organizationId },
-        include: { vendor: true },
+        include: { vendor: true, engagement: { select: { id: true, publicId: true, serviceName: true, vendorId: true } } },
     });
     if (!issue) throw new ApiError(404, 'Finding not found.');
 
@@ -214,6 +221,7 @@ export async function getFindingWorkspace(organizationId: string, issueId: strin
     const evidenceRequested = Boolean(response?.evidenceRequired || snapshot.draftRuleCode === 'required_evidence_missing');
     const usableEvidence = evidenceLinks.filter((row) => row.storedObject.scanStatus === 'CLEAN');
     const related = [
+        issue.engagement ? { type: 'Engagement', label: `${issue.engagement.publicId} · ${issue.engagement.serviceName}`, href: `/third-parties/engagements/${issue.engagement.id}` } : null,
         { type: 'Vendor', label: issue.vendor.name, href: `/vendors/${issue.vendorId}` },
         assessment ? { type: 'Assessment', label: assessment.assessmentType.replace(/_/g, ' '), href: `/vendors/${issue.vendorId}` } : null,
         snapshot.sourceQuestionId ? { type: 'Question', label: snapshot.sourceQuestionId, href: null } : null,
@@ -283,7 +291,11 @@ export async function getFindingWorkspace(organizationId: string, issueId: strin
         risk: {
             vendorTier: issue.vendor.tier === 'UNRATED' ? 'Not rated' : issue.vendor.tier,
             residualScoreRecorded: issue.vendor.tier === 'UNRATED' ? null : issue.vendor.residualRiskScore,
-            residualHonesty: 'A recorded residual score is vendor metadata. Finding severity is not vendor tier.',
+            residualHonesty: issue.engagement
+                ? 'Engagement residual risk is authoritative for Golden Journey work. Legacy Vendor residual is compatibility only.'
+                : 'A recorded residual score is vendor metadata. Finding severity is not vendor tier.',
+            engagementId: issue.engagementId,
+            engagementLabel: issue.engagement ? `${issue.engagement.publicId} · ${issue.engagement.serviceName}` : null,
             insuranceContext: insurance ? {
                 serviceCategory: insurance.serviceCategory,
                 criticality: insurance.criticality,
@@ -305,11 +317,15 @@ export async function getFindingWorkspace(organizationId: string, issueId: strin
             verifiedAt: issue.validatedAt,
             canMarkComplete: !issue.validatedAt && issue.status !== 'CLOSED',
         },
-        nextAction: nextAction({ ...issue, sourceSnapshot: snapshot }),
+        nextAction: nextAction({ ...issue, sourceSnapshot: snapshot, reviewState: issue.reviewState }),
         related,
         history,
         graphNodeId: graphNode.id,
         snapshot,
+        reviewState: issue.reviewState,
+        recommendedSeverity: issue.recommendedSeverity,
+        determinationNote: issue.determinationNote,
+        engagement: issue.engagement,
         vendor: omitForeignParent(organizationId, issue.vendor),
     };
 }

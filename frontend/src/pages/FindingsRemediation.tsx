@@ -24,9 +24,11 @@ type Finding = {
     assignedTo?: string | null;
     targetRemediationDate?: string | null;
     vendor?: { id: string; name: string };
+    engagement?: { id: string; publicId: string; serviceName: string } | null;
     identifiedDate: string;
     sourceKind?: string;
     sourceLabel?: string;
+    responsibility?: string | null;
     overdue?: boolean;
 };
 
@@ -42,6 +44,8 @@ export default function FindingsRemediation() {
     const [statusFilter, setStatusFilter] = useState('');
     const [severityFilter, setSeverityFilter] = useState('');
     const [sourceFilter, setSourceFilter] = useState('');
+    const [engagementFilter, setEngagementFilter] = useState('');
+    const [responsibilityFilter, setResponsibilityFilter] = useState('');
     const [overdueOnly, setOverdueOnly] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -111,6 +115,8 @@ export default function FindingsRemediation() {
         if (statusFilter && row.status !== statusFilter) return false;
         if (severityFilter && row.severity !== severityFilter) return false;
         if (sourceFilter && row.sourceKind !== sourceFilter) return false;
+        if (engagementFilter && row.engagement?.id !== engagementFilter) return false;
+        if (responsibilityFilter && row.responsibility !== responsibilityFilter) return false;
         if (overdueOnly && !(row.overdue || (row.targetRemediationDate && new Date(row.targetRemediationDate).getTime() < now && !closed.has(row.status)))) return false;
         return true;
     });
@@ -183,6 +189,16 @@ export default function FindingsRemediation() {
                         <MenuItem key={value} value={value}>{humanizeLabel(value)}</MenuItem>
                     ))}
                 </TextField>
+                <TextField select label="Filter by engagement" value={engagementFilter} onChange={(e) => setEngagementFilter(e.target.value)} sx={{ minWidth: 160, flex: '1 1 160px' }}>
+                    <MenuItem value="">All engagements</MenuItem>
+                    {Array.from(new Map(findings.filter((row) => row.engagement).map((row) => [row.engagement!.id, row.engagement!])).values()).map((row) => (
+                        <MenuItem key={row.id} value={row.id}>{row.serviceName}</MenuItem>
+                    ))}
+                </TextField>
+                <TextField select label="Filter by responsibility" value={responsibilityFilter} onChange={(e) => setResponsibilityFilter(e.target.value)} sx={{ minWidth: 150, flex: '1 1 150px' }}>
+                    <MenuItem value="">All responsibility</MenuItem>
+                    {['VENDOR', 'INTERNAL', 'SHARED'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
+                </TextField>
                 <TextField select label="Due" value={overdueOnly ? 'overdue' : ''} onChange={(e) => setOverdueOnly(e.target.value === 'overdue')} sx={{ minWidth: 120, flex: '1 1 120px' }}>
                     <MenuItem value="">All dates</MenuItem>
                     <MenuItem value="overdue">Overdue</MenuItem>
@@ -204,18 +220,21 @@ export default function FindingsRemediation() {
                     rowKey={(row) => row.id}
                     onRowClick={(row) => setSelectedId(row.id)}
                     searchPlaceholder="Search findings"
-                    searchValue={(row) => `${row.displayTitle || row.title} ${row.vendor?.name || ''} ${row.status} ${row.severity} ${row.sourceLabel || ''}`}
+                    searchValue={(row) => `${row.displayTitle || row.title} ${row.vendor?.name || ''} ${row.engagement?.serviceName || ''} ${row.status} ${row.severity} ${row.sourceLabel || ''}`}
                     columns={[
                         { id: 'title', label: 'Finding', sortValue: (row) => row.displayTitle || row.title, render: (row) => (
                             <Box>
                                 <Typography variant="subtitle2">{row.displayTitle || row.title}</Typography>
-                                <Typography variant="caption">{row.vendor?.name || 'Affected record'} · {row.sourceLabel || humanizeLabel(row.sourceKind || 'MANUAL')}</Typography>
+                                <Typography variant="caption">{row.vendor?.name || 'Affected record'} · {row.engagement?.serviceName || 'No engagement'} · {row.sourceLabel || humanizeLabel(row.sourceKind || 'MANUAL')}</Typography>
                             </Box>
                         ) },
+                        { id: 'thirdParty', label: 'Third Party', hideOnMobile: true, sortValue: (row) => row.vendor?.name || '', render: (row) => row.vendor?.name || '—' },
+                        { id: 'engagement', label: 'Engagement', hideOnMobile: true, sortValue: (row) => row.engagement?.serviceName || '', render: (row) => row.engagement?.serviceName || '—' },
                         { id: 'source', label: 'Source', hideOnMobile: true, sortValue: (row) => row.sourceKind || '', render: (row) => humanizeLabel(row.sourceKind || 'MANUAL') },
                         { id: 'severity', label: 'Severity', sortValue: (row) => row.severity, render: (row) => <StatusBadge value={row.severity} kind="severity" /> },
                         { id: 'status', label: 'Status', sortValue: (row) => row.status, render: (row) => <StatusBadge value={row.status} /> },
                         { id: 'owner', label: 'Owner', hideOnMobile: true, render: (row) => row.assignedTo || 'Unassigned' },
+                        { id: 'responsibility', label: 'Responsibility', hideOnMobile: true, render: (row) => row.responsibility || '—' },
                         { id: 'age', label: 'Age / due', hideOnMobile: true, sortValue: (row) => row.targetRemediationDate || row.identifiedDate, render: (row) => row.targetRemediationDate?.slice(0, 10) || ageDays(row.identifiedDate) },
                     ]}
                 />

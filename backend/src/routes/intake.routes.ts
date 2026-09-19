@@ -48,6 +48,17 @@ import {
     sendEngagementQuestionnaire,
     setAssessmentContact,
 } from '../services/engagementDueDiligenceService';
+import {
+    calculateResidual,
+    confirmFinding,
+    confirmResidual,
+    dismissCandidate,
+    getEngagementRisk,
+    listVendorEngagementRisk,
+    recordCompensatingControl,
+    recordControlEffectiveness,
+    seedFindingCandidates,
+} from '../services/engagementRiskService';
 
 const router = Router();
 
@@ -421,6 +432,78 @@ router.post('/engagements/:id/assessment-review/clarification', requirePractitio
 router.post('/engagements/:id/assessment-review/complete', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await completeSpecialistReview(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/risk', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['finding.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getEngagementRisk(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/finding-candidates/seed', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['finding.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await seedFindingCandidates(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/findings/:issueId/confirm', requirePractitionerPersona, requirePermission(PERMISSIONS['finding.update'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await confirmFinding(req.user!.organizationId, actor(req), req.params.issueId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/findings/:issueId/dismiss', requirePractitionerPersona, requirePermission(PERMISSIONS['finding.update'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await dismissCandidate(req.user!.organizationId, actor(req), req.params.issueId, req.body?.reason || req.body?.dismissReason) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/control-effectiveness', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await recordControlEffectiveness(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/compensating-controls', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await recordCompensatingControl(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/residual-risk/calculate', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await calculateResidual(req.user!.organizationId, actor(req), req.params.id, req.body?.reason || 'manual.calculate') });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/residual-risk/confirm', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await confirmResidual(req.user!.organizationId, actor(req), req.params.id, req.body?.note) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/vendors/:vendorId/engagement-risk', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['finding.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await listVendorEngagementRisk(req.user!.organizationId, actor(req), req.params.vendorId) });
     } catch (error) {
         next(error);
     }

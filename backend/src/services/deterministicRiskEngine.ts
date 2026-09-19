@@ -241,3 +241,132 @@ export function calculateVendorRiskAt(input: RiskEngineInput, at: Date): RiskEng
         calculatedAt: at.toISOString(),
     };
 }
+
+/** Golden Journey residual methodology. Reuses documented weights; does not wrap vendor-level calculateVendorRiskAt. */
+export const ENGAGEMENT_RISK_SCORE_VERSION = 'supreme-risk-engagement-1.0.0';
+export const ENGAGEMENT_CALCULATION_VERSION = 'supreme-risk-1.2.0-engagement-adapter';
+
+export const CONTROL_RATING_POINTS: Record<string, number> = {
+    EFFECTIVE: 80,
+    PARTIALLY_EFFECTIVE: 40,
+    INEFFECTIVE: 0,
+};
+
+export type EngagementResidualInput = {
+    confirmedTier: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+    controlRatings: Array<{ rating: string; controlKey?: string; controlTitle?: string }>;
+    openFindings: Array<{ severity: FindingSeverity; id?: string; title?: string }>;
+    reviewedCompensatingCount: number;
+};
+
+export type EngagementResidualReadiness = {
+    ready: boolean;
+    blockers: string[];
+};
+
+export function engagementResidualReadiness(input: {
+    confirmedTier?: string | null;
+    controlRatings: Array<{ rating: string; rationale?: string | null }>;
+}): EngagementResidualReadiness {
+    const blockers: string[] = [];
+    const tier = String(input.confirmedTier || '').toUpperCase();
+    if (!['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].includes(tier)) {
+        blockers.push('Confirmed inherent tier is required. Residual risk is blocked until Wave 2 confirmation exists.');
+    }
+    const applicable = input.controlRatings.filter((row) => row.rating !== 'NOT_APPLICABLE');
+    if (!input.controlRatings.length) {
+        blockers.push('No control-effectiveness judgments are recorded.');
+    }
+    if (input.controlRatings.some((row) => row.rating === 'NOT_APPLICABLE' && !String(row.rationale || '').trim())) {
+        blockers.push('Not applicable requires a rationale.');
+    }
+    if (applicable.some((row) => row.rating === 'NOT_ASSESSED' || !row.rating)) {
+        blockers.push('One or more applicable controls are not assessed. Residual risk is not ready.');
+    }
+    if (!applicable.filter((row) => ['EFFECTIVE', 'PARTIALLY_EFFECTIVE', 'INEFFECTIVE'].includes(row.rating)).length) {
+        blockers.push('At least one applicable control must be judged Effective, Partially effective, or Ineffective.');
+    }
+    return { ready: blockers.length === 0, blockers };
+}
+
+export function calculateEngagementResidual(input: EngagementResidualInput, at = new Date()): RiskEngineResult {
+    const readiness = engagementResidualReadiness({
+        confirmedTier: input.confirmedTier,
+        controlRatings: input.controlRatings,
+    });
+    if (!readiness.ready) {
+        throw new Error(readiness.blockers[0] || 'Residual risk is not ready.');
+    }
+    const weights = resolveWeights({});
+    const inherent = weights.tierBase[input.confirmedTier] ?? 40;
+    const factors: RiskFactor[] = [{
+        code: 'confirmed_inherent_tier',
+        label: `Confirmed inherent ${input.confirmedTier}`,
+        group: 'inherent',
+        points: inherent,
+        rationale: `Wave 2 confirmed EngagementIra tier ${input.confirmedTier} maps to documented tierBase ${inherent}. IRA was not recalculated.`,
+    }];
+
+    const scored = input.controlRatings.filter((row) => Object.prototype.hasOwnProperty.call(CONTROL_RATING_POINTS, row.rating));
+    const ceBase = scored.reduce((sum, row) => sum + CONTROL_RATING_POINTS[row.rating], 0) / scored.length;
+    const compensatingPoints = input.reviewedCompensatingCount * weights.compensatingControlPoints;
+    const controlEffectiveness = clamp(ceBase + compensatingPoints);
+    const afterControls = inherent * (1 - controlEffectiveness / 140);
+    factors.push({
+        code: 'engagement_control_effectiveness',
+        label: 'Engagement control-effectiveness haircut',
+        group: 'control',
+        points: clamp(controlEffectiveness) * -1,
+        rationale: `Human-governed ratings averaged ${Math.round(ceBase)}; ${input.reviewedCompensatingCount} reviewed compensating control(s) added ${compensatingPoints}. Residual starts at ${Math.round(afterControls)}. Questionnaire numeric scores were not used.`,
+    });
+    for (const row of scored) {
+        factors.push({
+            code: `ce_${(row.controlKey || 'control').toLowerCase()}`,
+            label: `${row.controlTitle || row.controlKey || 'Control'} ${row.rating}`,
+            group: 'control',
+            points: CONTROL_RATING_POINTS[row.rating],
+            rationale: `Engagement-specific judgment ${row.rating} = ${CONTROL_RATING_POINTS[row.rating]} points`,
+        });
+    }
+
+    let residual = afterControls;
+    for (const finding of input.openFindings) {
+        const points = weights.findingPoints[finding.severity] || 0;
+        residual += points;
+        factors.push({
+            code: `finding_${finding.severity.toLowerCase()}`,
+            label: finding.title || `${finding.severity} confirmed open finding`,
+            group: 'residual',
+            points,
+            rationale: `Confirmed open ${finding.severity} finding ${finding.id || ''} adds ${points}. Candidates and dismissed findings are excluded.`,
+        });
+    }
+    residual = clamp(residual);
+    const explanation = [
+        `Confirmed inherent ${input.confirmedTier} (${inherent})`,
+        `control effectiveness ${controlEffectiveness}`,
+        `${input.openFindings.length} confirmed open findings`,
+        `${input.reviewedCompensatingCount} reviewed compensating controls`,
+        `residual ${residual} (${band(residual)})`,
+        `methodology ${ENGAGEMENT_RISK_SCORE_VERSION}`,
+        `calculation ${ENGAGEMENT_CALCULATION_VERSION}`,
+    ].join('; ');
+
+    return {
+        scoreVersion: RISK_SCORE_VERSION,
+        inherentRisk: inherent,
+        controlEffectiveness,
+        residualRisk: residual,
+        riskBand: band(residual),
+        explanation,
+        factors,
+        inputs: {
+            vendorCriticality: input.confirmedTier,
+            openFindings: input.openFindings,
+            compensatingControls: input.reviewedCompensatingCount,
+            methodologyVersion: ENGAGEMENT_RISK_SCORE_VERSION,
+            authoritativeInherent: inherent,
+        },
+        calculatedAt: at.toISOString(),
+    };
+}

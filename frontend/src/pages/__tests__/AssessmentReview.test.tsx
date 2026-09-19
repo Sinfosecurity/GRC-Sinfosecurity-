@@ -60,6 +60,6 @@ describe('Specialist assessment review', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Request clarification' }));
         expect(await screen.findByText(/Vendor clarification requested/)).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Mark review complete' }));
-        expect(await screen.findByText(/No finding was created/)).toBeInTheDocument();
+        expect(await screen.findByText(/Candidates are not findings until confirmed/)).toBeInTheDocument();
     });
 });
