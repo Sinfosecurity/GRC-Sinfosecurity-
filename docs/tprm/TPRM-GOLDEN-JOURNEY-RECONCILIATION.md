@@ -717,6 +717,9 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 ## Wave 2 — Engagement IRA + Tier Review + requester clarification
 
 **Starting SHA:** `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`  
+**Implementation SHA:** `c47020a86feeb0b5b67bc408671159e68d8f2c26`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35434076672 PASS  
+**Hosted:** staging frontend/API `c47020a`. Production untouched.  
 **Based on:** accepted Wave 1 persona-isolation checkpoint. Local railway-cleanup `3e41f2b` was preserved on `housekeeping/railway-cleanup` and is **not** in this Wave 2 lineage.
 
 **Ownership:** IRA belongs to the Engagement, not the Third Party master. Two engagements on Microsoft Corporation have separate IRA histories.

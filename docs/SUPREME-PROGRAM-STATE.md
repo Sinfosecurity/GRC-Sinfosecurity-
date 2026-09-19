@@ -6,7 +6,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-19 (#12 Wave 1 ACCEPTED FOR CURRENT STAGE; Wave 2 ACTIVE — Engagement IRA + Tier Review + requester clarification; Wave 3 not started; not #12 PASS)
+**LAST UPDATED:** 2026-09-19 (#12 Wave 2 implemented at `c47020a`; Wave 1 ACCEPTED FOR CURRENT STAGE; Wave 3 not started; not #12 PASS)
 
 **CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 2 Engagement IRA + Tier Review + requester clarification. Wave 1 is accepted for the current stage. Wave 3 is not authorized. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACTIVE. WAVE 3 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 IMPLEMENTATION `c47020a86feeb0b5b67bc408671159e68d8f2c26`. WAVE 2 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35434076672 PASS. Hosted staging frontend/API `c47020a`. WAVE 3 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

@@ -1,0 +1,256 @@
+{
+  "item": "#12",
+  "wave": "2",
+  "declaredPass": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "wave3Started": false,
+  "checks": [
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "c47020a86feeb0b5b67bc408671159e68d8f2c26"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "c47020a86feeb0b5b67bc408671159e68d8f2c26"
+    },
+    {
+      "name": "postgres",
+      "result": "PASS",
+      "detail": "up"
+    },
+    {
+      "name": "signup",
+      "result": "PASS",
+      "detail": "cc28f187"
+    },
+    {
+      "name": "invite.requester",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "hasToken": false,
+        "delivery": "sent"
+      }
+    },
+    {
+      "name": "requester.only.session",
+      "result": "SKIP",
+      "detail": "Invite token was not returned after delivery=sent. Staging does not expose activation secrets. Requester-only hosted login was not fabricated or taken from email."
+    },
+    {
+      "name": "requester.ira.hosted",
+      "result": "SKIP",
+      "detail": "No requester-only session safely available. CI tprm-wave2-engagement-ira.integration.test.ts remains the authoritative IRA/clarification proof."
+    },
+    {
+      "name": "requester.clarification.hosted",
+      "result": "SKIP",
+      "detail": "No requester-only session safely available."
+    },
+    {
+      "name": "grc.denied.requester.apis",
+      "result": "PASS",
+      "detail": {
+        "GET /tprm/requester/home": 403,
+        "GET /tprm/requester/intakes": 403,
+        "GET /tprm/requester/actions": 403,
+        "GET /tprm/requester/iras/not-a-real-ira": 403,
+        "POST /tprm/requester/intakes": 403
+      }
+    },
+    {
+      "name": "grc.cannot.create.intake",
+      "result": "PASS",
+      "detail": {
+        "status": 403,
+        "note": "Wave 1 locked POST /tprm/intakes to the requester persona. GRC cannot start the Golden Journey."
+      }
+    },
+    {
+      "name": "hosted.engagement.ira.walk",
+      "result": "SKIP",
+      "detail": "Requester-only hosted login remains blocked by the invitation-token limitation. GRC cannot create intakes. CI tprm-wave2-engagement-ira.integration.test.ts is the authoritative Engagement \u2192 IRA \u2192 clarification \u2192 confirm/override proof."
+    },
+    {
+      "name": "hosted.tier.review.populated",
+      "result": "SKIP",
+      "detail": "No requester-created engagement is safely available on this hosted org."
+    },
+    {
+      "name": "hosted.confirm.override.clarification",
+      "result": "SKIP",
+      "detail": "Requires requester IRA submission. Authentication was not weakened."
+    },
+    {
+      "name": "wave3.not.started",
+      "result": "PASS",
+      "detail": "Wave 3 routes and due-diligence scoping were not invoked. Engagement status never left the Wave 2 envelope on this walk."
+    },
+    {
+      "name": "vendor.denied.ira",
+      "result": "PASS",
+      "detail": {
+        "vendorTierReview": 401,
+        "unauthIra": 401
+      }
+    },
+    {
+      "name": "finding.workspace.regression",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "insurance.regression",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "no.workspace.switcher",
+      "result": "PASS",
+      "detail": "GRC dashboard"
+    },
+    {
+      "name": "grc.denied.request",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/unauthorized"
+    },
+    {
+      "name": "grc.intake.workspace",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/third-parties/intake"
+    },
+    {
+      "name": "tier.review.route.exists",
+      "result": "PASS",
+      "detail": "GRC route /third-parties/engagements/:id/tier-review"
+    },
+    {
+      "name": "vendor.boundary.unchanged",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-assessment/activate"
+    },
+    {
+      "name": "overflow:grc-intake-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:tier-review-empty-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:grc-intake-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:tier-review-empty-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:grc-intake-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:tier-review-empty-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:grc-intake-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:tier-review-empty-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:grc-intake-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:tier-review-empty-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    }
+  ],
+  "shots": [
+    "grc-denied-request",
+    "grc-intake-1440",
+    "tier-review-empty-1440",
+    "vendor-activate",
+    "grc-intake-375",
+    "tier-review-empty-375",
+    "grc-intake-768",
+    "tier-review-empty-768",
+    "grc-intake-1024",
+    "tier-review-empty-1024",
+    "grc-intake-1440",
+    "tier-review-empty-1440",
+    "grc-intake-1920",
+    "tier-review-empty-1920"
+  ],
+  "overflows": [
+    {
+      "name": "grc-intake-375",
+      "extra": 0
+    },
+    {
+      "name": "tier-review-empty-375",
+      "extra": 0
+    },
+    {
+      "name": "grc-intake-768",
+      "extra": 0
+    },
+    {
+      "name": "tier-review-empty-768",
+      "extra": 0
+    },
+    {
+      "name": "grc-intake-1024",
+      "extra": 0
+    },
+    {
+      "name": "tier-review-empty-1024",
+      "extra": 0
+    },
+    {
+      "name": "grc-intake-1440",
+      "extra": 0
+    },
+    {
+      "name": "tier-review-empty-1440",
+      "extra": 0
+    },
+    {
+      "name": "grc-intake-1920",
+      "extra": 0
+    },
+    {
+      "name": "tier-review-empty-1920",
+      "extra": 0
+    }
+  ],
+  "sha": {
+    "api": "c47020a86feeb0b5b67bc408671159e68d8f2c26",
+    "frontend": "c47020a86feeb0b5b67bc408671159e68d8f2c26",
+    "required": "c47020a86feeb0b5b67bc408671159e68d8f2c26",
+    "environment": "staging",
+    "postgres": "up"
+  },
+  "summary": {
+    "pass": 26,
+    "fail": 0,
+    "skip": 6
+  }
+}

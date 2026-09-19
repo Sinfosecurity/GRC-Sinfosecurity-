@@ -219,9 +219,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACTIVE — ENGAGEMENT IRA + TIER REVIEW + REQUESTER CLARIFICATION. WAVE 3 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
-**CERTIFICATION SHA:** Wave 1 accepted-for-current-stage `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`. Wave 2 is not a #12 PASS acceptance SHA.
+**CERTIFICATION SHA:** Wave 1 accepted-for-current-stage `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`. Wave 2 implementation `c47020a86feeb0b5b67bc408671159e68d8f2c26` is not a #12 PASS acceptance SHA.
 
-**EVIDENCE:** Wave 2 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-2/`. Wave 1 persona-isolation `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1-persona-isolation/`. Architecture `docs/tprm/TPRM-GOLDEN-JOURNEY-RECONCILIATION.md`. Invitation email Queued ≠ Delivered.
+**EVIDENCE:** Wave 2 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-2/`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35434076672 PASS on `c47020a`. Hosted staging frontend/API `c47020a`. Wave 1 persona-isolation `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1-persona-isolation/`. Architecture `docs/tprm/TPRM-GOLDEN-JOURNEY-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Requester-only hosted login remains SKIP.
 
 **NEXT ACTION:** Product Leadership review of Wave 2. Do not start Wave 3. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted; do not extend. #24–#38 and #40 remain unauthorized.
 
