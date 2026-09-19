@@ -3,7 +3,10 @@
 **Item:** Findings + control effectiveness + Engagement residual risk  
 **Branch:** `supreme-risk-transformation`  
 **Starting SHA:** `627dfbcc3459ab4b718aaef25acbc9a0fbbcd9a8`  
+**Implementation SHA:** `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`  
 **Wave 3 implementation:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35445728764 PASS  
+**Hosted:** staging frontend/API `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`  
 **Status:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW  
 **#12:** NOT PASS  
 **Wave 5:** NOT STARTED  
@@ -14,21 +17,29 @@
 
 Candidate is not a finding until confirmed. Dismissal preserves history and does not count as open residual input. Confirmed findings are Engagement-owned. Two Microsoft engagements receive different CE judgments and different residual records. Unconfirmed inherent tier blocks residual. N/A requires rationale. NOT_ASSESSED does not become Effective. Closed findings exit the open-finding input after recalculation. Residual history is append-only. Requester and vendor sessions cannot read internal residual risk. Cross-tenant deny. Legacy Vendor residual is not written. No Accept Risk path for Golden Journey Engagement findings. No contract gate. No Engagement ACTIVE.
 
-## Hosted golden walk
+## Hosted runtime
 
-Recorded after staging deploy of the Wave 4 implementation SHA. Populated requester/vendor browser checks remain SKIP unless invitation-token policy changes. Authentication is not weakened.
+Frontend `https://supreme-risk-staging.onrender.com/version.json` `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`  
+API `https://supreme-risk-staging-api.onrender.com/health` `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`  
+Postgres up. Malware CONNECTED. Staging only. Production untouched.
+
+## Hosted golden walk
 
 | Check | Result |
 | --- | --- |
+| Hosted SHA | **PASS.** Frontend and API both `fc228bc`. |
+| Postgres / malware | **PASS.** |
 | Candidate ≠ finding | **PASS** in CI |
 | Confirm / dismiss | **PASS** in CI |
 | Multi-engagement isolation | **PASS** in CI |
 | Residual drill-down | **PASS** in frontend tests |
-| Requester denial | **PASS** in CI |
-| Vendor denial | **PASS** in CI |
-| Wave 5 not started | **PASS** in CI |
-| Hosted populated vendor walk | **SKIP** pending invitation token |
-| Hosted requester residual denial | **SKIP** pending populated requester login |
+| Findings register hosted | **PASS.** Engagement and responsibility filters present. |
+| Engagement risk route | **PASS.** Empty/missing Engagement shows an honest error, not a fabricated score. |
+| GRC denied Requester Workspace | **PASS.** `/request` → unauthorized. Requester APIs 403. |
+| Wave 5 accept-risk route | **PASS.** Not implemented (404). |
+| #23 Insurance | **PASS.** `POST /insurance/activate` 201. |
+| Responsive 375–1920 | **PASS.** No horizontal overflow on Findings and Engagement risk. |
+| Hosted populated vendor/requester walk | **SKIP.** Invite token still withheld. Auth was not weakened. |
 
 ## Confirmations
 

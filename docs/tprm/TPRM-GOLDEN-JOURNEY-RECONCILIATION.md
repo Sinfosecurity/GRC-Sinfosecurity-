@@ -760,6 +760,9 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 ## Wave 4 — Findings + control effectiveness + Engagement residual risk
 
 **Starting SHA:** `627dfbcc3459ab4b718aaef25acbc9a0fbbcd9a8` (Wave 3 evidence HEAD)  
+**Implementation SHA:** `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35445728764 PASS  
+**Hosted:** staging frontend/API `fc228bc`. Production untouched.  
 **Wave 3 implementation:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
 **Implementation:** Engagement-aware `VendorIssue.engagementId` (no second finding register). New `EngagementControlEffectiveness`, `EngagementCompensatingControl`, and `EngagementResidualRiskAssessment`.  
 **Wave 5:** NOT STARTED. No new risk acceptance, contract gate, or Engagement ACTIVE transition.

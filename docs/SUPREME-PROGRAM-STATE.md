@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). WAVE 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). WAVE 3 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35442535799 PASS on `680b40f`. WAVE 4 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 5 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). WAVE 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). WAVE 3 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35442535799 PASS on `680b40f`. WAVE 4 IMPLEMENTATION `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`. WAVE 4 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35445728764 PASS. Hosted staging frontend/API `fc228bc`. WAVE 4 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 5 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

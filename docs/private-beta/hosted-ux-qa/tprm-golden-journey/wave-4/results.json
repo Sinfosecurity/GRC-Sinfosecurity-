@@ -1,0 +1,30 @@
+{
+  "item": "#12",
+  "wave": "4",
+  "declaredPass": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "wave5Started": false,
+  "implementationSha": "fc228bc0ce3d3acf57afebc2ae7829cd92a10563",
+  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35445728764",
+  "checks": [
+    { "name": "api-sha", "result": "PASS", "detail": "fc228bc0ce3d3acf57afebc2ae7829cd92a10563" },
+    { "name": "frontend-sha", "result": "PASS", "detail": "fc228bc0ce3d3acf57afebc2ae7829cd92a10563" },
+    { "name": "postgres", "result": "PASS", "detail": "up" },
+    { "name": "malware", "result": "PASS", "detail": "CONNECTED" },
+    { "name": "ci", "result": "PASS", "detail": "35445728764" },
+    { "name": "candidate-not-finding", "result": "PASS", "detail": "CI tprm-wave4-engagement-risk.integration.test.ts" },
+    { "name": "multi-engagement-residual", "result": "PASS", "detail": "Azure and Professional Services independent residual records" },
+    { "name": "grc.denied.requester", "result": "PASS", "detail": "GET /tprm/requester/home 403; /request → unauthorized" },
+    { "name": "grc.cannot.create.intake", "result": "PASS", "detail": "POST /tprm/intakes 403" },
+    { "name": "unauth.residual", "result": "PASS", "detail": "401" },
+    { "name": "no-wave5-accept-risk", "result": "PASS", "detail": "POST /tprm/engagements/:id/accept-risk 404" },
+    { "name": "insurance", "result": "PASS", "detail": "POST /insurance/activate 201" },
+    { "name": "findings-register-hosted", "result": "PASS", "detail": "Engagement and responsibility filters present" },
+    { "name": "engagement-risk-route-hosted", "result": "PASS", "detail": "/third-parties/engagements/:id/risk rendered" },
+    { "name": "responsive", "result": "PASS", "detail": "375/768/1024/1440/1920 no horizontal overflow on Findings and Engagement risk" },
+    { "name": "hosted.populated.microsoft.walk", "result": "SKIP", "detail": "Invite token still withheld. CI is the authoritative populated proof." },
+    { "name": "hosted.requester.residual.denial", "result": "SKIP", "detail": "Requester-only hosted login remains blocked. Auth was not weakened." },
+    { "name": "hosted.vendor.residual.denial", "result": "SKIP", "detail": "No hosted vendor token. Auth was not weakened. CI vendor JWT 401/403." }
+  ]
+}
