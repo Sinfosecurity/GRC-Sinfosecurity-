@@ -97,7 +97,11 @@ export default function PrivacyActivityDetail() {
                                 <Typography>Source: {data.sourceOfData || 'Not recorded'}</Typography>
                                 <Typography>Storage: {(data.storageLocations || []).join(', ') || 'Not recorded'}</Typography>
                                 <Typography>Jurisdictions: {(data.jurisdictions || []).join(', ') || 'Not recorded'}</Typography>
-                                <Typography>Privacy regime: {(data.purposes || []).flatMap((row: any) => row.bases || []).map((basis: any) => basis.regime).filter(Boolean)[0] || 'Not determined'}</Typography>
+                                <Typography>Privacy regime: {(() => {
+                                    const regime = (data.purposes || []).flatMap((row: any) => row.bases || []).map((basis: any) => basis.regime).filter(Boolean)[0];
+                                    if (!regime || /^(NOT_DETERMINED|UNSPECIFIED|UNKNOWN)$/i.test(String(regime))) return 'Not determined';
+                                    return String(regime);
+                                })()}</Typography>
                                 <Typography>Risk level: {data.riskLevel}</Typography>
                                 <Typography sx={{ mt: 2 }} fontWeight={700}>Structured flow</Typography>
                                 <Typography>{[data.flow.source, ...(data.flow.systems || []), data.flow.businessProcess, ...(data.flow.vendors || []), ...(data.flow.recipients || []), ...(data.flow.storage || []), ...(data.flow.jurisdictions || [])].filter(Boolean).join(' → ')}</Typography>

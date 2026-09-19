@@ -139,16 +139,16 @@ export default function FindingsRemediation() {
             <Surface>
                 <FormSection title="Record a manual finding" body="Use this when an issue is not already created by an assessment or monitoring signal. Do not reuse questionnaire wording unless that is what was observed.">
                     <Stack spacing={1.5}>
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-                            <TextField select label="Affected vendor" value={createVendorId} onChange={(e) => setCreateVendorId(e.target.value)} sx={{ minWidth: 220 }}>
+                        <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap">
+                            <TextField select label="Affected vendor" value={createVendorId} onChange={(e) => setCreateVendorId(e.target.value)} sx={{ minWidth: 160, flex: '1 1 180px' }}>
                                 <MenuItem value="">Select vendor</MenuItem>
                                 {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                             </TextField>
-                            <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ flex: 1 }} />
-                            <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 140 }}>
+                            <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} sx={{ minWidth: 200, flex: '2 1 240px' }} />
+                            <TextField select label="Severity" value={severity} onChange={(e) => setSeverity(e.target.value)} sx={{ minWidth: 120, flex: '1 1 120px' }}>
                                 {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
                             </TextField>
-                            <TextField select label="Responsibility" value={responsibility} onChange={(e) => setResponsibility(e.target.value)} sx={{ minWidth: 180 }}>
+                            <TextField select label="Responsibility" value={responsibility} onChange={(e) => setResponsibility(e.target.value)} sx={{ minWidth: 140, flex: '1 1 140px' }}>
                                 <MenuItem value="INTERNAL">Internal</MenuItem>
                                 <MenuItem value="VENDOR">Vendor</MenuItem>
                                 <MenuItem value="SHARED">Shared</MenuItem>
@@ -159,31 +159,31 @@ export default function FindingsRemediation() {
                     </Stack>
                 </FormSection>
             </Surface>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 2, mb: 1.5 }}>
-                <TextField select label="Filter by vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 200 }}>
+            <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap" sx={{ mt: 2, mb: 1.5 }}>
+                <TextField select label="Filter by vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: 140, flex: '1 1 140px' }}>
                     <MenuItem value="">All vendors</MenuItem>
                     {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
                         <MenuItem value={vendorId}>Selected vendor</MenuItem>
                     )}
                     {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
                 </TextField>
-                <TextField select label="Filter by status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} sx={{ minWidth: 160 }}>
+                <TextField select label="Filter by status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} sx={{ minWidth: 140, flex: '1 1 140px' }}>
                     <MenuItem value="">All statuses</MenuItem>
                     {Array.from(new Set(findings.map((row) => row.status))).map((value) => (
                         <MenuItem key={value} value={value}>{humanizeLabel(value)}</MenuItem>
                     ))}
                 </TextField>
-                <TextField select label="Filter by severity" value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)} sx={{ minWidth: 160 }}>
+                <TextField select label="Filter by severity" value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)} sx={{ minWidth: 140, flex: '1 1 140px' }}>
                     <MenuItem value="">All severities</MenuItem>
                     {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((value) => <MenuItem key={value} value={value}>{value}</MenuItem>)}
                 </TextField>
-                <TextField select label="Filter by source" value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} sx={{ minWidth: 180 }}>
+                <TextField select label="Filter by source" value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} sx={{ minWidth: 140, flex: '1 1 140px' }}>
                     <MenuItem value="">All sources</MenuItem>
                     {Array.from(new Set(findings.map((row) => row.sourceKind).filter(Boolean))).map((value) => (
                         <MenuItem key={value} value={value}>{humanizeLabel(value)}</MenuItem>
                     ))}
                 </TextField>
-                <TextField select label="Due" value={overdueOnly ? 'overdue' : ''} onChange={(e) => setOverdueOnly(e.target.value === 'overdue')} sx={{ minWidth: 140 }}>
+                <TextField select label="Due" value={overdueOnly ? 'overdue' : ''} onChange={(e) => setOverdueOnly(e.target.value === 'overdue')} sx={{ minWidth: 120, flex: '1 1 120px' }}>
                     <MenuItem value="">All dates</MenuItem>
                     <MenuItem value="overdue">Overdue</MenuItem>
                 </TextField>

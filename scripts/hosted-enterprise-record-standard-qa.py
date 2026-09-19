@@ -266,10 +266,11 @@ def main() -> None:
                 )
             shot(page, f"{name}-1440")
 
-        if page.get_by_text("Privacy — Breach notification process not demonstrated").count():
-            page.goto(f"{BASE}/findings", wait_until="domcontentloaded")
-            page.wait_for_timeout(1000)
-            page.get_by_text("Privacy — Breach notification process not demonstrated").first.click()
+        page.goto(f"{BASE}/findings", wait_until="domcontentloaded")
+        page.wait_for_timeout(1000)
+        finding_title = page.get_by_text("Privacy — Breach notification process not demonstrated")
+        if finding_title.count():
+            finding_title.first.click()
             page.wait_for_timeout(1200)
             drawer = page.inner_text("body").lower()
             record(
@@ -278,6 +279,8 @@ def main() -> None:
                 "drawer stands alone",
             )
             shot(page, "finding-drawer-1440")
+        else:
+            record("finding-drawer-memoryless", "FAIL", "finding title not on register")
 
         if activity_id:
             page.goto(f"{BASE}/privacy-ops/activities/{activity_id}", wait_until="domcontentloaded")
@@ -285,8 +288,8 @@ def main() -> None:
             privacy_body = page.inner_text("body")
             record(
                 "privacy-detail-no-gdpr-default",
-                "PASS" if "Not determined" in privacy_body or "NOT_DETERMINED" in privacy_body else "FAIL",
-                "regime visible",
+                "PASS" if any(token in privacy_body for token in ("Not determined", "NOT_DETERMINED", "Unspecified", "UNSPECIFIED")) else "FAIL",
+                "regime visible as undetermined, not GDPR",
             )
             record(
                 "privacy-detail-no-claims-default",
