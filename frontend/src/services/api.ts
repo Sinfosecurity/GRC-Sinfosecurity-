@@ -524,6 +524,9 @@ export const requesterAPI = {
     create: (data: unknown) => api.post('/tprm/requester/intakes', data),
     get: (id: string) => api.get(`/tprm/requester/intakes/${id}`),
     respond: (id: string, data: unknown) => api.post(`/tprm/requester/intakes/${id}/information-response`, data),
+    getIra: (id: string) => api.get(`/tprm/requester/iras/${id}`),
+    submitIra: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/submit`, data),
+    submitIraClarification: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/clarification`, data),
 };
 
 export const intakeAPI = {
@@ -543,6 +546,10 @@ export const intakeAPI = {
     close: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/close`, data),
     listEngagements: (params?: unknown) => api.get('/tprm/engagements', { params }),
     getEngagement: (id: string) => api.get(`/tprm/engagements/${id}`),
+    getTierReview: (id: string) => api.get(`/tprm/engagements/${id}/tier-review`),
+    confirmTier: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/tier-review/confirm`, data || {}),
+    overrideTier: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/tier-review/override`, data),
+    requestIraClarification: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/tier-review/clarification`, data),
 };
 
 const intakeInfoApi = axios.create({

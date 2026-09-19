@@ -611,8 +611,8 @@ Sequence is required by FK/data dependencies. Do not start Wave 4–8 first.
 
 **Phase 0 lock SHA:** `e0784550abf7c806de74993baa5a73386702ef81`  
 **Wave 1:** implemented on `supreme-risk-transformation`.  
-**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 FOUNDATION PRESERVED · WAVE 1 PERSONA-ISOLATION CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW.  
-**Wave 1 NOT ACCEPTED. Not PASS.** Wave 2 not started and not authorized. IRA scoring not changed. Tier Review clarification not started.
+**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 ACCEPTED FOR CURRENT STAGE · WAVE 2 ACTIVE.  
+**Wave 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). Not PASS.** Wave 2 Engagement IRA + Tier Review + requester clarification is implemented. Wave 3 not started. Version 3 scoring preserved.
 
 ### What Wave 1 shipped
 
@@ -688,7 +688,11 @@ Requester IRA operating flow, Tier Review clarification loop, vendor assessment 
 ## Wave 1 persona-isolation correction (not Wave 2)
 
 **Starting evidence HEAD:** `fd2b5d9e704f633c81d0b089cf606f362d8e0cb3`  
-**Wave 1 foundation preserved:** `778b870d01e0946b93c14e5d10d19e2f04cbb79f`
+**Persona-isolation SHA:** `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`  
+**Wave 1 foundation preserved:** `778b870d01e0946b93c14e5d10d19e2f04cbb79f`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35431254050 PASS  
+**Hosted frontend SHA:** `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`  
+**Hosted API SHA:** `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`
 
 **Why:** The requester-boundary implementation introduced an unauthorized dual-role workspace switcher. Product Leadership did not design Requester Workspace and GRC Workspace as interchangeable modes.
 
@@ -706,4 +710,19 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Design-conformance rule:** Implementation convenience must not alter the approved Golden Journey. If implementation requires a material workflow, persona, authorization, data-model, or workspace deviation, engineering must STOP and return the decision to Product Leadership before implementation.
 
-**#12 status after this correction:** ACTIVE — GOLDEN JOURNEY REVAMP. Wave 1 foundation PRESERVED. Wave 1 persona-isolation correction READY FOR PRODUCT LEADERSHIP REVIEW. Wave 1 NOT ACCEPTED. Wave 2 NOT STARTED. Commercial production NO-GO. Production untouched. #23 preserved.
+**#12 status after this correction:** ACTIVE — GOLDEN JOURNEY REVAMP. Wave 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). Wave 2 ACTIVE. Wave 3 NOT STARTED. Commercial production NO-GO. Production untouched. #23 preserved.
+
+---
+
+## Wave 2 — Engagement IRA + Tier Review + requester clarification
+
+**Starting SHA:** `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`  
+**Based on:** accepted Wave 1 persona-isolation checkpoint. Local railway-cleanup `3e41f2b` was preserved on `housekeeping/railway-cleanup` and is **not** in this Wave 2 lineage.
+
+**Ownership:** IRA belongs to the Engagement, not the Third Party master. Two engagements on Microsoft Corporation have separate IRA histories.
+
+**Preserved:** Version 3 `scoreIra` / IR-01–IR-15, Don't Know → not rated, floors, packs, Low auto-confirm rules (confirm Low without starting Wave 3 DD), hashed requester task links, persona isolation, Insurance-on-Vendor (#23), Finding Workspace.
+
+**Shipped:** authenticated Requester Workspace IRA (`/request/ira/:id`), question-specific clarification (`/request/ira/:id/clarification`), GRC Tier Review (`/third-parties/engagements/:id/tier-review`) with Confirm / Override / Request clarification, immutable submission + clarification rounds, recalculation snapshots, business-friendly requester statuses, graph `Engagement → ASSESSMENT(EngagementIra)`.
+
+**Not started:** Wave 3 due-diligence scope, vendor assessment, evidence, findings, residual, treatment, contract, activation, monitoring.

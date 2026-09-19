@@ -52,6 +52,10 @@ vi.mock('../../services/api', () => ({
         createEngagement: vi.fn(),
         listEngagements: vi.fn(),
         getEngagement: vi.fn(),
+        getTierReview: vi.fn(),
+        confirmTier: vi.fn(),
+        overrideTier: vi.fn(),
+        requestIraClarification: vi.fn(),
     },
 }));
 

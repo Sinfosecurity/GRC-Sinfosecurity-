@@ -42,7 +42,17 @@ export default function RequesterActions() {
             {error && <Alert severity="error">{error}</Alert>}
             {message && <Alert severity="success">{message}</Alert>}
             {!items.length && !error && <Typography>Nothing needs your attention right now.</Typography>}
-            {items.map((item) => (
+            {items.map((item) => item.type === 'IRA_REQUIRED' || item.type === 'IRA_CLARIFICATION' ? (
+                <Stack key={item.id} sx={{ bgcolor: color.surface, border: `1px solid ${color.line}`, borderRadius: 2, p: 2 }} spacing={1.5}>
+                    <Typography fontWeight={700}>{item.title}</Typography>
+                    <Typography>{item.engagementPublicId} · {item.thirdPartyName}</Typography>
+                    <Typography>{item.serviceName}</Typography>
+                    <Typography>{item.requesterStatus}</Typography>
+                    <Button component={Link} to={item.href} variant="contained">
+                        {item.type === 'IRA_CLARIFICATION' ? 'Open clarification' : 'Complete risk assessment'}
+                    </Button>
+                </Stack>
+            ) : (
                 <Stack key={item.id} component="form" onSubmit={(event) => submit(event, item)} sx={{ bgcolor: color.surface, border: `1px solid ${color.line}`, borderRadius: 2, p: 2 }} spacing={1.5}>
                     <Typography fontWeight={700}>{item.publicId} · {item.proposedThirdPartyName}</Typography>
                     <Typography>{item.proposedServiceName}</Typography>

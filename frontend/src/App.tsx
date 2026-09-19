@@ -39,10 +39,13 @@ const RequesterMyRequests = lazy(() => import('./requester/RequesterMyRequests')
 const RequesterActions = lazy(() => import('./requester/RequesterActions'));
 const RequesterRequestDetail = lazy(() => import('./requester/RequesterRequestDetail'));
 const RequesterHelp = lazy(() => import('./requester/RequesterHelp'));
+const RequesterEngagementIra = lazy(() => import('./requester/RequesterEngagementIra'));
+const RequesterIraClarification = lazy(() => import('./requester/RequesterIraClarification'));
 const ThirdPartyIntakeQueue = lazy(() => import('./pages/ThirdPartyIntakeQueue'));
 const ThirdPartyMyWork = lazy(() => import('./pages/ThirdPartyMyWork'));
 const ThirdPartyIntakeDetail = lazy(() => import('./pages/ThirdPartyIntakeDetail'));
 const EngagementDetail = lazy(() => import('./pages/EngagementDetail'));
+const TierReview = lazy(() => import('./pages/TierReview'));
 const IntakeInfoRespond = lazy(() => import('./pages/IntakeInfoRespond'));
 const VendorAssessmentPortal = lazy(() => import('./pages/VendorAssessmentPortal'));
 const VendorAssessmentQuestionnaire = lazy(() => import('./pages/VendorAssessmentQuestionnaire'));
@@ -209,6 +212,8 @@ export default function App() {
                     <Route path="/request/new" element={<RequesterNewRequest />} />
                     <Route path="/request/my-requests" element={<RequesterMyRequests />} />
                     <Route path="/request/actions" element={<RequesterActions />} />
+                    <Route path="/request/ira/:id/clarification" element={<RequesterIraClarification />} />
+                    <Route path="/request/ira/:id" element={<RequesterEngagementIra />} />
                     <Route path="/request/help" element={<RequesterHelp />} />
                     <Route path="/request/:publicId" element={<RequesterRequestDetail />} />
                 </Route>
@@ -298,6 +303,7 @@ export default function App() {
                     <Route path="third-parties/intake" element={<ThirdPartyIntakeQueue />} />
                     <Route path="third-parties/my-work" element={<ThirdPartyMyWork />} />
                     <Route path="third-parties/intake/:id" element={<ThirdPartyIntakeDetail />} />
+                    <Route path="third-parties/engagements/:id/tier-review" element={<TierReview />} />
                     <Route path="third-parties/engagements/:id" element={<EngagementDetail />} />
                     <Route path="vendor-onboarding" element={<VendorOnboarding />} />
                     <Route path="vendor-onboarding/:id" element={<VendorOnboardingWorkspace />} />

@@ -26,6 +26,15 @@ import {
     startTriage,
     workload,
 } from '../services/intakeEngagementService';
+import {
+    confirmEngagementTier,
+    getRequesterIra,
+    getTierReview,
+    overrideEngagementTier,
+    requestIraClarification,
+    submitRequesterClarification,
+    submitRequesterIra,
+} from '../services/engagementIraService';
 
 const router = Router();
 
@@ -42,6 +51,8 @@ const requesterPerms = [
     PERMISSIONS['intake.create_own'],
     PERMISSIONS['intake.read_own'],
     PERMISSIONS['intake.respond_own'],
+    PERMISSIONS['ira.complete_own'],
+    PERMISSIONS['ira.clarify_own'],
 ] as const;
 
 router.get('/requester/home', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -253,6 +264,62 @@ router.get('/engagements', requirePractitionerPersona, requirePermission(PERMISS
 router.get('/engagements/:id', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await getEngagement(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/requester/iras/:id', requireRequesterPersona, requirePermission(PERMISSIONS['ira.complete_own'], PERMISSIONS['ira.clarify_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getRequesterIra(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/requester/iras/:id/submit', requireRequesterPersona, requirePermission(PERMISSIONS['ira.complete_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await submitRequesterIra(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/requester/iras/:id/clarification', requireRequesterPersona, requirePermission(PERMISSIONS['ira.clarify_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await submitRequesterClarification(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/tier-review', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getTierReview(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/tier-review/confirm', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await confirmEngagementTier(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/tier-review/override', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await overrideEngagementTier(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/tier-review/clarification', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await requestIraClarification(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
         next(error);
     }

@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-19 (#12 Wave 1 persona-isolation correction READY FOR PRODUCT LEADERSHIP REVIEW; Wave 1 NOT ACCEPTED; Wave 2 not started; not #12 PASS)
+**LAST UPDATED:** 2026-09-19 (#12 Wave 1 ACCEPTED FOR CURRENT STAGE; Wave 2 ACTIVE — Engagement IRA + Tier Review + requester clarification; Wave 3 not started; not #12 PASS)
 
-**CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 1 persona-isolation correction ready for Product Leadership review. Wave 1 is not accepted. Wave 2 is not authorized. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
+**CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 2 Engagement IRA + Tier Review + requester clarification. Wave 1 is accepted for the current stage. Wave 3 is not authorized. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 FOUNDATION PRESERVED. WAVE 1 PERSONA-ISOLATION CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 1 NOT ACCEPTED. WAVE 2 NOT STARTED. Phase 0 lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f`. Evidence HEAD before this correction `fd2b5d9e704f633c81d0b089cf606f362d8e0cb3`. Dual-role workspace switching removed. IRA scoring not changed. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACTIVE. WAVE 3 NOT STARTED. IRA belongs to Engagement. Version 3 scoring preserved. Dual-role workspace switching remains removed. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 FOUNDATION PRESERVED (`778b870d01e0946b93c14e5d10d19e2f04cbb79f`). WAVE 1 PERSONA-ISOLATION CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 1 NOT ACCEPTED. WAVE 2 NOT STARTED. Prior requester-boundary SHA `1168f8e5e0203b1972bb9b7dbf2b089da7d4ba51`. Evidence HEAD before this correction `fd2b5d9e704f633c81d0b089cf606f362d8e0cb3`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACTIVE. WAVE 3 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

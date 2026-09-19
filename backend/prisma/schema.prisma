@@ -236,6 +236,9 @@ model Organization {
   intakeAssignments           IntakeAssignment[]
   intakeInformationRequests   IntakeInformationRequest[]
   engagements                 Engagement[]
+  engagementIras              EngagementIra[]
+  engagementIraSubmissions    EngagementIraSubmission[]
+  engagementIraClarifications EngagementIraClarification[]
 
   @@index([slug])
   @@index([status])
@@ -794,6 +797,19 @@ enum EngagementStatus {
   DRAFT
   INTAKE_COMPLETE
   READY_FOR_IRA
+  IRA_IN_PROGRESS
+  TIER_REVIEW
+  NEEDS_REQUESTER_CLARIFICATION
+  INHERENT_TIER_CONFIRMED
+}
+
+enum EngagementIraStatus {
+  REQUIRED
+  IN_PROGRESS
+  SUBMITTED
+  NEEDS_CLARIFICATION
+  TIER_REVIEW
+  CONFIRMED
 }
 
 model IntakeRequest {
@@ -916,6 +932,8 @@ model Engagement {
   createdAt                DateTime          @default(now())
   updatedAt                DateTime          @updatedAt
   onboardings              VendorOnboarding[]
+  ira                      EngagementIra?
+  requesterTaskLinks       RequesterTaskLink[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, vendorId])
@@ -963,6 +981,76 @@ enum VendorTier {
   MEDIUM        // Medium risk - annual assessments
   LOW           // Low risk - biennial assessments
   UNRATED       // Not yet rated — IRA/confirmation required. Not Medium.
+}
+
+model EngagementIra {
+  id                          String              @id @default(uuid())
+  organization                Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId              String
+  engagement                  Engagement          @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId                String              @unique
+  status                      EngagementIraStatus @default(REQUIRED)
+  currentAnswers              Json?
+  recommendedTier             VendorTier?
+  recommendedScore            Int?
+  unknownKeys                 Json?
+  floors                      Json?
+  packs                       Json?
+  explanation                 String?
+  calculationSnapshot         Json?
+  previousCalculationSnapshot Json?
+  confirmedTier               VendorTier?
+  confirmedAt                 DateTime?
+  confirmedBy                 String?
+  overrideFromTier            VendorTier?
+  overrideReason              String?
+  scoringVersion              String              @default("3")
+  openedAt                    DateTime?
+  submittedAt                 DateTime?
+  submittedBy                 String?
+  createdAt                   DateTime            @default(now())
+  updatedAt                   DateTime            @updatedAt
+  submissions                 EngagementIraSubmission[]
+  clarifications              EngagementIraClarification[]
+
+  @@index([organizationId, status])
+}
+
+model EngagementIraSubmission {
+  id                   String         @id @default(uuid())
+  organization         Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  ira                  EngagementIra  @relation(fields: [iraId], references: [id], onDelete: Cascade)
+  iraId                String
+  kind                 String
+  answers              Json
+  calculationSnapshot  Json
+  submittedBy          String
+  submittedAt          DateTime       @default(now())
+
+  @@index([organizationId, iraId])
+}
+
+model EngagementIraClarification {
+  id              String         @id @default(uuid())
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String
+  ira             EngagementIra  @relation(fields: [iraId], references: [id], onDelete: Cascade)
+  iraId           String
+  round           Int
+  questionKey     String
+  previousAnswer  String?
+  analystNote     String
+  requestedBy     String
+  requestedAt     DateTime       @default(now())
+  dueAt           DateTime?
+  generalNote     String?
+  updatedAnswer   String?
+  comment         String?
+  respondedBy     String?
+  respondedAt     DateTime?
+
+  @@index([organizationId, iraId, round])
 }
 
 enum VendorStatus {
@@ -1047,6 +1135,8 @@ model RequesterTaskLink {
   organizationId      String
   vendor              Vendor               @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   vendorId            String
+  engagement          Engagement?          @relation(fields: [engagementId], references: [id])
+  engagementId        String?
   purpose             RequesterTaskPurpose
   email               String
   tokenHash           String               @unique
@@ -1064,6 +1154,7 @@ model RequesterTaskLink {
   updatedAt           DateTime             @updatedAt
 
   @@index([organizationId, vendorId, purpose])
+  @@index([engagementId])
   @@index([email])
 }
 

@@ -21,6 +21,13 @@ import { hashToken, randomToken } from './passwordService';
 import { customerAppUrl, genericOperationalEmail } from './transactionalEmail';
 import { allocateVendorPublicId, findDuplicateVendors } from './vendorOnboardingService';
 import { extractVendorDomain } from './vendorOnboardingScoring';
+import {
+    engagementIraNextAction,
+    engagementIraStatusLabel,
+    listRequesterIraActions,
+    openIraForEngagement,
+    requesterEngagementStatus,
+} from './engagementIraService';
 
 export type Actor = { id: string; name: string; email: string; role: string };
 
@@ -352,7 +359,7 @@ function requesterStatus(status: IntakeStatus, engagementStatus?: EngagementStat
         case IntakeStatus.READY_FOR_MATCH:
         case IntakeStatus.VENDOR_MATCHED: return 'Third party identified';
         case IntakeStatus.ENGAGEMENT_CREATED:
-            return engagementStatus === EngagementStatus.READY_FOR_IRA ? 'Risk assessment required' : 'Engagement created';
+            return engagementStatus ? requesterEngagementStatus(engagementStatus) : 'Engagement created';
         case IntakeStatus.CANCELLED: return 'Cancelled';
         case IntakeStatus.REJECTED: return 'Rejected';
         case IntakeStatus.DUPLICATE: return 'Closed as duplicate';
@@ -463,12 +470,8 @@ function presentEngagement(row: {
         targetStartDate: row.targetStartDate,
         procurementReference: row.procurementReference,
         status: row.status,
-        statusLabel: row.status === EngagementStatus.READY_FOR_IRA
-            ? 'Ready for inherent risk assessment'
-            : row.status === EngagementStatus.INTAKE_COMPLETE
-                ? 'Intake complete'
-                : 'Draft',
-        nextAction: row.status === EngagementStatus.READY_FOR_IRA ? 'Wave 2 will open inherent risk assessment' : 'Review this engagement',
+        statusLabel: engagementIraStatusLabel(row.status),
+        nextAction: engagementIraNextAction(row.status),
         legacyReviewRequired: row.legacyReviewRequired,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
@@ -1243,6 +1246,7 @@ export async function createEngagementFromIntake(organizationId: string, actor: 
     if (updated.requesterUserId) {
         await notifyActor(organizationId, updated.requesterUserId, 'intake.completed', `${updated.publicId} created an engagement`, `${vendor.name} · ${engagement.serviceName}`, 'Engagement', engagement.id);
     }
+    await openIraForEngagement(organizationId, actor, engagement);
     const directory = await usersByIds(organizationId, [engagement.assignedAnalystUserId, engagement.requesterUserId]);
     return {
         intake: presentIntake(updated, await directoryFor(organizationId, updated)),
@@ -1296,10 +1300,17 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
     if (!canRead(actor) && !canTriage(actor)) throw new ApiError(403, 'You cannot view engagements.');
     const row = await prisma.engagement.findFirst({
         where: { organizationId, OR: [{ id: key }, { publicId: key }] },
-        include: { vendor: { select: { id: true, publicId: true, name: true, legalName: true } }, originatingIntake: { select: { id: true, publicId: true } } },
+        include: {
+            vendor: { select: { id: true, publicId: true, name: true, legalName: true } },
+            originatingIntake: { select: { id: true, publicId: true } },
+            ira: { select: { id: true, status: true, recommendedTier: true, confirmedTier: true } },
+        },
     });
     if (!row) throw new ApiError(404, 'Engagement not found.');
-    return presentEngagement(row, await usersByIds(organizationId, [row.assignedAnalystUserId, row.requesterUserId]));
+    return {
+        ...presentEngagement(row, await usersByIds(organizationId, [row.assignedAnalystUserId, row.requesterUserId])),
+        ira: row.ira,
+    };
 }
 
 export async function createRequesterIntake(organizationId: string, actor: Actor, input: Parameters<typeof createIntakeRequest>[2]) {
@@ -1340,21 +1351,27 @@ export async function getRequesterIntake(organizationId: string, actor: Actor, k
 }
 
 export async function listRequesterActions(organizationId: string, actor: Actor) {
-    const { items } = await listRequesterIntakes(organizationId, actor);
+    const [{ items }, iraActions] = await Promise.all([
+        listRequesterIntakes(organizationId, actor),
+        listRequesterIraActions(organizationId, actor),
+    ]);
     return {
-        items: items.flatMap((row) => row.informationRequests.filter((item) => !item.respondedAt).map((item) => ({
-            id: item.id,
-            type: item.type,
-            intakeId: row.id,
-            publicId: row.publicId,
-            proposedThirdPartyName: row.proposedThirdPartyName,
-            proposedServiceName: row.proposedServiceName,
-            requestNote: item.requestNote,
-            fields: item.fields,
-            requestedBy: item.requestedBy,
-            requestedAt: item.requestedAt,
-            dueAt: null,
-        }))),
+        items: [
+            ...iraActions,
+            ...items.flatMap((row) => row.informationRequests.filter((item) => !item.respondedAt).map((item) => ({
+                id: item.id,
+                type: item.type,
+                intakeId: row.id,
+                publicId: row.publicId,
+                proposedThirdPartyName: row.proposedThirdPartyName,
+                proposedServiceName: row.proposedServiceName,
+                requestNote: item.requestNote,
+                fields: item.fields,
+                requestedBy: item.requestedBy,
+                requestedAt: item.requestedAt,
+                dueAt: null,
+            }))),
+        ],
     };
 }
 

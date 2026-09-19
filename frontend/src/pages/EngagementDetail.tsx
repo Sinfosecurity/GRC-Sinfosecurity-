@@ -58,6 +58,9 @@ export default function EngagementDetail() {
                             {data.vendorId && (
                                 <Button onClick={() => navigate(`/vendor-management?vendorId=${data.vendorId}`)}>Open third party</Button>
                             )}
+                            {data.ira && (
+                                <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/tier-review`)}>Open Tier Review</Button>
+                            )}
                         </Surface>
                         <Surface>
                             <Typography variant="h6" sx={{ mb: 1 }}>Engagements for this third party</Typography>

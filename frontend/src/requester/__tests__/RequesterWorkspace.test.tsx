@@ -32,6 +32,9 @@ vi.mock('../../services/api', () => ({
         create: vi.fn(),
         get: vi.fn(),
         respond: vi.fn(),
+        getIra: vi.fn(),
+        submitIra: vi.fn(),
+        submitIraClarification: vi.fn(),
     },
 }));
 
