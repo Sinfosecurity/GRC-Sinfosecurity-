@@ -57,6 +57,8 @@ export interface CreateAssessmentInput {
     assignedTo?: string;
     dueDate?: Date;
     templateId?: string;
+    engagementId?: string;
+    dueDiligencePlanId?: string;
 }
 
 export interface SubmitAssessmentResponseInput {
@@ -90,6 +92,7 @@ class VendorAssessmentService {
                 vendorId: data.vendorId,
                 assessmentType: data.assessmentType,
                 templateId: template.id,
+                engagementId: data.engagementId || null,
                 status: { notIn: [AssessmentStatus.COMPLETED, AssessmentStatus.CANCELLED] },
             },
             orderBy: { createdAt: 'desc' },

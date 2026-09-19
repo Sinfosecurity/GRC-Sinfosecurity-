@@ -53,7 +53,7 @@ export default function VendorAssessmentPortal() {
                     What you need to do
                 </Typography>
                 <Typography sx={{ color: color.navMuted, mt: 1.5, maxWidth: 640, fontSize: 16 }}>
-                    Answer the questions and attach the requested files for {data.vendorName}. You will only see this assignment.
+                    Answer the questions and attach the requested files for {data.vendorName}{data.serviceName ? ` · ${data.serviceName}` : ''}. You will only see this assignment.
                 </Typography>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1.5, sm: 4 }} sx={{ mt: 3 }}>
                     <Box>

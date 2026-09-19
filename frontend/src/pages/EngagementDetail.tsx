@@ -61,6 +61,12 @@ export default function EngagementDetail() {
                             {data.ira && (
                                 <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/tier-review`)}>Open Tier Review</Button>
                             )}
+                            {(data.dueDiligence || data.ira?.confirmedTier || ['INHERENT_TIER_CONFIRMED', 'DUE_DILIGENCE_PLANNING', 'READY_TO_SEND', 'AWAITING_VENDOR', 'VENDOR_IN_PROGRESS', 'VENDOR_SUBMITTED', 'SPECIALIST_REVIEW'].includes(data.status)) && (
+                                <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/due-diligence`)}>Review due-diligence scope</Button>
+                            )}
+                            {['VENDOR_SUBMITTED', 'SPECIALIST_REVIEW'].includes(data.status) && (
+                                <Button onClick={() => navigate(`/third-parties/engagements/${data.id}/assessment-review`)}>Open specialist review</Button>
+                            )}
                         </Surface>
                         <Surface>
                             <Typography variant="h6" sx={{ mb: 1 }}>Engagements for this third party</Typography>

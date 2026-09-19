@@ -12,6 +12,7 @@ export type LinkedUploadInput = {
     assessmentId?: string;
     issueId?: string;
     questionId?: string;
+    engagementId?: string;
     filename: string;
     contentType: string;
     buffer: Buffer;
@@ -98,6 +99,7 @@ export const evidenceLinkageService = {
                         assessmentId: input.assessmentId,
                         issueId: input.issueId,
                         questionId: input.questionId,
+                        engagementId: input.engagementId,
                         createdBy: input.uploadedBy,
                     },
                 });

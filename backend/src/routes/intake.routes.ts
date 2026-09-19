@@ -35,6 +35,19 @@ import {
     submitRequesterClarification,
     submitRequesterIra,
 } from '../services/engagementIraService';
+import {
+    completeSpecialistReview,
+    confirmDueDiligencePlan,
+    copyEngagementActivationLink,
+    getAssessmentReview,
+    getDueDiligencePlan,
+    listEngagementAssessments,
+    markEngagementInvitationShared,
+    modifyDueDiligencePlan,
+    requestVendorClarification,
+    sendEngagementQuestionnaire,
+    setAssessmentContact,
+} from '../services/engagementDueDiligenceService';
 
 const router = Router();
 
@@ -320,6 +333,94 @@ router.post('/engagements/:id/tier-review/override', requirePractitionerPersona,
 router.post('/engagements/:id/tier-review/clarification', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await requestIraClarification(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/assessments/engagements', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await listEngagementAssessments(req.user!.organizationId, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/due-diligence', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getDueDiligencePlan(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/due-diligence/modify', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await modifyDueDiligencePlan(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/due-diligence/confirm', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await confirmDueDiligencePlan(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/due-diligence/contact', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await setAssessmentContact(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/due-diligence/send', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await sendEngagementQuestionnaire(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/due-diligence/link', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await copyEngagementActivationLink(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/due-diligence/shared', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await markEngagementInvitationShared(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/assessment-review', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getAssessmentReview(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/assessment-review/clarification', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await requestVendorClarification(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/assessment-review/complete', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await completeSpecialistReview(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
         next(error);
     }

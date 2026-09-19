@@ -612,7 +612,7 @@ Sequence is required by FK/data dependencies. Do not start Wave 4–8 first.
 **Phase 0 lock SHA:** `e0784550abf7c806de74993baa5a73386702ef81`  
 **Wave 1:** implemented on `supreme-risk-transformation`.  
 **#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 ACCEPTED FOR CURRENT STAGE · WAVE 2 ACTIVE.  
-**Wave 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). Not PASS.** Wave 2 Engagement IRA + Tier Review + requester clarification is implemented. Wave 3 not started. Version 3 scoring preserved.
+**Wave 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). Not PASS.** Wave 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). Wave 3 Engagement due diligence + vendor assessment + evidence + specialist review is implemented and ready for Product Leadership review. Wave 4 not started. Version 3 scoring preserved.
 
 ### What Wave 1 shipped
 
@@ -728,4 +728,26 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Shipped:** authenticated Requester Workspace IRA (`/request/ira/:id`), question-specific clarification (`/request/ira/:id/clarification`), GRC Tier Review (`/third-parties/engagements/:id/tier-review`) with Confirm / Override / Request clarification, immutable submission + clarification rounds, recalculation snapshots, business-friendly requester statuses, graph `Engagement → ASSESSMENT(EngagementIra)`.
 
-**Not started:** Wave 3 due-diligence scope, vendor assessment, evidence, findings, residual, treatment, contract, activation, monitoring.
+**Not started:** Wave 4 findings, control effectiveness, residual risk, treatment, contract, activation, monitoring.
+
+---
+
+## Wave 3 — Engagement due diligence + vendor assessment + evidence + specialist review
+
+**Starting SHA:** `68c327dfecbf23fac67a159d3afa724f246e615d` (Wave 2 evidence descendant of `c47020a86feeb0b5b67bc408671159e68d8f2c26`)  
+**Implementation:** Engagement-scoped `EngagementDueDiligencePlan` (1:1 Engagement). Legacy `VendorOnboarding.vendorId @unique` remains readable and is **not** Golden Journey authority.  
+**Wave 4:** NOT STARTED. No authoritative Findings. No residual-risk recalculation on Wave 3 submit.
+
+**Ownership:** Due diligence, questionnaire, evidence requests, assessment instances, vendor due dates, specialist reviewers, and review history belong to the Engagement. Microsoft Azure Hosting and Microsoft Professional Services receive independent plans and assessment IDs on one Third Party master.
+
+**Plan:** Consumes the confirmed Wave 2 tier (does not recalculate it). Packs show name, included/excluded, why, trigger, required, evidence expected, and reviewer domain. Analyst may include/exclude with written rationale. Recommended snapshot is preserved. Unresolved Don't know remains `Scope requires review`.
+
+**Send:** 4a email queues the invitation (Accepted ≠ Delivered). 4b copy does not mark sent. Mark as sent moves the Engagement to `AWAITING_VENDOR`. Catalog version, pack keys, control IDs, and evidence request IDs are pinned at send/share.
+
+**Vendor workspace:** Secure activation only. Vendor sees Third Party, Engagement/service, questionnaire, due date, evidence, vendor clarification, and submission. Vendor cannot see requester IRA, tier reasoning, pack-selection rationale, other Engagements, or other tenants.
+
+**Evidence:** Reuses #14 StoredObject / EvidenceLink with optional `engagementId`. Non-CLEAN evidence is not usable. PENDING = Scanning, INFECTED = Blocked, UNKNOWN = Security status unavailable.
+
+**Specialist review:** Domain tasks (Cybersecurity, Privacy, Operational Resilience, Compliance, AI Governance, Financial Risk). Wave 3 conclusions: Response sufficient / Needs clarification / Evidence sufficient / Evidence missing / Review complete. Observations may be recorded for Wave 4. Question → Response → Evidence → Review. Finding is later.
+
+**Preserved:** Wave 1 persona isolation, Wave 2 IRA/Tier Review, Version 3 scoring, 4a/4b honesty, #3 malware fail-closed, #14 shared evidence, #23 Insurance on Vendor, Finding Workspace for legacy vendor-centric assessments.

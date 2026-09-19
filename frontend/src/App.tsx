@@ -46,6 +46,8 @@ const ThirdPartyMyWork = lazy(() => import('./pages/ThirdPartyMyWork'));
 const ThirdPartyIntakeDetail = lazy(() => import('./pages/ThirdPartyIntakeDetail'));
 const EngagementDetail = lazy(() => import('./pages/EngagementDetail'));
 const TierReview = lazy(() => import('./pages/TierReview'));
+const DueDiligencePlan = lazy(() => import('./pages/DueDiligencePlan'));
+const AssessmentReview = lazy(() => import('./pages/AssessmentReview'));
 const IntakeInfoRespond = lazy(() => import('./pages/IntakeInfoRespond'));
 const VendorAssessmentPortal = lazy(() => import('./pages/VendorAssessmentPortal'));
 const VendorAssessmentQuestionnaire = lazy(() => import('./pages/VendorAssessmentQuestionnaire'));
@@ -304,6 +306,8 @@ export default function App() {
                     <Route path="third-parties/my-work" element={<ThirdPartyMyWork />} />
                     <Route path="third-parties/intake/:id" element={<ThirdPartyIntakeDetail />} />
                     <Route path="third-parties/engagements/:id/tier-review" element={<TierReview />} />
+                    <Route path="third-parties/engagements/:id/due-diligence" element={<DueDiligencePlan />} />
+                    <Route path="third-parties/engagements/:id/assessment-review" element={<AssessmentReview />} />
                     <Route path="third-parties/engagements/:id" element={<EngagementDetail />} />
                     <Route path="vendor-onboarding" element={<VendorOnboarding />} />
                     <Route path="vendor-onboarding/:id" element={<VendorOnboardingWorkspace />} />

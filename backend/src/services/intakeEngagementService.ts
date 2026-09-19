@@ -1304,12 +1304,14 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
             vendor: { select: { id: true, publicId: true, name: true, legalName: true } },
             originatingIntake: { select: { id: true, publicId: true } },
             ira: { select: { id: true, status: true, recommendedTier: true, confirmedTier: true } },
+            dueDiligencePlan: { select: { id: true, status: true, confirmedTier: true, vendorDueAt: true } },
         },
     });
     if (!row) throw new ApiError(404, 'Engagement not found.');
     return {
         ...presentEngagement(row, await usersByIds(organizationId, [row.assignedAnalystUserId, row.requesterUserId])),
         ira: row.ira,
+        dueDiligence: row.dueDiligencePlan,
     };
 }
 

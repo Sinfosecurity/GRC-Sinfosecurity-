@@ -20,6 +20,7 @@ import { notifyUser } from './notificationDeliveryService';
 import { hashToken, randomToken } from './passwordService';
 import { customerAppUrl, genericOperationalEmail } from './transactionalEmail';
 import type { Actor } from './intakeEngagementService';
+import { openDueDiligencePlan } from './engagementDueDiligenceService';
 
 const TIER_VALUES = new Set(Object.values(VendorTier));
 
@@ -486,6 +487,9 @@ export async function submitRequesterIra(organizationId: string, actor: Actor, k
         cta: { label: 'Open Tier Review', url: customerAppUrl(`/third-parties/engagements/${ira.engagementId}/tier-review`) },
     });
     await notify(organizationId, ira.engagement.assignedAnalystUserId, 'approval.requested', email.subject, email.text, 'Engagement', ira.engagementId, { emailBody: email.text, emailHtml: email.html });
+    if (autoConfirm) {
+        await openDueDiligencePlan(organizationId, actor, { id: ira.engagementId });
+    }
     const fresh = await requireIra(organizationId, ira.id);
     return presentRequesterIra(fresh, questions);
 }
@@ -537,6 +541,7 @@ export async function confirmEngagementTier(organizationId: string, actor: Actor
         confirmedTier: ira.recommendedTier,
         scoringVersion: '3',
     });
+    await openDueDiligencePlan(organizationId, actor, { id: ira.engagementId });
     return getTierReview(organizationId, actor, ira.id);
 }
 
@@ -577,6 +582,7 @@ export async function overrideEngagementTier(organizationId: string, actor: Acto
         reason,
         scoringVersion: '3',
     });
+    await openDueDiligencePlan(organizationId, actor, { id: ira.engagementId });
     return getTierReview(organizationId, actor, ira.id);
 }
 
@@ -734,7 +740,19 @@ export function engagementIraNextAction(status: EngagementStatus) {
         case EngagementStatus.NEEDS_REQUESTER_CLARIFICATION:
             return 'Waiting for requester clarification';
         case EngagementStatus.INHERENT_TIER_CONFIRMED:
-            return 'Inherent tier confirmed. Due-diligence scoping is pending a later authorized wave.';
+            return 'Review due-diligence scope';
+        case EngagementStatus.DUE_DILIGENCE_PLANNING:
+            return 'Review due-diligence scope';
+        case EngagementStatus.READY_TO_SEND:
+            return 'Confirm vendor contact and send questionnaire';
+        case EngagementStatus.AWAITING_VENDOR:
+            return 'Waiting for the vendor to activate and respond';
+        case EngagementStatus.VENDOR_IN_PROGRESS:
+            return 'Vendor is completing the questionnaire';
+        case EngagementStatus.VENDOR_SUBMITTED:
+            return 'Open specialist review';
+        case EngagementStatus.SPECIALIST_REVIEW:
+            return 'Complete specialist review. Wave 4 is not started.';
         case EngagementStatus.INTAKE_COMPLETE:
             return 'Review this engagement';
         default:
@@ -749,6 +767,12 @@ export function engagementIraStatusLabel(status: EngagementStatus) {
         case EngagementStatus.TIER_REVIEW: return 'Tier review required';
         case EngagementStatus.NEEDS_REQUESTER_CLARIFICATION: return 'Waiting for requester clarification';
         case EngagementStatus.INHERENT_TIER_CONFIRMED: return 'Inherent tier confirmed';
+        case EngagementStatus.DUE_DILIGENCE_PLANNING: return 'Due-diligence planning';
+        case EngagementStatus.READY_TO_SEND: return 'Ready to send questionnaire';
+        case EngagementStatus.AWAITING_VENDOR: return 'Awaiting vendor';
+        case EngagementStatus.VENDOR_IN_PROGRESS: return 'Vendor in progress';
+        case EngagementStatus.VENDOR_SUBMITTED: return 'Vendor submitted';
+        case EngagementStatus.SPECIALIST_REVIEW: return 'Specialist review';
         case EngagementStatus.INTAKE_COMPLETE: return 'Intake complete';
         default: return 'Draft';
     }
@@ -764,6 +788,12 @@ export function requesterEngagementStatus(status: EngagementStatus) {
         case EngagementStatus.NEEDS_REQUESTER_CLARIFICATION:
             return 'Additional information required';
         case EngagementStatus.INHERENT_TIER_CONFIRMED:
+        case EngagementStatus.DUE_DILIGENCE_PLANNING:
+        case EngagementStatus.READY_TO_SEND:
+        case EngagementStatus.AWAITING_VENDOR:
+        case EngagementStatus.VENDOR_IN_PROGRESS:
+        case EngagementStatus.VENDOR_SUBMITTED:
+        case EngagementStatus.SPECIALIST_REVIEW:
             return 'Risk assessment confirmed';
         default:
             return 'Engagement created';

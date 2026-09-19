@@ -18,7 +18,7 @@ import AppTable from '../components/design/AppTable';
 import AttentionStrip from '../components/design/AttentionStrip';
 import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { color } from '../design/tokens';
-import { tprmAPI } from '../services/api';
+import { intakeAPI, tprmAPI } from '../services/api';
 import AssessmentAnswerInput from '../components/AssessmentAnswerInput';
 import EntityRelationships from '../components/EntityRelationships';
 import { downloadBinaryResponse, downloadErrorMessage } from '../services/download';
@@ -62,6 +62,9 @@ type Assessment = {
     overallScore?: number | null;
     dueDate?: string | null;
     vendor?: { id: string; name: string };
+    serviceName?: string;
+    engagementPublicId?: string;
+    confirmedTier?: string;
     responses?: Array<{
         id: string;
         questionId: string;
@@ -119,12 +122,20 @@ export default function Assessments() {
         setLoading(true);
         setError(null);
         try {
-            const [templateRes, assessmentRes] = await Promise.all([
+            const [templateRes, assessmentRes, engagementRes] = await Promise.all([
                 tprmAPI.questionnaires(),
                 tprmAPI.listAssessments(),
+                intakeAPI.listEngagementAssessments().catch(() => ({ data: { data: { items: [] } } })),
             ]);
             setTemplates(templateRes.data.data || []);
-            setAssessments(assessmentRes.data.data || []);
+            const engagementItems = engagementRes.data.data.items || [];
+            const byId = Object.fromEntries(engagementItems.map((row: any) => [row.id, row]));
+            setAssessments((assessmentRes.data.data || []).map((row: Assessment) => ({
+                ...row,
+                serviceName: byId[row.id]?.serviceName,
+                engagementPublicId: byId[row.id]?.engagementPublicId,
+                confirmedTier: byId[row.id]?.tier,
+            })));
         } catch (err: any) {
             setError(err.message || 'Unable to load assessments.');
         } finally {
@@ -553,12 +564,12 @@ export default function Assessments() {
                             rowKey={(row) => row.id}
                             onRowClick={(row) => openAssessment(row)}
                             searchPlaceholder="Search assessments"
-                            searchValue={(row) => `${row.vendor?.name || ''} ${templateById[row.templateId || '']?.name || ''} ${row.assessmentType} ${row.status}`}
+                            searchValue={(row) => `${row.vendor?.name || ''} ${row.serviceName || ''} ${row.engagementPublicId || ''} ${templateById[row.templateId || '']?.name || ''} ${row.assessmentType} ${row.status}`}
                             columns={[
-                                { id: 'vendor', label: 'Third party', sortValue: (row) => row.vendor?.name || '', render: (row) => (
+                                { id: 'vendor', label: 'Third party / Engagement', sortValue: (row) => `${row.vendor?.name || ''} ${row.serviceName || ''}`, render: (row) => (
                                     <Box>
-                                        <Typography variant="subtitle2">{row.vendor?.name || 'Vendor'}</Typography>
-                                        <Typography variant="body2">{templateById[row.templateId || '']?.name || row.assessmentType}</Typography>
+                                        <Typography variant="subtitle2">{row.vendor?.name || 'Vendor'}{row.serviceName ? ` · ${row.serviceName}` : ''}</Typography>
+                                        <Typography variant="body2">{row.engagementPublicId || templateById[row.templateId || '']?.name || row.assessmentType}{row.confirmedTier ? ` · ${row.confirmedTier}` : ''}</Typography>
                                     </Box>
                                 ) },
                                 { id: 'due', label: 'Due', hideOnMobile: true, sortValue: (row) => row.dueDate || '', render: (row) => row.dueDate ? row.dueDate.slice(0, 10) : '—' },

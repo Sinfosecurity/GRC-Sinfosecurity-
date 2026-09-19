@@ -205,7 +205,7 @@ describe('#12 Wave 2 engagement IRA, tier review, and clarification', () => {
         expect(confirm.body.data.history.overrideFromTier).toBeNull();
         expect(confirm.body.data.wave3Started).toBe(false);
         const engagement = await prisma.engagement.findUnique({ where: { id: azureEngagementId } });
-        expect(engagement?.status).toBe('INHERENT_TIER_CONFIRMED');
+        expect(['INHERENT_TIER_CONFIRMED', 'DUE_DILIGENCE_PLANNING']).toContain(engagement?.status);
     });
 
     it('overrides with rationale on a separate engagement and preserves the recommendation', async () => {

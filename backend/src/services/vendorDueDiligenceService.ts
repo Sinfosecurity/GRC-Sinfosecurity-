@@ -1,6 +1,7 @@
 import {
     AssessmentStatus,
     ContactRole,
+    EngagementStatus,
     IssueReviewState,
     IssueSeverity,
     IssueSource,
@@ -482,7 +483,13 @@ export async function activateVendorAccess(rawToken: string) {
         where: { vendorId: invitation.vendorId, stage: VendorOnboardingStage.AWAITING_VENDOR },
         data: { stage: VendorOnboardingStage.VENDOR_IN_PROGRESS, vendorActivatedAt: new Date() },
     });
-    await writeHistory(invitation.organizationId, null, 'vendor.access_activated', invitation.vendorId, `${invitation.contact.name} started the vendor assessment.`);
+    if (invitation.engagementId) {
+        await prisma.engagement.updateMany({
+            where: { id: invitation.engagementId, status: { in: [EngagementStatus.AWAITING_VENDOR, EngagementStatus.READY_TO_SEND] } },
+            data: { status: EngagementStatus.VENDOR_IN_PROGRESS },
+        });
+    }
+    await writeHistory(invitation.organizationId, null, invitation.engagementId ? 'assessment.activated' : 'vendor.access_activated', invitation.vendorId, `${invitation.contact.name} started the vendor assessment.`);
     const jwtToken = jwt.sign({
         plane: VENDOR_PLANE,
         kind: 'vendor_session',
@@ -505,12 +512,18 @@ export async function logoutVendor(sessionId: string) {
 }
 
 async function assignedAssessments(actor: VendorActor) {
+    const session = await prisma.vendorPortalSession.findFirst({
+        where: { id: actor.sessionId },
+        include: { invitation: { select: { engagementId: true } } },
+    });
+    const engagementId = session?.invitation?.engagementId || null;
     return prisma.vendorAssessment.findMany({
         where: {
             organizationId: actor.organizationId,
             vendorId: actor.vendorId,
             assignedContactId: actor.contactId,
             respondentPlane: 'VENDOR',
+            ...(engagementId ? { engagementId } : { engagementId: null }),
         },
         include: {
             responses: { orderBy: { questionId: 'asc' } },
@@ -598,11 +611,21 @@ export async function vendorWorkspace(actor: VendorActor) {
             submittedAt: assessment.submittedAt,
         });
     }
+    const session = await prisma.vendorPortalSession.findFirst({
+        where: { id: actor.sessionId },
+        include: { invitation: { select: { engagementId: true } } },
+    });
+    const engagement = session?.invitation?.engagementId
+        ? await prisma.engagement.findFirst({ where: { id: session.invitation.engagementId, organizationId: actor.organizationId }, select: { publicId: true, serviceName: true, businessPurpose: true } })
+        : null;
     return sanitizeVendorPayload({
         organizationName: vendor.organization.name,
         vendorName: vendor.name,
         publicId: vendor.publicId,
-        dueDate: vendor.onboarding?.dueDiligenceDueAt,
+        serviceName: engagement?.serviceName || null,
+        engagementPublicId: engagement?.publicId || null,
+        businessPurpose: engagement?.businessPurpose || null,
+        dueDate: presented[0]?.dueDate || vendor.onboarding?.dueDiligenceDueAt,
         progress: total ? Math.round((answered / total) * 100) : 0,
         assessments: presented,
         contactName: actor.name,
@@ -725,6 +748,7 @@ export async function uploadVendorEvidence(actor: VendorActor, assessmentId: str
                 vendorId: actor.vendorId,
                 assessmentId,
                 questionId: input.questionKey,
+                engagementId: assessment.engagementId,
                 createdBy: actor.contactId,
             },
         });
@@ -740,6 +764,7 @@ export async function uploadVendorEvidence(actor: VendorActor, assessmentId: str
         vendorId: actor.vendorId,
         assessmentId,
         questionId: input.questionKey,
+        engagementId: assessment.engagementId || undefined,
         filename: input.filename,
         contentType: input.contentType,
         buffer: input.buffer,
@@ -771,9 +796,14 @@ export async function submitVendorAssessment(actor: VendorActor, assessmentId: s
         throw new ApiError(409, 'This assessment has already been submitted.');
     }
     if (!input.attested) throw new ApiError(400, 'You must attest before submitting.');
+    const current = await prisma.vendorAssessment.findFirst({ where: { id: assessmentId, organizationId: actor.organizationId } });
+    const wave3Submit = Boolean(current?.engagementId);
     const checklist = submissionChecklist(detail.questions);
-    if (!checklist.complete) {
+    if (!wave3Submit && !checklist.complete) {
         throw new ApiError(409, `${checklist.remaining} item${checklist.remaining === 1 ? '' : 's'} remain before this can be submitted.`, true, checklist);
+    }
+    if (wave3Submit && checklist.unanswered.length) {
+        throw new ApiError(409, `${checklist.unanswered.length} required question${checklist.unanswered.length === 1 ? '' : 's'} remain before this can be submitted.`, true, checklist);
     }
     await prisma.vendorAssessment.update({
         where: { id: assessmentId },
@@ -787,7 +817,9 @@ export async function submitVendorAssessment(actor: VendorActor, assessmentId: s
             clarificationQuestionIds: Prisma.JsonNull,
         },
     });
-    const drafts = await generateDraftFindings(actor.organizationId, actor.vendorId, assessmentId, actor.name);
+    const submitted = await prisma.vendorAssessment.findFirst({ where: { id: assessmentId, organizationId: actor.organizationId } });
+    const wave3 = Boolean(submitted?.engagementId);
+    const drafts = wave3 ? [] : await generateDraftFindings(actor.organizationId, actor.vendorId, assessmentId, actor.name);
     const remaining = await prisma.vendorAssessment.count({
         where: {
             organizationId: actor.organizationId,
@@ -796,22 +828,60 @@ export async function submitVendorAssessment(actor: VendorActor, assessmentId: s
             respondentPlane: 'VENDOR',
             submittedAt: null,
             status: { notIn: [AssessmentStatus.COMPLETED, AssessmentStatus.CANCELLED] },
+            ...(wave3 ? { engagementId: submitted!.engagementId } : { engagementId: null }),
         },
     });
-    if (remaining === 0) {
+    if (remaining === 0 && !wave3) {
         await prisma.vendorOnboarding.update({
             where: { vendorId: actor.vendorId },
             data: { stage: VendorOnboardingStage.SUBMITTED, vendorSubmittedAt: new Date() },
         });
         await prisma.vendorAssessmentInvitation.updateMany({
-            where: { organizationId: actor.organizationId, vendorId: actor.vendorId, status: VendorInvitationStatus.ACTIVATED },
+            where: { organizationId: actor.organizationId, vendorId: actor.vendorId, status: VendorInvitationStatus.ACTIVATED, engagementId: null },
+            data: { status: VendorInvitationStatus.COMPLETED },
+        });
+    }
+    if (wave3 && submitted?.engagementId) {
+        await prisma.engagement.update({
+            where: { id: submitted.engagementId },
+            data: { status: EngagementStatus.VENDOR_SUBMITTED },
+        });
+        await prisma.vendorAssessmentInvitation.updateMany({
+            where: { organizationId: actor.organizationId, engagementId: submitted.engagementId, status: VendorInvitationStatus.ACTIVATED },
             data: { status: VendorInvitationStatus.COMPLETED },
         });
     }
     const vendor = await prisma.vendor.findUnique({ where: { id: actor.vendorId } });
-    await writeHistory(actor.organizationId, null, 'vendor.assessment_submitted', actor.vendorId, `${actor.name} submitted ${detail.name}.`);
-    await explainableRiskService.recalculate(actor.organizationId, actor.vendorId);
-    if (vendor?.businessOwnerUserId) {
+    await writeHistory(actor.organizationId, null, wave3 ? 'assessment.submitted' : 'vendor.assessment_submitted', actor.vendorId, `${actor.name} submitted ${detail.name}.`);
+    if (!wave3) {
+        await explainableRiskService.recalculate(actor.organizationId, actor.vendorId);
+    }
+    if (wave3 && submitted?.engagementId) {
+        const engagement = await prisma.engagement.findFirst({
+            where: { id: submitted.engagementId, organizationId: actor.organizationId },
+            select: { assignedAnalystUserId: true, publicId: true, serviceName: true },
+        });
+        if (engagement?.assignedAnalystUserId) {
+            const submittedMail = assessmentSubmittedEmail({
+                vendorName: `${vendor?.name || 'Vendor'} · ${engagement.serviceName}`,
+                publicId: engagement.publicId,
+                assessmentName: detail.name,
+                ctaUrl: customerAppUrl(`/third-parties/engagements/${submitted.engagementId}/assessment-review`),
+            });
+            await notifyUser({
+                organizationId: actor.organizationId,
+                userId: engagement.assignedAnalystUserId,
+                eventType: 'assessment.completed',
+                title: submittedMail.subject,
+                body: submittedMail.text,
+                emailBody: submittedMail.text,
+                emailHtml: submittedMail.html,
+                fromName: submittedMail.fromName,
+                resourceType: 'Engagement',
+                resourceId: submitted.engagementId,
+            });
+        }
+    } else if (vendor?.businessOwnerUserId) {
         const submittedMail = assessmentSubmittedEmail({
             vendorName: vendor.name,
             publicId: vendor.publicId,

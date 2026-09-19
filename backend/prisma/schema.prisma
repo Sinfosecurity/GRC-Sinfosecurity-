@@ -239,6 +239,8 @@ model Organization {
   engagementIras              EngagementIra[]
   engagementIraSubmissions    EngagementIraSubmission[]
   engagementIraClarifications EngagementIraClarification[]
+  engagementDueDiligencePlans EngagementDueDiligencePlan[]
+  engagementAssessmentReviews EngagementAssessmentReview[]
 
   @@index([slug])
   @@index([status])
@@ -801,6 +803,25 @@ enum EngagementStatus {
   TIER_REVIEW
   NEEDS_REQUESTER_CLARIFICATION
   INHERENT_TIER_CONFIRMED
+  DUE_DILIGENCE_PLANNING
+  READY_TO_SEND
+  AWAITING_VENDOR
+  VENDOR_IN_PROGRESS
+  VENDOR_SUBMITTED
+  SPECIALIST_REVIEW
+}
+
+enum EngagementDueDiligencePlanStatus {
+  DRAFT
+  NEEDS_REVIEW
+  CONFIRMED
+}
+
+enum EngagementReviewStatus {
+  PENDING
+  IN_REVIEW
+  NEEDS_CLARIFICATION
+  COMPLETE
 }
 
 enum EngagementIraStatus {
@@ -933,7 +954,12 @@ model Engagement {
   updatedAt                DateTime          @updatedAt
   onboardings              VendorOnboarding[]
   ira                      EngagementIra?
+  dueDiligencePlan         EngagementDueDiligencePlan?
+  assessments              VendorAssessment[]
+  assessmentInvitations    VendorAssessmentInvitation[]
+  assessmentReviews        EngagementAssessmentReview[]
   requesterTaskLinks       RequesterTaskLink[]
+  evidenceLinks            EvidenceLink[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, vendorId])
@@ -1051,6 +1077,70 @@ model EngagementIraClarification {
   respondedAt     DateTime?
 
   @@index([organizationId, iraId, round])
+}
+
+model EngagementDueDiligencePlan {
+  id                    String                           @id @default(uuid())
+  organization          Organization                     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  engagement            Engagement                       @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId          String                           @unique
+  vendorId              String
+  iraId                 String?
+  status                EngagementDueDiligencePlanStatus @default(DRAFT)
+  confirmedTier         VendorTier
+  scoringVersion        String                           @default("3")
+  catalogVersion        String?
+  recommendedSnapshot   Json
+  confirmedSnapshot     Json?
+  includedPackKeys      Json?
+  excludedPackKeys      Json?
+  packReasons           Json?
+  evidenceRequirements  Json?
+  reviewerDomains       Json?
+  unresolved            Json?
+  vendorDueAt           DateTime?
+  slaDays               Int?
+  changeReason          String?
+  generatedAt           DateTime                         @default(now())
+  confirmedAt           DateTime?
+  confirmedBy           String?
+  assessmentContactId   String?
+  invitationId          String?
+  sentAt                DateTime?
+  sentBy                String?
+  catalogPin            Json?
+  createdAt             DateTime                         @default(now())
+  updatedAt             DateTime                         @updatedAt
+  assessments           VendorAssessment[]
+  reviews               EngagementAssessmentReview[]
+
+  @@index([organizationId, status])
+  @@index([vendorId])
+}
+
+model EngagementAssessmentReview {
+  id              String                   @id @default(uuid())
+  organization    Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String
+  engagement      Engagement               @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId    String
+  plan            EngagementDueDiligencePlan? @relation(fields: [planId], references: [id])
+  planId          String?
+  assessment      VendorAssessment?        @relation(fields: [assessmentId], references: [id])
+  assessmentId    String?
+  domain          String
+  assignedTo      String?
+  status          EngagementReviewStatus   @default(PENDING)
+  conclusions     Json?
+  observation     String?
+  completedAt     DateTime?
+  completedBy     String?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@index([organizationId, engagementId])
+  @@index([assessmentId])
 }
 
 enum VendorStatus {
@@ -1182,10 +1272,14 @@ model VendorAssessmentInvitation {
   createdAt           DateTime               @default(now())
   updatedAt           DateTime               @updatedAt
   sessions            VendorPortalSession[]
+  engagement          Engagement?            @relation(fields: [engagementId], references: [id])
+  engagementId        String?
+  assessmentId        String?
 
   @@index([organizationId, vendorId])
   @@index([vendorContactId])
   @@index([providerMessageId])
+  @@index([engagementId])
 }
 
 model VendorPortalSession {
@@ -1257,6 +1351,13 @@ model VendorAssessment {
   // Evidence
   evidenceCollected     Boolean             @default(false)
   evidenceCount         Int                 @default(0)
+
+  engagement            Engagement?         @relation(fields: [engagementId], references: [id])
+  engagementId          String?
+  dueDiligencePlan      EngagementDueDiligencePlan? @relation(fields: [dueDiligencePlanId], references: [id])
+  dueDiligencePlanId    String?
+  catalogPin            Json?
+  reviews               EngagementAssessmentReview[]
   
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
@@ -1275,6 +1376,7 @@ model VendorAssessment {
   @@index([assignedTo])
   @@index([assignedContactId])
   @@index([organizationId, respondentPlane])
+  @@index([engagementId])
 }
 
 enum AssessmentType {
@@ -3065,6 +3167,8 @@ model EvidenceLink {
   assessmentId   String?
   issueId        String?
   questionId     String?
+  engagement     Engagement?  @relation(fields: [engagementId], references: [id])
+  engagementId   String?
   createdBy      String
   createdAt      DateTime     @default(now())
 
@@ -3073,6 +3177,7 @@ model EvidenceLink {
   @@index([vendorId])
   @@index([assessmentId])
   @@index([issueId])
+  @@index([engagementId])
 }
 
 model ScoringMethodology {

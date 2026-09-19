@@ -550,6 +550,17 @@ export const intakeAPI = {
     confirmTier: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/tier-review/confirm`, data || {}),
     overrideTier: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/tier-review/override`, data),
     requestIraClarification: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/tier-review/clarification`, data),
+    getDueDiligence: (id: string) => api.get(`/tprm/engagements/${id}/due-diligence`),
+    modifyDueDiligence: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/due-diligence/modify`, data),
+    confirmDueDiligence: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/due-diligence/confirm`, data || {}),
+    setAssessmentContact: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/due-diligence/contact`, data),
+    sendQuestionnaire: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/due-diligence/send`, data || {}),
+    copyActivationLink: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/due-diligence/link`, data || {}),
+    markInvitationShared: (id: string) => api.post(`/tprm/engagements/${id}/due-diligence/shared`),
+    getAssessmentReview: (id: string) => api.get(`/tprm/engagements/${id}/assessment-review`),
+    requestVendorClarification: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/assessment-review/clarification`, data),
+    completeSpecialistReview: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/assessment-review/complete`, data),
+    listEngagementAssessments: () => api.get('/tprm/assessments/engagements'),
 };
 
 const intakeInfoApi = axios.create({

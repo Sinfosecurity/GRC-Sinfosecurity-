@@ -18,7 +18,8 @@ describe('Vendor assessment portal', () => {
             data: {
                 data: {
                     organizationName: 'Elite Claims',
-                    vendorName: 'Acme Payroll',
+                    vendorName: 'Microsoft Corporation',
+                    serviceName: 'Azure Hosting',
                     dueDate: '2026-09-30',
                     progress: 42,
                     assessments: [{ id: 'a1', name: 'Information Security', status: 'In progress', answered: 18, total: 30 }],
@@ -34,8 +35,10 @@ describe('Vendor assessment portal', () => {
             </MemoryRouter>,
         );
         expect(await screen.findByText(/Elite Claims is requesting this/)).toBeInTheDocument();
+        expect(screen.getByText(/Microsoft Corporation · Azure Hosting/)).toBeInTheDocument();
         expect(screen.getByText(/Information Security/)).toBeInTheDocument();
         expect(screen.queryByText(/Dashboard/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/recommendedTier|Tier Review|Don't know/i)).not.toBeInTheDocument();
         expect(screen.getByRole('progressbar', { name: /18 of 30 answered/i })).toBeInTheDocument();
     });
 });
