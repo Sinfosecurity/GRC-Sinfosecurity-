@@ -29,7 +29,6 @@ const PredictiveAnalytics = lazy(() => import('./pages/PredictiveAnalytics'));
 const Reports = lazy(() => import('./pages/Reports'));
 const VendorManagement = lazy(() => import('./pages/VendorManagement'));
 const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
-const VendorOnboardingWorkspace = lazy(() => import('./pages/VendorOnboardingWorkspace'));
 const VendorAssessmentActivate = lazy(() => import('./pages/VendorAssessmentActivate'));
 const RequesterIra = lazy(() => import('./pages/RequesterIra'));
 const RequesterLayout = lazy(() => import('./requester/RequesterLayout'));
@@ -44,7 +43,17 @@ const RequesterIraClarification = lazy(() => import('./requester/RequesterIraCla
 const ThirdPartyIntakeQueue = lazy(() => import('./pages/ThirdPartyIntakeQueue'));
 const ThirdPartyMyWork = lazy(() => import('./pages/ThirdPartyMyWork'));
 const ThirdPartyIntakeDetail = lazy(() => import('./pages/ThirdPartyIntakeDetail'));
-const EngagementDetail = lazy(() => import('./pages/EngagementDetail'));
+const Engagements = lazy(() => import('./pages/Engagements'));
+const EngagementWorkspace = lazy(() => import('./pages/EngagementWorkspace'));
+const EngagementOverview = lazy(() => import('./pages/EngagementOverview'));
+const EngagementEvidence = lazy(() => import('./pages/EngagementEvidence'));
+const EngagementFindings = lazy(() => import('./pages/EngagementFindings'));
+const EngagementControls = lazy(() => import('./pages/EngagementControls'));
+const EngagementResidual = lazy(() => import('./pages/EngagementResidual'));
+const EngagementDecisions = lazy(() => import('./pages/EngagementDecisions'));
+const EngagementHistory = lazy(() => import('./pages/EngagementHistory'));
+const LegacyOnboardRedirect = lazy(() => import('./pages/LegacyOnboardRedirect'));
+const LegacyEngagementRedirect = lazy(() => import('./pages/LegacyEngagementRedirect'));
 const TierReview = lazy(() => import('./pages/TierReview'));
 const DueDiligencePlan = lazy(() => import('./pages/DueDiligencePlan'));
 const AssessmentReview = lazy(() => import('./pages/AssessmentReview'));
@@ -306,13 +315,23 @@ export default function App() {
                     <Route path="third-parties/intake" element={<ThirdPartyIntakeQueue />} />
                     <Route path="third-parties/my-work" element={<ThirdPartyMyWork />} />
                     <Route path="third-parties/intake/:id" element={<ThirdPartyIntakeDetail />} />
-                    <Route path="third-parties/engagements/:id/tier-review" element={<TierReview />} />
-                    <Route path="third-parties/engagements/:id/due-diligence" element={<DueDiligencePlan />} />
-                    <Route path="third-parties/engagements/:id/assessment-review" element={<AssessmentReview />} />
-                    <Route path="third-parties/engagements/:id/risk" element={<EngagementRisk />} />
-                    <Route path="third-parties/engagements/:id" element={<EngagementDetail />} />
+                    <Route path="engagements" element={<Engagements />} />
+                    <Route path="engagements/:id" element={<EngagementWorkspace />}>
+                        <Route index element={<EngagementOverview />} />
+                        <Route path="inherent-risk" element={<TierReview />} />
+                        <Route path="due-diligence" element={<DueDiligencePlan />} />
+                        <Route path="evidence" element={<EngagementEvidence />} />
+                        <Route path="findings" element={<EngagementFindings />} />
+                        <Route path="controls" element={<EngagementControls />} />
+                        <Route path="residual-risk" element={<EngagementResidual />} />
+                        <Route path="decisions" element={<EngagementDecisions />} />
+                        <Route path="history" element={<EngagementHistory />} />
+                        <Route path="specialist-review" element={<AssessmentReview />} />
+                        <Route path="risk" element={<EngagementRisk />} />
+                    </Route>
+                    <Route path="third-parties/engagements/:id/*" element={<LegacyEngagementRedirect />} />
                     <Route path="vendor-onboarding" element={<VendorOnboarding />} />
-                    <Route path="vendor-onboarding/:id" element={<VendorOnboardingWorkspace />} />
+                    <Route path="vendor-onboarding/:id" element={<LegacyOnboardRedirect />} />
                     <Route path="assessments" element={<Assessments />} />
                     <Route path="findings" element={<FindingsRemediation />} />
                     <Route path="decision-briefs" element={<DecisionBriefs />} />

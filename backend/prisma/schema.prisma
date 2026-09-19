@@ -1212,9 +1212,11 @@ model EngagementCompensatingControl {
   reviewedAt            DateTime?
   nextReviewAt          DateTime?
   consideredInResidual  Boolean                   @default(false)
+  idempotencyKey        String?
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
 
+  @@unique([organizationId, engagementId, idempotencyKey])
   @@index([organizationId, engagementId])
 }
 

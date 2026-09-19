@@ -766,13 +766,13 @@ export function engagementIraNextAction(status: EngagementStatus) {
         case EngagementStatus.VENDOR_IN_PROGRESS:
             return 'Vendor is completing the questionnaire';
         case EngagementStatus.VENDOR_SUBMITTED:
-            return 'Open specialist review';
+            return 'Complete Specialist Review';
         case EngagementStatus.SPECIALIST_REVIEW:
-            return 'Complete specialist review, then review finding candidates.';
+            return 'Complete Specialist Review';
         case EngagementStatus.FINDING_REVIEW:
-            return 'Review finding candidates and record control effectiveness.';
+            return 'Review Finding Candidates';
         case EngagementStatus.RESIDUAL_READY:
-            return 'Risk treatment decision pending. Wave 5 is not started.';
+            return 'Calculate Residual Risk';
         case EngagementStatus.INTAKE_COMPLETE:
             return 'Review this engagement';
         default:

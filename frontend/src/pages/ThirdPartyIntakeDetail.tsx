@@ -87,7 +87,7 @@ export default function ThirdPartyIntakeDetail() {
                             <Typography>Needed next: {data.nextAction}</Typography>
                             {data.matchedThirdParty && <Typography>Matched third party: {data.matchedThirdParty.name}</Typography>}
                             {data.createdEngagement && (
-                                <Button sx={{ mt: 1 }} onClick={() => navigate(`/third-parties/engagements/${data.createdEngagement.id}`)}>
+                                <Button sx={{ mt: 1 }} onClick={() => navigate(`/engagements/${data.createdEngagement.id}`)}>
                                     Open {data.createdEngagement.publicId}
                                 </Button>
                             )}

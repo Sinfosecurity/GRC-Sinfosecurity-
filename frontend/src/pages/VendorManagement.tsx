@@ -293,7 +293,7 @@ export default function VendorManagement() {
                 actions={
                     <Stack direction="row" spacing={1}>
                         <Button onClick={() => navigate('/third-parties/intake')}>Intake</Button>
-                        <Button onClick={() => navigate('/vendor-onboarding')}>Onboard Third Party</Button>
+                        <Button onClick={() => navigate('/engagements')}>Engagements</Button>
                         <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={saving}>Add existing record</Button>
                     </Stack>
                 }
@@ -336,7 +336,7 @@ export default function VendorManagement() {
                 error={error}
                 empty={!loading && vendors.length === 0}
                 emptyTitle="No third parties are recorded yet"
-                emptyBody="Onboard a third party or add an existing record. The new vendor appears in this list immediately."
+                emptyBody="Add an existing Third Party record, or create one from Intake. Residual risk lives on Engagements, not as one vendor score."
                 emptyAction={<Button variant="contained" onClick={() => setOpenDialog(true)}>Add vendor</Button>}
             >
                 <AppTable
@@ -369,7 +369,7 @@ export default function VendorManagement() {
                             row.assessmentStatus === 'Overdue' ? 'Review now' : row.assessmentStatus === 'In Progress' ? 'Continue review' : row.assessmentStatus === 'Completed' ? 'Open workspace' : 'Start assessment'
                         ) },
                         { id: 'action', label: '', render: (row) => (
-                            <Button size="small" onClick={(event) => { event.stopPropagation(); navigate(`/vendor-onboarding/${row.publicId || row.id}`); }}>
+                            <Button size="small" onClick={(event) => { event.stopPropagation(); navigate(`/vendor-management?vendorId=${row.id}`); }}>
                                 Open
                             </Button>
                         ) },
@@ -492,8 +492,8 @@ export default function VendorManagement() {
                                     <Typography variant="body2" sx={{ mb: 1 }}>Engagement residual risk is authoritative. The Vendor residual below is legacy compatibility only.</Typography>
                                     {engagements.length === 0 && <Typography variant="body2">No engagements recorded yet.</Typography>}
                                     {engagements.map((row) => (
-                                        <Button key={row.id} onClick={() => navigate(`/third-parties/engagements/${row.id}`)}>
-                                            {row.publicId} · {row.serviceName} · {row.statusLabel}{row.residual?.band ? ` · residual ${row.residual.band}` : ''}
+                                        <Button key={row.id} onClick={() => navigate(`/engagements/${row.id}`)}>
+                                            {row.publicId} · {row.serviceName} · {row.statusLabel}{row.residual?.band ? ` · residual ${row.residual.band}` : ' · Residual Not calculated'}
                                         </Button>
                                     ))}
                                 </Surface>

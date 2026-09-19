@@ -361,6 +361,8 @@ describe('#12 Wave 3 engagement due diligence, vendor assessment, and specialist
         expect(complete.status).toBe(200);
         expect(complete.body.data.authoritativeFindings).toBe(0);
         expect(complete.body.data.residualRiskCalculated).toBe(false);
+        expect(complete.body.data.state).not.toBe('VENDOR_SUBMITTED');
+        expect(complete.body.data.nextAction).not.toMatch(/Specialist review complete/);
         const vendorAfter = await prisma.vendor.findUnique({ where: { id: vendorId }, select: { residualRiskScore: true } });
         expect(vendorAfter?.residualRiskScore ?? 0).toBe(0);
     });

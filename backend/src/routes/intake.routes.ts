@@ -16,6 +16,7 @@ import {
     getRequesterIntake,
     listEngagements,
     listIntakeRequests,
+    resolveLegacyOnboard,
     listMyTprmWork,
     listRequesterActions,
     listRequesterColleagues,
@@ -62,6 +63,7 @@ import {
     recordCompensatingControl,
     recordControlEffectiveness,
     seedFindingCandidates,
+    createFindingCandidate,
 } from '../services/engagementRiskService';
 
 const router = Router();
@@ -314,6 +316,14 @@ router.post('/intakes/:id/close', requirePractitionerPersona, requirePermission(
     }
 });
 
+router.get('/legacy-onboard/:id', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await resolveLegacyOnboard(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/engagements', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
@@ -497,6 +507,14 @@ router.post('/engagements/:id/finding-candidates/seed', requirePractitionerPerso
     }
 });
 
+router.post('/engagements/:id/finding-candidates', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['finding.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await createFindingCandidate(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.post('/engagements/:id/findings/:issueId/confirm', requirePractitionerPersona, requirePermission(PERMISSIONS['finding.update'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await confirmFinding(req.user!.organizationId, actor(req), req.params.issueId, req.body || {}) });
@@ -523,7 +541,8 @@ router.post('/engagements/:id/control-effectiveness', requirePractitionerPersona
 
 router.post('/engagements/:id/compensating-controls', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['finding.update']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        res.status(201).json({ success: true, data: await recordCompensatingControl(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+        const idempotencyKey = req.body?.idempotencyKey || req.header('Idempotency-Key');
+        res.status(201).json({ success: true, data: await recordCompensatingControl(req.user!.organizationId, actor(req), req.params.id, { ...(req.body || {}), idempotencyKey }) });
     } catch (error) {
         next(error);
     }

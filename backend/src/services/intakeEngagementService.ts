@@ -1,12 +1,15 @@
 import {
+    EngagementResidualStatus,
     EngagementStatus,
     GovernanceNodeType,
     GovernanceRelationshipType,
     IntakePriority,
     IntakeSourceChannel,
     IntakeStatus,
+    IssueReviewState,
     Prisma,
     VendorCategory,
+    VendorIssueStatus,
     VendorStatus,
     VendorTier,
     VendorType,
@@ -22,7 +25,6 @@ import { customerAppUrl, genericOperationalEmail } from './transactionalEmail';
 import { allocateVendorPublicId, findDuplicateVendors } from './vendorOnboardingService';
 import { extractVendorDomain } from './vendorOnboardingScoring';
 import {
-    engagementIraNextAction,
     engagementIraStatusLabel,
     listRequesterIraActions,
     openIraForEngagement,
@@ -31,6 +33,7 @@ import {
 import { evidenceLinkageService } from './evidenceLinkageService';
 import { objectStorageService } from './objectStorageService';
 import { presentEvidenceAttachment } from '../tprm/evidenceRequirement';
+import { engagementPrimaryAction, notCalculated, notYetAssessed, recordedOrUnavailable } from '../tprm/engagementWorkspace';
 
 export type Actor = { id: string; name: string; email: string; role: string };
 
@@ -476,7 +479,7 @@ function presentEngagement(row: {
         procurementReference: row.procurementReference,
         status: row.status,
         statusLabel: engagementIraStatusLabel(row.status),
-        nextAction: engagementIraNextAction(row.status),
+        nextAction: engagementPrimaryAction(row.status).label,
         legacyReviewRequired: row.legacyReviewRequired,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
@@ -1317,7 +1320,29 @@ export async function listEngagements(organizationId: string, actor: Actor, quer
         }),
     ]);
     const directory = await usersByIds(organizationId, rows.map((row) => row.assignedAnalystUserId));
-    return { page, pageSize, total, items: rows.map((row) => presentEngagement(row, directory)) };
+    const residuals = await prisma.engagementResidualRiskAssessment.findMany({
+        where: { organizationId, engagementId: { in: rows.map((row) => row.id) }, status: { not: EngagementResidualStatus.NOT_READY } },
+        orderBy: { createdAt: 'desc' },
+    });
+    const latest = new Map<string, (typeof residuals)[number]>();
+    for (const row of residuals) {
+        if (!latest.has(row.engagementId)) latest.set(row.engagementId, row);
+    }
+    return {
+        page,
+        pageSize,
+        total,
+        items: rows.map((row) => {
+            const residual = latest.get(row.id);
+            const primary = engagementPrimaryAction(row.status, { residualConfirmed: residual?.status === EngagementResidualStatus.CONFIRMED });
+            return {
+                ...presentEngagement(row, directory),
+                nextAction: primary.label,
+                primaryActionHref: primary.href(row.id),
+                residual: residual ? { band: residual.residualBand, score: residual.residualScore, calculatedAt: residual.calculatedAt } : { band: null, score: null, status: 'Not calculated' },
+            };
+        }),
+    };
 }
 
 export async function getEngagement(organizationId: string, actor: Actor, key: string) {
@@ -1333,11 +1358,115 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
         },
     });
     if (!row) throw new ApiError(404, 'Engagement not found.');
+    const risk = await import('./engagementRiskService').then((mod) => mod.getEngagementRisk(organizationId, actor, row.id)).catch(() => null);
+    const assessments = await prisma.vendorAssessment.findMany({
+        where: { organizationId, engagementId: row.id },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true, status: true, submittedAt: true, frameworkUsed: true },
+    });
+    const openFindings = await prisma.vendorIssue.count({
+        where: {
+            organizationId,
+            engagementId: row.id,
+            reviewState: IssueReviewState.CONFIRMED,
+            status: { in: [VendorIssueStatus.OPEN, VendorIssueStatus.IN_PROGRESS, VendorIssueStatus.PENDING_VENDOR, VendorIssueStatus.PENDING_VALIDATION, VendorIssueStatus.REMEDIATED, VendorIssueStatus.ESCALATED] },
+        },
+    });
+    const reviews = await prisma.engagementAssessmentReview.findMany({
+        where: { organizationId, engagementId: row.id },
+        select: { domain: true, status: true, completedAt: true },
+    });
+    const history = await prisma.auditEvent.findMany({
+        where: { organizationId, resourceId: { in: [row.id, row.ira?.id || '', row.dueDiligencePlan?.id || ''].filter(Boolean) } },
+        orderBy: { timestamp: 'desc' },
+        take: 25,
+        select: { action: true, timestamp: true, actorUserId: true, resourceType: true },
+    });
+    const outstanding = reviews.filter((item) => item.status !== 'COMPLETE').map((item) => item.domain).filter(Boolean);
+    const primary = engagementPrimaryAction(row.status, {
+        residualReady: Boolean(risk?.residualReady),
+        residualConfirmed: risk?.residual?.status === 'CONFIRMED',
+        outstandingReviewDomains: outstanding,
+        openCandidateCount: risk?.candidates?.length || 0,
+        controlAssessed: Boolean(risk?.controls?.some((item: { rating?: string }) => item.rating && item.rating !== 'NOT_ASSESSED')),
+    });
+    const vendorAssessmentStatus = assessments.some((item) => item.submittedAt)
+        ? 'Vendor submitted'
+        : assessments.some((item) => item.status === 'IN_PROGRESS')
+            ? 'Vendor in progress'
+            : assessments.length
+                ? recordedOrUnavailable(itemStatus(assessments[0].status))
+                : 'Not yet assessed';
     return {
         ...presentEngagement(row, await usersByIds(organizationId, [row.assignedAnalystUserId, row.requesterUserId])),
         ira: row.ira,
         dueDiligence: row.dueDiligencePlan,
-        risk: await import('./engagementRiskService').then((mod) => mod.getEngagementRisk(organizationId, actor, row.id)).catch(() => null),
+        risk,
+        what: `${row.publicId} · ${row.serviceName}`,
+        why: row.businessPurpose || 'Not recorded',
+        source: row.originatingIntake ? `Intake ${row.originatingIntake.publicId}` : 'Legacy / none',
+        state: engagementIraStatusLabel(row.status),
+        owner: primary.owner,
+        impact: row.ira?.confirmedTier ? `Confirmed inherent ${row.ira.confirmedTier}` : 'Not yet assessed',
+        evidence: assessments.length ? `${assessments.length} vendor assessment record(s)` : 'Not recorded',
+        relationships: {
+            thirdParty: row.vendor ? { id: row.vendor.id, publicId: row.vendor.publicId, name: row.vendor.name } : null,
+            intake: row.originatingIntake || null,
+            iraId: row.ira?.id || null,
+            planId: row.dueDiligencePlan?.id || null,
+        },
+        nextAction: primary.label,
+        primaryAction: { label: primary.label, href: primary.href(row.id), owner: primary.owner, wave5: false },
+        confirmedInherentTier: notYetAssessed(row.ira?.confirmedTier || row.dueDiligencePlan?.confirmedTier),
+        dueDiligenceStatus: row.dueDiligencePlan?.status ? recordedOrUnavailable(row.dueDiligencePlan.status) : 'Not yet assessed',
+        vendorAssessmentStatus,
+        openFindingsCount: openFindings,
+        residual: risk?.residual?.residualBand ? risk.residual.residualBand : notCalculated(null),
+        assessments: assessments.map((item) => ({
+            id: item.id,
+            name: item.frameworkUsed || 'Assessment',
+            status: item.status,
+            submittedAt: item.submittedAt,
+        })),
+        history: history.map((item) => ({
+            at: item.timestamp,
+            action: item.action,
+            actor: item.actorUserId,
+            resourceType: item.resourceType,
+        })),
+        tabs: ['overview', 'inherent-risk', 'due-diligence', 'evidence', 'findings', 'controls', 'residual-risk', 'decisions', 'history'],
+    };
+}
+
+function itemStatus(status: string) {
+    return status.replace(/_/g, ' ').toLowerCase();
+}
+
+export async function resolveLegacyOnboard(organizationId: string, actor: Actor, vendorKey: string) {
+    assertNotVendorPlane(actor);
+    if (!canRead(actor) && !canTriage(actor)) throw new ApiError(403, 'You cannot view engagements.');
+    const vendor = await prisma.vendor.findFirst({
+        where: { organizationId, OR: [{ id: vendorKey }, { publicId: vendorKey }] },
+        select: { id: true, publicId: true, name: true },
+    });
+    if (!vendor) throw new ApiError(404, 'Legacy onboarding record not found.');
+    const engagements = await prisma.engagement.findMany({
+        where: { organizationId, vendorId: vendor.id },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, publicId: true, serviceName: true, status: true },
+    });
+    if (engagements.length === 1) {
+        return { mode: 'redirect' as const, vendor, engagement: engagements[0], compatibility: 'Deep link resolved to the Golden Journey Engagement.' };
+    }
+    if (engagements.length > 1) {
+        return { mode: 'choose' as const, vendor, engagements, compatibility: 'Multiple Engagements exist. Third Party remains the master record.' };
+    }
+    const onboarding = await prisma.vendorOnboarding.findFirst({ where: { organizationId, vendorId: vendor.id }, select: { id: true, stage: true } });
+    return {
+        mode: 'legacy' as const,
+        vendor,
+        onboarding,
+        compatibility: 'No Golden Journey Engagement exists. This remains a read-compatible legacy onboarding record. An Engagement was not manufactured.',
     };
 }
 

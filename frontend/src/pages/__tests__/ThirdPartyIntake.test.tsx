@@ -6,7 +6,8 @@ import ThirdPartyIntakeForm from '../ThirdPartyIntakeForm';
 import ThirdPartyIntakeQueue from '../ThirdPartyIntakeQueue';
 import ThirdPartyMyWork from '../ThirdPartyMyWork';
 import ThirdPartyIntakeDetail from '../ThirdPartyIntakeDetail';
-import EngagementDetail from '../EngagementDetail';
+import EngagementWorkspace from '../EngagementWorkspace';
+import EngagementOverview from '../EngagementOverview';
 
 const intake = {
     id: 'int-1',
@@ -103,6 +104,18 @@ describe('Wave 1 intake and engagement UI', () => {
                     thirdParty: { name: 'Microsoft Corporation' },
                     requesterName: 'Pat Requester',
                     originatingIntake: { id: 'int-1', publicId: 'INT-2026-0001' },
+                    what: 'ENG-2026-0001 · Azure Hosting',
+                    why: 'Host a customer-facing application.',
+                    source: 'Intake INT-2026-0001',
+                    state: 'Ready for inherent risk assessment',
+                    owner: 'Assigned TPRM analyst',
+                    impact: 'Not yet assessed',
+                    evidence: 'Not recorded',
+                    nextAction: 'Requester must complete the inherent-risk assessment',
+                    primaryAction: { label: 'Requester must complete the inherent-risk assessment', href: '/engagements/eng-1/inherent-risk', owner: 'Business requester' },
+                    confirmedInherentTier: 'Not yet assessed',
+                    residual: 'Not calculated',
+                    history: [],
                 },
             },
         });
@@ -233,15 +246,18 @@ describe('Wave 1 intake and engagement UI', () => {
 
     it('shows engagement detail and sibling engagements', async () => {
         render(
-            <MemoryRouter future={routerFuture} initialEntries={['/third-parties/engagements/eng-1']}>
+            <MemoryRouter future={routerFuture} initialEntries={['/engagements/eng-1']}>
                 <Routes>
-                    <Route path="/third-parties/engagements/:id" element={<EngagementDetail />} />
+                    <Route path="/engagements/:id" element={<EngagementWorkspace />}>
+                        <Route index element={<EngagementOverview />} />
+                    </Route>
                 </Routes>
             </MemoryRouter>
         );
         expect((await screen.findAllByText(/ENG-2026-0001 · Azure Hosting/)).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Microsoft Corporation/).length).toBeGreaterThan(0);
-        expect(screen.getByText(/Originating intake: INT-2026-0001/)).toBeInTheDocument();
+        expect(screen.getAllByText(/INT-2026-0001/).length).toBeGreaterThan(0);
+        expect(screen.getByRole('tab', { name: 'Overview' })).toBeInTheDocument();
     });
 
     it('shows an error when the queue fails', async () => {

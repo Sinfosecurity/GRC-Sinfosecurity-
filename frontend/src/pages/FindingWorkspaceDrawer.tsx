@@ -131,6 +131,11 @@ export default function FindingWorkspaceDrawer({
                                 {workspace.reviewState === 'DRAFT' ? ' · Candidate only until confirmed.' : ''}
                             </Alert>
                         )}
+                        {workspace.engagement && (
+                            <Button component={RouterLink} to={`/engagements/${workspace.engagement.id}/findings`} sx={{ mb: 2 }}>
+                                Back to Engagement findings
+                            </Button>
+                        )}
                         <Section title="Source">
                             <Typography variant="body2" sx={{ mb: 1 }}>{workspace.source.label}</Typography>
                             <Meta label="Vendor / affected record" value={workspace.source.vendorName} />

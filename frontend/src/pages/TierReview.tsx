@@ -71,7 +71,7 @@ export default function TierReview() {
             <PageHeader
                 crumbs={[
                     { label: 'Third Parties', to: '/vendor-management' },
-                    { label: data?.engagement?.publicId || 'Engagement', to: `/third-parties/engagements/${id}` },
+                    { label: data?.engagement?.publicId || 'Engagement', to: `/engagements/${id}` },
                     { label: 'Tier Review' },
                 ]}
                 title={data ? `Tier Review · ${data.what}` : 'Tier Review'}
@@ -181,7 +181,7 @@ export default function TierReview() {
                                 </Surface>
                             </>
                         )}
-                        <Button onClick={() => navigate(`/third-parties/engagements/${id}`)}>Back to engagement</Button>
+                        <Button onClick={() => navigate(`/engagements/${id}`)}>Back to engagement</Button>
                     </Stack>
                 )}
             </QueryState>

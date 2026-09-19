@@ -38,6 +38,8 @@ describe('Vendor assessment portal', () => {
         expect(screen.getByText(/Microsoft Corporation · Azure Hosting/)).toBeInTheDocument();
         expect(screen.getByText(/Information Security/)).toBeInTheDocument();
         expect(screen.queryByText(/Dashboard/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/^Engagements$/)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Product navigation')).not.toBeInTheDocument();
         expect(screen.queryByText(/recommendedTier|Tier Review|Don't know/i)).not.toBeInTheDocument();
         expect(screen.getByRole('progressbar', { name: /18 of 30 answered/i })).toBeInTheDocument();
     });

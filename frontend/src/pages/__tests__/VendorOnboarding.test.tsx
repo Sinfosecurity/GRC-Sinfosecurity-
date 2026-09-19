@@ -92,7 +92,7 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboarding />
             </MemoryRouter>
         );
-        expect(await screen.findByText('Open a third-party record')).toBeInTheDocument();
+        expect(await screen.findByText('Legacy onboarding records')).toBeInTheDocument();
         expect(screen.getByText(/1 in progress/)).toBeInTheDocument();
         expect(screen.getByText('VND-2026-0001')).toBeInTheDocument();
         expect(screen.getByText('Complete vendor intake')).toBeInTheDocument();

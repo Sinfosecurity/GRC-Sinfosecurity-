@@ -63,7 +63,7 @@ export default function AssessmentReview() {
             <PageHeader
                 crumbs={[
                     { label: 'Third Parties', to: '/vendor-management' },
-                    { label: data?.engagement?.publicId || 'Engagement', to: `/third-parties/engagements/${id}` },
+                    { label: data?.engagement?.publicId || 'Engagement', to: `/engagements/${id}` },
                     { label: 'Specialist review' },
                 ]}
                 title={data ? `Specialist review · ${data.what}` : 'Specialist review'}
@@ -81,7 +81,7 @@ export default function AssessmentReview() {
                             <Typography><strong>Confirmed tier:</strong> {data.confirmedTier}</Typography>
                             <Typography><strong>Authoritative findings:</strong> {data.authoritativeFindings || 0}</Typography>
                             <Typography><strong>Residual risk calculated:</strong> No until Engagement risk is calculated</Typography>
-                            <Button sx={{ mt: 1 }} onClick={() => navigate(`/third-parties/engagements/${id}/risk`)}>Open Engagement risk</Button>
+                            <Button sx={{ mt: 1 }} onClick={() => navigate(`/engagements/${id}/findings`)}>Open Engagement findings</Button>
                         </Surface>
                         {(data.items || []).map((item: any) => (
                             <Surface key={`${item.assessmentId}-${item.questionKey}`}>

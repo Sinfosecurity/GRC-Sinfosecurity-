@@ -183,11 +183,19 @@ describe('#12 Wave 4 engagement findings, control effectiveness, and residual ri
         expect(azureAssessmentId).not.toBe(servicesAssessmentId);
     });
 
-    it('seeds candidates that are not authoritative findings', async () => {
+    it('treats a negative answer as a review signal, not an automatic finding', async () => {
         const seeded = await request(app).post(`${API}/tprm/engagements/${azureEngagementId}/finding-candidates/seed`).set('Authorization', `Bearer ${analystToken}`).send({});
         expect(seeded.status).toBe(200);
-        expect(seeded.body.data.created).toBeGreaterThan(0);
-        azureCandidateId = seeded.body.data.ids[0];
+        expect(seeded.body.data.created).toBe(0);
+        expect(seeded.body.data.signals.length).toBeGreaterThan(0);
+        expect(seeded.body.data.honesty.negativeAnswerIsNotFinding).toBe(true);
+        const created = await request(app).post(`${API}/tprm/engagements/${azureEngagementId}/finding-candidates`).set('Authorization', `Bearer ${analystToken}`).send({
+            assessmentId: azureAssessmentId,
+            questionId: 'ACC-01',
+            rationale: 'Privileged access review was not demonstrated after specialist review.',
+        });
+        expect(created.status).toBe(201);
+        azureCandidateId = created.body.data.id;
         const extra = await prisma.vendorIssue.create({
             data: {
                 vendorId,
@@ -262,8 +270,21 @@ describe('#12 Wave 4 engagement findings, control effectiveness, and residual ri
             owner: 'Internal IAM',
             effectivenessJudgment: 'PARTIALLY_EFFECTIVE',
             consideredInResidual: true,
+            idempotencyKey: `cc-${azureEngagementId}-access-review`,
         });
         expect(compensating.status).toBe(201);
+        const retry = await request(app).post(`${API}/tprm/engagements/${azureEngagementId}/compensating-controls`).set('Authorization', `Bearer ${analystToken}`).send({
+            affectedControlId: 'Access Review',
+            description: 'Break-glass reviews by internal IAM weekly.',
+            owner: 'Internal IAM',
+            effectivenessJudgment: 'PARTIALLY_EFFECTIVE',
+            consideredInResidual: true,
+            idempotencyKey: `cc-${azureEngagementId}-access-review`,
+        });
+        expect([200, 201]).toContain(retry.status);
+        expect(retry.body.data.id).toBe(compensating.body.data.id);
+        const rows = await prisma.engagementCompensatingControl.findMany({ where: { engagementId: azureEngagementId, idempotencyKey: `cc-${azureEngagementId}-access-review` } });
+        expect(rows).toHaveLength(1);
         const servicesSeed = await request(app).post(`${API}/tprm/engagements/${servicesEngagementId}/finding-candidates/seed`).set('Authorization', `Bearer ${analystToken}`).send({});
         expect(servicesSeed.status).toBe(200);
         expect(servicesSeed.body.data.created).toBe(0);

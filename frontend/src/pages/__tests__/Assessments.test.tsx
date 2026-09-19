@@ -21,13 +21,13 @@ describe('Assessments', () => {
             <MemoryRouter future={routerFuture} initialEntries={['/assessments']}>
                 <Routes>
                     <Route path="/assessments" element={<Assessments />} />
-                    <Route path="/vendor-onboarding" element={<div>Open a third-party record</div>} />
+                    <Route path="/engagements" element={<div>Engagements</div>} />
                 </Routes>
             </MemoryRouter>
         );
         const start = await screen.findAllByRole('button', { name: 'Request a third party' });
         start[0].click();
-        expect(await screen.findByText('Open a third-party record')).toBeInTheDocument();
+        expect(await screen.findByText('Engagements')).toBeInTheDocument();
         expect(screen.queryByText('New assessment')).not.toBeInTheDocument();
         expect(screen.queryByText('Resolve scope to continue')).not.toBeInTheDocument();
     });

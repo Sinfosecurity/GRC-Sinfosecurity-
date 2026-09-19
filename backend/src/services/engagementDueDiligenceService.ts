@@ -652,17 +652,21 @@ export async function completeSpecialistReview(organizationId: string, actor: Ac
             assignedTo: review.assignedTo || actor.id,
         },
     });
-    const open = await prisma.engagementAssessmentReview.count({
+    const remaining = await prisma.engagementAssessmentReview.findMany({
         where: { engagementId: engagement.id, status: { not: EngagementReviewStatus.COMPLETE } },
+        select: { domain: true, status: true },
     });
-    if (open === 0) {
+    if (remaining.length === 0) {
+        await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.FINDING_REVIEW } });
+    } else if (engagement.status === EngagementStatus.VENDOR_SUBMITTED) {
         await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.SPECIALIST_REVIEW } });
     }
-    await audit(organizationId, actor.id, 'assessment.review.completed', 'EngagementAssessmentReview', review.id, { engagementId: engagement.id, conclusion, wave4Started: true });
-    if (open === 0) {
-        const { seedFindingCandidates } = await import('./engagementRiskService');
-        await seedFindingCandidates(organizationId, actor, engagement.id);
-    }
+    await audit(organizationId, actor.id, 'assessment.review.completed', 'EngagementAssessmentReview', review.id, {
+        engagementId: engagement.id,
+        conclusion,
+        wave4Started: true,
+        outstandingDomains: remaining.map((row) => row.domain),
+    });
     return presentAssessmentReview(organizationId, actor, engagement.id);
 }
 
@@ -802,9 +806,15 @@ async function presentAssessmentReview(organizationId: string, actor: Actor, key
                 status: EngagementReviewStatus.IN_REVIEW,
             },
         })));
-        await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.SPECIALIST_REVIEW } });
+        if (engagement.status === EngagementStatus.VENDOR_SUBMITTED) {
+            await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.SPECIALIST_REVIEW } });
+            engagement.status = EngagementStatus.SPECIALIST_REVIEW;
+        }
         await audit(organizationId, actor.id, 'assessment.review.assigned', 'Engagement', engagement.id, { domains });
     }
+    const outstanding = reviews.filter((row) => row.status !== EngagementReviewStatus.COMPLETE).map((row) => row.domain).filter(Boolean);
+    const { engagementPrimaryAction } = await import('../tprm/engagementWorkspace');
+    const primary = engagementPrimaryAction(engagement.status, { outstandingReviewDomains: outstanding });
     const links = await prisma.evidenceLink.findMany({
         where: { organizationId, engagementId: engagement.id },
         include: { storedObject: { select: { filename: true, scanStatus: true, uploadedAt: true } } },
@@ -818,10 +828,9 @@ async function presentAssessmentReview(organizationId: string, actor: Actor, key
         source: 'Engagement due-diligence plan and pinned catalog.',
         state: engagement.status,
         stateLabel: engagementStatusLabel(engagement.status),
-        owner: 'Assigned specialist / TPRM analyst',
-        nextAction: reviews.every((row) => row.status === EngagementReviewStatus.COMPLETE)
-            ? 'Specialist review complete. Review finding candidates. No candidate is an authoritative finding until confirmed.'
-            : 'Review vendor answers and evidence, request clarification, or mark review complete.',
+        owner: primary.owner,
+        nextAction: primary.label,
+        outstandingReviewDomains: outstanding,
         history: reviews,
         thirdParty: { id: engagement.vendor.id, name: engagement.vendor.name },
         engagement: { id: engagement.id, publicId: engagement.publicId, serviceName: engagement.serviceName },
@@ -881,11 +890,11 @@ export function nextDueDiligenceAction(status: EngagementStatus, hasInvitation =
         case EngagementStatus.VENDOR_IN_PROGRESS:
             return 'Vendor is completing the questionnaire';
         case EngagementStatus.VENDOR_SUBMITTED:
-            return 'Open specialist review';
+            return 'Complete Specialist Review';
         case EngagementStatus.SPECIALIST_REVIEW:
-            return 'Complete specialist review, then review finding candidates.';
+            return 'Complete Specialist Review';
         case EngagementStatus.FINDING_REVIEW:
-            return 'Review finding candidates and record control effectiveness.';
+            return 'Review Finding Candidates';
         case EngagementStatus.RESIDUAL_READY:
             return 'Risk treatment decision pending. Wave 5 is not started.';
         default:

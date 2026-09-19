@@ -32,12 +32,12 @@ function destination(row: Notice, permissions?: string[], role?: string) {
     if (row.resourceType === 'EngagementIra' && row.resourceId) {
         return participantExperience(role, permissions) === 'requester'
             ? '/request/actions'
-            : `/third-parties/engagements/${row.resourceId}/tier-review`;
+            : `/engagements/${row.resourceId}/inherent-risk`;
     }
     if (row.resourceType === 'Engagement' && row.resourceId) {
         return participantExperience(role, permissions) === 'requester'
             ? '/request/actions'
-            : `/third-parties/engagements/${row.resourceId}`;
+            : `/engagements/${row.resourceId}`;
     }
     if (row.resourceType === 'Vendor' && row.resourceId) return `/vendor-onboarding/${row.resourceId}`;
     if (row.resourceType === 'VendorAssessment') return '/assessments';

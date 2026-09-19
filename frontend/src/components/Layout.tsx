@@ -18,6 +18,8 @@ import {
     Typography,
 } from '@mui/material';
 import {
+    AssignmentIndOutlined,
+    AssignmentOutlined,
     AssessmentOutlined,
     BusinessOutlined,
     CreditCardOutlined,
@@ -62,10 +64,10 @@ const menuSections: NavSection[] = [
         primary: true,
         items: [
             { text: 'Home', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' },
+            { text: 'Intake', path: '/third-parties/intake', icon: <AssignmentOutlined fontSize="small" />, permission: 'intake.read' },
+            { text: 'My Work', path: '/third-parties/my-work', icon: <AssignmentIndOutlined fontSize="small" />, permission: 'intake.triage' },
             { text: 'Third Parties', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
-            { text: 'Intake', path: '/third-parties/intake', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.read' },
-            { text: 'My Work', path: '/third-parties/my-work', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.triage' },
-            { text: 'Onboard', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
+            { text: 'Engagements', path: '/engagements', icon: <AccountTreeOutlined fontSize="small" />, permission: 'intake.read' },
             { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },
             { text: 'Decisions', path: '/decision-briefs', icon: <GavelOutlined fontSize="small" />, permission: 'approval.read' },
@@ -174,6 +176,7 @@ function NavList({
                             <Button
                                 onClick={() => onToggleGroup(section.title)}
                                 aria-expanded={open}
+                                aria-controls={`nav-section-${section.title}`}
                                 sx={{ px: 1.25, minHeight: 32, color: color.navMuted, justifyContent: 'flex-start', textTransform: 'none', fontWeight: 700 }}
                             >
                                 {section.title}
@@ -184,14 +187,17 @@ function NavList({
                                 {section.title}
                             </Typography>
                         )}
-                        <Collapse in={collapsed || open} unmountOnExit={!section.primary}>
+                        <Collapse id={`nav-section-${section.title}`} in={collapsed || open} unmountOnExit={!section.primary}>
                         {items.map((item) => {
-                            const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
+                            const isActive = item.path === '/engagements'
+                                ? pathname === '/engagements' || pathname.startsWith('/engagements/') || pathname.startsWith('/third-parties/engagements/')
+                                : pathname === item.path || pathname.startsWith(`${item.path}/`);
                             const button = (
                                 <ListItemButton
                                     key={item.text}
                                     onClick={() => onNavigate(item.path)}
                                     selected={isActive}
+                                    aria-label={item.text}
                                     aria-current={isActive ? 'page' : undefined}
                                     sx={{
                                         mb: 0.25,
@@ -359,6 +365,9 @@ export default function Layout() {
                     </IconButton>
                     <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: color.inkMuted, minWidth: 140, fontWeight: 700 }}>
                         {orgName || 'Organization'}
+                    </Typography>
+                    <Typography sx={{ display: { xs: 'block', sm: 'none' }, fontSize: 13, fontWeight: 700, color: color.ink, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {searchable.find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.text || 'Supreme'}
                     </Typography>
                     <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: color.surfaceMuted, border: `1px solid ${color.line}`, borderRadius: '10px', px: 1.25, py: 0.65, maxWidth: 520 }}>
                         <Search fontSize="small" sx={{ color: color.inkMuted }} />

@@ -69,7 +69,7 @@ export default function DueDiligencePlan() {
             <PageHeader
                 crumbs={[
                     { label: 'Third Parties', to: '/vendor-management' },
-                    { label: data?.engagement?.publicId || 'Engagement', to: `/third-parties/engagements/${id}` },
+                    { label: data?.engagement?.publicId || 'Engagement', to: `/engagements/${id}` },
                     { label: 'Due diligence' },
                 ]}
                 title={data ? `Due-diligence scope · ${data.what}` : 'Due-diligence scope'}
@@ -144,7 +144,7 @@ export default function DueDiligencePlan() {
                                 </>
                             ) : null}
                             {(data.state === 'VENDOR_SUBMITTED' || data.state === 'SPECIALIST_REVIEW') && (
-                                <Button onClick={() => navigate(`/third-parties/engagements/${id}/assessment-review`)}>Open specialist review</Button>
+                                <Button onClick={() => navigate(`/engagements/${id}/evidence`)}>Open specialist review</Button>
                             )}
                         </Stack>
                         {copied && <Alert severity="info">Activation link ready. Copy is not send.</Alert>}

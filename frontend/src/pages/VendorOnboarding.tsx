@@ -92,11 +92,12 @@ export default function VendorOnboarding() {
         <QueryState loading={loading && !rows.length} error={null} empty={false}>
             <PageShell>
             <PageHeader
-                crumbs={[{ label: 'Third Parties', to: '/vendor-management' }, { label: 'Request' }]}
-                title="Open a third-party record"
-                description="GRC creates the vendor. Then you email or copy a secure inherent-risk link to the requester. The vendor is not invited yet."
+                crumbs={[{ label: 'Engagements', to: '/engagements' }, { label: 'Legacy onboarding' }]}
+                title="Legacy onboarding records"
+                description="This is a compatibility list, not the Golden Journey operating center. New work belongs on Engagements."
             />
             <Stack spacing={2.5} sx={{ minWidth: 0 }}>
+                <Alert severity="info">Onboard is no longer a primary Golden Journey destination. Open Engagements for current work. This page remains only for historical records that do not have an Engagement.</Alert>
                 {error && <Alert severity="error">{error}</Alert>}
                 <Surface>
                     <Box sx={{ pb: 2, mb: 0.5, borderBottom: '1px solid', borderColor: 'divider' }}>

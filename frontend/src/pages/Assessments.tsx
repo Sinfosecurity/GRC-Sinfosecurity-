@@ -114,7 +114,7 @@ export default function Assessments() {
     const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
     const [workspace, setWorkspace] = useState<any>(null);
     const [reviewMode, setReviewMode] = useState(true);
-    const startNewAssessment = () => navigate('/vendor-onboarding');
+    const startNewAssessment = () => navigate('/engagements');
     const draftRef = useRef('');
     const focusedQuestionKeyRef = useRef<string | null>(null);
 

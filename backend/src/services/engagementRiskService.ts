@@ -29,7 +29,9 @@ import {
     engagementResidualReadiness,
 } from './deterministicRiskEngine';
 import type { Actor } from './intakeEngagementService';
-import { engagementIraNextAction, engagementIraStatusLabel } from './engagementIraService';
+import { engagementIraStatusLabel } from './engagementIraService';
+import { engagementPrimaryAction } from '../tprm/engagementWorkspace';
+import { isAutomatedReviewSignalIssue, isSpecialistJudgedCandidate, reviewSignalHonesty, reviewSignalRule } from '../tprm/reviewSignals';
 
 const OPEN_FINDING = new Set<VendorIssueStatus>([
     VendorIssueStatus.OPEN,
@@ -100,11 +102,6 @@ function packKeys(plan: { includedPackKeys?: unknown; confirmedSnapshot?: unknow
     return (snapshot?.questionnairePlan?.packs || []).map((pack) => String(pack.key || '')).filter(Boolean);
 }
 
-function negativeAnswer(answer: string) {
-    const value = answer.trim().toLowerCase();
-    return value === 'no' || value === 'false' || value.startsWith('no ') || value.startsWith('no,');
-}
-
 function recommendSeverity(tier: string | null | undefined, rule: string): IssueSeverity {
     if (tier === 'CRITICAL' && rule === 'required_control_no') return IssueSeverity.HIGH;
     if (tier === 'HIGH' && rule === 'required_control_no') return IssueSeverity.HIGH;
@@ -122,19 +119,22 @@ function shortTopic(question: string) {
     return (cleaned.charAt(0).toUpperCase() + cleaned.slice(1)).slice(0, 120) || 'Control not demonstrated';
 }
 
-function nextWave4Action(status: EngagementStatus, residualReady: boolean, residualConfirmed: boolean) {
-    if (residualConfirmed) return 'Risk treatment decision pending. Wave 5 is not started.';
-    if (residualReady) return 'Review and confirm the Engagement residual-risk assessment. Wave 5 is not started.';
-    if (status === EngagementStatus.RESIDUAL_READY) return 'Review and confirm the Engagement residual-risk assessment. Wave 5 is not started.';
-    if (status === EngagementStatus.FINDING_REVIEW) return 'Review finding candidates and record control effectiveness.';
-    if (status === EngagementStatus.SPECIALIST_REVIEW) return 'Complete specialist review, then review finding candidates.';
-    return engagementIraNextAction(status);
+function nextWave4Action(status: EngagementStatus, residualReady: boolean, residualConfirmed: boolean, extras: {
+    outstandingReviewDomains?: string[];
+    openCandidateCount?: number;
+    controlAssessed?: boolean;
+} = {}) {
+    return engagementPrimaryAction(status, {
+        residualReady,
+        residualConfirmed,
+        outstandingReviewDomains: extras.outstandingReviewDomains,
+        openCandidateCount: extras.openCandidateCount,
+        controlAssessed: extras.controlAssessed,
+    }).label;
 }
 
-export async function seedFindingCandidates(organizationId: string, actor: Actor, key: string) {
-    assertPractitioner(actor);
-    if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can seed finding candidates.');
-    const engagement = await loadEngagement(organizationId, key);
+export async function listReviewSignals(organizationId: string, engagementId: string) {
+    const engagement = await loadEngagement(organizationId, engagementId);
     const assessments = await prisma.vendorAssessment.findMany({
         where: { organizationId, engagementId: engagement.id },
         include: { responses: { orderBy: { questionId: 'asc' } } },
@@ -145,85 +145,169 @@ export async function seedFindingCandidates(organizationId: string, actor: Actor
         include: { storedObject: { select: { id: true, scanStatus: true, filename: true } } },
     });
     const catalog = loadWorkbookCatalog();
-    const created: string[] = [];
+    const signals: Array<{
+        assessmentId: string;
+        questionId: string;
+        question: string;
+        vendorAnswer: string;
+        rule: string;
+        title: string;
+        existingIssueId: string | null;
+        candidateClass: 'REVIEW_SIGNAL';
+        authoritative: false;
+    }> = [];
     for (const assessment of assessments) {
         for (const response of assessment.responses) {
             const question = catalog.questions.find((row) => row.controlId === response.questionId);
             const evidence = links.find((link) => link.assessmentId === assessment.id && link.questionId === response.questionId);
             const review = reviews.find((row) => row.assessmentId === assessment.id || row.domain === (question?.domain || response.questionCategory));
-            const answer = String(response.response || '').trim();
-            const evidenceMissing = Boolean(response.evidenceRequired) && (!evidence || evidence.storedObject.scanStatus !== ScanStatus.CLEAN);
-            const reviewMissing = String((review?.conclusions as { conclusion?: string } | null)?.conclusion || '') === 'Evidence missing';
-            const rule = !answer
-                ? ''
-                : negativeAnswer(answer)
-                    ? 'required_control_no'
-                    : evidenceMissing || reviewMissing
-                        ? 'required_evidence_missing'
-                        : '';
+            const rule = reviewSignalRule({
+                answer: response.response,
+                evidenceRequired: Boolean(response.evidenceRequired),
+                evidenceClean: evidence?.storedObject.scanStatus === ScanStatus.CLEAN,
+                specialistConclusion: String((review?.conclusions as { conclusion?: string } | null)?.conclusion || ''),
+            });
             if (!rule) continue;
             const existing = await prisma.vendorIssue.findFirst({
                 where: { organizationId, engagementId: engagement.id, assessmentId: assessment.id, questionId: response.questionId },
             });
-            if (existing) continue;
-            const title = `${engagement.serviceName} — ${shortTopic(response.questionText || question?.question || response.questionId)}`;
-            const recommended = recommendSeverity(engagement.ira?.confirmedTier || engagement.dueDiligencePlan?.confirmedTier, rule);
-            const snapshot = buildSnapshot({
-                kind: /privacy/i.test(question?.domain || response.questionCategory || '') ? 'PRIVACY' : 'ASSESSMENT',
-                questionId: response.questionId,
-                questionText: response.questionText,
-                answer,
-                assessmentId: assessment.id,
-                assessmentType: assessment.assessmentType,
-                section: question?.domain || response.questionCategory,
-                pack: question?.pack || response.questionCategory,
-                controlKey: question?.controlId || response.questionId,
-                draftRuleCode: rule,
-                title,
-                category: question?.domain || response.questionCategory || 'Security',
-                evidenceRefs: evidence ? [evidence.storedObject.id] : [],
-            });
-            snapshot.displayTitle = title;
-            const issue = await prisma.vendorIssue.create({
-                data: {
-                    vendorId: engagement.vendorId,
-                    organizationId,
-                    engagementId: engagement.id,
-                    title,
-                    description: `Candidate only. Vendor answered ${answer || 'nothing recorded'}. This is not an authoritative finding until a GRC reviewer confirms it.`,
-                    issueType: 'CONTROL_FAILURE',
-                    severity: recommended,
-                    recommendedSeverity: recommended,
-                    priority: 'MEDIUM',
-                    source: 'INTERNAL_ASSESSMENT',
-                    identifiedBy: actor.id,
-                    category: question?.domain || response.questionCategory || 'Security',
-                    assignedTo: engagement.assignedAnalystUserId,
-                    assessmentId: assessment.id,
-                    questionId: response.questionId,
-                    controlId: question?.controlId || null,
-                    responsibility: 'VENDOR',
-                    reviewState: IssueReviewState.DRAFT,
-                    draftRuleCode: rule,
-                    sourceSnapshot: snapshot as Prisma.InputJsonValue,
-                    status: VendorIssueStatus.OPEN,
-                },
-            });
-            created.push(issue.id);
-            await audit(organizationId, actor.id, 'finding.candidate.created', 'VendorIssue', issue.id, {
-                engagementId: engagement.id,
-                vendorId: engagement.vendorId,
+            signals.push({
                 assessmentId: assessment.id,
                 questionId: response.questionId,
+                question: response.questionText || question?.question || response.questionId,
+                vendorAnswer: String(response.response || ''),
                 rule,
-                recommendedSeverity: recommended,
+                title: `${engagement.serviceName} — ${shortTopic(response.questionText || question?.question || response.questionId)}`,
+                existingIssueId: existing?.id || null,
+                candidateClass: 'REVIEW_SIGNAL',
+                authoritative: false,
             });
         }
     }
-    if (created.length && engagement.status === EngagementStatus.SPECIALIST_REVIEW) {
+    return { signals, honesty: reviewSignalHonesty() };
+}
+
+export async function seedFindingCandidates(organizationId: string, actor: Actor, key: string) {
+    assertPractitioner(actor);
+    if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can review finding signals.');
+    const engagement = await loadEngagement(organizationId, key);
+    const listed = await listReviewSignals(organizationId, engagement.id);
+    return { created: 0, ids: [] as string[], ...listed };
+}
+
+export async function createFindingCandidate(organizationId: string, actor: Actor, key: string, input: {
+    assessmentId: string;
+    questionId: string;
+    rationale: string;
+    severity?: IssueSeverity;
+}) {
+    assertPractitioner(actor);
+    if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can create a finding candidate.');
+    const rationale = String(input.rationale || '').trim();
+    if (!rationale) throw new ApiError(400, 'Record why this review signal warrants a Finding Candidate.');
+    const engagement = await loadEngagement(organizationId, key);
+    const candidateReady = new Set<EngagementStatus>([
+        EngagementStatus.VENDOR_SUBMITTED,
+        EngagementStatus.SPECIALIST_REVIEW,
+        EngagementStatus.FINDING_REVIEW,
+        EngagementStatus.RESIDUAL_READY,
+    ]);
+    if (!candidateReady.has(engagement.status)) {
+        throw new ApiError(409, 'Finding candidates can be created only after specialist review of a submitted vendor assessment.');
+    }
+    const assessment = await prisma.vendorAssessment.findFirst({
+        where: { organizationId, engagementId: engagement.id, id: input.assessmentId },
+        include: { responses: true },
+    });
+    if (!assessment) throw new ApiError(404, 'Assessment not found for this engagement.');
+    const response = assessment.responses.find((row) => row.questionId === input.questionId);
+    if (!response) throw new ApiError(404, 'Question not found on this assessment.');
+    const existing = await prisma.vendorIssue.findFirst({
+        where: { organizationId, engagementId: engagement.id, assessmentId: assessment.id, questionId: input.questionId },
+    });
+    if (existing?.reviewState === IssueReviewState.CONFIRMED) throw new ApiError(409, 'An authoritative finding already exists for this question.');
+    const catalog = loadWorkbookCatalog();
+    const question = catalog.questions.find((row) => row.controlId === input.questionId);
+    const title = `${engagement.serviceName} — ${shortTopic(response.questionText || question?.question || input.questionId)}`;
+    const recommended = input.severity || recommendSeverity(engagement.ira?.confirmedTier || engagement.dueDiligencePlan?.confirmedTier, 'specialist_judgment');
+    const snapshot = buildSnapshot({
+        kind: /privacy/i.test(question?.domain || response.questionCategory || '') ? 'PRIVACY' : 'ASSESSMENT',
+        questionId: input.questionId,
+        questionText: response.questionText,
+        answer: String(response.response || ''),
+        assessmentId: assessment.id,
+        assessmentType: assessment.assessmentType,
+        section: question?.domain || response.questionCategory,
+        pack: question?.pack || response.questionCategory,
+        controlKey: question?.controlId || input.questionId,
+        draftRuleCode: 'specialist_judgment',
+        title,
+        category: question?.domain || response.questionCategory || 'Security',
+        evidenceRefs: [],
+    }) as Record<string, unknown>;
+    snapshot.displayTitle = title;
+    snapshot.specialistJudged = true;
+    snapshot.candidateClass = 'FINDING_CANDIDATE';
+    snapshot.rationale = rationale;
+    if (existing) {
+        const updated = await prisma.vendorIssue.update({
+            where: { id: existing.id },
+            data: {
+                reviewState: IssueReviewState.DRAFT,
+                draftRuleCode: 'specialist_judgment',
+                sourceSnapshot: snapshot as Prisma.InputJsonValue,
+                determinationNote: rationale,
+                identifiedBy: actor.id,
+            },
+        });
+        await audit(organizationId, actor.id, 'finding.candidate.promoted', 'VendorIssue', updated.id, {
+            engagementId: engagement.id,
+            assessmentId: assessment.id,
+            questionId: input.questionId,
+            rationale,
+        });
+        if (engagement.status === EngagementStatus.SPECIALIST_REVIEW || engagement.status === EngagementStatus.VENDOR_SUBMITTED) {
+            await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.FINDING_REVIEW } });
+        }
+        return updated;
+    }
+    const issue = await prisma.vendorIssue.create({
+        data: {
+            vendorId: engagement.vendorId,
+            organizationId,
+            engagementId: engagement.id,
+            title,
+            description: `Specialist judgment: ${rationale}`,
+            issueType: 'CONTROL_FAILURE',
+            severity: recommended,
+            recommendedSeverity: recommended,
+            priority: 'MEDIUM',
+            source: 'INTERNAL_ASSESSMENT',
+            identifiedBy: actor.id,
+            category: question?.domain || response.questionCategory || 'Security',
+            assignedTo: engagement.assignedAnalystUserId,
+            assessmentId: assessment.id,
+            questionId: input.questionId,
+            controlId: question?.controlId || null,
+            responsibility: 'VENDOR',
+            reviewState: IssueReviewState.DRAFT,
+            draftRuleCode: 'specialist_judgment',
+            determinationNote: rationale,
+            sourceSnapshot: snapshot as Prisma.InputJsonValue,
+            status: VendorIssueStatus.OPEN,
+        },
+    });
+    await audit(organizationId, actor.id, 'finding.candidate.created', 'VendorIssue', issue.id, {
+        engagementId: engagement.id,
+        vendorId: engagement.vendorId,
+        assessmentId: assessment.id,
+        questionId: input.questionId,
+        rationale,
+    });
+    if (engagement.status === EngagementStatus.SPECIALIST_REVIEW || engagement.status === EngagementStatus.VENDOR_SUBMITTED) {
         await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.FINDING_REVIEW } });
     }
-    return { created: created.length, ids: created };
+    return issue;
 }
 
 export async function confirmFinding(organizationId: string, actor: Actor, issueId: string, input: {
@@ -476,11 +560,19 @@ export async function recordCompensatingControl(organizationId: string, actor: A
     effectivenessJudgment?: EngagementControlRating;
     consideredInResidual?: boolean;
     nextReviewAt?: string;
+    idempotencyKey?: string;
 }) {
     assertPractitioner(actor);
     if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can record a compensating control.');
     if (!String(input.description || '').trim()) throw new ApiError(400, 'Describe the compensating control.');
     const engagement = await loadEngagement(organizationId, key);
+    const idempotencyKey = String(input.idempotencyKey || '').trim() || null;
+    if (idempotencyKey) {
+        const existing = await prisma.engagementCompensatingControl.findFirst({
+            where: { organizationId, engagementId: engagement.id, idempotencyKey },
+        });
+        if (existing) return existing;
+    }
     const judgment = input.effectivenessJudgment || EngagementControlRating.NOT_ASSESSED;
     let considered = Boolean(input.consideredInResidual);
     if (considered) {
@@ -512,7 +604,16 @@ export async function recordCompensatingControl(organizationId: string, actor: A
             reviewedAt: new Date(),
             nextReviewAt: input.nextReviewAt ? new Date(input.nextReviewAt) : null,
             consideredInResidual: considered,
+            idempotencyKey,
         },
+    }).catch(async (error: { code?: string }) => {
+        if (error?.code === 'P2002' && idempotencyKey) {
+            const existing = await prisma.engagementCompensatingControl.findFirst({
+                where: { organizationId, engagementId: engagement.id, idempotencyKey },
+            });
+            if (existing) return existing;
+        }
+        throw error;
     });
     await audit(organizationId, actor.id, 'compensating_control.recorded', 'EngagementCompensatingControl', row.id, {
         engagementId: engagement.id,
@@ -684,6 +785,7 @@ export async function getEngagementRisk(organizationId: string, actor: Actor, ke
         orderBy: { createdAt: 'desc' },
         take: 25,
     });
+    const listedSignals = await listReviewSignals(organizationId, engagement.id);
     const insurance = await editionIsInsurance(organizationId);
     const siblings = await prisma.engagementResidualRiskAssessment.findMany({
         where: { organizationId, vendorId: engagement.vendorId, status: { not: EngagementResidualStatus.NOT_READY } },
@@ -707,6 +809,14 @@ export async function getEngagementRisk(organizationId: string, actor: Actor, ke
         dueDiligence: engagement.dueDiligencePlan ? { id: engagement.dueDiligencePlan.id, status: engagement.dueDiligencePlan.status, confirmedTier: engagement.dueDiligencePlan.confirmedTier } : null,
         findings: workspace.findings,
         candidates: workspace.candidates,
+        reviewSignals: listedSignals.signals.map((signal) => {
+            const existing = workspace.reviewSignals.find((row) => row.assessmentId === signal.assessmentId && row.questionId === signal.questionId);
+            return existing || {
+                ...signal,
+                honesty: listedSignals.honesty,
+            };
+        }),
+        honesty: listedSignals.honesty,
         controls: workspace.controls,
         applicableControls: workspace.applicableControls,
         compensating: workspace.compensating,
@@ -729,7 +839,10 @@ export async function getEngagementRisk(organizationId: string, actor: Actor, ke
             ratingPoints: CONTROL_RATING_POINTS,
             note: 'Residual risk uses confirmed Wave 2 inherent tier, human-governed Engagement control effectiveness, confirmed open findings, and reviewed compensating controls. Questionnaire averages are not authoritative.',
         },
-        nextAction: nextWave4Action(engagement.status, readiness.ready, latest?.status === EngagementResidualStatus.CONFIRMED),
+        nextAction: nextWave4Action(engagement.status, readiness.ready, latest?.status === EngagementResidualStatus.CONFIRMED, {
+            openCandidateCount: workspace.candidates.length,
+            controlAssessed: workspace.controls.some((row) => row.rating && row.rating !== EngagementControlRating.NOT_ASSESSED),
+        }),
         wave5Started: false,
         riskTreatmentPending: latest?.status === EngagementResidualStatus.CONFIRMED,
         insuranceContext: insurance,
@@ -868,7 +981,13 @@ async function collectRiskInputs(organizationId: string, engagementId: string) {
             iraId: engagement.ira?.id || null,
         },
         findings: issues.filter((row) => row.reviewState === IssueReviewState.CONFIRMED).map((row) => presentFinding(row, engagement)),
-        candidates: issues.filter((row) => row.reviewState === IssueReviewState.DRAFT).map((row) => presentFinding(row, engagement)),
+        candidates: issues.filter((row) => row.reviewState === IssueReviewState.DRAFT && isSpecialistJudgedCandidate(row.sourceSnapshot, row.draftRuleCode)).map((row) => presentFinding(row, engagement)),
+        reviewSignals: issues.filter((row) => row.reviewState === IssueReviewState.DRAFT && isAutomatedReviewSignalIssue(row.sourceSnapshot, row.draftRuleCode)).map((row) => ({
+            ...presentFinding(row, engagement),
+            candidateClass: 'REVIEW_SIGNAL' as const,
+            authoritative: false,
+            honesty: reviewSignalHonesty(),
+        })),
         dismissed: issues.filter((row) => row.reviewState === IssueReviewState.DISMISSED).map((row) => ({ id: row.id, title: row.title, reason: row.dismissReason })),
         openFindings: confirmedOpen.map((row) => ({
             id: row.id,

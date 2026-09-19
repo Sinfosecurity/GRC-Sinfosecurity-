@@ -85,7 +85,7 @@ export default function EngagementRisk() {
             <PageHeader
                 crumbs={[
                     { label: 'Third Parties', to: '/vendor-management' },
-                    { label: data?.engagement?.publicId || 'Engagement', to: `/third-parties/engagements/${id}` },
+                    { label: data?.engagement?.publicId || 'Engagement', to: `/engagements/${id}` },
                     { label: 'Engagement risk' },
                 ]}
                 title={data ? `Engagement risk · ${data.what}` : 'Engagement risk'}

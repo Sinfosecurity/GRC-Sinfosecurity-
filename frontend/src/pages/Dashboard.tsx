@@ -32,7 +32,7 @@ function greeting(name?: string) {
 function homeForRole(role?: string) {
     switch (role) {
         case 'BUSINESS_OWNER':
-            return { job: 'Complete intake and confirm the work that belongs to you.', cta: 'Onboard a third party', href: '/vendor-onboarding' };
+            return { job: 'Complete intake and confirm the work that belongs to you.', cta: 'Open requester workspace', href: '/request' };
         case 'ASSESSOR':
             return { job: 'Review exceptions, not every satisfactory answer.', cta: 'Open assessments', href: '/assessments' };
         case 'APPROVER':
