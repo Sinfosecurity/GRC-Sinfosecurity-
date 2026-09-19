@@ -7,7 +7,7 @@ import RequesterHome from '../RequesterHome';
 import RequesterNewRequest from '../RequesterNewRequest';
 import RequesterMyRequests from '../RequesterMyRequests';
 import RequesterActions from '../RequesterActions';
-import { hasPractitionerWorkspace, hasRequesterWorkspace } from '../workspace';
+import { hasPractitionerWorkspace, hasRequesterWorkspace, participantExperience } from '../workspace';
 
 vi.mock('../../contexts/AuthContext', () => ({
     useAuth: () => ({
@@ -62,6 +62,9 @@ describe('Requester workspace', () => {
         expect(screen.queryByRole('link', { name: 'Intake' })).not.toBeInTheDocument();
         expect(hasRequesterWorkspace(['intake.create_own'], 'BUSINESS_OWNER')).toBe(true);
         expect(hasPractitionerWorkspace(['intake.create_own'])).toBe(false);
+        expect(participantExperience('ASSESSOR', ['intake.create_own', 'vendor.read', 'intake.triage'])).toBe('grc');
+        expect(hasRequesterWorkspace(['intake.create_own', 'vendor.read'], 'ASSESSOR')).toBe(false);
+        expect(hasRequesterWorkspace(['intake.create_own'], 'ORGANIZATION_ADMIN')).toBe(false);
         expect(screen.queryByRole('button', { name: 'Open GRC workspace' })).not.toBeInTheDocument();
     });
 

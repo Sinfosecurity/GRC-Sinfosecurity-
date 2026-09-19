@@ -1,4 +1,4 @@
-import { canonicalizeRole, hasPermission, PERMISSIONS, roleMatches } from '../security/rbac';
+import { canonicalizeRole, customerLandingPath, hasPermission, participantExperience, PERMISSIONS, roleMatches } from '../security/rbac';
 
 describe('RBAC', () => {
     it('maps legacy roles without breaking compatibility', () => {
@@ -108,6 +108,27 @@ describe('RBAC', () => {
         expect(hasPermission('ASSESSOR', PERMISSIONS['intake.assign'])).toBe(false);
         expect(hasPermission('RISK_MANAGER', PERMISSIONS['intake.assign'])).toBe(true);
         expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['intake.assign'])).toBe(true);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['intake.create_own'])).toBe(false);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['intake.create_own'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['intake.create'])).toBe(false);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['intake.create'])).toBe(false);
+    });
+
+    it('isolates requester and GRC participant experiences by role', () => {
+        expect(participantExperience('BUSINESS_OWNER')).toBe('requester');
+        expect(participantExperience('DEPARTMENT_MANAGER')).toBe('requester');
+        expect(participantExperience('ASSESSOR')).toBe('grc');
+        expect(participantExperience('RISK_MANAGER')).toBe('grc');
+        expect(participantExperience('ORGANIZATION_ADMIN')).toBe('grc');
+        expect(participantExperience('VIEWER')).toBe('grc');
+        expect(participantExperience('APPROVER')).toBe('grc');
+        expect(participantExperience('AUDITOR')).toBe('grc');
+        expect(participantExperience('VENDOR')).toBe('vendor');
+        expect(customerLandingPath('BUSINESS_OWNER')).toBe('/request');
+        expect(customerLandingPath('ASSESSOR')).toBe('/dashboard');
+        expect(customerLandingPath('ORGANIZATION_ADMIN')).toBe('/dashboard');
+        expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['intake.create_own'])).toBe(true);
+        expect(participantExperience('ORGANIZATION_ADMIN')).not.toBe('requester');
     });
 
     it('matches aliased roles in authorize()', () => {

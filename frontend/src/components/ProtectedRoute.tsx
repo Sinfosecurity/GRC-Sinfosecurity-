@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Box, CircularProgress } from '@mui/material';
 import { isPlatformStaff } from '../platform/roles';
 import { portalLoginPath } from '../platform/portal';
-import { customerLandingPath, hasPractitionerWorkspace, hasRequesterWorkspace } from '../requester/workspace';
+import { customerLandingPath, participantExperience } from '../requester/workspace';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
@@ -56,15 +56,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles,
     return <Navigate to="/unauthorized" replace />;
   }
 
-  if (workspace === 'grc' && user && !hasPractitionerWorkspace(user.permissions)) {
-    return <Navigate to={hasRequesterWorkspace(user.permissions, user.role) ? '/request' : '/unauthorized'} replace />;
+  const participant = participantExperience(user?.role, user?.permissions);
+
+  if (workspace === 'grc' && user && participant !== 'grc') {
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  if (workspace === 'requester' && user && !hasRequesterWorkspace(user.permissions, user.role)) {
-    return <Navigate to={hasPractitionerWorkspace(user.permissions) ? '/dashboard' : '/unauthorized'} replace />;
+  if (workspace === 'requester' && user && participant !== 'requester') {
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  if (!workspace && user && hasRequesterWorkspace(user.permissions, user.role) && !hasPractitionerWorkspace(user.permissions)) {
+  if (!workspace && user && participant === 'requester') {
     return <Navigate to={customerLandingPath(user)} replace />;
   }
 

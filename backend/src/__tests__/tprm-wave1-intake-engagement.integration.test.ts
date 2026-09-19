@@ -162,14 +162,21 @@ describe('#12 Wave 1 intake assignment and engagement foundation', () => {
         const originalPurpose = asked.body.data.businessPurpose;
 
         const answered = await request(app)
-            .post(`${API}/tprm/intakes/${intakeId}/information-response`)
+            .post(`${API}/tprm/requester/intakes/${asked.body.data.publicId}/information-response`)
             .set('Authorization', `Bearer ${requesterToken}`)
             .send({ response: 'East US. Customer application data only.' });
         expect(answered.status).toBe(200);
-        expect(answered.body.data.status).toBe('IN_REVIEW');
-        expect(answered.body.data.businessPurpose).toBe(originalPurpose);
-        expect(answered.body.data.informationRequests[0].response).toContain('East US');
-        expect(answered.body.data.informationRequests[0].requestNote).toContain('hosting region');
+        expect(answered.body.data.requesterStatus).toBe('Under review');
+        expect(answered.body.data.assignmentHistory).toBeUndefined();
+
+        const grcView = await request(app).get(`${API}/tprm/intakes/${intakeId}`).set('Authorization', `Bearer ${analystToken}`);
+        expect(grcView.status).toBe(200);
+        expect(grcView.body.data.status).toBe('IN_REVIEW');
+        expect(grcView.body.data.businessPurpose).toBe(originalPurpose);
+        expect(grcView.body.data.requesterName).toBeTruthy();
+        expect(grcView.body.data.requesterEmail).toBeTruthy();
+        expect(grcView.body.data.informationRequests[0].response).toContain('East US');
+        expect(grcView.body.data.informationRequests[0].requestNote).toContain('hosting region');
     });
 
     it('matches or creates a third party, then creates an engagement', async () => {

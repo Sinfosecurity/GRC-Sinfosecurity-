@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../marketing/routerFuture';
 import { AuthProvider } from '../../contexts/AuthContext';
 import ProtectedRoute from '../ProtectedRoute';
+import { authAPI } from '../../services/api';
 
 vi.mock('../../services/api', () => ({
     authAPI: {
@@ -58,18 +59,17 @@ describe('ProtectedRoute', () => {
     });
 
     it('keeps a requester-only session out of the GRC workspace', async () => {
-        localStorage.setItem(
-            'user',
-            JSON.stringify({
-                id: 'req-1',
-                email: 'pat@example.test',
-                firstName: 'Pat',
-                lastName: 'Requester',
-                role: 'BUSINESS_OWNER',
-                organizationId: 'org1',
-                permissions: ['intake.create_own', 'intake.read_own', 'intake.respond_own'],
-            })
-        );
+        const requester = {
+            id: 'req-1',
+            email: 'pat@example.test',
+            firstName: 'Pat',
+            lastName: 'Requester',
+            role: 'BUSINESS_OWNER',
+            organizationId: 'org1',
+            permissions: ['intake.create_own', 'intake.read_own', 'intake.respond_own'],
+        };
+        vi.mocked(authAPI.getCurrentUser).mockResolvedValue({ data: { data: { user: requester } } } as any);
+        localStorage.setItem('user', JSON.stringify(requester));
         render(
             <MemoryRouter future={routerFuture} initialEntries={['/dashboard']}>
                 <AuthProvider>
@@ -81,6 +81,32 @@ describe('ProtectedRoute', () => {
         );
         await waitFor(() => {
             expect(screen.queryByText('GRC shell')).not.toBeInTheDocument();
+        });
+    });
+
+    it('keeps a GRC practitioner out of the requester workspace', async () => {
+        const analyst = {
+            id: 'ana-1',
+            email: 'ana@example.test',
+            firstName: 'Ana',
+            lastName: 'Lyst',
+            role: 'ASSESSOR',
+            organizationId: 'org1',
+            permissions: ['vendor.read', 'intake.read', 'intake.triage', 'intake.create_own'],
+        };
+        vi.mocked(authAPI.getCurrentUser).mockResolvedValue({ data: { data: { user: analyst } } } as any);
+        localStorage.setItem('user', JSON.stringify(analyst));
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/request']}>
+                <AuthProvider>
+                    <ProtectedRoute workspace="requester">
+                        <div>Requester shell</div>
+                    </ProtectedRoute>
+                </AuthProvider>
+            </MemoryRouter>
+        );
+        await waitFor(() => {
+            expect(screen.queryByText('Requester shell')).not.toBeInTheDocument();
         });
     });
 });

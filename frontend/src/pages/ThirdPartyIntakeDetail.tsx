@@ -23,7 +23,6 @@ export default function ThirdPartyIntakeDetail() {
     const [dueAt, setDueAt] = useState('');
     const [note, setNote] = useState('');
     const [infoNote, setInfoNote] = useState('');
-    const [response, setResponse] = useState('');
     const [search, setSearch] = useState('');
     const [matches, setMatches] = useState<any[]>([]);
     const [analysts, setAnalysts] = useState<Array<{ id: string; name: string }>>([]);
@@ -124,12 +123,8 @@ export default function ThirdPartyIntakeDetail() {
 
                         {data.status === 'NEEDS_INFORMATION' && (
                             <Surface>
-                                <SectionHeader title="Action required" />
-                                <Typography>GRC asked for more intake information. The original submission stays in history.</Typography>
-                                <TextField sx={{ mt: 1 }} multiline minRows={3} label="Your response" value={response} onChange={(event) => setResponse(event.target.value)} />
-                                <Button sx={{ mt: 1 }} variant="contained" disabled={Boolean(pending) || !response.trim()} onClick={() => run('respond', () => intakeAPI.respondInformation(data.id, { response }), 'Response received.')}>
-                                    {pending === 'respond' ? 'Sending…' : 'Submit response'}
-                                </Button>
+                                <SectionHeader title="Waiting for requester" />
+                                <Typography>GRC asked for more information. The requester answers in Requester Workspace. The response appears in this intake record.</Typography>
                             </Surface>
                         )}
 

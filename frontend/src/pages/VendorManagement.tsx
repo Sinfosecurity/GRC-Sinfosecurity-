@@ -285,7 +285,6 @@ export default function VendorManagement() {
                 description="Who matters, who needs attention, who is waiting, and what happens next. Residual risk and reviews come from persisted tenant data only."
                 actions={
                     <Stack direction="row" spacing={1}>
-                        <Button onClick={() => navigate('/request/new')}>Open requester form</Button>
                         <Button onClick={() => navigate('/third-parties/intake')}>Intake</Button>
                         <Button onClick={() => navigate('/vendor-onboarding')}>Onboard Third Party</Button>
                         <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={saving}>Add existing record</Button>

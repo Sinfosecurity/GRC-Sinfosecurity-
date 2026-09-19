@@ -68,3 +68,9 @@ Never merge `main`, deploy production, change production DNS, or declare product
 ## RULE 12 — Competitive objective
 
 Supreme’s strategic objective is not merely parity with OneTrust. The program aims to outperform category leaders on measurable customer outcomes while remaining truthful about current capability. Do not copy proprietary competitor code, content, or UI.
+
+## RULE 13 — Golden Journey design conformance
+
+Implementation convenience must not alter the approved Golden Journey. If implementation requires a material workflow, persona, authorization, data-model, or workspace deviation, engineering must STOP and return the decision to Product Leadership before implementation.
+
+This rule applies to all remaining #12 waves. Without explicit Product Leadership approval, do not introduce new participant personas, workspace switching, a combined requester/GRC shell, new lifecycle stages, alternative IRA ownership, vendor access to requester information, requester access to GRC records, GRC access to the requester portal, anonymous intake, a different Third Party/Engagement relationship, shortcuts around assignment, new scoring rules, or new approval gates.

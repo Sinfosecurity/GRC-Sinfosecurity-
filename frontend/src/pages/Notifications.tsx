@@ -10,7 +10,7 @@ import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import { formatDateTime, humanizeEventType } from '../utils/humanizeLabel';
 import { notificationAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { hasPractitionerWorkspace, hasRequesterWorkspace } from '../requester/workspace';
+import { participantExperience } from '../requester/workspace';
 
 type Notice = {
     id: string;
@@ -25,7 +25,7 @@ type Notice = {
 
 function destination(row: Notice, permissions?: string[], role?: string) {
     if (row.resourceType === 'IntakeRequest' && row.resourceId) {
-        return hasRequesterWorkspace(permissions, role) && !hasPractitionerWorkspace(permissions)
+        return participantExperience(role, permissions) === 'requester'
             ? `/request/${row.resourceId}`
             : `/third-parties/intake/${row.resourceId}`;
     }

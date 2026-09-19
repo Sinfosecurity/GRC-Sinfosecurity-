@@ -1,5 +1,5 @@
 import { Router, Response, NextFunction } from 'express';
-import { AuthRequest, requirePermission } from '../middleware/auth';
+import { AuthRequest, requirePermission, requirePractitionerPersona, requireRequesterPersona } from '../middleware/auth';
 import { PERMISSIONS } from '../security/rbac';
 import {
     assignIntake,
@@ -42,10 +42,9 @@ const requesterPerms = [
     PERMISSIONS['intake.create_own'],
     PERMISSIONS['intake.read_own'],
     PERMISSIONS['intake.respond_own'],
-    PERMISSIONS['intake.create'],
 ] as const;
 
-router.get('/requester/home', requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/requester/home', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await requesterHome(req.user!.organizationId, actor(req)) });
     } catch (error) {
@@ -53,7 +52,7 @@ router.get('/requester/home', requirePermission(...requesterPerms), async (req: 
     }
 });
 
-router.get('/requester/intakes', requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/requester/intakes', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await listRequesterIntakes(req.user!.organizationId, actor(req)) });
     } catch (error) {
@@ -61,7 +60,7 @@ router.get('/requester/intakes', requirePermission(...requesterPerms), async (re
     }
 });
 
-router.get('/requester/actions', requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/requester/actions', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await listRequesterActions(req.user!.organizationId, actor(req)) });
     } catch (error) {
@@ -69,7 +68,7 @@ router.get('/requester/actions', requirePermission(...requesterPerms), async (re
     }
 });
 
-router.get('/requester/colleagues', requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/requester/colleagues', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await listRequesterColleagues(req.user!.organizationId, actor(req)) });
     } catch (error) {
@@ -77,7 +76,7 @@ router.get('/requester/colleagues', requirePermission(...requesterPerms), async 
     }
 });
 
-router.post('/requester/intakes', requirePermission(PERMISSIONS['intake.create_own'], PERMISSIONS['intake.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/requester/intakes', requireRequesterPersona, requirePermission(PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await createRequesterIntake(req.user!.organizationId, actor(req), req.body || {}) });
     } catch (error) {
@@ -85,7 +84,7 @@ router.post('/requester/intakes', requirePermission(PERMISSIONS['intake.create_o
     }
 });
 
-router.get('/requester/intakes/:id', requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/requester/intakes/:id', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await getRequesterIntake(req.user!.organizationId, actor(req), req.params.id) });
     } catch (error) {
@@ -93,7 +92,7 @@ router.get('/requester/intakes/:id', requirePermission(...requesterPerms), async
     }
 });
 
-router.post('/requester/intakes/:id/information-response', requirePermission(PERMISSIONS['intake.respond_own'], PERMISSIONS['intake.create_own'], PERMISSIONS['intake.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/requester/intakes/:id/information-response', requireRequesterPersona, requirePermission(PERMISSIONS['intake.respond_own'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await respondRequesterInformation(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -101,7 +100,7 @@ router.post('/requester/intakes/:id/information-response', requirePermission(PER
     }
 });
 
-router.post('/intakes', requirePermission(PERMISSIONS['intake.create'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes', requireRequesterPersona, requirePermission(PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await createIntakeRequest(req.user!.organizationId, actor(req), req.body || {}) });
     } catch (error) {
@@ -109,7 +108,7 @@ router.post('/intakes', requirePermission(PERMISSIONS['intake.create'], PERMISSI
     }
 });
 
-router.get('/intakes', requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.assign'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/intakes', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.assign'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -126,7 +125,7 @@ router.get('/intakes', requirePermission(PERMISSIONS['intake.read'], PERMISSIONS
     }
 });
 
-router.get('/intakes/my-work', requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['intake.assign'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/intakes/my-work', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage'], PERMISSIONS['intake.assign'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await listMyTprmWork(req.user!.organizationId, actor(req)) });
     } catch (error) {
@@ -134,7 +133,7 @@ router.get('/intakes/my-work', requirePermission(PERMISSIONS['intake.triage'], P
     }
 });
 
-router.get('/intakes/workload', requirePermission(PERMISSIONS['intake.assign']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/intakes/workload', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.assign']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await workload(req.user!.organizationId) });
     } catch (error) {
@@ -142,7 +141,7 @@ router.get('/intakes/workload', requirePermission(PERMISSIONS['intake.assign']),
     }
 });
 
-router.get('/intakes/:id', requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.assign'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/intakes/:id', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.assign'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await getIntakeRequest(req.user!.organizationId, actor(req), req.params.id) });
     } catch (error) {
@@ -150,7 +149,7 @@ router.get('/intakes/:id', requirePermission(PERMISSIONS['intake.read'], PERMISS
     }
 });
 
-router.post('/intakes/:id/assign', requirePermission(PERMISSIONS['intake.assign']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/assign', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.assign']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await assignIntake(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -158,7 +157,7 @@ router.post('/intakes/:id/assign', requirePermission(PERMISSIONS['intake.assign'
     }
 });
 
-router.post('/intakes/:id/start-review', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/start-review', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await startTriage(req.user!.organizationId, actor(req), req.params.id) });
     } catch (error) {
@@ -166,7 +165,7 @@ router.post('/intakes/:id/start-review', requirePermission(PERMISSIONS['intake.t
     }
 });
 
-router.post('/intakes/:id/request-information', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/request-information', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await requestIntakeInformation(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -174,7 +173,7 @@ router.post('/intakes/:id/request-information', requirePermission(PERMISSIONS['i
     }
 });
 
-router.post('/intakes/:id/information-response', requirePermission(PERMISSIONS['intake.respond_own'], PERMISSIONS['intake.create_own'], PERMISSIONS['intake.create'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/information-response', requireRequesterPersona, requirePermission(PERMISSIONS['intake.respond_own'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await respondIntakeInformation(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -182,7 +181,7 @@ router.post('/intakes/:id/information-response', requirePermission(PERMISSIONS['
     }
 });
 
-router.get('/intakes/:id/third-parties', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/intakes/:id/third-parties', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -196,7 +195,7 @@ router.get('/intakes/:id/third-parties', requirePermission(PERMISSIONS['intake.t
     }
 });
 
-router.post('/third-parties/search', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/third-parties/search', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await searchThirdParties(req.user!.organizationId, actor(req), req.body || {}) });
     } catch (error) {
@@ -204,7 +203,7 @@ router.post('/third-parties/search', requirePermission(PERMISSIONS['intake.triag
     }
 });
 
-router.post('/intakes/:id/match', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/match', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await confirmThirdPartyMatch(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -212,7 +211,7 @@ router.post('/intakes/:id/match', requirePermission(PERMISSIONS['intake.triage']
     }
 });
 
-router.post('/intakes/:id/third-party', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/third-party', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await createThirdPartyFromIntake(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -220,7 +219,7 @@ router.post('/intakes/:id/third-party', requirePermission(PERMISSIONS['intake.tr
     }
 });
 
-router.post('/intakes/:id/engagement', requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/engagement', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await createEngagementFromIntake(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -228,7 +227,7 @@ router.post('/intakes/:id/engagement', requirePermission(PERMISSIONS['intake.tri
     }
 });
 
-router.post('/intakes/:id/close', requirePermission(PERMISSIONS['intake.assign'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/intakes/:id/close', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.assign'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await closeIntake(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
@@ -236,7 +235,7 @@ router.post('/intakes/:id/close', requirePermission(PERMISSIONS['intake.assign']
     }
 });
 
-router.get('/engagements', requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/engagements', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({
             success: true,
@@ -251,7 +250,7 @@ router.get('/engagements', requirePermission(PERMISSIONS['intake.read'], PERMISS
     }
 });
 
-router.get('/engagements/:id', requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/engagements/:id', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['vendor.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await getEngagement(req.user!.organizationId, actor(req), req.params.id) });
     } catch (error) {

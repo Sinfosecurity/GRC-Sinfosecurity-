@@ -1,4 +1,29 @@
-const REQUESTER_PERMS = ['intake.create_own', 'intake.read_own', 'intake.respond_own', 'intake.create'];
+const REQUESTER_ROLES = new Set(['BUSINESS_OWNER', 'DEPARTMENT_MANAGER']);
+const PLATFORM_ROLES = new Set([
+    'PLATFORM_OWNER',
+    'PLATFORM_ADMIN',
+    'SUPERADMIN',
+    'SUPPORT_ADMIN',
+    'SUPPORT_ANALYST',
+    'BILLING_SUPPORT',
+    'SECURITY_ADMIN',
+]);
+const GRC_ROLES = new Set([
+    'ORGANIZATION_ADMIN',
+    'ADMIN',
+    'ORG_ADMIN',
+    'ORG_OWNER',
+    'RISK_MANAGER',
+    'MANAGER',
+    'ASSESSOR',
+    'COMPLIANCE_OFFICER',
+    'COMPLIANCE_MANAGER',
+    'CONTRIBUTOR',
+    'APPROVER',
+    'AUDITOR',
+    'VIEWER',
+    'USER',
+]);
 const PRACTITIONER_PERMS = [
     'vendor.read',
     'intake.read',
@@ -16,10 +41,20 @@ const PRACTITIONER_PERMS = [
     'identity.manage',
 ];
 
-export function hasRequesterWorkspace(permissions: string[] = [], role?: string) {
-    return REQUESTER_PERMS.some((permission) => permissions.includes(permission))
-        || role === 'BUSINESS_OWNER'
-        || role === 'DEPARTMENT_MANAGER';
+export type ParticipantExperience = 'requester' | 'grc' | 'platform' | 'vendor' | null;
+
+export function participantExperience(role?: string, permissions: string[] = []): ParticipantExperience {
+    if (!role && !permissions.length) return null;
+    if (role && String(role).toUpperCase() === 'VENDOR') return 'vendor';
+    if (role && PLATFORM_ROLES.has(role)) return 'platform';
+    if (role && REQUESTER_ROLES.has(role)) return 'requester';
+    if (role && GRC_ROLES.has(role)) return 'grc';
+    if (hasPractitionerWorkspace(permissions)) return 'grc';
+    return null;
+}
+
+export function hasRequesterWorkspace(_permissions: string[] = [], role?: string) {
+    return participantExperience(role, _permissions) === 'requester';
 }
 
 export function hasPractitionerWorkspace(permissions: string[] = []) {
@@ -27,21 +62,8 @@ export function hasPractitionerWorkspace(permissions: string[] = []) {
 }
 
 export function customerLandingPath(user?: { permissions?: string[]; role?: string; nextPath?: string; plane?: string } | null) {
-    if (user?.nextPath) return user.nextPath;
     if (user?.plane === 'PLATFORM') return '/platform';
-    const requester = hasRequesterWorkspace(user?.permissions, user?.role);
-    const practitioner = hasPractitionerWorkspace(user?.permissions);
-    if (requester && !practitioner) return '/request';
+    if (participantExperience(user?.role, user?.permissions) === 'requester') return '/request';
+    if (user?.nextPath) return user.nextPath;
     return '/dashboard';
-}
-
-const WORKSPACE_KEY = 'supreme.workspace';
-
-export function rememberedWorkspace(): 'requester' | 'grc' | null {
-    const value = localStorage.getItem(WORKSPACE_KEY);
-    return value === 'requester' || value === 'grc' ? value : null;
-}
-
-export function rememberWorkspace(workspace: 'requester' | 'grc') {
-    localStorage.setItem(WORKSPACE_KEY, workspace);
 }

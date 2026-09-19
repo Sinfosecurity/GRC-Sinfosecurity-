@@ -184,6 +184,9 @@ describe('Wave 1 intake and engagement UI', () => {
             </MemoryRouter>
         );
         expect((await screen.findAllByText(/INT-2026-0001/)).length).toBeGreaterThan(0);
+        expect(screen.getByText(/Who requested it: Pat Requester/)).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Submit response' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Open requester form' })).not.toBeInTheDocument();
         fireEvent.change(screen.getByLabelText('What is missing?'), { target: { value: 'Need the business purpose' } });
         fireEvent.click(screen.getByRole('button', { name: 'Request more information' }));
         await waitFor(() => expect(intakeAPI.requestInformation).toHaveBeenCalled());
@@ -194,6 +197,34 @@ describe('Wave 1 intake and engagement UI', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Create engagement Azure Hosting' }));
         await waitFor(() => expect(intakeAPI.createEngagement).toHaveBeenCalled());
         expect(screen.getByRole('alert')).toHaveTextContent(/Third party confirmed|Engagement created|Information requested/);
+    });
+
+    it('shows requester identity and waits for the requester instead of answering as GRC', async () => {
+        const { intakeAPI } = await import('../../services/api');
+        (intakeAPI.get as any).mockResolvedValue({
+            data: {
+                data: {
+                    ...intake,
+                    status: 'NEEDS_INFORMATION',
+                    statusLabel: 'Needs information',
+                    assignedAnalystUserId: 'u-analyst',
+                    assignedAnalystName: 'Ana Lyst',
+                    informationRequests: [{ id: 'i1', requestNote: 'Need the region', requestedAt: '2026-09-18' }],
+                },
+            },
+        });
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/third-parties/intake/int-1']}>
+                <Routes>
+                    <Route path="/third-parties/intake/:id" element={<ThirdPartyIntakeDetail />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        expect(await screen.findByText(/Who requested it: Pat Requester/)).toBeInTheDocument();
+        expect(screen.getByText(/pat@example.test/)).toBeInTheDocument();
+        expect(screen.getByText(/Waiting for requester/)).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Submit response' })).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Your response')).not.toBeInTheDocument();
     });
 
     it('shows engagement detail and sibling engagements', async () => {

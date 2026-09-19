@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Box, Button, Menu, MenuItem, Typography } from '@mui/material';
+import { Box, Menu, MenuItem, Typography } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { color } from '../design/tokens';
-import { hasPractitionerWorkspace, rememberWorkspace } from './workspace';
 
 const links = [
     { to: '/request', label: 'Home', end: true },
@@ -17,7 +16,6 @@ export default function RequesterLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
-    const dualRole = hasPractitionerWorkspace(user?.permissions);
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: color.workspace, color: color.ink }}>
@@ -56,15 +54,6 @@ export default function RequesterLayout() {
                             </NavLink>
                         ))}
                     </Box>
-                    {dualRole && (
-                        <Button
-                            color="inherit"
-                            onClick={() => { rememberWorkspace('grc'); navigate('/dashboard'); }}
-                            sx={{ textTransform: 'none', border: `1px solid ${color.gold}`, color: color.navInk }}
-                        >
-                            Open GRC workspace
-                        </Button>
-                    )}
                     <Typography
                         component="button"
                         type="button"

@@ -151,19 +151,27 @@ describe('#12 requester workspace boundary', () => {
         }
     });
 
-    it('lets a dual-role analyst use both requester and GRC intake APIs', async () => {
-        const created = await request(app)
-            .post(`${API}/tprm/requester/intakes`)
-            .set('Authorization', `Bearer ${analystToken}`)
-            .send({
+    it('denies GRC practitioners the requester workspace even if they retain tenant permissions', async () => {
+        const denied = await Promise.all([
+            request(app).get(`${API}/tprm/requester/home`).set('Authorization', `Bearer ${analystToken}`),
+            request(app).get(`${API}/tprm/requester/intakes`).set('Authorization', `Bearer ${analystToken}`),
+            request(app).post(`${API}/tprm/requester/intakes`).set('Authorization', `Bearer ${analystToken}`).send({
                 proposedThirdPartyName: 'Dual Role Co',
                 proposedServiceName: 'Dual Service',
-                businessPurpose: 'Analyst also acts as a requester.',
-            });
-        expect(created.status).toBe(201);
-        const queue = await request(app).get(`${API}/tprm/intakes`).set('Authorization', `Bearer ${adminToken}`);
+                businessPurpose: 'Analyst must not become the requester.',
+            }),
+            request(app).get(`${API}/tprm/requester/home`).set('Authorization', `Bearer ${adminToken}`),
+            request(app).post(`${API}/tprm/requester/intakes`).set('Authorization', `Bearer ${adminToken}`).send({
+                proposedThirdPartyName: 'Admin Form',
+                proposedServiceName: 'Admin Service',
+                businessPurpose: 'Admin must not use Requester Workspace.',
+            }),
+        ]);
+        for (const response of denied) {
+            expect(response.status).toBe(403);
+        }
+        const queue = await request(app).get(`${API}/tprm/intakes`).set('Authorization', `Bearer ${analystToken}`);
         expect(queue.status).toBe(200);
-        expect(queue.body.data.items.some((row: { id: string }) => row.id === created.body.data.id)).toBe(true);
         const login = await request(app).post(`${API}/auth/login`).send({
             email: `ana-${suffix}@req-a.test`,
             password: PASSWORD,
@@ -171,8 +179,15 @@ describe('#12 requester workspace boundary', () => {
         });
         expect(login.status).toBe(200);
         expect(login.body.data.user.nextPath).toBe('/dashboard');
-        expect(login.body.data.user.permissions).toContain('intake.create_own');
+        expect(login.body.data.user.permissions).not.toContain('intake.create_own');
         expect(login.body.data.user.permissions).toContain('intake.triage');
+        const adminLogin = await request(app).post(`${API}/auth/login`).send({
+            email: `lead-${suffix}@req-a.test`,
+            password: PASSWORD,
+            plane: 'CUSTOMER',
+        });
+        expect(adminLogin.status).toBe(200);
+        expect(adminLogin.body.data.user.nextPath).toBe('/dashboard');
     });
 
     it('lets the requester respond from the requester API after GRC asks for information', async () => {
@@ -198,5 +213,13 @@ describe('#12 requester workspace boundary', () => {
         expect(answered.body.data.requesterStatus).toBe('Under review');
         expect(answered.body.data.informationRequests[0].response).toMatch(/Customer analytics/);
         expect(answered.body.data.assignmentHistory).toBeUndefined();
+
+        const grcView = await request(app).get(`${API}/tprm/intakes/${intakeId}`).set('Authorization', `Bearer ${analystToken}`);
+        expect(grcView.status).toBe(200);
+        expect(grcView.body.data.requesterName).toBe('Pat Requester');
+        expect(grcView.body.data.requesterEmail).toBe(`pat-${suffix}@req-a.test`);
+        expect(grcView.body.data.businessPurpose).toBeTruthy();
+        expect(grcView.body.data.informationRequests[0].response).toMatch(/Customer analytics/);
+        expect(grcView.body.data.assignmentHistory).toBeDefined();
     });
 });

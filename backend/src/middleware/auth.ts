@@ -4,7 +4,7 @@ import { UserAccountStatus } from '@prisma/client';
 import { ApiError } from './errorHandler';
 import { prisma } from '../config/database';
 import { getEnv } from '../config/env';
-import { Permission, hasAnyPermission, permissionsForRole, roleMatches } from '../security/rbac';
+import { Permission, hasAnyPermission, participantExperience, permissionsForRole, roleMatches } from '../security/rbac';
 import { LegacyPermission } from '../security/rbac';
 import { AuthPlane, CUSTOMER_PLANE, PLATFORM_PLANE, parsePlane } from '../security/sessionPlane';
 
@@ -170,6 +170,26 @@ export function requirePermission(...permissions: Array<Permission | LegacyPermi
         }
         next();
     };
+}
+
+export function requireRequesterPersona(req: AuthRequest, _res: Response, next: NextFunction) {
+    if (!req.user) {
+        return next(new ApiError(401, 'Authentication required'));
+    }
+    if (req.user.plane === 'VENDOR' || participantExperience(req.user.role) !== 'requester') {
+        return next(new ApiError(403, 'Requester Workspace is not available for this account.'));
+    }
+    next();
+}
+
+export function requirePractitionerPersona(req: AuthRequest, _res: Response, next: NextFunction) {
+    if (!req.user) {
+        return next(new ApiError(401, 'Authentication required'));
+    }
+    if (req.user.plane === 'VENDOR' || participantExperience(req.user.role) !== 'grc') {
+        return next(new ApiError(403, 'This GRC action is not available for this account.'));
+    }
+    next();
 }
 
 export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction) {

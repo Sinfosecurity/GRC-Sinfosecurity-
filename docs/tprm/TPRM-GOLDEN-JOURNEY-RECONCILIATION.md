@@ -611,8 +611,8 @@ Sequence is required by FK/data dependencies. Do not start Wave 4–8 first.
 
 **Phase 0 lock SHA:** `e0784550abf7c806de74993baa5a73386702ef81`  
 **Wave 1:** implemented on `supreme-risk-transformation`.  
-**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW.  
-**Not PASS.** Wave 2 not started. IRA scoring not changed. Tier Review clarification not started.
+**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 FOUNDATION PRESERVED · WAVE 1 PERSONA-ISOLATION CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW.  
+**Wave 1 NOT ACCEPTED. Not PASS.** Wave 2 not started and not authorized. IRA scoring not changed. Tier Review clarification not started.
 
 ### What Wave 1 shipped
 
@@ -637,7 +637,7 @@ Authenticated tenant users only. The form requires an existing Supreme session (
 
 `BUSINESS_OWNER` / `DEPARTMENT_MANAGER` receive only requester-own capabilities plus `notification.read`. They do not receive the GRC practitioner portfolio.
 
-GRC queue needs `intake.read` (or assign/triage). Assignment needs `intake.assign` (RISK_MANAGER / ORGANIZATION_ADMIN). Analyst work needs `intake.triage` (ASSESSOR+). Dual-role users (ASSESSOR / RISK_MANAGER / ORGANIZATION_ADMIN) keep both requester-own and practitioner permissions and may switch workspaces. Vendors have no intake or requester-workspace access. Information-request email uses a hashed capability token scoped to one request — the same security pattern as requester IRA links, not an open tenant form.
+GRC queue needs `intake.read` (or assign/triage). Assignment needs `intake.assign` (RISK_MANAGER / ORGANIZATION_ADMIN). Analyst work needs `intake.triage` (ASSESSOR+). Practitioner roles do not receive Requester Workspace. `ORGANIZATION_ADMIN` may still inherit tenant-wide capability names including `intake.create_own`, but participant experience is GRC and requester routes are denied. Vendors have no intake or requester-workspace access. Information-request email uses a hashed capability token scoped to one request — the same security pattern as requester IRA links, not an open tenant form.
 
 Primary requester routes: `/request`, `/request/new`, `/request/my-requests`, `/request/actions`, `/request/:publicId`. `/third-parties/request` redirects to `/request/new`. Practitioner GRC routes stay under `/third-parties/intake` and `/third-parties/my-work`. Requester APIs: `/api/v1/tprm/requester/*` return minimized fields only (`requesterStatus`, no assignment history, no match candidates, no raw enums).
 
@@ -677,8 +677,33 @@ Requester IRA operating flow, Tier Review clarification loop, vendor assessment 
 2. **GRC Practitioner Workspace** — queue, assignment, triage, match, Engagement, findings, decisions.
 3. **Vendor Workspace** — questionnaire / evidence. Unchanged. Vendor plane cannot read requester or intake-queue APIs.
 
-**Landing:** requester-only → `/request`. GRC-only → `/dashboard`. Dual-role → last remembered authorized workspace, otherwise `/dashboard`. Vendor → vendor portal.
+**Landing:** requester participant → `/request`. GRC practitioner → `/dashboard`. Vendor → vendor portal. There is no Requester ↔ GRC workspace switcher and no remembered workspace between these personas.
 
 **Wave 2 readiness (not implemented):** Actions Required already uses typed tasks (`INTAKE_INFORMATION_REQUEST`). Future `IRA_REQUIRED` / `IRA_CLARIFICATION_REQUIRED` must render inside Requester Workspace, not the GRC shell.
 
-**#12 status remains ACTIVE.** Wave 1 is not accepted until Product Leadership reviews hosted proof of this boundary. Wave 2 is not authorized.
+**Superseded:** the 2026-09-19 “ACCEPTED FOR CURRENT STAGE” note for the requester-experience boundary is withdrawn until Product Leadership reviews the persona-isolation correction. Dual-role workspace switching was not an approved Golden Journey behavior.
+
+---
+
+## Wave 1 persona-isolation correction (not Wave 2)
+
+**Starting evidence HEAD:** `fd2b5d9e704f633c81d0b089cf606f362d8e0cb3`  
+**Wave 1 foundation preserved:** `778b870d01e0946b93c14e5d10d19e2f04cbb79f`
+
+**Why:** The requester-boundary implementation introduced an unauthorized dual-role workspace switcher. Product Leadership did not design Requester Workspace and GRC Workspace as interchangeable modes.
+
+**Approved participant boundaries:**
+
+1. Business requester → Requester Workspace only (`/request`)
+2. TPRM / GRC practitioner → GRC Workspace only (`/dashboard` and practitioner routes)
+3. External vendor → Vendor Workspace only
+
+Neither participant enters the other’s workspace. TPRM still sees requester identity, department, business owner, requested third party/service, purpose, routing answers, timestamps, and requester responses **inside the Intake record**. GRC does not use requester APIs to obtain that information.
+
+**RBAC conflict and correction:** `ASSESSOR` and `RISK_MANAGER` previously inherited `REQUESTER_OWN` plus `intake.create`, which made them technically both personas. Those requester-own capabilities were stripped from practitioner roles. `ORGANIZATION_ADMIN` still has `TENANT_PERMISSIONS` (including `intake.create_own` by name). That leftover capability does **not** grant Requester Workspace; participant experience is enforced by role.
+
+**Removed:** Requester/GRC workspace switcher, last-remembered workspace, “Open requester workspace”, “Open GRC workspace”, and “Open requester form” from normal GRC workflow.
+
+**Design-conformance rule:** Implementation convenience must not alter the approved Golden Journey. If implementation requires a material workflow, persona, authorization, data-model, or workspace deviation, engineering must STOP and return the decision to Product Leadership before implementation.
+
+**#12 status after this correction:** ACTIVE — GOLDEN JOURNEY REVAMP. Wave 1 foundation PRESERVED. Wave 1 persona-isolation correction READY FOR PRODUCT LEADERSHIP REVIEW. Wave 1 NOT ACCEPTED. Wave 2 NOT STARTED. Commercial production NO-GO. Production untouched. #23 preserved.

@@ -40,5 +40,6 @@ describe('VendorManagement honesty', () => {
         expect(screen.getAllByText('Not rated').length).toBeGreaterThan(0);
         expect(screen.queryByText('%')).not.toBeInTheDocument();
         expect(screen.queryByText('60')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Open requester form' })).not.toBeInTheDocument();
     });
 });

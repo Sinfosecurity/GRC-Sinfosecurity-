@@ -228,13 +228,30 @@ export const PRACTITIONER_WORKSPACE_PERMISSIONS: Permission[] = [
     PERMISSIONS['identity.manage'],
 ];
 
+export type ParticipantExperience = 'requester' | 'grc' | 'platform' | 'vendor' | null;
+
+export function participantExperience(role: string | undefined | null): ParticipantExperience {
+    if (!role) return null;
+    if (String(role).toUpperCase() === 'VENDOR') return 'vendor';
+    const canonical = canonicalizeRole(role);
+    if (!canonical) return null;
+    if (canonical === 'BUSINESS_OWNER') return 'requester';
+    if (
+        canonical === 'PLATFORM_OWNER'
+        || canonical === 'PLATFORM_ADMIN'
+        || canonical === 'SUPPORT_ADMIN'
+        || canonical === 'SUPPORT_ANALYST'
+        || canonical === 'BILLING_SUPPORT'
+        || canonical === 'SECURITY_ADMIN'
+    ) {
+        return 'platform';
+    }
+    if (hasPractitionerWorkspace(canonical)) return 'grc';
+    return null;
+}
+
 export function hasRequesterWorkspace(role: string | undefined | null): boolean {
-    return hasAnyPermission(role, [
-        PERMISSIONS['intake.create_own'],
-        PERMISSIONS['intake.read_own'],
-        PERMISSIONS['intake.respond_own'],
-        PERMISSIONS['intake.create'],
-    ]);
+    return participantExperience(role) === 'requester';
 }
 
 export function hasPractitionerWorkspace(role: string | undefined | null): boolean {
@@ -242,10 +259,7 @@ export function hasPractitionerWorkspace(role: string | undefined | null): boole
 }
 
 export function customerLandingPath(role: string | undefined | null): string {
-    const requester = hasRequesterWorkspace(role);
-    const practitioner = hasPractitionerWorkspace(role);
-    if (requester && !practitioner) return '/request';
-    return '/dashboard';
+    return participantExperience(role) === 'requester' ? '/request' : '/dashboard';
 }
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
@@ -323,8 +337,6 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['automation.manage'],
         PERMISSIONS['automation.retry'],
         PERMISSIONS['insurance.manage'],
-        PERMISSIONS['intake.create'],
-        ...REQUESTER_OWN,
         PERMISSIONS['intake.assign'],
         PERMISSIONS['intake.triage'],
     ],
@@ -357,8 +369,6 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['intelligence.acknowledge'],
         PERMISSIONS['intelligence.report'],
         PERMISSIONS['insurance.manage'],
-        PERMISSIONS['intake.create'],
-        ...REQUESTER_OWN,
         PERMISSIONS['intake.triage'],
     ],
     APPROVER: [

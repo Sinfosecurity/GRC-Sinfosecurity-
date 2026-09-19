@@ -48,7 +48,6 @@ import {
 } from '@mui/icons-material';
 import { color } from '../design/tokens';
 import { canSeeNav, type NavPermission } from '../security/navAccess';
-import { hasRequesterWorkspace, rememberWorkspace } from '../requester/workspace';
 import { healthCheck, organizationAPI } from '../services/api';
 
 const EXPANDED = 248;
@@ -399,9 +398,6 @@ export default function Layout() {
                     </Typography>
                     <Menu anchorEl={menuEl} open={Boolean(menuEl)} onClose={() => setMenuEl(null)}>
                         <MenuItem disabled>{user?.email}</MenuItem>
-                        {hasRequesterWorkspace(user?.permissions, user?.role) && (
-                            <MenuItem onClick={() => { setMenuEl(null); rememberWorkspace('requester'); navigate('/request'); }}>Open requester workspace</MenuItem>
-                        )}
                         <MenuItem onClick={() => { setMenuEl(null); navigate('/organization-settings'); }}>Organization</MenuItem>
                         <MenuItem onClick={() => { setCollapsed((value) => !value); setMenuEl(null); }}>
                             {collapsed ? 'Expand navigation' : 'Collapse navigation'}
