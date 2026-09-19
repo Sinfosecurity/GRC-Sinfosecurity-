@@ -1,0 +1,84 @@
+{
+  "item": "#12",
+  "checkpoint": "manual-qa-personas",
+  "declaredPass": false,
+  "wave5Started": false,
+  "goldenJourneyChanged": false,
+  "vendorAuthChanged": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "organization": {
+    "id": "0e0de017-919a-4886-93d7-420b05f71f62",
+    "name": "Supreme GRC QA Organization",
+    "slug": "supreme-grc-qa"
+  },
+  "logins": {
+    "requester": { "http": 200, "role": "BUSINESS_OWNER", "nextPath": "/request", "result": "PASS" },
+    "lead": { "http": 200, "role": "RISK_MANAGER", "nextPath": "/dashboard", "result": "PASS" },
+    "analyst": { "http": 200, "role": "ASSESSOR", "nextPath": "/dashboard", "result": "PASS" }
+  },
+  "requesterAccess": {
+    "GET /tprm/requester/intakes": { "http": 200, "result": "PASS" },
+    "GET /tprm/requester/actions": { "http": 200, "result": "PASS" },
+    "GET /tprm/intakes": { "http": 403, "result": "PASS" },
+    "GET /tprm/intakes/my-work": { "http": 403, "result": "PASS" },
+    "GET /vendors": { "http": 403, "result": "PASS" },
+    "GET /tprm/findings": { "http": 403, "result": "PASS" },
+    "GET /users": { "http": 403, "result": "PASS" }
+  },
+  "leadAccess": {
+    "GET /tprm/intakes": { "http": 200, "result": "PASS" },
+    "POST /tprm/intakes/:id/assign": { "http": 200, "result": "PASS" },
+    "GET /tprm/requester/intakes": { "http": 403, "result": "PASS" },
+    "GET /tprm/requester/actions": { "http": 403, "result": "PASS" },
+    "POST /tprm/intakes": { "http": 403, "result": "PASS" }
+  },
+  "analystAccess": {
+    "GET /tprm/intakes/my-work": { "http": 200, "result": "PASS" },
+    "GET /tprm/requester/intakes": { "http": 403, "result": "PASS" },
+    "POST /tprm/intakes": { "http": 403, "result": "PASS" }
+  },
+  "vendorAccess": {
+    "vendorUserRow": false,
+    "activation": { "http": 200, "result": "PASS" },
+    "activationReuse": { "http": 410, "result": "PASS" },
+    "GET /vendor-portal/workspace": { "http": 200, "result": "PASS" },
+    "GET /tprm/requester/intakes": { "http": 401, "result": "PASS" },
+    "GET /tprm/requester/actions": { "http": 401, "result": "PASS" },
+    "GET /tprm/intakes": { "http": 401, "result": "PASS" },
+    "GET /tprm/intakes/my-work": { "http": 401, "result": "PASS" },
+    "GET /tprm/engagements/:id/tier-review": { "http": 401, "result": "PASS" },
+    "GET /tprm/engagements/:id/residual-risk": { "http": 401, "result": "PASS" },
+    "GET /tprm/engagements/:id/control-effectiveness": { "http": 401, "result": "PASS" },
+    "GET /vendors": { "http": 401, "result": "PASS" },
+    "GET /tprm/findings": { "http": 401, "result": "PASS" }
+  },
+  "manualCase": {
+    "publicId": "INT-2026-0001",
+    "proposedThirdPartyName": "Microsoft Corporation QA",
+    "proposedServiceName": "Azure Hosting QA",
+    "status": "UNASSIGNED",
+    "preCompleted": false
+  },
+  "requesterUi": {
+    "/request": { "result": "PASS", "detail": "Requester nav only; INT-2026-0001 visible" },
+    "/request/new": { "result": "PASS" },
+    "/request/my-requests": { "result": "PASS", "detail": "INT-2026-0001 listed" },
+    "/request/actions": { "result": "PASS", "detail": "empty actions; requester nav only" },
+    "/dashboard": { "result": "PASS", "httpUi": "redirect /unauthorized Access Denied" },
+    "/third-parties/intake": { "result": "PASS", "httpUi": "redirect /unauthorized Access Denied" }
+  },
+  "leadUi": {
+    "/dashboard": { "result": "PASS", "detail": "GRC nav; INT-2026-0001 assign action; no requester nav" },
+    "/third-parties/intake": { "result": "PASS", "detail": "TPRM Intake; 1 unassigned request" },
+    "/request": { "result": "PASS", "httpUi": "redirect /unauthorized Access Denied" }
+  },
+  "analystUi": {
+    "httpMyWork": { "result": "PASS" },
+    "httpRequesterDenied": { "result": "PASS" },
+    "hostedShell": "same GRC ProtectedRoute as TPRM Lead; no requester navigation"
+  },
+  "passwordDelivery": "generated_once_to_operator",
+  "vendorInvitationMethod": "normal_copy_or_send_after_dd_confirm",
+  "resetMethod": "scripts/staging/tprm-qa-personas.ts reset-test-data"
+}

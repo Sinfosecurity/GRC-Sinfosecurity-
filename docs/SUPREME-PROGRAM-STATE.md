@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-19 (#12 Wave 4 implemented; Waves 1–3 ACCEPTED FOR CURRENT STAGE; Wave 5 not started; not #12 PASS)
+**LAST UPDATED:** 2026-09-19 (#12 Wave 4 implemented; staging QA personas provisioned; Waves 1–3 ACCEPTED FOR CURRENT STAGE; Wave 5 not started; not #12 PASS)
 
 **CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 4 findings + control effectiveness + Engagement residual risk. Waves 1–3 are accepted for the current stage. Wave 5 is not authorized. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). WAVE 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). WAVE 4 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 5 NOT STARTED. Findings, control effectiveness, and residual risk belong to Engagement. Third Party ≠ Engagement. Version 3 confirmed inherent tier is the inherent source. Dual-role workspace switching remains removed. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). WAVE 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). WAVE 4 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 5 NOT STARTED. Staging QA personas are provisioned for manual walk. Findings, control effectiveness, and residual risk belong to Engagement. Third Party ≠ Engagement. Version 3 confirmed inherent tier is the inherent source. Dual-role workspace switching remains removed. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). WAVE 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). WAVE 3 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35442535799 PASS on `680b40f`. WAVE 4 IMPLEMENTATION `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`. WAVE 4 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35445728764 PASS. Hosted staging frontend/API `fc228bc`. WAVE 4 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 5 NOT STARTED. Requester-only hosted-browser proof remains DEFERRED. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE (`83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`). WAVE 2 ACCEPTED FOR CURRENT STAGE (`c47020a86feeb0b5b67bc408671159e68d8f2c26`). WAVE 3 ACCEPTED FOR CURRENT STAGE (`7132c7e09de66bb6a6917d70eb7f9f4958006190`). WAVE 3 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35442535799 PASS on `680b40f`. WAVE 4 IMPLEMENTATION `fc228bc0ce3d3acf57afebc2ae7829cd92a10563`. WAVE 4 CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35445728764 PASS. Hosted staging frontend/API `fc228bc`. WAVE 4 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 5 NOT STARTED. Staging QA personas provisioned in `supreme-grc-qa` for manual walk. Requester-only hosted-browser proof remains DEFERRED except the provisioned QA requester login. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

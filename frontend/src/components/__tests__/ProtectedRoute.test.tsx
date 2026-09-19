@@ -109,4 +109,30 @@ describe('ProtectedRoute', () => {
             expect(screen.queryByText('Requester shell')).not.toBeInTheDocument();
         });
     });
+
+    it('keeps a TPRM Lead out of the requester workspace', async () => {
+        const lead = {
+            id: 'lead-1',
+            email: 'lead@example.test',
+            firstName: 'QA',
+            lastName: 'TPRM Lead',
+            role: 'RISK_MANAGER',
+            organizationId: 'org1',
+            permissions: ['vendor.read', 'intake.read', 'intake.assign', 'intake.triage'],
+        };
+        vi.mocked(authAPI.getCurrentUser).mockResolvedValue({ data: { data: { user: lead } } } as any);
+        localStorage.setItem('user', JSON.stringify(lead));
+        render(
+            <MemoryRouter future={routerFuture} initialEntries={['/request']}>
+                <AuthProvider>
+                    <ProtectedRoute workspace="requester">
+                        <div>Requester shell</div>
+                    </ProtectedRoute>
+                </AuthProvider>
+            </MemoryRouter>
+        );
+        await waitFor(() => {
+            expect(screen.queryByText('Requester shell')).not.toBeInTheDocument();
+        });
+    });
 });
