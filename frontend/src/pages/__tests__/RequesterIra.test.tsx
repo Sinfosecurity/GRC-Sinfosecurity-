@@ -50,7 +50,7 @@ describe('Requester IRA', () => {
                 </Routes>
             </MemoryRouter>
         );
-        expect(await screen.findByText('Inherent risk questions')).toBeInTheDocument();
+        expect(await screen.findByText('Business-context risk assessment')).toBeInTheDocument();
         expect(screen.getByText(/Acme Payroll/)).toBeInTheDocument();
         expect(screen.getAllByText("Don't know").length).toBeGreaterThan(0);
         expect(screen.getByRole('button', { name: 'Submit' })).toBeDisabled();
@@ -91,7 +91,7 @@ describe('Requester IRA', () => {
         expect(screen.getByText(/✓ Submitted/)).toBeInTheDocument();
         expect(screen.getByText(/You may now close this page/)).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Submit' })).not.toBeInTheDocument();
-        expect(screen.queryByText('Inherent risk questions')).not.toBeInTheDocument();
+        expect(screen.queryByText('Business-context risk assessment')).not.toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'View submitted responses' }));
         expect(screen.getByText(/Personal data about employees or customers/)).toBeInTheDocument();
     });

@@ -410,11 +410,26 @@ async function pinPlan(planId: string, snapshot: Record<string, unknown>) {
     return pin;
 }
 
+async function assertInvitationIssuable(organizationId: string, engagementId: string, state: string, action: 'send' | 'copy') {
+    if (state === 'READY_TO_SEND' || state === 'AWAITING_VENDOR' || state === 'VENDOR_IN_PROGRESS') return;
+    const open = await prisma.vendorAssessment.count({
+        where: {
+            organizationId,
+            engagementId,
+            status: { notIn: [AssessmentStatus.COMPLETED, AssessmentStatus.CANCELLED] },
+        },
+    });
+    if (open > 0) return;
+    throw new ApiError(409, action === 'copy'
+        ? 'Confirm the due-diligence plan before copying a link.'
+        : 'Confirm the due-diligence plan before sending.');
+}
+
 export async function sendEngagementQuestionnaire(organizationId: string, actor: Actor, key: string, input: { name?: string; email?: string; title?: string; phone?: string; dueDate?: string; allowActivationLink?: boolean } = {}) {
     assertPractitioner(actor);
     if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can send the questionnaire.');
     const presented = await presentPlan(organizationId, key);
-    if (presented.state !== 'READY_TO_SEND' && presented.state !== 'AWAITING_VENDOR') throw new ApiError(409, 'Confirm the due-diligence plan before sending.');
+    await assertInvitationIssuable(organizationId, presented.engagement?.id || key, String(presented.state), 'send');
     if (presented.sendBlocked) throw new ApiError(409, presented.sendBlockMessage);
     if (input.email && input.name) await setAssessmentContact(organizationId, actor, key, input);
     const engagement = await loadEngagement(organizationId, key);
@@ -479,7 +494,7 @@ export async function copyEngagementActivationLink(organizationId: string, actor
     assertPractitioner(actor);
     if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can copy the activation link.');
     const presented = await presentPlan(organizationId, key);
-    if (presented.state !== 'READY_TO_SEND' && presented.state !== 'AWAITING_VENDOR') throw new ApiError(409, 'Confirm the due-diligence plan before copying a link.');
+    await assertInvitationIssuable(organizationId, presented.engagement?.id || key, String(presented.state), 'copy');
     if (input.email && input.name) await setAssessmentContact(organizationId, actor, key, input);
     const engagement = await loadEngagement(organizationId, key);
     const contactId = engagement.dueDiligencePlan?.assessmentContactId;
@@ -584,6 +599,16 @@ export async function completeSpecialistReview(organizationId: string, actor: Ac
     assertPractitioner(actor);
     if (!canManage(actor)) throw new ApiError(403, 'Only a TPRM reviewer can complete specialist review.');
     const engagement = await loadEngagement(organizationId, key);
+    const submitted = await prisma.vendorAssessment.count({
+        where: {
+            organizationId,
+            engagementId: engagement.id,
+            status: { in: [AssessmentStatus.PENDING_REVIEW, AssessmentStatus.COMPLETED] },
+        },
+    });
+    if (!submitted) {
+        throw new ApiError(409, 'This assessment cannot be marked review-complete because the vendor has not submitted it.');
+    }
     const conclusion = String(input.conclusion || 'Review complete').trim();
     if (!['Response sufficient', 'Needs clarification', 'Evidence sufficient', 'Evidence missing', 'Review complete'].includes(conclusion)) {
         throw new ApiError(400, 'Choose an approved Wave 3 review conclusion.');
