@@ -10,6 +10,8 @@ export const GRAPH_SEARCH_LIMIT = 50;
 
 export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
     GovernanceNodeType.ORGANIZATION,
+    GovernanceNodeType.INTAKE,
+    GovernanceNodeType.ENGAGEMENT,
     GovernanceNodeType.VENDOR,
     GovernanceNodeType.ASSESSMENT,
     GovernanceNodeType.EVIDENCE,
@@ -55,6 +57,8 @@ export const CURRENT_TPRM_NODE_TYPES: GovernanceNodeType[] = [
 
 export const SOURCE_RECORD_HREF: Record<string, (sourceId: string, extras?: { vendorId?: string }) => string> = {
     Organization: () => '/dashboard',
+    IntakeRequest: (id) => `/third-parties/intake/${id}`,
+    Engagement: (id) => `/third-parties/engagements/${id}`,
     Vendor: (id) => `/vendor-management?vendorId=${id}`,
     VendorAssessment: (id, extras) => `/assessments?vendorId=${extras?.vendorId || ''}&assessmentId=${id}`,
     VendorIssue: (_id, extras) => `/findings?vendorId=${extras?.vendorId || ''}`,

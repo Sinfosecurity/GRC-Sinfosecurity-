@@ -1,5 +1,6 @@
 import { AssessmentStatus, DecisionBriefStatus, VendorIssueStatus, VendorOnboardingStage, VendorStatus } from '@prisma/client';
 import { prisma } from '../config/database';
+import { intakeAttentionItems } from './intakeEngagementService';
 
 export type AttentionSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM';
 
@@ -74,6 +75,7 @@ export const attentionService = {
             overdueFindings,
             pendingBriefs,
             pendingVendorApprovals,
+            intakeItems,
         ] = await Promise.all([
             prisma.vendorOnboarding.findMany({
                 where: {
@@ -149,7 +151,12 @@ export const attentionService = {
                     approvalDecision: null,
                 },
             }),
+            intakeAttentionItems(organizationId),
         ]);
+        for (const item of intakeItems) {
+            items.push(item);
+        }
+
         for (const row of onboarding) {
             const due = row.dueDiligenceDueAt || (row.stage === VendorOnboardingStage.TIER_REVIEW ? row.tierReviewDueAt : row.intakeDueAt);
             const overdue = Boolean(due && due < now);

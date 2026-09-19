@@ -10,6 +10,7 @@ import { prisma } from '../config/database';
 import { tenantWhere } from '../security/tenant';
 import { monitoringCredentialsConfigured, resolveMonitoringProviderStatus } from '../services/monitoringProviderStatus';
 import tprmOperationsRoutes from './tprm.operations.routes';
+import intakeRoutes from './intake.routes';
 import { notifyUser } from '../services/notificationDeliveryService';
 import { approvalRequiredEmail, customerAppUrl, genericOperationalEmail, vendorActivatedEmail } from '../services/transactionalEmail';
 import { enforceSubscriptionWrites } from '../middleware/entitlement';
@@ -240,5 +241,6 @@ router.get('/monitoring/signals', requirePermission(PERMISSIONS['monitoring.read
 });
 
 router.use(tprmOperationsRoutes);
+router.use(intakeRoutes);
 
 export default router;

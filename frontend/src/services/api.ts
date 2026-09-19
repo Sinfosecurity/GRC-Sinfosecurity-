@@ -516,6 +516,35 @@ export const governanceAPI = {
     exportGraph: () => api.get('/governance/export'),
 };
 
+export const intakeAPI = {
+    create: (data: unknown) => api.post('/tprm/intakes', data),
+    list: (params?: unknown) => api.get('/tprm/intakes', { params }),
+    myWork: () => api.get('/tprm/intakes/my-work'),
+    workload: () => api.get('/tprm/intakes/workload'),
+    get: (id: string) => api.get(`/tprm/intakes/${id}`),
+    assign: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/assign`, data),
+    startReview: (id: string) => api.post(`/tprm/intakes/${id}/start-review`),
+    requestInformation: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/request-information`, data),
+    respondInformation: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/information-response`, data),
+    searchThirdParties: (id: string, params: unknown) => api.get(`/tprm/intakes/${id}/third-parties`, { params }),
+    match: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/match`, data),
+    createThirdParty: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/third-party`, data),
+    createEngagement: (id: string, data?: unknown) => api.post(`/tprm/intakes/${id}/engagement`, data || {}),
+    close: (id: string, data: unknown) => api.post(`/tprm/intakes/${id}/close`, data),
+    listEngagements: (params?: unknown) => api.get('/tprm/engagements', { params }),
+    getEngagement: (id: string) => api.get(`/tprm/engagements/${id}`),
+};
+
+const intakeInfoApi = axios.create({
+    baseURL: API_BASE_URL || '/api/v1',
+    headers: { 'Content-Type': 'application/json' },
+});
+
+export const intakeInfoAPI = {
+    get: (token: string) => intakeInfoApi.get('/intake-info', { params: { token } }),
+    respond: (token: string, data: unknown) => intakeInfoApi.post('/intake-info/respond', { token, ...(data as object) }),
+};
+
 export const vendorOnboardingAPI = {
     list: () => api.get('/vendors/onboarding'),
     owners: () => api.get('/vendors/onboarding/owners'),

@@ -63,6 +63,9 @@ const menuSections: NavSection[] = [
         items: [
             { text: 'Home', path: '/dashboard', icon: <DashboardOutlined fontSize="small" />, permission: 'always' },
             { text: 'Third Parties', path: '/vendor-management', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
+            { text: 'Request', path: '/third-parties/request', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.create' },
+            { text: 'Intake', path: '/third-parties/intake', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.read' },
+            { text: 'My Work', path: '/third-parties/my-work', icon: <BusinessOutlined fontSize="small" />, permission: 'intake.create' },
             { text: 'Onboard', path: '/vendor-onboarding', icon: <BusinessOutlined fontSize="small" />, permission: 'vendor.read' },
             { text: 'Assessments', path: '/assessments', icon: <AssessmentOutlined fontSize="small" />, permission: 'assessment.read' },
             { text: 'Findings', path: '/findings', icon: <ReportProblemOutlined fontSize="small" />, permission: 'finding.read' },

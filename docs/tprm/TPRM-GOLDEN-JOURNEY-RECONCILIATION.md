@@ -604,3 +604,43 @@ Sequence is required by FK/data dependencies. Do not start Wave 4–8 first.
 - Implementation not started
 
 **Next authorized step:** Product Leadership architecture review of this document. Implementation starts only when Wave 1 is explicitly authorized.
+
+---
+
+## Wave 1 implementation status (additive — does not rewrite Phase 0)
+
+**Phase 0 lock SHA:** `e0784550abf7c806de74993baa5a73386702ef81`  
+**Wave 1:** implemented on `supreme-risk-transformation`.  
+**#12 status:** ACTIVE — GOLDEN JOURNEY REVAMP · PHASE 0 COMPLETE · WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW.  
+**Not PASS.** Wave 2 not started. IRA scoring not changed. Tier Review clarification not started.
+
+### What Wave 1 shipped
+
+- First-class `IntakeRequest`, append-only `IntakeAssignment`, `IntakeInformationRequest`, and `Engagement`
+- Prisma `Vendor` remains the Third Party master (no rename)
+- `VendorOnboarding.engagementId` nullable compatibility link
+- Intake statuses only (no IRA / vendor-portal states on Intake)
+- Engagement statuses: `DRAFT` | `INTAKE_COMPLETE` | `READY_FOR_IRA`
+- Supreme form channel only (`SUPREME_FORM`)
+- Leadership assignment / reassignment history
+- Analyst My Work, triage, third-party search / confirm match / create
+- Multi-engagement per Third Party (`INT-YYYY-NNNN`, `ENG-YYYY-NNNN`)
+- Additive legacy backfill: one Engagement per existing `VendorOnboarding` when a name exists; empty service → `legacyReviewRequired`
+
+### Wave 1 access model
+
+Authenticated tenant users only. The form requires an existing Supreme session (employee / SSO / invited user). No anonymous public intake form. Requesters need `intake.create` (BUSINESS_OWNER and above). GRC queue needs `intake.read` without being requester-only. Assignment needs `intake.assign` (RISK_MANAGER / ORGANIZATION_ADMIN). Analyst work needs `intake.triage` (ASSESSOR+). Vendors have no intake access. Information-request email uses a hashed capability token scoped to one request — the same security pattern as requester IRA links, not an open tenant form.
+
+### Graph contract
+
+- `INTAKE` node ← `IntakeRequest`
+- `ENGAGEMENT` node ← `Engagement`
+- `Vendor` node remains Third Party
+- `ORIGINATED` Intake → Engagement
+- `HAS_ENGAGEMENT` Third Party → Engagement
+- `CONCERNS` Intake → Third Party after match
+- Requester is not a graph node (no USER type). Requester identity stays on Engagement / Intake fields.
+
+### Intentionally not in Wave 1
+
+Requester IRA operating flow, Tier Review clarification loop, vendor assessment / questionnaire changes, ServiceNow / Jira / email ingestion, Vendor → ThirdParty table rename, Insurance move to Engagement.

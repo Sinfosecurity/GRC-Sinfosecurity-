@@ -22,6 +22,8 @@ type Notice = {
 };
 
 function destination(row: Notice) {
+    if (row.resourceType === 'IntakeRequest' && row.resourceId) return `/third-parties/intake/${row.resourceId}`;
+    if (row.resourceType === 'Engagement' && row.resourceId) return `/third-parties/engagements/${row.resourceId}`;
     if (row.resourceType === 'Vendor' && row.resourceId) return `/vendor-onboarding/${row.resourceId}`;
     if (row.resourceType === 'VendorAssessment') return '/assessments';
     if (row.resourceType === 'VendorIssue' || row.resourceType === 'Finding') return '/findings';

@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-18 (Enterprise Record Standard hosted walk recorded)
+**LAST UPDATED:** 2026-09-18 (#12 Wave 1 intake / assignment / engagement foundation)
 
-**CURRENT ITEM:** #23 Insurance Edition. #12, #21, and #22 are ACCEPTED FOR CURRENT STAGE. #22 live provider validation is deferred. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
+**CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 1. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #23 ACTIVE — PHASE B READY FOR PRODUCT LEADERSHIP REVIEW. Phase A global foundation remains accepted for the current stage. Unnumbered UI 2.0 Enterprise Record Standard / Product Depth Remediation is ready for Product Leadership review. Finding Workspace Context Closure remains in the same unnumbered stream. UI 2.0 as a whole remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, #23 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW. Phase 0 lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 stops at Engagement creation. Wave 2 not started. IRA scoring not changed. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -32,9 +32,9 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#22:** ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED (Product Leadership 2026-09-18). Honesty/UI implementation and hosted frontend `7feb92de70cacfc954dc6632dbf862b61549ca53`. Hosted API `340f90818d9278a5173be3ca7be8eabba585f0cd`. Live Slack/Jira remain NOT TESTED. Cursor does not declare #22 PASS.
 
-**#23:** ACTIVE — PHASE B READY FOR PRODUCT LEADERSHIP REVIEW. Phase B implementation / hosted frontend / hosted API `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418 SUCCESS. Official walk 38 PASS / 0 FAIL. Supplemental hosted proofs 99 PASS / 0 FAIL / 1 SKIP. Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Phase B evidence `docs/private-beta/hosted-ux-qa/insurance-edition/phase-b/`. #27 and #30 are not started as independent items. Cursor does not declare #23 PASS. #24–#38 and #40 are not authorized.
+**#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED (Product Leadership 2026-09-18). Not commercial GO. Not production deployment. Not immutable. Hosted frontend `548cd19a893c35b9fb06059213c99fbfd0b9e495`. Hosted API `b00ad1274908a27a2253d6e5050420e2c10b8f39`. Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

@@ -1,0 +1,29 @@
+{
+  "item": "#12",
+  "wave": 1,
+  "phase0Lock": "e0784550abf7c806de74993baa5a73386702ef81",
+  "status": "WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW",
+  "declaredPass": false,
+  "hostedWalks": {
+    "goldenMicrosoftMultiEngagement": "NOT_RUN",
+    "needsInformation": "NOT_RUN",
+    "assignmentReassignment": "NOT_RUN",
+    "rbac": "NOT_RUN",
+    "migrationProof": "NOT_RUN"
+  },
+  "local": {
+    "backendTypecheck": "PASS",
+    "frontendTypecheck": "PASS",
+    "wave1Integration": "PASS",
+    "rbac": "PASS",
+    "insurancePhaseB": "PASS",
+    "vendorOnboardingV3": "PASS",
+    "iraTaskLink": "PASS",
+    "findingWorkspace": "PASS",
+    "frontendWave1": "PASS",
+    "fullFrontendSuite": "PASS",
+    "fullBackendSuite": "103 passed; 1 unrelated intelligence narrative expected NOT_CONFIGURED received ERROR because local AI provider status is ERROR"
+  },
+  "productionTouched": false,
+  "mainMerged": false
+}

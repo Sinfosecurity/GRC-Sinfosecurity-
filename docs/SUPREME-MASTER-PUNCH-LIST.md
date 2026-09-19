@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED. Product Leadership disposition 2026-09-18. Not commercial GO. Not production deployment. Not immutable / never-reopen. Prior private-testing acceptance (2026-09-14, SHA `97d79fffcd38b59527bd1d9f926bb613766de998`) remains historical. Hosted send-button fix `548cd19a893c35b9fb06059213c99fbfd0b9e495` is on staging frontend; API remains parent `b00ad1274908a27a2253d6e5050420e2c10b8f39`. READY_TO_SEND top CTA now sends when contact is present. Hosted navigation audit: 42 live routes PASS, 14 intentional quarantine/unauthorized, 0 route FAIL, 0 BLOCKER/HIGH. Cursor does not declare #12 PASS. Do not reopen #12 in this gate.
+**CURRENT STATUS:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW. Product Leadership reopened #12 for the controlled TPRM Golden Journey reconstruction. Phase 0 architecture lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 implements Intake Request, leadership assignment, Third Party match/create, and Engagement foundation only. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **CERTIFICATION SHA:** Hosted send fix / navigation-audit baseline `548cd19a893c35b9fb06059213c99fbfd0b9e495`. API hosted `b00ad1274908a27a2253d6e5050420e2c10b8f39`. CI `35368202589` PASS on `548cd19`. Prior UX-correction SHA `b00ad12` remains historical.
 
 **EVIDENCE:** Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Version 3 UX-correction walk A–H `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Copy link is not email sent. Real inbox not tested. Viewer RBAC not hosted-tested.
 
-**NEXT ACTION:** Keep current-stage acceptance. Reopen only if Product Leadership revises #12. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. UI 2.0 remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. #12-F and #12-V remain Product Leadership accepted. #20, #21, and #22 are accepted for the current stage. #23 is the authorized active item.
+**NEXT ACTION:** Product Leadership review of Wave 1. Do not start Wave 2 (IRA / Tier Review) until authorized. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted; do not extend. #24–#38 and #40 remain unauthorized.
 
 ---
 

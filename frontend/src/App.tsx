@@ -32,6 +32,12 @@ const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
 const VendorOnboardingWorkspace = lazy(() => import('./pages/VendorOnboardingWorkspace'));
 const VendorAssessmentActivate = lazy(() => import('./pages/VendorAssessmentActivate'));
 const RequesterIra = lazy(() => import('./pages/RequesterIra'));
+const ThirdPartyIntakeForm = lazy(() => import('./pages/ThirdPartyIntakeForm'));
+const ThirdPartyIntakeQueue = lazy(() => import('./pages/ThirdPartyIntakeQueue'));
+const ThirdPartyMyWork = lazy(() => import('./pages/ThirdPartyMyWork'));
+const ThirdPartyIntakeDetail = lazy(() => import('./pages/ThirdPartyIntakeDetail'));
+const EngagementDetail = lazy(() => import('./pages/EngagementDetail'));
+const IntakeInfoRespond = lazy(() => import('./pages/IntakeInfoRespond'));
 const VendorAssessmentPortal = lazy(() => import('./pages/VendorAssessmentPortal'));
 const VendorAssessmentQuestionnaire = lazy(() => import('./pages/VendorAssessmentQuestionnaire'));
 const SOCReports = lazy(() => import('./pages/SOCReports'));
@@ -172,6 +178,7 @@ export default function App() {
                     <Route path="/status" element={<PublicStatus />} />
                     <Route path="/vendor-assessment/activate" element={<VendorAssessmentActivate />} />
                     <Route path="/ira" element={<RequesterIra />} />
+                    <Route path="/intake-info" element={<IntakeInfoRespond />} />
                     <Route path="/vendor-assessment" element={<VendorAssessmentPortal />} />
                     <Route path="/vendor-assessment/:assessmentId" element={<VendorAssessmentQuestionnaire />} />
                     <Route path="/connected-platform" element={<PlatformStory />} />
@@ -273,6 +280,11 @@ export default function App() {
                     <Route path="predictive-analytics" element={LEGACY_ENABLED ? <PredictiveAnalytics /> : <LegacyQuarantine />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="vendor-management" element={<VendorManagement />} />
+                    <Route path="third-parties/request" element={<ThirdPartyIntakeForm />} />
+                    <Route path="third-parties/intake" element={<ThirdPartyIntakeQueue />} />
+                    <Route path="third-parties/my-work" element={<ThirdPartyMyWork />} />
+                    <Route path="third-parties/intake/:id" element={<ThirdPartyIntakeDetail />} />
+                    <Route path="third-parties/engagements/:id" element={<EngagementDetail />} />
                     <Route path="vendor-onboarding" element={<VendorOnboarding />} />
                     <Route path="vendor-onboarding/:id" element={<VendorOnboardingWorkspace />} />
                     <Route path="assessments" element={<Assessments />} />

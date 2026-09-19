@@ -27,7 +27,7 @@ import StatusBadge from '../components/design/StatusBadge';
 import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
 import { ExecutiveMetric, PageShell } from '../components/experience/ExperienceKit';
-import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
+import { aiGovernanceAPI, intakeAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 import { color } from '../design/tokens';
 import { humanizeLabel } from '../utils/humanizeLabel';
@@ -118,6 +118,7 @@ export default function VendorManagement() {
     } | null>(null);
     const [riskExplanationError, setRiskExplanationError] = useState<string | null>(null);
     const [aiLinks, setAiLinks] = useState<any>(null);
+    const [engagements, setEngagements] = useState<Array<{ id: string; publicId: string; serviceName: string; statusLabel: string }>>([]);
     const [saving, setSaving] = useState(false);
     const [newVendor, setNewVendor] = useState({
         name: '',
@@ -244,6 +245,10 @@ export default function VendorManagement() {
         setRiskExplanation(null);
         setRiskExplanationError(null);
         setAiLinks(null);
+        setEngagements([]);
+        intakeAPI.listEngagements({ vendorId: String(vendor.id), pageSize: 50 })
+            .then((response) => setEngagements(response.data.data.items || []))
+            .catch(() => setEngagements([]));
         tprmAPI.riskExplanation(String(vendor.id))
             .then((response) => setRiskExplanation(response.data.data))
             .catch((err: any) => setRiskExplanationError(err.message || 'Unable to load risk explanation'));
@@ -280,6 +285,8 @@ export default function VendorManagement() {
                 description="Who matters, who needs attention, who is waiting, and what happens next. Residual risk and reviews come from persisted tenant data only."
                 actions={
                     <Stack direction="row" spacing={1}>
+                        <Button onClick={() => navigate('/third-parties/request')}>Request a third party</Button>
+                        <Button onClick={() => navigate('/third-parties/intake')}>Intake</Button>
                         <Button onClick={() => navigate('/vendor-onboarding')}>Onboard Third Party</Button>
                         <Button variant="contained" onClick={() => setOpenDialog(true)} disabled={saving}>Add existing record</Button>
                     </Stack>
@@ -474,6 +481,15 @@ export default function VendorManagement() {
                                         <Button sx={{ mt: 1 }} onClick={() => navigate(`/ai-governance/systems/${aiLinks.systems[0].publicId}`)}>Open linked AI system</Button>
                                     </Surface>
                                 )}
+                                <Surface>
+                                    <Typography variant="h6" sx={{ mb: 1 }}>Engagements</Typography>
+                                    {engagements.length === 0 && <Typography variant="body2">No engagements recorded yet.</Typography>}
+                                    {engagements.map((row) => (
+                                        <Button key={row.id} onClick={() => navigate(`/third-parties/engagements/${row.id}`)}>
+                                            {row.publicId} · {row.serviceName} · {row.statusLabel}
+                                        </Button>
+                                    ))}
+                                </Surface>
                                 <EntityRelationships sourceModel="Vendor" sourceId={String(selectedVendor.id)} />
                             </Stack>
                         )}

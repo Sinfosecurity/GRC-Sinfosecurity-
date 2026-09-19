@@ -8,6 +8,10 @@ export const PERMISSIONS = {
     'vendor.create': 'vendor.create',
     'vendor.update': 'vendor.update',
     'vendor.delete': 'vendor.delete',
+    'intake.create': 'intake.create',
+    'intake.read': 'intake.read',
+    'intake.assign': 'intake.assign',
+    'intake.triage': 'intake.triage',
     'assessment.read': 'assessment.read',
     'assessment.create': 'assessment.create',
     'assessment.respond': 'assessment.respond',
@@ -190,6 +194,7 @@ const READ_PORTFOLIO: Permission[] = [
     PERMISSIONS['intelligence.read'],
     PERMISSIONS['automation.read'],
     PERMISSIONS['insurance.read'],
+    PERMISSIONS['intake.read'],
 ];
 
 const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
@@ -267,6 +272,9 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['automation.manage'],
         PERMISSIONS['automation.retry'],
         PERMISSIONS['insurance.manage'],
+        PERMISSIONS['intake.create'],
+        PERMISSIONS['intake.assign'],
+        PERMISSIONS['intake.triage'],
     ],
     ASSESSOR: [
         ...READ_PORTFOLIO,
@@ -297,6 +305,8 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['intelligence.acknowledge'],
         PERMISSIONS['intelligence.report'],
         PERMISSIONS['insurance.manage'],
+        PERMISSIONS['intake.create'],
+        PERMISSIONS['intake.triage'],
     ],
     APPROVER: [
         ...READ_PORTFOLIO,
@@ -328,6 +338,7 @@ const ROLE_PERMISSIONS: Record<CanonicalRole, Permission[]> = {
         PERMISSIONS['assessment.respond'],
         PERMISSIONS['evidence.upload'],
         PERMISSIONS['finding.read'],
+        PERMISSIONS['intake.create'],
     ],
     AUDITOR: [
         ...READ_PORTFOLIO,

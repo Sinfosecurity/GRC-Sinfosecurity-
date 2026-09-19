@@ -37,7 +37,13 @@ export type NotificationEvent =
     | 'user.invitation'
     | 'auth.password_reset'
     | 'ops.alert'
-    | 'automation.action';
+    | 'automation.action'
+    | 'intake.submitted'
+    | 'intake.assigned'
+    | 'intake.reassigned'
+    | 'intake.information_requested'
+    | 'intake.information_received'
+    | 'intake.completed';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
 export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';

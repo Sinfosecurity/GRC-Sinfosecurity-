@@ -95,6 +95,15 @@ describe('RBAC', () => {
         expect(hasPermission('ASSESSOR', PERMISSIONS['approval.decide'])).toBe(false);
         expect(hasPermission('ASSESSOR', PERMISSIONS['report.export'])).toBe(true);
         expect(hasPermission('VIEWER', PERMISSIONS['report.export'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['intake.assign'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['intake.create'])).toBe(false);
+        expect(hasPermission('VIEWER', PERMISSIONS['intake.read'])).toBe(true);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.create'])).toBe(true);
+        expect(hasPermission('BUSINESS_OWNER', PERMISSIONS['intake.assign'])).toBe(false);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['intake.triage'])).toBe(true);
+        expect(hasPermission('ASSESSOR', PERMISSIONS['intake.assign'])).toBe(false);
+        expect(hasPermission('RISK_MANAGER', PERMISSIONS['intake.assign'])).toBe(true);
+        expect(hasPermission('ORGANIZATION_ADMIN', PERMISSIONS['intake.assign'])).toBe(true);
     });
 
     it('matches aliased roles in authorize()', () => {

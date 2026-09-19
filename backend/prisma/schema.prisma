@@ -232,6 +232,10 @@ model Organization {
   insuranceApplicability      InsuranceApplicabilityDecision[]
   insuranceDelegatedAuthority InsuranceDelegatedAuthority[]
   insuranceCounterparties     InsuranceCounterparty[]
+  intakeRequests              IntakeRequest[]
+  intakeAssignments           IntakeAssignment[]
+  intakeInformationRequests   IntakeInformationRequest[]
+  engagements                 Engagement[]
 
   @@index([slug])
   @@index([status])
@@ -646,6 +650,8 @@ model Vendor {
   businessProcessMappings BusinessProcessVendorMapping[]
   baa                   VendorBAA?
   isoControlMappings    VendorISOControlMapping[]
+  intakeMatches         IntakeRequest[]
+  engagements           Engagement[]
   
   @@unique([organizationId, publicId])
   @@index([organizationId])
@@ -740,14 +746,181 @@ model VendorOnboarding {
   reassessmentFrequencyDays Int?
   lastReassessmentAt    DateTime?
   residualAtApproval    Int?
+  engagementId          String?
+  engagement            Engagement?            @relation(fields: [engagementId], references: [id])
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 
   @@index([organizationId])
+  @@index([engagementId])
   @@index([organizationId, stage])
   @@index([intakeDueAt])
   @@index([tierReviewDueAt])
   @@index([dueDiligenceDueAt])
+}
+
+enum IntakeSourceChannel {
+  SUPREME_FORM
+  EMAIL
+  SERVICENOW
+  JIRA
+  PROCUREMENT
+  PUBLIC_API
+  OTHER
+}
+
+enum IntakeStatus {
+  SUBMITTED
+  UNASSIGNED
+  ASSIGNED
+  IN_REVIEW
+  NEEDS_INFORMATION
+  READY_FOR_MATCH
+  VENDOR_MATCHED
+  ENGAGEMENT_CREATED
+  CANCELLED
+  REJECTED
+  DUPLICATE
+}
+
+enum IntakePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum EngagementStatus {
+  DRAFT
+  INTAKE_COMPLETE
+  READY_FOR_IRA
+}
+
+model IntakeRequest {
+  id                      String              @id @default(uuid())
+  publicId                String
+  organization            Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId          String
+  requesterUserId         String?
+  requesterName           String
+  requesterEmail          String
+  requesterBusinessUnit   String?
+  businessOwnerUserId     String?
+  businessOwnerName       String?
+  businessOwnerEmail      String?
+  proposedThirdPartyName  String
+  proposedServiceName     String
+  businessPurpose         String
+  vendorWebsite           String?
+  vendorContactName       String?
+  vendorContactEmail      String?
+  targetStartDate         DateTime?
+  estimatedSpend          Decimal?            @db.Decimal(15, 2)
+  procurementReference    String?
+  sourceChannel           IntakeSourceChannel @default(SUPREME_FORM)
+  priority                IntakePriority      @default(MEDIUM)
+  status                  IntakeStatus        @default(UNASSIGNED)
+  assignedAnalystUserId   String?
+  assignmentDueAt         DateTime?
+  matchedVendorId         String?
+  matchedVendor           Vendor?             @relation(fields: [matchedVendorId], references: [id])
+  createdEngagementId     String?             @unique
+  createdEngagement       Engagement?         @relation("IntakeCreatedEngagement", fields: [createdEngagementId], references: [id])
+  routingFacts            Json?
+  matchCandidates         Json?
+  matchReason             String?
+  matchConfirmedBy        String?
+  matchConfirmedAt        DateTime?
+  submittedAt             DateTime            @default(now())
+  assignedAt              DateTime?
+  triageStartedAt         DateTime?
+  completedAt             DateTime?
+  closedReason            String?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  assignments             IntakeAssignment[]
+  informationRequests     IntakeInformationRequest[]
+  engagements             Engagement[]        @relation("EngagementOriginatingIntake")
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, status])
+  @@index([organizationId, assignedAnalystUserId])
+  @@index([organizationId, submittedAt])
+  @@index([matchedVendorId])
+  @@index([createdEngagementId])
+}
+
+model IntakeAssignment {
+  id              String         @id @default(uuid())
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String
+  intake          IntakeRequest  @relation(fields: [intakeRequestId], references: [id], onDelete: Cascade)
+  intakeRequestId String
+  fromAnalystUserId String?
+  toAnalystUserId String
+  assignedByUserId String
+  note            String?
+  priority        IntakePriority
+  dueAt           DateTime?
+  assignedAt      DateTime       @default(now())
+
+  @@index([organizationId, intakeRequestId])
+  @@index([toAnalystUserId])
+}
+
+model IntakeInformationRequest {
+  id              String        @id @default(uuid())
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String
+  intake          IntakeRequest @relation(fields: [intakeRequestId], references: [id], onDelete: Cascade)
+  intakeRequestId String
+  fields          String[]
+  requestNote     String
+  requestedBy     String
+  requestedAt     DateTime      @default(now())
+  response        String?
+  respondedAt     DateTime?
+  respondedBy     String?
+  tokenHash       String?       @unique
+  expiresAt       DateTime?
+  createdAt       DateTime      @default(now())
+
+  @@index([organizationId, intakeRequestId])
+}
+
+model Engagement {
+  id                       String            @id @default(uuid())
+  publicId                 String
+  organization             Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId           String
+  vendor                   Vendor            @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId                 String
+  originatingIntakeRequestId String?
+  originatingIntake        IntakeRequest?    @relation("EngagementOriginatingIntake", fields: [originatingIntakeRequestId], references: [id])
+  createdFromIntake        IntakeRequest?    @relation("IntakeCreatedEngagement")
+  serviceName              String
+  businessPurpose          String
+  requesterUserId          String?
+  requesterName            String?
+  requesterEmail           String?
+  businessOwnerUserId      String?
+  businessOwnerName        String?
+  businessOwnerEmail       String?
+  assignedAnalystUserId    String?
+  relationshipOwnerUserId  String?
+  businessUnit             String?
+  targetStartDate          DateTime?
+  procurementReference     String?
+  status                   EngagementStatus  @default(READY_FOR_IRA)
+  legacyReviewRequired     Boolean           @default(false)
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+  onboardings              VendorOnboarding[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, vendorId])
+  @@index([organizationId, status])
+  @@index([originatingIntakeRequestId])
 }
 
 enum VendorType {
@@ -3160,6 +3333,8 @@ model PrivilegeElevation {
 enum GovernanceNodeType {
   ORGANIZATION
   BUSINESS_UNIT
+  INTAKE
+  ENGAGEMENT
   VENDOR
   SYSTEM
   APPLICATION
@@ -3248,6 +3423,8 @@ enum GovernanceRelationshipType {
   GOVERNS
   TRANSFERS_VIA
   CONCERNS
+  HAS_ENGAGEMENT
+  ORIGINATED
 }
 
 enum GovernanceProvenance {
