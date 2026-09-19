@@ -219,7 +219,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 REQUESTER-EXPERIENCE BOUNDARY CORRECTION READY FOR PRODUCT LEADERSHIP REVIEW. Product Leadership reopened #12 for the controlled TPRM Golden Journey reconstruction. Phase 0 architecture lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 runtime foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f` is preserved. This correction separates Requester Workspace from the GRC practitioner shell. It is not Wave 2. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
-**CERTIFICATION SHA:** Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f`. Requester-boundary correction SHA recorded after commit on `supreme-risk-transformation`. This is not a #12 PASS acceptance SHA.
+**CERTIFICATION SHA:** Wave 1 foundation `778b870d01e0946b93c14e5d10d19e2f04cbb79f`. Requester-boundary correction `1168f8e5e0203b1972bb9b7dbf2b089da7d4ba51`. This is not a #12 PASS acceptance SHA.
 
 **EVIDENCE:** Wave 1 hosted walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1/`. Requester-boundary evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1-requester-boundary/`. Architecture `docs/tprm/TPRM-GOLDEN-JOURNEY-RECONCILIATION.md`. Invitation email Queued ≠ Delivered.
 

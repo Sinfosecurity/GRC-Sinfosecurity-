@@ -663,6 +663,10 @@ Requester IRA operating flow, Tier Review clarification loop, vendor assessment 
 
 ## Wave 1 requester-experience boundary correction (not Wave 2)
 
+**Correction SHA:** `1168f8e5e0203b1972bb9b7dbf2b089da7d4ba51`  
+**Wave 1 foundation preserved:** `778b870d01e0946b93c14e5d10d19e2f04cbb79f`  
+**Docs descendant preserved:** `0d23449a69c0090647d7863e3f6f172e2fd45abe`
+
 **Why:** Hosted `/third-parties/request` rendered the business requester inside the GRC practitioner shell. Authentication is not GRC membership. This correction is a Wave 1 product-boundary fix. It does not authorize Wave 2.
 
 **Preserved Wave 1 model:** `IntakeRequest`, `IntakeAssignment`, `IntakeInformationRequest`, `Engagement`, Third Party matching, multi-Engagement, Intake Queue, leadership assignment, My Work, audit, notifications, graph lineage, Wave 1 migration. IRA scoring unchanged. Tier Review clarification not started. Vendor questionnaire unchanged. Insurance unchanged.
