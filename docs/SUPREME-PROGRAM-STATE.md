@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE + MANUAL-WALK REMEDIATION VERIFIED. WAVE 2 ACCEPTED FOR CURRENT STAGE + MANUAL-WALK REMEDIATION VERIFIED. WAVE 3 ACCEPTED FOR CURRENT STAGE + MANUAL-WALK REMEDIATION VERIFIED. WAVE 4 IMPLEMENTED — PRODUCT LEADERSHIP REVIEW EVIDENCE UPDATED. WAVE 5 NOT STARTED. Manual-walk package starts from `f19bcea3119e928001447995244c7fc19ff6758b`. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/manual-walk-remediation/`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE + MANUAL-WALK REMEDIATION VERIFIED. WAVE 2 ACCEPTED FOR CURRENT STAGE + MANUAL-WALK REMEDIATION VERIFIED. WAVE 3 ACCEPTED FOR CURRENT STAGE + MANUAL-WALK REMEDIATION VERIFIED. WAVE 4 IMPLEMENTED — PRODUCT LEADERSHIP REVIEW EVIDENCE UPDATED. WAVE 5 NOT STARTED. Manual-walk implementation / hosted SHA `63c2c39b228d3e2daeaa013235002b3591ff53e0`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35457961925 PASS. Starts from `f19bcea3119e928001447995244c7fc19ff6758b`. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/manual-walk-remediation/`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 

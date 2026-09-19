@@ -1,0 +1,857 @@
+{
+  "item": "#12",
+  "package": "manual-walk-remediation",
+  "declaredPass": false,
+  "wave5Started": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "implementationSha": "63c2c39b228d3e2daeaa013235002b3591ff53e0",
+  "checks": [
+    {
+      "name": "hosted.frontend.sha",
+      "result": "PASS",
+      "detail": "63c2c39b228d3e2daeaa013235002b3591ff53e0"
+    },
+    {
+      "name": "hosted.api.sha",
+      "result": "PASS",
+      "detail": "63c2c39b228d3e2daeaa013235002b3591ff53e0"
+    },
+    {
+      "name": "hosted.postgres",
+      "result": "PASS",
+      "detail": "up"
+    },
+    {
+      "name": "hosted.malware",
+      "result": "PASS",
+      "detail": "up"
+    },
+    {
+      "name": "login.requester",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "role": "BUSINESS_OWNER",
+        "next": null
+      }
+    },
+    {
+      "name": "login.lead",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "role": "RISK_MANAGER",
+        "next": null
+      }
+    },
+    {
+      "name": "login.analyst",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "role": "ASSESSOR",
+        "next": null
+      }
+    },
+    {
+      "name": "analyst.id",
+      "result": "PASS",
+      "detail": true
+    },
+    {
+      "name": "azure.engagement",
+      "result": "PASS",
+      "detail": {
+        "publicId": "ENG-2026-0001",
+        "status": "RESIDUAL_READY",
+        "statusLabel": "Residual risk ready",
+        "nextAction": "Risk treatment decision pending. Wave 5 is not started.",
+        "iraStatus": "CONFIRMED",
+        "thirdParty": "Microsoft Corporation QA"
+      }
+    },
+    {
+      "name": "ira.state.no.contradiction.api",
+      "result": "PASS",
+      "detail": {
+        "status": "RESIDUAL_READY",
+        "statusLabel": "Residual risk ready",
+        "nextAction": "Risk treatment decision pending. Wave 5 is not started.",
+        "ira": {
+          "status": "CONFIRMED",
+          "statusLabel": null,
+          "state": null,
+          "source": null,
+          "authoritativeState": null
+        }
+      }
+    },
+    {
+      "name": "second.intake.create",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "publicId": "INT-2026-0003",
+        "reused": true,
+        "status": "ENGAGEMENT_CREATED"
+      }
+    },
+    {
+      "name": "second.intake.assign",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "already": "ENGAGEMENT_CREATED"
+      }
+    },
+    {
+      "name": "second.intake.rfi",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "hasOpen": false
+      }
+    },
+    {
+      "name": "requester.actions.after.rfi",
+      "result": "PASS",
+      "detail": {
+        "count": 0,
+        "note": "empty after response is expected"
+      }
+    },
+    {
+      "name": "requester.attachment.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "filename": "data-processing-overview.pdf",
+        "scan": "Clean",
+        "reused": true
+      }
+    },
+    {
+      "name": "requester.attachment.response",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "reused": true
+      }
+    },
+    {
+      "name": "analyst.sees.response.and.attachment",
+      "result": "PASS",
+      "detail": {
+        "status": "ENGAGEMENT_CREATED",
+        "hasResponseText": true,
+        "hasFilename": true
+      }
+    },
+    {
+      "name": "third.party.search",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "count": 1
+      }
+    },
+    {
+      "name": "second.intake.match",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "already": true
+      }
+    },
+    {
+      "name": "second.engagement.create",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "reused": true,
+        "idPresent": true
+      }
+    },
+    {
+      "name": "second.ira.action",
+      "result": "PASS",
+      "detail": {
+        "idPresent": false,
+        "note": "IRA already submitted; country persistence proved on ENG-2026-0002"
+      }
+    },
+    {
+      "name": "ira.jurisdiction.mapping",
+      "result": "PASS",
+      "detail": {
+        "recommendedTier": "LOW",
+        "score": 4,
+        "explanation": "Inherent risk 3.6% maps to LOW.",
+        "a6": "outside"
+      }
+    },
+    {
+      "name": "azure.tier.confirm",
+      "result": "PASS",
+      "detail": {
+        "http": 409,
+        "confirmedTier": null,
+        "error": {
+          "type": "ApiError",
+          "message": "This inherent tier is already confirmed.",
+          "statusCode": 409,
+          "timestamp": "2026-09-19T17:35:26.691Z",
+          "requestId": "8f14fb33-f43a-4782-b4bc-72296a4d85cb"
+        }
+      }
+    },
+    {
+      "name": "azure.dd.opened",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "state": "RESIDUAL_READY",
+        "next": "Risk treatment decision pending. Wave 5 is not started."
+      }
+    },
+    {
+      "name": "azure.dd.confirm",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "state": "READY_TO_SEND",
+        "error": null
+      }
+    },
+    {
+      "name": "azure.vendor.contact",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "azure.copy.secure.link",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "present": true,
+        "host": "supreme-risk-staging.onrender.com",
+        "path": "/vendor-assessment/activate",
+        "hasToken": true
+      }
+    },
+    {
+      "name": "vendor.activate",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "hasSession": true,
+        "userCreated": false
+      }
+    },
+    {
+      "name": "vendor.activate.reuse",
+      "result": "PASS",
+      "detail": {
+        "http": 410
+      }
+    },
+    {
+      "name": "vendor.denied.internal",
+      "result": "PASS",
+      "detail": {
+        "/tprm/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/tier-review": 401,
+        "/tprm/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/risk": 401,
+        "/tprm/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/control-effectiveness": 401,
+        "/tprm/findings": 401,
+        "/tprm/requester/intakes": 401,
+        "/vendors": 401
+      }
+    },
+    {
+      "name": "vendor.workspace",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "count": 7,
+        "title": null
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.0bda14fc",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 45,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.0bda14fc",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-002",
+          "VRA-003",
+          "VRA-004",
+          "VRA-005",
+          "VRA-006",
+          "VRA-007",
+          "VRA-014",
+          "VRA-015",
+          "VRA-016",
+          "VRA-017",
+          "VRA-018",
+          "VRA-019",
+          "VRA-020",
+          "VRA-021",
+          "VRA-022",
+          "VRA-023",
+          "VRA-024",
+          "VRA-025",
+          "VRA-026",
+          "VRA-039",
+          "VRA-040",
+          "VRA-041",
+          "VRA-042",
+          "VRA-043",
+          "VRA-044",
+          "VRA-045",
+          "VRA-053",
+          "VRA-054",
+          "VRA-055",
+          "VRA-056",
+          "VRA-057",
+          "VRA-058",
+          "VRA-059",
+          "VRA-060",
+          "VRA-061",
+          "VRA-062",
+          "VRA-063",
+          "VRA-064",
+          "VRA-071",
+          "VRA-072",
+          "VRA-073",
+          "VRA-074",
+          "VRA-075",
+          "VRA-076"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 44
+      }
+    },
+    {
+      "name": "vendor.submit.0bda14fc",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.0bda14fc",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.bf423287",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 13,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.bf423287",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-009",
+          "VRA-010",
+          "VRA-011",
+          "VRA-012",
+          "VRA-013",
+          "VRA-077",
+          "VRA-078",
+          "VRA-079",
+          "VRA-080",
+          "VRA-081",
+          "VRA-082",
+          "VRA-083"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 12
+      }
+    },
+    {
+      "name": "vendor.submit.bf423287",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.bf423287",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.8cdce424",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 7,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.8cdce424",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-047",
+          "VRA-048",
+          "VRA-049",
+          "VRA-050",
+          "VRA-051",
+          "VRA-052"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 6
+      }
+    },
+    {
+      "name": "vendor.submit.8cdce424",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.8cdce424",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.f6e66e9a",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 13,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.f6e66e9a",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-034",
+          "VRA-035",
+          "VRA-036",
+          "VRA-037",
+          "VRA-038",
+          "VRA-084",
+          "VRA-085",
+          "VRA-086",
+          "VRA-087",
+          "VRA-088",
+          "VRA-089",
+          "VRA-090"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 12
+      }
+    },
+    {
+      "name": "vendor.submit.f6e66e9a",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.f6e66e9a",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.65b28c74",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 6,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.65b28c74",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-028",
+          "VRA-029",
+          "VRA-030",
+          "VRA-031",
+          "VRA-032"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 5
+      }
+    },
+    {
+      "name": "vendor.submit.65b28c74",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.65b28c74",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.9fd1a684",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 6,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.9fd1a684",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-066",
+          "VRA-067",
+          "VRA-068",
+          "VRA-069",
+          "VRA-070"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 5
+      }
+    },
+    {
+      "name": "vendor.submit.9fd1a684",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.9fd1a684",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "vendor.assessment.detail.1603043d",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "questions": 6,
+        "requiredEvidence": null,
+        "optionalEvidence": null,
+        "complete": null
+      }
+    },
+    {
+      "name": "vendor.evidence.upload",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "scan": null,
+        "usable": true
+      }
+    },
+    {
+      "name": "vendor.readiness.1603043d",
+      "result": "PASS",
+      "detail": {
+        "remaining": 0,
+        "unanswered": [],
+        "evidence": [],
+        "optionalEvidence": [
+          "VRA-098",
+          "VRA-099",
+          "VRA-100",
+          "VRA-101",
+          "VRA-102"
+        ],
+        "complete": true,
+        "questionsRequired": true,
+        "evidenceRequiredCount": 0,
+        "evidenceOptionalCount": 5
+      }
+    },
+    {
+      "name": "vendor.submit.1603043d",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "businessMessage": null,
+        "status": null
+      }
+    },
+    {
+      "name": "vendor.locked.after.submit.1603043d",
+      "result": "PASS",
+      "detail": {
+        "http": 409
+      }
+    },
+    {
+      "name": "wave3.submission.result",
+      "result": "PASS",
+      "detail": {
+        "submitted": 7
+      }
+    },
+    {
+      "name": "specialist.queue",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "state": "VENDOR_SUBMITTED",
+        "items": 96,
+        "next": "Specialist review complete. Review finding candidates. No candidate is an authoritative finding until confirmed."
+      }
+    },
+    {
+      "name": "specialist.complete",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "candidates.present",
+      "result": "PASS",
+      "detail": {
+        "candidates": 96,
+        "findings": 0,
+        "next": "Review and confirm the Engagement residual-risk assessment. Wave 5 is not started."
+      }
+    },
+    {
+      "name": "finding.confirm",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc"
+      }
+    },
+    {
+      "name": "finding.dismiss",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "title": "Azure Hosting QA \u2014 Are compliance and assurance records protected, retained, and retrievable for required periods?\n\nGuidance: State retenti"
+      }
+    },
+    {
+      "name": "shared.controls.available",
+      "result": "PASS",
+      "detail": {
+        "count": 96
+      }
+    },
+    {
+      "name": "control.effectiveness",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "compensating.control",
+      "result": "PASS",
+      "detail": {
+        "http": 201,
+        "error": null
+      }
+    },
+    {
+      "name": "residual.calculate",
+      "result": "PASS",
+      "detail": {
+        "http": 200,
+        "band": "MEDIUM",
+        "methodology": "supreme-risk-engagement-1.0.0",
+        "error": null
+      }
+    },
+    {
+      "name": "requester.denied.wave4",
+      "result": "PASS",
+      "detail": {
+        "/tprm/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/risk": 403,
+        "/tprm/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/assessment-review": 403,
+        "/tprm/findings": 403,
+        "/tprm/intakes/f199dfcf-69c2-4122-b6a7-ce37040dc8b1": 403
+      }
+    },
+    {
+      "name": "unauthenticated.deny",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "multi.engagement.isolation",
+      "result": "PASS",
+      "detail": {
+        "azureService": "Azure Hosting QA",
+        "m365Service": "Microsoft 365 Collaboration QA",
+        "azureResidual": "MEDIUM",
+        "m365Residual": "Due-diligence planning",
+        "azureFindings": 1,
+        "m365Findings": 0
+      }
+    },
+    {
+      "name": "wave5.not.started",
+      "result": "PASS",
+      "detail": 404
+    }
+  ],
+  "sha": {
+    "frontend": "63c2c39b228d3e2daeaa013235002b3591ff53e0",
+    "api": "63c2c39b228d3e2daeaa013235002b3591ff53e0",
+    "required": "63c2c39b228d3e2daeaa013235002b3591ff53e0"
+  },
+  "wave5AcceptRisk": 404,
+  "summary": {
+    "pass": 80,
+    "fail": 0,
+    "partial": 0
+  },
+  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35457961925"
+}
