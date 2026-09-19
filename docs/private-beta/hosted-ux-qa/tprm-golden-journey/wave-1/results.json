@@ -1,16 +1,98 @@
 {
   "item": "#12",
   "wave": 1,
-  "phase0Lock": "e0784550abf7c806de74993baa5a73386702ef81",
   "status": "WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW",
   "declaredPass": false,
-  "hostedWalks": {
-    "goldenMicrosoftMultiEngagement": "NOT_RUN",
-    "needsInformation": "NOT_RUN",
-    "assignmentReassignment": "NOT_RUN",
-    "rbac": "NOT_RUN",
-    "migrationProof": "NOT_RUN"
+  "phase0Lock": "e0784550abf7c806de74993baa5a73386702ef81",
+  "implementationSha": "778b870d01e0946b93c14e5d10d19e2f04cbb79f",
+  "runtimeSha": "778b870d01e0946b93c14e5d10d19e2f04cbb79f",
+  "ci": {
+    "url": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35417211492",
+    "headSha": "778b870d01e0946b93c14e5d10d19e2f04cbb79f",
+    "conclusion": "success"
   },
+  "hosting": {
+    "frontend": {
+      "url": "https://supreme-risk-staging.onrender.com/version.json",
+      "gitSha": "778b870d01e0946b93c14e5d10d19e2f04cbb79f"
+    },
+    "api": {
+      "url": "https://supreme-risk-staging-api.onrender.com/health",
+      "gitSha": "778b870d01e0946b93c14e5d10d19e2f04cbb79f",
+      "status": "degraded",
+      "environment": "staging",
+      "postgres": "up",
+      "email": "up",
+      "mongodb": "degraded",
+      "ai": "degraded",
+      "memory": "degraded"
+    },
+    "productionTouched": false,
+    "mainMerged": false
+  },
+  "tenant": {
+    "organizationId": "c0cdb206-f11d-4cc5-8378-33d2ef05cb6d",
+    "note": "Fresh hosted org created for Wave 1. Passwords and session tokens are not stored."
+  },
+  "ids": {
+    "azureIntake": "INT-2026-0001",
+    "m365Intake": "INT-2026-0002",
+    "needsInfoIntake": "INT-2026-0003",
+    "azureEngagement": "ENG-2026-0001",
+    "m365Engagement": "ENG-2026-0002",
+    "microsoftVendorId": "4328f04a-cf03-4b0e-864f-47169fbe5101"
+  },
+  "hostedWalks": {
+    "goldenMicrosoftMultiEngagement": "PASS",
+    "needsInformation": "PASS",
+    "assignmentReassignment": "PASS",
+    "rbac": "PASS",
+    "vendorAuthenticatedSession": "SKIP",
+    "migrationProofPreWave1Vendor": "SKIP",
+    "responsive375Form": "PASS",
+    "responsive768": "SKIP",
+    "responsive1024": "SKIP",
+    "responsive1440Pages": "PASS",
+    "responsive1920": "SKIP"
+  },
+  "walkDetail": {
+    "intakeCreate": "PASS",
+    "acknowledgementPublicId": "INT-2026-0001 UNASSIGNED",
+    "leadAssignAnalystA": "PASS",
+    "analystNotification": "PASS",
+    "myWorkAssignment": "PASS",
+    "startReview": "PASS",
+    "searchMicrosoft": "PASS",
+    "createThirdPartyUnrated": "PASS",
+    "createAzureEngagement": "PASS",
+    "intakeEngagementCreated": "PASS",
+    "secondIntakeM365": "PASS",
+    "confirmExistingMicrosoftMatch": "PASS",
+    "secondEngagementSameVendor": "PASS",
+    "needsInformationRoundTrip": "PASS",
+    "reassignmentHistoryAtoB": "PASS",
+    "myWorkAfterReassign": "PASS",
+    "graphOriginatedHasEngagement": "PASS",
+    "auditRequiredActions": "PASS",
+    "insuranceClassificationOnVendor": "PASS",
+    "viewerCannotCreateOrAssign": "PASS",
+    "analystCannotAssign": "PASS",
+    "requesterSeesOwnIntake": "PASS",
+    "crossTenantDeny": "PASS",
+    "unauthenticatedDeny": "PASS"
+  },
+  "auditActionsObserved": [
+    "intake.created",
+    "intake.assigned",
+    "intake.reassigned",
+    "intake.review_started",
+    "intake.information_requested",
+    "intake.information_received",
+    "intake.third_party_created",
+    "intake.third_party_matched",
+    "engagement.created",
+    "intake.completed"
+  ],
   "local": {
     "backendTypecheck": "PASS",
     "frontendTypecheck": "PASS",
@@ -22,8 +104,19 @@
     "findingWorkspace": "PASS",
     "frontendWave1": "PASS",
     "fullFrontendSuite": "PASS",
-    "fullBackendSuite": "103 passed; 1 unrelated intelligence narrative expected NOT_CONFIGURED received ERROR because local AI provider status is ERROR"
+    "fullBackendSuite": "103 passed; 1 unrelated intelligence narrative expected NOT_CONFIGURED received ERROR because local AI provider status is ERROR",
+    "prismaValidate": "PASS via CI",
+    "secretScan": "PASS via CI",
+    "productionFrontendBuild": "PASS via CI",
+    "publicBuildSafety": "PASS via CI"
   },
-  "productionTouched": false,
-  "mainMerged": false
+  "notes": [
+    "Access model: authenticated tenant users only. No anonymous intake form.",
+    "Invite activation for extra roles used failed-delivery @localhost addresses so activationUrl was returned. Tokens were not stored.",
+    "Fresh hosted tenant has no pre-Wave-1 Vendor. Migration proof SKIP on this tenant. Additive migration remains in repo.",
+    "No vendor authenticated session was created. Unauthenticated /tprm/intakes returned 401. Vendor portal /me without session returned 404.",
+    "InsuranceVendorClassification created on Vendor 4328f04a-cf03-4b0e-864f-47169fbe5101 with engagementId null.",
+    "Automation-browser screenshots show a webfont combining-mark artifact. Accessibility snapshots are the authoritative hosted UI record.",
+    "768 / 1024 / 1920 hosted screenshots were not captured. Form was checked at 375. Desktop pages were captured at the default hosted viewport."
+  ]
 }

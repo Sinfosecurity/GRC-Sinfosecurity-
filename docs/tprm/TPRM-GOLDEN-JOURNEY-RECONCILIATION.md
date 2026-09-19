@@ -641,6 +641,10 @@ Authenticated tenant users only. The form requires an existing Supreme session (
 - `CONCERNS` Intake → Third Party after match
 - Requester is not a graph node (no USER type). Requester identity stays on Engagement / Intake fields.
 
+### Hosted Wave 1 walk
+
+Runtime SHA `778b870d01e0946b93c14e5d10d19e2f04cbb79f` on staging frontend and API. Fresh org produced `INT-2026-0001` Azure Hosting and `INT-2026-0002` Microsoft 365 against one Microsoft Corporation Third Party (`ENG-2026-0001`, `ENG-2026-0002`). Needs-information and A→B reassignment were proved. Insurance classification stayed on Vendor. Pre-Wave-1 vendor migration proof was SKIP on this fresh tenant. Evidence: `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1/`. Not #12 PASS.
+
 ### Intentionally not in Wave 1
 
 Requester IRA operating flow, Tier Review clarification loop, vendor assessment / questionnaire changes, ServiceNow / Jira / email ingestion, Vendor → ThirdParty table rename, Insurance move to Engagement.

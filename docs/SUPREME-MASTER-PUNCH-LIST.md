@@ -219,9 +219,9 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 READY FOR PRODUCT LEADERSHIP REVIEW. Product Leadership reopened #12 for the controlled TPRM Golden Journey reconstruction. Phase 0 architecture lock `e0784550abf7c806de74993baa5a73386702ef81`. Wave 1 implements Intake Request, leadership assignment, Third Party match/create, and Engagement foundation only. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
-**CERTIFICATION SHA:** Hosted send fix / navigation-audit baseline `548cd19a893c35b9fb06059213c99fbfd0b9e495`. API hosted `b00ad1274908a27a2253d6e5050420e2c10b8f39`. CI `35368202589` PASS on `548cd19`. Prior UX-correction SHA `b00ad12` remains historical.
+**CERTIFICATION SHA:** Wave 1 implementation / hosted runtime `778b870d01e0946b93c14e5d10d19e2f04cbb79f`. CI `35417211492` PASS on `778b870`. This is not a #12 PASS acceptance SHA. Prior navigation-audit baseline `548cd19a893c35b9fb06059213c99fbfd0b9e495` and Version 3 UX-correction `b00ad12` remain historical.
 
-**EVIDENCE:** Navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Version 3 UX-correction walk A–H `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Mapping `docs/ADR-TPRM-WORKBOOK-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Copy link is not email sent. Real inbox not tested. Viewer RBAC not hosted-tested.
+**EVIDENCE:** Wave 1 hosted walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1/`. Architecture `docs/tprm/TPRM-GOLDEN-JOURNEY-RECONCILIATION.md`. Prior navigation audit `docs/private-beta/hosted-ux-qa/navigation-audit/`. Version 3 UX-correction walk A–H `docs/private-beta/hosted-ux-qa/supreme-tprm-v3-flow-closure/`. Invitation email Queued ≠ Delivered.
 
 **NEXT ACTION:** Product Leadership review of Wave 1. Do not start Wave 2 (IRA / Tier Review) until authorized. Do not merge `main` or deploy commercial production. Do not declare #12 PASS. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted; do not extend. #24–#38 and #40 remain unauthorized.
 
