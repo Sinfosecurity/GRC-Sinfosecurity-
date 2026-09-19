@@ -1,0 +1,353 @@
+{
+  "item": "#12",
+  "wave": "3",
+  "declaredPass": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "wave4Started": false,
+  "checks": [
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "680b40f0593d9c8c1e8f9339aa03322267a6f898"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "680b40f0593d9c8c1e8f9339aa03322267a6f898"
+    },
+    {
+      "name": "postgres",
+      "result": "PASS",
+      "detail": "up"
+    },
+    {
+      "name": "malware",
+      "result": "PASS",
+      "detail": "up"
+    },
+    {
+      "name": "signup",
+      "result": "PASS",
+      "detail": "3ba66a19"
+    },
+    {
+      "name": "invite.requester",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "hasToken": false
+      }
+    },
+    {
+      "name": "requester.only.session",
+      "result": "SKIP",
+      "detail": "Invite token was not returned after delivery=sent. Authentication was not weakened."
+    },
+    {
+      "name": "hosted.golden.populated",
+      "result": "SKIP",
+      "detail": "Requester-only hosted login remains blocked. CI tprm-wave3-engagement-dd.integration.test.ts is the authoritative Microsoft Azure vs Professional Services proof."
+    },
+    {
+      "name": "hosted.4b.copy.mark-shared",
+      "result": "SKIP",
+      "detail": "Requires a requester-created Engagement. CI preserves copy-not-sent and mark-shared."
+    },
+    {
+      "name": "hosted.vendor.session",
+      "result": "SKIP",
+      "detail": "No hosted vendor activation token was obtained. Auth was not weakened."
+    },
+    {
+      "name": "grc.denied.requester.apis",
+      "result": "PASS",
+      "detail": {
+        "GET /tprm/requester/home": 403,
+        "GET /tprm/requester/iras/not-a-real-ira": 403,
+        "GET due-diligence as missing": 404
+      }
+    },
+    {
+      "name": "grc.cannot.create.intake",
+      "result": "PASS",
+      "detail": "Wave 1 persona lock preserved"
+    },
+    {
+      "name": "vendor.denied.ira.tier.dd",
+      "result": "PASS",
+      "detail": {
+        "vendorDueDiligence": 401,
+        "unauthIra": 401,
+        "vendorTier": 401
+      }
+    },
+    {
+      "name": "finding.workspace.regression",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "assessment.center.api",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "insurance.regression",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "wave4.not.started",
+      "result": "PASS",
+      "detail": "No residual-risk or finding-generation Wave 4 APIs were invoked."
+    },
+    {
+      "name": "assessment.center.ui",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/assessments"
+    },
+    {
+      "name": "due.diligence.route",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/third-parties/engagements/missing/due-diligence"
+    },
+    {
+      "name": "specialist.review.route",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/third-parties/engagements/missing/assessment-review"
+    },
+    {
+      "name": "vendor.activate.no.ira",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-assessment/activate"
+    },
+    {
+      "name": "grc.denied.request",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/unauthorized"
+    },
+    {
+      "name": "overflow:due-diligence-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessments-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessment-review-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:due-diligence-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessments-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessment-review-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:due-diligence-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessments-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessment-review-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:due-diligence-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessments-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessment-review-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:due-diligence-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessments-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:assessment-review-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    }
+  ],
+  "shots": [
+    "assessments-center-1440",
+    "due-diligence-empty-1440",
+    "assessment-review-empty-1440",
+    "vendor-activate",
+    "due-diligence-375",
+    "assessments-375",
+    "vendor-activate-375",
+    "assessment-review-375",
+    "due-diligence-768",
+    "assessments-768",
+    "vendor-activate-768",
+    "assessment-review-768",
+    "due-diligence-1024",
+    "assessments-1024",
+    "vendor-activate-1024",
+    "assessment-review-1024",
+    "due-diligence-1440",
+    "assessments-1440",
+    "vendor-activate-1440",
+    "assessment-review-1440",
+    "due-diligence-1920",
+    "assessments-1920",
+    "vendor-activate-1920",
+    "assessment-review-1920"
+  ],
+  "overflows": [
+    {
+      "name": "due-diligence-375",
+      "extra": 0
+    },
+    {
+      "name": "assessments-375",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-375",
+      "extra": 0
+    },
+    {
+      "name": "assessment-review-375",
+      "extra": 0
+    },
+    {
+      "name": "due-diligence-768",
+      "extra": 0
+    },
+    {
+      "name": "assessments-768",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-768",
+      "extra": 0
+    },
+    {
+      "name": "assessment-review-768",
+      "extra": 0
+    },
+    {
+      "name": "due-diligence-1024",
+      "extra": 0
+    },
+    {
+      "name": "assessments-1024",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-1024",
+      "extra": 0
+    },
+    {
+      "name": "assessment-review-1024",
+      "extra": 0
+    },
+    {
+      "name": "due-diligence-1440",
+      "extra": 0
+    },
+    {
+      "name": "assessments-1440",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-1440",
+      "extra": 0
+    },
+    {
+      "name": "assessment-review-1440",
+      "extra": 0
+    },
+    {
+      "name": "due-diligence-1920",
+      "extra": 0
+    },
+    {
+      "name": "assessments-1920",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-1920",
+      "extra": 0
+    },
+    {
+      "name": "assessment-review-1920",
+      "extra": 0
+    }
+  ],
+  "sha": {
+    "api": "680b40f0593d9c8c1e8f9339aa03322267a6f898",
+    "frontend": "680b40f0593d9c8c1e8f9339aa03322267a6f898",
+    "required": "680b40f0593d9c8c1e8f9339aa03322267a6f898",
+    "implementation": "7132c7e09de66bb6a6917d70eb7f9f4958006190",
+    "environment": "staging",
+    "postgres": "up",
+    "malware": "up"
+  },
+  "summary": {
+    "pass": 38,
+    "fail": 0,
+    "skip": 4
+  }
+}

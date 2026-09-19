@@ -736,6 +736,8 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Starting SHA:** `68c327dfecbf23fac67a159d3afa724f246e615d` (Wave 2 evidence descendant of `c47020a86feeb0b5b67bc408671159e68d8f2c26`)  
 **Implementation SHA:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35442535799 PASS on `680b40f`  
+**Hosted:** staging frontend/API `680b40f`. Production untouched.  
 **Implementation:** Engagement-scoped `EngagementDueDiligencePlan` (1:1 Engagement). Legacy `VendorOnboarding.vendorId @unique` remains readable and is **not** Golden Journey authority.  
 **Wave 4:** NOT STARTED. No authoritative Findings. No residual-risk recalculation on Wave 3 submit.
 
