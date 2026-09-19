@@ -205,6 +205,24 @@ describe('#12 requester workspace boundary', () => {
         expect(actions.status).toBe(200);
         expect(actions.body.data.items[0].requestNote).toMatch(/business purpose/i);
 
+        const uploaded = await request(app)
+            .post(`${API}/tprm/requester/intakes/${publicId}/information-attachments`)
+            .set('Authorization', `Bearer ${requesterToken}`)
+            .field('informationRequestId', actions.body.data.items[0].id)
+            .attach('file', Buffer.from('%PDF-1.4 clarification'), 'purpose.pdf');
+        expect([201, 409]).toContain(uploaded.status);
+        if (uploaded.status === 201) {
+            expect(uploaded.body.data.filename).toMatch(/purpose/);
+            expect(uploaded.body.data.usable).toBe(Boolean(uploaded.body.data.scanState === 'Clean'));
+        }
+
+        const otherDenied = await request(app)
+            .post(`${API}/tprm/requester/intakes/${publicId}/information-attachments`)
+            .set('Authorization', `Bearer ${otherRequesterToken}`)
+            .field('informationRequestId', actions.body.data.items[0].id)
+            .attach('file', Buffer.from('other'), 'other.pdf');
+        expect([403, 404]).toContain(otherDenied.status);
+
         const answered = await request(app)
             .post(`${API}/tprm/requester/intakes/${publicId}/information-response`)
             .set('Authorization', `Bearer ${requesterToken}`)
@@ -212,6 +230,7 @@ describe('#12 requester workspace boundary', () => {
         expect(answered.status).toBe(200);
         expect(answered.body.data.requesterStatus).toBe('Under review');
         expect(answered.body.data.informationRequests[0].response).toMatch(/Customer analytics/);
+        expect(answered.body.data.informationRequests[0].attachments).toBeDefined();
         expect(answered.body.data.assignmentHistory).toBeUndefined();
 
         const grcView = await request(app).get(`${API}/tprm/intakes/${intakeId}`).set('Authorization', `Bearer ${analystToken}`);
@@ -220,6 +239,7 @@ describe('#12 requester workspace boundary', () => {
         expect(grcView.body.data.requesterEmail).toBe(`pat-${suffix}@req-a.test`);
         expect(grcView.body.data.businessPurpose).toBeTruthy();
         expect(grcView.body.data.informationRequests[0].response).toMatch(/Customer analytics/);
+        expect(grcView.body.data.informationRequests[0].attachments).toBeDefined();
         expect(grcView.body.data.assignmentHistory).toBeDefined();
     });
 });

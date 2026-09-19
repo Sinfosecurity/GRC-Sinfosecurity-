@@ -41,6 +41,8 @@ const ALLOWED_QUESTION_KEYS = new Set([
     'options',
     'required',
     'evidenceRequired',
+    'evidenceOptional',
+    'evidenceExpectation',
     'response',
     'comment',
     'hasEvidence',
@@ -73,6 +75,8 @@ export function presentVendorQuestion(input: {
     options?: string[];
     required?: boolean;
     evidenceRequired?: boolean;
+    evidenceOptional?: boolean;
+    evidenceExpectation?: 'REQUIRED' | 'OPTIONAL' | 'NOT_REQUIRED';
     response?: string | null;
     comment?: string | null;
     hasEvidence?: boolean;
@@ -94,6 +98,8 @@ export function presentVendorQuestion(input: {
         options: input.options?.length ? input.options : ['Yes', 'Partial', 'No', 'N/A'],
         required: input.required !== false,
         evidenceRequired: Boolean(input.evidenceRequired),
+        evidenceOptional: Boolean(input.evidenceOptional),
+        evidenceExpectation: input.evidenceExpectation || (input.evidenceRequired ? 'REQUIRED' : input.evidenceOptional ? 'OPTIONAL' : 'NOT_REQUIRED'),
         response: input.response || '',
         comment: input.comment || '',
         hasEvidence: Boolean(input.hasEvidence),

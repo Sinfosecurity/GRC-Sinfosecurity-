@@ -32,6 +32,7 @@ vi.mock('../../services/api', () => ({
         create: vi.fn(),
         get: vi.fn(),
         respond: vi.fn(),
+        uploadAttachment: vi.fn(),
         getIra: vi.fn(),
         submitIra: vi.fn(),
         submitIraClarification: vi.fn(),
@@ -97,6 +98,7 @@ describe('Requester workspace', () => {
         );
         expect(await screen.findByText(/INT-2026-0004/)).toBeInTheDocument();
         expect(await screen.findByText(/Need a real purpose/)).toBeInTheDocument();
+        expect(screen.getByText(/Supporting documents/)).toBeInTheDocument();
         fireEvent.change(screen.getByLabelText('Your response'), { target: { value: 'Customer analytics' } });
         vi.mocked(requesterAPI.respond).mockResolvedValue({ data: { data: { requesterStatus: 'Under review' } } } as any);
         fireEvent.click(screen.getByRole('button', { name: 'Send response' }));

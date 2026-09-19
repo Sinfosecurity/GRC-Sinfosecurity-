@@ -50,7 +50,7 @@ describe('Vendor questionnaire evidence status', () => {
                 </Routes>
             </MemoryRouter>,
         );
-        expect(await screen.findByText(/Security status unavailable/)).toBeInTheDocument();
+        expect(await screen.findByText(/Rejected\/unusable/)).toBeInTheDocument();
         expect(screen.queryByText(/File status: Ready/)).not.toBeInTheDocument();
         expect(screen.queryByText(/CLEAN/)).not.toBeInTheDocument();
         expect(screen.getByRole('progressbar', { name: /1 of 1 answered/i })).toBeInTheDocument();

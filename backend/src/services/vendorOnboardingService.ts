@@ -32,6 +32,9 @@ import {
 import { assertTierMeetsFloor, parseVendorTier, resolveMinimumTier } from './vendorTierIntegrity';
 import { IRA_QUESTIONS } from '../tprm/iraCatalog';
 import { scoreIra } from '../tprm/iraScoring';
+import { authoritativeIraState } from '../tprm/iraState';
+import { presentJurisdictions } from '../tprm/iraJurisdiction';
+import { presentCountryCatalog } from '../tprm/countryCatalog';
 
 export const INTAKE_SLA_DAYS = 5;
 export const TIER_REVIEW_SLA_DAYS = 2;
@@ -458,7 +461,7 @@ function summarize(row: {
 
 function nextAction(stage: VendorOnboardingStage, ira?: { required?: boolean; sent?: boolean; submitted?: boolean }) {
     if ((stage === VendorOnboardingStage.REQUEST || stage === VendorOnboardingStage.INTAKE) && ira?.required && !ira.submitted) {
-        return ira.sent ? 'Wait for the requester to complete the inherent-risk form' : 'Send the inherent-risk form';
+        return ira.sent ? 'Waiting on requester' : 'Send assessment';
     }
     switch (stage) {
         case VendorOnboardingStage.REQUEST:
@@ -1098,6 +1101,9 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         where: { organizationId, vendorId: vendor.id, purpose: 'IRA' },
         orderBy: { createdAt: 'desc' },
     }).catch(() => null);
+    const engagementIra = vendor.onboarding?.engagementId
+        ? await prisma.engagementIra.findUnique({ where: { engagementId: vendor.onboarding.engagementId } })
+        : null;
     const liveRecommendation = recommendTierFromIntake((assessment?.responses || []).map((row) => ({
         questionKey: row.questionId,
         response: row.response,
@@ -1143,9 +1149,9 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         nextAction: vendor.onboarding!.stage === VendorOnboardingStage.TIER_REVIEW && !vendor.onboarding?.recommendedTier
             ? `Not yet rated — ${vendor.onboarding?.iraUnknownCount || 0} answers need confirmation.`
             : nextAction(vendor.onboarding!.stage, {
-            required: Boolean(vendor.onboarding?.requesterEmail),
-            sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
-            submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
+            required: Boolean(vendor.onboarding?.requesterEmail || engagementIra),
+            sent: Boolean(engagementIra || iraLink?.emailSentAt || iraLink?.markedSentAt),
+            submitted: Boolean(engagementIra?.submittedAt || (vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers)),
         }),
         canEditIntake: actor ? canCompleteIntake(actor.role, actor.id, vendor.businessOwnerUserId) : false,
         canReviewTier: actor ? canReviewTier(actor.role) : false,
@@ -1163,29 +1169,56 @@ export async function presentOnboarding(organizationId: string, vendorKey: strin
         requesterEmail: vendor.onboarding?.requesterEmail || null,
         engagementPublicId: vendor.onboarding?.engagementPublicId || null,
         screeningStatus: vendor.onboarding?.screeningStatus || 'CLEAR',
-        ira: {
-            required: Boolean(vendor.onboarding?.requesterEmail),
-            status: vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers
-                ? 'IRA_SUBMITTED'
-                : iraLink?.status === 'OPENED' && vendor.onboarding?.iraAnswers && Object.keys(vendor.onboarding.iraAnswers as object).length
-                    ? 'IRA_IN_PROGRESS'
-                    : iraLink?.openedAt || iraLink?.status === 'OPENED'
-                        ? 'IRA_OPENED'
-                        : iraLink?.emailSentAt || iraLink?.markedSentAt
-                            ? 'IRA_SENT'
-                            : 'IRA_NOT_SENT',
-            sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
-            submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
-            sentAt: iraLink?.emailSentAt || iraLink?.markedSentAt || null,
-            openedAt: iraLink?.openedAt || null,
-            submittedAt: iraLink?.submittedAt || vendor.onboarding?.intakeCompletedAt || null,
-            unknownCount: vendor.onboarding?.iraUnknownCount || 0,
-            unknownMessage: vendor.onboarding?.iraUnknownCount
-                ? `Not yet rated — ${vendor.onboarding.iraUnknownCount} answer${vendor.onboarding.iraUnknownCount === 1 ? '' : 's'} need confirmation.`
-                : null,
-            answers: vendor.onboarding?.iraAnswers && typeof vendor.onboarding.iraAnswers === 'object' ? vendor.onboarding.iraAnswers : {},
-            questions: IRA_QUESTIONS.map((question) => ({ key: question.key, part: question.part, question: question.question, options: question.options })),
-        },
+        ira: (() => {
+            const state = authoritativeIraState({
+                engagementIra,
+                legacy: {
+                    status: vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers
+                        ? 'IRA_SUBMITTED'
+                        : iraLink?.status === 'OPENED' && vendor.onboarding?.iraAnswers && Object.keys(vendor.onboarding.iraAnswers as object).length
+                            ? 'IRA_IN_PROGRESS'
+                            : iraLink?.openedAt || iraLink?.status === 'OPENED'
+                                ? 'IRA_OPENED'
+                                : iraLink?.emailSentAt || iraLink?.markedSentAt
+                                    ? 'IRA_SENT'
+                                    : 'IRA_NOT_SENT',
+                    sent: Boolean(iraLink?.emailSentAt || iraLink?.markedSentAt),
+                    submitted: Boolean(vendor.onboarding?.intakeCompletedAt && vendor.onboarding?.iraAnswers),
+                    sentAt: iraLink?.emailSentAt || iraLink?.markedSentAt || null,
+                    submittedAt: iraLink?.submittedAt || vendor.onboarding?.intakeCompletedAt || null,
+                },
+                requesterHasWorkspace: Boolean(vendor.requesterUserId || engagementIra),
+            });
+            const answers = (engagementIra?.currentAnswers && typeof engagementIra.currentAnswers === 'object'
+                ? engagementIra.currentAnswers
+                : vendor.onboarding?.iraAnswers && typeof vendor.onboarding.iraAnswers === 'object'
+                    ? vendor.onboarding.iraAnswers
+                    : {}) as Record<string, string>;
+            return {
+                required: Boolean(vendor.onboarding?.requesterEmail || engagementIra),
+                source: state.source,
+                status: state.status,
+                statusLabel: state.statusLabel,
+                sent: state.sent,
+                submitted: state.submitted,
+                sentAt: state.sentAt,
+                openedAt: engagementIra?.openedAt || iraLink?.openedAt || null,
+                submittedAt: state.submittedAt,
+                owner: state.owner,
+                next: state.next,
+                primaryAction: state.primaryAction,
+                secondaryAction: state.secondaryAction,
+                currentStage: 'Inherent Risk Assessment (IRA)',
+                unknownCount: vendor.onboarding?.iraUnknownCount || 0,
+                unknownMessage: vendor.onboarding?.iraUnknownCount
+                    ? `Not yet rated — ${vendor.onboarding.iraUnknownCount} answer${vendor.onboarding.iraUnknownCount === 1 ? '' : 's'} need confirmation.`
+                    : null,
+                answers,
+                jurisdictions: presentJurisdictions(answers),
+                countries: presentCountryCatalog(),
+                questions: IRA_QUESTIONS.map((question) => ({ key: question.key, part: question.part, question: question.question, input: question.input, storageKey: question.storageKey, processingKey: question.processingKey, options: question.options })),
+            };
+        })(),
         intake: {
             sections: (template?.sections || []).map((section) => ({
                 title: section.title,

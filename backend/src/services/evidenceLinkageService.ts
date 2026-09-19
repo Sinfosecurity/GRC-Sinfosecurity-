@@ -8,11 +8,13 @@ import { tenantWhere } from '../security/tenant';
 export type LinkedUploadInput = {
     organizationId: string;
     uploadedBy: string;
-    vendorId: string;
+    vendorId?: string;
     assessmentId?: string;
     issueId?: string;
     questionId?: string;
     engagementId?: string;
+    intakeRequestId?: string;
+    intakeInformationRequestId?: string;
     filename: string;
     contentType: string;
     buffer: Buffer;
@@ -23,12 +25,16 @@ export type LinkedUploadInput = {
 
 export const evidenceLinkageService = {
     async uploadLinked(input: LinkedUploadInput) {
-        const vendor = await prisma.vendor.findFirst({
-            where: tenantWhere(input.organizationId, { id: input.vendorId }),
-            select: { id: true, name: true },
-        });
-        if (!vendor) {
-            throw new ApiError(404, 'Vendor not found');
+        if (input.vendorId) {
+            const vendor = await prisma.vendor.findFirst({
+                where: tenantWhere(input.organizationId, { id: input.vendorId }),
+                select: { id: true, name: true },
+            });
+            if (!vendor) {
+                throw new ApiError(404, 'Vendor not found');
+            }
+        } else if (!input.intakeRequestId) {
+            throw new ApiError(400, 'An intake or vendor record is required to attach evidence.');
         }
 
         if (input.assessmentId) {
@@ -62,8 +68,8 @@ export const evidenceLinkageService = {
         const stored = await objectStorageService.upload({
             organizationId: input.organizationId,
             uploadedBy: input.uploadedBy,
-            ownerType: 'vendor',
-            ownerId: input.vendorId,
+            ownerType: input.intakeRequestId ? 'intake' : 'vendor',
+            ownerId: input.intakeRequestId || input.vendorId || input.organizationId,
             filename: input.filename,
             contentType: input.contentType,
             buffer: input.buffer,
@@ -72,7 +78,7 @@ export const evidenceLinkageService = {
 
         try {
             const linked = await prisma.$transaction(async (tx) => {
-                const document = await tx.vendorDocument.create({
+                const document = input.vendorId ? await tx.vendorDocument.create({
                     data: {
                         vendorId: input.vendorId,
                         organizationId: input.organizationId,
@@ -90,7 +96,7 @@ export const evidenceLinkageService = {
                         storedObjectId: stored.id,
                         uploadedBy: input.uploadedBy,
                     },
-                });
+                }) : null;
                 const link = await tx.evidenceLink.create({
                     data: {
                         organizationId: input.organizationId,
@@ -100,6 +106,8 @@ export const evidenceLinkageService = {
                         issueId: input.issueId,
                         questionId: input.questionId,
                         engagementId: input.engagementId,
+                        intakeRequestId: input.intakeRequestId,
+                        intakeInformationRequestId: input.intakeInformationRequestId,
                         createdBy: input.uploadedBy,
                     },
                 });
@@ -142,6 +150,8 @@ export const evidenceLinkageService = {
                         assessmentId: input.assessmentId,
                         issueId: input.issueId,
                         questionId: input.questionId,
+                        intakeRequestId: input.intakeRequestId,
+                        intakeInformationRequestId: input.intakeInformationRequestId,
                     },
                 });
             } catch {

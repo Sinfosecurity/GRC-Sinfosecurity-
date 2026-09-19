@@ -68,7 +68,7 @@ describe('Version 3 requester IRA path', () => {
         vendorId = created.body.data.id;
         expect(created.body.data.ira.required).toBe(true);
         expect(created.body.data.ira.sent).toBe(false);
-        expect(created.body.data.nextAction).toBe('Send the inherent-risk form');
+        expect(created.body.data.nextAction).toBe('Send assessment');
         expect(created.body.data.dueDate).toBeNull();
     });
 

@@ -185,10 +185,17 @@ export default function ThirdPartyIntakeDetail() {
                                 </Typography>
                             ))}
                             {(data.informationRequests || []).map((row: any) => (
-                                <Typography key={row.id} variant="body2">
-                                    Information requested {formatShortDate(row.requestedAt)}: {row.requestNote}
-                                    {row.response ? ` · Response ${formatShortDate(row.respondedAt)}: ${row.response}` : ''}
-                                </Typography>
+                                <Stack key={row.id} spacing={0.75} sx={{ mb: 1.5 }}>
+                                    <Typography variant="body2">
+                                        Information requested {formatShortDate(row.requestedAt)}: {row.requestNote}
+                                        {row.response ? ` · Response ${formatShortDate(row.respondedAt)}: ${row.response}` : ''}
+                                    </Typography>
+                                    {(row.attachments || []).map((file: any) => (
+                                        <Typography key={file.id} variant="body2">
+                                            Attachment: {file.filename} · {file.fileType} · {file.scanState} · {file.usable ? 'Usable' : 'Unusable'}
+                                        </Typography>
+                                    ))}
+                                </Stack>
                             ))}
                         </Surface>
                     </Stack>

@@ -3,12 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 import { Alert, Box, Button, Checkbox, FormControlLabel, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { iraAPI } from '../services/api';
 import { color } from '../design/tokens';
+import IraJurisdictionFields from '../components/IraJurisdictionFields';
 
 type Question = {
     key: string;
     part: 'A' | 'B';
     question: string;
     multiple?: boolean;
+    input?: 'choice' | 'jurisdictions';
     options: Array<{ value: string; label: string }>;
 };
 
@@ -135,7 +137,7 @@ export default function RequesterIra() {
                     </>
                 ) : (
                     <>
-                        <Typography variant="h4">Inherent risk questions</Typography>
+                        <Typography variant="h4">Business-context risk assessment</Typography>
                         <Typography>
                             {data?.vendorName || 'This engagement'} — answer only what you know. Don&apos;t know is allowed. The vendor will not see this.
                         </Typography>
@@ -149,7 +151,16 @@ export default function RequesterIra() {
                                     </Typography>
                                     <Stack spacing={1.5}>
                                         {questions.filter((question) => question.part === part).map((question) => (
-                                            question.multiple ? (
+                                            question.input === 'jurisdictions' || question.key === 'a6' ? (
+                                                <IraJurisdictionFields
+                                                    key={question.key}
+                                                    storageValue={answers.a6_storage || ''}
+                                                    processingValue={answers.a6_processing || ''}
+                                                    countries={data.countries || data.form?.countries || []}
+                                                    disabled={readOnly}
+                                                    onChange={(key, value) => setAnswers((current) => ({ ...current, [key]: value, a6: value.includes('dont_know') ? 'dont_know' : current.a6 }))}
+                                                />
+                                            ) : question.multiple ? (
                                                 <Box key={question.key}>
                                                     <Typography variant="subtitle2">{question.question}</Typography>
                                                     {question.options.map((option) => (

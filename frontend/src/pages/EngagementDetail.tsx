@@ -5,7 +5,7 @@ import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
 import StatusBadge from '../components/design/StatusBadge';
-import { PageShell } from '../components/experience/ExperienceKit';
+import { GuidedStageCard, PageShell } from '../components/experience/ExperienceKit';
 import { intakeAPI } from '../services/api';
 import { formatShortDate } from '../utils/humanizeLabel';
 
@@ -41,6 +41,19 @@ export default function EngagementDetail() {
             <QueryState loading={loading} error={error} empty={!loading && !data} emptyTitle="Engagement not found" emptyBody="Return to Third Parties.">
                 {data && (
                     <Stack spacing={2}>
+                        <GuidedStageCard
+                            stage={data.statusLabel || 'Engagement'}
+                            status={data.statusLabel}
+                            owner={data.assignedAnalystName || 'TPRM Analyst'}
+                            next={data.nextAction}
+                            primaryAction={data.nextAction}
+                            onPrimary={['READY_FOR_IRA', 'IRA_IN_PROGRESS', 'NEEDS_REQUESTER_CLARIFICATION'].includes(data.status) ? undefined : () => {
+                                if (['VENDOR_SUBMITTED', 'SPECIALIST_REVIEW'].includes(data.status)) navigate(`/third-parties/engagements/${data.id}/assessment-review`);
+                                else if (['FINDING_REVIEW', 'RESIDUAL_READY'].includes(data.status)) navigate(`/third-parties/engagements/${data.id}/risk`);
+                                else if (data.ira) navigate(`/third-parties/engagements/${data.id}/tier-review`);
+                                else navigate(`/third-parties/engagements/${data.id}/due-diligence`);
+                            }}
+                        />
                         <Surface>
                             <Typography>Third party: {data.thirdParty?.name}</Typography>
                             <Typography>Service: {data.serviceName}</Typography>

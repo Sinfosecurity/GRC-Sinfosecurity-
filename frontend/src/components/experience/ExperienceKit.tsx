@@ -149,6 +149,44 @@ export function AttentionHero({
     );
 }
 
+export function GuidedStageCard({
+    stage,
+    status,
+    owner,
+    next,
+    primaryAction,
+    onPrimary,
+    secondaryAction,
+    onSecondary,
+    primaryDisabled,
+}: {
+    stage: string;
+    status: string;
+    owner: string;
+    next: string;
+    primaryAction: string;
+    onPrimary?: () => void;
+    secondaryAction?: string | null;
+    onSecondary?: () => void;
+    primaryDisabled?: boolean;
+}) {
+    return (
+        <Box sx={{ bgcolor: color.surface, border: `1px solid ${color.line}`, borderRadius: 2, p: { xs: 2, md: 2.5 } }}>
+            <Typography sx={{ fontSize: 12, letterSpacing: 0.6, fontWeight: 700, color: color.inkMuted }}>CURRENT STAGE</Typography>
+            <Typography variant="h5" sx={{ mt: 0.5 }}>{stage}</Typography>
+            <Stack spacing={0.75} sx={{ mt: 1.5 }}>
+                <Typography><strong>Status:</strong> {status}</Typography>
+                <Typography><strong>Owner:</strong> {owner}</Typography>
+                <Typography><strong>Next:</strong> {next}</Typography>
+            </Stack>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 2 }}>
+                {onPrimary && <Button variant="contained" disabled={primaryDisabled} onClick={onPrimary}>{primaryAction}</Button>}
+                {secondaryAction && onSecondary && <Button onClick={onSecondary}>{secondaryAction}</Button>}
+            </Stack>
+        </Box>
+    );
+}
+
 export function NextActionCard({
     label,
     detail,

@@ -896,6 +896,7 @@ model IntakeRequest {
   updatedAt               DateTime            @updatedAt
   assignments             IntakeAssignment[]
   informationRequests     IntakeInformationRequest[]
+  evidenceLinks           EvidenceLink[]
   engagements             Engagement[]        @relation("EngagementOriginatingIntake")
 
   @@unique([organizationId, publicId])
@@ -940,6 +941,7 @@ model IntakeInformationRequest {
   tokenHash       String?       @unique
   expiresAt       DateTime?
   createdAt       DateTime      @default(now())
+  evidenceLinks   EvidenceLink[]
 
   @@index([organizationId, intakeRequestId])
 }
@@ -3282,6 +3284,10 @@ model EvidenceLink {
   questionId     String?
   engagement     Engagement?  @relation(fields: [engagementId], references: [id])
   engagementId   String?
+  intakeRequest              IntakeRequest? @relation(fields: [intakeRequestId], references: [id])
+  intakeRequestId            String?
+  intakeInformationRequest   IntakeInformationRequest? @relation(fields: [intakeInformationRequestId], references: [id])
+  intakeInformationRequestId String?
   createdBy      String
   createdAt      DateTime     @default(now())
 
@@ -3291,6 +3297,8 @@ model EvidenceLink {
   @@index([assessmentId])
   @@index([issueId])
   @@index([engagementId])
+  @@index([intakeRequestId])
+  @@index([intakeInformationRequestId])
 }
 
 model ScoringMethodology {

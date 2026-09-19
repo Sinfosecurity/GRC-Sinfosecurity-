@@ -128,9 +128,9 @@ describe('Onboard Third Party workspace', () => {
                 <VendorOnboardingWorkspace />
             </MemoryRouter>
         );
-        expect((await screen.findAllByText('Send the inherent-risk form')).length).toBeGreaterThan(0);
-        expect(screen.getByRole('button', { name: 'Email IRA link' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Copy IRA link' })).toBeInTheDocument();
+        expect(await screen.findByText('Inherent Risk Assessment (IRA)')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Send assessment' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Copy secure link' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Submit intake' })).not.toBeInTheDocument();
         expect(screen.getByText(/Do not fill the old in-app intake/)).toBeInTheDocument();
     });

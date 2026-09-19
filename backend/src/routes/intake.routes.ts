@@ -1,5 +1,7 @@
 import { Router, Response, NextFunction } from 'express';
+import multer from 'multer';
 import { AuthRequest, requirePermission, requirePractitionerPersona, requireRequesterPersona } from '../middleware/auth';
+import { uploadLimiter } from '../middleware/rateLimiter';
 import { PERMISSIONS } from '../security/rbac';
 import {
     assignIntake,
@@ -22,6 +24,8 @@ import {
     requesterHome,
     respondIntakeInformation,
     respondRequesterInformation,
+    uploadRequesterInformationAttachment,
+    downloadIntakeInformationAttachment,
     searchThirdParties,
     startTriage,
     workload,
@@ -61,6 +65,7 @@ import {
 } from '../services/engagementRiskService';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
 
 function actor(req: AuthRequest) {
     return {
@@ -130,6 +135,45 @@ router.get('/requester/intakes/:id', requireRequesterPersona, requirePermission(
 router.post('/requester/intakes/:id/information-response', requireRequesterPersona, requirePermission(PERMISSIONS['intake.respond_own'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await respondRequesterInformation(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/requester/intakes/:id/information-attachments', requireRequesterPersona, requirePermission(PERMISSIONS['intake.respond_own'], PERMISSIONS['intake.create_own']), uploadLimiter, upload.single('file'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        if (!req.file) throw new Error('Choose a supporting document.');
+        res.status(201).json({
+            success: true,
+            data: await uploadRequesterInformationAttachment(req.user!.organizationId, actor(req), req.params.id, {
+                informationRequestId: String(req.body?.informationRequestId || ''),
+                filename: req.file.originalname,
+                contentType: req.file.mimetype,
+                buffer: req.file.buffer,
+            }),
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/requester/intakes/:id/information-attachments/:storedObjectId', requireRequesterPersona, requirePermission(...requesterPerms), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { stored, buffer } = await downloadIntakeInformationAttachment(req.user!.organizationId, actor(req), req.params.id, req.params.storedObjectId);
+        res.setHeader('Content-Type', stored.contentType);
+        res.setHeader('Content-Disposition', `attachment; filename="${stored.filename}"`);
+        res.send(buffer);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/intakes/:id/information-attachments/:storedObjectId', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { stored, buffer } = await downloadIntakeInformationAttachment(req.user!.organizationId, actor(req), req.params.id, req.params.storedObjectId);
+        res.setHeader('Content-Type', stored.contentType);
+        res.setHeader('Content-Disposition', `attachment; filename="${stored.filename}"`);
+        res.send(buffer);
     } catch (error) {
         next(error);
     }

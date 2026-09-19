@@ -7,6 +7,9 @@ export type IraQuestion = {
     part: 'A' | 'B';
     question: string;
     multiple?: boolean;
+    input?: 'choice' | 'jurisdictions';
+    storageKey?: string;
+    processingKey?: string;
     options: IraChoice[];
 };
 
@@ -85,11 +88,11 @@ export const IRA_QUESTIONS: IraQuestion[] = [
         key: 'a6',
         part: 'A',
         question: 'Where will our data be stored or handled?',
+        input: 'jurisdictions',
+        storageKey: 'a6_storage',
+        processingKey: 'a6_processing',
         options: [
-            { value: 'country', label: 'Our country only' },
-            { value: 'region', label: 'Same region' },
-            { value: 'outside', label: 'Outside the region' },
-            { value: 'dont_know', label: DONT_KNOW },
+            { value: 'dont_know', label: "Don't know / Not yet confirmed" },
         ],
     },
     {
@@ -200,8 +203,14 @@ export function splitValues(value?: string | null) {
 }
 
 export function missingIraQuestions(answers: Array<{ questionKey: string; response?: string | null }>, questions: IraQuestion[] = IRA_QUESTIONS) {
-    return questions.filter((question) => !String(answers.find((row) => row.questionKey === question.key)?.response || '').trim())
-        .map((question) => question.key);
+    return questions.filter((question) => {
+        if (question.input === 'jurisdictions') {
+            const derived = String(answers.find((row) => row.questionKey === question.key)?.response || '').trim();
+            const storage = String(answers.find((row) => row.questionKey === (question.storageKey || 'a6_storage'))?.response || '').trim();
+            return !derived && !storage;
+        }
+        return !String(answers.find((row) => row.questionKey === question.key)?.response || '').trim();
+    }).map((question) => question.key);
 }
 
 export function isBaselineLiteQuestion(controlId?: string | null) {

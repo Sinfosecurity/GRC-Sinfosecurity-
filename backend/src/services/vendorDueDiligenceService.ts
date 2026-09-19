@@ -28,6 +28,7 @@ import { addBusinessDays, workbookControlGap } from './vendorOnboardingScoring';
 import { loadWorkbookCatalog, workbookControlIdsForPacks, workbookDomainsForPacks, workbookEvidenceForDomains } from '../tprm/workbookCatalog';
 import { presentVendorQuestion, sanitizeVendorPayload, sanitizeVendorQuestions } from '../tprm/vendorPayload';
 import { isBaselineLiteQuestion } from '../tprm/iraCatalog';
+import { evidenceExpectationForQuestion, isUsableEvidence as usableByPolicy, scanLabel as truthfulScanLabel } from '../tprm/evidenceRequirement';
 import { getOnboarding } from './vendorOnboardingService';
 import { explainableRiskService } from './explainableRiskService';
 import {
@@ -88,14 +89,16 @@ function invitationPreparedLabel(status?: string | null, emailStatus?: string | 
 }
 
 function scanLabel(status: ScanStatus | string) {
-    if (status === ScanStatus.CLEAN) return 'Ready';
-    if (status === ScanStatus.PENDING) return 'Scanning';
-    if (status === ScanStatus.INFECTED) return 'Blocked';
+    const labeled = truthfulScanLabel(status);
+    if (labeled === 'Clean') return 'Ready';
+    if (labeled === 'Scanning') return 'Scanning';
+    if (labeled === 'Blocked') return 'Blocked';
+    if (labeled === 'Uploaded') return 'Uploaded';
     return 'Security status unavailable';
 }
 
 function isUsableEvidence(status: ScanStatus | string) {
-    return status === ScanStatus.CLEAN;
+    return usableByPolicy(status);
 }
 
 function firstName(name: string) {
@@ -534,19 +537,30 @@ async function assignedAssessments(actor: VendorActor) {
 }
 
 async function templateMap(templateId?: string | null) {
-    if (!templateId) return new Map<string, { text: string; required: boolean; evidenceRequired: boolean; options: string[]; section: string; type: string; guidance?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null }>();
+    if (!templateId) return new Map<string, { text: string; required: boolean; evidenceRequired: boolean; evidenceOptional: boolean; evidenceExpectation: 'REQUIRED' | 'OPTIONAL' | 'NOT_REQUIRED'; options: string[]; section: string; type: string; guidance?: string | null; expectedEvidence?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null }>();
     const template = await prisma.questionnaireTemplate.findUnique({
         where: { id: templateId },
         include: { sections: { include: { questions: { orderBy: { sortOrder: 'asc' } } }, orderBy: { sortOrder: 'asc' } } },
     });
-    const map = new Map<string, { text: string; required: boolean; evidenceRequired: boolean; options: string[]; section: string; type: string; guidance?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null }>();
+    const map = new Map<string, { text: string; required: boolean; evidenceRequired: boolean; evidenceOptional: boolean; evidenceExpectation: 'REQUIRED' | 'OPTIONAL' | 'NOT_REQUIRED'; options: string[]; section: string; type: string; guidance?: string | null; expectedEvidence?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null }>();
     for (const section of template?.sections || []) {
         for (const question of section.questions) {
+            const parsed = question.questionText.includes('Expected evidence:')
+                ? question.questionText.split('Expected evidence:')[1]?.split('\n\n')[0]?.trim()
+                : null;
+            const expectation = evidenceExpectationForQuestion({
+                controlId: question.questionKey,
+                evidenceRequired: question.evidenceRequired,
+                expectedEvidence: parsed,
+            });
             map.set(question.questionKey, {
                 text: question.questionText.replace(/\n\nGuidance:.*$/s, ''),
                 guidance: question.questionText.includes('Guidance:') ? question.questionText.split('Guidance:')[1]?.trim() : null,
+                expectedEvidence: parsed,
                 required: question.required,
-                evidenceRequired: question.evidenceRequired,
+                evidenceRequired: expectation === 'REQUIRED',
+                evidenceOptional: expectation === 'OPTIONAL',
+                evidenceExpectation: expectation,
                 options: Array.isArray(question.options) ? question.options as string[] : [],
                 section: section.title,
                 type: question.questionType,
@@ -564,16 +578,24 @@ function liteQuestions<T extends { key: string }>(tier: VendorTier | undefined, 
     return lite.length ? lite : questions;
 }
 
-function presentQuestion(row: { questionId: string; questionText: string; questionCategory?: string | null; response: string | null; evidenceRequired: boolean; hasEvidence: boolean; notes?: string | null }, meta: { text?: string; required: boolean; evidenceRequired: boolean; options: string[]; section: string; type: string; guidance?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null } | undefined, answers: Map<string, string>, evidenceStatus?: string) {
+function presentQuestion(row: { questionId: string; questionText: string; questionCategory?: string | null; response: string | null; evidenceRequired: boolean; hasEvidence: boolean; notes?: string | null }, meta: { text?: string; required: boolean; evidenceRequired: boolean; evidenceOptional?: boolean; evidenceExpectation?: 'REQUIRED' | 'OPTIONAL' | 'NOT_REQUIRED'; options: string[]; section: string; type: string; guidance?: string | null; expectedEvidence?: string | null; conditionalOnKey?: string | null; conditionalValue?: string | null } | undefined, answers: Map<string, string>, evidenceStatus?: string) {
     const visible = questionVisible({ questionId: row.questionId, conditionalOnKey: meta?.conditionalOnKey, conditionalValue: meta?.conditionalValue }, answers);
+    const expectation = meta?.evidenceExpectation || evidenceExpectationForQuestion({
+        controlId: row.questionId,
+        evidenceRequired: meta?.evidenceRequired,
+        expectedEvidence: meta?.expectedEvidence,
+    });
     return presentVendorQuestion({
         key: row.questionId,
         question: meta?.text || row.questionText,
         domain: row.questionCategory || meta?.section || 'Assessment',
         guidance: meta?.guidance || null,
+        expectedEvidence: meta?.expectedEvidence || null,
         options: meta?.options?.length ? meta.options : ['Yes', 'Partial', 'No', 'N/A'],
         required: meta?.required !== false && visible,
-        evidenceRequired: (meta?.evidenceRequired || row.evidenceRequired) && visible,
+        evidenceRequired: expectation === 'REQUIRED' && visible,
+        evidenceOptional: expectation === 'OPTIONAL' && visible,
+        evidenceExpectation: visible ? expectation : 'NOT_REQUIRED',
         response: row.response || '',
         comment: row.notes || '',
         hasEvidence: row.hasEvidence,
@@ -655,15 +677,17 @@ export async function vendorAssessmentDetail(actor: VendorActor, assessmentId: s
         ...row,
         locked: Boolean(assessment.submittedAt) && !clarification.includes(row.key),
     })));
+    const readiness = submissionChecklist(vendorQuestions);
     return sanitizeVendorPayload({
         id: assessment.id,
-        name: assessment.frameworkUsed || 'Assessment',
+        name: assessment.frameworkUsed || 'Due-Diligence Assessment',
         templateVersion: assessment.templateVersion,
         status: assessment.status === AssessmentStatus.PENDING_REVIEW ? 'Submitted' : 'Open',
         submitted: Boolean(assessment.submittedAt),
         lastSaved: assessment.updatedAt,
         dueDate: assessment.dueDate,
         attestation: ATTESTATION_STATEMENT,
+        readiness,
         questions: vendorQuestions,
         vendorEvidence: links
             .filter((link) => link.storedObject)
@@ -778,32 +802,40 @@ export async function uploadVendorEvidence(actor: VendorActor, assessmentId: str
     };
 }
 
-export function submissionChecklist(questions: Array<{ key: string; required: boolean; evidenceRequired: boolean; response: string; visible: boolean; hasEvidence: boolean; evidenceStatus?: string | null }>) {
+export function submissionChecklist(questions: Array<{ key: string; required: boolean; evidenceRequired: boolean; evidenceOptional?: boolean; response: string; visible: boolean; hasEvidence: boolean; evidenceStatus?: string | null }>) {
     const visible = questions.filter((row) => row.visible);
-    const unanswered = visible.filter((row) => row.required && !row.response);
-    const evidenceMissing = visible.filter((row) => row.evidenceRequired && (!row.hasEvidence || row.evidenceStatus === 'Scanning' || row.evidenceStatus === 'Blocked' || row.evidenceStatus === 'Unavailable' || row.evidenceStatus === 'Security status unavailable'));
+    const unanswered = visible.filter((row) => row.required && !String(row.response || '').trim());
+    const unusable = (status?: string | null) => !status || ['Scanning', 'Blocked', 'Unavailable', 'Security status unavailable', 'Rejected/unusable', 'Uploaded'].includes(String(status));
+    const requiredEvidenceMissing = visible.filter((row) => row.evidenceRequired && (!row.hasEvidence || unusable(row.evidenceStatus) || !isUsableEvidence(row.evidenceStatus || '')));
+    const optionalEvidenceMissing = visible.filter((row) => row.evidenceOptional && !row.evidenceRequired && (!row.hasEvidence || unusable(row.evidenceStatus)));
     return {
-        remaining: unanswered.length + evidenceMissing.length,
+        remaining: unanswered.length + requiredEvidenceMissing.length,
         unanswered: unanswered.map((row) => row.key),
-        evidence: evidenceMissing.map((row) => row.key),
-        complete: unanswered.length === 0 && evidenceMissing.length === 0,
+        evidence: requiredEvidenceMissing.map((row) => row.key),
+        optionalEvidence: optionalEvidenceMissing.map((row) => row.key),
+        complete: unanswered.length === 0 && requiredEvidenceMissing.length === 0,
+        questionsRequired: visible.some((row) => row.required),
+        evidenceRequiredCount: requiredEvidenceMissing.length,
+        evidenceOptionalCount: optionalEvidenceMissing.length,
     };
 }
 
 export async function submitVendorAssessment(actor: VendorActor, assessmentId: string, input: { attested?: boolean }) {
     const detail = await vendorAssessmentDetail(actor, assessmentId);
     if (detail.submitted && !(await prisma.vendorAssessment.findFirst({ where: { id: assessmentId, clarificationQuestionIds: { not: Prisma.JsonNull } } }))) {
-        throw new ApiError(409, 'This assessment has already been submitted.');
+        throw new ApiError(409, 'This assessment has already been submitted and cannot be changed.');
     }
     if (!input.attested) throw new ApiError(400, 'You must attest before submitting.');
     const current = await prisma.vendorAssessment.findFirst({ where: { id: assessmentId, organizationId: actor.organizationId } });
     const wave3Submit = Boolean(current?.engagementId);
     const checklist = submissionChecklist(detail.questions);
-    if (!wave3Submit && !checklist.complete) {
-        throw new ApiError(409, `${checklist.remaining} item${checklist.remaining === 1 ? '' : 's'} remain before this can be submitted.`, true, checklist);
-    }
-    if (wave3Submit && checklist.unanswered.length) {
-        throw new ApiError(409, `${checklist.unanswered.length} required question${checklist.unanswered.length === 1 ? '' : 's'} remain before this can be submitted.`, true, checklist);
+    if (!checklist.complete) {
+        const message = checklist.unanswered.length && checklist.evidence.length
+            ? `This assessment cannot be submitted yet because ${checklist.unanswered.length} required question${checklist.unanswered.length === 1 ? '' : 's'} and ${checklist.evidence.length} required evidence item${checklist.evidence.length === 1 ? '' : 's'} are outstanding.`
+            : checklist.unanswered.length
+                ? `This assessment cannot be submitted yet because ${checklist.unanswered.length} required question${checklist.unanswered.length === 1 ? '' : 's'} ${checklist.unanswered.length === 1 ? 'is' : 'are'} unanswered.`
+                : `This assessment cannot be submitted yet because ${checklist.evidence.length} required evidence item${checklist.evidence.length === 1 ? '' : 's'} ${checklist.evidence.length === 1 ? 'is' : 'are'} missing.`;
+        throw new ApiError(409, message, true, { ...checklist, code: 'ASSESSMENT_NOT_READY', wave3Submit });
     }
     await prisma.vendorAssessment.update({
         where: { id: assessmentId },

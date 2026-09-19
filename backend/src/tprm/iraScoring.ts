@@ -1,6 +1,8 @@
 import { VendorTier } from '@prisma/client';
 import { isDontKnow, splitValues, type IraQuestion } from './iraCatalog';
 import { IRA_QUESTIONS } from './iraCatalog';
+import { persistIraJurisdictions } from './iraJurisdiction';
+import { presentCountryCatalog } from './countryCatalog';
 import {
     confirmScopeBlockMessage,
     type PackState,
@@ -47,6 +49,7 @@ export type IraRating = {
     autoConfirmEligible: boolean;
     autoConfirmBlockedReason: string | null;
     explanation: string;
+    methodologyGap?: string | null;
 };
 
 const WEIGHTS: Record<string, number> = {
@@ -87,23 +90,58 @@ export function scoreIra(
     input: {
         externalRating?: { provider?: string; grade?: string; score?: number | null; assessedAt?: string | Date | null } | null;
         now?: Date;
+        organizationCountry?: string | null;
     } = {}
 ): IraRating {
-    const unknownKeys = IRA_QUESTIONS.filter((question) => isDontKnow(answer(answers, question.key))).map((question) => question.key);
-    const a1 = splitValues(answer(answers, 'a1'));
-    const a2 = splitValues(answer(answers, 'a2'));
-    const a3 = answer(answers, 'a3');
-    const a4 = answer(answers, 'a4');
-    const a5 = answer(answers, 'a5');
-    const a6 = answer(answers, 'a6');
-    const a7 = answer(answers, 'a7');
-    const a8 = answer(answers, 'a8');
-    const a9 = answer(answers, 'a9');
-    const b1 = answer(answers, 'b1');
-    const b2 = answer(answers, 'b2');
-    const b3 = answer(answers, 'b3');
-    const b4 = answer(answers, 'b4');
-    const b5 = answer(answers, 'b5');
+    const asRecord = Object.fromEntries(answers.map((row) => [row.questionKey, String(row.response || '')]));
+    const jurisdictions = persistIraJurisdictions(asRecord, input.organizationCountry);
+    if (jurisdictions.methodologyGap) {
+        return {
+            ready: false,
+            unknownKeys: ['a6'],
+            unknownCount: 1,
+            message: jurisdictions.gapMessage || 'Geographic risk cannot be scored from the selected jurisdictions.',
+            percent: null,
+            recommendedTier: null,
+            factors: [],
+            floors: [],
+            packs: {
+                catalogVersion: '',
+                packs: [],
+                includedPackKeys: [],
+                includedTemplateKeys: [],
+                includedQuestionCount: 0,
+                confirmScopeCount: 0,
+                sendBlocked: true,
+                sendBlockMessage: jurisdictions.gapMessage || 'Geographic methodology gap.',
+            },
+            signals: { personalData: false, highVolumePersonal: false, aiInvolved: false, dpaRequired: false, privacyPack: false },
+            autoConfirmEligible: false,
+            autoConfirmBlockedReason: jurisdictions.gapMessage,
+            explanation: jurisdictions.gapMessage || 'No geographic score was invented.',
+            methodologyGap: jurisdictions.methodologyGap,
+        };
+    }
+    const derivedAnswers = jurisdictions.derived
+        ? answers.map((row) => (row.questionKey === 'a6' ? { ...row, response: jurisdictions.derived } : row)).concat(
+            answers.some((row) => row.questionKey === 'a6') ? [] : [{ questionKey: 'a6', response: jurisdictions.derived }]
+        )
+        : answers;
+    const unknownKeys = IRA_QUESTIONS.filter((question) => isDontKnow(answer(derivedAnswers, question.key))).map((question) => question.key);
+    const a1 = splitValues(answer(derivedAnswers, 'a1'));
+    const a2 = splitValues(answer(derivedAnswers, 'a2'));
+    const a3 = answer(derivedAnswers, 'a3');
+    const a4 = answer(derivedAnswers, 'a4');
+    const a5 = answer(derivedAnswers, 'a5');
+    const a6 = answer(derivedAnswers, 'a6');
+    const a7 = answer(derivedAnswers, 'a7');
+    const a8 = answer(derivedAnswers, 'a8');
+    const a9 = answer(derivedAnswers, 'a9');
+    const b1 = answer(derivedAnswers, 'b1');
+    const b2 = answer(derivedAnswers, 'b2');
+    const b3 = answer(derivedAnswers, 'b3');
+    const b4 = answer(derivedAnswers, 'b4');
+    const b5 = answer(derivedAnswers, 'b5');
 
     const personal = has(a2, 'personal');
     const sensitive = has(a2, 'card', 'health', 'credentials', 'regulated');
@@ -149,7 +187,7 @@ export function scoreIra(
         { code: 'regulatory-high', label: 'Regulatory or contractual obligation', tier: VendorTier.HIGH, applies: b3 === 'yes', rationale: 'Regulated-service floor.' },
         { code: 'write-api-high', label: 'Automated connection that changes our data', tier: VendorTier.HIGH, applies: a4 === 'write', rationale: 'Write integration floor.' },
         { code: 'financial-high', label: 'Material financial loss', tier: VendorTier.HIGH, applies: b2 === 'material', rationale: 'Financial-impact floor.' },
-        ...insuranceIraFloors(answers),
+        ...insuranceIraFloors(derivedAnswers),
     ];
 
     const catalog = loadWorkbookCatalog();
@@ -207,6 +245,7 @@ export function scoreIra(
             autoConfirmEligible: false,
             autoConfirmBlockedReason: 'Answers still marked Don\'t know.',
             explanation: 'No tier is stored while any IRA answer is Don\'t know.',
+            methodologyGap: null,
         };
     }
 
@@ -262,6 +301,7 @@ export function scoreIra(
         autoConfirmEligible: !blocked,
         autoConfirmBlockedReason: blocked,
         explanation: `Inherent risk ${percent}% maps to ${tier}${floorApplies ? ' after floors' : ''}${lowExternal ? ', then raised one level by the external rating' : ''}.`,
+        methodologyGap: null,
     };
 }
 
@@ -271,5 +311,6 @@ export function iraForm(questions: IraQuestion[] = IRA_QUESTIONS) {
             { id: 'A', title: 'What will this vendor do?', questions: questions.filter((row) => row.part === 'A') },
             { id: 'B', title: 'How bad if it fails?', questions: questions.filter((row) => row.part === 'B') },
         ],
+        countries: presentCountryCatalog(),
     };
 }

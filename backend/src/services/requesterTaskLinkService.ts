@@ -5,6 +5,8 @@ import { missingIraQuestions } from '../tprm/iraCatalog';
 import { iraQuestionsForEdition } from '../insurance/iraOverlay';
 import { editionIsInsurance } from '../insurance/insuranceService';
 import { iraForm, scoreIra } from '../tprm/iraScoring';
+import { persistIraJurisdictions, presentJurisdictions } from '../tprm/iraJurisdiction';
+import { presentCountryCatalog } from '../tprm/countryCatalog';
 import { hashToken, randomToken } from './passwordService';
 import { recordAudit } from './auditEventService';
 import { deliverEmail, notifyUser } from './notificationDeliveryService';
@@ -82,10 +84,12 @@ function publicIra(vendor: { name: string; publicId: string | null; onboarding: 
         readOnly: submitted,
         submittedAt: link.submittedAt || vendor.onboarding?.intakeCompletedAt || null,
         confirmation: submitted
-            ? 'Your Inherent Risk Assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'
+            ? 'Your risk assessment has been submitted successfully to the Governance, Risk & Compliance team. GRC will contact you if clarification is required.'
             : null,
         expiresAt: link.expiresAt,
         questions,
+        countries: presentCountryCatalog(),
+        jurisdictions: presentJurisdictions(answers),
     };
 }
 
@@ -235,13 +239,20 @@ export async function submitIraForm(token: string, answers: Record<string, strin
     }
     const insuranceActive = await editionIsInsurance(link.organizationId);
     const questions = iraQuestionsForEdition(insuranceActive);
-    const payload = questions.map((question) => ({ questionKey: question.key, response: answers[question.key] || '' }));
+    const organization = await prisma.organization.findUnique({ where: { id: link.organizationId }, select: { country: true } });
+    const persisted = persistIraJurisdictions(answers, organization?.country);
+    if (persisted.methodologyGap === 'INVALID_COUNTRY') throw new ApiError(400, persisted.gapMessage || 'Choose countries from the catalog.');
+    const payload = questions.map((question) => ({ questionKey: question.key, response: persisted.answers[question.key] || '' })).concat(
+        persisted.answers.a6_storage ? [{ questionKey: 'a6_storage', response: persisted.answers.a6_storage }] : [],
+        persisted.answers.a6_processing ? [{ questionKey: 'a6_processing', response: persisted.answers.a6_processing }] : [],
+    );
     const missing = missingIraQuestions(payload, questions);
     if (missing.length) throw new ApiError(400, `Answer every question. Don't know is allowed. Still needed: ${missing.length}.`);
     const rating = link.vendor.onboarding?.externalRating && typeof link.vendor.onboarding.externalRating === 'object'
         ? link.vendor.onboarding.externalRating as { provider?: string; grade?: string; score?: number | null; assessedAt?: string }
         : null;
-    const scored = scoreIra(payload, { externalRating: rating });
+    const scored = scoreIra(payload, { externalRating: rating, organizationCountry: organization?.country });
+    answers = persisted.answers;
     const autoConfirm = scored.autoConfirmEligible && scored.recommendedTier === VendorTier.LOW;
     await prisma.vendorOnboarding.update({
         where: { vendorId: link.vendorId },

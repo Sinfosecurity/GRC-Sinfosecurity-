@@ -4,7 +4,7 @@ import { Alert, Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, 
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import QueryState from '../components/QueryState';
-import { EntitySummary, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
+import { EntitySummary, GuidedStageCard, NextActionCard, PageShell } from '../components/experience/ExperienceKit';
 import ReviewDecidePanel from '../components/experience/ReviewDecidePanel';
 import QuestionnairePlan from '../components/tprm/QuestionnairePlan';
 import { approvalStatusCopy } from '../experience/approvalCopy';
@@ -217,6 +217,34 @@ export default function VendorOnboardingWorkspace() {
                         >
                             This third party is already onboarded. This page is monitoring, not a new assessment.
                         </Alert>
+                    ) : data.ira?.required && !data.ira?.submitted && (data.stageKey === 'INTAKE' || data.stageKey === 'REQUEST') ? (
+                        <GuidedStageCard
+                            stage={data.ira.currentStage || 'Inherent Risk Assessment (IRA)'}
+                            status={data.ira.statusLabel || (data.ira.sent ? 'Waiting on requester' : 'Waiting to be sent')}
+                            owner={data.ira.owner || 'TPRM Analyst'}
+                            next={data.ira.next || 'Send the business-context assessment to the requester.'}
+                            primaryAction={data.ira.source === 'ENGAGEMENT_IRA' && data.ira.sent ? 'Waiting on requester' : (data.ira.primaryAction || 'Send assessment')}
+                            onPrimary={data.ira.source === 'ENGAGEMENT_IRA' && data.ira.sent
+                                ? undefined
+                                : () => run(() => vendorOnboardingAPI.sendIra(id))}
+                            primaryDisabled={saving || (data.ira.source === 'ENGAGEMENT_IRA' && data.ira.sent)}
+                            secondaryAction={data.ira.secondaryAction || 'Copy secure link'}
+                            onSecondary={async () => {
+                                setSaving(true);
+                                setError(null);
+                                try {
+                                    const response = await vendorOnboardingAPI.iraLink(id);
+                                    const url = response.data.data.iraLink?.url;
+                                    if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
+                                    setCopiedIraLink(url || 'copied');
+                                    load();
+                                } catch (err: any) {
+                                    setError(err.message || 'Unable to copy the secure link');
+                                } finally {
+                                    setSaving(false);
+                                }
+                            }}
+                        />
                     ) : (
                         <NextActionCard
                             label={dominantNextAction({ ...data, actorId: data.actorId }).label}
@@ -226,54 +254,18 @@ export default function VendorOnboardingWorkspace() {
                                     ? confirmRecommendation
                                     : data.stageKey === 'READY_TO_SEND'
                                         ? startVendorSend
-                                        : data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && !data.ira?.sent
-                                            ? () => run(() => vendorOnboardingAPI.sendIra(id))
-                                            : () => setTab(defaultTab(data.stage))
+                                        : () => setTab(defaultTab(data.stage))
                             }
                         />
                     )}
                     {error && <Alert severity="error">{error}</Alert>}
-                    {data.ira?.required && (
-                        <Alert severity={data.ira.submitted ? 'success' : data.ira.sent ? 'info' : 'warning'}>
-                            {(data.ira.status || 'IRA_NOT_SENT').replace(/_/g, ' ')}
-                            {data.ira.sentAt ? ` · sent ${formatShortDate(data.ira.sentAt)}` : ''}
-                            {data.ira.submittedAt ? ` · submitted ${formatShortDate(data.ira.submittedAt)}` : ''}
-                            {data.ira.unknownMessage ? ` · ${data.ira.unknownMessage}` : ''}
+                    {copiedIraLink && (
+                        <Alert severity="success">
+                            Secure URL copied. This does not email the requester until you send the assessment.
                         </Alert>
                     )}
-                    {data.ira?.required && !data.ira?.submitted && data.stageKey === 'INTAKE' && (
-                        <Surface>
-                            <Typography variant="h6">Send the inherent-risk form</Typography>
-                            <Typography variant="body2" sx={{ mb: 1.5 }}>
-                                {data.requesterName || 'The requester'} ({data.requesterEmail}) does not need a Supreme login. Email the link or copy it and mark it sent. The 5-day clock starts then.
-                            </Typography>
-                            {copiedIraLink && (
-                                <Alert severity="success" sx={{ mb: 1.5 }}>
-                                    Secure URL: {copiedIraLink}. Not emailed until you mark it sent.
-                                </Alert>
-                            )}
-                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                <Button variant="contained" disabled={saving} onClick={() => run(() => vendorOnboardingAPI.sendIra(id))}>Email IRA link</Button>
-                                <Button disabled={saving} onClick={async () => {
-                                    setSaving(true);
-                                    setError(null);
-                                    try {
-                                        const response = await vendorOnboardingAPI.iraLink(id);
-                                        const url = response.data.data.iraLink?.url;
-                                        if (url && navigator.clipboard) await navigator.clipboard.writeText(url);
-                                        setCopiedIraLink(url || 'copied');
-                                        load();
-                                    } catch (err: any) {
-                                        setError(err.message || 'Unable to copy the IRA link');
-                                    } finally {
-                                        setSaving(false);
-                                    }
-                                }}>Copy IRA link</Button>
-                                {copiedIraLink && (
-                                    <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markIraShared(id))}>Mark as sent</Button>
-                                )}
-                            </Stack>
-                        </Surface>
+                    {copiedIraLink && data.ira?.source !== 'ENGAGEMENT_IRA' && (
+                        <Button disabled={saving} onClick={() => run(() => vendorOnboardingAPI.markIraShared(id))}>Mark as sent</Button>
                     )}
                     {data.canReviewTier && data.stageKey === 'TIER_REVIEW' && data.tierReview?.recommendedTier && (
                         <Surface>
@@ -428,11 +420,11 @@ export default function VendorOnboardingWorkspace() {
 
                     {tab === 1 && data.ira?.required && (
                         <Surface>
-                            <Typography variant="h6">Requester inherent-risk answers</Typography>
+                            <Typography variant="h6">Requester inherent risk assessment</Typography>
                             <Typography variant="body2" sx={{ mb: 1.5 }}>
                                 {data.ira.submitted
                                     ? 'The requester completed this form. The vendor does not see it.'
-                                    : 'Do not fill the old in-app intake. Send the inherent-risk link above. The requester answers business-context questions only.'}
+                                    : 'Do not fill the old in-app intake. Use the primary action above. The requester answers business-context questions only.'}
                             </Typography>
                             {data.ira.submitted && (data.ira.questions || []).map((question: { key: string; question: string; options?: Array<{ value: string; label: string }> }) => {
                                 const raw = String((data.ira.answers || {})[question.key] || '');

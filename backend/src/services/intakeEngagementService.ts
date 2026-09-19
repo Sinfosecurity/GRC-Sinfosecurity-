@@ -28,6 +28,9 @@ import {
     openIraForEngagement,
     requesterEngagementStatus,
 } from './engagementIraService';
+import { evidenceLinkageService } from './evidenceLinkageService';
+import { objectStorageService } from './objectStorageService';
+import { presentEvidenceAttachment } from '../tprm/evidenceRequirement';
 
 export type Actor = { id: string; name: string; email: string; role: string };
 
@@ -328,6 +331,7 @@ export function presentIntake(row: {
             respondedAt: item.respondedAt,
             respondedBy: item.respondedBy,
             respondedByName: item.respondedBy ? directory?.get(item.respondedBy)?.name || null : null,
+            attachments: presentAttachments((item as { evidenceLinks?: Array<{ storedObject: { id: string; filename: string; contentType: string; uploadedAt: Date; scanStatus: string } }> }).evidenceLinks),
         })),
     };
 }
@@ -405,6 +409,7 @@ function presentRequesterIntake(row: Parameters<typeof presentIntake>[0]) {
             requestedAt: item.requestedAt,
             response: item.response,
             respondedAt: item.respondedAt,
+            attachments: presentAttachments((item as { evidenceLinks?: Array<{ storedObject: { id: string; filename: string; contentType: string; uploadedAt: Date; scanStatus: string } }> }).evidenceLinks),
         })),
     };
 }
@@ -482,8 +487,20 @@ const intakeInclude = {
     matchedVendor: { select: { id: true, publicId: true, name: true, legalName: true, website: true, country: true, status: true, tier: true } },
     createdEngagement: { select: { id: true, publicId: true, serviceName: true, status: true } },
     assignments: { orderBy: { assignedAt: 'asc' as const } },
-    informationRequests: { orderBy: { requestedAt: 'asc' as const }, select: { id: true, fields: true, requestNote: true, requestedBy: true, requestedAt: true, response: true, respondedAt: true, respondedBy: true } },
+    informationRequests: {
+        orderBy: { requestedAt: 'asc' as const },
+        include: {
+            evidenceLinks: {
+                include: { storedObject: { select: { id: true, filename: true, contentType: true, uploadedAt: true, scanStatus: true } } },
+                orderBy: { createdAt: 'asc' as const },
+            },
+        },
+    },
 };
+
+function presentAttachments(links?: Array<{ storedObject: { id: string; filename: string; contentType: string; uploadedAt: Date; scanStatus: string } }>) {
+    return (links || []).map((link) => presentEvidenceAttachment(link.storedObject));
+}
 
 async function loadIntake(organizationId: string, key: string) {
     return prisma.intakeRequest.findFirst({
@@ -960,6 +977,8 @@ export async function getPublicIntakeInfo(token: string) {
             procurementReference: row.intake.procurementReference,
         },
         alreadyResponded: Boolean(row.respondedAt),
+        informationRequestId: row.id,
+        attachments: presentAttachments(row.evidenceLinks),
     };
 }
 
@@ -972,7 +991,13 @@ async function informationByToken(token: string) {
     const hash = hashToken(String(token || ''));
     const row = await prisma.intakeInformationRequest.findFirst({
         where: { tokenHash: hash },
-        include: { intake: true },
+        include: {
+            intake: true,
+            evidenceLinks: {
+                include: { storedObject: { select: { id: true, filename: true, contentType: true, uploadedAt: true, scanStatus: true } } },
+                orderBy: { createdAt: 'asc' },
+            },
+        },
     });
     if (!row) throw new ApiError(404, 'This information request was not found or has expired.');
     if (row.expiresAt && row.expiresAt.getTime() < Date.now()) throw new ApiError(410, 'This information request has expired.');
@@ -1373,6 +1398,7 @@ export async function listRequesterActions(organizationId: string, actor: Actor)
                 requestedBy: item.requestedBy,
                 requestedAt: item.requestedAt,
                 dueAt: null,
+                attachments: item.attachments || [],
             }))),
         ],
     };
@@ -1392,6 +1418,70 @@ export async function requesterHome(organizationId: string, actor: Actor) {
             actionsRequired: actions.items.length,
         },
     };
+}
+
+export async function uploadRequesterInformationAttachment(
+    organizationId: string,
+    actor: Actor,
+    key: string,
+    input: { informationRequestId?: string; filename: string; contentType: string; buffer: Buffer }
+) {
+    assertNotVendorPlane(actor);
+    const intake = await requireIntake(organizationId, key, actor);
+    if (!isOwn(intake, actor) && !canTriage(actor)) throw new ApiError(403, 'Only the requester can attach supporting documents.');
+    const pending = intake.informationRequests.find((row) => !row.respondedAt && (!input.informationRequestId || row.id === input.informationRequestId));
+    if (!pending) throw new ApiError(400, 'There is no open information request.');
+    const linked = await evidenceLinkageService.uploadLinked({
+        organizationId,
+        uploadedBy: actor.id,
+        vendorId: intake.matchedVendorId || undefined,
+        intakeRequestId: intake.id,
+        intakeInformationRequestId: pending.id,
+        engagementId: intake.createdEngagementId || undefined,
+        questionId: `intake-info:${pending.id}`,
+        filename: input.filename,
+        contentType: input.contentType,
+        buffer: input.buffer,
+        title: input.filename,
+    });
+    await audit(organizationId, actor.id, 'intake.information_attachment.uploaded', 'IntakeRequest', intake.id, {
+        informationRequestId: pending.id,
+        storedObjectId: linked.stored.id,
+        scanStatus: linked.stored.scanStatus,
+    });
+    return presentEvidenceAttachment(linked.stored);
+}
+
+export async function uploadPublicIntakeAttachment(token: string, input: { filename: string; contentType: string; buffer: Buffer }) {
+    const row = await informationByToken(token);
+    if (row.respondedAt) throw new ApiError(409, 'This information request was already answered.');
+    const linked = await evidenceLinkageService.uploadLinked({
+        organizationId: row.organizationId,
+        uploadedBy: row.intake.requesterUserId || row.requestedBy,
+        vendorId: row.intake.matchedVendorId || undefined,
+        intakeRequestId: row.intakeRequestId,
+        intakeInformationRequestId: row.id,
+        engagementId: row.intake.createdEngagementId || undefined,
+        questionId: `intake-info:${row.id}`,
+        filename: input.filename,
+        contentType: input.contentType,
+        buffer: input.buffer,
+        title: input.filename,
+    });
+    return presentEvidenceAttachment(linked.stored);
+}
+
+export async function downloadIntakeInformationAttachment(organizationId: string, actor: Actor, key: string, storedObjectId: string) {
+    assertNotVendorPlane(actor);
+    const intake = await requireIntake(organizationId, key, actor);
+    if (!isOwn(intake, actor) && !canTriage(actor) && !canSeeQueue(actor)) {
+        throw new ApiError(403, 'You cannot download this file.');
+    }
+    const link = await prisma.evidenceLink.findFirst({
+        where: { organizationId, storedObjectId, intakeRequestId: intake.id },
+    });
+    if (!link) throw new ApiError(404, 'That file is not part of this request.');
+    return objectStorageService.getForDownload(storedObjectId, organizationId, actor.id);
 }
 
 export async function respondRequesterInformation(organizationId: string, actor: Actor, key: string, input: { informationRequestId?: string; response?: string; updates?: Record<string, unknown> }) {

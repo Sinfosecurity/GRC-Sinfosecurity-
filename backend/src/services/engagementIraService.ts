@@ -14,6 +14,8 @@ import { editionIsInsurance } from '../insurance/insuranceService';
 import { iraQuestionsForEdition } from '../insurance/iraOverlay';
 import { IRA_QUESTIONS, missingIraQuestions } from '../tprm/iraCatalog';
 import { iraForm, scoreIra, type IraRating } from '../tprm/iraScoring';
+import { persistIraJurisdictions, presentJurisdictions } from '../tprm/iraJurisdiction';
+import { presentCountryCatalog } from '../tprm/countryCatalog';
 import { recordAudit } from './auditEventService';
 import { createRelationship, ensureNode } from './governanceGraphService';
 import { notifyUser } from './notificationDeliveryService';
@@ -133,7 +135,13 @@ function ownsIra(ira: { engagement: { requesterUserId: string | null; requesterE
 async function scoreAnswers(organizationId: string, engagementId: string, answers: Record<string, string>) {
     const insurance = await editionIsInsurance(organizationId);
     const questions = iraQuestionsForEdition(insurance);
-    const payload = toPayload(answers, questions);
+    const organization = await prisma.organization.findUnique({ where: { id: organizationId }, select: { country: true } });
+    const persisted = persistIraJurisdictions(answers, organization?.country);
+    if (persisted.methodologyGap === 'INVALID_COUNTRY') throw new ApiError(400, persisted.gapMessage || 'Choose countries from the catalog.');
+    const payload = toPayload(persisted.answers, questions).concat(
+        persisted.answers.a6_storage ? [{ questionKey: 'a6_storage', response: persisted.answers.a6_storage }] : [],
+        persisted.answers.a6_processing ? [{ questionKey: 'a6_processing', response: persisted.answers.a6_processing }] : [],
+    );
     const missing = missingIraQuestions(payload, questions);
     if (missing.length) throw new ApiError(400, `Answer every question. Don't know is allowed. Still needed: ${missing.length}.`);
     const onboarding = await prisma.vendorOnboarding.findFirst({
@@ -143,7 +151,13 @@ async function scoreAnswers(organizationId: string, engagementId: string, answer
     const rating = onboarding?.externalRating && typeof onboarding.externalRating === 'object'
         ? onboarding.externalRating as { provider?: string; grade?: string; score?: number | null; assessedAt?: string }
         : null;
-    return { scored: scoreIra(payload, { externalRating: rating }), questions, insurance };
+    return {
+        scored: scoreIra(payload, { externalRating: rating, organizationCountry: organization?.country }),
+        questions,
+        insurance,
+        answers: persisted.answers,
+        jurisdictions: presentJurisdictions(persisted.answers, organization?.country),
+    };
 }
 
 async function writeIraGraph(organizationId: string, actorId: string, engagement: { id: string; publicId: string; serviceName: string; vendorId: string }, iraId: string) {
@@ -208,6 +222,8 @@ function presentRequesterIra(ira: NonNullable<Awaited<ReturnType<typeof loadIra>
         form: opened || ira.status === EngagementIraStatus.IN_PROGRESS || ira.status === EngagementIraStatus.REQUIRED
             ? iraForm(questions)
             : undefined,
+        countries: presentCountryCatalog(),
+        jurisdictions: presentJurisdictions(asAnswers(ira.currentAnswers)),
         answers: ira.status === EngagementIraStatus.REQUIRED || ira.status === EngagementIraStatus.IN_PROGRESS ? asAnswers(ira.currentAnswers) : undefined,
         submittedAt: ira.submittedAt,
         clarification: openItems.length ? {
@@ -429,8 +445,8 @@ export async function submitRequesterIra(organizationId: string, actor: Actor, k
     if (ira.status !== EngagementIraStatus.REQUIRED && ira.status !== EngagementIraStatus.IN_PROGRESS) {
         throw new ApiError(409, 'This risk assessment has already been submitted.');
     }
-    const answers = asAnswers(input.answers);
-    const { scored, questions } = await scoreAnswers(organizationId, ira.engagementId, answers);
+    const incoming = asAnswers(input.answers);
+    const { scored, questions, answers } = await scoreAnswers(organizationId, ira.engagementId, incoming);
     const autoConfirm = scored.autoConfirmEligible && scored.recommendedTier === VendorTier.LOW;
     const now = new Date();
     await prisma.$transaction([

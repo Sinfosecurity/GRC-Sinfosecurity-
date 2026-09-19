@@ -52,7 +52,7 @@ export function workbookLibraryTemplates(): LibraryTemplate[] {
                     weight: row.weight,
                     options: VENDOR_OPTIONS,
                     questionType: 'SINGLE_CHOICE',
-                    evidenceRequired: Boolean(row.expectedEvidence),
+                    evidenceRequired: false,
                     guidance: [
                         row.guidance,
                         row.expectedEvidence ? `Expected evidence: ${row.expectedEvidence}` : '',

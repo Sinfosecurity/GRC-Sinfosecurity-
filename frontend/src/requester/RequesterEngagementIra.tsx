@@ -3,12 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import { Alert, Box, Button, Checkbox, FormControlLabel, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { requesterAPI } from '../services/api';
 import { color } from '../design/tokens';
+import IraJurisdictionFields from '../components/IraJurisdictionFields';
 
 type Question = {
     key: string;
     part: 'A' | 'B';
     question: string;
     multiple?: boolean;
+    input?: 'choice' | 'jurisdictions';
     options: Array<{ value: string; label: string }>;
 };
 
@@ -84,7 +86,16 @@ export default function RequesterEngagementIra() {
                             <Typography variant="h2" sx={{ fontSize: 22, mb: 1.5 }}>{part.title}</Typography>
                             <Stack spacing={1.5}>
                                 {part.questions.map((question) => (
-                                    question.multiple ? (
+                                    question.input === 'jurisdictions' || question.key === 'a6' ? (
+                                        <IraJurisdictionFields
+                                            key={question.key}
+                                            storageValue={answers.a6_storage || ''}
+                                            processingValue={answers.a6_processing || ''}
+                                            countries={data.countries || data.form?.countries || []}
+                                            disabled={readOnly}
+                                            onChange={(key, value) => setAnswers((current) => ({ ...current, [key]: value, a6: value.includes('dont_know') ? 'dont_know' : current.a6 }))}
+                                        />
+                                    ) : question.multiple ? (
                                         <Box key={question.key}>
                                             <Typography variant="subtitle2">{question.question}</Typography>
                                             {question.options.map((option) => (
@@ -124,7 +135,7 @@ export default function RequesterEngagementIra() {
                         label="I confirm these answers are accurate for this service."
                     />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                        <Button type="submit" variant="contained" disabled={saving || !attested || questions.some((question) => !answers[question.key])}>
+                        <Button type="submit" variant="contained" disabled={saving || !attested || questions.some((question) => question.input === 'jurisdictions' || question.key === 'a6' ? !answers.a6_storage && !answers.a6 : !answers[question.key])}>
                             {saving ? 'Submitting…' : 'Submit risk assessment'}
                         </Button>
                         <Button component={Link} to="/request/actions">Back to actions</Button>

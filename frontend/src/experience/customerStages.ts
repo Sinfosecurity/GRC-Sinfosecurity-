@@ -92,8 +92,8 @@ export function dominantNextAction(data: {
     }
     if ((stage === 'INTAKE' || stage === 'Intake') && data.ira?.required && !data.ira?.submitted) {
         return data.ira.sent
-            ? { label: 'Waiting on requester', detail: 'The inherent-risk form is with the requester. They do not need a Supreme login.' }
-            : { label: 'Send the inherent-risk form', detail: 'Email the link or copy it and mark it sent. The 5-day clock starts then.' };
+            ? { label: 'Waiting on requester', detail: 'The business-context risk assessment is with the requester.' }
+            : { label: 'Send assessment', detail: 'Send the business-context assessment to the requester. Copy a secure link only as a secondary delivery method.' };
     }
     if (stage === 'INTAKE' || stage === 'Intake') return { label: 'Complete intake', detail: data.nextAction || 'Answer the inherent-risk questions.' };
     if (stage === 'TIER_REVIEW' || stage === 'Tier review') {
@@ -162,7 +162,7 @@ export function version3OperatingSteps(data: {
     const iraSubmitted = Boolean(data.ira?.submitted || data.ira?.status === 'IRA_SUBMITTED');
     return [
         { key: 'REQUEST', label: 'Request', state: pathState(true, false) },
-        { key: 'IRA_SENT', label: 'IRA sent', state: pathState(iraSent, !iraSent && (stage === 'INTAKE' || stage === 'REQUEST')) },
+        { key: 'IRA_SENT', label: 'Inherent Risk Assessment', state: pathState(iraSent, !iraSent && (stage === 'INTAKE' || stage === 'REQUEST')) },
         { key: 'IRA_SUBMITTED', label: 'IRA submitted', state: pathState(iraSubmitted, iraSent && !iraSubmitted) },
         { key: 'TIER_REVIEW', label: 'Tier review', state: pathState(PAST_TIER.includes(stage), stage === 'TIER_REVIEW') },
         { key: 'QUESTIONNAIRE_READY', label: 'Questionnaire ready', state: pathState(PAST_READY.includes(stage), stage === 'READY_TO_SEND') },

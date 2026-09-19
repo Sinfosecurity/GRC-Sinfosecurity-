@@ -37,7 +37,7 @@ describe('five-stage customer mapping', () => {
         expect(dominantNextAction({
             stageKey: 'INTAKE',
             ira: { required: true, sent: false, submitted: false },
-        }).label).toBe('Send the inherent-risk form');
+        }).label).toBe('Send assessment');
         expect(dominantNextAction({
             stageKey: 'INTAKE',
             ira: { required: true, sent: true, submitted: false },

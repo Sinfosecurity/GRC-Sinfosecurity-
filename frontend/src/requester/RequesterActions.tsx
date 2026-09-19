@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
 import { requesterAPI } from '../services/api';
 import { color } from '../design/tokens';
+import ClarificationAttachments, { type ClarificationAttachment } from '../components/ClarificationAttachments';
 
 export default function RequesterActions() {
     const [items, setItems] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [response, setResponse] = useState<Record<string, string>>({});
+    const [attachments, setAttachments] = useState<Record<string, ClarificationAttachment[]>>({});
     const [pending, setPending] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
@@ -59,6 +61,16 @@ export default function RequesterActions() {
                     <Typography><strong>Requested by GRC</strong> {item.requestedAt ? `on ${new Date(item.requestedAt).toLocaleString()}` : ''}</Typography>
                     <Typography>{item.requestNote}</Typography>
                     <TextField id={`response-${item.id}`} required label="Your response" value={response[item.id] || ''} onChange={(event) => setResponse((current) => ({ ...current, [item.id]: event.target.value }))} multiline minRows={3} inputProps={{ 'aria-label': 'Your response' }} />
+                    <ClarificationAttachments
+                        attachments={[...(item.attachments || []), ...(attachments[item.id] || [])]}
+                        onUpload={async (file) => {
+                            const form = new FormData();
+                            form.append('file', file);
+                            form.append('informationRequestId', item.id);
+                            const uploaded = await requesterAPI.uploadAttachment(item.publicId, form);
+                            setAttachments((current) => ({ ...current, [item.id]: [...(current[item.id] || []), uploaded.data.data] }));
+                        }}
+                    />
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                         <Button type="submit" variant="contained" disabled={pending === item.id}>{pending === item.id ? 'Sending…' : 'Send response'}</Button>
                         <Button component={Link} to={`/request/${item.publicId}`}>Open request</Button>

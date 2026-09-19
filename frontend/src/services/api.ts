@@ -63,7 +63,9 @@ api.interceptors.response.use(
                 : detailMessage ||
                     (typeof nestedError === 'string' ? nestedError : nestedError?.message) ||
                     payload?.message) ||
-            (status === 403
+            (status === 409
+                ? (typeof nestedError === 'object' && nestedError?.message) || payload?.message || 'This record changed while you were working. Refresh to load the latest version; your saved responses are preserved.'
+                : status === 403
                 ? 'You do not have permission to perform this action.'
                 : status === 404
                     ? 'The requested record was not found.'
@@ -524,6 +526,9 @@ export const requesterAPI = {
     create: (data: unknown) => api.post('/tprm/requester/intakes', data),
     get: (id: string) => api.get(`/tprm/requester/intakes/${id}`),
     respond: (id: string, data: unknown) => api.post(`/tprm/requester/intakes/${id}/information-response`, data),
+    uploadAttachment: (id: string, form: FormData) => api.post(`/tprm/requester/intakes/${id}/information-attachments`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    }),
     getIra: (id: string) => api.get(`/tprm/requester/iras/${id}`),
     submitIra: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/submit`, data),
     submitIraClarification: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/clarification`, data),
@@ -580,6 +585,10 @@ const intakeInfoApi = axios.create({
 export const intakeInfoAPI = {
     get: (token: string) => intakeInfoApi.get('/intake-info', { params: { token } }),
     respond: (token: string, data: unknown) => intakeInfoApi.post('/intake-info/respond', { token, ...(data as object) }),
+    upload: (token: string, form: FormData) => intakeInfoApi.post('/intake-info/attachments', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        params: { token },
+    }),
 };
 
 export const vendorOnboardingAPI = {
@@ -637,6 +646,26 @@ vendorApi.interceptors.request.use((config) => {
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
+
+vendorApi.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError<{ error?: string | { message?: string }; message?: string }>) => {
+        const status = error.response?.status;
+        const payload = error.response?.data;
+        const nestedError = payload?.error;
+        const apiMessage = typeof nestedError === 'string' ? nestedError : nestedError?.message || payload?.message;
+        const message = apiMessage
+            || (status === 409
+                ? 'This assessment cannot be submitted yet. Refresh to load the latest version; your saved responses are preserved.'
+                : status === 400
+                    ? 'This assessment is not ready to submit.'
+                    : error.message || 'The request failed.');
+        if (status === 401) {
+            localStorage.removeItem('vendorToken');
+        }
+        return Promise.reject(new ApiClientError(message, status, typeof nestedError === 'object' ? nestedError?.message : undefined));
+    }
+);
 
 export const vendorPortalAPI = {
     activate: (token: string) => vendorApi.post('/vendor-portal/activate', { token }),

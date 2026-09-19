@@ -3,11 +3,13 @@ import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import Surface from '../components/design/Surface';
 import { intakeInfoAPI } from '../services/api';
+import ClarificationAttachments, { type ClarificationAttachment } from '../components/ClarificationAttachments';
 
 export default function IntakeInfoRespond() {
     const token = new URLSearchParams(window.location.search).get('token') || '';
     const [data, setData] = useState<any>(null);
     const [response, setResponse] = useState('');
+    const [attachments, setAttachments] = useState<ClarificationAttachment[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [done, setDone] = useState(false);
     const [pending, setPending] = useState(false);
@@ -50,6 +52,16 @@ export default function IntakeInfoRespond() {
                     <Typography variant="body2" sx={{ mt: 1 }}>Original purpose: {data.original?.businessPurpose}</Typography>
                     <Stack component="form" spacing={2} sx={{ mt: 2 }} onSubmit={submit}>
                         <TextField required multiline minRows={4} label="Your response" value={response} onChange={(event) => setResponse(event.target.value)} />
+                        <ClarificationAttachments
+                            attachments={[...(data.attachments || []), ...attachments]}
+                            onUpload={async (file) => {
+                                const form = new FormData();
+                                form.append('file', file);
+                                form.append('token', token);
+                                const uploaded = await intakeInfoAPI.upload(token, form);
+                                setAttachments((current) => [...current, uploaded.data.data]);
+                            }}
+                        />
                         <Button type="submit" variant="contained" disabled={pending}>{pending ? 'Sending…' : 'Submit response'}</Button>
                     </Stack>
                 </Surface>
