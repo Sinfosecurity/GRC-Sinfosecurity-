@@ -109,6 +109,8 @@ export default function Assessments() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [saveState, setSaveState] = useState('Answers save when you leave the field or choose Save & next.');
+    const [workspace, setWorkspace] = useState<any>(null);
+    const [reviewMode, setReviewMode] = useState(true);
     const startNewAssessment = () => navigate('/vendor-onboarding');
     const draftRef = useRef('');
     const focusedQuestionKeyRef = useRef<string | null>(null);
@@ -190,6 +192,13 @@ export default function Assessments() {
         setSelected(detail.data.data);
         setSectionIndex(0);
         setQuestionIndex(0);
+        setReviewMode(true);
+        try {
+            const review = await tprmAPI.assessmentWorkspace(row.id);
+            setWorkspace(review.data.data);
+        } catch {
+            setWorkspace(null);
+        }
     };
 
     const persist = async (questionId: string, response: string) => {
@@ -254,6 +263,78 @@ export default function Assessments() {
         }
     };
 
+    if (selected && reviewMode && workspace) {
+        return (
+            <Box sx={{ maxWidth: 1100 }}>
+                {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>}
+                <Surface>
+                    <Button size="small" onClick={() => { setSelected(null); setWorkspace(null); }}>Back to Assessment Center</Button>
+                    <Typography variant="h1" sx={{ mt: 1 }}>{workspace.header.vendorName}</Typography>
+                    <Typography variant="body2">{workspace.header.templateName} · {workspace.header.type.replace(/_/g, ' ')}</Typography>
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }} flexWrap="wrap" useFlexGap>
+                        <StatusBadge value={workspace.header.status} kind="plain" />
+                        {workspace.header.completedAt && <StatusBadge kind="plain" tone="info" label={`Completed ${String(workspace.header.completedAt).slice(0, 10)}`} />}
+                    </Stack>
+                    <Alert severity="info" sx={{ mt: 2 }}>Next: {workspace.nextAction.label}. {workspace.nextAction.detail}</Alert>
+                </Surface>
+                <Stack spacing={2} sx={{ mt: 2 }}>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>Scope</Typography>
+                        <Typography variant="body2">{workspace.scope.why}</Typography>
+                        <Typography variant="body2">Vendor tier: {workspace.scope.vendorTier}</Typography>
+                        <Typography variant="body2">Pack / template: {workspace.scope.pack} · {workspace.scope.questionCount} questions</Typography>
+                    </Surface>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>Outcome</Typography>
+                        <Typography variant="body2">Score: {workspace.outcome.score == null ? 'Not calculated' : workspace.outcome.score}</Typography>
+                        <Typography variant="body2">Unanswered: {workspace.outcome.unanswered} — unanswered is not No</Typography>
+                        <Typography variant="body2">Evidence gaps: {workspace.outcome.evidenceGaps} — absence is not control failure</Typography>
+                        <Typography variant="body2">Findings generated: {workspace.outcome.findingsGenerated} ({workspace.outcome.openFindings} open)</Typography>
+                        <Typography variant="body2">Decision: {workspace.outcome.decisionStatus}</Typography>
+                    </Surface>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>Key responses</Typography>
+                        {!workspace.keyResponses.length && <Typography variant="body2">No Don’t-know or negative responses are recorded.</Typography>}
+                        {workspace.keyResponses.map((row: any) => (
+                            <Box key={row.questionId} sx={{ mb: 1.25 }}>
+                                <Typography variant="subtitle2">{row.question}</Typography>
+                                <Typography variant="body2">{row.recorded ? row.answer : 'No response recorded'}</Typography>
+                            </Box>
+                        ))}
+                    </Surface>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>Findings</Typography>
+                        {!workspace.findings.length && <Typography variant="body2">No findings were generated from this assessment.</Typography>}
+                        {workspace.findings.map((row: any) => (
+                            <Box key={row.id} sx={{ mb: 1 }}>
+                                <Typography variant="subtitle2">{row.title}</Typography>
+                                <Typography variant="caption">{row.severity} · {row.status}</Typography>
+                                <Button size="small" sx={{ display: 'block' }} onClick={() => navigate(`/findings?issueId=${row.id}`)}>Open finding</Button>
+                            </Box>
+                        ))}
+                    </Surface>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>Evidence</Typography>
+                        {workspace.evidence.empty && <Typography variant="body2">{workspace.evidence.empty}</Typography>}
+                        {workspace.evidence.items.map((row: any) => (
+                            <Typography key={row.id} variant="body2">{row.filename} · {row.usable ? 'Ready' : 'Not usable'}</Typography>
+                        ))}
+                    </Surface>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>History</Typography>
+                        {workspace.history.map((row: any, index: number) => (
+                            <Typography key={`${row.label}-${index}`} variant="body2">{String(row.at).slice(0, 10)} — {row.label}</Typography>
+                        ))}
+                    </Surface>
+                    <Stack direction="row" spacing={1}>
+                        <Button variant="contained" onClick={() => setReviewMode(false)}>Browse questions</Button>
+                        <Button onClick={downloadPdf} disabled={busy}>Download PDF</Button>
+                    </Stack>
+                </Stack>
+            </Box>
+        );
+    }
+
     if (selected) {
         const [prompt, ...guidance] = (currentQuestion?.questionText || '').split('\n');
         const response = (selected.responses || []).find((row) => row.questionId === currentQuestion?.questionKey);
@@ -267,6 +348,7 @@ export default function Assessments() {
                         <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
                             <Box>
                                 <Button size="small" onClick={() => setSelected(null)}>Back to Assessment Center</Button>
+                                {workspace && <Button size="small" onClick={() => setReviewMode(true)}>Review summary</Button>}
                                 <Typography variant="h1">{selected.vendor?.name || 'Assessment'}</Typography>
                                 <Typography variant="body2">{selectedTemplate?.name || 'Assessment'} · {saveState}</Typography>
                                 <Stack direction="row" spacing={1} sx={{ mt: 1 }} flexWrap="wrap" useFlexGap>

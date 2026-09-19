@@ -66,6 +66,27 @@ router.post(
     }
 );
 
+router.get('/:id', requirePermission(PERMISSIONS['evidence.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const stored = await prisma.storedObject.findFirst({
+            where: tenantWhere(req.user!.organizationId, { id: req.params.id, deletedAt: null }),
+        });
+        if (!stored) throw new ApiError(404, 'Evidence not found');
+        res.json({
+            success: true,
+            data: {
+                ...stored,
+                honesty: {
+                    uploadedIsNotValid: 'Uploaded is not valid evidence. Scan and usability are separate.',
+                    expiredIsNotIllegal: 'Expired metadata requires review. It is not a finding that processing is illegal.',
+                },
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/:id/download', requirePermission(PERMISSIONS['evidence.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { stored, buffer } = await objectStorageService.getForDownload(

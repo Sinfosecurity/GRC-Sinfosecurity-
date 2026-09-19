@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import PageHeader from '../components/design/PageHeader';
 import StatusBadge from '../components/design/StatusBadge';
@@ -13,6 +13,10 @@ const SECTIONS = ['Overview', 'Scoring', 'Impact', 'Controls', 'Evidence', 'Find
 
 export default function RiskDetail() {
     const { publicId = '' } = useParams();
+    const navigate = useNavigate();
+    const [acceptConditions, setAcceptConditions] = useState('');
+    const [acceptReview, setAcceptReview] = useState('');
+    const [actionState, setActionState] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
     const [section, setSection] = useState<(typeof SECTIONS)[number]>('Overview');
     const [detail, setDetail] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
@@ -91,7 +95,10 @@ export default function RiskDetail() {
                     <Typography variant="body2">{risk.description || 'No additional description.'}</Typography>
                     <Typography variant="caption" display="block" sx={{ mt: 2 }}>Category {humanizeLabel(risk.category)} · Review {formatShortDate(risk.reviewDate)}</Typography>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} sx={{ mt: 1.5 }}>
-                        <StatusBadge kind="plain" tone={risk.ownerUserId ? 'neutral' : 'high'} label={detail.owners?.[0] ? `${detail.owners[0].firstName} ${detail.owners[0].lastName}` : 'Unassigned'} />
+                        <StatusBadge kind="plain" tone={risk.ownerUserId ? 'neutral' : 'high'} label={(() => {
+                            const owner = (detail.owners || []).find((person: any) => person.id === risk.ownerUserId);
+                            return owner ? `${owner.firstName} ${owner.lastName}` : 'Unassigned';
+                        })()} />
                         <Box component="form" onSubmit={(event) => submit(event, () => ermAPI.update(risk.publicId, { ownerUserId }))}>
                             <Stack direction="row" spacing={1}>
                                 <TextField select size="small" label="Assign owner" value={ownerUserId} onChange={(e) => setOwnerUserId(e.target.value)} sx={{ minWidth: 220 }}>
@@ -167,7 +174,10 @@ export default function RiskDetail() {
                 <Surface>
                     {(detail.findings || []).length === 0 && <Typography variant="body2">No findings linked to this risk.</Typography>}
                     {(detail.findings || []).map((finding: any) => (
-                        <Typography key={finding.id} variant="body2">{finding.title} · {humanizeLabel(finding.severity)} · {humanizeLabel(finding.status)}</Typography>
+                        <Box key={finding.id} sx={{ mb: 1 }}>
+                            <Typography variant="body2">{finding.title} · {humanizeLabel(finding.severity)} · {humanizeLabel(finding.status)}</Typography>
+                            <Button size="small" onClick={() => navigate(`/findings?issueId=${finding.id}`)}>Open finding</Button>
+                        </Box>
                     ))}
                     <Box component="form" onSubmit={(event) => submit(event, () => ermAPI.linkFinding(risk.publicId, { findingId }))}>
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 2 }}>
@@ -227,9 +237,31 @@ export default function RiskDetail() {
                     {(risk.decisions || []).map((item: any) => (
                         <Typography key={item.id} variant="body2">{humanizeLabel(item.decision)} · {humanizeLabel(item.status)} · {formatShortDate(item.approvedAt)}</Typography>
                     ))}
-                    <Box component="form" onSubmit={(event) => submit(event, () => ermAPI.decide(risk.publicId, { decision: 'ACCEPT', rationale: decisionRationale, approve: true }))}>
-                        <TextField label="Acceptance rationale" value={decisionRationale} onChange={(e) => setDecisionRationale(e.target.value)} fullWidth sx={{ my: 1 }} />
-                        <Button type="submit" variant="contained">Accept risk</Button>
+                    <Box component="form" onSubmit={(event) => submit(event, async () => {
+                        if (!decisionRationale.trim()) throw new Error('Acceptance requires a rationale. Residual score is unchanged.');
+                        setActionState('pending');
+                        try {
+                            await ermAPI.decide(risk.publicId, {
+                                decision: 'ACCEPT',
+                                rationale: decisionRationale.trim(),
+                                conditions: acceptConditions || undefined,
+                                expiresAt: acceptReview || undefined,
+                                approve: true,
+                            });
+                            setActionState('success');
+                        } catch (err) {
+                            setActionState('error');
+                            throw err;
+                        }
+                    })}>
+                        <Typography variant="body2" sx={{ mb: 1 }}>Acceptance is a recorded decision. Residual score does not change.</Typography>
+                        <TextField label="Acceptance rationale" value={decisionRationale} onChange={(e) => setDecisionRationale(e.target.value)} fullWidth required sx={{ my: 1 }} />
+                        <TextField label="Conditions" value={acceptConditions} onChange={(e) => setAcceptConditions(e.target.value)} fullWidth sx={{ mb: 1 }} />
+                        <TextField type="date" label="Review / expiry" InputLabelProps={{ shrink: true }} value={acceptReview} onChange={(e) => setAcceptReview(e.target.value)} fullWidth sx={{ mb: 1 }} />
+                        <Button type="submit" variant="contained" disabled={!decisionRationale.trim() || actionState === 'pending'}>
+                            {actionState === 'pending' ? 'Recording…' : 'Accept risk'}
+                        </Button>
+                        {actionState === 'success' && <Typography variant="caption" display="block" sx={{ mt: 1 }}>Acceptance recorded. Residual score unchanged.</Typography>}
                     </Box>
                 </Surface>
             )}

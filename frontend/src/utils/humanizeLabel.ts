@@ -1,4 +1,7 @@
 const CUSTOMER_LABELS: Record<string, string> = {
+    UNRATED: 'Not rated',
+    NOT_RATED: 'Not rated',
+    NOT_DETERMINED: 'Not determined',
     NOT_CLASSIFIED: 'Not Classified',
     APPROVED_WITH_CONDITIONS: 'Approved with Conditions',
     APPROVE_WITH_CONDITIONS: 'Approve with Conditions',

@@ -789,6 +789,7 @@ enum VendorTier {
   HIGH          // High risk - semi-annual assessments
   MEDIUM        // Medium risk - annual assessments
   LOW           // Low risk - biennial assessments
+  UNRATED       // Not yet rated — IRA/confirmation required. Not Medium.
 }
 
 enum VendorStatus {

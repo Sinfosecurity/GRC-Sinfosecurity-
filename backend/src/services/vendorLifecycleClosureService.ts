@@ -36,6 +36,7 @@ export const REASSESSMENT_DAYS: Record<VendorTier, number> = {
     HIGH: 180,
     MEDIUM: 365,
     LOW: 730,
+    UNRATED: 0,
 };
 
 function canReview(role: string) {

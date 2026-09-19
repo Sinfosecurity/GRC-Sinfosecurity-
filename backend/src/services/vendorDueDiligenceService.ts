@@ -46,6 +46,7 @@ export const VENDOR_SLA_DAYS: Record<VendorTier, number> = {
     HIGH: 15,
     MEDIUM: 20,
     LOW: 25,
+    UNRATED: 0,
 };
 
 const INVITE_LABEL: Record<VendorInvitationStatus, string> = {
@@ -101,6 +102,7 @@ function firstName(name: string) {
 }
 
 function dueDays(tier: VendorTier) {
+    if (tier === VendorTier.UNRATED) return 0;
     return VENDOR_SLA_DAYS[tier] || 20;
 }
 

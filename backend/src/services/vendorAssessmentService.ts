@@ -495,6 +495,7 @@ class VendorAssessmentService {
     private async updateVendorRiskScore(vendorId: string, assessmentScore: number) {
         const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } });
         if (!vendor) return;
+        if (vendor.tier === 'UNRATED') return;
         const issues = await prisma.vendorIssue.findMany({
             where: { vendorId, status: { in: ['OPEN', 'IN_PROGRESS', 'PENDING_VALIDATION'] } },
         });

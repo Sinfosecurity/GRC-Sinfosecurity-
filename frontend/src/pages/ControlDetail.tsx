@@ -353,7 +353,7 @@ export default function ControlDetail() {
                                         <Typography variant="caption" display="block" sx={{ mb: 1 }}>
                                             {row.status.replace(/_/g, ' ')} · {row.severity.replace(/_/g, ' ')}
                                         </Typography>
-                                        <Button size="small" onClick={() => navigate('/findings')}>Open findings</Button>
+                                        <Button size="small" onClick={() => navigate(`/findings?issueId=${row.id}`)}>Open finding</Button>
                                     </Box>
                                 ))}
                                 {linkedFindings.length === 0 && <Typography variant="body2">No findings are linked to this control’s tests.</Typography>}

@@ -23,10 +23,12 @@ const mockedPrisma = prisma as unknown as {
 };
 
 describe('VendorManagementService tenant scoping', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         mockedPrisma.vendor.create.mockReset();
         mockedPrisma.vendor.findFirst.mockReset();
         mockedPrisma.vendor.findUnique.mockReset();
+        const { explainableRiskService } = await import('../explainableRiskService');
+        (explainableRiskService.recalculate as jest.Mock).mockClear();
     });
 
     it('creates vendors with the caller organizationId', async () => {
@@ -63,6 +65,40 @@ describe('VendorManagementService tenant scoping', () => {
         const payload = mockedPrisma.vendor.create.mock.calls[0][0].data;
         expect(payload.organizationId).toBe('org-a');
         expect(vendor.organizationId).toBe('org-a');
+    });
+
+    it('creates an unrated vendor without inventing residual risk', async () => {
+        mockedPrisma.vendor.create.mockResolvedValue({
+            id: 'vendor-2',
+            name: 'Unrated Co',
+            organizationId: 'org-a',
+            tier: VendorTier.UNRATED,
+            status: VendorStatus.PROPOSED,
+        });
+        mockedPrisma.vendor.findUnique.mockResolvedValue({
+            id: 'vendor-2',
+            name: 'Unrated Co',
+            organizationId: 'org-a',
+            tier: VendorTier.UNRATED,
+            status: VendorStatus.PROPOSED,
+        });
+        const { explainableRiskService } = await import('../explainableRiskService');
+        await vendorManagementService.createVendor({
+            name: 'Unrated Co',
+            vendorType: VendorType.SAAS,
+            category: 'TECHNOLOGY',
+            primaryContact: 'owner@unrated.test',
+            contactEmail: 'owner@unrated.test',
+            servicesProvided: 'SaaS',
+            dataTypesAccessed: [],
+            geographicFootprint: [],
+            regulatoryScope: [],
+            organizationId: 'org-a',
+        });
+        const payload = mockedPrisma.vendor.create.mock.calls[0][0].data;
+        expect(payload.tier).toBe(VendorTier.UNRATED);
+        expect(payload.residualRiskScore).toBe(0);
+        expect(explainableRiskService.recalculate).not.toHaveBeenCalled();
     });
 
     it('looks up vendors by id AND organizationId', async () => {

@@ -41,7 +41,7 @@ export const publicResources = {
             name,
             vendorType: (body.vendorType as VendorType) || VendorType.SAAS,
             category: String(body.category || 'TECHNOLOGY'),
-            tier: (body.tier as VendorTier) || VendorTier.LOW,
+            tier: (body.tier as VendorTier) || VendorTier.UNRATED,
             primaryContact: String(body.primaryContact || 'API'),
             contactEmail: String(body.contactEmail || 'api@example.invalid'),
             servicesProvided: String(body.servicesProvided || 'Created via public API'),

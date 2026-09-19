@@ -68,6 +68,11 @@ export default function FindingsRemediation() {
         load();
     }, []);
 
+    useEffect(() => {
+        const issueId = searchParams.get('issueId');
+        if (issueId) setSelectedId(issueId);
+    }, [searchParams]);
+
     const create = async () => {
         if (!createVendorId || !title || !description.trim()) return;
         setBusy(true);

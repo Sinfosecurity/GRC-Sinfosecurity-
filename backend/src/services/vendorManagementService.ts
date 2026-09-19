@@ -15,13 +15,14 @@ import { recordAudit } from './auditEventService';
 import { allocateVendorPublicId } from './vendorOnboardingService';
 import { extractVendorDomain } from './vendorOnboardingScoring';
 import { applyHardFloorToTier, assertLegacyUpdateMaySetTier, resolveMinimumTier } from './vendorTierIntegrity';
+import { isUnratedTier, presentResidualScore } from '../governance/recordHonesty';
 
 export interface CreateVendorInput {
     name: string;
     legalName?: string;
     vendorType: VendorType;
     category: string;
-    tier: VendorTier;
+    tier?: VendorTier;
     primaryContact: string;
     contactEmail: string;
     contactPhone?: string;
@@ -88,16 +89,22 @@ class VendorManagementService {
      */
     async createVendor(data: CreateVendorInput): Promise<Vendor> {
         try {
-            const tier = applyHardFloorToTier(
-                data.tier,
-                resolveMinimumTier({ dataTypesAccessed: data.dataTypesAccessed })
-            );
-            const inherentRiskScore = this.calculateInherentRisk(
-                tier,
-                data.dataTypesAccessed,
-                data.hasSubcontractors || false
-            );
-            const nextReviewDate = this.calculateNextReviewDate(tier);
+            const requested = data.tier && data.tier !== VendorTier.UNRATED ? data.tier : VendorTier.UNRATED;
+            const unrated = requested === VendorTier.UNRATED;
+            const tier = unrated
+                ? VendorTier.UNRATED
+                : applyHardFloorToTier(
+                    requested,
+                    resolveMinimumTier({ dataTypesAccessed: data.dataTypesAccessed })
+                );
+            const inherentRiskScore = unrated
+                ? 0
+                : this.calculateInherentRisk(
+                    tier as Exclude<VendorTier, 'UNRATED'>,
+                    data.dataTypesAccessed,
+                    data.hasSubcontractors || false
+                );
+            const nextReviewDate = unrated ? undefined : this.calculateNextReviewDate(tier);
 
             const createData: Prisma.VendorUncheckedCreateInput = {
                 publicId: await allocateVendorPublicId(data.organizationId),
@@ -123,16 +130,18 @@ class VendorManagementService {
                 fourthParties: data.fourthParties,
                 organizationId: data.organizationId,
                 inherentRiskScore,
-                residualRiskScore: inherentRiskScore,
+                residualRiskScore: unrated ? 0 : inherentRiskScore,
                 nextReviewDate,
                 status: VendorStatus.PROPOSED,
-                criticalityLevel: this.mapTierToCriticality(tier),
+                ...(unrated ? {} : { criticalityLevel: this.mapTierToCriticality(tier) }),
             };
 
             const vendor = await prisma.vendor.create({
                 data: createData,
             });
-            await explainableRiskService.recalculate(vendor.organizationId, vendor.id);
+            if (!unrated) {
+                await explainableRiskService.recalculate(vendor.organizationId, vendor.id);
+            }
             const scored = await prisma.vendor.findUnique({ where: { id: vendor.id } });
 
             logger.info(`Vendor created successfully`, { vendorId: vendor.id, vendorName: vendor.name, tier: vendor.tier });
@@ -269,6 +278,9 @@ class VendorManagementService {
         return {
             vendors: vendors.map((vendor) => ({
                 ...vendor,
+                residualRiskScore: presentResidualScore(vendor.residualRiskScore, vendor.tier),
+                inherentRiskScore: presentResidualScore(vendor.inherentRiskScore, vendor.tier),
+                tierRated: !isUnratedTier(vendor.tier),
                 assessmentStatus: deriveAssessmentStatus(vendor.assessments[0]),
             })),
             pagination: {
@@ -573,7 +585,7 @@ class VendorManagementService {
      * Calculate inherent risk score based on multiple factors
      */
     private calculateInherentRisk(
-        tier: VendorTier,
+        tier: Exclude<VendorTier, 'UNRATED'>,
         dataTypes: string[],
         hasSubcontractors: boolean
     ): number {
@@ -634,7 +646,7 @@ class VendorManagementService {
             case VendorTier.LOW:
                 return CriticalityLevel.LOW;
             default:
-                return CriticalityLevel.MEDIUM;
+                return CriticalityLevel.LOW;
         }
     }
 

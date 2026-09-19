@@ -88,21 +88,21 @@ export default function InsuranceHome() {
     const [showLicenseForm, setShowLicenseForm] = useState(false);
     const [step, setStep] = useState(0);
     const [draft, setDraft] = useState<any>({
-        organizationType: 'INSURER',
-        domicileCountryCode: 'NG',
+        organizationType: '',
+        domicileCountryCode: '',
         domicileSubJurisdiction: '',
-        operatingJurisdictions: ['NG', 'US'],
-        linesOfBusiness: ['MOTOR', 'PROPERTY'],
-        activities: ['CLAIMS', 'UNDERWRITING'],
-        dataHandled: ['POLICYHOLDER'],
+        operatingJurisdictions: [] as string[],
+        linesOfBusiness: [] as string[],
+        activities: [] as string[],
+        dataHandled: [] as string[],
         aiUsage: [] as string[],
-        thirdPartyEcosystem: ['TPA'],
+        thirdPartyEcosystem: [] as string[],
         enabledPacks: [] as string[],
         recommendationDecisions: {} as Record<string, string>,
     });
-    const [entityForm, setEntityForm] = useState({ name: '', organizationType: 'INSURER', domicileCountryCode: 'NG', domicileSubJurisdiction: '', linesOfBusiness: ['MOTOR'] as string[], isGroup: false, parentPublicId: '' });
-    const [licenseForm, setLicenseForm] = useState({ entityPublicId: '', authorityKey: 'NAICOM', jurisdictionCode: 'NG', licenseType: 'NG_INSURER', reference: '', status: 'UNKNOWN', effectiveDate: '', expiryDate: '', verificationBasis: 'CUSTOMER_RECORDED', reviewDueAt: '' });
-    const [vendorForm, setVendorForm] = useState({ vendorId: '', serviceCategory: 'TPA', jurisdictionCode: 'NG', entityId: '', linesOfBusiness: ['MOTOR'] as string[], claimsAuthority: false, underwritingAuthority: false, policyholderInteraction: false, premiumHandling: false, licenseRequired: false, aiModelProvider: false, regulatedOutsourcing: false, fourthPartyUse: false, criticality: 'HIGH' });
+    const [entityForm, setEntityForm] = useState({ name: '', organizationType: '', domicileCountryCode: '', domicileSubJurisdiction: '', linesOfBusiness: [] as string[], isGroup: false, parentPublicId: '' });
+    const [licenseForm, setLicenseForm] = useState({ entityPublicId: '', authorityKey: '', jurisdictionCode: '', licenseType: '', reference: '', status: 'UNKNOWN', effectiveDate: '', expiryDate: '', verificationBasis: 'CUSTOMER_RECORDED', reviewDueAt: '' });
+    const [vendorForm, setVendorForm] = useState({ vendorId: '', serviceCategory: '', jurisdictionCode: '', entityId: '', linesOfBusiness: [] as string[], claimsAuthority: false, underwritingAuthority: false, policyholderInteraction: false, premiumHandling: false, licenseRequired: false, aiModelProvider: false, regulatedOutsourcing: false, fourthPartyUse: false, criticality: '' });
     const [existingVendors, setExistingVendors] = useState<any[]>([]);
     const [aiSystems, setAiSystems] = useState<any[]>([]);
     const [aiForm, setAiForm] = useState({ aiSystemId: '', entityId: '', insuranceUseCase: 'CLAIMS', lineOfBusiness: 'MOTOR', jurisdictionCode: 'NG', underwritingInfluence: false, pricingInfluence: false, claimsInfluence: true, fraudInfluence: false, consumerImpact: false, externalData: false, thirdPartyProvider: '', validationStatus: '', biasReviewStatus: '', explainability: '', humanOversight: 'Required', nextReviewAt: '' });
@@ -186,6 +186,10 @@ export default function InsuranceHome() {
     const activate = async (event: FormEvent) => {
         event.preventDefault();
         setError(null);
+        if (!draft.organizationType || !draft.domicileCountryCode) {
+            setError('Select an organization type and domicile. Supreme does not prefill production applicability.');
+            return;
+        }
         try {
             await insuranceAPI.activate({
                 ...draft,
@@ -295,17 +299,19 @@ export default function InsuranceHome() {
                             {showWizard && canConfigure && (
                                 <Surface>
                                     <Typography variant="h6" sx={{ mb: 0.5 }}>Activate Insurance Edition</Typography>
-                                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>Twelve steps. Pack recommendations follow your answers. They are not legal requirements.</Typography>
+                                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>Twelve steps. Nothing is preselected. Pack recommendations follow your answers. They are not legal requirements and empty answers stay empty.</Typography>
                                     <WorkflowStepper steps={WIZARD} active={step} compact />
                                     <Box component="form" onSubmit={activate} sx={{ mt: 2 }}>
                                         {step === 0 && (
                                             <TextField select fullWidth label="Organization type" value={draft.organizationType} onChange={(e) => setDraft({ ...draft, organizationType: e.target.value })}>
+                                                <MenuItem value="">Not selected</MenuItem>
                                                 {typesForDraft.map((row: any) => <MenuItem key={row.key} value={row.key}>{row.label}</MenuItem>)}
                                             </TextField>
                                         )}
                                         {step === 1 && (
                                             <Stack spacing={2}>
                                                 <TextField select fullWidth label="Domicile" value={draft.domicileCountryCode} onChange={(e) => setDraft({ ...draft, domicileCountryCode: e.target.value, domicileSubJurisdiction: '' })}>
+                                                    <MenuItem value="">Not selected</MenuItem>
                                                     {(catalog?.countries || []).map((row: any) => <MenuItem key={row.key} value={row.key}>{row.label}</MenuItem>)}
                                                 </TextField>
                                                 {draft.domicileCountryCode === 'US' && (

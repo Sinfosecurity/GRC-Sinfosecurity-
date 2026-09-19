@@ -63,9 +63,17 @@ export default function ComplianceRequirementDetail() {
                         </Stack>
                         {section === 'Overview' && (
                             <Surface>
+                                <Typography>Requirement: {data.requirementKey}</Typography>
                                 <Typography>Framework: {data.framework} {data.version}</Typography>
+                                <Typography>Authority / source: {data.authority || 'Not recorded'}</Typography>
+                                <Typography>Jurisdiction: {data.jurisdiction || 'Not recorded'}</Typography>
+                                <Typography>Effective: {data.effectiveFrom ? String(data.effectiveFrom).slice(0, 10) : 'Not recorded'}</Typography>
                                 <Typography>Applicability: {data.applicability}</Typography>
                                 <Typography>Owner: {data.owner}</Typography>
+                                {data.nextAction && (
+                                    <Alert severity="info" sx={{ my: 1.5 }}>Next: {data.nextAction.label}. {data.nextAction.detail}</Alert>
+                                )}
+                                {data.sourceUrl && <Typography variant="body2">Source: {data.sourceUrl}</Typography>}
                                 {data.applicabilityKey === 'NOT_APPLICABLE' && (
                                     <Typography color="text.secondary">Not applicable rationale: {data.naRationale} · {data.naActor} · {data.naAt ? new Date(data.naAt).toLocaleString() : ''}. This is not pass.</Typography>
                                 )}
@@ -115,6 +123,9 @@ export default function ComplianceRequirementDetail() {
                                             </Typography>
                                         )}
                                     </Box>
+                                ))}
+                                {data.evidence.map((item: any) => (
+                                    <Button key={`open-${item.id}`} size="small" onClick={() => navigate(`/documents?storedObjectId=${item.storedObjectId}`)}>Open {item.filename}</Button>
                                 ))}
                                 <Button sx={{ mt: 1 }} onClick={() => navigate('/documents')}>Use existing evidence</Button>
                             </Surface>

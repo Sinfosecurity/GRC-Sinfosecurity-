@@ -6,7 +6,7 @@
 import { z } from 'zod';
 
 // Enums
-export const VendorTierSchema = z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']);
+export const VendorTierSchema = z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'UNRATED']);
 export const VendorTypeSchema = z.enum([
     'IT_SERVICE',
     'CLOUD_SERVICE',
@@ -53,7 +53,7 @@ export const CreateVendorSchema = z.object({
     legalName: z.string().max(255).optional(),
     vendorType: VendorTypeSchema,
     category: VendorCategorySchema,
-    tier: VendorTierSchema,
+    tier: VendorTierSchema.optional(),
     website: z.string().url('Invalid URL').max(255).optional().or(z.literal('')),
     primaryContact: z.string().min(1, 'Primary contact is required').max(255),
     contactEmail: z.string().email('Valid contact email is required').max(255),

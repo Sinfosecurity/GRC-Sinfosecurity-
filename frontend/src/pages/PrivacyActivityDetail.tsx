@@ -18,9 +18,19 @@ export default function PrivacyActivityDetail() {
     const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const [purpose, setPurpose] = useState('Claims servicing');
+    const [purpose, setPurpose] = useState('');
     const [basisType, setBasisType] = useState('CONTRACT');
     const [rationale, setRationale] = useState('');
+    const [regime, setRegime] = useState('NOT_DETERMINED');
+    const [regimes, setRegimes] = useState<Array<{ key: string; name: string }>>([
+        { key: 'NOT_DETERMINED', name: 'Not determined' },
+        { key: 'GDPR', name: 'GDPR' },
+        { key: 'NDPA', name: 'Nigeria NDPA' },
+        { key: 'UK_GDPR', name: 'UK GDPR' },
+        { key: 'CCPA_CPRA', name: 'CCPA / CPRA' },
+        { key: 'US_STATE', name: 'US state privacy' },
+        { key: 'NY_PRIVACY', name: 'New York privacy/security' },
+    ]);
     const [dataKind, setDataKind] = useState('IDENTITY');
     const [subjectKind, setSubjectKind] = useState('CUSTOMERS');
     const [systemName, setSystemName] = useState('');
@@ -46,6 +56,12 @@ export default function PrivacyActivityDetail() {
                 setVendors(rows.map((row: { id: string; name: string }) => ({ id: row.id, name: row.name })));
             })
             .catch(() => setVendors([]));
+        privacyAPI.catalog()
+            .then((res) => {
+                const rows = res.data?.data?.regimes || [];
+                if (rows.length) setRegimes(rows.map((row: { key: string; name: string }) => ({ key: row.key, name: row.name })));
+            })
+            .catch(() => undefined);
     }, []);
 
     const run = (event: FormEvent, action: () => Promise<unknown>) => {
@@ -81,6 +97,7 @@ export default function PrivacyActivityDetail() {
                                 <Typography>Source: {data.sourceOfData || 'Not recorded'}</Typography>
                                 <Typography>Storage: {(data.storageLocations || []).join(', ') || 'Not recorded'}</Typography>
                                 <Typography>Jurisdictions: {(data.jurisdictions || []).join(', ') || 'Not recorded'}</Typography>
+                                <Typography>Privacy regime: {(data.purposes || []).flatMap((row: any) => row.bases || []).map((basis: any) => basis.regime).filter(Boolean)[0] || 'Not determined'}</Typography>
                                 <Typography>Risk level: {data.riskLevel}</Typography>
                                 <Typography sx={{ mt: 2 }} fontWeight={700}>Structured flow</Typography>
                                 <Typography>{[data.flow.source, ...(data.flow.systems || []), data.flow.businessProcess, ...(data.flow.vendors || []), ...(data.flow.recipients || []), ...(data.flow.storage || []), ...(data.flow.jurisdictions || [])].filter(Boolean).join(' → ')}</Typography>
@@ -100,15 +117,18 @@ export default function PrivacyActivityDetail() {
                                     </Stack>
                                 ))}
                                 <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addPurpose(publicId!, { name: purpose }))} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 2 }}>
-                                    <TextField label="Purpose" value={purpose} onChange={(event) => setPurpose(event.target.value)} />
-                                    <Button type="submit">Add purpose</Button>
+                                    <TextField label="Purpose" value={purpose} onChange={(event) => setPurpose(event.target.value)} placeholder="Describe the processing purpose" required />
+                                    <Button type="submit" disabled={!purpose.trim()}>Add purpose</Button>
                                 </Stack>
-                                <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addBasis(publicId!, { purposeName: purpose, basisType, rationale, regime: 'GDPR' }))} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 1.5 }}>
+                                <Stack component="form" onSubmit={(event) => run(event, () => privacyAPI.addBasis(publicId!, { purposeName: purpose, basisType, rationale, regime }))} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 1.5 }}>
+                                    <TextField select label="Privacy regime" value={regime} onChange={(event) => setRegime(event.target.value)} sx={{ minWidth: 220 }} helperText="Supreme does not assign GDPR automatically.">
+                                        {regimes.map((item) => <MenuItem key={item.key} value={item.key}>{item.name}</MenuItem>)}
+                                    </TextField>
                                     <TextField select label="Recorded basis" value={basisType} onChange={(event) => setBasisType(event.target.value)} sx={{ minWidth: 200 }}>
                                         {['CONTRACT', 'CONSENT', 'LEGAL_OBLIGATION', 'LEGITIMATE_INTERESTS', 'BUSINESS_PURPOSE', 'OTHER'].map((item) => <MenuItem key={item} value={item}>{item.replace(/_/g, ' ')}</MenuItem>)}
                                     </TextField>
                                     <TextField label="Rationale" value={rationale} onChange={(event) => setRationale(event.target.value)} required />
-                                    <Button type="submit">Record basis</Button>
+                                    <Button type="submit" disabled={!purpose.trim() || !rationale.trim()}>Record basis</Button>
                                 </Stack>
                             </Surface>
                         )}

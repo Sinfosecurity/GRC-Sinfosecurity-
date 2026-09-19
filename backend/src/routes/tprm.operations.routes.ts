@@ -8,6 +8,7 @@ import vendorAssessmentService from '../services/vendorAssessmentService';
 import vendorIssueService from '../services/vendorIssueService';
 import { listTemplates } from '../services/questionnaireService';
 import { evidenceLinkageService } from '../services/evidenceLinkageService';
+import { objectStorageService } from '../services/objectStorageService';
 import { scoringMethodologyService } from '../services/scoringMethodologyService';
 import { RISK_SCORE_VERSION } from '../services/deterministicRiskEngine';
 import { reportGenerationService } from '../reports/reportGenerationService';
@@ -163,6 +164,15 @@ router.post('/vendors/:vendorId/assessments', requirePermission(PERMISSIONS['ass
     }
 });
 
+router.get('/assessments/:assessmentId/workspace', requirePermission(PERMISSIONS['assessment.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { getAssessmentWorkspace } = await import('../assessments/assessmentWorkspaceService');
+        res.json({ success: true, data: await getAssessmentWorkspace(req.user!.organizationId, req.params.assessmentId) });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.get('/vendors/:vendorId/assessments/:assessmentId', requirePermission(PERMISSIONS['assessment.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const data = await vendorAssessmentService.getAssessmentById(req.params.assessmentId, req.user!.organizationId);
@@ -237,7 +247,18 @@ router.post(
                 throw new ApiError(400, 'File is required');
             }
             if (!req.body.vendorId) {
-                throw new ApiError(400, 'vendorId is required');
+                const stored = await objectStorageService.upload({
+                    organizationId: req.user!.organizationId,
+                    uploadedBy: req.user!.id,
+                    ownerType: String(req.body.ownerType || 'organization'),
+                    ownerId: String(req.body.ownerId || req.user!.organizationId),
+                    filename: req.file.originalname,
+                    contentType: req.file.mimetype,
+                    buffer: req.file.buffer,
+                    classification: req.body.classification,
+                });
+                res.status(201).json({ success: true, data: stored });
+                return;
             }
             const data = await evidenceLinkageService.uploadLinked({
                 organizationId: req.user!.organizationId,

@@ -60,6 +60,7 @@ const TIER_LABEL: Record<VendorTier, string> = {
     HIGH: 'High',
     MEDIUM: 'Medium',
     LOW: 'Low',
+    UNRATED: 'Not rated',
 };
 
 const HISTORY_ACTIONS: Record<string, string> = {
@@ -326,7 +327,7 @@ export async function createOnboardingRequest(organizationId: string, actor: Act
             legalName: input.legalName || name,
             vendorType: input.vendorType || typeFromService(input.category),
             category: categoryFromService(input.category),
-            tier: VendorTier.MEDIUM,
+            tier: VendorTier.UNRATED,
             status: VendorStatus.PROPOSED,
             primaryContact: input.primaryContact || owner.name || actor.name || 'Not recorded',
             contactEmail: input.contactEmail || 'not-recorded@example.invalid',

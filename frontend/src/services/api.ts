@@ -327,6 +327,8 @@ export const policiesAPI = {
 
 export const documentsAPI = {
     getAll: () => api.get('/documents'),
+    get: (id: string) => api.get(`/documents/${id}`),
+    upload: (form: FormData) => api.post('/documents', form, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 export const usersAPI = {
@@ -424,6 +426,7 @@ export const tprmAPI = {
     createAssessment: (vendorId: string, data: unknown) => api.post(`/tprm/vendors/${vendorId}/assessments`, data),
     getAssessment: (vendorId: string, assessmentId: string) =>
         api.get(`/tprm/vendors/${vendorId}/assessments/${assessmentId}`),
+    assessmentWorkspace: (assessmentId: string) => api.get(`/tprm/assessments/${assessmentId}/workspace`),
     submitAssessmentResponse: (vendorId: string, assessmentId: string, data: unknown) =>
         api.post(`/tprm/vendors/${vendorId}/assessments/${assessmentId}/responses`, data),
     completeAssessment: (vendorId: string, assessmentId: string) =>

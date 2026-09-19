@@ -18,6 +18,7 @@ export default function AiSystemDetail() {
     const [useCaseName, setUseCaseName] = useState('');
     const [providerName, setProviderName] = useState('');
     const [vendorId, setVendorId] = useState('');
+    const [nonVendorProvider, setNonVendorProvider] = useState(false);
     const [newVersion, setNewVersion] = useState('');
     const [changeReason, setChangeReason] = useState('');
 
@@ -45,6 +46,10 @@ export default function AiSystemDetail() {
 
     const addProvider = (event: FormEvent) => {
         event.preventDefault();
+        if (!vendorId && !nonVendorProvider) {
+            setError('Link an existing third-party vendor, or confirm this provider is not a vendor.');
+            return;
+        }
         aiGovernanceAPI.createProvider({ providerName, vendorId: vendorId || undefined, modelVersion: newVersion || undefined })
             .then((res) => aiGovernanceAPI.attachProvider(publicId, res.data.data.publicId, { modelVersion: newVersion || undefined, changeReason: changeReason || 'Provider recorded' }))
             .then(load)
@@ -115,9 +120,12 @@ export default function AiSystemDetail() {
                             <Stack component="form" onSubmit={addProvider} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ my: 1.5 }} flexWrap="wrap" useFlexGap>
                                 <TextField label="Provider name" value={providerName} onChange={(event) => setProviderName(event.target.value)} required />
                                 <TextField select label="Existing vendor" value={vendorId} onChange={(event) => setVendorId(event.target.value)} SelectProps={{ native: true }} sx={{ minWidth: 220 }}>
-                                    <option value="">No vendor linked</option>
+                                    <option value="">Select vendor</option>
                                     {vendors.map((vendor: any) => <option key={vendor.id} value={vendor.id}>{vendor.name}</option>)}
                                 </TextField>
+                                <Button type="button" onClick={() => setNonVendorProvider((value) => !value)}>
+                                    {nonVendorProvider ? 'Non-vendor provider confirmed' : 'This is not an existing vendor'}
+                                </Button>
                                 <Button type="submit">Record provider</Button>
                             </Stack>
                             <Stack component="form" onSubmit={changeVersion} direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>

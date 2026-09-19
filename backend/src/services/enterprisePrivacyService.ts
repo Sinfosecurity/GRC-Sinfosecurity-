@@ -1043,7 +1043,7 @@ export const enterprisePrivacyService = {
     async createRights(organizationId: string, actorUserId: string | null, input: Record<string, unknown>) {
         const activity = input.activityPublicId ? await activityOrThrow(organizationId, String(input.activityPublicId)) : null;
         const receivedAt = parseDate(input.receivedAt) || new Date();
-        const regime = String(input.regime || 'GDPR');
+        const regime = String(input.regime || 'NOT_DETERMINED');
         const requestType = parseEnum(input.requestType, Object.values(PrivacyRightsType), 'request type');
         const deadline = configuredDeadline(regime, requestType, receivedAt);
         const extensionDays = input.extensionDays != null ? Number(input.extensionDays) : null;

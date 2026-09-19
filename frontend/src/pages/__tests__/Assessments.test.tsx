@@ -8,6 +8,7 @@ vi.mock('../../services/api', () => ({
     tprmAPI: {
         questionnaires: vi.fn().mockResolvedValue({ data: { data: [] } }),
         listAssessments: vi.fn().mockResolvedValue({ data: { data: [] } }),
+        assessmentWorkspace: vi.fn().mockResolvedValue({ data: { data: null } }),
     },
 }));
 

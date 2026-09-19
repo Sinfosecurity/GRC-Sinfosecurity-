@@ -31,13 +31,14 @@ import { aiGovernanceAPI, tprmAPI, vendorAPI } from '../services/api';
 import EntityRelationships from '../components/EntityRelationships';
 import { color } from '../design/tokens';
 import { humanizeLabel } from '../utils/humanizeLabel';
+import { displayRiskTier, isUnratedTier, residualDisplay } from '../utils/recordHonesty';
 
 interface Vendor {
     id: string | number;
     publicId?: string;
     name: string;
     category: string;
-    tier: 'Critical' | 'High' | 'Medium' | 'Low';
+    tier: string;
     status: string;
     riskScore: number | null;
     residualRiskScore?: number | null;
@@ -68,13 +69,6 @@ const categories = [
     { value: 'CYBERSECURITY', label: 'Cybersecurity' },
     { value: 'OTHER', label: 'Other' },
 ];
-const tiers = [
-    { value: 'CRITICAL', label: 'Critical' },
-    { value: 'HIGH', label: 'High' },
-    { value: 'MEDIUM', label: 'Medium' },
-    { value: 'LOW', label: 'Low' },
-];
-
 function displayAssessmentStatus(status?: string) {
     switch (status) {
         case 'COMPLETED':
@@ -94,8 +88,7 @@ function displayAssessmentStatus(status?: string) {
 }
 
 function displayTier(tier?: string) {
-    if (!tier) return 'Medium';
-    return tier.charAt(0) + tier.slice(1).toLowerCase();
+    return displayRiskTier(tier);
 }
 
 export default function VendorManagement() {
@@ -130,7 +123,6 @@ export default function VendorManagement() {
         name: '',
         vendorType: 'SAAS',
         category: '',
-        tier: 'MEDIUM',
         contactEmail: '',
         primaryContact: '',
         servicesProvided: '',
@@ -155,12 +147,12 @@ export default function VendorManagement() {
                     publicId: v.publicId,
                     name: v.name,
                     category: v.category,
-                    tier: displayTier(v.tier) as Vendor['tier'],
+                    tier: displayTier(v.tier),
                     status: v.status,
-                    riskScore: v.residualRiskScore ?? null,
-                    residualRiskScore: v.residualRiskScore ?? null,
-                    inherentRiskScore: v.inherentRiskScore ?? null,
-                    complianceScore: v.residualRiskScore != null ? 100 - v.residualRiskScore : null,
+                    riskScore: isUnratedTier(v.tier) ? null : v.residualRiskScore ?? null,
+                    residualRiskScore: isUnratedTier(v.tier) ? null : v.residualRiskScore ?? null,
+                    inherentRiskScore: isUnratedTier(v.tier) ? null : v.inherentRiskScore ?? null,
+                    complianceScore: null,
                     lastAssessment: v.lastAssessmentDate ? new Date(v.lastAssessmentDate).toISOString().split('T')[0] : 'N/A',
                     nextReview: v.nextReviewDate ? new Date(v.nextReviewDate).toISOString().split('T')[0] : 'N/A',
                     contactEmail: v.contactEmail || v.primaryContact || 'N/A',
@@ -215,7 +207,6 @@ export default function VendorManagement() {
                 name: newVendor.name.trim(),
                 vendorType: newVendor.vendorType,
                 category: newVendor.category,
-                tier: newVendor.tier,
                 primaryContact: newVendor.primaryContact.trim(),
                 contactEmail: newVendor.contactEmail.trim(),
                 servicesProvided: newVendor.servicesProvided.trim(),
@@ -225,13 +216,12 @@ export default function VendorManagement() {
                 geographicFootprint: [],
                 regulatoryScope: [],
             });
-            setSnackbar({ open: true, message: 'Vendor added. The list has been refreshed.', severity: 'success' });
+            setSnackbar({ open: true, message: 'Vendor added. Tier stays Not rated until inherent-risk assessment is confirmed.', severity: 'success' });
             setOpenDialog(false);
             setNewVendor({
                 name: '',
                 vendorType: 'SAAS',
                 category: '',
-                tier: 'MEDIUM',
                 contactEmail: '',
                 primaryContact: '',
                 servicesProvided: '',
@@ -352,8 +342,12 @@ export default function VendorManagement() {
                                 <Typography variant="caption">{row.publicId || humanizeLabel(row.status)}</Typography>
                             </Box>
                         ) },
-                        { id: 'tier', label: 'Tier', sortValue: (row) => row.tier, render: (row) => <StatusBadge value={row.tier} kind="severity" /> },
-                        { id: 'risk', label: 'Residual', sortValue: (row) => row.residualRiskScore ?? -1, render: (row) => row.residualRiskScore != null ? `${row.residualRiskScore}` : 'Not scored' },
+                        { id: 'tier', label: 'Tier', sortValue: (row) => row.tier, render: (row) => (
+                            isUnratedTier(row.tier) || row.tier === 'Not rated'
+                                ? <StatusBadge kind="plain" tone="neutral" label="Not rated" />
+                                : <StatusBadge value={row.tier} kind="severity" />
+                        ) },
+                        { id: 'risk', label: 'Residual', sortValue: (row) => row.residualRiskScore ?? -1, render: (row) => residualDisplay(row.residualRiskScore, row.tier === 'Not rated' ? 'UNRATED' : row.tier) },
                         { id: 'status', label: 'State', hideOnMobile: true, sortValue: (row) => row.status, render: (row) => <StatusBadge kind="plain" label={humanizeLabel(row.status)} /> },
                         { id: 'assessment', label: 'Attention', sortValue: (row) => row.assessmentStatus, render: (row) => (
                             <StatusBadge kind="plain" tone={row.assessmentStatus === 'Overdue' ? 'critical' : row.assessmentStatus === 'Completed' ? 'success' : 'high'} label={row.assessmentStatus === 'Overdue' ? 'Overdue' : row.assessmentStatus === 'In Progress' ? 'Waiting on us' : row.assessmentStatus} />
@@ -396,12 +390,9 @@ export default function VendorManagement() {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <FormControl fullWidth required>
-                                <InputLabel>Risk tier</InputLabel>
-                                <Select value={newVendor.tier} onChange={(e) => setNewVendor({ ...newVendor, tier: e.target.value })} label="Risk tier">
-                                    {tiers.map((tier) => <MenuItem key={tier.value} value={tier.value}>{tier.label}</MenuItem>)}
-                                </Select>
-                            </FormControl>
+                            <Alert severity="info">
+                                Risk tier is Not rated. Inherent-risk assessment recommends a tier; an analyst confirms it. Adding a record does not set an authoritative tier.
+                            </Alert>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField fullWidth label="Primary contact" value={newVendor.primaryContact} onChange={(e) => setNewVendor({ ...newVendor, primaryContact: e.target.value })} required />
@@ -441,7 +432,9 @@ export default function VendorManagement() {
                         <Typography variant="overline">Vendor</Typography>
                         <Typography variant="h3" sx={{ mb: 1 }}>{selectedVendor.name}</Typography>
                         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
-                            <StatusBadge value={selectedVendor.tier} kind="severity" />
+                            {isUnratedTier(selectedVendor.tier) || selectedVendor.tier === 'Not rated'
+                                ? <StatusBadge kind="plain" tone="neutral" label="Not rated" />
+                                : <StatusBadge value={selectedVendor.tier} kind="severity" />}
                             <StatusBadge kind="plain" label={humanizeLabel(selectedVendor.status)} />
                             <StatusBadge kind="plain" tone={selectedVendor.assessmentStatus === 'Overdue' ? 'critical' : 'info'} label={selectedVendor.assessmentStatus} />
                         </Stack>

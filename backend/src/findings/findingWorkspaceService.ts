@@ -281,8 +281,8 @@ export async function getFindingWorkspace(organizationId: string, issueId: strin
             empty: usableEvidence.length === 0 ? 'No supporting evidence is currently attached.' : null,
         },
         risk: {
-            vendorTier: issue.vendor.tier,
-            residualScoreRecorded: issue.vendor.residualRiskScore,
+            vendorTier: issue.vendor.tier === 'UNRATED' ? 'Not rated' : issue.vendor.tier,
+            residualScoreRecorded: issue.vendor.tier === 'UNRATED' ? null : issue.vendor.residualRiskScore,
             residualHonesty: 'A recorded residual score is vendor metadata. Finding severity is not vendor tier.',
             insuranceContext: insurance ? {
                 serviceCategory: insurance.serviceCategory,

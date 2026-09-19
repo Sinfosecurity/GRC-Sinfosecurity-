@@ -13,7 +13,7 @@ type Workspace = {
     reason: string;
     control: { key?: string | null; href?: string | null; expected: string; riskDomain?: string | null };
     evidence: { requested: boolean; received: number; missing: boolean; items: Array<{ id: string; filename: string; status: string }>; empty: string | null };
-    risk: { vendorTier: string; residualScoreRecorded: number; residualHonesty: string; insuranceContext?: { serviceCategory: string; criticality?: string | null; jurisdictionCode?: string | null } | null };
+    risk: { vendorTier: string; residualScoreRecorded: number | null; residualHonesty: string; insuranceContext?: { serviceCategory: string; criticality?: string | null; jurisdictionCode?: string | null } | null };
     remediation: { plan?: string | null; targetDate?: string | null; ownerName?: string | null; responsibilityLabel: string; status: string };
     verification: { notes?: string | null; verifiedBy?: string | null; verifiedAt?: string | null; canMarkComplete: boolean };
     nextAction: { key: string; label: string; detail: string; primary: 'plan' | 'await' | 'verify' | 'close' | 'none' };
@@ -163,7 +163,7 @@ export default function FindingWorkspaceDrawer({
 
                         <Section title="Risk / business context">
                             <Meta label="Vendor tier" value={humanizeLabel(workspace.risk.vendorTier)} />
-                            <Meta label="Recorded residual score" value={String(workspace.risk.residualScoreRecorded)} />
+                            <Meta label="Recorded residual score" value={workspace.risk.residualScoreRecorded == null ? 'Not scored' : String(workspace.risk.residualScoreRecorded)} />
                             <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>{workspace.risk.residualHonesty}</Typography>
                             {workspace.risk.insuranceContext && (
                                 <Meta

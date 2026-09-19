@@ -52,6 +52,8 @@ export default function DocumentManagement() {
     const [vendors, setVendors] = useState<Array<{ id: string; name: string }>>([]);
     const [controls, setControls] = useState<Array<{ id: string; controlKey: string; title: string }>>([]);
     const [vendorId, setVendorId] = useState(searchParams.get('vendorId') || '');
+    const [ownerType, setOwnerType] = useState(searchParams.get('vendorId') ? 'vendor' : 'organization');
+    const [detail, setDetail] = useState<any>(null);
     const [uploading, setUploading] = useState(false);
     const [scanFilter, setScanFilter] = useState('');
     const [freshnessFilter, setFreshnessFilter] = useState('');
@@ -108,10 +110,13 @@ export default function DocumentManagement() {
     const showImpact = async (id: string) => {
         setSelectedId(id);
         try {
-            const response = await sccAPI.impact(id);
-            setImpact(response.data.data);
+            const impactRes = await sccAPI.impact(id).catch(() => ({ data: { data: null } }));
+            setImpact(impactRes.data.data);
+            const row = items.find((item) => item.id === id) || reusable.find((item) => item.id === id);
+            setDetail(row || { id });
         } catch {
             setImpact(null);
+            setDetail({ id });
         }
     };
 
@@ -130,24 +135,33 @@ export default function DocumentManagement() {
                 Reuse a Ready file. Linking one control does not prove every mapped requirement.
             </Typography>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
-                <TextField select label="Link upload to vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: { md: 280 }, width: { xs: '100%', md: 'auto' } }}>
-                    <MenuItem value="">Select vendor</MenuItem>
-                    {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
-                        <MenuItem value={vendorId}>Selected vendor</MenuItem>
-                    )}
-                    {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                <TextField select label="Evidence belongs to" value={ownerType} onChange={(e) => setOwnerType(e.target.value)} sx={{ minWidth: { md: 240 }, width: { xs: '100%', md: 'auto' } }}>
+                    <MenuItem value="organization">Organization / program</MenuItem>
+                    <MenuItem value="vendor">Vendor</MenuItem>
+                    <MenuItem value="control">Control (link after upload)</MenuItem>
                 </TextField>
-                <Button component="label" variant="contained" disabled={!vendorId || uploading}>
+                {ownerType === 'vendor' && (
+                    <TextField select label="Vendor" value={vendorId} onChange={(e) => setVendorId(e.target.value)} sx={{ minWidth: { md: 280 }, width: { xs: '100%', md: 'auto' } }}>
+                        <MenuItem value="">Select vendor</MenuItem>
+                        {vendorId && !vendors.some((vendor) => vendor.id === vendorId) && (
+                            <MenuItem value={vendorId}>Selected vendor</MenuItem>
+                        )}
+                        {vendors.map((vendor) => <MenuItem key={vendor.id} value={vendor.id}>{vendor.name}</MenuItem>)}
+                    </TextField>
+                )}
+                <Button component="label" variant="contained" disabled={uploading || (ownerType === 'vendor' && !vendorId)}>
                     {uploading ? 'Uploading…' : 'Upload evidence'}
                     <input hidden type="file" onChange={async (event) => {
                         const file = event.target.files?.[0];
-                        if (!file || !vendorId) return;
+                        if (!file) return;
+                        if (ownerType === 'vendor' && !vendorId) return;
                         setUploading(true);
                         setError(null);
                         try {
                             const form = new FormData();
                             form.append('file', file);
-                            form.append('vendorId', vendorId);
+                            form.append('ownerType', ownerType === 'control' ? 'organization' : ownerType);
+                            if (ownerType === 'vendor') form.append('vendorId', vendorId);
                             await tprmAPI.uploadEvidence(form);
                             load();
                         } catch (err: any) {
@@ -158,11 +172,9 @@ export default function DocumentManagement() {
                     }} />
                 </Button>
             </Stack>
-            {!vendorId && (
-                <Alert severity="info" sx={{ mb: 2, display: { xs: 'none', sm: 'flex' } }}>
-                    Select a vendor so a new file is stored and linked atomically. Prefer “Use existing evidence” when the file is already here.
-                </Alert>
-            )}
+            <Alert severity="info" sx={{ mb: 2 }}>
+                Evidence may belong to a vendor, control, requirement, or the organization. Uploaded is not valid evidence until scan and review say it is usable.
+            </Alert>
 
             <Surface>
                 <Typography variant="h5" sx={{ mb: 1 }}>Use existing evidence</Typography>
@@ -252,6 +264,19 @@ export default function DocumentManagement() {
             )}
             {selectedId && (
                 <Box sx={{ mt: 2 }}>
+                    <Surface>
+                        <Typography variant="h5" sx={{ mb: 1 }}>Evidence detail</Typography>
+                        <Typography variant="body2">File: {detail?.filename || selectedId}</Typography>
+                        <Typography variant="body2">Owner: {detail?.ownerType || 'organization'} · {detail?.ownerId || 'This organization'}</Typography>
+                        <Typography variant="body2">Scan: {humanizeLabel(detail?.scanStatus)} — uploaded is not valid evidence</Typography>
+                        <Typography variant="body2">Freshness: {humanizeLabel(reusable.find((item) => item.id === selectedId)?.freshness) || 'Not reviewed'}</Typography>
+                        <Typography variant="body2">Usable: {reusable.find((item) => item.id === selectedId)?.usable ? 'Ready' : 'Not usable'}</Typography>
+                        {impact && (
+                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                Reuse: {impact.potentialImpact?.controls?.length ?? 0} controls, {impact.potentialImpact?.requirements?.length ?? 0} requirements, {impact.potentialImpact?.vendors?.length ?? 0} vendors. Residual scores are unchanged.
+                            </Typography>
+                        )}
+                    </Surface>
                     <EntityRelationships sourceModel="StoredObject" sourceId={selectedId} compact />
                 </Box>
             )}

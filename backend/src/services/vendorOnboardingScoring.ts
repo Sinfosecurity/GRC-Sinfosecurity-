@@ -479,6 +479,7 @@ export function recommendTierFromIntake(answers: IntakeAnswer[]): InherentTierRe
 }
 
 export const TIER_RANK: Record<VendorTier, number> = {
+    UNRATED: 0,
     LOW: 1,
     MEDIUM: 2,
     HIGH: 3,

@@ -905,6 +905,7 @@ export const enterpriseComplianceService = {
                 })
                 : Promise.resolve([]),
         ]);
+        const { requirementNextAction } = await import('../governance/recordHonesty');
         const cleanExisting = evidence.filter((link) => link.storedObject.scanStatus === 'CLEAN' && USABLE_EVIDENCE.includes(link.relationship as typeof USABLE_EVIDENCE[number]));
         const storedIds = [...new Set(evidence.map((link) => link.storedObjectId))];
         const reuseLinks = storedIds.length
@@ -923,7 +924,10 @@ export const enterpriseComplianceService = {
             frameworkRequirementId: state.requirementId,
             requirementKey: state.requirement.requirementKey,
             summary: state.requirement.supremeSummary,
-            sourceUrl: state.requirement.sourceUrl,
+            sourceUrl: state.requirement.sourceUrl || state.requirement.frameworkVersion.sourceUrl || state.requirement.frameworkVersion.framework.sourceUrl,
+            authority: state.requirement.frameworkVersion.framework.publisher,
+            jurisdiction: 'Not recorded on this framework definition',
+            effectiveFrom: state.requirement.frameworkVersion.effectiveFrom,
             framework: state.requirement.frameworkVersion.framework.name,
             version: state.requirement.frameworkVersion.version,
             activationId: state.activation.publicId,
@@ -983,7 +987,13 @@ export const enterpriseComplianceService = {
                 appetite: humanComplianceLabel(row.appetiteStatus),
                 note: 'Potential risk impact. Residual score is unchanged until Supreme Risk recalculates it.',
             })),
-            findings: findings.map((row) => ({ title: row.title, severity: humanComplianceLabel(row.severity), status: humanComplianceLabel(row.status) })),
+            findings: findings.map((row) => ({ id: row.id, title: row.title, severity: humanComplianceLabel(row.severity), status: humanComplianceLabel(row.status), href: `/findings?issueId=${row.id}` })),
+            nextAction: requirementNextAction({
+                applicabilityKey: state.applicability,
+                mappedControls: controls.length,
+                usableEvidence: cleanExisting.length,
+                latestTest: controls[0]?.tests[0] ? String(controls[0].tests[0].result) : 'Not tested',
+            }),
             history: historyRows.map((row) => ({ title: row.eventType, change: row.change, summary: row.summary, createdAt: row.createdAt })),
         };
     },
