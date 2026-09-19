@@ -121,7 +121,7 @@ describe('Version 3 requester IRA path', () => {
         expect(workspace.body.data.tierAuthoritative).toBe(false);
         expect(workspace.body.data.ira.unknownMessage).toMatch(/Not yet rated/);
         const stored = await prisma.vendor.findUnique({ where: { id: vendorId } });
-        expect(stored?.tier).toBe('MEDIUM');
+        expect(stored?.tier).toBe('UNRATED');
         expect(workspace.body.data.tierKey).toBeNull();
         const blocked = await request(app)
             .post(`${API}/vendors/onboarding/${publicId}/tier/confirm`)
@@ -205,7 +205,7 @@ describe('Version 3 requester IRA path', () => {
         expect(before.body.data.tierAuthoritative).toBe(false);
         expect(before.body.data.tierReview.confirmedTier).toBeNull();
         const beforeVendor = await prisma.vendor.findUnique({ where: { id: created.body.data.id } });
-        expect(beforeVendor?.tier).toBe('MEDIUM');
+        expect(beforeVendor?.tier).toBe('UNRATED');
         const notices = await prisma.inAppNotification.findMany({
             where: { organizationId: beforeVendor?.organizationId, resourceId: created.body.data.id },
         });

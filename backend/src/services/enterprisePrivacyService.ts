@@ -733,7 +733,7 @@ export const enterprisePrivacyService = {
                 purposeId: purpose.id,
                 basisType: parseEnum(input.basisType, Object.values(PrivacyBasisType), 'basis'),
                 rationale,
-                regime: String(input.regime || 'UNSPECIFIED'),
+                regime: String(input.regime || 'NOT_DETERMINED'),
                 ownerUserId: input.ownerUserId ? String(input.ownerUserId) : actorUserId,
                 storedObjectId: input.storedObjectId ? String(input.storedObjectId) : null,
                 effectiveFrom: parseDate(input.effectiveFrom) || new Date(),
