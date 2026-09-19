@@ -783,12 +783,12 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **DEFINITION OF DONE:** Product Leadership independently inspects repository, hosted application, before/after screenshots, seamless approval workflow, CI, and security regression. Cursor may report ENGINEERING COMPLETE or HOSTED UX CERTIFICATION COMPLETE. Cursor does not declare SUPREME UI 2.0 PRODUCT LEADERSHIP ACCEPTED.
 
-**CURRENT STATUS:** ENGINEERING PARTIAL — PRODUCT LEADERSHIP ACCEPTANCE PENDING / PRODUCT LEADERSHIP REVIEW OPEN
+**CURRENT STATUS:** ENGINEERING PARTIAL — PRODUCT LEADERSHIP ACCEPTANCE PENDING / PRODUCT LEADERSHIP REVIEW OPEN. Finding Workspace Context Closure is ready for Product Leadership review. UI 2.0 as a whole is not accepted.
 
-**CERTIFICATION SHA:** Implementation / hosted `ac7e1beff1ae6d1d6c9caf489e02274f5fa9815b`. Documentation `428a2ae862f74520d24432bddf30508fc667b305`. CI `35174706857` PASS.
+**CERTIFICATION SHA:** Finding workspace implementation / hosted `9852e87f6016d68b907572fccf0d141f3be3a469`. Prior UI 2.0 implementation / hosted `ac7e1beff1ae6d1d6c9caf489e02274f5fa9815b`. Finding workspace CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35407087568 SUCCESS.
 
-**EVIDENCE:** `docs/SUPREME-UI-2-DESIGN-SYSTEM.md`, `docs/private-beta/SUPREME-UI-2-CERTIFICATION.md`, `docs/private-beta/hosted-ux-qa/supreme-ui-2/before/`
+**EVIDENCE:** `docs/SUPREME-UI-2-DESIGN-SYSTEM.md`, `docs/private-beta/SUPREME-UI-2-CERTIFICATION.md`, `docs/private-beta/hosted-ux-qa/supreme-ui-2/before/`, Finding workspace `docs/private-beta/hosted-ux-qa/finding-workspace/`.
 
-**PRODUCT LEADERSHIP ACCEPTANCE FINDING:** TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow.
+**PRODUCT LEADERSHIP ACCEPTANCE FINDING:** TPRM assessment/questionnaire flow did not clearly implement the approved risk-driven pack model; generic template selection was exposed in the standard assessment flow. Separately, Product Leadership found the Findings drawer lacked standalone source context; that correction is recorded as Finding Workspace Context Closure and is not punch-list item #41.
 
-**NEXT ACTION:** Finish local Version 3 IRA verification, then host the golden journey on staging when Product Leadership authorizes staging. Product Leadership re-reviews the risk-driven Questionnaire Plan after hosted evidence. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW. Do not merge `main`. Do not deploy production. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, or #21 PASS. Authoritative flow: `docs/tprm/TPRM_Onboarding_Flow_Instructions.pdf`. ADRs: `docs/ADR-TPRM-INHERENT-RISK-SCORING.md`, `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md`.
+**NEXT ACTION:** Product Leadership review of Finding Workspace Context Closure. Do not write READY FOR UI 2.0 ACCEPTANCE REVIEW. Do not create #41. Do not merge `main`. Do not deploy production. #23 remains ACTIVE. Cursor does not declare UI 2.0 accepted, H-5 CLOSED, H-6 CLOSED, #21 PASS, or #23 PASS. Authoritative flow: `docs/tprm/TPRM_Onboarding_Flow_Instructions.pdf`. ADRs: `docs/ADR-TPRM-INHERENT-RISK-SCORING.md`, `docs/ADR-TPRM-REQUESTER-TASK-LINKS.md`.

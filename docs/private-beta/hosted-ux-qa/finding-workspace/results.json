@@ -1,0 +1,136 @@
+{
+  "checks": [
+    {
+      "name": "api-health",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "api-sha",
+      "result": "PASS",
+      "detail": "9852e87f6016d68b907572fccf0d141f3be3a469"
+    },
+    {
+      "name": "frontend-sha",
+      "result": "PASS",
+      "detail": "9852e87f6016d68b907572fccf0d141f3be3a469"
+    },
+    {
+      "name": "org",
+      "result": "PASS",
+      "detail": "ac677391"
+    },
+    {
+      "name": "vendor",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "privacy-finding",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "privacy-workspace",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "no-fake-percent",
+      "result": "PASS",
+      "detail": "honesty"
+    },
+    {
+      "name": "manual-finding",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "plan-persist",
+      "result": "PASS",
+      "detail": "200"
+    },
+    {
+      "name": "insurance-finding",
+      "result": "PASS",
+      "detail": "201"
+    },
+    {
+      "name": "list-distinguishable",
+      "result": "PASS",
+      "detail": "titles"
+    },
+    {
+      "name": "drawer-source",
+      "result": "PASS",
+      "detail": "source visible"
+    },
+    {
+      "name": "drawer-observed",
+      "result": "PASS",
+      "detail": "observed visible"
+    },
+    {
+      "name": "drawer-next",
+      "result": "PASS",
+      "detail": "next action"
+    },
+    {
+      "name": "overflow:register-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:register-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:register-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:register-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    }
+  ],
+  "shots": [
+    "register-1440",
+    "manual-drawer-1440",
+    "privacy-drawer-1440",
+    "register-375",
+    "register-768",
+    "register-1440",
+    "register-1920"
+  ],
+  "overflows": [
+    {
+      "name": "register-375",
+      "extra": 0
+    },
+    {
+      "name": "register-768",
+      "extra": 0
+    },
+    {
+      "name": "register-1440",
+      "extra": 0
+    },
+    {
+      "name": "register-1920",
+      "extra": 0
+    }
+  ],
+  "sha": {
+    "api": "9852e87f6016d68b907572fccf0d141f3be3a469",
+    "frontend": "9852e87f6016d68b907572fccf0d141f3be3a469"
+  },
+  "notes": [],
+  "summary": {
+    "pass": 19,
+    "fail": 0,
+    "skip": 0
+  }
+}

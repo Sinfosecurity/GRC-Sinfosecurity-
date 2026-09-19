@@ -10,7 +10,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **CURRENT ITEM:** #23 Insurance Edition. #12, #21, and #22 are ACCEPTED FOR CURRENT STAGE. #22 live provider validation is deferred. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #23 ACTIVE — PHASE B READY FOR PRODUCT LEADERSHIP REVIEW. Phase A global foundation remains accepted for the current stage. UI 2.0 ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, #23 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #23 ACTIVE — PHASE B READY FOR PRODUCT LEADERSHIP REVIEW. Phase A global foundation remains accepted for the current stage. Unnumbered UI 2.0 Finding Workspace Context Closure is ready for Product Leadership review. UI 2.0 as a whole remains ENGINEERING PARTIAL / PRODUCT LEADERSHIP REVIEW OPEN. Cursor does not declare Supreme UI 2.0 accepted, #12 PASS, #21 PASS, #22 PASS, #23 PASS, H-5 CLOSED, H-6 CLOSED, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
