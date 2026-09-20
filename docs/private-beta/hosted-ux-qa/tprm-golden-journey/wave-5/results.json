@@ -1,0 +1,33 @@
+{
+  "item": "#12",
+  "wave": "5",
+  "declaredPass": false,
+  "wave5Accepted": false,
+  "wave6Started": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "startingSha": "1bece45cb94de832ef40b3d811977a179058f15b",
+  "implementationSha": "88938c263d741365578e874599156096fe5d6276",
+  "hostedFrontendSha": "963953570154616f3a2029e854de339711eb9ea7",
+  "hostedApiSha": "963953570154616f3a2029e854de339711eb9ea7",
+  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35517206054",
+  "environment": "staging",
+  "checks": [
+    { "name": "hosted.api.sha", "result": "PASS", "detail": "963953570154616f3a2029e854de339711eb9ea7" },
+    { "name": "hosted.frontend.sha", "result": "PASS", "detail": "963953570154616f3a2029e854de339711eb9ea7" },
+    { "name": "hosted.environment", "result": "PASS", "detail": "staging" },
+    { "name": "hosted.postgres", "result": "PASS", "detail": "up" },
+    { "name": "ci", "result": "PASS", "detail": "35517206054 checkout SHA 9639535 includes implementation 88938c2" },
+    { "name": "secret.scan", "result": "PASS", "detail": "files_with_findings=0" },
+    { "name": "migration.safety", "result": "PASS", "detail": "38 files" },
+    { "name": "backend.typecheck", "result": "PASS", "detail": "tsc --noEmit" },
+    { "name": "frontend.typecheck", "result": "PASS", "detail": "tsc --noEmit" },
+    { "name": "frontend.tests", "result": "PASS", "detail": "83 files / 264 tests" },
+    { "name": "frontend.production.build", "result": "PASS", "detail": "public-build-safety PASS" },
+    { "name": "backend.full.tests", "result": "PASS", "detail": "CI quality job including Wave 5 integration and Wave 1–4 regressions" },
+    { "name": "unauth.decisions", "result": "PASS", "detail": "GET /tprm/engagements/:id/decisions 401" },
+    { "name": "unauth.activate", "result": "PASS", "detail": "GET /tprm/engagements/:id/activate 401" },
+    { "name": "vendor.activate.page", "result": "PASS", "detail": "/vendor-assessment/activate 200 invitation-only" },
+    { "name": "authenticated.golden.walk", "result": "SKIP", "detail": "STAGING_QA_* passwords were not present in this operator session. Automated CI covers the Engagement path. Re-run scripts/hosted-tprm-wave5.py with operator-only env to complete the hosted login walk." }
+  ]
+}
