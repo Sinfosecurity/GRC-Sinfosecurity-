@@ -784,6 +784,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 ## Wave 5 — Treatment + acceptance + approval + contract gate + Engagement activation
 
 **Starting SHA:** `1bece45cb94de832ef40b3d811977a179058f15b` (accepted Wave 4 checkpoint)  
+**Implementation SHA:** `88938c263d741365578e874599156096fe5d6276`  
 **Wave 6:** NOT STARTED. No monitoring, reassessment, termination, or offboarding.
 
 **Ownership:** Treatment, acceptance, approvals, contract requirements, contract exceptions, contract gate, and activation belong to the Engagement. Azure Hosting and Microsoft 365 keep independent Wave 5 records on one Microsoft Third Party master. Activating one Engagement does not activate siblings.

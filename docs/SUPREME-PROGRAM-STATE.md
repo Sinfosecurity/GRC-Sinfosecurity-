@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE (`1bece45cb94de832ef40b3d811977a179058f15b`). WAVE 5 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. WAVE 6 NOT STARTED. Wave 5 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Starts from accepted Wave 4 checkpoint `1bece45cb94de832ef40b3d811977a179058f15b`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE (`1bece45cb94de832ef40b3d811977a179058f15b`). WAVE 5 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW (`88938c263d741365578e874599156096fe5d6276`). WAVE 6 NOT STARTED. Wave 5 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Starts from accepted Wave 4 checkpoint `1bece45cb94de832ef40b3d811977a179058f15b`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 
