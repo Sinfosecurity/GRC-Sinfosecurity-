@@ -712,7 +712,20 @@ export async function calculateResidual(organizationId: string, actor: Actor, ke
         toNodeId: riskNode.node.id,
         relationshipType: GovernanceRelationshipType.HAS_RISK,
     });
-    await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.RESIDUAL_READY } });
+    const wave5 = new Set<EngagementStatus>([
+        EngagementStatus.TREATMENT_REVIEW,
+        EngagementStatus.ACCEPTANCE_PENDING,
+        EngagementStatus.TREATMENT_DECIDED,
+        EngagementStatus.CONTRACT_REVIEW,
+        EngagementStatus.GATE_BLOCKED,
+        EngagementStatus.GATE_APPROVED,
+        EngagementStatus.ACTIVE,
+        EngagementStatus.AVOIDED,
+        EngagementStatus.REJECTED,
+    ]);
+    if (!wave5.has(engagement.status)) {
+        await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.RESIDUAL_READY } });
+    }
     await audit(organizationId, actor.id, triggerReason === 'manual.calculate' ? 'residual_risk.calculated' : 'residual_risk.recalculated', 'EngagementResidualRiskAssessment', row.id, {
         engagementId: engagement.id,
         vendorId: engagement.vendorId,
@@ -721,7 +734,7 @@ export async function calculateResidual(organizationId: string, actor: Actor, ke
         triggerReason,
         methodologyVersion: ENGAGEMENT_RISK_SCORE_VERSION,
     });
-    await notify(organizationId, engagement.assignedAnalystUserId, 'residual_risk.ready', `Residual risk ready: ${engagement.serviceName}`, `Engagement residual risk is ${result.riskBand}. Wave 5 treatment is not started.`, 'EngagementResidualRiskAssessment', row.id);
+    await notify(organizationId, engagement.assignedAnalystUserId, 'residual_risk.ready', `Residual risk ready: ${engagement.serviceName}`, `Engagement residual risk is ${result.riskBand}. Review risk treatment.`, 'EngagementResidualRiskAssessment', row.id);
     return presentResidual(row, workspace);
 }
 
@@ -760,9 +773,10 @@ export async function confirmResidual(organizationId: string, actor: Actor, key:
             calculatedBy: latest.calculatedBy,
             reviewedAt: new Date(),
             reviewedBy: actor.id,
-            reviewNote: note?.trim() || 'Confirmed. Risk treatment decision pending. Wave 5 is not started.',
+            reviewNote: note?.trim() || 'Confirmed. Review risk treatment.',
         },
     });
+    await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.TREATMENT_REVIEW } });
     await audit(organizationId, actor.id, 'residual_risk.reviewed', 'EngagementResidualRiskAssessment', row.id, {
         engagementId: engagement.id,
         vendorId: engagement.vendorId,
@@ -1112,7 +1126,7 @@ function presentResidual(row: {
         findingsAffecting: row.openFindingSnapshot || workspace.openFindings,
         compensating: row.compensatingSnapshot || workspace.compensating,
         nextAction: row.status === EngagementResidualStatus.CONFIRMED
-            ? 'Risk treatment decision pending. Wave 5 is not started.'
+            ? 'Review risk treatment'
             : 'Review the calculation drivers, then confirm this Engagement residual-risk assessment.',
         wave5Started: false,
     };

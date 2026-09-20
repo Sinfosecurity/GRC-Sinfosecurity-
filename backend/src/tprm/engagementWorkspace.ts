@@ -18,7 +18,7 @@ export type PrimaryAction = {
     label: string;
     href: (engagementId: string) => string;
     owner: string;
-    wave5: false;
+    wave5: boolean;
 };
 
 const ACTIONS: Record<string, PrimaryAction> = {
@@ -100,6 +100,60 @@ const ACTIONS: Record<string, PrimaryAction> = {
         owner: 'Assigned TPRM analyst',
         wave5: false,
     },
+    TREATMENT_REVIEW: {
+        label: 'Review risk treatment',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
+    ACCEPTANCE_PENDING: {
+        label: 'Await decision',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Authorized approver',
+        wave5: true,
+    },
+    TREATMENT_DECIDED: {
+        label: 'Review contract requirements',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
+    CONTRACT_REVIEW: {
+        label: 'Complete requirements',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
+    GATE_BLOCKED: {
+        label: 'Resolve blockers',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
+    GATE_APPROVED: {
+        label: 'Activate Engagement',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Authorized activator',
+        wave5: true,
+    },
+    ACTIVE: {
+        label: 'Monitoring setup pending Wave 6',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
+    AVOIDED: {
+        label: 'Engagement avoided',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
+    REJECTED: {
+        label: 'Request declined',
+        href: (id) => `/engagements/${id}/decisions`,
+        owner: 'Assigned TPRM analyst',
+        wave5: true,
+    },
     INTAKE_COMPLETE: {
         label: 'Review this engagement',
         href: (id) => `/engagements/${id}`,
@@ -116,19 +170,42 @@ export function engagementPrimaryAction(
         outstandingReviewDomains?: string[];
         openCandidateCount?: number;
         controlAssessed?: boolean;
+        treatmentType?: string | null;
+        acceptanceStatus?: string | null;
+        gateStatus?: string | null;
+        mandatoryOpen?: boolean;
     } = {},
 ): PrimaryAction {
-    if (extras.residualConfirmed) {
+    if (status === EngagementStatus.ACTIVE) return ACTIONS.ACTIVE;
+    if (status === EngagementStatus.AVOIDED) return ACTIONS.AVOIDED;
+    if (status === EngagementStatus.REJECTED) return ACTIONS.REJECTED;
+    if (extras.gateStatus === 'APPROVED') return ACTIONS.GATE_APPROVED;
+    if (extras.gateStatus === 'BLOCKED') return ACTIONS.GATE_BLOCKED;
+    if (status === EngagementStatus.GATE_APPROVED) return ACTIONS.GATE_APPROVED;
+    if (status === EngagementStatus.GATE_BLOCKED) return ACTIONS.GATE_BLOCKED;
+    if (extras.mandatoryOpen || status === EngagementStatus.CONTRACT_REVIEW) return ACTIONS.CONTRACT_REVIEW;
+    if (extras.acceptanceStatus === 'PENDING' || extras.acceptanceStatus === 'REQUESTED' || status === EngagementStatus.ACCEPTANCE_PENDING) {
+        return extras.treatmentType === 'ACCEPT' && extras.acceptanceStatus !== 'PENDING' && extras.acceptanceStatus !== 'REQUESTED'
+            ? { label: 'Request acceptance approval', href: (id) => `/engagements/${id}/decisions`, owner: 'Assigned TPRM analyst', wave5: true }
+            : ACTIONS.ACCEPTANCE_PENDING;
+    }
+    if (extras.treatmentType === 'ACCEPT' && extras.acceptanceStatus !== 'APPROVED') {
+        return { label: 'Request acceptance approval', href: (id) => `/engagements/${id}/decisions`, owner: 'Assigned TPRM analyst', wave5: true };
+    }
+    if (extras.residualConfirmed && !extras.treatmentType) {
         return {
-            label: 'Risk treatment decision pending. Wave 5 is not started.',
-            href: (id) => `/engagements/${id}/residual-risk`,
+            label: 'Review risk treatment',
+            href: (id) => `/engagements/${id}/decisions`,
             owner: 'Assigned TPRM analyst',
-            wave5: false,
+            wave5: true,
         };
+    }
+    if (status === EngagementStatus.RESIDUAL_READY && extras.residualConfirmed) {
+        return ACTIONS.TREATMENT_REVIEW;
     }
     if (status === EngagementStatus.RESIDUAL_READY) {
         return {
-            label: 'Review the Engagement residual-risk assessment. Wave 5 is not started.',
+            label: 'Review the Engagement residual-risk assessment.',
             href: (id) => `/engagements/${id}/residual-risk`,
             owner: 'Assigned TPRM analyst',
             wave5: false,

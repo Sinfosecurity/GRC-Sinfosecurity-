@@ -577,6 +577,18 @@ export const intakeAPI = {
     calculateResidual: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/residual-risk/calculate`, data || {}),
     confirmResidual: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/residual-risk/confirm`, data || {}),
     vendorEngagementRisk: (vendorId: string) => api.get(`/tprm/vendors/${vendorId}/engagement-risk`),
+    getDecisions: (id: string) => api.get(`/tprm/engagements/${id}/decisions`),
+    selectTreatment: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/treatment`, data),
+    requestAcceptance: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/acceptance`, data),
+    decideAcceptance: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/acceptance/decide`, data),
+    createContractRequirement: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/contract-requirements`, data),
+    updateContractRequirement: (id: string, requirementId: string, data: unknown) => api.patch(`/tprm/engagements/${id}/contract-requirements/${requirementId}`, data),
+    requestContractException: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/contract-exceptions`, data),
+    decideContractException: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/contract-exceptions/decide`, data),
+    evaluateGate: (id: string) => api.post(`/tprm/engagements/${id}/gate/evaluate`, {}),
+    activateEngagement: (id: string) => api.post(`/tprm/engagements/${id}/activate`, {}),
+    generateDecisionBrief: (id: string) => api.post(`/tprm/engagements/${id}/decision-briefs`, {}),
+    getDecisionBrief: (id: string, briefId: string) => api.get(`/tprm/engagements/${id}/decision-briefs/${briefId}`),
 };
 
 const intakeInfoApi = axios.create({

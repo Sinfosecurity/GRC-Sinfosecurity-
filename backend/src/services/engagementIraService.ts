@@ -795,6 +795,15 @@ export function engagementIraStatusLabel(status: EngagementStatus) {
         case EngagementStatus.SPECIALIST_REVIEW: return 'Specialist review';
         case EngagementStatus.FINDING_REVIEW: return 'Finding review';
         case EngagementStatus.RESIDUAL_READY: return 'Residual risk ready';
+        case EngagementStatus.TREATMENT_REVIEW: return 'Treatment review';
+        case EngagementStatus.ACCEPTANCE_PENDING: return 'Acceptance pending';
+        case EngagementStatus.TREATMENT_DECIDED: return 'Treatment decided';
+        case EngagementStatus.CONTRACT_REVIEW: return 'Contract review';
+        case EngagementStatus.GATE_BLOCKED: return 'Contract gate blocked';
+        case EngagementStatus.GATE_APPROVED: return 'Approved to proceed';
+        case EngagementStatus.ACTIVE: return 'Engagement Active';
+        case EngagementStatus.AVOIDED: return 'Engagement avoided';
+        case EngagementStatus.REJECTED: return 'Request declined';
         case EngagementStatus.INTAKE_COMPLETE: return 'Intake complete';
         default: return 'Draft';
     }
@@ -816,7 +825,22 @@ export function requesterEngagementStatus(status: EngagementStatus) {
         case EngagementStatus.VENDOR_IN_PROGRESS:
         case EngagementStatus.VENDOR_SUBMITTED:
         case EngagementStatus.SPECIALIST_REVIEW:
-            return 'Risk assessment confirmed';
+        case EngagementStatus.FINDING_REVIEW:
+        case EngagementStatus.RESIDUAL_READY:
+        case EngagementStatus.TREATMENT_REVIEW:
+            return 'Under risk review';
+        case EngagementStatus.ACCEPTANCE_PENDING:
+        case EngagementStatus.TREATMENT_DECIDED:
+        case EngagementStatus.CONTRACT_REVIEW:
+        case EngagementStatus.GATE_BLOCKED:
+            return 'Approval in progress';
+        case EngagementStatus.GATE_APPROVED:
+            return 'Approved to proceed';
+        case EngagementStatus.ACTIVE:
+            return 'Approved to proceed';
+        case EngagementStatus.AVOIDED:
+        case EngagementStatus.REJECTED:
+            return 'Request declined';
         default:
             return 'Engagement created';
     }

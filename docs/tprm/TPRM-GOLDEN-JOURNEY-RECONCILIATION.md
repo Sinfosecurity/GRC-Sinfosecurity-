@@ -765,7 +765,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Hosted:** staging frontend/API `fc228bc`. Production untouched.  
 **Wave 3 implementation:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
 **Implementation:** Engagement-aware `VendorIssue.engagementId` (no second finding register). New `EngagementControlEffectiveness`, `EngagementCompensatingControl`, and `EngagementResidualRiskAssessment`.  
-**Wave 5:** NOT STARTED. No new risk acceptance, contract gate, or Engagement ACTIVE transition.
+**Wave 5:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Residual remains Engagement-authoritative. Acceptance does not rewrite residual.
 
 **Finding principle:** Question ≠ Finding. Answer ≠ Finding. Missing evidence ≠ automatic Finding. Low score ≠ automatic Finding. Wave 3 review outcomes may seed a **candidate** (`IssueReviewState.DRAFT`). Only a GRC reviewer confirm creates an authoritative finding. Dismissal preserves history.
 
@@ -778,3 +778,28 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Legacy:** Vendor `inherentRiskScore` / `residualRiskScore` / `ScoreCalculation` remain readable compatibility. They are not Golden Journey authority.
 
 **Preserved:** Finding Workspace context closure, Shared Controls, Shared Evidence, Governance Graph (`HAS_FINDING`, `AFFECTS`, `HAS_RISK`, `SUPPORTS`), Version 3 IRA, #23 Insurance on Third Party, Wave 1 persona isolation.
+
+---
+
+## Wave 5 — Treatment + acceptance + approval + contract gate + Engagement activation
+
+**Starting SHA:** `1bece45cb94de832ef40b3d811977a179058f15b` (accepted Wave 4 checkpoint)  
+**Wave 6:** NOT STARTED. No monitoring, reassessment, termination, or offboarding.
+
+**Ownership:** Treatment, acceptance, approvals, contract requirements, contract exceptions, contract gate, and activation belong to the Engagement. Azure Hosting and Microsoft 365 keep independent Wave 5 records on one Microsoft Third Party master. Activating one Engagement does not activate siblings.
+
+**Treatment types:** `MITIGATE`, `ACCEPT`, `TRANSFER`, `AVOID`. Prior treatments are superseded, not overwritten. MITIGATE reuses Finding remediation / Shared Controls / Shared Evidence and does not close Findings or reduce residual because a plan exists. ACCEPT snapshots the exact residual version and requires expiry or review date. TRANSFER records the mechanism and does not claim risk disappeared. AVOID is a terminal Engagement state (`AVOIDED`); records are preserved.
+
+**Acceptance authority:** Existing capability policy only — `risk.treat` prepares, `risk.accept` / `approval.decide` decides, default deny self-approval. No invented Medium→Manager / High→CISO / Critical→CEO matrix. Organization Admin receives tenant permissions through existing RBAC and does not gain a new silent bypass.
+
+**Decision Brief:** Reuses `RiskDecisionBrief` with optional `engagementId` + `versionNumber`. New decision state creates a new immutable version. Legacy vendor briefs remain readable and are never presented as current Engagement acceptance.
+
+**Contract:** Governance conditions, not a CLM product. Every requirement records source and why it exists. Human-added requires rationale. Exceptions do not make a control Effective, close a Finding, or lower residual.
+
+**Gate:** Engagement-specific `NOT_READY` / `READY_FOR_REVIEW` / `BLOCKED` / `APPROVED`. Exact blockers are returned. Activation is explicit, requires `engagement.activate`, and is denied while the gate is blocked. After ACTIVE the next action is Monitoring setup pending Wave 6 only.
+
+**New models:** `EngagementRiskTreatment`, `EngagementRiskAcceptance`, `EngagementDecisionApproval`, `EngagementContractRequirement`, `EngagementContractException`, `EngagementContractGate`, `EngagementActivation`. Added because vendor-scoped `VendorApprovalWorkflow`, `VendorException`, `VendorContract`, and `RiskDecisionBrief` cannot represent Engagement-authoritative Wave 5 state cleanly.
+
+**Graph:** Truthful `Engagement → HAS_DECISION → Decision` and `Engagement → SUBJECT_TO → Contract Requirement` only when those records exist. No second graph.
+
+**Personas:** Requester sees business-safe statuses only. Vendor remains invitation-only and cannot see Wave 5 internals. Cross-tenant DENY.

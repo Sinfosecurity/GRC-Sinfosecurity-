@@ -65,6 +65,21 @@ import {
     seedFindingCandidates,
     createFindingCandidate,
 } from '../services/engagementRiskService';
+import {
+    activateEngagement,
+    createContractRequirement,
+    decideAcceptance,
+    decideApproval,
+    decideContractException,
+    evaluateGate,
+    generateDecisionBrief,
+    getDecisionBrief,
+    getDecisionWorkspace,
+    requestAcceptance,
+    requestContractException,
+    selectTreatment,
+    updateContractRequirement,
+} from '../services/engagementTreatmentService';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
@@ -559,6 +574,137 @@ router.post('/engagements/:id/residual-risk/calculate', requirePractitionerPerso
 router.post('/engagements/:id/residual-risk/confirm', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await confirmResidual(req.user!.organizationId, actor(req), req.params.id, req.body?.note) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/decisions', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['risk.read'], PERMISSIONS['approval.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getDecisionWorkspace(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/treatment', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.treat'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await selectTreatment(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/acceptance', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.treat'], PERMISSIONS['risk.accept']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await requestAcceptance(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/acceptance/decide', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.accept'], PERMISSIONS['approval.decide']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await decideAcceptance(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/approvals', requirePractitionerPersona, requirePermission(PERMISSIONS['approval.read'], PERMISSIONS['risk.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const workspace = await getDecisionWorkspace(req.user!.organizationId, actor(req), req.params.id);
+        res.json({ success: true, data: workspace.approvals });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/approvals', requirePractitionerPersona, requirePermission(PERMISSIONS['approval.decide'], PERMISSIONS['risk.accept']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await decideApproval(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/contract-requirements', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.treat'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await createContractRequirement(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.patch('/engagements/:id/contract-requirements/:requirementId', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.treat'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await updateContractRequirement(req.user!.organizationId, actor(req), req.params.id, req.params.requirementId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/contract-exceptions', requirePractitionerPersona, requirePermission(PERMISSIONS['exception.create'], PERMISSIONS['risk.treat']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await requestContractException(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/contract-exceptions/decide', requirePractitionerPersona, requirePermission(PERMISSIONS['exception.approve'], PERMISSIONS['approval.decide']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await decideContractException(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/gate', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['risk.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const workspace = await getDecisionWorkspace(req.user!.organizationId, actor(req), req.params.id);
+        res.json({ success: true, data: workspace.gate });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/gate/evaluate', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.treat'], PERMISSIONS['intake.triage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await evaluateGate(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/activate', requirePractitionerPersona, requirePermission(PERMISSIONS['engagement.activate']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await activateEngagement(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/decision-briefs', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const workspace = await getDecisionWorkspace(req.user!.organizationId, actor(req), req.params.id);
+        res.json({ success: true, data: workspace.decisionBriefs });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/decision-briefs', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await generateDecisionBrief(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/decision-briefs/:briefId', requirePractitionerPersona, requirePermission(PERMISSIONS['risk.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getDecisionBrief(req.user!.organizationId, actor(req), req.params.id, req.params.briefId) });
     } catch (error) {
         next(error);
     }

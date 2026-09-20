@@ -66,7 +66,7 @@ export default function EngagementResidual() {
                         )}
                         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
                             <Button disabled={busy} onClick={() => run(() => intakeAPI.calculateResidual(id), 'Engagement residual risk calculated.')}>Calculate residual risk</Button>
-                            <Button disabled={busy || !data.residual} onClick={() => run(() => intakeAPI.confirmResidual(id, { note: confirmNote }), 'Residual risk confirmed. Wave 5 is not started.')}>Confirm residual assessment</Button>
+                            <Button disabled={busy || !data.residual} onClick={() => run(() => intakeAPI.confirmResidual(id, { note: confirmNote }), 'Residual risk confirmed. Review risk treatment.')}>Confirm residual assessment</Button>
                         </Stack>
                         <TextField sx={{ mt: 1 }} label="Confirmation note" value={confirmNote} onChange={(event) => setConfirmNote(event.target.value)} fullWidth />
                     </Surface>
@@ -77,7 +77,7 @@ export default function EngagementResidual() {
                         ))}
                         {!(data.history || []).length && <Typography variant="body2">Not recorded</Typography>}
                     </Surface>
-                    <Typography variant="caption">Wave 5 treatment, acceptance, and contracting have not started. Residual risk remains Engagement-authoritative.</Typography>
+                    <Typography variant="caption">Residual risk remains Engagement-authoritative. Treatment, acceptance, and activation are on Decisions.</Typography>
                 </Stack>
             )}
         </QueryState>

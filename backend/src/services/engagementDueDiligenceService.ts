@@ -896,7 +896,20 @@ export function nextDueDiligenceAction(status: EngagementStatus, hasInvitation =
         case EngagementStatus.FINDING_REVIEW:
             return 'Review Finding Candidates';
         case EngagementStatus.RESIDUAL_READY:
-            return 'Risk treatment decision pending. Wave 5 is not started.';
+        case EngagementStatus.TREATMENT_REVIEW:
+            return 'Review risk treatment';
+        case EngagementStatus.ACCEPTANCE_PENDING:
+            return 'Await decision';
+        case EngagementStatus.CONTRACT_REVIEW:
+            return 'Complete requirements';
+        case EngagementStatus.GATE_BLOCKED:
+            return 'Resolve blockers';
+        case EngagementStatus.GATE_APPROVED:
+            return 'Activate Engagement';
+        case EngagementStatus.ACTIVE:
+            return 'Monitoring setup pending Wave 6';
+        case EngagementStatus.AVOIDED:
+            return 'Engagement avoided';
         default:
             return 'Review this engagement';
     }

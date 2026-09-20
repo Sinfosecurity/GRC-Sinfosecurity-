@@ -45,7 +45,12 @@ export type NotificationEvent =
     | 'intake.reassigned'
     | 'intake.information_requested'
     | 'intake.information_received'
-    | 'intake.completed';
+    | 'intake.completed'
+    | 'treatment.needed'
+    | 'acceptance.requested'
+    | 'contract_requirement.action'
+    | 'contract_gate.ready'
+    | 'engagement.activated';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
 export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';

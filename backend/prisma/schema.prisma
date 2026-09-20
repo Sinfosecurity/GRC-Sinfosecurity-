@@ -244,6 +244,13 @@ model Organization {
   engagementControlEffectiveness EngagementControlEffectiveness[]
   engagementCompensatingControls EngagementCompensatingControl[]
   engagementResidualAssessments EngagementResidualRiskAssessment[]
+  engagementRiskTreatments    EngagementRiskTreatment[]
+  engagementRiskAcceptances   EngagementRiskAcceptance[]
+  engagementDecisionApprovals EngagementDecisionApproval[]
+  engagementContractRequirements EngagementContractRequirement[]
+  engagementContractExceptions EngagementContractException[]
+  engagementContractGates     EngagementContractGate[]
+  engagementActivations       EngagementActivation[]
 
   @@index([slug])
   @@index([status])
@@ -814,6 +821,15 @@ enum EngagementStatus {
   SPECIALIST_REVIEW
   FINDING_REVIEW
   RESIDUAL_READY
+  TREATMENT_REVIEW
+  ACCEPTANCE_PENDING
+  TREATMENT_DECIDED
+  CONTRACT_REVIEW
+  GATE_BLOCKED
+  GATE_APPROVED
+  ACTIVE
+  AVOIDED
+  REJECTED
 }
 
 enum EngagementDueDiligencePlanStatus {
@@ -985,6 +1001,14 @@ model Engagement {
   controlEffectiveness     EngagementControlEffectiveness[]
   compensatingControls     EngagementCompensatingControl[]
   residualAssessments      EngagementResidualRiskAssessment[]
+  riskTreatments           EngagementRiskTreatment[]
+  riskAcceptances          EngagementRiskAcceptance[]
+  decisionApprovals        EngagementDecisionApproval[]
+  contractRequirements     EngagementContractRequirement[]
+  contractExceptions       EngagementContractException[]
+  contractGates            EngagementContractGate[]
+  activations              EngagementActivation[]
+  decisionBriefs           RiskDecisionBrief[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, vendorId])
@@ -1252,6 +1276,267 @@ model EngagementResidualRiskAssessment {
   createdAt                  DateTime                 @default(now())
 
   @@index([organizationId, engagementId, createdAt])
+}
+
+enum EngagementTreatmentType {
+  MITIGATE
+  ACCEPT
+  TRANSFER
+  AVOID
+}
+
+enum EngagementTreatmentStatus {
+  DRAFT
+  SELECTED
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  RETURNED
+  COMPLETE
+  SUPERSEDED
+}
+
+enum EngagementAcceptanceStatus {
+  DRAFT
+  REQUESTED
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+  SUPERSEDED
+}
+
+enum EngagementApprovalType {
+  RISK_ACCEPTANCE
+  TREATMENT
+  CONTRACT_EXCEPTION
+  CONTRACT_GATE
+  ACTIVATION
+}
+
+enum EngagementApprovalStatus {
+  REQUESTED
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+}
+
+enum EngagementContractRequirementSource {
+  CONFIRMED_FINDING
+  CONTROL_GAP
+  TREATMENT_DECISION
+  REGULATORY_REQUIREMENT
+  INSURANCE_PACK
+  ORGANIZATION_POLICY
+  HUMAN_ADDED
+}
+
+enum EngagementContractRequirementStatus {
+  OPEN
+  SATISFIED
+  EXCEPTION_REQUESTED
+  EXCEPTION_APPROVED
+  WAIVED
+}
+
+enum EngagementContractGateStatus {
+  NOT_READY
+  READY_FOR_REVIEW
+  BLOCKED
+  APPROVED
+}
+
+enum EngagementTransferMechanism {
+  INSURANCE
+  CONTRACTUAL_INDEMNITY
+  SERVICE_ARCHITECTURE
+  OTHER
+}
+
+model EngagementRiskTreatment {
+  id                         String                     @id @default(uuid())
+  organization               Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId             String
+  vendorId                   String
+  engagement                 Engagement                 @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId               String
+  residualAssessmentId       String
+  residualScoreSnapshot      Int?
+  residualBandSnapshot       String?
+  residualMethodologyVersion String?
+  type                       EngagementTreatmentType
+  rationale                  String
+  ownerUserId                String?
+  createdByUserId            String
+  status                     EngagementTreatmentStatus  @default(SELECTED)
+  conditions                 String?
+  relatedFindingIds          Json?
+  relatedControlIds          Json?
+  relatedEvidenceIds         Json?
+  mitigationAction           String?
+  mitigationOwnerUserId      String?
+  mitigationDueDate          DateTime?
+  mitigationFindingId        String?
+  mitigationControlId        String?
+  mitigationEvidenceRequired String?
+  mitigationCompletionCondition String?
+  mitigationStatus           String?
+  transferMechanism          EngagementTransferMechanism?
+  transferOwnerUserId        String?
+  transferEvidenceRef        String?
+  transferEffectiveAt        DateTime?
+  transferExpiresAt          DateTime?
+  supersededById             String?
+  createdAt                  DateTime                   @default(now())
+  history                    Json?
+
+  @@index([organizationId, engagementId, createdAt])
+  @@index([organizationId, vendorId])
+}
+
+model EngagementRiskAcceptance {
+  id                         String                      @id @default(uuid())
+  organization               Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId             String
+  vendorId                   String
+  engagement                 Engagement                  @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId               String
+  treatmentId                String
+  residualAssessmentId       String
+  residualScoreSnapshot      Int
+  residualBandSnapshot       String
+  residualMethodologyVersion String
+  rationale                  String
+  requesterUserId            String
+  ownerUserId                String?
+  authorizedApproverUserId   String?
+  status                     EngagementAcceptanceStatus  @default(REQUESTED)
+  conditions                 String?
+  expiresAt                  DateTime?
+  reviewAt                   DateTime?
+  relatedFindingIds          Json?
+  decisionSnapshot           Json
+  decidedAt                  DateTime?
+  decidedByUserId            String?
+  decisionComment            String?
+  createdAt                  DateTime                    @default(now())
+
+  @@index([organizationId, engagementId, createdAt])
+  @@index([organizationId, vendorId])
+}
+
+model EngagementDecisionApproval {
+  id                   String                   @id @default(uuid())
+  organization         Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  vendorId             String
+  engagement           Engagement               @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId         String
+  type                 EngagementApprovalType
+  treatmentId          String?
+  acceptanceId         String?
+  exceptionId          String?
+  status               EngagementApprovalStatus @default(REQUESTED)
+  requestedByUserId    String
+  assignedApproverUserId String?
+  decidedByUserId      String?
+  capability           String
+  comment              String?
+  decisionVersion      Int                      @default(1)
+  decidedAt            DateTime?
+  snapshot             Json?
+  createdAt            DateTime                 @default(now())
+
+  @@index([organizationId, engagementId, createdAt])
+  @@index([organizationId, type, status])
+}
+
+model EngagementContractRequirement {
+  id                   String                               @id @default(uuid())
+  organization         Organization                         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  vendorId             String
+  engagement           Engagement                           @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId         String
+  requirement          String
+  source               EngagementContractRequirementSource
+  sourceRef            String?
+  sourceRationale      String?
+  ownerUserId          String?
+  mandatory            Boolean                              @default(true)
+  status               EngagementContractRequirementStatus  @default(OPEN)
+  evidenceRef          String?
+  reviewerUserId       String?
+  reviewedAt           DateTime?
+  createdByUserId      String
+  createdAt            DateTime                             @default(now())
+  updatedAt            DateTime                             @updatedAt
+
+  @@index([organizationId, engagementId])
+  @@index([organizationId, vendorId])
+}
+
+model EngagementContractException {
+  id                   String       @id @default(uuid())
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  vendorId             String
+  engagement           Engagement   @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId         String
+  requirementId        String
+  reason               String
+  requesterUserId      String
+  authorityUserId      String?
+  status               EngagementApprovalStatus @default(REQUESTED)
+  conditions           String?
+  expiresAt            DateTime?
+  reviewAt             DateTime?
+  decidedAt            DateTime?
+  decidedByUserId      String?
+  decisionComment      String?
+  createdAt            DateTime     @default(now())
+
+  @@index([organizationId, engagementId])
+  @@index([organizationId, requirementId])
+}
+
+model EngagementContractGate {
+  id                   String                       @id @default(uuid())
+  organization         Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  vendorId             String
+  engagement           Engagement                   @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId         String
+  residualAssessmentId String?
+  treatmentId          String?
+  status               EngagementContractGateStatus @default(NOT_READY)
+  blockers             Json
+  evaluatedAt          DateTime?
+  evaluatedByUserId    String?
+  createdAt            DateTime                     @default(now())
+
+  @@index([organizationId, engagementId, createdAt])
+}
+
+model EngagementActivation {
+  id                   String       @id @default(uuid())
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId       String
+  vendorId             String
+  engagement           Engagement   @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId         String
+  activatedByUserId    String
+  activatedAt          DateTime     @default(now())
+  treatmentSnapshot    Json
+  acceptanceSnapshot   Json?
+  approvalSnapshot     Json
+  gateSnapshot         Json
+  decisionBriefId      String?
+  decisionBriefVersion Int?
+  createdAt            DateTime     @default(now())
+
+  @@index([organizationId, engagementId])
 }
 
 enum VendorStatus {
@@ -3049,6 +3334,9 @@ model RiskDecisionBrief {
   organization       Organization         @relation(fields: [organizationId], references: [id])
   organizationId     String
   vendorId           String
+  engagementId       String?
+  engagement         Engagement?          @relation(fields: [engagementId], references: [id])
+  versionNumber      Int                  @default(1)
   engagementName     String?
   scoreCalculationId String?
   inherentRisk       Int
@@ -3074,6 +3362,8 @@ model RiskDecisionBrief {
 
   @@index([organizationId])
   @@index([vendorId])
+  @@index([engagementId])
+  @@index([organizationId, engagementId, versionNumber])
   @@index([organizationId, status])
   @@index([createdAt])
 }
@@ -3744,6 +4034,9 @@ enum GovernanceRelationshipType {
   CONCERNS
   HAS_ENGAGEMENT
   ORIGINATED
+  HAS_DECISION
+  SUBJECT_TO
+  HAS_CONTRACT
 }
 
 enum GovernanceProvenance {

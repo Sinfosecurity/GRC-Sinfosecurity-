@@ -75,7 +75,7 @@ describe('Engagement risk workspace', () => {
         expect(screen.getByText(/Result:/)).toBeInTheDocument();
         expect(screen.getAllByText(/Confirmed inherent CRITICAL/).length).toBeGreaterThan(0);
         expect(screen.getByText(/Professional Services — LOW/)).toBeInTheDocument();
-        expect(screen.getByText(/Wave 5 treatment, acceptance, and contracting have not started/)).toBeInTheDocument();
+        expect(screen.getByText(/Treatment, acceptance, and activation stay on the Decisions tab/)).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Confirm finding' }));
         expect(intakeAPI.confirmFinding).toHaveBeenCalled();
     });

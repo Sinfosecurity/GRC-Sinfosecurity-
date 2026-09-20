@@ -337,9 +337,9 @@ describe('#12 Wave 4 engagement findings, control effectiveness, and residual ri
             note: 'Confirmed for Wave 4. Treatment is Wave 5.',
         });
         expect(confirm.status).toBe(200);
-        expect(confirm.body.data.nextAction).toMatch(/Wave 5 is not started/);
+        expect(confirm.body.data.nextAction).toMatch(/Review risk treatment/);
         const engagement = await prisma.engagement.findUnique({ where: { id: azureEngagementId } });
-        expect(['FINDING_REVIEW', 'RESIDUAL_READY', 'SPECIALIST_REVIEW']).toContain(engagement?.status);
+        expect(['FINDING_REVIEW', 'RESIDUAL_READY', 'SPECIALIST_REVIEW', 'TREATMENT_REVIEW']).toContain(engagement?.status);
         expect(confirm.body.data.wave5Started).toBe(false);
     });
 

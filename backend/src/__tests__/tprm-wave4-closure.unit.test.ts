@@ -16,7 +16,10 @@ describe('#12 Wave 4 closure helpers', () => {
         expect(engagementPrimaryAction(EngagementStatus.SPECIALIST_REVIEW, { outstandingReviewDomains: ['Privacy'] }).label).toMatch(/Privacy/);
         expect(engagementPrimaryAction(EngagementStatus.FINDING_REVIEW, { openCandidateCount: 2 }).label).toBe('Review Finding Candidates');
         expect(engagementPrimaryAction(EngagementStatus.FINDING_REVIEW, { openCandidateCount: 0, controlAssessed: false }).label).toBe('Assess Control Effectiveness');
-        expect(engagementPrimaryAction(EngagementStatus.RESIDUAL_READY).label).toMatch(/Wave 5 is not started/);
-        expect(engagementPrimaryAction(EngagementStatus.RESIDUAL_READY, { residualConfirmed: true }).label).toMatch(/Wave 5 is not started/);
+        expect(engagementPrimaryAction(EngagementStatus.RESIDUAL_READY).label).toMatch(/residual-risk assessment/);
+        expect(engagementPrimaryAction(EngagementStatus.RESIDUAL_READY, { residualConfirmed: true }).label).toBe('Review risk treatment');
+        expect(engagementPrimaryAction(EngagementStatus.GATE_BLOCKED).label).toBe('Resolve blockers');
+        expect(engagementPrimaryAction(EngagementStatus.GATE_APPROVED).label).toBe('Activate Engagement');
+        expect(engagementPrimaryAction(EngagementStatus.ACTIVE).label).toBe('Monitoring setup pending Wave 6');
     });
 });

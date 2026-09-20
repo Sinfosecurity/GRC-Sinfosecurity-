@@ -105,7 +105,7 @@ export default function EngagementRisk() {
                             <Typography><strong>Residual:</strong> {data.residual?.residualBand || (data.residualReady ? 'Ready to calculate' : 'Not ready')}</Typography>
                             <Typography><strong>Methodology:</strong> {data.methodology?.version}</Typography>
                             <Typography><strong>Next action:</strong> {data.nextAction}</Typography>
-                            <Typography variant="caption" display="block">Wave 5 treatment, acceptance, and contracting have not started.</Typography>
+                            <Typography variant="caption" display="block">Treatment, acceptance, and activation stay on the Decisions tab. Residual is unchanged by acceptance.</Typography>
                         </Surface>
                         <Surface>
                             <Typography variant="h6">Finding candidates</Typography>
