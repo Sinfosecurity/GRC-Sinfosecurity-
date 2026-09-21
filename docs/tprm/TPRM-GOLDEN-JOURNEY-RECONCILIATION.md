@@ -765,7 +765,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Hosted:** staging frontend/API `fc228bc`. Production untouched.  
 **Wave 3 implementation:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
 **Implementation:** Engagement-aware `VendorIssue.engagementId` (no second finding register). New `EngagementControlEffectiveness`, `EngagementCompensatingControl`, and `EngagementResidualRiskAssessment`.  
-**Wave 5:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Residual remains Engagement-authoritative. Acceptance does not rewrite residual.
+**Wave 5:** HOSTED CLOSURE READY FOR PRODUCT LEADERSHIP REVIEW. Residual remains Engagement-authoritative. Acceptance does not rewrite residual. Not accepted.
 
 **Finding principle:** Question ≠ Finding. Answer ≠ Finding. Missing evidence ≠ automatic Finding. Low score ≠ automatic Finding. Wave 3 review outcomes may seed a **candidate** (`IssueReviewState.DRAFT`). Only a GRC reviewer confirm creates an authoritative finding. Dismissal preserves history.
 
@@ -786,7 +786,8 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Starting SHA:** `1bece45cb94de832ef40b3d811977a179058f15b` (accepted Wave 4 checkpoint)  
 **Implementation SHA:** `88938c263d741365578e874599156096fe5d6276`  
 **CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35517206054 PASS on `9639535`  
-**Hosted:** staging frontend/API `9639535`. Production untouched.  
+**Hosted:** staging frontend/API `9639535`. Authenticated closure walk completed 2026-09-21. Production untouched.  
+**Wave 5 accepted:** NO.  
 **Wave 6:** NOT STARTED. No monitoring, reassessment, termination, or offboarding.
 
 **Ownership:** Treatment, acceptance, approvals, contract requirements, contract exceptions, contract gate, and activation belong to the Engagement. Azure Hosting and Microsoft 365 keep independent Wave 5 records on one Microsoft Third Party master. Activating one Engagement does not activate siblings.
@@ -806,3 +807,5 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Graph:** Truthful `Engagement → HAS_DECISION → Decision` and `Engagement → SUBJECT_TO → Contract Requirement` only when those records exist. No second graph.
 
 **Personas:** Requester sees business-safe statuses only. Vendor remains invitation-only and cannot see Wave 5 internals. Cross-tenant DENY.
+
+**Hosted closure:** Authenticated staging walk on Azure Hosting QA proved ACCEPT + SoD deny + authorized approval + residual unchanged (MEDIUM 58) + blocked-gate activation deny + gate APPROVED + Azure ACTIVE + Microsoft 365 isolation + requester/vendor denial + Decision Brief v1/v2 + MITIGATE/TRANSFER/AVOID + audit + queued notifications + responsive/a11y. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Wave 5 is not accepted. Wave 6 is not started.

@@ -1,33 +1,1077 @@
 {
   "item": "#12",
-  "wave": "5",
+  "wave": "5-hosted-closure",
   "declaredPass": false,
   "wave5Accepted": false,
   "wave6Started": false,
   "productionTouched": false,
   "mainMerged": false,
-  "startingSha": "1bece45cb94de832ef40b3d811977a179058f15b",
   "implementationSha": "88938c263d741365578e874599156096fe5d6276",
-  "hostedFrontendSha": "963953570154616f3a2029e854de339711eb9ea7",
-  "hostedApiSha": "963953570154616f3a2029e854de339711eb9ea7",
-  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35517206054",
-  "environment": "staging",
   "checks": [
-    { "name": "hosted.api.sha", "result": "PASS", "detail": "963953570154616f3a2029e854de339711eb9ea7" },
-    { "name": "hosted.frontend.sha", "result": "PASS", "detail": "963953570154616f3a2029e854de339711eb9ea7" },
-    { "name": "hosted.environment", "result": "PASS", "detail": "staging" },
-    { "name": "hosted.postgres", "result": "PASS", "detail": "up" },
-    { "name": "ci", "result": "PASS", "detail": "35517206054 checkout SHA 9639535 includes implementation 88938c2" },
-    { "name": "secret.scan", "result": "PASS", "detail": "files_with_findings=0" },
-    { "name": "migration.safety", "result": "PASS", "detail": "38 files" },
-    { "name": "backend.typecheck", "result": "PASS", "detail": "tsc --noEmit" },
-    { "name": "frontend.typecheck", "result": "PASS", "detail": "tsc --noEmit" },
-    { "name": "frontend.tests", "result": "PASS", "detail": "83 files / 264 tests" },
-    { "name": "frontend.production.build", "result": "PASS", "detail": "public-build-safety PASS" },
-    { "name": "backend.full.tests", "result": "PASS", "detail": "CI quality job including Wave 5 integration and Wave 1–4 regressions" },
-    { "name": "unauth.decisions", "result": "PASS", "detail": "GET /tprm/engagements/:id/decisions 401" },
-    { "name": "unauth.activate", "result": "PASS", "detail": "GET /tprm/engagements/:id/activate 401" },
-    { "name": "vendor.activate.page", "result": "PASS", "detail": "/vendor-assessment/activate 200 invitation-only" },
-    { "name": "authenticated.golden.walk", "result": "SKIP", "detail": "STAGING_QA_* passwords were not present in this operator session. Automated CI covers the Engagement path. Re-run scripts/hosted-tprm-wave5.py with operator-only env to complete the hosted login walk." }
-  ]
+    {
+      "name": "hosted.api.sha",
+      "result": "PASS",
+      "detail": "963953570154616f3a2029e854de339711eb9ea7"
+    },
+    {
+      "name": "hosted.frontend.sha",
+      "result": "PASS",
+      "detail": "963953570154616f3a2029e854de339711eb9ea7"
+    },
+    {
+      "name": "hosted.environment",
+      "result": "PASS",
+      "detail": "staging"
+    },
+    {
+      "name": "hosted.lineage.includes.88938c2",
+      "result": "PASS",
+      "detail": "9639535 and later docs SHAs contain implementation 88938c2"
+    },
+    {
+      "name": "wave5.migration",
+      "result": "PASS",
+      "detail": "applied"
+    },
+    {
+      "name": "login.lead",
+      "result": "PASS",
+      "detail": "RISK_MANAGER"
+    },
+    {
+      "name": "login.analyst",
+      "result": "PASS",
+      "detail": "ASSESSOR"
+    },
+    {
+      "name": "login.requester",
+      "result": "PASS",
+      "detail": "BUSINESS_OWNER"
+    },
+    {
+      "name": "azure.before.snapshot",
+      "result": "PASS",
+      "detail": {
+        "id": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
+        "publicId": "ENG-2026-0001",
+        "status": "TREATMENT_REVIEW",
+        "confirmedInherentTier": "CRITICAL",
+        "residual": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "band": "MEDIUM",
+          "score": 58
+        },
+        "findings": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM"
+          }
+        ],
+        "controls": [
+          {
+            "title": "Governance",
+            "rating": "PARTIALLY_EFFECTIVE"
+          }
+        ],
+        "compensating": [
+          {
+            "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "considered": true
+          },
+          {
+            "id": "99fca332-128f-4850-be62-b710da252311",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "considered": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "decisions.workspace",
+      "result": "PASS",
+      "detail": {
+        "nextAction": "Review risk treatment",
+        "hasResidual": true,
+        "sections": [
+          "residual",
+          "treatment",
+          "acceptance",
+          "approvals",
+          "contractRequirements",
+          "contractExceptions",
+          "gate",
+          "activation",
+          "decisionBriefs",
+          "history"
+        ]
+      }
+    },
+    {
+      "name": "mitigate.selected",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "type": "MITIGATE"
+      }
+    },
+    {
+      "name": "mitigate.residual.unchanged",
+      "result": "PASS",
+      "detail": {
+        "before": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "band": "MEDIUM",
+          "score": 58
+        },
+        "after": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "band": "MEDIUM",
+          "score": 58
+        }
+      }
+    },
+    {
+      "name": "mitigate.findings.unchanged",
+      "result": "PASS",
+      "detail": {
+        "before": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM"
+          }
+        ],
+        "after": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM"
+          }
+        ]
+      }
+    },
+    {
+      "name": "mitigate.controls.unchanged",
+      "result": "PASS",
+      "detail": {
+        "before": [
+          {
+            "title": "Governance",
+            "rating": "PARTIALLY_EFFECTIVE"
+          }
+        ],
+        "after": [
+          {
+            "title": "Governance",
+            "rating": "PARTIALLY_EFFECTIVE"
+          }
+        ]
+      }
+    },
+    {
+      "name": "transfer.selected",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "type": "TRANSFER",
+        "historyCount": 2
+      }
+    },
+    {
+      "name": "transfer.residual.not.eliminated",
+      "result": "PASS",
+      "detail": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "status": "CONFIRMED",
+        "band": "MEDIUM",
+        "score": 58
+      }
+    },
+    {
+      "name": "accept.requested",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "acceptance": "PENDING",
+        "residualAssessmentId": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "snapshotBand": "MEDIUM",
+        "snapshotScore": 58
+      }
+    },
+    {
+      "name": "self.approval.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 403,
+        "message": "Forbidden: Insufficient permissions"
+      }
+    },
+    {
+      "name": "authorized.approval",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "approverRole": "RISK_MANAGER",
+        "approverUserId": "6d182e96-12c1-4090-a71a-5d3b0b55f9ee",
+        "decidedAt": "2026-09-21T02:33:50.299Z",
+        "commentPresent": true,
+        "decisionVersion": 1
+      }
+    },
+    {
+      "name": "residual.unchanged.after.acceptance",
+      "result": "PASS",
+      "detail": {
+        "before": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "band": "MEDIUM",
+          "score": 58
+        },
+        "after": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "band": "MEDIUM",
+          "score": 58
+        }
+      }
+    },
+    {
+      "name": "findings.unchanged.after.acceptance",
+      "result": "PASS",
+      "detail": {
+        "before": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM"
+          }
+        ],
+        "after": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM"
+          }
+        ]
+      }
+    },
+    {
+      "name": "controls.unchanged.after.acceptance",
+      "result": "PASS",
+      "detail": {
+        "before": [
+          {
+            "title": "Governance",
+            "rating": "PARTIALLY_EFFECTIVE"
+          }
+        ],
+        "after": [
+          {
+            "title": "Governance",
+            "rating": "PARTIALLY_EFFECTIVE"
+          }
+        ]
+      }
+    },
+    {
+      "name": "compensating.unchanged.after.acceptance",
+      "result": "PASS",
+      "detail": {
+        "before": [
+          {
+            "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "considered": true
+          },
+          {
+            "id": "99fca332-128f-4850-be62-b710da252311",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "considered": true
+          }
+        ],
+        "after": [
+          {
+            "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "considered": true
+          },
+          {
+            "id": "99fca332-128f-4850-be62-b710da252311",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "considered": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "contract.requirement",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "requirement": "Privileged access review evidence",
+        "source": "CONFIRMED_FINDING",
+        "sourceRef": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+        "mandatory": true,
+        "reqStatus": "OPEN",
+        "ownerUserId": "a9406969-875a-46b8-81d2-f1fd92d17ce4"
+      }
+    },
+    {
+      "name": "gate.blocked",
+      "result": "PASS",
+      "detail": {
+        "status": "BLOCKED",
+        "blockers": [
+          "Mandatory Privileged access review evidence requirement not recorded"
+        ]
+      }
+    },
+    {
+      "name": "blocked.activation.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 409,
+        "message": "Activation denied. Mandatory Privileged access review evidence requirement not recorded"
+      }
+    },
+    {
+      "name": "requester.cannot.activate",
+      "result": "PASS",
+      "detail": 403
+    },
+    {
+      "name": "analyst.cannot.activate",
+      "result": "PASS",
+      "detail": 403
+    },
+    {
+      "name": "gate.approved",
+      "result": "PASS",
+      "detail": {
+        "status": "APPROVED"
+      }
+    },
+    {
+      "name": "decision.brief.v1",
+      "result": "PASS",
+      "detail": {
+        "id": "af41694a-136e-4b23-8061-34e5c0092ff2",
+        "version": 1
+      }
+    },
+    {
+      "name": "azure.activated",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "engagement": "ACTIVE",
+        "nextAction": "Monitoring setup pending Wave 6",
+        "wave6Started": false,
+        "activatedBy": "6d182e96-12c1-4090-a71a-5d3b0b55f9ee",
+        "activatedAt": "2026-09-21T02:33:56.175Z",
+        "briefVersion": 1
+      }
+    },
+    {
+      "name": "wave6.next.action",
+      "result": "PASS",
+      "detail": "Monitoring setup pending Wave 6"
+    },
+    {
+      "name": "wave6.not.started.flag",
+      "result": "PASS",
+      "detail": false
+    },
+    {
+      "name": "decision.brief.immutable",
+      "result": "PASS",
+      "detail": {
+        "first": "af41694a-136e-4b23-8061-34e5c0092ff2",
+        "second": "eff9926d-7500-4177-8669-6b97c27dd23a",
+        "secondVersion": 2
+      }
+    },
+    {
+      "name": "m365.isolated",
+      "result": "PASS",
+      "detail": {
+        "status": "DUE_DILIGENCE_PLANNING",
+        "treatment": null,
+        "acceptance": null,
+        "requirements": 0,
+        "gate": "NOT_READY"
+      }
+    },
+    {
+      "name": "third.party.aggregation",
+      "result": "PASS",
+      "detail": {
+        "count": 2,
+        "rows": [
+          {
+            "service": "Azure Hosting QA",
+            "residual": "MEDIUM",
+            "status": "ACTIVE"
+          },
+          {
+            "service": "Microsoft 365 Collaboration QA",
+            "residual": null,
+            "status": "DUE_DILIGENCE_PLANNING"
+          }
+        ]
+      }
+    },
+    {
+      "name": "requester.decisions.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 403,
+        "message": "This GRC action is not available for this account."
+      }
+    },
+    {
+      "name": "requester.business.safe",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "vendor.invitation.page",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "avoid.terminal",
+      "result": "PASS",
+      "detail": "AVOIDED"
+    },
+    {
+      "name": "avoid.cannot.activate",
+      "result": "PASS",
+      "detail": 409
+    },
+    {
+      "name": "avoid.did.not.change.azure",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "unauth.denied",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "audit.risk_treatment.selected",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.risk_acceptance.requested",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.risk_acceptance.approved",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.approval.requested",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.approval.approved",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.contract_requirement.created",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.contract_gate.evaluated",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.contract_gate.blocked",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.contract_gate.approved",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "audit.engagement.activated",
+      "result": "PASS",
+      "detail": "present"
+    },
+    {
+      "name": "notifications.internal.queued",
+      "result": "PASS",
+      "detail": [
+        "acceptance.requested",
+        "contract_gate.ready",
+        "contract_requirement.action",
+        "engagement.activated",
+        "treatment.needed"
+      ]
+    },
+    {
+      "name": "notifications.not.sent.to.requester",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "name": "wave6.no.new.vendor.monitoring",
+      "result": "PASS",
+      "detail": "0"
+    },
+    {
+      "name": "wave6.no.reassessment.architecture",
+      "result": "PASS",
+      "detail": "No Wave 6 reassessment or offboarding records were created by activation."
+    },
+    {
+      "name": "vendor.decisions.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.gate.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.activate.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.treatment.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.acceptance.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.contract.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.briefs.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "vendor.m365.denied",
+      "result": "PASS",
+      "detail": {
+        "status": 401,
+        "message": "Invalid or expired token"
+      }
+    },
+    {
+      "name": "ui.lead.decisions.loaded",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/decisions"
+    },
+    {
+      "name": "ui.wave6.next.action",
+      "result": "PASS",
+      "detail": "Monitoring setup pending Wave 6"
+    },
+    {
+      "name": "ui.residual.medium.58",
+      "result": "PASS",
+      "detail": "MEDIUM 58 present"
+    },
+    {
+      "name": "ui.acceptance.approved",
+      "result": "PASS",
+      "detail": "acceptance section present"
+    },
+    {
+      "name": "ui.gate.status",
+      "result": "PASS",
+      "detail": "gate section present"
+    },
+    {
+      "name": "ui.no.contradictory.active.blocked",
+      "result": "PASS",
+      "detail": "post-activation gate is not shown as blocked"
+    },
+    {
+      "name": "a11y.labelled.controls",
+      "result": "PASS",
+      "detail": [
+        "Treatment type",
+        "Treatment rationale",
+        "Conditions",
+        "Acceptance review date",
+        "Approver comment",
+        "Requirement",
+        "Requirement source",
+        "Source reference",
+        "Why this requirement exists"
+      ]
+    },
+    {
+      "name": "a11y.semantic.blocker.list",
+      "result": "PASS",
+      "detail": [
+        "No mandatory blockers."
+      ]
+    },
+    {
+      "name": "a11y.status.not.color.only",
+      "result": "PASS",
+      "detail": "band/score/status text present"
+    },
+    {
+      "name": "a11y.headings",
+      "result": "PASS",
+      "detail": [
+        "ENG-2026-0001 \u00b7 Azure Hosting QA",
+        "Primary next action",
+        "Residual risk",
+        "Treatment",
+        "Acceptance",
+        "Approvals",
+        "Contract requirements",
+        "Contract gate",
+        "Decision briefs",
+        "Sibling engagements"
+      ]
+    },
+    {
+      "name": "a11y.keyboard.tab",
+      "result": "PASS",
+      "detail": {
+        "tag": "div",
+        "id": "",
+        "name": "Home",
+        "outline": "solid 2px rgb(212, 188, 138)",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "name": "a11y.visible.focus",
+      "result": "PASS",
+      "detail": {
+        "tag": "div",
+        "id": "",
+        "name": "Home",
+        "outline": "solid 2px rgb(212, 188, 138)",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "name": "a11y.accessible.input",
+      "result": "PASS",
+      "detail": "Approver comment accepted keyboard/text input"
+    },
+    {
+      "name": "overflow:azure-decisions-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.decisions.375",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0,
+        "clipped": []
+      }
+    },
+    {
+      "name": "mobile.nav.drawer",
+      "result": "PASS",
+      "detail": "Open navigation present"
+    },
+    {
+      "name": "overflow:azure-decisions-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.decisions.768",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0,
+        "clipped": []
+      }
+    },
+    {
+      "name": "overflow:azure-decisions-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.decisions.1024",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0,
+        "clipped": []
+      }
+    },
+    {
+      "name": "overflow:azure-decisions-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.decisions.1440",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0,
+        "clipped": []
+      }
+    },
+    {
+      "name": "overflow:azure-decisions-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.decisions.1920",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0,
+        "clipped": []
+      }
+    },
+    {
+      "name": "ui.m365.isolated",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/engagements/eeb0ae53-0e05-4748-8434-79f28c9e564a/decisions"
+    },
+    {
+      "name": "ui.m365.no.azure.treatment",
+      "result": "PASS",
+      "detail": "sibling treatment not inherited"
+    },
+    {
+      "name": "ui.third.party.aggregation",
+      "result": "PASS",
+      "detail": "one Third Party with two Engagements"
+    },
+    {
+      "name": "ui.requester.workspace",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/request"
+    },
+    {
+      "name": "ui.requester.no.grc.nav",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/request"
+    },
+    {
+      "name": "ui.requester.decisions.denied",
+      "result": "PASS",
+      "detail": {
+        "url": "https://supreme-risk-staging.onrender.com/unauthorized",
+        "leaked": false
+      }
+    },
+    {
+      "name": "ui.vendor.invitation.only",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/vendor-assessment/activate"
+    },
+    {
+      "name": "ui.vendor.no.wave5.internals",
+      "result": "PASS",
+      "detail": "invitation page has no Wave 5 internals"
+    },
+    {
+      "name": "overflow:vendor-activate-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "overflow:vendor-activate-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.required.sections",
+      "result": "PASS",
+      "detail": {
+        "375": [],
+        "768": [],
+        "1024": [],
+        "1440": [],
+        "1920": []
+      }
+    },
+    {
+      "name": "ui.screenshots",
+      "result": "PASS",
+      "detail": 16
+    },
+    {
+      "name": "ui.history.tab",
+      "result": "PASS",
+      "detail": "History tab present on Azure ENG-2026-0001; screenshot lead-azure-history-1440"
+    },
+    {
+      "name": "ui.contract.exceptions.heading",
+      "result": "SKIP",
+      "detail": "API workspace exposes contractExceptions. Hosted Decisions page has no dedicated Contract Exceptions heading. No exceptions were recorded on Azure. Not treated as a golden-path defect; no new Wave 5 UI scope added."
+    },
+    {
+      "name": "a11y.accessible.error.state",
+      "result": "PASS",
+      "detail": "Decisions page uses role=alert for errors. Requester isolation renders Access Denied. API 403/409 return business-readable messages."
+    }
+  ],
+  "snapshots": {
+    "azureBefore": {
+      "id": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
+      "publicId": "ENG-2026-0001",
+      "status": "TREATMENT_REVIEW",
+      "confirmedInherentTier": "CRITICAL",
+      "residual": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "status": "CONFIRMED",
+        "band": "MEDIUM",
+        "score": 58
+      },
+      "findings": [
+        {
+          "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+          "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+          "status": "OPEN",
+          "severity": "MEDIUM"
+        }
+      ],
+      "controls": [
+        {
+          "title": "Governance",
+          "rating": "PARTIALLY_EFFECTIVE"
+        }
+      ],
+      "compensating": [
+        {
+          "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+          "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+          "considered": true
+        },
+        {
+          "id": "99fca332-128f-4850-be62-b710da252311",
+          "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+          "considered": true
+        }
+      ]
+    },
+    "azureAfter": {
+      "residual": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "status": "CONFIRMED",
+        "band": "MEDIUM",
+        "score": 58
+      },
+      "findings": [
+        {
+          "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+          "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+          "status": "OPEN",
+          "severity": "MEDIUM"
+        }
+      ],
+      "controls": [
+        {
+          "title": "Governance",
+          "rating": "PARTIALLY_EFFECTIVE"
+        }
+      ],
+      "status": "ACTIVE"
+    }
+  },
+  "sha": {
+    "api": "963953570154616f3a2029e854de339711eb9ea7",
+    "frontend": "963953570154616f3a2029e854de339711eb9ea7",
+    "required": "88938c263d741365578e874599156096fe5d6276",
+    "environment": "staging",
+    "postgres": "up"
+  },
+  "shots": [
+    "lead-azure-decisions-1440",
+    "lead-azure-decisions-focus",
+    "lead-azure-decisions-375",
+    "lead-nav-375-open",
+    "lead-azure-decisions-768",
+    "lead-azure-decisions-1024",
+    "lead-azure-decisions-1920",
+    "lead-m365-decisions-1440",
+    "lead-microsoft-third-party-1440",
+    "requester-home-1440",
+    "requester-denied-decisions-1440",
+    "vendor-activate-1440",
+    "vendor-activate-375",
+    "vendor-activate-768",
+    "vendor-activate-1024",
+    "vendor-activate-1920",
+    "lead-azure-history-1440"
+  ],
+  "overflows": [
+    {
+      "name": "azure-decisions-375",
+      "extra": 0
+    },
+    {
+      "name": "azure-decisions-768",
+      "extra": 0
+    },
+    {
+      "name": "azure-decisions-1024",
+      "extra": 0
+    },
+    {
+      "name": "azure-decisions-1440",
+      "extra": 0
+    },
+    {
+      "name": "azure-decisions-1920",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-375",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-768",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-1024",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-1440",
+      "extra": 0
+    },
+    {
+      "name": "vendor-activate-1920",
+      "extra": 0
+    }
+  ],
+  "a11y": {
+    "labels": [
+      "Treatment type",
+      "Treatment rationale",
+      "Conditions",
+      "Acceptance review date",
+      "Approver comment",
+      "Requirement",
+      "Requirement source",
+      "Source reference",
+      "Why this requirement exists"
+    ],
+    "headings": [
+      "ENG-2026-0001 \u00b7 Azure Hosting QA",
+      "Primary next action",
+      "Residual risk",
+      "Treatment",
+      "Acceptance",
+      "Approvals",
+      "Contract requirements",
+      "Contract gate",
+      "Decision briefs",
+      "Sibling engagements"
+    ],
+    "blockerList": true,
+    "blockerItems": [
+      "No mandatory blockers."
+    ],
+    "alerts": [],
+    "buttons": [
+      "Programs",
+      "Intelligence",
+      "Automation",
+      "Governance",
+      "Reports",
+      "Administration",
+      "QA",
+      "Monitoring setup pending Wave 6",
+      "Select treatment",
+      "Approve acceptance",
+      "Reject acceptance",
+      "Return acceptance",
+      "Add requirement",
+      "Evaluate gate",
+      "Activate Engagement",
+      "Generate decision brief"
+    ],
+    "focusableCount": 51,
+    "firstFocusable": "Skip to content"
+  },
+  "hostedClosure": {
+    "status": "HOSTED CLOSURE READY FOR PRODUCT LEADERSHIP REVIEW",
+    "wave5Accepted": false,
+    "wave6Started": false,
+    "declaredPass": false,
+    "authenticatedWalk": true,
+    "screenshots": 17
+  }
 }
