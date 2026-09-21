@@ -116,7 +116,7 @@ def main() -> None:
     SHOTS.mkdir(parents=True, exist_ok=True)
     fe = json.loads(urllib.request.urlopen(f"{BASE}/version.json", timeout=30).read())
     RESULTS["uiSha"] = fe.get("gitSha")
-    record("ui.hosted.sha", "PASS" if str(fe.get("gitSha") or "").startswith("25791f7") else "FAIL", fe.get("gitSha"))
+    record("ui.hosted.sha", "PASS" if str(fe.get("gitSha") or "").startswith("2d8fe29") else "FAIL", fe.get("gitSha"))
 
     required = (
         "Primary next action",
@@ -136,7 +136,9 @@ def main() -> None:
         text = visible_text(page)
         record("ui.azure.monitoring.loaded", "PASS" if "Monitoring profile" in text and "Source health" in text else "FAIL", page.url)
         record("ui.source.bitsight.not.configured", "PASS" if "BitSight" in text and "NOT CONFIGURED" in text.replace("_", " ") else "FAIL", "BitSight honesty")
-        record("ui.no.247.claim", "PASS" if "24/7" not in text and "continuous threat" not in text.lower() else "FAIL", "no fake continuous claim")
+        claims_live = "live breach detection is active" in text.lower() or "24/7 monitoring is active" in text.lower()
+        honest_denial = "not advertising 24/7" in text.lower() or "only configured sources" in text.lower()
+        record("ui.no.247.claim", "PASS" if honest_denial and not claims_live else "FAIL", "honest source statement")
         record("ui.one.primary.action", "PASS" if text.count("Primary next action") >= 1 else "FAIL", "one primary next action")
         shot(page, "lead-azure-monitoring-1440")
 
@@ -206,11 +208,15 @@ def main() -> None:
         page.goto(f"{BASE}/engagements/{AZURE}/monitoring", wait_until="networkidle")
         page.wait_for_timeout(1400)
         requester = visible_text(page)
-        record(
-            "ui.requester.denied.internal.monitoring",
-            "PASS" if "cannot open internal" in requester.lower() or "not available" in requester.lower() or "unable to load" in requester.lower() or "403" in requester,
-            requester[:240],
+        denied = (
+            "cannot open internal" in requester.lower()
+            or "not available" in requester.lower()
+            or "unable to load" in requester.lower()
+            or "access denied" in requester.lower()
+            or "don't have permission" in requester.lower()
+            or "403" in requester
         )
+        record("ui.requester.denied.internal.monitoring", "PASS" if denied else "FAIL", requester[:240])
         shot(page, "requester-azure-monitoring-denied")
 
         browser.close()

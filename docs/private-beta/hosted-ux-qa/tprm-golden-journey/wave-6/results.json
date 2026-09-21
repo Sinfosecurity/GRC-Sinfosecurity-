@@ -1,0 +1,507 @@
+{
+  "item": "#12",
+  "wave": "6",
+  "declaredPass": false,
+  "wave6Accepted": false,
+  "wave7Started": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "checks": [
+    {
+      "name": "hosted.environment",
+      "result": "PASS",
+      "detail": "staging"
+    },
+    {
+      "name": "login.lead",
+      "result": "PASS",
+      "detail": "RISK_MANAGER"
+    },
+    {
+      "name": "login.analyst",
+      "result": "PASS",
+      "detail": "ASSESSOR"
+    },
+    {
+      "name": "azure.residual.before",
+      "result": "PASS",
+      "detail": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "status": "CONFIRMED",
+        "residualBand": "MEDIUM",
+        "residualScore": 58
+      }
+    },
+    {
+      "name": "azure.monitoring.workspace",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "source.health.bitsight",
+      "result": "PASS",
+      "detail": "NOT_CONFIGURED"
+    },
+    {
+      "name": "profile.activated",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "manual.signal",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "inbox.contains.signal",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "signal.assigned",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "signal.triaged",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "residual.unchanged",
+      "result": "PASS",
+      "detail": {
+        "before": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "residualBand": "MEDIUM",
+          "residualScore": 58
+        },
+        "after": {
+          "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+          "status": "CONFIRMED",
+          "residualBand": "MEDIUM",
+          "residualScore": 58
+        }
+      }
+    },
+    {
+      "name": "controls.unchanged",
+      "result": "PASS",
+      "detail": [
+        {
+          "id": "7bdc6f79-cd56-4812-8281-ef215bd1425f",
+          "rating": "PARTIALLY_EFFECTIVE",
+          "controlTitle": "Governance"
+        }
+      ]
+    },
+    {
+      "name": "signal.escalated",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "finding.from.signal",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "reassessment.recommended",
+      "result": "PASS",
+      "detail": false
+    },
+    {
+      "name": "wave7.not.started",
+      "result": "PASS",
+      "detail": {
+        "recommendation": {
+          "id": "701e9255-f750-41e0-bcc0-449dc5ffa010",
+          "organizationId": "0e0de017-919a-4886-93d7-420b05f71f62",
+          "engagementId": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
+          "signalId": "8b779821-8be5-4b9c-93ca-57e64362dae4",
+          "reason": "Material privileged-access lapse should be reassessed in Wave 7.",
+          "recommendedScope": "Engagement residual and due diligence",
+          "urgency": "NORMAL",
+          "triggerType": "MATERIAL_SECURITY_INCIDENT",
+          "requestedByUserId": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+          "status": "RECOMMENDED",
+          "wave7Started": false,
+          "createdAt": "2026-09-21T03:33:41.765Z"
+        },
+        "wave7Started": false,
+        "newIraCreated": false,
+        "honesty": "Reassessment recommended / due. Reassessment has not started."
+      }
+    },
+    {
+      "name": "m365.not.auto.changed",
+      "result": "PASS",
+      "detail": 1
+    },
+    {
+      "name": "third.party.signal",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "independent.impacts",
+      "result": "PASS",
+      "detail": {
+        "93a259e6-81bf-4eb1-b79f-2077c6eeafda": "AFFECTED",
+        "eeb0ae53-0e05-4748-8434-79f28c9e564a": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "name": "requester.denied",
+      "result": "PASS",
+      "detail": 403
+    },
+    {
+      "name": "unauth.denied",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "vendor.invitation.only",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "azure.still.active",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "ui.hosted.sha",
+      "result": "PASS",
+      "detail": "2d8fe29a8e5ece972e0d2020ee25c474a2ecde91"
+    },
+    {
+      "name": "ui.azure.monitoring.loaded",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/monitoring"
+    },
+    {
+      "name": "ui.source.bitsight.not.configured",
+      "result": "PASS",
+      "detail": "BitSight honesty"
+    },
+    {
+      "name": "ui.no.247.claim",
+      "result": "PASS",
+      "detail": "honest source statement"
+    },
+    {
+      "name": "ui.one.primary.action",
+      "result": "PASS",
+      "detail": "one primary next action"
+    },
+    {
+      "name": "a11y.labelled.controls",
+      "result": "PASS",
+      "detail": [
+        "What are we monitoring?",
+        "Why are we monitoring it?",
+        "Domains",
+        "Source",
+        "Domain",
+        "Signal title",
+        "What happened?"
+      ]
+    },
+    {
+      "name": "a11y.semantic.table",
+      "result": "PASS",
+      "detail": true
+    },
+    {
+      "name": "a11y.status.not.color.only",
+      "result": "PASS",
+      "detail": "status text present"
+    },
+    {
+      "name": "a11y.headings",
+      "result": "PASS",
+      "detail": [
+        "ENG-2026-0001 \u00b7 Azure Hosting QA",
+        "Primary next action",
+        "Monitoring profile",
+        "Source health",
+        "Record observation",
+        "Signals"
+      ]
+    },
+    {
+      "name": "a11y.keyboard.tab",
+      "result": "PASS",
+      "detail": {
+        "tag": "div",
+        "name": "Home",
+        "outline": "solid 2px rgb(212, 188, 138)",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "name": "a11y.visible.focus",
+      "result": "PASS",
+      "detail": {
+        "tag": "div",
+        "name": "Home",
+        "outline": "solid 2px rgb(212, 188, 138)",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "name": "ui.inbox.loaded",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/monitoring"
+    },
+    {
+      "name": "ui.signal.detail",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/monitoring/signals/66a07caa-660b-4c57-a3f2-077b5b01a4f2"
+    },
+    {
+      "name": "ui.no.reassessment.started",
+      "result": "PASS",
+      "detail": "handoff only"
+    },
+    {
+      "name": "overflow:azure-monitoring-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.monitoring.375",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:inbox-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.inbox.375",
+      "result": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "overflow:azure-monitoring-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.monitoring.768",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:inbox-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.inbox.768",
+      "result": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "overflow:azure-monitoring-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.monitoring.1024",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:inbox-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.inbox.1024",
+      "result": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "overflow:azure-monitoring-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.monitoring.1440",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:inbox-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.inbox.1440",
+      "result": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "overflow:azure-monitoring-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.monitoring.1920",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:inbox-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.inbox.1920",
+      "result": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "ui.requester.denied.internal.monitoring",
+      "result": "PASS",
+      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nAccess Denied\n\nYou don't have permission to access this page. Please contact your administrator if you believe this is an error.\n\nReturn to y"
+    },
+    {
+      "name": "vendor.monitoring.denied",
+      "result": "PASS",
+      "detail": [
+        {
+          "path": "/tprm/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/monitoring",
+          "status": 401,
+          "message": "Invalid or expired token"
+        },
+        {
+          "path": "/tprm/monitoring/signals",
+          "status": 401,
+          "message": "Invalid or expired token"
+        },
+        {
+          "path": "/tprm/monitoring/portfolio",
+          "status": 401,
+          "message": "Invalid or expired token"
+        }
+      ]
+    }
+  ],
+  "sha": {
+    "api": "2d8fe29a8e5ece972e0d2020ee25c474a2ecde91",
+    "frontend": "2d8fe29a8e5ece972e0d2020ee25c474a2ecde91",
+    "environment": "staging"
+  },
+  "shots": [
+    "lead-azure-monitoring-1440",
+    "lead-monitoring-inbox-1440",
+    "lead-signal-detail-1440",
+    "lead-azure-monitoring-375",
+    "lead-inbox-375",
+    "lead-azure-monitoring-768",
+    "lead-inbox-768",
+    "lead-azure-monitoring-1024",
+    "lead-inbox-1024",
+    "lead-inbox-1440",
+    "lead-azure-monitoring-1920",
+    "lead-inbox-1920",
+    "requester-azure-monitoring-denied"
+  ],
+  "overflows": [
+    {
+      "name": "azure-monitoring-375",
+      "extra": 0
+    },
+    {
+      "name": "inbox-375",
+      "extra": 0
+    },
+    {
+      "name": "azure-monitoring-768",
+      "extra": 0
+    },
+    {
+      "name": "inbox-768",
+      "extra": 0
+    },
+    {
+      "name": "azure-monitoring-1024",
+      "extra": 0
+    },
+    {
+      "name": "inbox-1024",
+      "extra": 0
+    },
+    {
+      "name": "azure-monitoring-1440",
+      "extra": 0
+    },
+    {
+      "name": "inbox-1440",
+      "extra": 0
+    },
+    {
+      "name": "azure-monitoring-1920",
+      "extra": 0
+    },
+    {
+      "name": "inbox-1920",
+      "extra": 0
+    }
+  ],
+  "a11y": {
+    "labels": [
+      "What are we monitoring?",
+      "Why are we monitoring it?",
+      "Domains",
+      "Source",
+      "Domain",
+      "Signal title",
+      "What happened?"
+    ],
+    "headings": [
+      "ENG-2026-0001 \u00b7 Azure Hosting QA",
+      "Primary next action",
+      "Monitoring profile",
+      "Source health",
+      "Record observation",
+      "Signals"
+    ],
+    "alerts": [],
+    "hasTable": true,
+    "focusableCount": 49,
+    "firstFocusable": "Skip to content"
+  },
+  "uiSha": "2d8fe29a8e5ece972e0d2020ee25c474a2ecde91",
+  "implementationSha": "2d8fe29a8e5ece972e0d2020ee25c474a2ecde91",
+  "startingSha": "da0119b12c7ab487cb17468c02e0c216d16a504b",
+  "ci": {
+    "url": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35557647040",
+    "conclusion": "success",
+    "headSha": "2d8fe29a8e5ece972e0d2020ee25c474a2ecde91"
+  },
+  "hostedWalk": "PASS",
+  "failedCount": 0
+}

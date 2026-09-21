@@ -813,6 +813,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 ## Wave 6 — Ongoing monitoring + signal triage + escalation + reassessment handoff
 
 **Starting SHA:** Wave 5 accepted lineage `88938c263d741365578e874599156096fe5d6276` / evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`  
+**Implementation SHA:** `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`  
 **Wave 6:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Not accepted.  
 **Wave 7:** NOT STARTED. No new IRA, DDQ, residual recalculation, termination, or offboarding.
 

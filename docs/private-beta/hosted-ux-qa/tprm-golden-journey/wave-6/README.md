@@ -2,9 +2,12 @@
 
 **Item:** Golden Journey Engagement monitoring  
 **Branch:** `supreme-risk-transformation`  
-**Starting SHA:** `88938c263d741365578e874599156096fe5d6276`  
+**Starting SHA:** `da0119b12c7ab487cb17468c02e0c216d16a504b`  
+**Implementation SHA:** `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`  
+**Hosted SHA:** API and frontend `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35557647040 PASS  
 **Status:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW  
-**Wave 5 accepted:** YES for current stage  
+**Wave 5 accepted:** YES for current stage (`88938c2` / `9639535` / `da0119b`)  
 **Wave 6 accepted:** NO  
 **Wave 7:** NOT STARTED  
 **#12:** NOT PASS  
@@ -13,20 +16,33 @@
 
 ## Architecture
 
-Third Party ≠ Engagement. The Monitoring Profile belongs to the Engagement. VendorMonitoring remains readable legacy and is not Engagement authority. A signal is an observation. It does not change residual risk, Control Effectiveness, or Engagement ACTIVE status, and it does not start Wave 7 reassessment.
+Third Party ≠ Engagement. The Monitoring Profile belongs to the Engagement. VendorMonitoring remains readable legacy at `/tprm/monitoring/legacy-signals` and is not Engagement authority. A signal is an observation. It does not change residual risk, Control Effectiveness, or Engagement ACTIVE status, and it does not start Wave 7 reassessment.
 
-## Hosted walk
+## Hosted golden walk
 
-Staging only. See `results.json` after the walk.
+Staging only. Authenticated API walk + UI/responsive/a11y walk. See `results.json` and `screenshots/`.
 
-1. Open Azure Hosting QA  
-2. Configure and activate the Monitoring Profile  
-3. Record a legitimate manual observation  
-4. Assign, mark Azure affected, triage  
-5. Confirm residual remains MEDIUM 58  
-6. Escalate  
-7. Create a Finding only through reviewed handoff  
-8. Recommend reassessment without starting Wave 7  
-9. Confirm Microsoft 365 is not automatically rewritten  
-10. Record a Third Party-level signal with independent impact states  
-11. Confirm Requester and Vendor denial  
+| Check | Result |
+| --- | --- |
+| Azure residual before | MEDIUM 58 |
+| Profile configured and activated | PASS |
+| Manual HIGH observation | PASS |
+| Inbox contains signal | PASS |
+| Assign / Azure affected / triage | PASS |
+| Residual after triage | MEDIUM 58 unchanged |
+| Control Effectiveness | PARTIALLY_EFFECTIVE unchanged |
+| Escalate | PASS |
+| Finding only after reviewed handoff | PASS |
+| Reassessment recommended | `wave7Started=false`, no new IRA |
+| Microsoft 365 not auto-rewritten | PASS |
+| Third Party signal independent impacts | Azure AFFECTED / M365 NEEDS_REVIEW |
+| Requester denied | 403 API / Access Denied UI |
+| Vendor denied | 401 on internal monitoring APIs |
+| Azure still ACTIVE | PASS |
+| BitSight / SecurityScorecard | NOT_CONFIGURED |
+| Responsive 375–1920 | no overflow |
+| Accessibility | labelled controls, table, visible focus |
+
+## Provider honesty
+
+No live BitSight, SecurityScorecard, Slack, or Jira connection. Manual, internal review, vendor-notification (internal model), and Intelligence attention are the available sources.
