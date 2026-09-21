@@ -546,7 +546,20 @@ export async function listSignals(organizationId: string, actor: Actor, query: a
         orderBy: { receivedAt: 'desc' },
         take: 100,
     });
-    return { signals: signals.map(presentSignal), sourceHealth: await sourceHealth(organizationId) };
+    const legacy = await prisma.vendorMonitoring.findMany({
+        where: { organizationId },
+        orderBy: { detectedAt: 'desc' },
+        take: 10,
+        select: { id: true, source: true, riskIndicator: true, riskLevel: true, detectedAt: true, vendorId: true },
+    });
+    return {
+        signals: signals.map(presentSignal),
+        sourceHealth: await sourceHealth(organizationId),
+        legacyVendorMonitoring: legacy.map((row) => ({
+            ...row,
+            honesty: 'Legacy vendor-level signal. Not Engagement-authoritative unless separately reviewed.',
+        })),
+    };
 }
 
 export async function getSignalDetail(organizationId: string, actor: Actor, signalId: string) {

@@ -15,6 +15,7 @@ import { notifyUser } from '../services/notificationDeliveryService';
 import { approvalRequiredEmail, customerAppUrl, genericOperationalEmail, vendorActivatedEmail } from '../services/transactionalEmail';
 import { enforceSubscriptionWrites } from '../middleware/entitlement';
 import { vendorOffboardService } from '../services/vendorOffboardService';
+import { listSignals } from '../services/engagementMonitoringService';
 
 const router = Router();
 router.use(authenticate);
@@ -206,7 +207,7 @@ router.post('/vendors/:vendorId/offboard', requirePermission(PERMISSIONS['vendor
     }
 });
 
-router.get('/monitoring/signals', requirePermission(PERMISSIONS['monitoring.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.get('/monitoring/legacy-signals', requirePermission(PERMISSIONS['monitoring.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const [signals, connection] = await Promise.all([
             prisma.vendorMonitoring.findMany({
@@ -233,7 +234,24 @@ router.get('/monitoring/signals', requirePermission(PERMISSIONS['monitoring.read
                 providerStatus,
                 signalCount: signals.length,
                 signals,
+                honesty: 'Legacy vendor-level monitoring. Not Engagement-authoritative unless separately reviewed.',
             },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/monitoring/signals', requirePermission(PERMISSIONS['monitoring.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({
+            success: true,
+            data: await listSignals(req.user!.organizationId, {
+                id: req.user!.id,
+                name: req.user!.name,
+                email: req.user!.email,
+                role: req.user!.role,
+            }, req.query),
         });
     } catch (error) {
         next(error);

@@ -170,6 +170,9 @@ describe('#12 Wave 6 engagement monitoring', () => {
         signalId = created.body.data.id;
         expect(created.body.data.attentionPriority).toBe('HIGH');
         expect(created.body.data.normalizationExplanation).toMatch(/not residual risk/);
+        const inbox = await request(app).get(`${API}/tprm/monitoring/signals`).set('Authorization', `Bearer ${analystToken}`);
+        expect(inbox.status).toBe(200);
+        expect(inbox.body.data.signals.some((row: any) => row.id === signalId)).toBe(true);
         const again = await request(app).post(`${API}/tprm/monitoring/signals/manual`).set('Authorization', `Bearer ${analystToken}`).send({
             vendorId,
             engagementId: azureId,

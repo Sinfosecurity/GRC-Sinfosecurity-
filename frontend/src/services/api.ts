@@ -418,7 +418,7 @@ export const tprmAPI = {
     evidence: (vendorId?: string) => api.get('/tprm/evidence', { params: vendorId ? { vendorId } : undefined }),
     uploadEvidence: (form: FormData) =>
         api.post('/tprm/evidence/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } }),
-    monitoringSignals: () => api.get('/tprm/monitoring/signals'),
+    monitoringSignals: () => api.get('/tprm/monitoring/legacy-signals'),
     questionnaires: () => api.get('/tprm/questionnaires'),
     cloneQuestionnaire: (templateId: string, name?: string) => api.post(`/tprm/questionnaires/${templateId}/clone`, { name }),
     assessmentRecommendations: (vendorId: string) => api.get('/tprm/assessments/recommendations', { params: { vendorId } }),
