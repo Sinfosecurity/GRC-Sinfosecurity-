@@ -907,7 +907,7 @@ export function nextDueDiligenceAction(status: EngagementStatus, hasInvitation =
         case EngagementStatus.GATE_APPROVED:
             return 'Activate Engagement';
         case EngagementStatus.ACTIVE:
-            return 'Monitoring setup pending Wave 6';
+            return 'Configure monitoring profile';
         case EngagementStatus.AVOIDED:
             return 'Engagement avoided';
         default:

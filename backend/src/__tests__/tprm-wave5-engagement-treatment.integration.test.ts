@@ -252,7 +252,7 @@ describe('#12 Wave 5 engagement treatment, acceptance, gate, and activation', ()
         const activated = await request(app).post(`${API}/tprm/engagements/${azureId}/activate`).set('Authorization', `Bearer ${managerToken}`).send({});
         expect(activated.status).toBe(200);
         expect(activated.body.data.engagement.status).toBe('ACTIVE');
-        expect(activated.body.data.nextAction).toMatch(/Monitoring setup pending Wave 6/);
+        expect(activated.body.data.nextAction).toMatch(/Configure monitoring profile/);
         expect(activated.body.data.wave6Started).toBe(false);
         const azure = await prisma.engagement.findUnique({ where: { id: azureId } });
         const m365 = await prisma.engagement.findUnique({ where: { id: m365Id } });

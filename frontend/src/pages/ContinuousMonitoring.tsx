@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import QueryState from '../components/QueryState';
 import PageHeader from '../components/design/PageHeader';
@@ -7,79 +8,77 @@ import AppTable from '../components/design/AppTable';
 import Surface from '../components/design/Surface';
 import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import AttentionStrip from '../components/design/AttentionStrip';
-import { tprmAPI } from '../services/api';
-
-type Signal = {
-    id: string;
-    monitoringType: string;
-    riskIndicator: string;
-    riskLevel: string;
-    requiresAction: boolean;
-    detectedAt: string;
-    vendor?: { name: string };
-};
+import { intakeAPI } from '../services/api';
 
 export default function ContinuousMonitoring() {
-    const [signals, setSignals] = useState<Signal[]>([]);
-    const [providerStatus, setProviderStatus] = useState('NOT_CONFIGURED');
-    const [signalCount, setSignalCount] = useState(0);
+    const navigate = useNavigate();
+    const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        tprmAPI.monitoringSignals()
-            .then((response) => {
-                setSignals(response.data.data.signals || []);
-                setProviderStatus(response.data.data.providerStatus || 'NOT_CONFIGURED');
-                setSignalCount(response.data.data.signalCount ?? response.data.data.signals?.length ?? 0);
-            })
-            .catch((err) => setError(err.message))
+        intakeAPI.monitoringPortfolio()
+            .then((response) => setData(response.data.data))
+            .catch((err) => setError(err.response?.data?.error?.message || err.message))
             .finally(() => setLoading(false));
     }, []);
 
-    const actionable = signals.filter((row) => row.requiresAction).length;
+    const signals = data?.signals || [];
 
     return (
         <WorkspaceFrame purpose="register">
             <PageHeader
                 crumbs={[{ label: 'Third-party risk' }, { label: 'Monitoring' }]}
-                title="Continuous monitoring"
-                description="Only recorded vendor signals are shown. External rating feeds are not simulated or backfilled."
-                meta={<StatusBadge kind="plain" tone={providerStatus === 'CONNECTED' ? 'success' : providerStatus === 'NOT_CONFIGURED' ? 'medium' : 'high'} label={providerStatus === 'CONNECTED' ? 'Provider connected' : signals.length ? 'Signals detected' : providerStatus === 'NOT_CONFIGURED' ? 'Not configured' : 'No signals'} />}
+                title="Monitoring inbox"
+                description="Engagement monitoring work lives here. External rating feeds are shown only when connected."
+                meta={<StatusBadge kind="plain" label={data?.coverage === 'Not calculated' ? 'Coverage not calculated' : 'Monitoring'} />}
             />
             <Box sx={{ mb: 2 }}>
                 <AttentionStrip items={[
-                    { label: 'Recorded signals', value: signalCount },
-                    { label: 'Require action', value: actionable },
+                    { label: 'Active monitored Engagements', value: data?.activeMonitoredEngagements ?? 0 },
+                    { label: 'Need review', value: data?.signalsNeedingReview ?? 0 },
+                    { label: 'High priority', value: data?.highPrioritySignals ?? 0 },
+                    { label: 'Reassessment recommended', value: data?.reassessmentRecommendations ?? 0 },
                 ]} />
             </Box>
-            <QueryState
-                loading={loading}
-                error={error}
-                empty={signals.length === 0}
-                emptyTitle="No monitoring signals"
-                emptyBody="When a connected provider records a vendor signal, it appears here and can raise a finding. An empty list is truthful — it is not a healthy-score placeholder."
-            >
+            <QueryState loading={loading} error={error} empty={!loading && signals.length === 0} emptyTitle="No monitoring signals" emptyBody="When an authorized analyst records or ingests an observation, it appears here. An empty list is truthful.">
                 <Surface padded={false}>
-                <AppTable
-                    embedded
-                    rows={signals}
-                    rowKey={(row) => row.id}
-                    searchPlaceholder="Search signals"
-                    searchValue={(row) => `${row.vendor?.name || ''} ${row.monitoringType} ${row.riskIndicator} ${row.riskLevel}`}
-                    columns={[
-                        { id: 'vendor', label: 'Vendor', sortValue: (row) => row.vendor?.name || '', render: (row) => (
-                            <Typography variant="subtitle2">{row.vendor?.name || 'Vendor'}</Typography>
-                        ) },
-                        { id: 'type', label: 'Type', hideOnMobile: true, sortValue: (row) => row.monitoringType, render: (row) => row.monitoringType },
-                        { id: 'indicator', label: 'Indicator', render: (row) => row.riskIndicator },
-                        { id: 'level', label: 'Level', sortValue: (row) => row.riskLevel, render: (row) => <StatusBadge value={row.riskLevel} kind="severity" /> },
-                        { id: 'action', label: 'Action', hideOnMobile: true, render: (row) => row.requiresAction ? 'Required' : 'Informational' },
-                        { id: 'when', label: 'Detected', hideOnMobile: true, sortValue: (row) => row.detectedAt, render: (row) => row.detectedAt?.slice(0, 16) || '—' },
-                    ]}
-                />
+                    <AppTable
+                        embedded
+                        rows={signals}
+                        rowKey={(row: any) => row.id}
+                        searchPlaceholder="Search signals"
+                        searchValue={(row: any) => `${row.vendor?.name || ''} ${row.title} ${row.domain} ${row.status}`}
+                        columns={[
+                            { id: 'priority', label: 'Priority', render: (row: any) => <StatusBadge kind="severity" value={row.attentionPriority} /> },
+                            { id: 'title', label: 'Signal', render: (row: any) => (
+                                <>
+                                    <Typography variant="subtitle2">{row.title}</Typography>
+                                    <Typography variant="caption">{row.publicId}</Typography>
+                                </>
+                            ) },
+                            { id: 'party', label: 'Third Party', hideOnMobile: true, render: (row: any) => row.vendor?.name || 'Third Party' },
+                            { id: 'engagement', label: 'Engagement', hideOnMobile: true, render: (row: any) => (row.impacts || []).map((item: any) => item.engagement?.serviceName).filter(Boolean).join(', ') || 'Third Party level' },
+                            { id: 'domain', label: 'Domain', hideOnMobile: true, render: (row: any) => String(row.domain || '').replace(/_/g, ' ') },
+                            { id: 'source', label: 'Source', hideOnMobile: true, render: (row: any) => row.sourceProvider },
+                            { id: 'age', label: 'Age', hideOnMobile: true, render: (row: any) => `${row.ageHours}h` },
+                            { id: 'owner', label: 'Owner', hideOnMobile: true, render: (row: any) => row.reviewOwnerUserId ? 'Assigned' : 'Unassigned' },
+                            { id: 'status', label: 'Status', render: (row: any) => String(row.status).replace(/_/g, ' ') },
+                            { id: 'next', label: 'Next action', render: (row: any) => row.nextAction },
+                        ]}
+                        onRowClick={(row: any) => navigate(`/monitoring/signals/${row.id}`)}
+                    />
                 </Surface>
             </QueryState>
+            {data?.sourceHealth && (
+                <Surface>
+                    <Typography variant="h6" component="h2">Source health</Typography>
+                    {data.sourceHealth.map((row: any) => (
+                        <Typography key={`${row.label}-${row.status}`} variant="body2">{row.label} · {row.status.replace(/_/g, ' ')} — {row.honesty}</Typography>
+                    ))}
+                    <Typography variant="body2" sx={{ mt: 1 }}>{data.honesty}</Typography>
+                </Surface>
+            )}
         </WorkspaceFrame>
     );
 }

@@ -115,6 +115,7 @@ describe('Wave 4 closure navigation', () => {
         expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-current', 'page');
         expect(screen.getByRole('tab', { name: 'Inherent Risk' })).toBeInTheDocument();
         expect(screen.getByRole('tab', { name: 'Residual Risk' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'Monitoring' })).toBeInTheDocument();
         expect(screen.getAllByText('Complete Specialist Review').length).toBeGreaterThan(0);
     });
 

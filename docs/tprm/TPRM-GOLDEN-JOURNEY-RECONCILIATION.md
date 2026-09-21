@@ -557,11 +557,11 @@ Add `engagementId`. Preserve Finding Workspace. Add human CE. Do not fork residu
 **WAVE 5 — Treatment / Acceptance / Contract Gate / Activation**  
 Treatments + explicit gate. Activate Engagement.
 
-**WAVE 6 — Monitoring / Reassessment**  
-Profiles, materiality, linked cycles. Reuse #19/#20/#22. No live provider work unless separately authorized.
+**WAVE 6 — Ongoing monitoring / signal triage / escalation / reassessment handoff**  
+Engagement Monitoring Profile, signal ingest/normalize/inbox/triage/materiality, escalation, and reassessment recommendation. Reuse #19/#20/#22. No live provider work unless separately authorized. Does not start reassessment.
 
-**WAVE 7 — Termination / Offboarding**  
-Task-gated Engagement exit. Third Party remains if other engagements exist.
+**WAVE 7 — Reassessment lifecycle**  
+Consumes Wave 6 recommendations. New IRA, DDQ, residual recalculation, and periodic reassessment execution belong here. Not started. Termination/offboarding remains later and is not started.
 
 **WAVE 8 — Analytics / Portfolio / Maturity**  
 Only after Engagement rollup is real.
@@ -765,7 +765,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Hosted:** staging frontend/API `fc228bc`. Production untouched.  
 **Wave 3 implementation:** `7132c7e09de66bb6a6917d70eb7f9f4958006190`  
 **Implementation:** Engagement-aware `VendorIssue.engagementId` (no second finding register). New `EngagementControlEffectiveness`, `EngagementCompensatingControl`, and `EngagementResidualRiskAssessment`.  
-**Wave 5:** HOSTED CLOSURE READY FOR PRODUCT LEADERSHIP REVIEW. Residual remains Engagement-authoritative. Acceptance does not rewrite residual. Not accepted.
+**Wave 5:** ACCEPTED FOR CURRENT STAGE (`88938c263d741365578e874599156096fe5d6276`). Residual remains Engagement-authoritative. Acceptance does not rewrite residual.
 
 **Finding principle:** Question ≠ Finding. Answer ≠ Finding. Missing evidence ≠ automatic Finding. Low score ≠ automatic Finding. Wave 3 review outcomes may seed a **candidate** (`IssueReviewState.DRAFT`). Only a GRC reviewer confirm creates an authoritative finding. Dismissal preserves history.
 
@@ -787,8 +787,8 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Implementation SHA:** `88938c263d741365578e874599156096fe5d6276`  
 **CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35517206054 PASS on `9639535`  
 **Hosted:** staging frontend/API `9639535`. Authenticated closure walk completed 2026-09-21. Production untouched.  
-**Wave 5 accepted:** NO.  
-**Wave 6:** NOT STARTED. No monitoring, reassessment, termination, or offboarding.
+**Wave 5 accepted:** YES for current stage.  
+**Wave 6:** AUTHORIZED. Monitoring profile, signal triage, escalation, and reassessment recommendation/handoff only. Wave 7 not started.
 
 **Ownership:** Treatment, acceptance, approvals, contract requirements, contract exceptions, contract gate, and activation belong to the Engagement. Azure Hosting and Microsoft 365 keep independent Wave 5 records on one Microsoft Third Party master. Activating one Engagement does not activate siblings.
 
@@ -808,4 +808,20 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Personas:** Requester sees business-safe statuses only. Vendor remains invitation-only and cannot see Wave 5 internals. Cross-tenant DENY.
 
-**Hosted closure:** Authenticated staging walk on Azure Hosting QA proved ACCEPT + SoD deny + authorized approval + residual unchanged (MEDIUM 58) + blocked-gate activation deny + gate APPROVED + Azure ACTIVE + Microsoft 365 isolation + requester/vendor denial + Decision Brief v1/v2 + MITIGATE/TRANSFER/AVOID + audit + queued notifications + responsive/a11y. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Wave 5 is not accepted. Wave 6 is not started.
+**Hosted closure:** Authenticated staging walk on Azure Hosting QA proved ACCEPT + SoD deny + authorized approval + residual unchanged (MEDIUM 58) + blocked-gate activation deny + gate APPROVED + Azure ACTIVE + Microsoft 365 isolation + requester/vendor denial + Decision Brief v1/v2 + MITIGATE/TRANSFER/AVOID + audit + queued notifications + responsive/a11y. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Wave 5 ACCEPTED FOR CURRENT STAGE. Wave 6 implemented and ready for Product Leadership review. Wave 7 not started.
+
+## Wave 6 — Ongoing monitoring + signal triage + escalation + reassessment handoff
+
+**Starting SHA:** Wave 5 accepted lineage `88938c263d741365578e874599156096fe5d6276` / evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`  
+**Wave 6:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Not accepted.  
+**Wave 7:** NOT STARTED. No new IRA, DDQ, residual recalculation, termination, or offboarding.
+
+**Why VendorMonitoring is insufficient:** It is vendor-scoped, has no Engagement profile, no per-Engagement relevance, no triage/materiality, no escalation object, and no reassessment handoff. Wave 6 extends it with `EngagementMonitoringProfile`, `EngagementMonitoringSignal`, `MonitoringSignalEngagementImpact`, `MonitoringReview`, `MonitoringEscalation`, and `ReassessmentRecommendation`. Legacy vendor rows remain readable and are never fabricated into Engagement linkage.
+
+**Ownership:** The Monitoring Profile belongs to the Engagement. A Third Party signal may list potentially affected Engagements. Humans mark Affected / Not affected / Needs review. Azure signals do not rewrite Microsoft 365.
+
+**Signal honesty:** Signal ≠ Finding, residual change, Control Effectiveness change, or reassessment. Finding creation is an explicit reviewed handoff. Reassessment recommendation records `wave7Started=false`.
+
+**Sources:** Manual, internal review, vendor-notification (internal model), and system/Intelligence attention are available. BitSight, SecurityScorecard, Slack, and Jira are NOT_CONFIGURED / Coming later. No fake 24/7 monitoring claim.
+
+**Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`.

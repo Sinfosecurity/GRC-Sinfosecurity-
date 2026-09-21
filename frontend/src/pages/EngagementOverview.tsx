@@ -34,6 +34,14 @@ export default function EngagementOverview() {
                 <Typography>Vendor assessment status: {data.vendorAssessmentStatus || 'Not yet assessed'}</Typography>
                 <Typography>Confirmed open Findings: {data.openFindingsCount ?? 0}</Typography>
                 <Typography>Residual risk: {data.residual || 'Not calculated'}</Typography>
+                {data.monitoring && (
+                    <>
+                        <Typography>Monitoring profile: {data.monitoring.profileStatus}</Typography>
+                        <Typography>Open monitoring signals: {data.monitoring.openSignals ?? 0}</Typography>
+                        <Typography>High-priority signals: {data.monitoring.highPriority ?? 0}</Typography>
+                        <Typography>Reassessment recommended: {data.monitoring.reassessmentRecommended ? 'Yes — Wave 7 has not started' : 'No'}</Typography>
+                    </>
+                )}
                 <Typography>Target start: {data.targetStartDate ? formatShortDate(data.targetStartDate) : 'Not recorded'}</Typography>
                 {data.legacyReviewRequired && <Typography>Legacy review required. Missing service facts were not guessed.</Typography>}
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>

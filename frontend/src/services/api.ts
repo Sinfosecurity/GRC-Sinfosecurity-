@@ -589,6 +589,21 @@ export const intakeAPI = {
     activateEngagement: (id: string) => api.post(`/tprm/engagements/${id}/activate`, {}),
     generateDecisionBrief: (id: string) => api.post(`/tprm/engagements/${id}/decision-briefs`, {}),
     getDecisionBrief: (id: string, briefId: string) => api.get(`/tprm/engagements/${id}/decision-briefs/${briefId}`),
+    getMonitoring: (id: string) => api.get(`/tprm/engagements/${id}/monitoring`),
+    saveMonitoringProfile: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/monitoring/profile`, data),
+    updateMonitoringProfile: (id: string, data: unknown) => api.patch(`/tprm/engagements/${id}/monitoring/profile`, data),
+    monitoringPortfolio: () => api.get('/tprm/monitoring/portfolio'),
+    listMonitoringSignals: (params?: Record<string, string>) => api.get('/tprm/monitoring/signals', { params }),
+    getMonitoringSignal: (signalId: string) => api.get(`/tprm/monitoring/signals/${signalId}`),
+    createManualSignal: (data: unknown) => api.post('/tprm/monitoring/signals/manual', data),
+    ingestProviderSignal: (data: unknown) => api.post('/tprm/monitoring/signals/provider', data),
+    assignMonitoringSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/assign`, data),
+    setMonitoringImpact: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/impact`, data),
+    triageMonitoringSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/triage`, data),
+    escalateMonitoringSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/escalate`, data),
+    closeMonitoringSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/close`, data),
+    createFindingFromSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/finding`, data),
+    recommendReassessment: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/recommend-reassessment`, data),
 };
 
 const intakeInfoApi = axios.create({

@@ -20,6 +20,6 @@ describe('#12 Wave 4 closure helpers', () => {
         expect(engagementPrimaryAction(EngagementStatus.RESIDUAL_READY, { residualConfirmed: true }).label).toBe('Review risk treatment');
         expect(engagementPrimaryAction(EngagementStatus.GATE_BLOCKED).label).toBe('Resolve blockers');
         expect(engagementPrimaryAction(EngagementStatus.GATE_APPROVED).label).toBe('Activate Engagement');
-        expect(engagementPrimaryAction(EngagementStatus.ACTIVE).label).toBe('Monitoring setup pending Wave 6');
+        expect(engagementPrimaryAction(EngagementStatus.ACTIVE).label).toBe('Configure monitoring profile');
     });
 });

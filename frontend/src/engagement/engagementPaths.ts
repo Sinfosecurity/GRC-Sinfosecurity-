@@ -7,6 +7,7 @@ export const ENGAGEMENT_TABS = [
     { id: 'controls', label: 'Controls', path: '/controls' },
     { id: 'residual-risk', label: 'Residual Risk', path: '/residual-risk' },
     { id: 'decisions', label: 'Decisions', path: '/decisions' },
+    { id: 'monitoring', label: 'Monitoring', path: '/monitoring' },
     { id: 'history', label: 'History', path: '/history' },
 ] as const;
 

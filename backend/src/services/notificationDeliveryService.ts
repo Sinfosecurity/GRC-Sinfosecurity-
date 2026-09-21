@@ -50,7 +50,13 @@ export type NotificationEvent =
     | 'acceptance.requested'
     | 'contract_requirement.action'
     | 'contract_gate.ready'
-    | 'engagement.activated';
+    | 'engagement.activated'
+    | 'monitoring.signal.assigned'
+    | 'monitoring.signal.high_priority'
+    | 'monitoring.signal.overdue'
+    | 'monitoring.signal.escalated'
+    | 'monitoring.reassessment_recommended'
+    | 'monitoring.profile.review_due';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
 export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';

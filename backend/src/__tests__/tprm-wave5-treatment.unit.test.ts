@@ -40,7 +40,8 @@ describe('#12 Wave 5 treatment helpers', () => {
         expect(engagementPrimaryAction(EngagementStatus.TREATMENT_REVIEW).label).toBe('Review risk treatment');
         expect(engagementPrimaryAction(EngagementStatus.ACCEPTANCE_PENDING).label).toBe('Await decision');
         expect(engagementPrimaryAction(EngagementStatus.CONTRACT_REVIEW, { mandatoryOpen: true }).label).toBe('Complete requirements');
-        expect(engagementPrimaryAction(EngagementStatus.ACTIVE).label).toBe('Monitoring setup pending Wave 6');
+        expect(engagementPrimaryAction(EngagementStatus.ACTIVE).label).toBe('Configure monitoring profile');
+        expect(engagementPrimaryAction(EngagementStatus.ACTIVE, { highPrioritySignals: 1 }).label).toBe('Review high-priority monitoring signal');
     });
 
     it('uses capability-based activation authority without invented job titles', () => {

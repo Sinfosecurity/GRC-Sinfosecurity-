@@ -9,6 +9,7 @@ export const ENGAGEMENT_WORKSPACE_TABS = [
     'controls',
     'residual-risk',
     'decisions',
+    'monitoring',
     'history',
 ] as const;
 
@@ -174,9 +175,30 @@ export function engagementPrimaryAction(
         acceptanceStatus?: string | null;
         gateStatus?: string | null;
         mandatoryOpen?: boolean;
+        monitoringProfileStatus?: string | null;
+        openMonitoringSignals?: number;
+        highPrioritySignals?: number;
+        reassessmentRecommended?: boolean;
     } = {},
 ): PrimaryAction {
-    if (status === EngagementStatus.ACTIVE) return ACTIONS.ACTIVE;
+    if (status === EngagementStatus.ACTIVE) {
+        if (extras.reassessmentRecommended) {
+            return { label: 'Reassessment recommended / due', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        if ((extras.highPrioritySignals || 0) > 0) {
+            return { label: 'Review high-priority monitoring signal', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        if ((extras.openMonitoringSignals || 0) > 0) {
+            return { label: 'Review monitoring signal', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        if (extras.monitoringProfileStatus === 'ACTIVE') {
+            return { label: 'Monitoring active — no signals need review', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        if (extras.monitoringProfileStatus === 'PAUSED') {
+            return { label: 'Resume or review monitoring profile', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        return { label: 'Configure monitoring profile', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+    }
     if (status === EngagementStatus.AVOIDED) return ACTIONS.AVOIDED;
     if (status === EngagementStatus.REJECTED) return ACTIONS.REJECTED;
     if (extras.gateStatus === 'APPROVED') return ACTIONS.GATE_APPROVED;

@@ -80,6 +80,22 @@ import {
     selectTreatment,
     updateContractRequirement,
 } from '../services/engagementTreatmentService';
+import {
+    assignSignal,
+    closeSignal,
+    createFindingFromSignal,
+    createManualSignal,
+    escalateSignal,
+    getMonitoringWorkspace,
+    getSignalDetail,
+    ingestProviderObservation,
+    listSignals,
+    portfolioMonitoring,
+    recommendReassessment,
+    setImpact,
+    triageSignal,
+    upsertProfile,
+} from '../services/engagementMonitoringService';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
@@ -713,6 +729,126 @@ router.get('/engagements/:id/decision-briefs/:briefId', requirePractitionerPerso
 router.get('/vendors/:vendorId/engagement-risk', requirePractitionerPersona, requirePermission(PERMISSIONS['intake.read'], PERMISSIONS['finding.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await listVendorEngagementRisk(req.user!.organizationId, actor(req), req.params.vendorId) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/monitoring', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getMonitoringWorkspace(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/monitoring/profile', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await upsertProfile(req.user!.organizationId, actor(req), req.params.id, req.body || {}, Boolean(req.body?.activate)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.patch('/engagements/:id/monitoring/profile', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await upsertProfile(req.user!.organizationId, actor(req), req.params.id, req.body || {}, req.body?.status === 'ACTIVE') });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/monitoring/signals', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await listSignals(req.user!.organizationId, actor(req), req.query) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/monitoring/portfolio', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await portfolioMonitoring(req.user!.organizationId, actor(req)) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/monitoring/signals/:signalId', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getSignalDetail(req.user!.organizationId, actor(req), req.params.signalId) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/manual', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await createManualSignal(req.user!.organizationId, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/provider', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await ingestProviderObservation(req.user!.organizationId, actor(req), req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/assign', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await assignSignal(req.user!.organizationId, actor(req), req.params.signalId, req.body?.ownerUserId) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/impact', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await setImpact(req.user!.organizationId, actor(req), req.params.signalId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/triage', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await triageSignal(req.user!.organizationId, actor(req), req.params.signalId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/escalate', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.escalate'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await escalateSignal(req.user!.organizationId, actor(req), req.params.signalId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/close', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await closeSignal(req.user!.organizationId, actor(req), req.params.signalId, req.body?.rationale || req.body?.reason) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/finding', requirePractitionerPersona, requirePermission(PERMISSIONS['finding.create']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await createFindingFromSignal(req.user!.organizationId, actor(req), req.params.signalId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/monitoring/signals/:signalId/recommend-reassessment', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await recommendReassessment(req.user!.organizationId, actor(req), req.params.signalId, req.body || {}) });
     } catch (error) {
         next(error);
     }

@@ -251,6 +251,12 @@ model Organization {
   engagementContractExceptions EngagementContractException[]
   engagementContractGates     EngagementContractGate[]
   engagementActivations       EngagementActivation[]
+  engagementMonitoringProfiles EngagementMonitoringProfile[]
+  engagementMonitoringSignals EngagementMonitoringSignal[]
+  monitoringSignalImpacts     MonitoringSignalEngagementImpact[]
+  monitoringReviews           MonitoringReview[]
+  monitoringEscalations       MonitoringEscalation[]
+  reassessmentRecommendations ReassessmentRecommendation[]
 
   @@index([slug])
   @@index([status])
@@ -647,6 +653,8 @@ model Vendor {
   requesterTaskLinks    RequesterTaskLink[]
   portalSessions        VendorPortalSession[]
   monitoringRecords     VendorMonitoring[]
+  monitoringProfiles    EngagementMonitoringProfile[]
+  monitoringSignals     EngagementMonitoringSignal[]
   reviews               VendorReview[]
   
   // Enterprise Audit Relations
@@ -1009,6 +1017,9 @@ model Engagement {
   contractGates            EngagementContractGate[]
   activations              EngagementActivation[]
   decisionBriefs           RiskDecisionBrief[]
+  monitoringProfile        EngagementMonitoringProfile?
+  monitoringImpacts        MonitoringSignalEngagementImpact[]
+  reassessmentRecommendations ReassessmentRecommendation[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, vendorId])
@@ -1537,6 +1548,248 @@ model EngagementActivation {
   createdAt            DateTime     @default(now())
 
   @@index([organizationId, engagementId])
+}
+
+enum EngagementMonitoringProfileStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  RETIRED
+}
+
+enum MonitoringDomain {
+  CYBERSECURITY
+  PRIVACY
+  OPERATIONAL_RESILIENCE
+  FINANCIAL_VIABILITY
+  REGULATORY_COMPLIANCE
+  FOURTH_PARTY
+  BUSINESS_CONTINUITY
+  INSURANCE
+  AI_MODEL_DEPENDENCY
+}
+
+enum MonitoringSourceType {
+  INTERNAL_REVIEW
+  MANUAL_OBSERVATION
+  VENDOR_NOTIFICATION
+  PUBLIC_API
+  WEBHOOK
+  PROVIDER_OBSERVATION
+  SECURITY_RATING
+  EXTERNAL_INTELLIGENCE
+  REGULATORY_EVENT
+  CONTRACT_EVENT
+  DOCUMENT_EXPIRY
+  SYSTEM_EVENT
+}
+
+enum MonitoringSignalStatus {
+  NEW
+  NEEDS_REVIEW
+  ASSIGNED
+  ESCALATED
+  WATCHING
+  CLOSED
+}
+
+enum MonitoringTriageOutcome {
+  NOT_RELEVANT
+  MONITOR
+  ACTION_REQUIRED
+  ESCALATE
+  REASSESSMENT_RECOMMENDED
+}
+
+enum MonitoringImpactDecision {
+  AFFECTED
+  NOT_AFFECTED
+  NEEDS_REVIEW
+}
+
+enum MonitoringPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MonitoringEscalationStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum ReassessmentRecommendationStatus {
+  RECOMMENDED
+  SUBMITTED
+  WITHDRAWN
+}
+
+enum ReassessmentTriggerType {
+  MATERIAL_SECURITY_INCIDENT
+  MAJOR_SERVICE_CHANGE
+  MATERIAL_DATA_SCOPE_CHANGE
+  CRITICAL_FINDING
+  REGULATORY_CHANGE
+  FINANCIAL_DISTRESS
+  SUBPROCESSOR_CHANGE
+  PROLONGED_OUTAGE
+  CONTRACT_CHANGE
+  SCHEDULED_PERIODIC_REVIEW
+}
+
+model EngagementMonitoringProfile {
+  id                         String                             @id @default(uuid())
+  organization               Organization                       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId             String
+  vendor                     Vendor                             @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId                   String
+  engagement                 Engagement                         @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId               String                             @unique
+  status                     EngagementMonitoringProfileStatus  @default(DRAFT)
+  ownerUserId                String?
+  reviewCadenceDays          Int?
+  enabledDomains             Json
+  enabledSources             Json
+  materialityConfig          Json?
+  reassessmentTriggerConfig  Json?
+  whatMonitoring             String
+  whyMonitoring              String
+  effectiveAt                DateTime?
+  lastReviewedAt             DateTime?
+  nextReviewAt               DateTime?
+  createdByUserId            String
+  updatedByUserId            String
+  version                    Int                                @default(1)
+  history                    Json?
+  createdAt                  DateTime                           @default(now())
+  updatedAt                  DateTime                           @updatedAt
+
+  @@index([organizationId, vendorId])
+  @@index([organizationId, status])
+}
+
+model EngagementMonitoringSignal {
+  id                         String                  @id @default(uuid())
+  organization               Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId             String
+  vendor                     Vendor                  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId                   String
+  originatingEngagementId    String?
+  publicId                   String
+  sourceType                 MonitoringSourceType
+  sourceProvider             String
+  sourceRecordRef            String?
+  signalType                 String
+  domain                     MonitoringDomain
+  observedAt                 DateTime
+  receivedAt                 DateTime                @default(now())
+  title                      String
+  summary                    String
+  sourceMetadata             Json
+  sourceSeverity             String?
+  attentionPriority          MonitoringPriority
+  normalizationExplanation   String
+  confidence                 String?
+  status                     MonitoringSignalStatus  @default(NEW)
+  dedupKey                   String
+  reviewOwnerUserId          String?
+  triageOutcome              MonitoringTriageOutcome?
+  materiality                String?
+  materialityRationale       String?
+  relatedEvidenceRef         String?
+  relatedFindingId           String?
+  relatedRecommendationId    String?
+  version                    Int                     @default(1)
+  createdByUserId            String
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @updatedAt
+  impacts                    MonitoringSignalEngagementImpact[]
+  reviews                    MonitoringReview[]
+  escalations                MonitoringEscalation[]
+  evidenceLinks              EvidenceLink[]
+  recommendations            ReassessmentRecommendation[]
+
+  @@unique([organizationId, publicId])
+  @@unique([organizationId, dedupKey])
+  @@index([organizationId, vendorId, status])
+  @@index([organizationId, attentionPriority, status])
+  @@index([organizationId, originatingEngagementId])
+}
+
+model MonitoringSignalEngagementImpact {
+  id             String                    @id @default(uuid())
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  signal         EngagementMonitoringSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  signalId       String
+  engagement     Engagement                @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId   String
+  decision       MonitoringImpactDecision  @default(NEEDS_REVIEW)
+  rationale      String?
+  decidedByUserId String?
+  decidedAt      DateTime?
+  createdAt      DateTime                  @default(now())
+
+  @@unique([signalId, engagementId])
+  @@index([organizationId, engagementId])
+}
+
+model MonitoringReview {
+  id             String                   @id @default(uuid())
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  signal         EngagementMonitoringSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  signalId       String
+  reviewerUserId String
+  reviewedAt     DateTime                 @default(now())
+  decision       MonitoringTriageOutcome
+  rationale      String
+  engagementId   String?
+  materiality    String?
+  nextAction     String?
+  createdAt      DateTime                 @default(now())
+
+  @@index([organizationId, signalId, reviewedAt])
+}
+
+model MonitoringEscalation {
+  id             String                     @id @default(uuid())
+  organization   Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  signal         EngagementMonitoringSignal @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  signalId       String
+  engagementId   String?
+  fromUserId     String
+  toUserId       String
+  reason         String
+  priority       MonitoringPriority
+  dueAt          DateTime?
+  status         MonitoringEscalationStatus @default(OPEN)
+  createdAt      DateTime                   @default(now())
+
+  @@index([organizationId, signalId, createdAt])
+}
+
+model ReassessmentRecommendation {
+  id                String                            @id @default(uuid())
+  organization      Organization                      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId    String
+  engagement        Engagement                        @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId      String
+  signal            EngagementMonitoringSignal?       @relation(fields: [signalId], references: [id])
+  signalId          String?
+  reason            String
+  recommendedScope  String
+  urgency           String
+  triggerType       ReassessmentTriggerType
+  requestedByUserId String
+  status            ReassessmentRecommendationStatus  @default(RECOMMENDED)
+  wave7Started      Boolean                           @default(false)
+  createdAt         DateTime                          @default(now())
+
+  @@index([organizationId, engagementId, createdAt])
 }
 
 enum VendorStatus {
@@ -3576,6 +3829,8 @@ model EvidenceLink {
   questionId     String?
   engagement     Engagement?  @relation(fields: [engagementId], references: [id])
   engagementId   String?
+  monitoringSignal EngagementMonitoringSignal? @relation(fields: [monitoringSignalId], references: [id])
+  monitoringSignalId String?
   intakeRequest              IntakeRequest? @relation(fields: [intakeRequestId], references: [id])
   intakeRequestId            String?
   intakeInformationRequest   IntakeInformationRequest? @relation(fields: [intakeInformationRequestId], references: [id])
@@ -3589,6 +3844,7 @@ model EvidenceLink {
   @@index([assessmentId])
   @@index([issueId])
   @@index([engagementId])
+  @@index([monitoringSignalId])
   @@index([intakeRequestId])
   @@index([intakeInformationRequestId])
 }
@@ -3991,6 +4247,8 @@ enum GovernanceNodeType {
   PRODUCT
   BUSINESS_PROCESS
   CRITICAL_SERVICE
+  MONITORING_PROFILE
+  MONITORING_SIGNAL
 }
 
 enum GovernanceRelationshipType {
@@ -4037,6 +4295,8 @@ enum GovernanceRelationshipType {
   HAS_DECISION
   SUBJECT_TO
   HAS_CONTRACT
+  OBSERVED
+  RELATES_TO
 }
 
 enum GovernanceProvenance {

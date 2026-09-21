@@ -1383,12 +1383,18 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
         select: { action: true, timestamp: true, actorUserId: true, resourceType: true },
     });
     const outstanding = reviews.filter((item) => item.status !== 'COMPLETE').map((item) => item.domain).filter(Boolean);
+    const { monitoringExtras } = await import('./engagementMonitoringService');
+    const monitoring = row.status === 'ACTIVE' ? await monitoringExtras(organizationId, row.id) : null;
     const primary = engagementPrimaryAction(row.status, {
         residualReady: Boolean(risk?.residualReady),
         residualConfirmed: risk?.residual?.status === 'CONFIRMED',
         outstandingReviewDomains: outstanding,
         openCandidateCount: risk?.candidates?.length || 0,
         controlAssessed: Boolean(risk?.controls?.some((item: { rating?: string }) => item.rating && item.rating !== 'NOT_ASSESSED')),
+        monitoringProfileStatus: monitoring?.monitoringProfileStatus,
+        openMonitoringSignals: monitoring?.openMonitoringSignals,
+        highPrioritySignals: monitoring?.highPrioritySignals,
+        reassessmentRecommended: monitoring?.reassessmentRecommended,
     });
     const vendorAssessmentStatus = assessments.some((item) => item.submittedAt)
         ? 'Vendor submitted'
@@ -1434,7 +1440,15 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
             actor: item.actorUserId,
             resourceType: item.resourceType,
         })),
-        tabs: ['overview', 'inherent-risk', 'due-diligence', 'evidence', 'findings', 'controls', 'residual-risk', 'decisions', 'history'],
+        tabs: ['overview', 'inherent-risk', 'due-diligence', 'evidence', 'findings', 'controls', 'residual-risk', 'decisions', 'monitoring', 'history'],
+        monitoring: monitoring ? {
+            profileStatus: monitoring.monitoringProfileStatus || 'Not configured',
+            openSignals: monitoring.openSignals,
+            highPriority: monitoring.highPrioritySignals,
+            lastReview: monitoring.lastReview?.lastReviewedAt || null,
+            nextReview: monitoring.lastReview?.nextReviewAt || null,
+            reassessmentRecommended: monitoring.reassessmentRecommended,
+        } : null,
     };
 }
 
