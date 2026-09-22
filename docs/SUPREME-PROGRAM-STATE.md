@@ -6,7 +6,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-22 (security remediation for 2026-09-22 pentest implemented — READY FOR PRODUCT LEADERSHIP SECURITY REVIEW; not Wave 9; Wave 8 remains implemented and unaccepted; not #12 PASS)
+**LAST UPDATED:** 2026-09-22 (security remediation for 2026-09-22 pentest implemented and hosted-retested — READY FOR PRODUCT LEADERSHIP SECURITY REVIEW; SHA `da9f7de77239f0a354508fe757b1f2291637f20f`; CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS; not Wave 9; Wave 8 remains implemented and unaccepted; not #12 PASS)
 
 **CURRENT ITEM:** #12 TPRM Golden Journey Revamp remains ACTIVE. Mandatory unnumbered security remediation from the 2026-09-22 penetration-test report is implemented and ready for Product Leadership security review. This is not Wave 9 and not a new punch-list number. Waves 1–7 remain accepted. Wave 8 remains implemented and unaccepted. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
