@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authAPI } from '../../services/api';
+import { clearBrowserSessionArtifacts, setAccessToken } from '../../services/sessionStore';
 
 interface User {
     id: string;
@@ -34,9 +35,9 @@ export const login = createAsyncThunk(
     async (credentials: { email: string; password: string }, { rejectWithValue }) => {
         try {
             const response = await authAPI.login(credentials);
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('refreshToken', response.data.refreshToken);
-            return response.data;
+            const payload = response.data.data || response.data;
+            setAccessToken(payload.token);
+            return payload;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Login failed');
         }
@@ -49,8 +50,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
     } catch (error) {
         console.error('Logout error:', error);
     } finally {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        clearBrowserSessionArtifacts();
     }
 });
 
@@ -58,15 +58,12 @@ export const refreshAccessToken = createAsyncThunk(
     'auth/refresh',
     async (_, { rejectWithValue }) => {
         try {
-            const refreshToken = localStorage.getItem('refreshToken');
-            if (!refreshToken) throw new Error('No refresh token');
-            
-            const response = await authAPI.refreshToken(refreshToken);
-            localStorage.setItem('token', response.data.token);
-            return response.data;
+            const response = await authAPI.refreshToken();
+            const payload = response.data.data || response.data;
+            setAccessToken(payload.token);
+            return payload;
         } catch (error: any) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
+            clearBrowserSessionArtifacts();
             return rejectWithValue(error.response?.data?.message || 'Token refresh failed');
         }
     }
@@ -91,9 +88,8 @@ const authSlice = createSlice({
         setCredentials: (state, action: PayloadAction<{ user: User; token: string; refreshToken?: string }>) => {
             state.user = action.payload.user;
             state.token = action.payload.token;
-            if (action.payload.refreshToken) {
-                state.refreshToken = action.payload.refreshToken;
-            }
+            state.refreshToken = null;
+            setAccessToken(action.payload.token);
             state.isAuthenticated = true;
             state.error = null;
         },
@@ -103,6 +99,7 @@ const authSlice = createSlice({
             state.refreshToken = null;
             state.isAuthenticated = false;
             state.error = null;
+            clearBrowserSessionArtifacts();
         },
         setError: (state, action: PayloadAction<string>) => {
             state.error = action.payload;
@@ -122,7 +119,7 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = action.payload.user;
                 state.token = action.payload.token;
-                state.refreshToken = action.payload.refreshToken;
+                state.refreshToken = null;
                 state.isAuthenticated = true;
                 state.error = null;
             })

@@ -45,7 +45,10 @@ const router = express.Router();
 
 function sendRouteError(res: { status: (code: number) => { json: (body: unknown) => void } }, error: { statusCode?: number; status?: number; message?: string }, fallback = 400) {
     const status = error.statusCode || error.status || fallback;
-    res.status(status).json({ error: { message: error.message || 'Request failed.' } });
+    const message = status >= 500
+        ? 'An unexpected error occurred.'
+        : error.message || 'Request failed.';
+    res.status(status).json({ error: { message } });
 }
 
 // Apply authentication to all routes

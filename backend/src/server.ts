@@ -77,8 +77,10 @@ import { standardTimeout } from './middleware/timeout';
 import { requestId, requestLogger, performanceMonitor } from './middleware/logging';
 import { sanitizeInput } from './middleware/sanitization';
 import { corsOriginDelegate } from './security/corsOrigins';
-import { authenticate } from './middleware/auth';
+import { authenticate, AuthRequest } from './middleware/auth';
 import { rejectPlatformTenantContent } from './security/tenant';
+import { isPlatformStaffRole, hasPermission, PERMISSIONS } from './security/rbac';
+import { ApiError } from './middleware/errorHandler';
 
 // Import config
 import { connectDatabase, prisma, redisClient } from './config/database';
@@ -88,6 +90,7 @@ import {
     healthCheckHandler,
     readinessCheckHandler,
     livenessCheckHandler,
+    diagnosticsHealthHandler,
     gracefulShutdown,
 } from './utils/healthCheck';
 import { monitoringService } from './utils/monitoring';
@@ -232,9 +235,16 @@ app.get('/metrics/json', async (req: Request, res: Response) => {
 });
 
 // Health check endpoints
-app.get('/health', healthCheckHandler); // Comprehensive health check with all dependencies
-app.get('/health/ready', readinessCheckHandler); // Kubernetes readiness probe
-app.get('/health/live', livenessCheckHandler); // Kubernetes liveness probe
+app.get('/health', healthCheckHandler);
+app.get('/health/ready', readinessCheckHandler);
+app.get('/health/live', livenessCheckHandler);
+app.get('/api/v1/ops/diagnostics', authenticate, (req: AuthRequest, _res: Response, next: NextFunction) => {
+    const role = req.user?.role;
+    if (role && (isPlatformStaffRole(role) || hasPermission(role, PERMISSIONS['organization.manage']))) {
+        return next();
+    }
+    next(new ApiError(403, 'You do not have permission to view diagnostics.'));
+}, diagnosticsHealthHandler);
 
 // API Routes
 const API_PREFIX = `/api/${process.env.API_VERSION || 'v1'}`;

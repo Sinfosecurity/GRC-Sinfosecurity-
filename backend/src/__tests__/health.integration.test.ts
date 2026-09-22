@@ -12,44 +12,38 @@ describe('Health Check API', () => {
                 .get('/health')
                 .expect(200);
 
-            expect(response.body.status).toMatch(/healthy|degraded/);
+            expect(response.body.status).toBe('ok');
             expect(response.body).toHaveProperty('timestamp');
-            expect(response.body).toHaveProperty('uptime');
-            expect(response.body).toHaveProperty('environment');
+            expect(response.body).not.toHaveProperty('uptime');
+            expect(response.body).not.toHaveProperty('environment');
+            expect(Object.keys(response.body).sort()).toEqual(['status', 'timestamp']);
         });
 
-        it('should include memory usage', async () => {
+        it('should not include memory usage on the public surface', async () => {
             const response = await request(app)
                 .get('/health')
                 .expect(200);
 
-            expect(response.body).toHaveProperty('memory');
-            expect(response.body.memory).toHaveProperty('rss');
-            expect(response.body.memory).toHaveProperty('heapUsed');
+            expect(response.body).not.toHaveProperty('memory');
         });
 
-        it('should include version information', async () => {
+        it('should not include version or git information on the public surface', async () => {
             const response = await request(app)
                 .get('/health')
                 .expect(200);
 
-            expect(response.body).toHaveProperty('version');
-            expect(response.body).toHaveProperty('gitSha');
-            expect(response.body).toHaveProperty('runtimeMode');
-            expect(response.body).toHaveProperty('deploymentEnvironment');
-            expect(response.body.runtimeMode).toBe(process.env.NODE_ENV || 'test');
-            expect(response.body.deploymentEnvironment).toBe(process.env.APP_ENVIRONMENT || process.env.VITE_ENVIRONMENT || process.env.NODE_ENV || 'test');
+            expect(response.body).not.toHaveProperty('version');
+            expect(response.body).not.toHaveProperty('gitSha');
+            expect(response.body).not.toHaveProperty('runtimeMode');
+            expect(response.body).not.toHaveProperty('deploymentEnvironment');
         });
 
-        it('should check database connections in production mode', async () => {
+        it('should not expose database checks on the public surface', async () => {
             const response = await request(app)
                 .get('/health')
                 .expect(200);
 
-            expect(response.body).toHaveProperty('checks');
-            if (response.body.checks?.postgres || response.body.checks?.database) {
-                expect(response.body.checks.postgres || response.body.checks.database).toBeDefined();
-            }
+            expect(response.body).not.toHaveProperty('checks');
         });
 
         it('should add request ID header', async () => {

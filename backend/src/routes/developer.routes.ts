@@ -30,6 +30,7 @@ router.get('/overview', async (req: AuthRequest, res: Response, next: NextFuncti
                 connectedIntegrations: integrations.filter((row) => row.status.key === 'connected').length,
                 publicApiBase: '/public/v1',
                 sinkUrl: webhookService.sinkUrl(organizationId),
+                sinkToken: webhookService.sinkToken(organizationId),
             },
         });
     } catch (error) { next(error); }
@@ -66,8 +67,13 @@ router.get('/webhooks', async (req: AuthRequest, res: Response, next: NextFuncti
     catch (error) { next(error); }
 });
 
-router.get('/webhooks/events', (_req, res) => {
-    res.json({ success: true, data: webhookService.events() });
+router.get('/webhooks/events', (_req, res, next) => {
+    try {
+        const events = webhookService.events();
+        res.json({ success: true, data: Array.isArray(events) ? events : [] });
+    } catch (error) {
+        next(error);
+    }
 });
 
 router.post('/webhooks', async (req: AuthRequest, res: Response, next: NextFunction) => {

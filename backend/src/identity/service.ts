@@ -251,7 +251,15 @@ export const identityService = {
     },
 
     async discoverOidcIssuer(organizationId: string, id: string, actorUserId: string, issuer: string) {
-        await providerForOrg(organizationId, id);
+        const provider = await providerForOrg(organizationId, id);
+        const { issuerHostAllowed } = await import('../security/ssrfPolicy');
+        const approved = (await prisma.identityDomain.findMany({
+            where: { organizationId, providerId: id, status: DomainVerificationStatus.VERIFIED },
+            select: { domain: true },
+        })).map((row) => row.domain);
+        if (!issuerHostAllowed(issuer, provider.issuer, approved)) {
+            throw new ApiError(400, 'Use an approved issuer for this identity provider.');
+        }
         const discovered = await discoverOidc(issuer);
         return this.updateProvider(organizationId, id, actorUserId, {
             issuer: discovered.issuer,

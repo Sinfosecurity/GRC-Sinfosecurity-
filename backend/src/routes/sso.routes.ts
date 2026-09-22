@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ssoLimiter } from '../middleware/rateLimiter';
 import { identityService } from '../identity/service';
+import { sessionRefreshTtlMs, setRefreshCookie, shouldExposeRefreshTokenInBody } from '../security/refreshCookie';
 
 const router = Router();
 
@@ -42,7 +43,19 @@ router.get('/oidc/callback', ssoLimiter, async (req, res, next) => {
 
 router.post('/exchange', ssoLimiter, async (req, res, next) => {
     try {
-        res.json({ success: true, data: await identityService.exchange(String(req.body?.code || '')) });
+        const data = await identityService.exchange(String(req.body?.code || '')) as { refreshToken?: string; token?: string; user?: unknown };
+        if (data.refreshToken) {
+            setRefreshCookie(res, data.refreshToken, sessionRefreshTtlMs());
+        }
+        const { refreshToken, ...rest } = data;
+        res.json({
+            success: true,
+            data: {
+                ...rest,
+                refreshTokenStorage: 'cookie',
+                ...(shouldExposeRefreshTokenInBody() ? { refreshToken } : {}),
+            },
+        });
     } catch (error) { next(error); }
 });
 

@@ -4,7 +4,11 @@ import { scimError, scimService } from '../identity/scim';
 const router = Router();
 
 async function requireScim(req: Request, res: Response, next: NextFunction) {
-    const token = await scimService.authenticate(req.headers.authorization);
+    const authorization = req.headers.authorization || '';
+    if (/^Basic\s+/i.test(authorization)) {
+        return res.status(401).json(scimError(401, 'Use a Bearer SCIM token.', 'unauthorized'));
+    }
+    const token = await scimService.authenticate(authorization);
     if (!token) {
         return res.status(401).json(scimError(401, 'Not authorized.', 'unauthorized'));
     }

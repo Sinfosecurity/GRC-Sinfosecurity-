@@ -10,6 +10,7 @@ import { prisma } from '../config/database';
 
 const router = Router();
 const limiter = createCategoryLimiter('public_api');
+const sinkLimiter = createCategoryLimiter('demo_ip');
 
 export type PublicRequest = {
     publicClient?: { id: string; organizationId: string; scopes: string[] };
@@ -86,7 +87,7 @@ router.get('/docs', (_req, res) => {
 </body></html>`);
 });
 
-router.post('/webhook-sink/:sinkId', async (req, res, next) => {
+router.post('/webhook-sink/:sinkId', sinkLimiter, async (req, res, next) => {
     try {
         if (shouldForceSinkFailure(String(req.params.sinkId), String(req.query.failOnce || '') === '1')) {
             res.status(500).json({ error: { message: 'Forced staging webhook failure', code: 'WEBHOOK_TEST_FAIL' } });

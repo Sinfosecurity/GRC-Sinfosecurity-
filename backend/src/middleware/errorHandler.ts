@@ -23,6 +23,7 @@ export function errorHandler(
     let message = err.message || 'Internal Server Error';
     let errorType = 'ServerError';
     let details: any = {};
+    const unexpected = !err.statusCode && !(err instanceof ApiError) && !(err instanceof PrismaClientKnownRequestError) && !(err instanceof PrismaClientValidationError);
 
     // Handle specific error types
     if (err instanceof ApiError) {
@@ -88,28 +89,46 @@ export function errorHandler(
         logger.info('Request Error:', logData);
     }
 
-    // Send error response
+    if (statusCode >= 500 || unexpected) {
+        statusCode = statusCode >= 500 ? statusCode : 500;
+        message = 'An unexpected error occurred.';
+        errorType = 'internal_error';
+        details = {};
+    }
+
     const errorResponse: any = {
         success: false,
-        error: {
+        error: 'internal_error',
+        message,
+        requestId: (req as any).id,
+    };
+
+    if (statusCode < 500) {
+        errorResponse.error = {
             type: errorType,
             message,
             code: err.code,
             statusCode,
             timestamp: new Date().toISOString(),
             requestId: (req as any).id,
-        },
-    };
+        };
+        if (err.isOperational && Object.keys(details).length > 0 && !looksSensitive(details)) {
+            errorResponse.error.details = details;
+        }
+    } else {
+        errorResponse.error = 'internal_error';
+    }
 
-    // Include details in development or for operational errors
-    if (process.env.NODE_ENV === 'development') {
-        errorResponse.error.stack = err.stack;
-        errorResponse.error.details = details;
-    } else if (err.isOperational && Object.keys(details).length > 0) {
-        errorResponse.error.details = details;
+    if (process.env.NODE_ENV === 'development' && process.env.APP_ENVIRONMENT !== 'staging') {
+        errorResponse.stack = err.stack;
     }
 
     res.status(statusCode).json(errorResponse);
+}
+
+function looksSensitive(details: unknown): boolean {
+    const text = JSON.stringify(details || {});
+    return /stack|prisma|sql|password|secret|token|\/users\/|\\\\|\.ts:\d+/i.test(text);
 }
 
 /**
@@ -162,16 +181,22 @@ function handlePrismaError(error: PrismaClientKnownRequestError): {
 /**
  * Enhanced API Error classes
  */
-export function publicServerErrorPayload(error: unknown): { error: string } {
-    return { error: legacyErrorMessage(error, 500) };
+export function publicServerErrorPayload(_error: unknown): { error: string; message: string; requestId?: string } {
+    return { error: 'internal_error', message: 'An unexpected error occurred.' };
 }
 
 export function legacyErrorMessage(error: unknown, statusCode = 500): string {
-    const hosted = process.env.NODE_ENV === 'production' || process.env.APP_ENVIRONMENT === 'staging';
-    if (statusCode >= 500 && hosted) {
-        return 'An unexpected error occurred';
+    if (statusCode >= 500) {
+        return 'An unexpected error occurred.';
     }
-    return error instanceof Error ? error.message : 'An unexpected error occurred';
+    return error instanceof Error ? sanitizeClientMessage(error.message) : 'An unexpected error occurred.';
+}
+
+export function sanitizeClientMessage(message: string): string {
+    if (/\.filter is not a function|Cannot read properties of|Prisma|ECONNREFUSED|ENOENT|\/Users\/|\/home\/|at Object\./i.test(message)) {
+        return 'An unexpected error occurred.';
+    }
+    return message;
 }
 
 export class ApiError extends Error implements AppError {

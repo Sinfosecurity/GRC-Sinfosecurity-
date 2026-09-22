@@ -15,6 +15,14 @@ import { requestedPlane } from '../security/sessionPlane';
 import { totpMfaService } from '../services/totpMfaService';
 import { privilegeElevationService } from '../services/privilegeElevationService';
 import { requirePlatformStaff } from '../security/platform';
+import {
+    assertRefreshCsrf,
+    clearRefreshCookie,
+    readRefreshToken,
+    sessionRefreshTtlMs,
+    setRefreshCookie,
+    shouldExposeRefreshTokenInBody,
+} from '../security/refreshCookie';
 
 const router = Router();
 
@@ -26,11 +34,31 @@ function meta(req: Request) {
     };
 }
 
+function sessionBody(result: { token?: string; refreshToken?: string; [key: string]: unknown }) {
+    if (!('refreshToken' in result) || !result.refreshToken) return result;
+    const { refreshToken, ...rest } = result;
+    return {
+        ...rest,
+        refreshTokenStorage: 'cookie',
+        ...(shouldExposeRefreshTokenInBody() ? { refreshToken } : {}),
+    };
+}
+
+function attachRefresh(res: Response, result: { refreshToken?: string } | Record<string, unknown>) {
+    const token = 'refreshToken' in result && typeof result.refreshToken === 'string' ? result.refreshToken : undefined;
+    if (token) {
+        setRefreshCookie(res, token, sessionRefreshTtlMs());
+    }
+}
+
 router.post('/register', signupRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password, firstName, lastName, organizationName, country } = req.body || {};
         if (!email || !password || !firstName || !lastName || !organizationName) {
             throw new ApiError(400, 'Email, password, name, and organization name are required');
+        }
+        if (req.body?.organizationId) {
+            throw new ApiError(400, 'You cannot join an existing organization from public registration.');
         }
         const result = await authService.signup({
             email,
@@ -40,8 +68,8 @@ router.post('/register', signupRateLimiter, async (req: Request, res: Response, 
             organizationName,
             country,
         });
-        res.cookie('token', result.token, authService.cookieOptions());
-        res.status(201).json({ success: true, data: result });
+        attachRefresh(res, result);
+        res.status(201).json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }
@@ -53,6 +81,9 @@ router.post('/signup', signupRateLimiter, async (req: Request, res: Response, ne
         if (!email || !password || !firstName || !lastName || !organizationName) {
             throw new ApiError(400, 'Email, password, name, and organization name are required');
         }
+        if (req.body?.organizationId) {
+            throw new ApiError(400, 'You cannot join an existing organization from public registration.');
+        }
         const result = await authService.signup({
             email,
             password,
@@ -61,8 +92,8 @@ router.post('/signup', signupRateLimiter, async (req: Request, res: Response, ne
             organizationName,
             country,
         });
-        res.cookie('token', result.token, authService.cookieOptions());
-        res.status(201).json({ success: true, data: result });
+        attachRefresh(res, result);
+        res.status(201).json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }
@@ -75,10 +106,8 @@ router.post('/login', loginIpLimiter, authRateLimiter, async (req: Request, res:
             throw new ApiError(400, 'Email and password are required');
         }
         const result = await authService.login(email, password, { ...meta(req), plane: requestedPlane(req.body) });
-        if ('token' in result && result.token) {
-            res.cookie('token', result.token, authService.cookieOptions());
-        }
-        res.json({ success: true, data: result });
+        attachRefresh(res, result);
+        res.json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }
@@ -86,13 +115,14 @@ router.post('/login', loginIpLimiter, authRateLimiter, async (req: Request, res:
 
 router.post('/refresh', authRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const refreshToken = req.body?.refreshToken || req.cookies?.refreshToken;
-        if (!refreshToken) {
+        const presented = readRefreshToken(req);
+        if (!presented.token) {
             throw new ApiError(400, 'Refresh token is required');
         }
-        const result = await authService.refresh(refreshToken);
-        res.cookie('token', result.token, authService.cookieOptions());
-        res.json({ success: true, data: result });
+        assertRefreshCsrf(req, presented.fromCookie);
+        const result = await authService.refresh(presented.token);
+        attachRefresh(res, result);
+        res.json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }
@@ -100,8 +130,9 @@ router.post('/refresh', authRateLimiter, async (req: Request, res: Response, nex
 
 router.post('/logout', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        await authService.logout(req.body?.refreshToken, req.user?.id);
-        res.clearCookie('token', authService.cookieOptions());
+        const presented = readRefreshToken(req);
+        await authService.logout(presented.token || req.body?.refreshToken, req.user?.id);
+        clearRefreshCookie(res);
         res.json({ success: true, data: { message: 'Logged out successfully' } });
     } catch (error) {
         next(error);
@@ -173,8 +204,8 @@ router.post('/activate', activationRateLimiter, async (req: Request, res: Respon
             throw new ApiError(400, 'Invitation token, password, and name are required');
         }
         const result = await authService.acceptInvitation(token, { password, firstName, lastName });
-        res.cookie('token', result.token, authService.cookieOptions());
-        res.json({ success: true, data: result });
+        attachRefresh(res, result);
+        res.json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }
@@ -200,8 +231,8 @@ router.post('/mfa/enroll/confirm', authenticate, mfaLimiter, async (req: AuthReq
         const result = await authService.completePlatformEnrollment(req.user!.id, String(req.body?.code || ''), {
             requestId: meta(req).requestId,
         });
-        res.cookie('token', result.token, authService.cookieOptions());
-        res.json({ success: true, data: result });
+        attachRefresh(res, result);
+        res.json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }
@@ -214,8 +245,8 @@ router.post('/mfa/verify', mfaLimiter, async (req: Request, res: Response, next:
             String(req.body?.code || ''),
             meta(req)
         );
-        res.cookie('token', result.token, authService.cookieOptions());
-        res.json({ success: true, data: result });
+        attachRefresh(res, result);
+        res.json({ success: true, data: sessionBody(result) });
     } catch (error) {
         next(error);
     }

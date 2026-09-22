@@ -55,6 +55,28 @@ export const publicResources = {
     },
 
     async updateVendor(organizationId: string, id: string, body: Record<string, unknown>) {
+        const allowed = new Set(['name', 'primaryContact', 'contactEmail', 'servicesProvided']);
+        const forbidden = new Set([
+            'organizationId',
+            'status',
+            'tier',
+            'inherentRiskScore',
+            'residualRisk',
+            'residualRiskScore',
+            'createdBy',
+            'approvedBy',
+            'id',
+            'publicId',
+        ]);
+        const keys = Object.keys(body || {});
+        const blocked = keys.filter((key) => forbidden.has(key));
+        if (blocked.length) {
+            throw new ApiError(400, `These fields cannot be assigned: ${blocked.join(', ')}.`);
+        }
+        const unknown = keys.filter((key) => !allowed.has(key));
+        if (unknown.length) {
+            throw new ApiError(400, `Unknown fields are not accepted: ${unknown.join(', ')}.`);
+        }
         const vendor = await vendorManagementService.updateVendor(id, organizationId, {
             name: typeof body.name === 'string' ? body.name : undefined,
             primaryContact: typeof body.primaryContact === 'string' ? body.primaryContact : undefined,

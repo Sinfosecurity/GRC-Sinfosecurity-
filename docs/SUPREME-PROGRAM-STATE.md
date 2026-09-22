@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-21 (#12 Wave 8 implemented — termination + offboarding + final disposition; Waves 1–7 ACCEPTED FOR CURRENT STAGE; Wave 8 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW; not #12 PASS)
+**LAST UPDATED:** 2026-09-22 (security remediation for 2026-09-22 pentest implemented — READY FOR PRODUCT LEADERSHIP SECURITY REVIEW; not Wave 9; Wave 8 remains implemented and unaccepted; not #12 PASS)
 
-**CURRENT ITEM:** #12 TPRM Golden Journey Revamp — Wave 8 termination, offboarding, and final disposition. Waves 1–7 are accepted for the current stage. Wave 8 is implemented and ready for Product Leadership review. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
+**CURRENT ITEM:** #12 TPRM Golden Journey Revamp remains ACTIVE. Mandatory unnumbered security remediation from the 2026-09-22 penetration-test report is implemented and ready for Product Leadership security review. This is not Wave 9 and not a new punch-list number. Waves 1–7 remain accepted. Wave 8 remains implemented and unaccepted. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. H-5 and H-6 remain OPEN. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE. WAVE 5 ACCEPTED FOR CURRENT STAGE. WAVE 6 ACCEPTED FOR CURRENT STAGE. WAVE 7 ACCEPTED FOR CURRENT STAGE. WAVE 8 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Offboarding belongs to the Engagement. Closing Azure does not close Microsoft 365. Historical residual remains inspectable. Cursor does not declare Wave 8 accepted, #12 PASS, #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. WAVES 1–7 ACCEPTED FOR CURRENT STAGE. WAVE 8 IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. SECURITY REMEDIATION IMPLEMENTED — READY FOR PRODUCT LEADERSHIP SECURITY REVIEW. Cursor does not declare the remediation accepted, Wave 8 accepted, #12 PASS, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 

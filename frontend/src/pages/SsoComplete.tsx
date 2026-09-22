@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import MarketingLayout from '../marketing/MarketingLayout';
 import { authAPI } from '../services/api';
+import { setAccessToken } from '../services/sessionStore';
 
 export default function SsoComplete() {
     const [params] = useSearchParams();
@@ -20,7 +21,7 @@ export default function SsoComplete() {
                 if (!data?.token || !data?.user) {
                     throw new Error('The sign-in request could not be completed. Try again.');
                 }
-                localStorage.setItem('token', data.token);
+                setAccessToken(data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 window.location.assign('/dashboard');
             })

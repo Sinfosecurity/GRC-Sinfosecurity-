@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { REFRESH_CSRF_HEADER, REFRESH_CSRF_VALUE, clearBrowserSessionArtifacts, getAccessToken } from './sessionStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:4000/api/v1' : '');
 
@@ -27,10 +28,11 @@ export class ApiClientError extends Error {
 }
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = getAccessToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers[REFRESH_CSRF_HEADER] = REFRESH_CSRF_VALUE;
     return config;
 });
 
@@ -85,7 +87,7 @@ api.interceptors.response.use(
                 return Promise.reject(new ApiClientError(message, status, apiCode || error.code, details));
             }
             const authFlow = path.startsWith('/login') || path.startsWith('/admin/') || path === '/';
-            localStorage.removeItem('token');
+            clearBrowserSessionArtifacts();
             localStorage.removeItem('user');
             if (!authFlow) {
                 window.location.href = path.startsWith('/platform') ? '/admin/login' : '/login';
@@ -112,7 +114,10 @@ export const authAPI = {
         country?: string;
     }) => api.post('/auth/signup', data),
     logout: () => api.post('/auth/logout'),
-    refreshToken: (refreshToken: string) => api.post('/auth/refresh', { refreshToken }),
+    refreshToken: (refreshToken?: string) =>
+        api.post('/auth/refresh', refreshToken ? { refreshToken } : {}, {
+            headers: { [REFRESH_CSRF_HEADER]: REFRESH_CSRF_VALUE },
+        }),
     getCurrentUser: () => api.get('/auth/me'),
     forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
     resetPassword: (token: string, password: string) => api.post('/auth/reset-password', { token, password }),

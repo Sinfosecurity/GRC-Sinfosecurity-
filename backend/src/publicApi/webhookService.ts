@@ -1,5 +1,7 @@
+import crypto from 'crypto';
 import { Prisma, WebhookDeliveryStatus } from '@prisma/client';
 import { prisma } from '../config/database';
+import { getEnv } from '../config/env';
 import { ApiError } from '../middleware/errorHandler';
 import { recordAudit } from '../services/auditEventService';
 import { encryptSecret, decryptSecret } from '../security/secretBox';
@@ -43,11 +45,31 @@ function newSecret() {
 
 export const webhookService = {
     events() {
-        return WEBHOOK_EVENTS.filter((event) => event !== 'webhook.test');
+        const catalog = Array.isArray(WEBHOOK_EVENTS) ? WEBHOOK_EVENTS : [];
+        return catalog.filter((event) => event !== 'webhook.test');
     },
 
     sinkUrl(organizationId: string) {
         return `${identityServiceUrls('unused').origin}/public/v1/webhook-sink/${organizationId.slice(0, 8)}`;
+    },
+
+    sinkToken(organizationId: string) {
+        return this.sinkTokenForPrefix(organizationId.slice(0, 8));
+    },
+
+    sinkTokenForPrefix(prefix: string) {
+        const secret = process.env.WEBHOOK_SINK_SECRET || getEnv().jwtSecret;
+        return crypto.createHmac('sha256', secret).update(`webhook-sink:${prefix}`).digest('hex');
+    },
+
+    assertSinkToken(organizationIdPrefix: string, presented?: string) {
+        if (!presented) throw new ApiError(401, 'Webhook sink authentication is required.');
+        const token = this.sinkTokenForPrefix(organizationIdPrefix);
+        const left = Buffer.from(presented);
+        const right = Buffer.from(token);
+        if (left.length !== right.length || !crypto.timingSafeEqual(left, right)) {
+            throw new ApiError(401, 'Webhook sink authentication is required.');
+        }
     },
 
     async list(organizationId: string) {
@@ -345,19 +367,45 @@ export const webhookService = {
     },
 
     async receiveSink(organizationIdPrefix: string, headers: Record<string, string>, body: unknown) {
+        const presented = headers['x-supreme-sink-token'] || headers['authorization']?.replace(/^Bearer\s+/i, '');
+        this.assertSinkToken(organizationIdPrefix, presented);
+        if (body == null || typeof body !== 'object' || Array.isArray(body)) {
+            throw new ApiError(400, 'Webhook sink accepts a JSON object only.');
+        }
+        const serialized = JSON.stringify(body);
+        if (serialized.length > 64 * 1024) {
+            throw new ApiError(413, 'Webhook sink payload is too large.');
+        }
         const org = await prisma.organization.findFirst({
             where: { id: { startsWith: organizationIdPrefix } },
             select: { id: true },
         });
         if (!org) throw new ApiError(404, 'Webhook sink not found');
+        const eventId = headers['x-supreme-event-id'] || null;
+        if (eventId) {
+            const existing = await prisma.webhookSinkReceipt.findFirst({
+                where: { organizationId: org.id, eventId },
+            });
+            if (existing) return { received: true, idempotent: true };
+        }
         await prisma.webhookSinkReceipt.create({
             data: {
                 organizationId: org.id,
                 sinkPublicId: organizationIdPrefix,
-                eventId: headers['x-supreme-event-id'] || null,
-                headers,
+                eventId,
+                headers: {
+                    'x-supreme-event-id': headers['x-supreme-event-id'] || '',
+                    'x-supreme-event': headers['x-supreme-event'] || '',
+                },
                 body: body as object,
             },
+        });
+        await recordAudit({
+            organizationId: org.id,
+            action: 'webhook.sink.received',
+            resourceType: 'WebhookSinkReceipt',
+            result: 'success',
+            metadata: { eventId },
         });
         return { received: true };
     },

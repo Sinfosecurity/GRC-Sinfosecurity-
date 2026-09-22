@@ -30,7 +30,7 @@ describe('authSlice', () => {
         const actual = authReducer(initialState, setCredentials({ user, token, refreshToken }));
         expect(actual.user).toEqual(user);
         expect(actual.token).toEqual(token);
-        expect(actual.refreshToken).toEqual(refreshToken);
+        expect(actual.refreshToken).toBeNull();
         expect(actual.isAuthenticated).toBe(true);
     });
 

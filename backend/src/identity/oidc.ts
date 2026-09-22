@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { assertSafeOutboundDestination, ssrfSafeJson } from '../security/ssrfSafeFetch';
 import { IdentityError } from './core';
 
 export type OidcClaims = {
@@ -18,16 +19,21 @@ type Jwk = { kid?: string; kty?: string; n?: string; e?: string; crv?: string; x
 
 export async function discoverOidc(issuer: string) {
     const wellKnown = issuer.replace(/\/$/, '') + '/.well-known/openid-configuration';
-    const response = await fetch(wellKnown);
-    if (!response.ok) throw new IdentityError('provider_unavailable', 502);
-    const json = await response.json() as {
+    const json = await ssrfSafeJson<{
         issuer?: string;
         authorization_endpoint?: string;
         token_endpoint?: string;
         jwks_uri?: string;
-    };
+        userinfo_endpoint?: string;
+    }>(wellKnown);
     if (!json.authorization_endpoint || !json.token_endpoint || !json.jwks_uri) {
         throw new IdentityError('configuration_error', 400);
+    }
+    await assertSafeOutboundDestination(json.authorization_endpoint);
+    await assertSafeOutboundDestination(json.token_endpoint);
+    await assertSafeOutboundDestination(json.jwks_uri);
+    if (json.userinfo_endpoint) {
+        await assertSafeOutboundDestination(json.userinfo_endpoint);
     }
     return {
         issuer: json.issuer || issuer,
@@ -80,13 +86,13 @@ export async function exchangeOidcCode(input: {
         code_verifier: input.codeVerifier,
     });
     if (input.clientSecret) body.set('client_secret', input.clientSecret);
-    const response = await fetch(input.tokenEndpoint, {
+    const response = await ssrfSafeJson<{ id_token?: string; access_token?: string }>(input.tokenEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body,
+        body: body.toString(),
+        maxRedirects: 0,
     });
-    if (!response.ok) throw new IdentityError('provider_unavailable', 502);
-    return response.json() as Promise<{ id_token?: string; access_token?: string }>;
+    return response;
 }
 
 function publicKeyFromJwk(jwk: Jwk) {
@@ -94,9 +100,7 @@ function publicKeyFromJwk(jwk: Jwk) {
 }
 
 async function keyFromJwks(jwksUri: string, kid?: string) {
-    const response = await fetch(jwksUri);
-    if (!response.ok) throw new IdentityError('provider_unavailable', 502);
-    const jwks = await response.json() as { keys?: Jwk[] };
+    const jwks = await ssrfSafeJson<{ keys?: Jwk[] }>(jwksUri, { maxRedirects: 0 });
     const keys = jwks.keys || [];
     const jwk = (kid && keys.find((item) => item.kid === kid)) || keys[0];
     if (!jwk) throw new IdentityError('invalid_signature');

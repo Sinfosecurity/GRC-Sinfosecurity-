@@ -9,6 +9,7 @@ import { recordAudit } from './auditEventService';
 import { notify } from './notificationDeliveryService';
 import { passwordResetEmailBody, passwordResetEmailHtml } from './publicFrontendUrl';
 import { totpMfaService } from './totpMfaService';
+import { privilegedMfaDecision } from '../security/privilegedMfaPolicy';
 import { loginLockoutService } from './loginLockoutService';
 import { ApiError } from '../middleware/errorHandler';
 
@@ -263,6 +264,7 @@ export const authService = {
             throw new ApiError(401, GENERIC_AUTH_ERROR);
         }
 
+        const privilegedMfa = privilegedMfaDecision({ role: user.role, email: user.email, plane });
         if (plane === PLATFORM_PLANE && !user.mfaEnabled) {
             await recordAudit({
                 organizationId: user.organizationId,
@@ -297,6 +299,48 @@ export const authService = {
                 userAgent: meta?.userAgent,
                 requestId: meta?.requestId,
                 metadata: { reason: 'mfa_required' },
+            });
+            return {
+                kind: 'mfa_required' as const,
+                mfaRequired: true,
+                challengeToken,
+            };
+        }
+
+        if (privilegedMfa.required && !user.mfaEnabled) {
+            await recordAudit({
+                organizationId: user.organizationId,
+                actorUserId: user.id,
+                action: 'auth.login',
+                resourceType: 'User',
+                resourceId: user.id,
+                result: 'success',
+                ipAddress: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+                metadata: { reason: 'privileged_mfa_enrollment_required' },
+            });
+            return {
+                kind: 'mfa_enroll' as const,
+                mfaEnrollmentRequired: true,
+                enrollmentToken: signAccessToken(user, { plane, enrollOnly: true }),
+                user: toPublicUser(user, { plane, enrollOnly: true }),
+            };
+        }
+
+        if (privilegedMfa.required && user.mfaEnabled) {
+            const challengeToken = await totpMfaService.createChallenge(user.id, 'MFA_LOGIN');
+            await recordAudit({
+                organizationId: user.organizationId,
+                actorUserId: user.id,
+                action: 'auth.login',
+                resourceType: 'User',
+                resourceId: user.id,
+                result: 'success',
+                ipAddress: meta?.ip,
+                userAgent: meta?.userAgent,
+                requestId: meta?.requestId,
+                metadata: { reason: 'privileged_mfa_required' },
             });
             return {
                 kind: 'mfa_required' as const,
@@ -347,9 +391,9 @@ export const authService = {
             ipAddress: meta?.ip,
             userAgent: meta?.userAgent,
             requestId: meta?.requestId,
-            metadata: { plane: PLATFORM_PLANE, mfa: true },
+            metadata: { plane: isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE, mfa: true },
         });
-        return issueSession(user, PLATFORM_PLANE, true);
+        return issueSession(user, isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE, true);
     },
 
     async completePlatformEnrollment(userId: string, code: string, meta?: { requestId?: string | null }) {
@@ -360,7 +404,8 @@ export const authService = {
         });
         if (!user) throw new ApiError(401, 'Authentication required');
         await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
-        const session = await issueSession(user, PLATFORM_PLANE, true);
+        const plane = isPlatformStaffRole(user.role) ? PLATFORM_PLANE : CUSTOMER_PLANE;
+        const session = await issueSession(user, plane, true);
         return { ...session, recoveryCodes: recovery.recoveryCodes };
     },
 
@@ -389,7 +434,14 @@ export const authService = {
             include: { user: { include: { organization: true } } },
         });
 
-        if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
+        if (stored?.revokedAt) {
+            await prisma.refreshToken.updateMany({
+                where: { userId: stored.userId, revokedAt: null },
+                data: { revokedAt: new Date() },
+            });
+            throw new ApiError(401, 'Invalid or expired token');
+        }
+        if (!stored || stored.expiresAt < new Date()) {
             throw new ApiError(401, 'Invalid or expired token');
         }
 
@@ -564,6 +616,9 @@ export const authService = {
             throw new ApiError(422, policyError);
         }
         const email = input.email.toLowerCase().trim();
+        if ((input as { organizationId?: string }).organizationId) {
+            throw new ApiError(400, 'You cannot join an existing organization from public registration.');
+        }
         const existing = await prisma.user.findUnique({ where: { email } });
         if (existing) {
             throw new ApiError(409, 'Unable to create account');

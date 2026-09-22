@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '../services/api';
+import { clearBrowserSessionArtifacts, getAccessToken, setAccessToken } from '../services/sessionStore';
 
 export interface User {
   id: string;
@@ -46,7 +47,7 @@ export const useAuth = () => {
 };
 
 function persist(token: string, user: User) {
-  localStorage.setItem('token', token);
+  setAccessToken(token);
   localStorage.setItem('user', JSON.stringify(user));
 }
 
@@ -56,30 +57,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      authAPI.getCurrentUser()
-        .then((response) => {
-          const next = response.data.data.user;
-          setUser(next);
-          localStorage.setItem('user', JSON.stringify(next));
-        })
-        .catch((err: { status?: number }) => {
-          if (err?.status && err.status !== 401) {
-            return;
-          }
-          setToken(null);
-          setUser(null);
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
+    const existing = getAccessToken();
+    const hydrate = (nextToken: string) => {
+      setToken(nextToken);
+      setAccessToken(nextToken);
+      return authAPI.getCurrentUser().then((response) => {
+        const next = response.data.data.user;
+        setUser(next);
+        localStorage.setItem('user', JSON.stringify(next));
+      });
+    };
+    const start = existing
+      ? hydrate(existing)
+      : authAPI.refreshToken().then((response) => hydrate(response.data.data.token));
+    start
+      .catch((err: { status?: number }) => {
+        if (err?.status && err.status !== 401) {
+          if (storedUser) setUser(JSON.parse(storedUser));
+          return;
+        }
+        setToken(null);
+        setUser(null);
+        clearBrowserSessionArtifacts();
+        localStorage.removeItem('user');
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const login = async (email: string, password: string, plane?: 'CUSTOMER' | 'PLATFORM') => {
@@ -139,7 +142,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
+    clearBrowserSessionArtifacts();
     localStorage.removeItem('user');
   };
 

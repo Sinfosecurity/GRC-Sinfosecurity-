@@ -287,24 +287,25 @@ export function registerDefaultHealthChecks() {
     logger.info('Default health checks registered');
 }
 
+const PUBLIC_HEALTH_KEYS = new Set(['status', 'timestamp']);
+
+export function publicHealthPayload(status: 'ok' | 'unavailable' = 'ok') {
+    return {
+        status,
+        timestamp: new Date().toISOString(),
+    };
+}
+
+export function assertPublicHealthMinimized(body: Record<string, unknown>) {
+    const keys = Object.keys(body);
+    return keys.every((key) => PUBLIC_HEALTH_KEYS.has(key));
+}
+
 /**
- * Health check endpoint handler
+ * Public liveness — no infrastructure detail.
  */
-export async function healthCheckHandler(req: Request, res: Response) {
-    const result = await healthChecker.executeChecks();
-
-    // Set appropriate status code
-    const statusCode = result.status === 'healthy' ? 200 : result.status === 'degraded' ? 200 : 503;
-    const memory = process.memoryUsage();
-
-    res.status(statusCode).json({
-        ...result,
-        memory: {
-            rss: memory.rss,
-            heapUsed: memory.heapUsed,
-            heapTotal: memory.heapTotal,
-        },
-    });
+export async function healthCheckHandler(_req: Request, res: Response) {
+    res.status(200).json(publicHealthPayload('ok'));
 }
 
 /**
@@ -317,27 +318,31 @@ export async function readinessCheckHandler(req: Request, res: Response) {
         const { malwareScanService } = await import('../malware/malwareScanService');
         const malware = await malwareScanService.probe();
 
-        res.status(200).json({
-            status: 'ready',
-            timestamp: new Date().toISOString(),
-            malware,
-        });
+        void malware;
+        res.status(200).json(publicHealthPayload('ok'));
     } catch (error) {
-        res.status(503).json({
-            status: 'not_ready',
-            timestamp: new Date().toISOString(),
-        });
+        res.status(503).json(publicHealthPayload('unavailable'));
     }
 }
 
 /**
  * Liveness check (process is alive)
  */
-export async function livenessCheckHandler(req: Request, res: Response) {
-    res.status(200).json({
-        status: 'alive',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
+export async function livenessCheckHandler(_req: Request, res: Response) {
+    res.status(200).json(publicHealthPayload('ok'));
+}
+
+export async function diagnosticsHealthHandler(_req: Request, res: Response) {
+    const result = await healthChecker.executeChecks();
+    const statusCode = result.status === 'unhealthy' ? 503 : 200;
+    const memory = process.memoryUsage();
+    res.status(statusCode).json({
+        ...result,
+        memory: {
+            rss: memory.rss,
+            heapUsed: memory.heapUsed,
+            heapTotal: memory.heapTotal,
+        },
     });
 }
 
