@@ -37,6 +37,7 @@ vi.mock('../../services/api', () => ({
         submitIra: vi.fn(),
         submitIraClarification: vi.fn(),
         recordReassessmentDelta: vi.fn(),
+        completeOffboardingTask: vi.fn(),
     },
 }));
 
@@ -168,5 +169,36 @@ describe('Requester workspace', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Send business update' }));
         await waitFor(() => expect(requesterAPI.recordReassessmentDelta).toHaveBeenCalled());
         expect(screen.queryByText('Intake Queue')).not.toBeInTheDocument();
+    });
+
+    it('collects a business-safe offboarding confirmation without opening GRC', async () => {
+        vi.mocked(requesterAPI.actions).mockResolvedValue({
+            data: {
+                data: {
+                    items: [{
+                        id: 'ob-1',
+                        type: 'OFFBOARDING_BUSINESS_TASK',
+                        title: 'Confirm replacement service ready',
+                        engagementId: 'azure',
+                        engagementPublicId: 'ENG-2026-0001',
+                        thirdPartyName: 'Microsoft Corporation',
+                        serviceName: 'Azure Hosting QA',
+                        honesty: 'Confirm the assigned business transition only. Internal termination reasoning is not shown.',
+                    }],
+                },
+            },
+        } as any);
+        vi.mocked(requesterAPI.completeOffboardingTask).mockResolvedValue({ data: { data: { honesty: 'Thank you.' } } } as any);
+        render(
+            <MemoryRouter future={routerFuture}>
+                <RequesterActions />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText(/replacement service ready/)).toBeInTheDocument();
+        fireEvent.change(screen.getByRole('textbox', { name: /Confirm the business transition/ }), { target: { value: 'Replacement service is live.' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm business transition' }));
+        await waitFor(() => expect(requesterAPI.completeOffboardingTask).toHaveBeenCalled());
+        expect(screen.queryByText('Intake Queue')).not.toBeInTheDocument();
+        expect(screen.queryByText(/termination deliberation/i)).not.toBeInTheDocument();
     });
 });

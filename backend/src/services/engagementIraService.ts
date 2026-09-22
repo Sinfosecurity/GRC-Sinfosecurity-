@@ -802,6 +802,8 @@ export function engagementIraStatusLabel(status: EngagementStatus) {
         case EngagementStatus.GATE_BLOCKED: return 'Contract gate blocked';
         case EngagementStatus.GATE_APPROVED: return 'Approved to proceed';
         case EngagementStatus.ACTIVE: return 'Engagement Active';
+        case EngagementStatus.OFFBOARDING: return 'Offboarding in progress';
+        case EngagementStatus.OFFBOARDED: return 'Engagement offboarded';
         case EngagementStatus.AVOIDED: return 'Engagement avoided';
         case EngagementStatus.REJECTED: return 'Request declined';
         case EngagementStatus.INTAKE_COMPLETE: return 'Intake complete';
@@ -838,6 +840,10 @@ export function requesterEngagementStatus(status: EngagementStatus) {
             return 'Approved to proceed';
         case EngagementStatus.ACTIVE:
             return 'Approved to proceed';
+        case EngagementStatus.OFFBOARDING:
+            return 'Service ending';
+        case EngagementStatus.OFFBOARDED:
+            return 'Service ended';
         case EngagementStatus.AVOIDED:
         case EngagementStatus.REJECTED:
             return 'Request declined';

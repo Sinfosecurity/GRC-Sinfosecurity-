@@ -815,7 +815,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Starting SHA:** Wave 5 accepted lineage `88938c263d741365578e874599156096fe5d6276` / evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`  
 **Implementation SHA:** `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`  
 **Wave 6:** ACCEPTED FOR CURRENT STAGE (`2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`, evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`).  
-**Wave 7:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW (`7afd0d5c08a64667f592831509338ab74cf9a7b3`). Periodic and event-driven reassessment. Wave 8 not started.
+**Wave 7:** ACCEPTED FOR CURRENT STAGE (`7afd0d5c08a64667f592831509338ab74cf9a7b3`, evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`). Periodic and event-driven reassessment.
 
 **Why VendorMonitoring is insufficient:** It is vendor-scoped, has no Engagement profile, no per-Engagement relevance, no triage/materiality, no escalation object, and no reassessment handoff. Wave 6 extends it with `EngagementMonitoringProfile`, `EngagementMonitoringSignal`, `MonitoringSignalEngagementImpact`, `MonitoringReview`, `MonitoringEscalation`, and `ReassessmentRecommendation`. Legacy vendor rows remain readable and are never fabricated into Engagement linkage.
 
@@ -831,8 +831,8 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Starting SHA:** Wave 6 accepted lineage `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91` / evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`  
 **Implementation SHA:** `7afd0d5c08a64667f592831509338ab74cf9a7b3`  
-**Wave 7:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Not accepted.  
-**Wave 8:** NOT STARTED.
+**Wave 7:** ACCEPTED FOR CURRENT STAGE (`7afd0d5c08a64667f592831509338ab74cf9a7b3`, evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`).  
+**Wave 8:** AUTHORIZED. Termination, offboarding, and final disposition. Not started as accepted work.
 
 **Ownership:** Reassessment belongs to the Engagement. It is a new versioned cycle. Third Party ≠ Engagement. Azure reassessment does not reassess Microsoft 365.
 

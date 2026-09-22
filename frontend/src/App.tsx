@@ -53,6 +53,8 @@ const EngagementResidual = lazy(() => import('./pages/EngagementResidual'));
 const EngagementDecisions = lazy(() => import('./pages/EngagementDecisions'));
 const EngagementMonitoring = lazy(() => import('./pages/EngagementMonitoring'));
 const EngagementReassessment = lazy(() => import('./pages/EngagementReassessment'));
+const EngagementOffboarding = lazy(() => import('./pages/EngagementOffboarding'));
+const OffboardingRegister = lazy(() => import('./pages/OffboardingRegister'));
 const MonitoringSignalDetail = lazy(() => import('./pages/MonitoringSignalDetail'));
 const EngagementHistory = lazy(() => import('./pages/EngagementHistory'));
 const LegacyOnboardRedirect = lazy(() => import('./pages/LegacyOnboardRedirect'));
@@ -330,6 +332,7 @@ export default function App() {
                         <Route path="decisions" element={<EngagementDecisions />} />
                         <Route path="monitoring" element={<EngagementMonitoring />} />
                         <Route path="reassessment" element={<EngagementReassessment />} />
+                        <Route path="offboarding" element={<EngagementOffboarding />} />
                         <Route path="history" element={<EngagementHistory />} />
                         <Route path="specialist-review" element={<AssessmentReview />} />
                         <Route path="risk" element={<EngagementRisk />} />
@@ -341,6 +344,7 @@ export default function App() {
                     <Route path="findings" element={<FindingsRemediation />} />
                     <Route path="decision-briefs" element={<DecisionBriefs />} />
                     <Route path="monitoring" element={<ContinuousMonitoring />} />
+                    <Route path="offboarding" element={<OffboardingRegister />} />
                     <Route path="monitoring/signals/:signalId" element={<MonitoringSignalDetail />} />
                     <Route path="questionnaires" element={<Questionnaires />} />
                     <Route path="billing" element={<Billing />} />

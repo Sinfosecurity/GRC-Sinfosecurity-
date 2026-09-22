@@ -77,6 +77,7 @@ const menuSections: NavSection[] = [
         title: 'Programs',
         items: [
             { text: 'Monitoring', path: '/monitoring', icon: <MonitorHeartOutlined fontSize="small" />, permission: 'monitoring.read' },
+            { text: 'Offboarding', path: '/offboarding', icon: <HistoryOutlined fontSize="small" />, permission: 'intake.read' },
             { text: 'Risk', path: '/risks', icon: <WarningAmberOutlined fontSize="small" />, permission: 'risk.read' },
             { text: 'Risk register', path: '/risks/register', icon: <ReportProblemOutlined fontSize="small" />, permission: 'risk.read' },
             { text: 'Compliance', path: '/compliance', icon: <VerifiedUserOutlined fontSize="small" />, permission: 'compliance.read' },

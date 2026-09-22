@@ -9,6 +9,7 @@ export const ENGAGEMENT_TABS = [
     { id: 'decisions', label: 'Decisions', path: '/decisions' },
     { id: 'monitoring', label: 'Monitoring', path: '/monitoring' },
     { id: 'reassessment', label: 'Reassessment', path: '/reassessment' },
+    { id: 'offboarding', label: 'Offboarding', path: '/offboarding' },
     { id: 'history', label: 'History', path: '/history' },
 ] as const;
 

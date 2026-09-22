@@ -44,7 +44,32 @@ export default function RequesterActions() {
             {error && <Alert severity="error">{error}</Alert>}
             {message && <Alert severity="success">{message}</Alert>}
             {!items.length && !error && <Typography>Nothing needs your attention right now.</Typography>}
-            {items.map((item) => item.type === 'REASSESSMENT_BUSINESS_CONTEXT' ? (
+            {items.map((item) => item.type === 'OFFBOARDING_BUSINESS_TASK' ? (
+                <Stack key={item.id} component="form" onSubmit={async (event) => {
+                    event.preventDefault();
+                    setPending(item.id);
+                    setError(null);
+                    try {
+                        await requesterAPI.completeOffboardingTask(item.engagementId, item.id, {
+                            status: 'COMPLETED',
+                            internalVerification: response[item.id] || 'Business transition confirmed.',
+                        });
+                        setMessage('Thank you. The TPRM analyst will use this business confirmation. Residual risk was not changed.');
+                        load();
+                    } catch (err: any) {
+                        setError(err.response?.data?.error?.message || 'Unable to send the business confirmation.');
+                    } finally {
+                        setPending(null);
+                    }
+                }} sx={{ bgcolor: color.surface, border: `1px solid ${color.line}`, borderRadius: 2, p: 2 }} spacing={1.5}>
+                    <Typography fontWeight={700}>{item.title}</Typography>
+                    <Typography>{item.engagementPublicId} · {item.thirdPartyName}</Typography>
+                    <Typography>{item.serviceName}</Typography>
+                    <Typography>{item.honesty}</Typography>
+                    <TextField required label="Confirm the business transition" value={response[item.id] || ''} onChange={(event) => setResponse((current) => ({ ...current, [item.id]: event.target.value }))} multiline minRows={3} inputProps={{ 'aria-label': 'Confirm the business transition' }} />
+                    <Button type="submit" variant="contained" disabled={pending === item.id}>{pending === item.id ? 'Sending…' : 'Confirm business transition'}</Button>
+                </Stack>
+            ) : item.type === 'REASSESSMENT_BUSINESS_CONTEXT' ? (
                 <Stack key={item.id} component="form" onSubmit={async (event) => {
                     event.preventDefault();
                     setPending(item.id);

@@ -44,6 +44,9 @@ export default function EngagementOverview() {
                 )}
                 <Typography>Target start: {data.targetStartDate ? formatShortDate(data.targetStartDate) : 'Not recorded'}</Typography>
                 {data.legacyReviewRequired && <Typography>Legacy review required. Missing service facts were not guessed.</Typography>}
+                {['OFFBOARDING', 'OFFBOARDED'].includes(String(data.status || '')) && (
+                    <Typography>Offboarding: {data.status === 'OFFBOARDED' ? 'Engagement offboarded. History is inspectable.' : 'Offboarding in progress for this Engagement only.'}</Typography>
+                )}
                 <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1 }}>
                     {data.vendorId && <Button onClick={() => window.location.assign(`/vendor-management?vendorId=${data.vendorId}`)}>Open Third Party</Button>}
                     {data.originatingIntake && <Button onClick={() => window.location.assign(`/third-parties/intake/${data.originatingIntake.id}`)}>Open originating intake</Button>}

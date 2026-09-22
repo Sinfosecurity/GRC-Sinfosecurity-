@@ -11,6 +11,7 @@ export const ENGAGEMENT_WORKSPACE_TABS = [
     'decisions',
     'monitoring',
     'reassessment',
+    'offboarding',
     'history',
 ] as const;
 
@@ -181,8 +182,32 @@ export function engagementPrimaryAction(
         highPrioritySignals?: number;
         reassessmentRecommended?: boolean;
         openReassessment?: boolean;
+        terminationRecommended?: boolean;
+        openOffboarding?: boolean;
+        offboardingStatus?: string | null;
+        offboardingGateReady?: boolean;
+        vendorOffboardingPending?: boolean;
+        offboardingBlocked?: boolean;
     } = {},
 ): PrimaryAction {
+    if (status === EngagementStatus.OFFBOARDED) {
+        return { label: 'Engagement offboarded — history is inspectable', href: (id) => `/engagements/${id}/offboarding`, owner: 'Assigned TPRM analyst', wave5: false };
+    }
+    if (status === EngagementStatus.OFFBOARDING || extras.openOffboarding) {
+        if (extras.offboardingGateReady || extras.offboardingStatus === 'READY_FOR_CLOSURE') {
+            return { label: 'Review closure', href: (id) => `/engagements/${id}/offboarding`, owner: 'Authorized risk owner', wave5: false };
+        }
+        if (extras.offboardingBlocked || extras.offboardingStatus === 'BLOCKED') {
+            return { label: 'Resolve blocker', href: (id) => `/engagements/${id}/offboarding`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        if (extras.vendorOffboardingPending) {
+            return { label: 'Await vendor response', href: (id) => `/engagements/${id}/offboarding`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
+        return { label: 'Complete obligations', href: (id) => `/engagements/${id}/offboarding`, owner: 'Assigned TPRM analyst', wave5: false };
+    }
+    if (status === EngagementStatus.ACTIVE && extras.terminationRecommended && !extras.openReassessment) {
+        return { label: 'Start offboarding', href: (id) => `/engagements/${id}/offboarding`, owner: 'Assigned TPRM analyst', wave5: false };
+    }
     if (status === EngagementStatus.ACTIVE) {
         if (extras.openReassessment) {
             return { label: 'Continue reassessment', href: (id) => `/engagements/${id}/reassessment`, owner: 'Assigned TPRM analyst', wave5: false };

@@ -24,10 +24,16 @@ export default function EngagementWorkspace() {
             .finally(() => setLoading(false));
     }, [id, location.pathname]);
 
-    const current = ENGAGEMENT_TABS.find((tab) => {
+    const visibleTabs = ENGAGEMENT_TABS.filter((tab) => {
+        if (tab.id !== 'offboarding') return true;
+        if (location.pathname.includes('/offboarding')) return true;
+        if (Array.isArray(data?.tabs) && data.tabs.includes('offboarding')) return true;
+        return ['OFFBOARDING', 'OFFBOARDED'].includes(String(data?.status || ''));
+    });
+    const current = visibleTabs.find((tab) => {
         const href = engagementHref(id, tab.path);
         return tab.path ? location.pathname.startsWith(href) : location.pathname === href;
-    }) || ENGAGEMENT_TABS[0];
+    }) || visibleTabs[0];
 
     return (
         <PageShell>
@@ -58,7 +64,7 @@ export default function EngagementWorkspace() {
                         <Tabs
                             value={current.id}
                             onChange={(_, value) => {
-                                const tab = ENGAGEMENT_TABS.find((item) => item.id === value);
+                                const tab = visibleTabs.find((item) => item.id === value);
                                 if (tab) navigate(engagementHref(id, tab.path));
                             }}
                             variant="scrollable"
@@ -66,7 +72,7 @@ export default function EngagementWorkspace() {
                             aria-label="Engagement workspace"
                             sx={{ mt: 1, mb: 2, borderBottom: 1, borderColor: 'divider', maxWidth: '100%' }}
                         >
-                            {ENGAGEMENT_TABS.map((tab) => (
+                            {visibleTabs.map((tab) => (
                                 <Tab
                                     key={tab.id}
                                     value={tab.id}

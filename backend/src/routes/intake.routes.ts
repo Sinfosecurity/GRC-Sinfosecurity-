@@ -111,6 +111,19 @@ import {
     startReassessment,
     updateScope,
 } from '../services/engagementReassessmentService';
+import {
+    addObligation,
+    cancelOffboarding,
+    completeOffboarding,
+    createException,
+    createOffboarding,
+    evaluateClosureGate,
+    getOffboardingWorkspace,
+    linkEvidence,
+    listOffboardingRegister,
+    startOffboarding,
+    updateObligation,
+} from '../services/engagementOffboardingService';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
@@ -968,6 +981,94 @@ router.post('/engagements/:id/reassessment/decide', requirePractitionerPersona, 
 router.post('/engagements/:id/reassessment/return-to-monitoring', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.json({ success: true, data: await returnToMonitoring(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/offboarding', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.read'], PERMISSIONS['intake.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await listOffboardingRegister(req.user!.organizationId, actor(req), req.query || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/offboarding', requirePermission(PERMISSIONS['offboarding.read'], PERMISSIONS['intake.read'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getOffboardingWorkspace(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await createOffboarding(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/start', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await startOffboarding(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/obligations', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await addObligation(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/obligations/:obligationId', requirePermission(PERMISSIONS['offboarding.manage'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await updateObligation(req.user!.organizationId, actor(req), req.params.id, req.params.obligationId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/evidence', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.manage'], PERMISSIONS['evidence.link']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await linkEvidence(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/exception', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.exception'], PERMISSIONS['offboarding.complete']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await createException(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/evaluate-gate', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.read'], PERMISSIONS['offboarding.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await evaluateClosureGate(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/complete', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.complete'], PERMISSIONS['offboarding.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await completeOffboarding(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/offboarding/cancel', requirePractitionerPersona, requirePermission(PERMISSIONS['offboarding.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await cancelOffboarding(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
         next(error);
     }

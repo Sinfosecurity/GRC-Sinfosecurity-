@@ -259,6 +259,10 @@ model Organization {
   reassessmentRecommendations ReassessmentRecommendation[]
   engagementReassessments     EngagementReassessment[]
   engagementReassessmentItems EngagementReassessmentItem[]
+  engagementOffboardingCases  EngagementOffboardingCase[]
+  engagementOffboardingObligations EngagementOffboardingObligation[]
+  engagementOffboardingExceptions EngagementOffboardingException[]
+  engagementFinalDispositions EngagementFinalDisposition[]
 
   @@index([slug])
   @@index([status])
@@ -838,6 +842,8 @@ enum EngagementStatus {
   GATE_BLOCKED
   GATE_APPROVED
   ACTIVE
+  OFFBOARDING
+  OFFBOARDED
   AVOIDED
   REJECTED
 }
@@ -1023,6 +1029,7 @@ model Engagement {
   monitoringImpacts        MonitoringSignalEngagementImpact[]
   reassessmentRecommendations ReassessmentRecommendation[]
   reassessments            EngagementReassessment[]
+  offboardingCases         EngagementOffboardingCase[]
 
   @@unique([organizationId, publicId])
   @@index([organizationId, vendorId])
@@ -1914,6 +1921,187 @@ model EngagementReassessmentItem {
 
   @@unique([reassessmentId, kind, sourceKey])
   @@index([organizationId, reassessmentId])
+}
+
+enum EngagementOffboardingStatus {
+  DRAFT
+  PLANNED
+  IN_PROGRESS
+  BLOCKED
+  READY_FOR_CLOSURE
+  COMPLETED
+  CANCELLED
+}
+
+enum OffboardingObligationCategory {
+  BUSINESS_TRANSITION
+  ACCESS_REVOCATION
+  INTEGRATION_CLOSURE
+  CREDENTIAL_REVOCATION
+  DATA_RETURN
+  DATA_DELETION
+  DATA_RETENTION
+  SUBPROCESSOR_CLOSURE
+  ASSET_RETURN
+  CONTRACT_NOTICE
+  FINAL_PAYMENT
+  EVIDENCE_COLLECTION
+  LEGAL_RETENTION
+  BUSINESS_CONTINUITY
+  KNOWLEDGE_TRANSFER
+}
+
+enum OffboardingObligationStatus {
+  NOT_REQUIRED
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum OffboardingAudience {
+  INTERNAL
+  REQUESTER
+  VENDOR
+}
+
+enum DataDispositionType {
+  RETURN_REQUIRED
+  DELETION_REQUIRED
+  RETENTION_REQUIRED
+  NOT_APPLICABLE
+}
+
+enum OffboardingExceptionStatus {
+  OPEN
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum ReassessmentConflictDisposition {
+  COMPLETE_REASSESSMENT
+  CANCEL_REASSESSMENT
+  SUPERSEDE_FOR_TERMINATION
+}
+
+model EngagementOffboardingCase {
+  id                              String                       @id @default(uuid())
+  organization                    Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId                  String
+  vendorId                        String
+  engagement                      Engagement                   @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+  engagementId                    String
+  publicId                        String
+  status                          EngagementOffboardingStatus  @default(DRAFT)
+  reason                          String
+  sourceRecommendationId          String?
+  decisionOwnerUserId             String?
+  decidedAt                       DateTime?
+  effectiveTerminationDate        DateTime?
+  urgency                         String                       @default("NORMAL")
+  businessOwnerUserId             String?
+  riskOwnerUserId                 String?
+  contractOwnerUserId             String?
+  notes                           String?
+  reassessmentConflictDisposition ReassessmentConflictDisposition?
+  reassessmentConflictRationale   String?
+  findingDisposition              String                       @default("RETAINED_FOR_RECORD")
+  startedByUserId                 String
+  startedAt                       DateTime                     @default(now())
+  completedByUserId               String?
+  completedAt                     DateTime?
+  cancelledByUserId               String?
+  cancelledAt                     DateTime?
+  cancelRationale                 String?
+  version                         Int                          @default(1)
+  history                         Json?
+  createdAt                       DateTime                     @default(now())
+  updatedAt                       DateTime                     @updatedAt
+  obligations                     EngagementOffboardingObligation[]
+  exceptions                      EngagementOffboardingException[]
+  dispositions                    EngagementFinalDisposition[]
+
+  @@unique([organizationId, publicId])
+  @@index([organizationId, engagementId, status])
+}
+
+model EngagementOffboardingObligation {
+  id                    String                       @id @default(uuid())
+  organization          Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId        String
+  case                  EngagementOffboardingCase    @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId                String
+  category              OffboardingObligationCategory
+  title                 String
+  applicable            Boolean                      @default(true)
+  mandatory             Boolean                      @default(false)
+  audience              OffboardingAudience          @default(INTERNAL)
+  ownerUserId           String?
+  dueAt                 DateTime?
+  status                OffboardingObligationStatus  @default(PENDING)
+  systemName            String?
+  accessType            String?
+  integrationType       String?
+  dataCategory          String?
+  dataLocation          String?
+  dataDisposition       DataDispositionType?
+  retentionReason       String?
+  retentionPeriod       String?
+  retentionSource       String?
+  retentionExpiry       DateTime?
+  noticeRequired        Boolean?
+  noticeDueAt           DateTime?
+  noticeSentAt          DateTime?
+  vendorConfirmation    String?
+  internalVerification  String?
+  storedObjectId        String?
+  completedByUserId     String?
+  completedAt           DateTime?
+  rationale             String?
+  automationHonesty     String                       @default("Manual verification required. No connected integration performed this action.")
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  exceptions            EngagementOffboardingException[]
+
+  @@index([organizationId, caseId])
+}
+
+model EngagementOffboardingException {
+  id             String                      @id @default(uuid())
+  organization   Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  case           EngagementOffboardingCase   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId         String
+  obligation     EngagementOffboardingObligation? @relation(fields: [obligationId], references: [id])
+  obligationId   String?
+  reason         String
+  ownerUserId    String?
+  approverUserId String?
+  expiryAt       DateTime?
+  evidenceNote   String?
+  status         OffboardingExceptionStatus  @default(OPEN)
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+
+  @@index([organizationId, caseId])
+}
+
+model EngagementFinalDisposition {
+  id             String                    @id @default(uuid())
+  organization   Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  case           EngagementOffboardingCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId         String
+  engagementId   String
+  vendorId       String
+  versionNumber  Int                       @default(1)
+  snapshot       Json
+  createdBy      String
+  createdAt      DateTime                  @default(now())
+
+  @@unique([caseId, versionNumber])
+  @@index([organizationId, engagementId])
 }
 
 enum VendorStatus {
@@ -4374,6 +4562,7 @@ enum GovernanceNodeType {
   MONITORING_PROFILE
   MONITORING_SIGNAL
   REASSESSMENT
+  OFFBOARDING
 }
 
 enum GovernanceRelationshipType {
@@ -4423,6 +4612,9 @@ enum GovernanceRelationshipType {
   OBSERVED
   RELATES_TO
   SUPERSEDES
+  HAS_OFFBOARDING
+  HAS_OBLIGATION
+  PRODUCED
 }
 
 enum GovernanceProvenance {

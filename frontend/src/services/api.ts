@@ -533,6 +533,7 @@ export const requesterAPI = {
     submitIra: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/submit`, data),
     submitIraClarification: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/clarification`, data),
     recordReassessmentDelta: (engagementId: string, data: unknown) => api.post(`/tprm/engagements/${engagementId}/reassessment/requester-delta`, data),
+    completeOffboardingTask: (engagementId: string, obligationId: string, data: unknown) => api.post(`/tprm/engagements/${engagementId}/offboarding/obligations/${obligationId}`, data),
 };
 
 export const intakeAPI = {
@@ -617,6 +618,17 @@ export const intakeAPI = {
     calculateReassessmentResidual: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/residual`, data),
     decideReassessment: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/decide`, data),
     returnReassessmentToMonitoring: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/return-to-monitoring`, data),
+    listOffboarding: (params?: unknown) => api.get('/tprm/offboarding', { params }),
+    getOffboarding: (id: string) => api.get(`/tprm/engagements/${id}/offboarding`),
+    createOffboarding: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/offboarding`, data),
+    startOffboarding: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/offboarding/start`, data || {}),
+    addOffboardingObligation: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/offboarding/obligations`, data),
+    updateOffboardingObligation: (id: string, obligationId: string, data: unknown) => api.post(`/tprm/engagements/${id}/offboarding/obligations/${obligationId}`, data),
+    linkOffboardingEvidence: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/offboarding/evidence`, data),
+    createOffboardingException: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/offboarding/exception`, data),
+    evaluateOffboardingGate: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/offboarding/evaluate-gate`, data || {}),
+    completeOffboarding: (id: string, data?: unknown) => api.post(`/tprm/engagements/${id}/offboarding/complete`, data || {}),
+    cancelOffboarding: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/offboarding/cancel`, data),
 };
 
 const intakeInfoApi = axios.create({

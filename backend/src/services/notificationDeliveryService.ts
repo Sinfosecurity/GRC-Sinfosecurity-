@@ -59,7 +59,13 @@ export type NotificationEvent =
     | 'monitoring.profile.review_due'
     | 'reassessment.started'
     | 'reassessment.requester_delta'
-    | 'reassessment.completed';
+    | 'reassessment.completed'
+    | 'offboarding.created'
+    | 'offboarding.business_task.sent'
+    | 'offboarding.blocker'
+    | 'offboarding.closure_ready'
+    | 'offboarding.vendor_response'
+    | 'offboarding.completed';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
 export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';
