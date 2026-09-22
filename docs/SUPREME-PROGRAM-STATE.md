@@ -366,7 +366,7 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 **ITEM:** #12 Consolidated Golden Journey certification  
 **STATUS CHANGE:** Waves 1–8 and pentest remediation already ACCEPTED FOR CURRENT STAGE. Certification recert after staging MinIO bucket restore. EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Cursor does not declare #12 PASS. No Wave 9.  
 **SHA:** certification / hosted frontend `da9f7de77239f0a354508fe757b1f2291637f20f`. Hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`. Wave 8 accepted `037b8e98dac360e12084bb0de8b66ee666036feb`.  
-**EVIDENCE:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`. Real PDF/PNG CLEAN upload after bucket restore. Authenticated OIDC SSRF 400/200. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS. Commercial production remains NO-GO.
+**EVIDENCE:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/` (`ee3b5faf83a180913ebdd75e077b2911709131ad`). Real PDF/PNG CLEAN upload after bucket restore. Authenticated OIDC SSRF 400/200. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS. Commercial production remains NO-GO.
 
 ### 2026-09-18
 
