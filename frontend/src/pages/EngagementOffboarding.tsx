@@ -67,7 +67,8 @@ export default function EngagementOffboarding() {
         }
     };
 
-    const active = data?.active;
+    const active = data?.active || (data?.current && data.current.status !== 'CANCELLED' ? data.current : null);
+    const caseIsOpen = Boolean(data?.active);
     const obligations = data?.obligations || [];
     const exceptions = data?.exceptions || [];
     const disposition = (data?.dispositions || []).slice(-1)[0];
@@ -123,10 +124,11 @@ export default function EngagementOffboarding() {
                                 <Typography>Reason: {active.reason}</Typography>
                                 <Typography>Effective date: {active.effectiveTerminationDate ? String(active.effectiveTerminationDate).slice(0, 10) : 'Not set'}</Typography>
                                 <Typography>Age: {active.startedAt ? `${Math.max(0, Math.floor((Date.now() - new Date(active.startedAt).getTime()) / 86400000))} day(s)` : 'Not set'}</Typography>
-                                {active.status === 'PLANNED' && (
+                                {caseIsOpen && active.status === 'PLANNED' && (
                                     <Button sx={{ mt: 1 }} disabled={busy} onClick={() => run(() => intakeAPI.startOffboarding(id), 'Offboarding started. Complete obligations.')}>Start obligation work</Button>
                                 )}
                             </Surface>
+                            {caseIsOpen && (
                             <Surface>
                                 <Typography variant="h6" component="h2">Obligations</Typography>
                                 <Typography variant="body2">Humans choose applicability. Access revocation and data deletion are tracked. Manual verification required unless a connected integration confirmed the action.</Typography>
@@ -144,6 +146,7 @@ export default function EngagementOffboarding() {
                                     mandatory: mandatory === 'yes',
                                 }), 'Obligation added. It is not complete until verified.')}>Add obligation</Button>
                             </Surface>
+                            )}
                             <Surface padded={false}>
                                 <Typography variant="h6" component="h2" sx={{ p: 2, pb: 0 }}>Obligation register</Typography>
                                 <AppTable
@@ -162,6 +165,8 @@ export default function EngagementOffboarding() {
                                     onRowClick={(row: any) => setSelectedObligation(row.id)}
                                 />
                             </Surface>
+                            {caseIsOpen && (
+                            <>
                             <Surface>
                                 <Typography variant="h6" component="h2">Complete or evidence an obligation</Typography>
                                 <TextField select sx={{ mt: 1, minWidth: 280 }} label="Obligation" value={selectedObligation} onChange={(event) => setSelectedObligation(event.target.value)}>
@@ -208,6 +213,8 @@ export default function EngagementOffboarding() {
                                 <TextField sx={{ mt: 1 }} label="Cancellation reason" value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} fullWidth />
                                 <Button sx={{ mt: 1 }} disabled={busy} onClick={() => run(() => intakeAPI.cancelOffboarding(id, { reason: cancelReason || 'Offboarding cancelled before closure.' }), 'Offboarding cancelled. The Engagement remains active.')}>Cancel offboarding</Button>
                             </Surface>
+                            </>
+                            )}
                         </>
                     )}
                     {disposition && (

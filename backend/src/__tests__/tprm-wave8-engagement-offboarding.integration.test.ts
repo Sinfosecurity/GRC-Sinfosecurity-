@@ -230,7 +230,7 @@ describe('#12 Wave 8 engagement offboarding', () => {
         const closed = await request(app).post(`${API}/tprm/engagements/${azureId}/offboarding/complete`).set('Authorization', `Bearer ${managerToken}`).send({});
         expect(closed.status).toBe(200);
         expect(closed.body.data.engagement.status).toBe('OFFBOARDED');
-        expect(closed.body.data.dispositions[0].snapshot.historicalResidual.residualScore).toBe(58);
+        expect(closed.body.data.dispositions?.[0]?.snapshot?.historicalResidual?.residualScore).toBe(58);
         const azure = await prisma.engagement.findUnique({ where: { id: azureId } });
         const m365 = await prisma.engagement.findUnique({ where: { id: m365Id } });
         const residual = await prisma.engagementResidualRiskAssessment.findUnique({ where: { id: residualId } });

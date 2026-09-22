@@ -189,9 +189,10 @@ export async function getOffboardingWorkspace(organizationId: string, actor: Act
         }),
     ]);
     const active = cases.find((row) => OPEN.has(row.status)) || null;
+    const current = active || [...cases].reverse().find((row) => row.status === EngagementOffboardingStatus.COMPLETED) || cases[cases.length - 1] || null;
     const gate = active
         ? evaluateGate({ ...active, openReassessment: Boolean(openReassessment) && !active.reassessmentConflictDisposition })
-        : { ready: false, blockers: [], status: EngagementOffboardingStatus.DRAFT };
+        : { ready: Boolean(current?.status === EngagementOffboardingStatus.COMPLETED), blockers: [], status: current?.status || EngagementOffboardingStatus.DRAFT };
     const vendorPending = Boolean(active?.obligations.some((row) => row.audience === 'VENDOR' && row.applicable && row.status !== 'COMPLETED' && row.status !== 'NOT_REQUIRED'));
     const aggregate = await thirdPartyAggregate(organizationId, engagement.vendorId, engagementId);
     const historical = engagement.residualAssessments[0] || null;
@@ -200,7 +201,7 @@ export async function getOffboardingWorkspace(organizationId: string, actor: Act
     const primary = engagementPrimaryAction(engagement.status, {
         terminationRecommended,
         openOffboarding: Boolean(active),
-        offboardingStatus: active?.status,
+        offboardingStatus: current?.status,
         offboardingGateReady: gate.ready,
         vendorOffboardingPending: vendorPending,
         offboardingBlocked: gate.blockers.length > 0,
@@ -217,9 +218,10 @@ export async function getOffboardingWorkspace(organizationId: string, actor: Act
         recommendations,
         cases,
         active,
-        obligations: active?.obligations || [],
-        exceptions: active?.exceptions || [],
-        dispositions: active?.dispositions || [],
+        current,
+        obligations: current?.obligations || [],
+        exceptions: current?.exceptions || [],
+        dispositions: current?.dispositions || [],
         gate,
         openReassessment,
         historicalResidual: historical,
