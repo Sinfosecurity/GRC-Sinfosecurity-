@@ -863,3 +863,15 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Personas:** Requester sees assigned business-transition tasks in Requester Workspace only. Vendor remains invitation-only and cannot open the internal case. Cross-tenant DENY.
 
 **Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`.
+
+## Consolidated Golden Journey certification
+
+**Certification SHA:** `da9f7de77239f0a354508fe757b1f2291637f20f`  
+**Hosted API:** `b5d006599e9a6a93b69d8a73500b9d0159f0229b`  
+**CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS  
+**Result:** EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. `#12` is not PASS. No Wave 9.
+
+**Live walk:** Requester `INT-2026-0006` → assignment → Microsoft Third Party reuse → new Engagement → Version 3 IRA Don’t Know → clarification → human MEDIUM tier → Engagement DD plan.  
+**Reused immutable Azure history:** Findings, CE, Cycle 1 residual MEDIUM 58, treatment/acceptance, contract gate, activation, monitoring, reassessment, termination, offboarding, final disposition. Microsoft 365 remained `DUE_DILIGENCE_PLANNING`.
+
+**Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`.
