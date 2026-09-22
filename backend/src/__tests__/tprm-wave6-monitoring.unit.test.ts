@@ -23,7 +23,7 @@ describe('#12 Wave 6 monitoring helpers', () => {
         expect(engagementPrimaryAction(EngagementStatus.ACTIVE).label).toBe('Configure monitoring profile');
         expect(engagementPrimaryAction(EngagementStatus.ACTIVE, { monitoringProfileStatus: 'ACTIVE', openMonitoringSignals: 2 }).label).toBe('Review monitoring signal');
         expect(engagementPrimaryAction(EngagementStatus.ACTIVE, { highPrioritySignals: 1 }).label).toBe('Review high-priority monitoring signal');
-        expect(engagementPrimaryAction(EngagementStatus.ACTIVE, { reassessmentRecommended: true }).label).toBe('Reassessment recommended / due');
+        expect(engagementPrimaryAction(EngagementStatus.ACTIVE, { reassessmentRecommended: true }).label).toBe('Start reassessment');
     });
 
     it('uses smallest monitoring capabilities', () => {
