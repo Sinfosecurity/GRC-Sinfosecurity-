@@ -832,7 +832,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Starting SHA:** Wave 6 accepted lineage `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91` / evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`  
 **Implementation SHA:** `7afd0d5c08a64667f592831509338ab74cf9a7b3`  
 **Wave 7:** ACCEPTED FOR CURRENT STAGE (`7afd0d5c08a64667f592831509338ab74cf9a7b3`, evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`).  
-**Wave 8:** AUTHORIZED. Termination, offboarding, and final disposition. Not started as accepted work.
+**Wave 8:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW (`037b8e98dac360e12084bb0de8b66ee666036feb`). Termination, offboarding, and final disposition. Not accepted.
 
 **Ownership:** Reassessment belongs to the Engagement. It is a new versioned cycle. Third Party ≠ Engagement. Azure reassessment does not reassess Microsoft 365.
 
@@ -845,3 +845,21 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Personas:** Requester provides business-context updates in Requester Workspace only. GRC shell remains practitioner-only. Vendor remains invitation-only. Cross-tenant DENY.
 
 **Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`.
+
+## Wave 8 — Termination + offboarding + final disposition
+
+**Starting SHA:** Wave 7 accepted lineage `7afd0d5c08a64667f592831509338ab74cf9a7b3` / evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`  
+**Implementation SHA:** `037b8e98dac360e12084bb0de8b66ee666036feb`  
+**Wave 8:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Not accepted.
+
+**Ownership:** Offboarding belongs to the Engagement. One authoritative open `EngagementOffboardingCase` at a time. Azure closure does not close Microsoft 365. Third Party aggregate stays in use while any live sibling Engagement remains.
+
+**Decision:** Wave 7 `TERMINATION_RECOMMENDED` is not automatic termination. Wave 8 requires an explicit authorized case. Monitoring and reassessment cannot close the Engagement.
+
+**Gate:** Exact blockers. Analyst prepares. A different authorized lead closes. Exceptions do not mark obligations complete. Final state is `OFFBOARDED`. Monitoring may retire only at closure. Historical residual, reassessment, Findings, and Decision Briefs are not rewritten.
+
+**Disposition:** Bounded immutable `EngagementFinalDisposition`. `RiskDecisionBrief` is not reused. Future need creates a new Engagement.
+
+**Personas:** Requester sees assigned business-transition tasks in Requester Workspace only. Vendor remains invitation-only and cannot open the internal case. Cross-tenant DENY.
+
+**Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`.
