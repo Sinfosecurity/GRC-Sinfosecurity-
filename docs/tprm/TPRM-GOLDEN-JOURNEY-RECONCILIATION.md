@@ -867,11 +867,15 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 ## Consolidated Golden Journey certification
 
 **Certification SHA:** `da9f7de77239f0a354508fe757b1f2291637f20f`  
+**Hosted frontend SHA:** `da9f7de77239f0a354508fe757b1f2291637f20f`  
 **Hosted API:** `b5d006599e9a6a93b69d8a73500b9d0159f0229b`  
+**Lineage:** Wave 8 accepted implementation `037b8e98dac360e12084bb0de8b66ee666036feb` + accepted pentest remediation `da9f7de`. Hosted API remains remediation deploy `b5d0065`.  
 **CI:** https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS  
 **Result:** EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. `#12` is not PASS. No Wave 9.
 
-**Live walk:** Requester `INT-2026-0006` → assignment → Microsoft Third Party reuse → new Engagement → Version 3 IRA Don’t Know → clarification → human MEDIUM tier → Engagement DD plan.  
+**Live walk:** Requester `INT-2026-0006` → assignment → information-request round-trip → Microsoft Third Party reuse → new Engagement `ENG-2026-0004` → Version 3 IRA Don’t Know → clarification → human MEDIUM tier → Engagement DD plan.  
+**Evidence E2E:** After staging MinIO bucket restore (`job-dap0l8dg1s2s738vm0fg`, 2026-09-22T04:57:46Z), real hosted PDF `03f22c61-15f4-44ce-9bec-47eb882400d0` and PNG `6175b9cb-efd6-4347-80a6-2ab584842ea9` uploaded CLEAN, downloaded 200, unauthenticated 401, Org B 404. Diagnostics `storage.status=up` was not accepted as substitute.  
+**Authenticated OIDC SSRF:** ORGANIZATION_ADMIN signup; localhost / metadata / RFC1918 rejected 400; Microsoft public issuer 200.  
 **Reused immutable Azure history:** Findings, CE, Cycle 1 residual MEDIUM 58, treatment/acceptance, contract gate, activation, monitoring, reassessment, termination, offboarding, final disposition. Microsoft 365 remained `DUE_DILIGENCE_PLANNING`.
 
 **Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`.

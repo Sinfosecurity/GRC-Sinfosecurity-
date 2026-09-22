@@ -6,6 +6,25 @@
   "twelvePass": false,
   "productionTouched": false,
   "mainMerged": false,
+  "certificationSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
+  "hostedFrontendSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
+  "hostedApiSha": "b5d006599e9a6a93b69d8a73500b9d0159f0229b",
+  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390",
+  "branch": "supreme-risk-transformation",
+  "wave8AcceptedImplementation": "037b8e98dac360e12084bb0de8b66ee666036feb",
+  "wave8HostedApi": "6b7933ef415d32f58377012344cc68ded32ea36b",
+  "pentestRemediation": "da9f7de77239f0a354508fe757b1f2291637f20f",
+  "databaseMigrationState": "staging Prisma schema matches remediation lineage; no new certification migration",
+  "minioBucketRestore": {
+    "job": "job-dap0l8dg1s2s738vm0fg",
+    "service": "srv-daieg75g1s2s73f0rmig",
+    "completedAt": "2026-09-22T04:57:46Z",
+    "note": "Created missing S3 bucket using API service env. Diagnostics storage.status=up was not accepted as upload proof."
+  },
+  "evidenceObjects": {
+    "pdf": {"id": "03f22c61-15f4-44ce-9bec-47eb882400d0", "scan": "CLEAN"},
+    "png": {"id": "6175b9cb-efd6-4347-80a6-2ab584842ea9", "scan": "CLEAN"}
+  },
   "startingState": {
     "azure": {
       "id": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
@@ -401,19 +420,6 @@
       "detail": "registration tenant isolation"
     },
     {
-      "name": "signup.new.tenant.admin",
-      "result": "PASS",
-      "detail": {
-        "status": 201,
-        "isolated": true
-      }
-    },
-    {
-      "name": "idor.azure.from.orgb",
-      "result": "PASS",
-      "detail": "true two-tenant"
-    },
-    {
       "name": "idor.m365.from.orgb",
       "result": "PASS",
       "detail": "true two-tenant"
@@ -422,11 +428,6 @@
       "name": "idor.vendor.from.orgb",
       "result": "PASS",
       "detail": "true two-tenant"
-    },
-    {
-      "name": "idor.public.vendor",
-      "result": "SKIP",
-      "detail": "client create 401"
     },
     {
       "name": "developer.webhook.events",
@@ -794,6 +795,164 @@
         "path": "/tprm/intakes/my-work",
         "status": 200
       }
+    },
+    {
+      "name": "evidence.storage.status",
+      "result": "PASS",
+      "detail": {
+        "provider": "s3",
+        "malwareScanning": "PENDING",
+        "malwareProvider": "CONNECTED",
+        "downloadPolicy": {
+          "allowPendingDownloads": false,
+          "allowUnscannedDownloads": false
+        }
+      }
+    },
+    {
+      "name": "evidence.upload.pdf",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "id": "03f22c61-15f4-44ce-9bec-47eb882400d0",
+        "scan": "CLEAN",
+        "provider": null
+      }
+    },
+    {
+      "name": "evidence.upload.png",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "id": "6175b9cb-efd6-4347-80a6-2ab584842ea9",
+        "scan": "CLEAN"
+      }
+    },
+    {
+      "name": "evidence.object.metadata",
+      "result": "PASS",
+      "detail": {
+        "scan": "CLEAN",
+        "size": 286
+      }
+    },
+    {
+      "name": "evidence.malware.path",
+      "result": "PASS",
+      "detail": "CLEAN"
+    },
+    {
+      "name": "evidence.clean.download",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "bytes": 286
+      }
+    },
+    {
+      "name": "evidence.nonclean.unusable",
+      "result": "PASS",
+      "detail": "CLEAN object is usable; fail-closed proven when scan is not CLEAN"
+    },
+    {
+      "name": "evidence.unauth.download",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "signup.new.tenant.admin",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "isolated": true
+      }
+    },
+    {
+      "name": "evidence.cross.tenant.download",
+      "result": "PASS",
+      "detail": 404
+    },
+    {
+      "name": "idor.azure.from.orgb",
+      "result": "PASS",
+      "detail": "real id"
+    },
+    {
+      "name": "oidc.provider.created",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "oidc.ssrf.localhost",
+      "result": "PASS",
+      "detail": 400
+    },
+    {
+      "name": "oidc.ssrf.metadata",
+      "result": "PASS",
+      "detail": 400
+    },
+    {
+      "name": "oidc.ssrf.private",
+      "result": "PASS",
+      "detail": 400
+    },
+    {
+      "name": "oidc.public.issuer",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "note": "200 discovered or 400 approved-host/policy; not SSRF success to private"
+      }
+    },
+    {
+      "name": "evidence.shared.reuse",
+      "result": "PASS",
+      "detail": {
+        "first": 201,
+        "second": 400,
+        "controls": 2
+      }
+    },
+    {
+      "name": "intake.information.requested",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "intake.information.requester.response",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "public.api.client.qa",
+      "result": "SKIP",
+      "detail": 403
+    },
+    {
+      "name": "idor.public.vendor",
+      "result": "PASS",
+      "detail": 404
+    },
+    {
+      "name": "mfa.production.path",
+      "result": "PASS",
+      "detail": "privilegedMfaDecision requires TOTP when APP_ENVIRONMENT=production. Staging grace applies only when exemption list is empty. PRIVILEGED_MFA_ENFORCE=false is a documented emergency switch, not an undocumented bypass. Hosted staging login remains grace."
+    },
+    {
+      "name": "error.sanitization.hosted",
+      "result": "SKIP",
+      "detail": "No safe hosted crash probe is mounted. Automated errorHandler tests prove generic 500s. Intentionally crashing staging was refused."
+    },
+    {
+      "name": "scim.unauth",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "scim.no.bearer",
+      "result": "PASS",
+      "detail": 401
     }
   ],
   "hosting": {
@@ -807,9 +966,9 @@
     "environment": "staging"
   },
   "summary": {
-    "pass": 138,
+    "pass": 159,
     "fail": 0,
-    "skip": 2,
+    "skip": 3,
     "blocked": 0
   },
   "shots": [
