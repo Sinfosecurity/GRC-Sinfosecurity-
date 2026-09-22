@@ -227,12 +227,13 @@ describe('#12 Wave 7 engagement reassessment', () => {
         const residual = await request(app).post(`${API}/tprm/engagements/${azureId}/reassessment/residual`).set('Authorization', `Bearer ${managerToken}`).send({ note: 'Cycle 2 residual.' });
         expect(residual.status).toBe(200);
         expect(residual.body.data.historicalUnchanged.residualScore).toBe(58);
+        expect(residual.body.data.engagement.status).toBe('ACTIVE');
         const still = await prisma.engagementResidualRiskAssessment.findUnique({ where: { id: residualId } });
         expect(still?.residualScore).toBe(58);
         expect(still?.reassessmentId).toBeNull();
         const decide = await request(app).post(`${API}/tprm/engagements/${azureId}/reassessment/decide`).set('Authorization', `Bearer ${managerToken}`).send({
-            decision: 'CONTINUE_MONITORING',
-            rationale: 'No termination. Return to monitoring.',
+            decision: 'TERMINATION_RECOMMENDED',
+            rationale: 'Must not start Wave 8.',
             startWave8: true,
         });
         expect(decide.status).toBe(409);

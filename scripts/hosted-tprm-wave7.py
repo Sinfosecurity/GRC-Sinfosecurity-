@@ -114,6 +114,7 @@ def main() -> None:
     residual = request_json("POST", f"/tprm/engagements/{AZURE}/reassessment/residual", lead, {"note": "New residual. Cycle 1 remains MEDIUM 58."})
     after_hist = ((data_of(residual[1]).get("historicalUnchanged") or data_of(residual[1]).get("historicalResidual") or {}))
     record("new.residual.does.not.rewrite.58", "PASS" if residual[0] in (200, 409) and (after_hist.get("residualScore") in (58, None) or residual[0] == 409) else "FAIL", residual[0])
+    record("azure.active.after.residual", "PASS" if residual[0] in (200, 409) and (residual[0] == 409 or data_of(residual[1]).get("engagement", {}).get("status") == "ACTIVE") else "FAIL", residual[0])
     still = request_json("GET", f"/tprm/engagements/{AZURE}/reassessment", lead)
     record("cycle1.still.medium.58", "PASS" if (data_of(still[1]).get("historicalResidual") or {}).get("residualScore") == 58 else "FAIL", data_of(still[1]).get("historicalResidual"))
     m365 = request_json("GET", f"/tprm/engagements/{M365}/reassessment", lead)

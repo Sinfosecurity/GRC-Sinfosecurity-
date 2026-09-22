@@ -776,7 +776,14 @@ export async function confirmResidual(organizationId: string, actor: Actor, key:
             reviewNote: note?.trim() || 'Confirmed. Review risk treatment.',
         },
     });
-    await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.TREATMENT_REVIEW } });
+    const preserveStatus = new Set<EngagementStatus>([
+        EngagementStatus.ACTIVE,
+        EngagementStatus.AVOIDED,
+        EngagementStatus.REJECTED,
+    ]);
+    if (!preserveStatus.has(engagement.status)) {
+        await prisma.engagement.update({ where: { id: engagement.id }, data: { status: EngagementStatus.TREATMENT_REVIEW } });
+    }
     await audit(organizationId, actor.id, 'residual_risk.reviewed', 'EngagementResidualRiskAssessment', row.id, {
         engagementId: engagement.id,
         vendorId: engagement.vendorId,

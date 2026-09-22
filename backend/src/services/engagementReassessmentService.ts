@@ -603,6 +603,7 @@ export async function calculateCycleResidual(organizationId: string, actor: Acto
         where: { id: cycle.id },
         data: { currentResidualId: newest?.id || latest?.id, status: EngagementReassessmentStatus.DECISION },
     });
+    await prisma.engagement.update({ where: { id: engagementId }, data: { status: EngagementStatus.ACTIVE } });
     const engagement = await prisma.engagement.findUnique({ where: { id: engagementId }, select: { status: true } });
     await audit(organizationId, actor.id, 'reassessment.residual_calculated', 'EngagementReassessment', cycle.id, {
         priorResidualId: prior?.id,
@@ -628,8 +629,8 @@ export async function decideReassessment(organizationId: string, actor: Actor, e
         throw new ApiError(400, 'Choose Continue monitoring, Further treatment required, or Termination recommended.');
     }
     if (!body.rationale) throw new ApiError(400, 'Record why this reassessment decision is being made.');
-    if (body.decision === ReassessmentDecisionType.TERMINATION_RECOMMENDED && body.startWave8) {
-        throw new ApiError(409, 'Termination recommended is recorded only. Wave 8 has not started and cannot start from this cycle.');
+    if (body.startWave8) {
+        throw new ApiError(409, 'Wave 8 has not started and cannot start from this cycle. Termination recommended is recorded only.');
     }
     await prisma.engagementReassessment.update({
         where: { id: cycle.id },

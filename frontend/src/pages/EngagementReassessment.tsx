@@ -97,6 +97,7 @@ export default function EngagementReassessment() {
                             </Surface>
                             <Surface padded={false}>
                                 <Typography variant="h6" component="h2" sx={{ p: 2, pb: 0 }}>Delta items</Typography>
+                                <Typography variant="body2" sx={{ px: 2, pb: 1 }}>Each item is classified REUSE, REFRESH, NEW, or NOT REQUIRED. The entire original questionnaire is not resent.</Typography>
                                 <AppTable
                                     embedded
                                     rows={items}
@@ -107,7 +108,23 @@ export default function EngagementReassessment() {
                                         { id: 'kind', label: 'Kind', hideOnMobile: true, render: (row: any) => String(row.kind).replace(/_/g, ' ') },
                                         { id: 'title', label: 'Item', render: (row: any) => row.title },
                                         { id: 'previous', label: 'Previous', hideOnMobile: true, render: (row: any) => row.previousValue || 'Not recorded' },
-                                        { id: 'disposition', label: 'Disposition', render: (row: any) => String(row.disposition).replace(/_/g, ' ') },
+                                        {
+                                            id: 'disposition',
+                                            label: 'Disposition',
+                                            render: (row: any) => (
+                                                <TextField
+                                                    select
+                                                    size="small"
+                                                    label="Disposition"
+                                                    value={row.disposition}
+                                                    onChange={(event) => run(() => intakeAPI.reviewReassessmentItem(id, row.id, { disposition: event.target.value }), `${row.title} marked ${String(event.target.value).replace(/_/g, ' ')}.`)}
+                                                >
+                                                    {DISPOSITIONS.map((item) => (
+                                                        <MenuItem key={item} value={item}>{item.replace(/_/g, ' ')}</MenuItem>
+                                                    ))}
+                                                </TextField>
+                                            ),
+                                        },
                                         { id: 'rationale', label: 'Why', hideOnMobile: true, render: (row: any) => row.rationale },
                                     ]}
                                 />
