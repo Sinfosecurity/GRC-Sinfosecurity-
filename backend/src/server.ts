@@ -240,7 +240,7 @@ app.get('/health/ready', readinessCheckHandler);
 app.get('/health/live', livenessCheckHandler);
 app.get('/api/v1/ops/diagnostics', authenticate, (req: AuthRequest, _res: Response, next: NextFunction) => {
     const role = req.user?.role;
-    if (role && (isPlatformStaffRole(role) || hasPermission(role, PERMISSIONS['organization.manage']))) {
+    if (role && (isPlatformStaffRole(role) || hasPermission(role, PERMISSIONS['organization.manage']) || hasPermission(role, PERMISSIONS['risk.manage']))) {
         return next();
     }
     next(new ApiError(403, 'You do not have permission to view diagnostics.'));

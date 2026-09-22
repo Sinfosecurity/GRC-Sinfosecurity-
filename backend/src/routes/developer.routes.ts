@@ -8,6 +8,16 @@ import { prisma } from '../config/database';
 
 const router = Router();
 router.use(authenticate);
+
+router.get('/webhooks/events', (_req, res, next) => {
+    try {
+        const events = webhookService.events();
+        res.json({ success: true, data: Array.isArray(events) ? events : [] });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.use(requirePermission(PERMISSIONS['integration.manage']));
 
 function actor(req: AuthRequest) {
@@ -65,15 +75,6 @@ router.post('/clients/:id/revoke', async (req: AuthRequest, res: Response, next:
 router.get('/webhooks', async (req: AuthRequest, res: Response, next: NextFunction) => {
     try { res.json({ success: true, data: await webhookService.list(actor(req).organizationId) }); }
     catch (error) { next(error); }
-});
-
-router.get('/webhooks/events', (_req, res, next) => {
-    try {
-        const events = webhookService.events();
-        res.json({ success: true, data: Array.isArray(events) ? events : [] });
-    } catch (error) {
-        next(error);
-    }
 });
 
 router.post('/webhooks', async (req: AuthRequest, res: Response, next: NextFunction) => {
