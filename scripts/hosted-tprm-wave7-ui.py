@@ -105,6 +105,10 @@ def main() -> None:
     SHOTS.mkdir(parents=True, exist_ok=True)
     fe = json.loads(urllib.request.urlopen(f"{BASE}/version.json", timeout=30).read())
     RESULTS["uiSha"] = fe.get("gitSha")
+    RESULTS["checks"] = [
+        item for item in RESULTS.get("checks", [])
+        if not str(item.get("name") or "").startswith(("ui.", "overflow:", "responsive.", "a11y."))
+    ]
     record("ui.hosted.sha", "PASS" if fe.get("gitSha") else "FAIL", fe.get("gitSha"))
 
     required = (
@@ -187,7 +191,11 @@ def main() -> None:
         record("ui.requester.denied.grc.shell", "PASS" if denied else "FAIL", requester[:240])
         shot(page, "requester-azure-reassessment-denied")
         page.goto(f"{BASE}/request/actions", wait_until="networkidle")
-        page.wait_for_timeout(1400)
+        page.wait_for_timeout(800)
+        try:
+            page.get_by_text("service or data scope", exact=False).first.wait_for(timeout=8000)
+        except Exception:
+            page.get_by_text("Nothing needs your attention", exact=False).wait_for(timeout=4000)
         actions = visible_text(page)
         limited = (
             "business update" in actions.lower()

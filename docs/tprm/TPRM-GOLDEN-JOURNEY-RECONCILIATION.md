@@ -815,7 +815,7 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Starting SHA:** Wave 5 accepted lineage `88938c263d741365578e874599156096fe5d6276` / evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`  
 **Implementation SHA:** `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`  
 **Wave 6:** ACCEPTED FOR CURRENT STAGE (`2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`, evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`).  
-**Wave 7:** AUTHORIZED. Periodic and event-driven reassessment. Wave 8 not started.
+**Wave 7:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW (`7afd0d5c08a64667f592831509338ab74cf9a7b3`). Periodic and event-driven reassessment. Wave 8 not started.
 
 **Why VendorMonitoring is insufficient:** It is vendor-scoped, has no Engagement profile, no per-Engagement relevance, no triage/materiality, no escalation object, and no reassessment handoff. Wave 6 extends it with `EngagementMonitoringProfile`, `EngagementMonitoringSignal`, `MonitoringSignalEngagementImpact`, `MonitoringReview`, `MonitoringEscalation`, and `ReassessmentRecommendation`. Legacy vendor rows remain readable and are never fabricated into Engagement linkage.
 
@@ -826,3 +826,22 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Sources:** Manual, internal review, vendor-notification (internal model), and system/Intelligence attention are available. BitSight, SecurityScorecard, Slack, and Jira are NOT_CONFIGURED / Coming later. No fake 24/7 monitoring claim.
 
 **Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`.
+
+## Wave 7 — Periodic + event-driven reassessment
+
+**Starting SHA:** Wave 6 accepted lineage `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91` / evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`  
+**Implementation SHA:** `7afd0d5c08a64667f592831509338ab74cf9a7b3`  
+**Wave 7:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Not accepted.  
+**Wave 8:** NOT STARTED.
+
+**Ownership:** Reassessment belongs to the Engagement. It is a new versioned cycle. Third Party ≠ Engagement. Azure reassessment does not reassess Microsoft 365.
+
+**Delta:** Items are classified REUSE / REFRESH / NEW / NOT REQUIRED. The vendor is not automatically sent the entire original questionnaire. Shared Evidence is reused or refreshed. Invitation-only vendor architecture is preserved.
+
+**History:** Cycle 1 residual remains inspectable. Hosted Azure Cycle 1 remains MEDIUM 58. Cycle 2 writes a new residual row. Old acceptance does not automatically apply. Confirming a new residual on an ACTIVE Engagement does not demote the Engagement.
+
+**Decision:** CONTINUE_MONITORING, FURTHER_TREATMENT_REQUIRED, or TERMINATION_RECOMMENDED. `startWave8` is always rejected. Completed reassessment returns to Monitoring with the Engagement ACTIVE.
+
+**Personas:** Requester provides business-context updates in Requester Workspace only. GRC shell remains practitioner-only. Vendor remains invitation-only. Cross-tenant DENY.
+
+**Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`.

@@ -1,0 +1,657 @@
+{
+  "item": "#12",
+  "wave": "7",
+  "declaredPass": false,
+  "wave7Accepted": false,
+  "wave8Started": false,
+  "productionTouched": false,
+  "mainMerged": false,
+  "implementationSha": "7afd0d5c08a64667f592831509338ab74cf9a7b3",
+  "hostedSha": {
+    "api": "7afd0d5c08a64667f592831509338ab74cf9a7b3",
+    "frontend": "7afd0d5c08a64667f592831509338ab74cf9a7b3",
+    "environment": "staging"
+  },
+  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35674087083",
+  "checks": [
+    {
+      "name": "hosted.environment",
+      "result": "PASS",
+      "detail": "staging"
+    },
+    {
+      "name": "azure.residual.cycle1",
+      "result": "PASS",
+      "detail": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "organizationId": "0e0de017-919a-4886-93d7-420b05f71f62",
+        "engagementId": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
+        "vendorId": "b777503b-8a35-4a4c-ad10-b0bfdd599c2b",
+        "status": "CONFIRMED",
+        "inherentTier": "CRITICAL",
+        "inherentScore": 80,
+        "inherentSource": "EngagementIra.confirmedTier",
+        "inherentConfirmedAt": "2026-09-19T17:20:41.736Z",
+        "inherentScoringVersion": "3",
+        "controlEffectivenessSnapshot": [
+          {
+            "id": "7bdc6f79-cd56-4812-8281-ef215bd1425f",
+            "domain": "Governance and Risk",
+            "rating": "PARTIALLY_EFFECTIVE",
+            "controlId": "VRA-001",
+            "rationale": "Control exists and is operated, but evidence coverage is incomplete for Azure Hosting QA.",
+            "controlKey": "VRA-001",
+            "reviewedAt": "2026-09-19T17:36:20.074Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "controlTitle": "Governance"
+          }
+        ],
+        "openFindingSnapshot": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM",
+            "controlId": "VRA-102",
+            "responsibility": "VENDOR"
+          }
+        ],
+        "compensatingSnapshot": [
+          {
+            "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+            "owner": "QA TPRM Analyst",
+            "reviewedAt": "2026-09-19T17:36:20.743Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "affectedControlKey": "VRA-001",
+            "consideredInResidual": true,
+            "effectivenessJudgment": "PARTIALLY_EFFECTIVE"
+          },
+          {
+            "id": "99fca332-128f-4850-be62-b710da252311",
+            "owner": "QA TPRM Analyst",
+            "reviewedAt": "2026-09-19T17:21:59.431Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "affectedControlKey": "VRA-001",
+            "consideredInResidual": true,
+            "effectivenessJudgment": "PARTIALLY_EFFECTIVE"
+          }
+        ],
+        "methodologyVersion": "supreme-risk-engagement-1.0.0",
+        "calculationVersion": "supreme-risk-1.2.0-engagement-adapter",
+        "residualScore": 58,
+        "residualBand": "MEDIUM",
+        "explanation": "Confirmed inherent CRITICAL (80); control effectiveness 46; 1 confirmed open findings; 2 reviewed compensating controls; residual 58 (MEDIUM); methodology supreme-risk-engagement-1.0.0; calculation supreme-risk-1.2.0-engagement-adapter",
+        "factors": [
+          {
+            "code": "confirmed_inherent_tier",
+            "group": "inherent",
+            "label": "Confirmed inherent CRITICAL",
+            "points": 80,
+            "rationale": "Wave 2 confirmed EngagementIra tier CRITICAL maps to documented tierBase 80. IRA was not recalculated."
+          },
+          {
+            "code": "engagement_control_effectiveness",
+            "group": "control",
+            "label": "Engagement control-effectiveness haircut",
+            "points": -46,
+            "rationale": "Human-governed ratings averaged 40; 2 reviewed compensating control(s) added 6. Residual starts at 54. Questionnaire numeric scores were not used."
+          },
+          {
+            "code": "ce_vra-001",
+            "group": "control",
+            "label": "Governance PARTIALLY_EFFECTIVE",
+            "points": 40,
+            "rationale": "Engagement-specific judgment PARTIALLY_EFFECTIVE = 40 points"
+          },
+          {
+            "code": "finding_medium",
+            "group": "residual",
+            "label": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "points": 4,
+            "rationale": "Confirmed open MEDIUM finding 5385cace-58f3-4c95-8b9b-42eda09bc14d adds 4. Candidates and dismissed findings are excluded."
+          }
+        ],
+        "readiness": {
+          "ready": true,
+          "blockers": []
+        },
+        "triggerReason": "residual_risk.confirmed",
+        "calculatedAt": "2026-09-19T17:36:22.028Z",
+        "calculatedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+        "reviewedAt": "2026-09-21T02:33:30.366Z",
+        "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+        "reviewNote": "Confirmed hosted Wave 5 residual. Review risk treatment.",
+        "reassessmentId": null,
+        "createdAt": "2026-09-21T02:33:30.368Z"
+      }
+    },
+    {
+      "name": "reassessment.started",
+      "result": "PASS",
+      "detail": 201
+    },
+    {
+      "name": "delta.dispositions.present",
+      "result": "PASS",
+      "detail": [
+        "REFRESH",
+        "REUSE"
+      ]
+    },
+    {
+      "name": "azure.still.active",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "historical.58.unchanged",
+      "result": "PASS",
+      "detail": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "organizationId": "0e0de017-919a-4886-93d7-420b05f71f62",
+        "engagementId": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
+        "vendorId": "b777503b-8a35-4a4c-ad10-b0bfdd599c2b",
+        "status": "CONFIRMED",
+        "inherentTier": "CRITICAL",
+        "inherentScore": 80,
+        "inherentSource": "EngagementIra.confirmedTier",
+        "inherentConfirmedAt": "2026-09-19T17:20:41.736Z",
+        "inherentScoringVersion": "3",
+        "controlEffectivenessSnapshot": [
+          {
+            "id": "7bdc6f79-cd56-4812-8281-ef215bd1425f",
+            "domain": "Governance and Risk",
+            "rating": "PARTIALLY_EFFECTIVE",
+            "controlId": "VRA-001",
+            "rationale": "Control exists and is operated, but evidence coverage is incomplete for Azure Hosting QA.",
+            "controlKey": "VRA-001",
+            "reviewedAt": "2026-09-19T17:36:20.074Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "controlTitle": "Governance"
+          }
+        ],
+        "openFindingSnapshot": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM",
+            "controlId": "VRA-102",
+            "responsibility": "VENDOR"
+          }
+        ],
+        "compensatingSnapshot": [
+          {
+            "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+            "owner": "QA TPRM Analyst",
+            "reviewedAt": "2026-09-19T17:36:20.743Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "affectedControlKey": "VRA-001",
+            "consideredInResidual": true,
+            "effectivenessJudgment": "PARTIALLY_EFFECTIVE"
+          },
+          {
+            "id": "99fca332-128f-4850-be62-b710da252311",
+            "owner": "QA TPRM Analyst",
+            "reviewedAt": "2026-09-19T17:21:59.431Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "affectedControlKey": "VRA-001",
+            "consideredInResidual": true,
+            "effectivenessJudgment": "PARTIALLY_EFFECTIVE"
+          }
+        ],
+        "methodologyVersion": "supreme-risk-engagement-1.0.0",
+        "calculationVersion": "supreme-risk-1.2.0-engagement-adapter",
+        "residualScore": 58,
+        "residualBand": "MEDIUM",
+        "explanation": "Confirmed inherent CRITICAL (80); control effectiveness 46; 1 confirmed open findings; 2 reviewed compensating controls; residual 58 (MEDIUM); methodology supreme-risk-engagement-1.0.0; calculation supreme-risk-1.2.0-engagement-adapter",
+        "factors": [
+          {
+            "code": "confirmed_inherent_tier",
+            "group": "inherent",
+            "label": "Confirmed inherent CRITICAL",
+            "points": 80,
+            "rationale": "Wave 2 confirmed EngagementIra tier CRITICAL maps to documented tierBase 80. IRA was not recalculated."
+          },
+          {
+            "code": "engagement_control_effectiveness",
+            "group": "control",
+            "label": "Engagement control-effectiveness haircut",
+            "points": -46,
+            "rationale": "Human-governed ratings averaged 40; 2 reviewed compensating control(s) added 6. Residual starts at 54. Questionnaire numeric scores were not used."
+          },
+          {
+            "code": "ce_vra-001",
+            "group": "control",
+            "label": "Governance PARTIALLY_EFFECTIVE",
+            "points": 40,
+            "rationale": "Engagement-specific judgment PARTIALLY_EFFECTIVE = 40 points"
+          },
+          {
+            "code": "finding_medium",
+            "group": "residual",
+            "label": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "points": 4,
+            "rationale": "Confirmed open MEDIUM finding 5385cace-58f3-4c95-8b9b-42eda09bc14d adds 4. Candidates and dismissed findings are excluded."
+          }
+        ],
+        "readiness": {
+          "ready": true,
+          "blockers": []
+        },
+        "triggerReason": "residual_risk.confirmed",
+        "calculatedAt": "2026-09-19T17:36:22.028Z",
+        "calculatedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+        "reviewedAt": "2026-09-21T02:33:30.366Z",
+        "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+        "reviewNote": "Confirmed hosted Wave 5 residual. Review risk treatment.",
+        "reassessmentId": null,
+        "createdAt": "2026-09-21T02:33:30.368Z"
+      }
+    },
+    {
+      "name": "wave8.not.started",
+      "result": "PASS",
+      "detail": false
+    },
+    {
+      "name": "requester.cannot.start",
+      "result": "PASS",
+      "detail": 403
+    },
+    {
+      "name": "requester.business.context.only",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "new.residual.does.not.rewrite.58",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "azure.active.after.residual",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "cycle1.still.medium.58",
+      "result": "PASS",
+      "detail": {
+        "id": "435f528c-62c6-4784-88ac-0152cb1cfc69",
+        "organizationId": "0e0de017-919a-4886-93d7-420b05f71f62",
+        "engagementId": "93a259e6-81bf-4eb1-b79f-2077c6eeafda",
+        "vendorId": "b777503b-8a35-4a4c-ad10-b0bfdd599c2b",
+        "status": "CONFIRMED",
+        "inherentTier": "CRITICAL",
+        "inherentScore": 80,
+        "inherentSource": "EngagementIra.confirmedTier",
+        "inherentConfirmedAt": "2026-09-19T17:20:41.736Z",
+        "inherentScoringVersion": "3",
+        "controlEffectivenessSnapshot": [
+          {
+            "id": "7bdc6f79-cd56-4812-8281-ef215bd1425f",
+            "domain": "Governance and Risk",
+            "rating": "PARTIALLY_EFFECTIVE",
+            "controlId": "VRA-001",
+            "rationale": "Control exists and is operated, but evidence coverage is incomplete for Azure Hosting QA.",
+            "controlKey": "VRA-001",
+            "reviewedAt": "2026-09-19T17:36:20.074Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "controlTitle": "Governance"
+          }
+        ],
+        "openFindingSnapshot": [
+          {
+            "id": "5385cace-58f3-4c95-8b9b-42eda09bc14d",
+            "title": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "status": "OPEN",
+            "severity": "MEDIUM",
+            "controlId": "VRA-102",
+            "responsibility": "VENDOR"
+          }
+        ],
+        "compensatingSnapshot": [
+          {
+            "id": "e633b10a-9b7b-4850-b234-c8f094b22a6f",
+            "owner": "QA TPRM Analyst",
+            "reviewedAt": "2026-09-19T17:36:20.743Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "affectedControlKey": "VRA-001",
+            "consideredInResidual": true,
+            "effectivenessJudgment": "PARTIALLY_EFFECTIVE"
+          },
+          {
+            "id": "99fca332-128f-4850-be62-b710da252311",
+            "owner": "QA TPRM Analyst",
+            "reviewedAt": "2026-09-19T17:21:59.431Z",
+            "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+            "description": "Privileged access reviews performed monthly by the Azure hosting owner.",
+            "affectedControlKey": "VRA-001",
+            "consideredInResidual": true,
+            "effectivenessJudgment": "PARTIALLY_EFFECTIVE"
+          }
+        ],
+        "methodologyVersion": "supreme-risk-engagement-1.0.0",
+        "calculationVersion": "supreme-risk-1.2.0-engagement-adapter",
+        "residualScore": 58,
+        "residualBand": "MEDIUM",
+        "explanation": "Confirmed inherent CRITICAL (80); control effectiveness 46; 1 confirmed open findings; 2 reviewed compensating controls; residual 58 (MEDIUM); methodology supreme-risk-engagement-1.0.0; calculation supreme-risk-1.2.0-engagement-adapter",
+        "factors": [
+          {
+            "code": "confirmed_inherent_tier",
+            "group": "inherent",
+            "label": "Confirmed inherent CRITICAL",
+            "points": 80,
+            "rationale": "Wave 2 confirmed EngagementIra tier CRITICAL maps to documented tierBase 80. IRA was not recalculated."
+          },
+          {
+            "code": "engagement_control_effectiveness",
+            "group": "control",
+            "label": "Engagement control-effectiveness haircut",
+            "points": -46,
+            "rationale": "Human-governed ratings averaged 40; 2 reviewed compensating control(s) added 6. Residual starts at 54. Questionnaire numeric scores were not used."
+          },
+          {
+            "code": "ce_vra-001",
+            "group": "control",
+            "label": "Governance PARTIALLY_EFFECTIVE",
+            "points": 40,
+            "rationale": "Engagement-specific judgment PARTIALLY_EFFECTIVE = 40 points"
+          },
+          {
+            "code": "finding_medium",
+            "group": "residual",
+            "label": "Azure Hosting QA \u2014 Are audit and assessment findings risk-ranked, assigned, monitored, and independently validated before closure?\n\nGuidanc",
+            "points": 4,
+            "rationale": "Confirmed open MEDIUM finding 5385cace-58f3-4c95-8b9b-42eda09bc14d adds 4. Candidates and dismissed findings are excluded."
+          }
+        ],
+        "readiness": {
+          "ready": true,
+          "blockers": []
+        },
+        "triggerReason": "residual_risk.confirmed",
+        "calculatedAt": "2026-09-19T17:36:22.028Z",
+        "calculatedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+        "reviewedAt": "2026-09-21T02:33:30.366Z",
+        "reviewedBy": "a9406969-875a-46b8-81d2-f1fd92d17ce4",
+        "reviewNote": "Confirmed hosted Wave 5 residual. Review risk treatment.",
+        "reassessmentId": null,
+        "createdAt": "2026-09-21T02:33:30.368Z"
+      }
+    },
+    {
+      "name": "m365.not.reassessed",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "wave8.blocked",
+      "result": "PASS",
+      "detail": 409
+    },
+    {
+      "name": "decision.continue.monitoring",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "returned.to.monitoring",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "azure.active.after",
+      "result": "PASS",
+      "detail": "ACTIVE"
+    },
+    {
+      "name": "unauth.denied",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "ui.hosted.sha",
+      "result": "PASS",
+      "detail": "7afd0d5c08a64667f592831509338ab74cf9a7b3"
+    },
+    {
+      "name": "ui.azure.reassessment.loaded",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/engagements/93a259e6-81bf-4eb1-b79f-2077c6eeafda/reassessment"
+    },
+    {
+      "name": "ui.cycle1.medium.58",
+      "result": "PASS",
+      "detail": "historical residual visible"
+    },
+    {
+      "name": "ui.wave8.not.started",
+      "result": "PASS",
+      "detail": "wave 8 honesty"
+    },
+    {
+      "name": "ui.delta.classes",
+      "result": "PASS",
+      "detail": "delta classification labels"
+    },
+    {
+      "name": "ui.one.primary.action",
+      "result": "PASS",
+      "detail": "one primary next action"
+    },
+    {
+      "name": "a11y.labelled.controls",
+      "result": "PASS",
+      "detail": [
+        "Reassessment kind",
+        "What changed?",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Disposition",
+        "Decision",
+        "Rationale"
+      ]
+    },
+    {
+      "name": "a11y.headings",
+      "result": "PASS",
+      "detail": [
+        "ENG-2026-0001 \u00b7 Azure Hosting QA",
+        "Primary next action",
+        "Historical residual \u2014 Cycle 1",
+        "Current cycle",
+        "Requester business-context delta",
+        "Delta items",
+        "Advance cycle",
+        "Previous vs current",
+        "Reassessment decision"
+      ]
+    },
+    {
+      "name": "a11y.keyboard.tab",
+      "result": "PASS",
+      "detail": {
+        "tag": "div",
+        "outline": "solid 2px rgb(212, 188, 138)",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "name": "a11y.visible.focus",
+      "result": "PASS",
+      "detail": {
+        "tag": "div",
+        "outline": "solid 2px rgb(212, 188, 138)",
+        "boxShadow": "none"
+      }
+    },
+    {
+      "name": "ui.m365.not.reassessing.azure",
+      "result": "PASS",
+      "detail": "https://supreme-risk-staging.onrender.com/engagements/eeb0ae53-0e05-4748-8434-79f28c9e564a/reassessment"
+    },
+    {
+      "name": "overflow:azure-reassessment-375",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.reassessment.375",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:azure-reassessment-768",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.reassessment.768",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:azure-reassessment-1024",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.reassessment.1024",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:azure-reassessment-1440",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.reassessment.1440",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "overflow:azure-reassessment-1920",
+      "result": "PASS",
+      "detail": "extra=0"
+    },
+    {
+      "name": "responsive.azure.reassessment.1920",
+      "result": "PASS",
+      "detail": {
+        "missing": [],
+        "overflow": 0
+      }
+    },
+    {
+      "name": "ui.requester.denied.grc.shell",
+      "result": "PASS",
+      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nAccess Denied\n\nYou don't have permission to access this page. Please contact your administrator if you believe this is an error.\n\nReturn to y"
+    },
+    {
+      "name": "ui.requester.business.context.workspace",
+      "result": "PASS",
+      "detail": "SUPREME \u2014 STAGING\nIsolated staging environment. Not production. Do not use production tenant data.\nSkip to content\n\nSUPREME\n\nThird-Party Requests\n\nHome\nNew Request\nMy Requests\nActions Required\nHelp\nQA\nActions required\n\nAnswer GRC questions "
+    }
+  ],
+  "sha": {
+    "api": "2c550a38ae2dd4b0278d547ebb6a1c626991d5d1",
+    "frontend": "e79f0a1df723c894de1f06d24e7d9942d82087f2",
+    "environment": "staging"
+  },
+  "shots": [
+    "lead-azure-reassessment-1440",
+    "lead-m365-reassessment-1440",
+    "lead-azure-reassessment-375",
+    "lead-azure-reassessment-768",
+    "lead-azure-reassessment-1024",
+    "lead-azure-reassessment-1920",
+    "requester-azure-reassessment",
+    "requester-azure-reassessment-denied",
+    "requester-actions-business-context"
+  ],
+  "overflows": [
+    {
+      "name": "azure-reassessment-375",
+      "extra": 0
+    },
+    {
+      "name": "azure-reassessment-768",
+      "extra": 0
+    },
+    {
+      "name": "azure-reassessment-1024",
+      "extra": 0
+    },
+    {
+      "name": "azure-reassessment-1440",
+      "extra": 0
+    },
+    {
+      "name": "azure-reassessment-1920",
+      "extra": 0
+    }
+  ],
+  "a11y": {
+    "labels": [
+      "Reassessment kind",
+      "What changed?",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Disposition",
+      "Decision",
+      "Rationale"
+    ],
+    "headings": [
+      "ENG-2026-0001 \u00b7 Azure Hosting QA",
+      "Primary next action",
+      "Historical residual \u2014 Cycle 1",
+      "Current cycle",
+      "Requester business-context delta",
+      "Delta items",
+      "Advance cycle",
+      "Previous vs current",
+      "Reassessment decision"
+    ],
+    "hasTable": true,
+    "focusableCount": 80
+  },
+  "uiSha": "7afd0d5c08a64667f592831509338ab74cf9a7b3"
+}
