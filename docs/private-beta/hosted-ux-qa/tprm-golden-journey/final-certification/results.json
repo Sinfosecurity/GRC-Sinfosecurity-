@@ -6,7 +6,7 @@
   "twelvePass": false,
   "productionTouched": false,
   "mainMerged": false,
-  "certificationSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
+  "certificationSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
   "hostedFrontendSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
   "hostedApiSha": "b5d006599e9a6a93b69d8a73500b9d0159f0229b",
   "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390",
@@ -1125,6 +1125,15 @@
       "detail": {
         "note": "Production object storage must be deterministically provisioned. Staging MinIO bootstrap is not copied to production. Commercial production remains NO-GO. No production bucket is claimed."
       }
+    },
+    {
+      "name": "ci.exact.certification.sha",
+      "result": "PASS",
+      "detail": {
+        "sha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
+        "run": 35721879631,
+        "conclusion": "success"
+      }
     }
   ],
   "hosting": {
@@ -1138,7 +1147,7 @@
     "environment": "staging"
   },
   "summary": {
-    "pass": 173,
+    "pass": 174,
     "fail": 2,
     "skip": 3,
     "blocked": 1
@@ -1282,13 +1291,16 @@
         "sha": "da9f7de77239f0a354508fe757b1f2291637f20f"
       },
       "exactCertificationSha": {
-        "status": "PENDING",
-        "note": "Must run on the commit that records this amendment"
+        "status": "PASS",
+        "run": "35721879631",
+        "sha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
+        "url": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631"
       }
     },
     "hostedStaging": {
       "goldenJourney": "see checks",
       "objectStoragePersistence": "FAIL"
     }
-  }
+  },
+  "ciExact": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631"
 }
