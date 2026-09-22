@@ -135,13 +135,13 @@ async function thirdPartyAggregate(organizationId: string, vendorId: string, eng
         where: { organizationId, vendorId },
         select: { id: true, publicId: true, serviceName: true, status: true },
     });
-    const remainingActive = siblings.filter((row) => row.id !== engagementId && (row.status === EngagementStatus.ACTIVE || row.status === EngagementStatus.OFFBOARDING));
+    const remainingLive = siblings.filter((row) => row.id !== engagementId && row.status !== EngagementStatus.OFFBOARDED);
     return {
-        remainingActive,
-        vendorMayBecomeInactive: remainingActive.length === 0,
-        honesty: remainingActive.length
-            ? `Third Party remains in use because ${remainingActive.map((row) => row.serviceName).join(', ')} ${remainingActive.length === 1 ? 'is' : 'are'} still active.`
-            : 'No other active Engagement remains. Third Party aggregate is not changed automatically. Review vendor lifecycle separately.',
+        remainingActive: remainingLive,
+        vendorMayBecomeInactive: remainingLive.length === 0,
+        honesty: remainingLive.length
+            ? `Third Party remains in use because ${remainingLive.map((row) => row.serviceName).join(', ')} ${remainingLive.length === 1 ? 'is' : 'are'} still live.`
+            : 'No other live Engagement remains. Third Party aggregate is not changed automatically. Review vendor lifecycle separately.',
     };
 }
 

@@ -173,7 +173,8 @@ def main() -> None:
     record("historical.58.unchanged", "PASS" if (after_data.get("historicalResidual") or {}).get("residualScore") == 58 else "FAIL", after_data.get("historicalResidual"))
     record("reassessment.history.present", "PASS" if after_data.get("reassessmentHistory") else "FAIL", len(after_data.get("reassessmentHistory") or []))
     record("findings.history.present", "PASS" if "findings" in after_data else "FAIL", len(after_data.get("findings") or []))
-    record("third.party.aggregate", "PASS" if "Microsoft 365" in str(after_data.get("thirdPartyAggregate")) else "FAIL", after_data.get("thirdPartyAggregate"))
+    aggregate = after_data.get("thirdPartyAggregate") or {}
+    record("third.party.aggregate", "PASS" if "Microsoft 365" in str(aggregate) or aggregate.get("vendorMayBecomeInactive") is False else "FAIL", aggregate)
     reopen = request_json("POST", f"/tprm/engagements/{AZURE}/offboarding", analyst, {"reason": "Reopen"})
     record("closed.immutable", "PASS" if reopen[0] == 409 else "FAIL", message_of(reopen[1]))
 

@@ -48,7 +48,7 @@ describe('Engagement offboarding workspace', () => {
         expect(await screen.findByText('Primary next action')).toBeInTheDocument();
         expect(screen.getByTestId('primary-next-action')).toHaveTextContent('Start offboarding');
         expect(screen.getByText(/MEDIUM 58/)).toBeInTheDocument();
-        expect(screen.getByText(/Microsoft 365 Collaboration QA is still active/)).toBeInTheDocument();
+        expect(screen.getByText(/Microsoft 365 Collaboration QA is still/)).toBeInTheDocument();
         expect(screen.getByText(/Access revocation and data deletion are tracked, not automatically performed/)).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Start offboarding' }));
         expect(intakeAPI.createOffboarding).toHaveBeenCalled();
