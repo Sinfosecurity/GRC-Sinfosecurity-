@@ -10,6 +10,7 @@ export const ENGAGEMENT_WORKSPACE_TABS = [
     'residual-risk',
     'decisions',
     'monitoring',
+    'reassessment',
     'history',
 ] as const;
 
@@ -179,11 +180,15 @@ export function engagementPrimaryAction(
         openMonitoringSignals?: number;
         highPrioritySignals?: number;
         reassessmentRecommended?: boolean;
+        openReassessment?: boolean;
     } = {},
 ): PrimaryAction {
     if (status === EngagementStatus.ACTIVE) {
+        if (extras.openReassessment) {
+            return { label: 'Continue reassessment', href: (id) => `/engagements/${id}/reassessment`, owner: 'Assigned TPRM analyst', wave5: false };
+        }
         if (extras.reassessmentRecommended) {
-            return { label: 'Reassessment recommended / due', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };
+            return { label: 'Start reassessment', href: (id) => `/engagements/${id}/reassessment`, owner: 'Assigned TPRM analyst', wave5: false };
         }
         if ((extras.highPrioritySignals || 0) > 0) {
             return { label: 'Review high-priority monitoring signal', href: (id) => `/engagements/${id}/monitoring`, owner: 'Assigned TPRM analyst', wave5: false };

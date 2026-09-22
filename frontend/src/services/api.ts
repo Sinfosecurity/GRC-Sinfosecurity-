@@ -604,6 +604,18 @@ export const intakeAPI = {
     closeMonitoringSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/close`, data),
     createFindingFromSignal: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/finding`, data),
     recommendReassessment: (signalId: string, data: unknown) => api.post(`/tprm/monitoring/signals/${signalId}/recommend-reassessment`, data),
+    getReassessment: (id: string) => api.get(`/tprm/engagements/${id}/reassessment`),
+    startReassessment: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/start`, data),
+    recordReassessmentDelta: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/requester-delta`, data),
+    refreshReassessmentIra: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/ira`, data),
+    confirmReassessmentTier: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/tier-review`, data),
+    confirmReassessmentDeltaPlan: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/delta-plan`, data),
+    requestReassessmentVendorRefresh: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/vendor-refresh`, data),
+    reviewReassessmentItem: (id: string, itemId: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/items/${itemId}`, data),
+    advanceReassessment: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/advance`, data),
+    calculateReassessmentResidual: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/residual`, data),
+    decideReassessment: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/decide`, data),
+    returnReassessmentToMonitoring: (id: string, data: unknown) => api.post(`/tprm/engagements/${id}/reassessment/return-to-monitoring`, data),
 };
 
 const intakeInfoApi = axios.create({

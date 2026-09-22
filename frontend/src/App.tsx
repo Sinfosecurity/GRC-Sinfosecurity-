@@ -52,6 +52,7 @@ const EngagementControls = lazy(() => import('./pages/EngagementControls'));
 const EngagementResidual = lazy(() => import('./pages/EngagementResidual'));
 const EngagementDecisions = lazy(() => import('./pages/EngagementDecisions'));
 const EngagementMonitoring = lazy(() => import('./pages/EngagementMonitoring'));
+const EngagementReassessment = lazy(() => import('./pages/EngagementReassessment'));
 const MonitoringSignalDetail = lazy(() => import('./pages/MonitoringSignalDetail'));
 const EngagementHistory = lazy(() => import('./pages/EngagementHistory'));
 const LegacyOnboardRedirect = lazy(() => import('./pages/LegacyOnboardRedirect'));
@@ -328,6 +329,7 @@ export default function App() {
                         <Route path="residual-risk" element={<EngagementResidual />} />
                         <Route path="decisions" element={<EngagementDecisions />} />
                         <Route path="monitoring" element={<EngagementMonitoring />} />
+                        <Route path="reassessment" element={<EngagementReassessment />} />
                         <Route path="history" element={<EngagementHistory />} />
                         <Route path="specialist-review" element={<AssessmentReview />} />
                         <Route path="risk" element={<EngagementRisk />} />

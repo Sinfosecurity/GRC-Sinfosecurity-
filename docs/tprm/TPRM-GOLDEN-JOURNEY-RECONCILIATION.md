@@ -814,8 +814,8 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 
 **Starting SHA:** Wave 5 accepted lineage `88938c263d741365578e874599156096fe5d6276` / evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`  
 **Implementation SHA:** `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`  
-**Wave 6:** IMPLEMENTED — READY FOR PRODUCT LEADERSHIP REVIEW. Not accepted.  
-**Wave 7:** NOT STARTED. No new IRA, DDQ, residual recalculation, termination, or offboarding.
+**Wave 6:** ACCEPTED FOR CURRENT STAGE (`2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`, evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`).  
+**Wave 7:** AUTHORIZED. Periodic and event-driven reassessment. Wave 8 not started.
 
 **Why VendorMonitoring is insufficient:** It is vendor-scoped, has no Engagement profile, no per-Engagement relevance, no triage/materiality, no escalation object, and no reassessment handoff. Wave 6 extends it with `EngagementMonitoringProfile`, `EngagementMonitoringSignal`, `MonitoringSignalEngagementImpact`, `MonitoringReview`, `MonitoringEscalation`, and `ReassessmentRecommendation`. Legacy vendor rows remain readable and are never fabricated into Engagement linkage.
 

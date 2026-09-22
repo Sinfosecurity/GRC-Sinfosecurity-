@@ -56,7 +56,10 @@ export type NotificationEvent =
     | 'monitoring.signal.overdue'
     | 'monitoring.signal.escalated'
     | 'monitoring.reassessment_recommended'
-    | 'monitoring.profile.review_due';
+    | 'monitoring.profile.review_due'
+    | 'reassessment.started'
+    | 'reassessment.requester_delta'
+    | 'reassessment.completed';
 
 export type EmailProviderStatus = 'CONNECTED' | 'DEGRADED' | 'ERROR' | 'NOT_CONFIGURED';
 export type EmailDeliveryStatus = 'ACCEPTED' | 'DELIVERED' | 'FAILED' | 'NOT_CONFIGURED';

@@ -39,7 +39,7 @@ export default function EngagementOverview() {
                         <Typography>Monitoring profile: {data.monitoring.profileStatus}</Typography>
                         <Typography>Open monitoring signals: {data.monitoring.openSignals ?? 0}</Typography>
                         <Typography>High-priority signals: {data.monitoring.highPriority ?? 0}</Typography>
-                        <Typography>Reassessment recommended: {data.monitoring.reassessmentRecommended ? 'Yes — Wave 7 has not started' : 'No'}</Typography>
+                        <Typography>Reassessment recommended: {data.monitoring.reassessmentRecommended ? 'Yes' : 'No'}</Typography>
                     </>
                 )}
                 <Typography>Target start: {data.targetStartDate ? formatShortDate(data.targetStartDate) : 'Not recorded'}</Typography>

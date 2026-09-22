@@ -1384,7 +1384,9 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
     });
     const outstanding = reviews.filter((item) => item.status !== 'COMPLETE').map((item) => item.domain).filter(Boolean);
     const { monitoringExtras } = await import('./engagementMonitoringService');
+    const { reassessmentExtras } = await import('./engagementReassessmentService');
     const monitoring = row.status === 'ACTIVE' ? await monitoringExtras(organizationId, row.id) : null;
+    const reassessment = row.status === 'ACTIVE' ? await reassessmentExtras(organizationId, row.id) : null;
     const primary = engagementPrimaryAction(row.status, {
         residualReady: Boolean(risk?.residualReady),
         residualConfirmed: risk?.residual?.status === 'CONFIRMED',
@@ -1395,6 +1397,7 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
         openMonitoringSignals: monitoring?.openMonitoringSignals,
         highPrioritySignals: monitoring?.highPrioritySignals,
         reassessmentRecommended: monitoring?.reassessmentRecommended,
+        openReassessment: reassessment?.openReassessment,
     });
     const vendorAssessmentStatus = assessments.some((item) => item.submittedAt)
         ? 'Vendor submitted'
@@ -1440,7 +1443,7 @@ export async function getEngagement(organizationId: string, actor: Actor, key: s
             actor: item.actorUserId,
             resourceType: item.resourceType,
         })),
-        tabs: ['overview', 'inherent-risk', 'due-diligence', 'evidence', 'findings', 'controls', 'residual-risk', 'decisions', 'monitoring', 'history'],
+        tabs: ['overview', 'inherent-risk', 'due-diligence', 'evidence', 'findings', 'controls', 'residual-risk', 'decisions', 'monitoring', 'reassessment', 'history'],
         monitoring: monitoring ? {
             profileStatus: monitoring.monitoringProfileStatus || 'Not configured',
             openSignals: monitoring.openSignals,

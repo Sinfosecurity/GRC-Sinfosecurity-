@@ -96,6 +96,21 @@ import {
     triageSignal,
     upsertProfile,
 } from '../services/engagementMonitoringService';
+import {
+    advanceStage,
+    calculateCycleResidual,
+    confirmDeltaPlan,
+    confirmTierReview,
+    decideReassessment,
+    getReassessmentWorkspace,
+    recordRequesterDelta,
+    refreshIra,
+    requestVendorRefresh,
+    returnToMonitoring,
+    reviewItem,
+    startReassessment,
+    updateScope,
+} from '../services/engagementReassessmentService';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
@@ -849,6 +864,110 @@ router.post('/monitoring/signals/:signalId/finding', requirePractitionerPersona,
 router.post('/monitoring/signals/:signalId/recommend-reassessment', requirePractitionerPersona, requirePermission(PERMISSIONS['monitoring.triage'], PERMISSIONS['monitoring.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         res.status(201).json({ success: true, data: await recommendReassessment(req.user!.organizationId, actor(req), req.params.signalId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get('/engagements/:id/reassessment', requirePermission(PERMISSIONS['reassessment.read'], PERMISSIONS['intake.read'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await getReassessmentWorkspace(req.user!.organizationId, actor(req), req.params.id) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/start', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.status(201).json({ success: true, data: await startReassessment(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/scope', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await updateScope(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/requester-delta', requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage'], PERMISSIONS['intake.create_own']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await recordRequesterDelta(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/ira', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await refreshIra(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/tier-review', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await confirmTierReview(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/delta-plan', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await confirmDeltaPlan(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/vendor-refresh', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await requestVendorRefresh(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/items/:itemId', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await reviewItem(req.user!.organizationId, actor(req), req.params.id, req.params.itemId, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/advance', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await advanceStage(req.user!.organizationId, actor(req), req.params.id, req.body?.status, req.body?.cycleId) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/residual', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.manage'], PERMISSIONS['risk.score']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await calculateCycleResidual(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/decide', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await decideReassessment(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/engagements/:id/reassessment/return-to-monitoring', requirePractitionerPersona, requirePermission(PERMISSIONS['reassessment.initiate'], PERMISSIONS['reassessment.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        res.json({ success: true, data: await returnToMonitoring(req.user!.organizationId, actor(req), req.params.id, req.body || {}) });
     } catch (error) {
         next(error);
     }
