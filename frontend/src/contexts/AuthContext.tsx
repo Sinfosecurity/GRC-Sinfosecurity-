@@ -59,22 +59,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const existing = getAccessToken();
-    const hydrate = (nextToken: string) => {
-      setToken(nextToken);
-      setAccessToken(nextToken);
-      return authAPI.getCurrentUser().then((response) => {
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    if (existing) {
+      setToken(existing);
+      setAccessToken(existing);
+    }
+    const confirm = existing
+      ? authAPI.getCurrentUser()
+      : authAPI.refreshToken().then((response) => {
+          const nextToken = response.data.data.token;
+          setToken(nextToken);
+          setAccessToken(nextToken);
+          return authAPI.getCurrentUser();
+        });
+    confirm
+      .then((response) => {
         const next = response.data.data.user;
         setUser(next);
         localStorage.setItem('user', JSON.stringify(next));
-      });
-    };
-    const start = existing
-      ? hydrate(existing)
-      : authAPI.refreshToken().then((response) => hydrate(response.data.data.token));
-    start
+      })
       .catch((err: { status?: number }) => {
         if (err?.status && err.status !== 401) {
-          if (storedUser) setUser(JSON.parse(storedUser));
+          return;
+        }
+        if (existing && storedUser) {
           return;
         }
         setToken(null);
