@@ -198,23 +198,25 @@ export default function EngagementOffboarding() {
                                 ))}
                             </Surface>
                             <Surface>
-                                <Typography variant="h6" component="h2">Closure gate</Typography>
-                                <Typography>Ready: {gate?.ready ? 'Yes' : 'No'}</Typography>
-                                <ul aria-label="Closure blockers">
-                                    {(gate?.blockers || []).length ? gate.blockers.map((item: string) => <li key={item}>{item}</li>) : <li>No blockers recorded. Evaluate the gate to confirm.</li>}
-                                </ul>
-                                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                                    <Button disabled={busy} onClick={() => run(() => intakeAPI.evaluateOffboardingGate(id), 'Closure gate evaluated.')}>Evaluate closure gate</Button>
-                                    <Button disabled={busy} onClick={() => run(() => intakeAPI.completeOffboarding(id), 'Engagement offboarded. Historical records remain inspectable.')}>Approve final closure</Button>
-                                </Stack>
-                            </Surface>
-                            <Surface>
                                 <Typography variant="h6" component="h2">Cancel before closure</Typography>
                                 <TextField sx={{ mt: 1 }} label="Cancellation reason" value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} fullWidth />
                                 <Button sx={{ mt: 1 }} disabled={busy} onClick={() => run(() => intakeAPI.cancelOffboarding(id, { reason: cancelReason || 'Offboarding cancelled before closure.' }), 'Offboarding cancelled. The Engagement remains active.')}>Cancel offboarding</Button>
                             </Surface>
                             </>
                             )}
+                            <Surface>
+                                <Typography variant="h6" component="h2">Closure gate</Typography>
+                                <Typography>Ready: {gate?.ready ? 'Yes' : 'No'}</Typography>
+                                <ul aria-label="Closure blockers">
+                                    {(gate?.blockers || []).length ? gate.blockers.map((item: string) => <li key={item}>{item}</li>) : <li>No outstanding mandatory blockers.</li>}
+                                </ul>
+                                {caseIsOpen && (
+                                    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                                        <Button disabled={busy} onClick={() => run(() => intakeAPI.evaluateOffboardingGate(id), 'Closure gate evaluated.')}>Evaluate closure gate</Button>
+                                        <Button disabled={busy} onClick={() => run(() => intakeAPI.completeOffboarding(id), 'Engagement offboarded. Historical records remain inspectable.')}>Approve final closure</Button>
+                                    </Stack>
+                                )}
+                            </Surface>
                         </>
                     )}
                     {disposition && (
