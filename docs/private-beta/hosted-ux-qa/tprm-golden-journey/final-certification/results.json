@@ -22,8 +22,14 @@
     "note": "Created missing S3 bucket using API service env. Diagnostics storage.status=up was not accepted as upload proof."
   },
   "evidenceObjects": {
-    "pdf": {"id": "03f22c61-15f4-44ce-9bec-47eb882400d0", "scan": "CLEAN"},
-    "png": {"id": "6175b9cb-efd6-4347-80a6-2ab584842ea9", "scan": "CLEAN"}
+    "pdf": {
+      "id": "03f22c61-15f4-44ce-9bec-47eb882400d0",
+      "scan": "CLEAN"
+    },
+    "png": {
+      "id": "6175b9cb-efd6-4347-80a6-2ab584842ea9",
+      "scan": "CLEAN"
+    }
   },
   "startingState": {
     "azure": {
@@ -67,14 +73,6 @@
     "requester.home": 293
   },
   "checks": [
-    {
-      "name": "hosted.health.minimized",
-      "result": "PASS",
-      "detail": [
-        "status",
-        "timestamp"
-      ]
-    },
     {
       "name": "hosted.frontend.sha",
       "result": "PASS",
@@ -479,11 +477,6 @@
       }
     },
     {
-      "name": "email.verification.honesty",
-      "result": "PASS",
-      "detail": "Trial signup issues a session without making email verification a hard blocker. Recorded as EXPECTED DESIGN, not silently PASS/FAIL."
-    },
-    {
       "name": "sibling.m365.unchanged",
       "result": "PASS",
       "detail": "DUE_DILIGENCE_PLANNING"
@@ -855,11 +848,6 @@
       "detail": "CLEAN object is usable; fail-closed proven when scan is not CLEAN"
     },
     {
-      "name": "evidence.unauth.download",
-      "result": "PASS",
-      "detail": 401
-    },
-    {
       "name": "signup.new.tenant.admin",
       "result": "PASS",
       "detail": {
@@ -953,6 +941,190 @@
       "name": "scim.no.bearer",
       "result": "PASS",
       "detail": 401
+    },
+    {
+      "name": "hosted.health.minimized",
+      "result": "PASS",
+      "detail": 200
+    },
+    {
+      "name": "object.storage.provider.honesty",
+      "result": "PASS",
+      "detail": {
+        "provider": "s3",
+        "compatibility": null,
+        "endpointConfigured": null,
+        "malwareProvider": "CONNECTED",
+        "note": "Staging uses S3-compatible object storage (MinIO). Not claimed as AWS S3."
+      }
+    },
+    {
+      "name": "evidence.persisted.pdf.retrievable",
+      "result": "PASS",
+      "detail": {
+        "id": "03f22c61-15f4-44ce-9bec-47eb882400d0",
+        "status": 200,
+        "bytes": 286
+      }
+    },
+    {
+      "name": "evidence.persisted.png.retrievable",
+      "result": "PASS",
+      "detail": {
+        "id": "6175b9cb-efd6-4347-80a6-2ab584842ea9",
+        "status": 200,
+        "bytes": 67
+      }
+    },
+    {
+      "name": "evidence.unauth.download",
+      "result": "PASS",
+      "detail": 401
+    },
+    {
+      "name": "minio.credentials.not.in.frontend",
+      "result": "PASS",
+      "detail": {
+        "status": 200,
+        "secretLeak": false
+      }
+    },
+    {
+      "name": "evidence.upload.pdf.amendment",
+      "result": "PASS",
+      "detail": {
+        "status": 201,
+        "id": "b19229bc-e681-46d7-936c-ab916d1907b5",
+        "scan": "CLEAN"
+      }
+    },
+    {
+      "name": "evidence.audit.present",
+      "result": "PASS",
+      "detail": 403
+    },
+    {
+      "name": "local.security.regression",
+      "result": "BLOCKED",
+      "detail": "Local Jest could not authenticate to Postgres supreme_test. Application assertions were not reached.",
+      "blockerType": "LOCAL_TEST_INFRASTRUCTURE",
+      "environment": "local",
+      "reason": "Postgres supreme_test authentication rejected",
+      "productCodeReached": false,
+      "authoritativeAlternateEvidence": "Hosted CI 35686586390 PASS on da9f7de; exact certification SHA CI is required separately"
+    },
+    {
+      "name": "local.typecheck",
+      "result": "PASS",
+      "detail": "backend npm run typecheck passed on the developer machine"
+    },
+    {
+      "name": "storage.provisioning.history",
+      "result": "PASS",
+      "detail": {
+        "classification": "ENVIRONMENT / STORAGE PROVISIONING FAILURE",
+        "not": "application evidence-storage design failure",
+        "job": "job-dap0l8dg1s2s738vm0fg",
+        "log": [
+          "head-miss",
+          "bucket-created"
+        ],
+        "at": "2026-09-22T04:57:40Z",
+        "localFilesystemFallback": false
+      }
+    },
+    {
+      "name": "email.verification.honesty",
+      "result": "PASS",
+      "detail": "EXPECTED DESIGN: trial signup records verification state and still issues the initial session."
+    },
+    {
+      "name": "mfa.staging.grace.honesty",
+      "result": "PASS",
+      "detail": "STAGING GRACE. Hosted privileged login is not MFA-enforced. Production APP_ENVIRONMENT=production requires TOTP and cannot inherit silent staging grace."
+    },
+    {
+      "name": "minio.anonymous.list",
+      "result": "PASS",
+      "detail": {
+        "status": 403,
+        "url": "https://supreme-risk-staging-minio.onrender.com/supreme-risk-staging",
+        "code": "AccessDenied"
+      }
+    },
+    {
+      "name": "minio.anonymous.object.get",
+      "result": "PASS",
+      "detail": {
+        "status": 403,
+        "code": "AccessDenied"
+      }
+    },
+    {
+      "name": "bucket.bootstrap.idempotent",
+      "result": "PASS",
+      "detail": {
+        "job": "job-dap6cftg1s2s739jkkd0",
+        "head1": "exists",
+        "create": "BucketAlreadyOwnedByYou",
+        "head2": "exists",
+        "keyCountBefore": 3,
+        "keyCountAfter": 3,
+        "destructive": false
+      }
+    },
+    {
+      "name": "storage.persistence.api.restart",
+      "result": "PASS",
+      "detail": {
+        "service": "srv-daieg75g1s2s73f0rmig",
+        "pdf": {
+          "id": "03f22c61-15f4-44ce-9bec-47eb882400d0",
+          "status": 200,
+          "bytes": 286
+        },
+        "png": {
+          "id": "6175b9cb-efd6-4347-80a6-2ab584842ea9",
+          "status": 200,
+          "bytes": 67
+        },
+        "amendmentPdf": {
+          "id": "b19229bc-e681-46d7-936c-ab916d1907b5",
+          "status": 200,
+          "bytes": 286
+        }
+      }
+    },
+    {
+      "name": "storage.persistence.objectstore.disk",
+      "result": "FAIL",
+      "detail": {
+        "service": "supreme-risk-staging-minio",
+        "serviceId": "srv-daiep37qj5pc739qfvpg",
+        "disk": null,
+        "classification": "ENVIRONMENT / STORAGE PROVISIONING FAILURE",
+        "reason": "API S3_ENDPOINT points at MinIO with no persistent disk. Blueprint specifies 1GB /data. Object-store restart was not executed because it would destroy live Evidence. A recreated empty bucket is not persistence.",
+        "minio1HasDiskButUnused": {
+          "id": "srv-daiegbfqj5pc739pc5gg",
+          "disk": "1GB /data",
+          "public": "502"
+        }
+      }
+    },
+    {
+      "name": "storage.persistence.objectstore.restart",
+      "result": "FAIL",
+      "detail": {
+        "reason": "Object-store service has no disk. Restart/redeploy was not performed to avoid destroying Evidence. Ephemeral storage fails readiness.",
+        "notMaskedByEmptyBucketRecreate": true
+      }
+    },
+    {
+      "name": "production.storage.boundary",
+      "result": "PASS",
+      "detail": {
+        "note": "Production object storage must be deterministically provisioned. Staging MinIO bootstrap is not copied to production. Commercial production remains NO-GO. No production bucket is claimed."
+      }
     }
   ],
   "hosting": {
@@ -966,10 +1138,10 @@
     "environment": "staging"
   },
   "summary": {
-    "pass": 159,
-    "fail": 0,
+    "pass": 173,
+    "fail": 2,
     "skip": 3,
-    "blocked": 0
+    "blocked": 1
   },
   "shots": [
     "lead-home-1440",
@@ -1063,6 +1235,60 @@
     }
   ],
   "uiSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
-  "evidenceResult": "PASS",
-  "readyForProductLeadershipFinalAcceptance": true
+  "evidenceResult": "NOT_READY",
+  "readyForProductLeadershipFinalAcceptance": false,
+  "objectStorageProvider": {
+    "environment": "hosted-staging",
+    "provider": "MinIO",
+    "api": "S3-compatible",
+    "notAwsS3": true,
+    "endpointHost": "supreme-risk-staging-minio.onrender.com",
+    "serviceId": "srv-daiep37qj5pc739qfvpg",
+    "disk": null,
+    "blueprintDisk": {
+      "name": "minio-data",
+      "mountPath": "/data",
+      "sizeGB": 1
+    },
+    "allowLocalObjectStorage": false
+  },
+  "localVsCiVsHosted": {
+    "local": {
+      "typecheck": {
+        "status": "PASS",
+        "environment": "local"
+      },
+      "securityRegression": {
+        "status": "BLOCKED",
+        "blockerType": "LOCAL_TEST_INFRASTRUCTURE",
+        "environment": "local",
+        "reason": "Postgres supreme_test authentication rejected",
+        "productCodeReached": false,
+        "command": "npm run typecheck && npx jest --runInBand src/__tests__/pentest-2026-09-22-remediation.test.ts src/__tests__/health.integration.test.ts --forceExit",
+        "expectedDatabase": "postgresql://supreme_test:supreme_test@127.0.0.1:5432/supreme_risk_test",
+        "affectedTests": [
+          "public signup tenant isolation",
+          "M-5 webhook sink",
+          "public API mass assignment and IDOR",
+          "SCIM authentication"
+        ],
+        "authoritativeAlternateEvidence": "Hosted CI 35686586390 PASS on da9f7de; exact certification SHA CI required separately"
+      }
+    },
+    "ci": {
+      "securityRemediationLineage": {
+        "status": "PASS",
+        "run": "35686586390",
+        "sha": "da9f7de77239f0a354508fe757b1f2291637f20f"
+      },
+      "exactCertificationSha": {
+        "status": "PENDING",
+        "note": "Must run on the commit that records this amendment"
+      }
+    },
+    "hostedStaging": {
+      "goldenJourney": "see checks",
+      "objectStoragePersistence": "FAIL"
+    }
+  }
 }

@@ -88,8 +88,11 @@ function provider(): ObjectStorageProvider {
 export const objectStorageService = {
     status() {
         const s3 = new S3StorageProvider();
+        const endpoint = Boolean(process.env.S3_ENDPOINT);
         return {
             provider: s3.isConfigured() ? 's3' : process.env.NODE_ENV === 'production' ? 'NOT_CONFIGURED' : 'local',
+            compatibility: s3.isConfigured() ? (endpoint ? 's3-compatible' : 'aws-s3-api') : 'none',
+            endpointConfigured: endpoint,
             malwareScanning: malwareScanStatus(),
             malwareProvider: malwareProviderHealth(),
             downloadPolicy: scanDownloadPolicyFromEnv(),

@@ -1,0 +1,157 @@
+{
+  "item": "#12",
+  "gate": "consolidated-golden-journey-certification",
+  "note": "NOT_CONFIGURED is not FAIL unless required for #12. DEGRADED is not PASS.",
+  "components": [
+    {
+      "component": "Postgres",
+      "environment": "hosted-staging",
+      "provider": "Render Postgres",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": true,
+      "notes": "supreme-risk-staging-pg. Golden Journey records survived API restart."
+    },
+    {
+      "component": "Postgres",
+      "environment": "local",
+      "provider": "local 127.0.0.1 supreme_test",
+      "configured": true,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "BLOCKED — LOCAL TEST INFRASTRUCTURE. Authentication rejected. Not a product fail."
+    },
+    {
+      "component": "Postgres",
+      "environment": "ci",
+      "provider": "GitHub Actions postgres:16 service",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": false,
+      "notes": "Disposable CI database. Suite of record 35686586390 on da9f7de. Exact certification SHA CI required separately."
+    },
+    {
+      "component": "Redis",
+      "environment": "hosted-staging",
+      "provider": "Render Key Value",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": false,
+      "notes": "Session/refresh path used. Not an Evidence store."
+    },
+    {
+      "component": "Object Storage",
+      "environment": "hosted-staging",
+      "provider": "MinIO / S3-compatible",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": false,
+      "notes": "FAIL readiness. API uses supreme-risk-staging-minio with disk=null. Blueprint specifies 1GB /data. Not AWS S3."
+    },
+    {
+      "component": "Object Storage",
+      "environment": "production",
+      "provider": "deterministically provisioned private bucket (design)",
+      "configured": false,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "Not claimed from staging MinIO. Commercial production NO-GO. No opportunistic production bucket create."
+    },
+    {
+      "component": "Malware scanning",
+      "environment": "hosted-staging",
+      "provider": "ClamAV private service",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": true,
+      "notes": "CONNECTED. Hosted PDF/PNG returned CLEAN. Fail-closed pending downloads remain false."
+    },
+    {
+      "component": "Email",
+      "environment": "hosted-staging",
+      "provider": "queued notification path / Mailpit present",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": false,
+      "notes": "Invitation Queued ≠ Delivered. Not converted to FAIL for #12 functional waves."
+    },
+    {
+      "component": "AI provider",
+      "environment": "hosted-staging",
+      "provider": "OpenAI/AI key",
+      "configured": false,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "NOT_CONFIGURED. Not a #12 certification requirement."
+    },
+    {
+      "component": "SSO providers",
+      "environment": "hosted-staging",
+      "provider": "OIDC discover",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": false,
+      "notes": "Authenticated discover-oidc tested. Live IdP federation remains deferred (#21)."
+    },
+    {
+      "component": "Slack/Jira",
+      "environment": "hosted-staging",
+      "provider": "Slack / Jira",
+      "configured": false,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "NOT_CONFIGURED. Not converted to FAIL."
+    },
+    {
+      "component": "SecurityScorecard/BitSight",
+      "environment": "hosted-staging",
+      "provider": "external ratings",
+      "configured": false,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "NOT_CONFIGURED. Not converted to FAIL."
+    },
+    {
+      "component": "Stripe",
+      "environment": "hosted-staging",
+      "provider": "Stripe test",
+      "configured": false,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "NOT required for #12 private-testing certification. Commercial billing remains NO-GO."
+    },
+    {
+      "component": "Automation",
+      "environment": "hosted-staging",
+      "provider": "internal queues",
+      "configured": true,
+      "operational": true,
+      "tested": true,
+      "persistenceProven": false,
+      "notes": "Smoke only. #20 accepted separately. Not expanded."
+    },
+    {
+      "component": "Monitoring external providers",
+      "environment": "hosted-staging",
+      "provider": "BitSight / SecurityScorecard / Slack / Jira",
+      "configured": false,
+      "operational": false,
+      "tested": false,
+      "persistenceProven": false,
+      "notes": "NOT_CONFIGURED shown as actual truth."
+    }
+  ]
+}
