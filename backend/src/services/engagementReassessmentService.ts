@@ -664,6 +664,34 @@ export async function returnToMonitoring(organizationId: string, actor: Actor, e
     return getReassessmentWorkspace(organizationId, actor, engagementId);
 }
 
+export async function listRequesterReassessmentActions(organizationId: string, actor: Actor) {
+    if (participantExperience(actor.role) !== 'requester') return [];
+    const cycles = await prisma.engagementReassessment.findMany({
+        where: {
+            organizationId,
+            status: { in: [...OPEN] },
+            engagement: { requesterUserId: actor.id },
+        },
+        include: {
+            items: { where: { kind: ReassessmentItemKind.BUSINESS_CONTEXT } },
+            engagement: { select: { id: true, publicId: true, serviceName: true, vendor: { select: { name: true } } } },
+        },
+        orderBy: { startedAt: 'desc' },
+    });
+    return cycles
+        .filter((cycle) => cycle.items.some((row) => !row.currentValue))
+        .map((cycle) => ({
+            id: cycle.id,
+            type: 'REASSESSMENT_BUSINESS_CONTEXT',
+            title: 'Confirm whether the service or data scope changed',
+            engagementId: cycle.engagement.id,
+            engagementPublicId: cycle.engagement.publicId,
+            thirdPartyName: cycle.engagement.vendor.name,
+            serviceName: cycle.engagement.serviceName,
+            honesty: 'Provide a business update only. Internal residual reasoning is not shown.',
+        }));
+}
+
 export async function reassessmentExtras(organizationId: string, engagementId: string) {
     const active = await prisma.engagementReassessment.findFirst({
         where: { organizationId, engagementId, status: { in: [...OPEN] } },

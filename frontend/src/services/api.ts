@@ -532,6 +532,7 @@ export const requesterAPI = {
     getIra: (id: string) => api.get(`/tprm/requester/iras/${id}`),
     submitIra: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/submit`, data),
     submitIraClarification: (id: string, data: unknown) => api.post(`/tprm/requester/iras/${id}/clarification`, data),
+    recordReassessmentDelta: (engagementId: string, data: unknown) => api.post(`/tprm/engagements/${engagementId}/reassessment/requester-delta`, data),
 };
 
 export const intakeAPI = {

@@ -179,14 +179,24 @@ def main() -> None:
         page.goto(f"{BASE}/engagements/{AZURE}/reassessment", wait_until="networkidle")
         page.wait_for_timeout(1400)
         requester = visible_text(page)
-        limited = (
-            "business-context" in requester.lower()
-            or "business context" in requester.lower()
+        denied = (
+            "access denied" in requester.lower()
+            or "don't have permission" in requester.lower()
             or "cannot open internal" in requester.lower()
-            or "not shown" in requester.lower()
         )
-        record("ui.requester.business.context.only", "PASS" if limited else "FAIL", requester[:240])
-        shot(page, "requester-azure-reassessment")
+        record("ui.requester.denied.grc.shell", "PASS" if denied else "FAIL", requester[:240])
+        shot(page, "requester-azure-reassessment-denied")
+        page.goto(f"{BASE}/request/actions", wait_until="networkidle")
+        page.wait_for_timeout(1400)
+        actions = visible_text(page)
+        limited = (
+            "business update" in actions.lower()
+            or "data scope" in actions.lower()
+            or "service or data" in actions.lower()
+            or "nothing needs your attention" in actions.lower()
+        )
+        record("ui.requester.business.context.workspace", "PASS" if limited else "FAIL", actions[:240])
+        shot(page, "requester-actions-business-context")
 
         browser.close()
 

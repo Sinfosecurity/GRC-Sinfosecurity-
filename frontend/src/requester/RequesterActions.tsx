@@ -44,7 +44,29 @@ export default function RequesterActions() {
             {error && <Alert severity="error">{error}</Alert>}
             {message && <Alert severity="success">{message}</Alert>}
             {!items.length && !error && <Typography>Nothing needs your attention right now.</Typography>}
-            {items.map((item) => item.type === 'IRA_REQUIRED' || item.type === 'IRA_CLARIFICATION' ? (
+            {items.map((item) => item.type === 'REASSESSMENT_BUSINESS_CONTEXT' ? (
+                <Stack key={item.id} component="form" onSubmit={async (event) => {
+                    event.preventDefault();
+                    setPending(item.id);
+                    setError(null);
+                    try {
+                        await requesterAPI.recordReassessmentDelta(item.engagementId, { summary: response[item.id] || 'No material service or data-scope change.' });
+                        setMessage('Thank you. The TPRM analyst will use this business update. Residual risk was not changed.');
+                        load();
+                    } catch (err: any) {
+                        setError(err.response?.data?.error?.message || 'Unable to send the business update.');
+                    } finally {
+                        setPending(null);
+                    }
+                }} sx={{ bgcolor: color.surface, border: `1px solid ${color.line}`, borderRadius: 2, p: 2 }} spacing={1.5}>
+                    <Typography fontWeight={700}>{item.title}</Typography>
+                    <Typography>{item.engagementPublicId} · {item.thirdPartyName}</Typography>
+                    <Typography>{item.serviceName}</Typography>
+                    <Typography>{item.honesty}</Typography>
+                    <TextField required label="What changed in the service or data scope?" value={response[item.id] || ''} onChange={(event) => setResponse((current) => ({ ...current, [item.id]: event.target.value }))} multiline minRows={3} inputProps={{ 'aria-label': 'What changed in the service or data scope?' }} />
+                    <Button type="submit" variant="contained" disabled={pending === item.id}>{pending === item.id ? 'Sending…' : 'Send business update'}</Button>
+                </Stack>
+            ) : item.type === 'IRA_REQUIRED' || item.type === 'IRA_CLARIFICATION' ? (
                 <Stack key={item.id} sx={{ bgcolor: color.surface, border: `1px solid ${color.line}`, borderRadius: 2, p: 2 }} spacing={1.5}>
                     <Typography fontWeight={700}>{item.title}</Typography>
                     <Typography>{item.engagementPublicId} · {item.thirdPartyName}</Typography>

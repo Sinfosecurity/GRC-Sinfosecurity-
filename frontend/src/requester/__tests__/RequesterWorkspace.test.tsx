@@ -36,6 +36,7 @@ vi.mock('../../services/api', () => ({
         getIra: vi.fn(),
         submitIra: vi.fn(),
         submitIraClarification: vi.fn(),
+        recordReassessmentDelta: vi.fn(),
     },
 }));
 
@@ -136,6 +137,36 @@ describe('Requester workspace', () => {
         expect(await screen.findByText('Thank you')).toBeInTheDocument();
         expect(screen.getByText(/INT-2026-0007/)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View request' })).toBeInTheDocument();
+        expect(screen.queryByText('Intake Queue')).not.toBeInTheDocument();
+    });
+
+    it('collects a reassessment business-context update without opening GRC', async () => {
+        vi.mocked(requesterAPI.actions).mockResolvedValue({
+            data: {
+                data: {
+                    items: [{
+                        id: 'ras-1',
+                        type: 'REASSESSMENT_BUSINESS_CONTEXT',
+                        title: 'Confirm whether the service or data scope changed',
+                        engagementId: 'azure',
+                        engagementPublicId: 'ENG-2026-0001',
+                        thirdPartyName: 'Microsoft Corporation',
+                        serviceName: 'Azure Hosting QA',
+                        honesty: 'Provide a business update only. Internal residual reasoning is not shown.',
+                    }],
+                },
+            },
+        } as any);
+        vi.mocked(requesterAPI.recordReassessmentDelta).mockResolvedValue({ data: { data: { honesty: 'Thank you.' } } } as any);
+        render(
+            <MemoryRouter future={routerFuture}>
+                <RequesterActions />
+            </MemoryRouter>
+        );
+        expect(await screen.findByText(/service or data scope changed/)).toBeInTheDocument();
+        fireEvent.change(screen.getByRole('textbox', { name: /What changed in the service or data scope/ }), { target: { value: 'No material change.' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Send business update' }));
+        await waitFor(() => expect(requesterAPI.recordReassessmentDelta).toHaveBeenCalled());
         expect(screen.queryByText('Intake Queue')).not.toBeInTheDocument();
     });
 });

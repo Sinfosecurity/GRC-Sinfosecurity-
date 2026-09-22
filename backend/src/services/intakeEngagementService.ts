@@ -1525,12 +1525,15 @@ export async function getRequesterIntake(organizationId: string, actor: Actor, k
 }
 
 export async function listRequesterActions(organizationId: string, actor: Actor) {
-    const [{ items }, iraActions] = await Promise.all([
+    const { listRequesterReassessmentActions } = await import('./engagementReassessmentService');
+    const [{ items }, iraActions, reassessmentActions] = await Promise.all([
         listRequesterIntakes(organizationId, actor),
         listRequesterIraActions(organizationId, actor),
+        listRequesterReassessmentActions(organizationId, actor),
     ]);
     return {
         items: [
+            ...reassessmentActions,
             ...iraActions,
             ...items.flatMap((row) => row.informationRequests.filter((item) => !item.respondedAt).map((item) => ({
                 id: item.id,
