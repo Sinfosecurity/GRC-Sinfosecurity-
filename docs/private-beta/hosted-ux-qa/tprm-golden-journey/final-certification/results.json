@@ -8,7 +8,7 @@
   "mainMerged": false,
   "certificationSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
   "hostedFrontendSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
-  "hostedApiSha": "b5d006599e9a6a93b69d8a73500b9d0159f0229b",
+  "hostedApiSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
   "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390",
   "branch": "supreme-risk-transformation",
   "wave8AcceptedImplementation": "037b8e98dac360e12084bb0de8b66ee666036feb",
@@ -1078,45 +1078,38 @@
       "result": "PASS",
       "detail": {
         "service": "srv-daieg75g1s2s73f0rmig",
-        "pdf": {
-          "id": "03f22c61-15f4-44ce-9bec-47eb882400d0",
-          "status": 200,
-          "bytes": 286
-        },
-        "png": {
-          "id": "6175b9cb-efd6-4347-80a6-2ab584842ea9",
-          "status": 200,
-          "bytes": 67
-        },
-        "amendmentPdf": {
-          "id": "b19229bc-e681-46d7-936c-ab916d1907b5",
-          "status": 200,
-          "bytes": 286
-        }
+        "objects": 7,
+        "sameStorageKeys": true
       }
     },
     {
       "name": "storage.persistence.objectstore.disk",
-      "result": "FAIL",
+      "result": "PASS",
       "detail": {
         "service": "supreme-risk-staging-minio",
         "serviceId": "srv-daiep37qj5pc739qfvpg",
-        "disk": null,
-        "classification": "ENVIRONMENT / STORAGE PROVISIONING FAILURE",
-        "reason": "API S3_ENDPOINT points at MinIO with no persistent disk. Blueprint specifies 1GB /data. Object-store restart was not executed because it would destroy live Evidence. A recreated empty bucket is not persistence.",
-        "minio1HasDiskButUnused": {
-          "id": "srv-daiegbfqj5pc739pc5gg",
-          "disk": "1GB /data",
-          "public": "502"
+        "disk": {
+          "id": "dsk-dapgkkgae00c73d28kdg",
+          "name": "minio-data-live",
+          "mountPath": "/data",
+          "sizeGB": 1
+        },
+        "unusedSiblingNotCounted": {
+          "id": "srv-daiegbfqj5pc739pc5gg"
         }
       }
     },
     {
       "name": "storage.persistence.objectstore.restart",
-      "result": "FAIL",
+      "result": "PASS",
       "detail": {
-        "reason": "Object-store service has no disk. Restart/redeploy was not performed to avoid destroying Evidence. Ephemeral storage fails readiness.",
-        "notMaskedByEmptyBucketRecreate": true
+        "method": "process restart",
+        "service": "srv-daiep37qj5pc739qfvpg",
+        "healthDuring": 502,
+        "healthAfter": 200,
+        "objects": 7,
+        "notMaskedByEmptyBucketRecreate": true,
+        "failedDockerRebuild": "dep-dapgnp3tqb8s7392mft0"
       }
     },
     {
@@ -1134,6 +1127,55 @@
         "run": 35721879631,
         "conclusion": "success"
       }
+    },
+    {
+      "name": "blocker.closure.fresh.pdf",
+      "result": "PASS",
+      "detail": {
+        "id": "95c8476e-54e3-45e5-be13-279e4ceb7755",
+        "scan": "CLEAN",
+        "bytes": 286
+      }
+    },
+    {
+      "name": "blocker.closure.fresh.png",
+      "result": "PASS",
+      "detail": {
+        "id": "0378d254-722a-4fe5-be8e-cb1ce56acc9f",
+        "scan": "CLEAN",
+        "bytes": 67
+      }
+    },
+    {
+      "name": "blocker.closure.shared.evidence",
+      "result": "PASS",
+      "detail": {
+        "storedObjectId": "52929772-847d-4fe0-b3d0-626452f8e3b8",
+        "controlLink": "090f666e-54b9-4d4d-8e37-7db465e7cd3e",
+        "secondByteCopy": false
+      }
+    },
+    {
+      "name": "blocker.closure.inventory.after",
+      "result": "PASS",
+      "detail": {
+        "job": "job-dapgrn0ae00c73d2ukig",
+        "head": "exists",
+        "keyCount": 7
+      }
+    },
+    {
+      "name": "blocker.closure.cross.tenant",
+      "result": "PASS",
+      "detail": 404
+    },
+    {
+      "name": "blocker.closure.health.minimal",
+      "result": "PASS",
+      "detail": [
+        "status",
+        "timestamp"
+      ]
     }
   ],
   "hosting": {
@@ -1147,8 +1189,8 @@
     "environment": "staging"
   },
   "summary": {
-    "pass": 174,
-    "fail": 2,
+    "pass": 182,
+    "fail": 0,
     "skip": 3,
     "blocked": 1
   },
@@ -1244,16 +1286,21 @@
     }
   ],
   "uiSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
-  "evidenceResult": "NOT_READY",
-  "readyForProductLeadershipFinalAcceptance": false,
+  "evidenceResult": "PASS",
+  "readyForProductLeadershipFinalAcceptance": true,
   "objectStorageProvider": {
     "environment": "hosted-staging",
     "provider": "MinIO",
-    "api": "S3-compatible",
+    "api": "S3-compatible persistent object storage",
     "notAwsS3": true,
     "endpointHost": "supreme-risk-staging-minio.onrender.com",
     "serviceId": "srv-daiep37qj5pc739qfvpg",
-    "disk": null,
+    "disk": {
+      "id": "dsk-dapgkkgae00c73d28kdg",
+      "name": "minio-data-live",
+      "mountPath": "/data",
+      "sizeGB": 1
+    },
     "blueprintDisk": {
       "name": "minio-data",
       "mountPath": "/data",
@@ -1298,9 +1345,10 @@
       }
     },
     "hostedStaging": {
-      "goldenJourney": "see checks",
-      "objectStoragePersistence": "FAIL"
+      "goldenJourney": "reused prior certification evidence",
+      "objectStoragePersistence": "PASS"
     }
   },
-  "ciExact": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631"
+  "ciExact": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631",
+  "blockerClosureNote": "Persistence closed. Exact blocker-closure SHA/CI recorded after this commit."
 }

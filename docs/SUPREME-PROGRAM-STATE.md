@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-22 (Wave 8 ACCEPTED FOR CURRENT STAGE; security remediation ACCEPTED FOR CURRENT STAGE; #12 consolidated Golden Journey certification — NOT READY FOR ACCEPTANCE — staging MinIO has no persistent disk; not Wave 9; not #12 PASS)
+**LAST UPDATED:** 2026-09-22 (Wave 8 ACCEPTED FOR CURRENT STAGE; security remediation ACCEPTED FOR CURRENT STAGE; #12 consolidated Golden Journey certification — EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE; staging MinIO persistent disk proved across object-store restart; not Wave 9; not #12 PASS)
 
-**CURRENT ITEM:** #12 TPRM Golden Journey Revamp remains ACTIVE. Waves 1–8 and the 2026-09-22 pentest security remediation are accepted for the current stage. No Wave 9. Consolidated Golden Journey certification is NOT READY FOR ACCEPTANCE because staging Evidence MinIO has no persistent disk. Cursor does not declare #12 PASS. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN and are not the pentest PENTEST-H1/H2 labels. #24–#38 and #40 are not authorized.
+**CURRENT ITEM:** #12 TPRM Golden Journey Revamp remains ACTIVE. Waves 1–8 and the 2026-09-22 pentest security remediation are accepted for the current stage. No Wave 9. Consolidated Golden Journey certification is EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Staging Evidence MinIO now has persistent disk `minio-data-live` on the live API service. Cursor does not declare #12 PASS. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted for the current stage and is not extended. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN and are not the pentest PENTEST-H1/H2 labels. #24–#38 and #40 are not authorized.
 
-**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. WAVES 1–8 ACCEPTED FOR CURRENT STAGE. SECURITY REMEDIATION ACCEPTED FOR CURRENT STAGE. CONSOLIDATED CERTIFICATION — NOT READY FOR ACCEPTANCE. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #12 ACTIVE — GOLDEN JOURNEY REVAMP. WAVES 1–8 ACCEPTED FOR CURRENT STAGE. SECURITY REMEDIATION ACCEPTED FOR CURRENT STAGE. CONSOLIDATED CERTIFICATION — EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Cursor does not declare #12 PASS, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -34,7 +34,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#23:** ACCEPTED FOR CURRENT STAGE — Phase A/B. Not extended in Wave 1. Insurance remains on Vendor / Third Party identity. Cursor does not declare #23 PASS.
 
-**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE (`1bece45cb94de832ef40b3d811977a179058f15b`). WAVE 5 ACCEPTED FOR CURRENT STAGE (`88938c263d741365578e874599156096fe5d6276`). Hosted/CI SHA `963953570154616f3a2029e854de339711eb9ea7`. Evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`. WAVE 6 ACCEPTED FOR CURRENT STAGE (`2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`, evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`). WAVE 7 ACCEPTED FOR CURRENT STAGE (`7afd0d5c08a64667f592831509338ab74cf9a7b3`, evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`). WAVE 8 ACCEPTED FOR CURRENT STAGE (`037b8e98dac360e12084bb0de8b66ee666036feb`, hosted API `6b7933ef415d32f58377012344cc68ded32ea36b`, evidence `f168b71cd7df00aaf2a64091446af3c2f81a9390`, CI 35681630112). The failed UI walk on `96765c4` is not controlling. Security remediation ACCEPTED FOR CURRENT STAGE (`da9f7de77239f0a354508fe757b1f2291637f20f`, evidence `4f59f3326781d925570309f041b6971d791be40f`, acceptance/evidence record `87b6b6e996683cb3b13c19c078016df8d26c9698`, hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`, CI 35686586390). Consolidated certification SHA `da9f7de77239f0a354508fe757b1f2291637f20f` / hosted frontend `da9f7de` / hosted API `b5d0065`. Environment-honesty amendment proved real PDF/PNG CLEAN upload, API-restart retrieval, authenticated OIDC SSRF, and idempotent bucket bootstrap. Staging Evidence MinIO has no persistent disk. NOT READY FOR ACCEPTANCE. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`. Wave 8 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`. Wave 7 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`. Wave 6 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`. Wave 5 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**#12:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE (`1bece45cb94de832ef40b3d811977a179058f15b`). WAVE 5 ACCEPTED FOR CURRENT STAGE (`88938c263d741365578e874599156096fe5d6276`). Hosted/CI SHA `963953570154616f3a2029e854de339711eb9ea7`. Evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`. WAVE 6 ACCEPTED FOR CURRENT STAGE (`2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`, evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`). WAVE 7 ACCEPTED FOR CURRENT STAGE (`7afd0d5c08a64667f592831509338ab74cf9a7b3`, evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`). WAVE 8 ACCEPTED FOR CURRENT STAGE (`037b8e98dac360e12084bb0de8b66ee666036feb`, hosted API `6b7933ef415d32f58377012344cc68ded32ea36b`, evidence `f168b71cd7df00aaf2a64091446af3c2f81a9390`, CI 35681630112). The failed UI walk on `96765c4` is not controlling. Security remediation ACCEPTED FOR CURRENT STAGE (`da9f7de77239f0a354508fe757b1f2291637f20f`, evidence `4f59f3326781d925570309f041b6971d791be40f`, acceptance/evidence record `87b6b6e996683cb3b13c19c078016df8d26c9698`, hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`, CI 35686586390). Consolidated certification hosted frontend `da9f7de77239f0a354508fe757b1f2291637f20f` / hosted API `ace61c75c8b82623a46bc0d31525a75d00efafc6`. Environment-honesty amendment `ace61c7` proved real PDF/PNG CLEAN upload, API-restart retrieval, authenticated OIDC SSRF, and idempotent bucket bootstrap. Persistent disk `minio-data-live` is now attached to live MinIO `srv-daiep37qj5pc739qfvpg`. Objects survived object-store process restart. EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`. Wave 8 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`. Wave 7 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`. Wave 6 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`. Wave 5 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
 
 **#20:** PASS — Product Leadership accepted.
 
@@ -285,9 +285,9 @@ Do not start #20.
 
 ## CURRENT BLOCKERS
 
-- #12 consolidated certification is NOT READY FOR ACCEPTANCE: staging Evidence MinIO (`supreme-risk-staging-minio`) has no persistent disk. Cursor does not declare #12 PASS.
+- #12 consolidated certification is EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Cursor does not declare #12 PASS.
 - #12 invitation inbox remains Queued ≠ Delivered.
-- Production-grade Postgres, Redis, object storage, ClamAV, and off-site/immutable backups are not created for production. Staging MinIO bucket restore was an environment provisioning repair, not persistence proof.
+- Production-grade Postgres, Redis, object storage, ClamAV, and off-site/immutable backups are not created for production. Staging MinIO now has a persistent disk; that does not provision production storage.
 - Security / support / sales mailboxes undesignated.
 - Legal Privacy/Terms/Subprocessors still Draft.
 - Live Stripe catalog and launch billing model undecided (#2 remains PARTIAL / CONDITIONALLY CLEARED).
@@ -309,7 +309,7 @@ Do not start #20.
 
 ## NEXT DECISION REQUIRED
 
-Attach the blueprint 1 GB `/data` disk to the MinIO service the API uses, or point staging at a durable S3-compatible store, then repeat object-store persistence. Do not recreate an empty bucket as a substitute. Cursor does not declare #12 PASS. Do not start a new roadmap item. Do not create Wave 9. Commercial production remains NO-GO. #19 remains PARTIAL / review-open and is not started from this gate. #20 is not authorized.
+Product Leadership final acceptance of the #12 consolidated Golden Journey certification. Cursor does not declare #12 PASS. Do not start a new roadmap item. Do not create Wave 9. Commercial production remains NO-GO. #19 remains PARTIAL / review-open and is not started from this gate. #20 is not authorized.
 
 ---
 
@@ -340,7 +340,7 @@ Do not invent percentages.
 | 9 | Final Security Review | EVIDENCE RESULT PASS; HOSTED CLOSURE PASS |
 | 10 | Production Cutover Rehearsal | PASS |
 | 11 | Production Release Checklist | EVIDENCE RESULT PASS — production ready NO; GO/NO-GO NO-GO |
-| 12 | Supreme Third Party Production v1 | ACTIVE — Golden Journey Waves 1–8 + security rem ACCEPTED FOR CURRENT STAGE; certification NOT READY FOR ACCEPTANCE (ephemeral staging MinIO); Cursor does not declare #12 PASS; commercial production NO-GO |
+| 12 | Supreme Third Party Production v1 | ACTIVE — Golden Journey Waves 1–8 + security rem ACCEPTED FOR CURRENT STAGE; certification EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE; Cursor does not declare #12 PASS; commercial production NO-GO |
 | 13 | Governance Graph | Product Leadership accepted (2026-09-13) |
 | 14 | Shared Control & Evidence Layer | Product Leadership accepted PASS (2026-09-13) |
 | 15 | Supreme Risk | PASS — Product Leadership accepted (2026-09-13) |
@@ -363,8 +363,15 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 ### 2026-09-22
 
+**ITEM:** #12 Evidence durability blocker closure  
+**STATUS CHANGE:** Staging Evidence MinIO persistent disk attached to the live API service. Objects survived object-store process restart and API restart. CONSOLIDATED GOLDEN JOURNEY CERTIFICATION — EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Cursor does not declare #12 PASS. No Wave 9.  
+**SHA:** starting honesty amendment `ace61c75c8b82623a46bc0d31525a75d00efafc6`. Hosted frontend `da9f7de77239f0a354508fe757b1f2291637f20f`. Hosted API `ace61c75c8b82623a46bc0d31525a75d00efafc6`.  
+**EVIDENCE:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/blocker-closure.md`. Commercial production remains NO-GO.
+
+### 2026-09-22
+
 **ITEM:** #12 Consolidated Golden Journey certification  
-**STATUS CHANGE:** Waves 1–8 and pentest remediation ACCEPTED FOR CURRENT STAGE. Environment-honesty amendment found ephemeral staging MinIO. NOT READY FOR ACCEPTANCE. Cursor does not declare #12 PASS. No Wave 9.  
+**STATUS CHANGE:** Waves 1–8 and pentest remediation ACCEPTED FOR CURRENT STAGE. Environment-honesty amendment found ephemeral staging MinIO. NOT READY FOR ACCEPTANCE at that time. Cursor does not declare #12 PASS. No Wave 9.  
 **SHA:** certification / hosted frontend `da9f7de77239f0a354508fe757b1f2291637f20f`. Hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`. Wave 8 accepted `037b8e98dac360e12084bb0de8b66ee666036feb`.  
 **EVIDENCE:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/` (`ee3b5faf83a180913ebdd75e077b2911709131ad`). Real PDF/PNG CLEAN upload after bucket restore. Authenticated OIDC SSRF 400/200. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS. Commercial production remains NO-GO.
 

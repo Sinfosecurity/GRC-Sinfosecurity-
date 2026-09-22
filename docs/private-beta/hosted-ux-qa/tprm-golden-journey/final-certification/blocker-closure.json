@@ -1,0 +1,192 @@
+{
+  "item": "#12",
+  "gate": "consolidated-golden-journey-certification-blocker-closure",
+  "notWave9": true,
+  "declaredPass": false,
+  "twelvePass": false,
+  "readyForProductLeadershipFinalAcceptance": true,
+  "evidenceResult": "PASS",
+  "productionTouched": false,
+  "mainMerged": false,
+  "option": "A",
+  "provider": "MinIO / S3-compatible persistent object storage",
+  "notAwsS3": true,
+  "startingSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
+  "hostedApiSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
+  "hostedFrontendSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
+  "priorExactCertificationCi": 35721879631,
+  "topologyBefore": {
+    "service": "supreme-risk-staging-minio",
+    "serviceId": "srv-daiep37qj5pc739qfvpg",
+    "endpointHost": "supreme-risk-staging-minio.onrender.com",
+    "disk": null,
+    "bucket": "supreme-risk-staging",
+    "objectCount": 3
+  },
+  "topologyAfter": {
+    "service": "supreme-risk-staging-minio",
+    "serviceId": "srv-daiep37qj5pc739qfvpg",
+    "endpointHost": "supreme-risk-staging-minio.onrender.com",
+    "disk": {
+      "id": "dsk-dapgkkgae00c73d28kdg",
+      "name": "minio-data-live",
+      "mountPath": "/data",
+      "sizeGB": 1
+    },
+    "minioDataPath": "/data",
+    "liveDeploy": "dep-dapgl83bc2fs73fm7mj0",
+    "failedRebuild": "dep-dapgnp3tqb8s7392mft0",
+    "bucket": "supreme-risk-staging",
+    "objectCount": 7,
+    "unusedSibling": {
+      "name": "supreme-risk-staging-minio-1",
+      "id": "srv-daiegbfqj5pc739pc5gg",
+      "usedByApi": false
+    }
+  },
+  "inventoryBefore": {
+    "source": "local capture /tmp/supreme-evidence-migrate/inventory.json before disk attach",
+    "count": 3,
+    "objects": [
+      {
+        "id": "03f22c61-15f4-44ce-9bec-47eb882400d0",
+        "storageKey": "0e0de017-919a-4886-93d7-420b05f71f62/vendor/b777503b-8a35-4a4c-ad10-b0bfdd599c2b/407ff8f9-6898-4a27-8d92-27954a72f488-cert-1790053101.pdf",
+        "bytes": 286,
+        "sha256": "26fb196de7965414cb9d97b791b7bd53b9b4a10cf51a2f51f1c63db0c4a1653c"
+      },
+      {
+        "id": "6175b9cb-efd6-4347-80a6-2ab584842ea9",
+        "storageKey": "0e0de017-919a-4886-93d7-420b05f71f62/vendor/b777503b-8a35-4a4c-ad10-b0bfdd599c2b/3afa1f76-4dca-43cc-9ae7-e47e4eebeceb-cert-1790053101.png",
+        "bytes": 67,
+        "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      },
+      {
+        "id": "b19229bc-e681-46d7-936c-ab916d1907b5",
+        "storageKey": "0e0de017-919a-4886-93d7-420b05f71f62/vendor/b777503b-8a35-4a4c-ad10-b0bfdd599c2b/d8b91c6f-ad38-47a0-aee9-a7c5b448e91b-honesty-1790076341.pdf",
+        "bytes": 286,
+        "sha256": "26fb196de7965414cb9d97b791b7bd53b9b4a10cf51a2f51f1c63db0c4a1653c"
+      }
+    ]
+  },
+  "migration": {
+    "emptyAfterFirstDiskDeploy": {
+      "job": "job-dapgku60tbcc73are4c0",
+      "head": "NotFound",
+      "count": 0
+    },
+    "restore": {
+      "job": "job-dapgn1v40ujc73eh5nig",
+      "sameKeys": true,
+      "duplicateDbRecords": false
+    },
+    "midInventory": {
+      "job": "job-dapgoigae00c73d2koh0",
+      "count": 5
+    }
+  },
+  "inventoryAfter": {
+    "job": "job-dapgrn0ae00c73d2ukig",
+    "finishedAt": "2026-09-22T23:23:51Z",
+    "env": "staging",
+    "bucket": "supreme-risk-staging",
+    "host": "supreme-risk-staging-minio.onrender.com",
+    "head": "exists",
+    "keyCount": 7
+  },
+  "freshUploads": {
+    "pdf": {
+      "id": "95c8476e-54e3-45e5-be13-279e4ceb7755",
+      "storageKey": "0e0de017-919a-4886-93d7-420b05f71f62/vendor/b777503b-8a35-4a4c-ad10-b0bfdd599c2b/8d04a033-edb6-4098-8ccc-ad929715fa2b-closure-1790119263.pdf",
+      "scan": "CLEAN",
+      "bytes": 286,
+      "sha256": "26fb196de7965414cb9d97b791b7bd53b9b4a10cf51a2f51f1c63db0c4a1653c"
+    },
+    "png": {
+      "id": "0378d254-722a-4fe5-be8e-cb1ce56acc9f",
+      "storageKey": "0e0de017-919a-4886-93d7-420b05f71f62/vendor/b777503b-8a35-4a4c-ad10-b0bfdd599c2b/b53852f0-91e7-4011-8a0e-925423a22371-closure-1790119263.png",
+      "scan": "CLEAN",
+      "bytes": 67,
+      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+    }
+  },
+  "persistence": {
+    "objectStoreRestart": {
+      "service": "srv-daiep37qj5pc739qfvpg",
+      "method": "process restart",
+      "healthBefore": 200,
+      "healthDuring": 502,
+      "healthAfter": 200,
+      "result": "PASS",
+      "objectsVerified": 7
+    },
+    "apiRestart": {
+      "service": "srv-daieg75g1s2s73f0rmig",
+      "result": "PASS",
+      "objectsVerified": 7,
+      "sameStorageKeys": true
+    }
+  },
+  "security": {
+    "authorized": 200,
+    "unauthenticated": 401,
+    "crossTenant": 404,
+    "orgB": "aae26d14-1fbb-4fb7-86f0-7f8badc7ec91",
+    "anonymousMinioList": 403,
+    "anonymousMinioGet": 403,
+    "frontendSecretLeak": false,
+    "publicHealthKeys": ["status", "timestamp"]
+  },
+  "malware": {
+    "freshPdf": "CLEAN",
+    "freshPng": "CLEAN",
+    "downloadPolicy": {
+      "allowPendingDownloads": false,
+      "allowUnscannedDownloads": false
+    },
+    "diagnosticsBeforeApiRestart": "DEGRADED",
+    "diagnosticsAfterApiRestart": "CONNECTED"
+  },
+  "sharedEvidence": {
+    "storedObjectId": "52929772-847d-4fe0-b3d0-626452f8e3b8",
+    "controlLink": {
+      "id": "090f666e-54b9-4d4d-8e37-7db465e7cd3e",
+      "targetType": "CONTROL",
+      "targetId": "ab0f0c05-bc2f-4909-a7d2-d4b7e006d9ad",
+      "relationship": "SUPPORTS",
+      "http": 201
+    },
+    "vendorPartialLink": {
+      "id": "12cfa233-1de4-47f8-aa28-57ce4a26429b",
+      "targetType": "VENDOR",
+      "relationship": "PARTIALLY_SUPPORTS",
+      "http": 201
+    },
+    "secondByteCopy": false
+  },
+  "bucketBootstrap": {
+    "afterRestart": "exists",
+    "destructive": false,
+    "productionGuardUnchanged": true
+  },
+  "affectedRerun": [
+    "evidence.upload",
+    "evidence.download",
+    "malware.clean.path",
+    "shared.evidence.reuse",
+    "tenant.isolation",
+    "anonymous.minio",
+    "public.health",
+    "objectstore.restart.persistence",
+    "api.restart.persistence",
+    "offboarding.inspectable"
+  ],
+  "reusedPriorCertificationEvidence": [
+    "waves-1-8-golden-journey",
+    "azure-offboarded-m365-sibling",
+    "cycle1-medium-58",
+    "oidc-ssrf",
+    "ui-screenshots",
+    "vendor-invitation-only",
+    "exact-certification-ci-35721879631"
+  ]
+}

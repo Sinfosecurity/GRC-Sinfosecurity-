@@ -1,8 +1,10 @@
 # Staging object-storage persistence
 
-Staging Evidence uses **MinIO / S3-compatible** object storage.
+Staging Evidence uses **MinIO / S3-compatible persistent object storage**.
 
 It is **not** AWS S3.
+
+Production object storage was not touched and is not validated by this work.
 
 ## Provider
 
@@ -10,10 +12,11 @@ It is **not** AWS S3.
 | --- | --- |
 | API `S3_ENDPOINT` host | `supreme-risk-staging-minio.onrender.com` |
 | Service | `supreme-risk-staging-minio` `srv-daiep37qj5pc739qfvpg` |
-| Live disk | **none** |
-| Blueprint disk | `minio-data` → `/data` 1 GB (`render.staging.yaml`) |
+| Live disk | `dsk-dapgkkgae00c73d28kdg` `minio-data-live` 1 GB mounted at `/data` |
+| MinIO data path | `/data` |
+| Bucket | `supreme-risk-staging` |
 | `ALLOW_LOCAL_OBJECT_STORAGE` | `false` |
-| Unused sibling | `supreme-risk-staging-minio-1` has 1 GB `/data` and is **502** |
+| Unused sibling | `supreme-risk-staging-minio-1` has 1 GB `/data` and is **not** used by the API |
 
 ## Prior missing-bucket event
 
@@ -26,16 +29,21 @@ Job `job-dap0l8dg1s2s738vm0fg` at `2026-09-22T04:57:40Z`:
 
 No local-filesystem fallback was introduced.
 
+## Disk attach and restore
+
+1. Existing 3 certification objects were copied locally with keys, sizes, and sha256.
+2. Persistent disk was attached to the live API MinIO service, not `minio-1`.
+3. First disk-mounted deploy emptied `/data` (`job-dapgku60tbcc73are4c0` `head=NotFound` count 0).
+4. Job `job-dapgn1v40ujc73eh5nig` restored the same 3 keys. StoredObject ids were unchanged.
+
 ## Idempotent bootstrap
 
-Job `job-dap6cftg1s2s739jkkd0`:
+After restart, job `job-dapgrn0ae00c73d2ukig`:
 
-- `head1=exists`
-- `create=BucketAlreadyOwnedByYou`
-- `head2=exists`
-- key count 3 → 3
-
-No delete. No bucket replace. Objects remained listed.
+- `head=exists`
+- `keyCount=7`
+- no delete
+- no bucket replace
 
 Application helper: `backend/src/storage/bucketBootstrap.ts`. Production opportunistic create is refused.
 
@@ -43,12 +51,12 @@ Application helper: `backend/src/storage/bucketBootstrap.ts`. Production opportu
 
 | Boundary | Result |
 | --- | --- |
-| API restart `srv-daieg75g1s2s73f0rmig` | **PASS** — PDF/PNG still 200 |
-| Object-store disk | **FAIL** — live MinIO has no disk |
-| Object-store restart/redeploy | **FAIL** — not executed; would destroy live Evidence on ephemeral storage |
+| API restart `srv-daieg75g1s2s73f0rmig` | **PASS** — 7 objects still 200, same keys/checksums |
+| Object-store disk | **PASS** — live MinIO has 1 GB `/data` |
+| Object-store process restart `srv-daiep37qj5pc739qfvpg` | **PASS** — health 502 then 200; 7 objects still 200; no re-restore |
 | Empty bucket recreate | **not used** as a persistence substitute |
 
-A recreated empty bucket is not persisted Evidence.
+See `blocker-closure.md`.
 
 ## Production boundary
 

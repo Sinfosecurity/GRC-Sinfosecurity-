@@ -50,8 +50,8 @@
       "configured": true,
       "operational": true,
       "tested": true,
-      "persistenceProven": false,
-      "notes": "FAIL readiness. API uses supreme-risk-staging-minio with disk=null. Blueprint specifies 1GB /data. Not AWS S3."
+      "persistenceProven": true,
+      "notes": "PASS readiness. API uses supreme-risk-staging-minio with persistent disk minio-data-live 1GB mounted at /data. Object-store process restart proved. Not AWS S3."
     },
     {
       "component": "Object Storage",
@@ -71,7 +71,7 @@
       "operational": true,
       "tested": true,
       "persistenceProven": true,
-      "notes": "CONNECTED. Hosted PDF/PNG returned CLEAN. Fail-closed pending downloads remain false."
+      "notes": "CONNECTED after API restart. Fresh closure PDF/PNG returned CLEAN. Diagnostics were DEGRADED immediately before that restart. Fail-closed pending downloads remain false."
     },
     {
       "component": "Email",
