@@ -14,6 +14,7 @@
   "mainMerged": false,
   "productionTouched": false,
   "runtimeCodeChanged": false,
+  "reconciliationSha": "ba7a3ba701e8b72595fa53204a7401da98ddcb3b",
   "controllingImplementationSha": "f87038fa160e935ae6b6f890a3124dd383c0b1ec",
   "controllingCi": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418",
   "controllingCiResult": "SUCCESS",

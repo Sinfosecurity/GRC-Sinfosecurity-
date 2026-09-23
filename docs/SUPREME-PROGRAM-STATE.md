@@ -368,7 +368,7 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 **ITEM:** #23 Insurance Edition — Phase B acceptance + completion reconciliation  
 **STATUS CHANGE:** PHASE B ACCEPTED FOR CURRENT STAGE. Completion reconciliation READY FOR PRODUCT LEADERSHIP REVIEW. Recommendation category B — bounded completion gaps. #23 remains ACTIVE / NOT PASS. No Phase C. #24 / #27 / #30 not started. #39 not declared complete. Viewer hosted session remains SKIP. #12 remains PASS (private-testing). Commercial production remains NO-GO. `main` not merged. Production untouched.  
-**SHA:** controlling Phase B `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418 SUCCESS.  
+**SHA:** reconciliation (docs only) `ba7a3ba701e8b72595fa53204a7401da98ddcb3b`. Controlling Phase B `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418 SUCCESS.  
 **EVIDENCE:** `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`. Official walk 38 PASS / 0 FAIL. Supplemental 99 PASS / 0 FAIL / 1 SKIP.
 
 ### 2026-09-22

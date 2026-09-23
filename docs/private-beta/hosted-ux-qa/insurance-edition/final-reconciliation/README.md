@@ -15,6 +15,7 @@ This is not a new punch-list item. No Insurance features were implemented in thi
 
 | Record | Value |
 | --- | --- |
+| Reconciliation SHA (docs only) | `ba7a3ba701e8b72595fa53204a7401da98ddcb3b` |
 | Controlling implementation / hosted frontend / hosted API | `f87038fa160e935ae6b6f890a3124dd383c0b1ec` |
 | Controlling CI | https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418 SUCCESS |
 | Official hosted walk | 38 PASS / 0 FAIL |
