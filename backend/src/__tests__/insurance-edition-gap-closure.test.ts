@@ -109,9 +109,10 @@ describe('Insurance Edition bounded gap closure', () => {
         expect(JSON.stringify(otherList.body)).not.toContain(licensePublicId);
         expect(JSON.stringify(otherList.body)).not.toContain(cleanA.id);
 
-        const downloadA = await request(app).get(`/api/v1/documents/${cleanA.id}/download`).set('Authorization', `Bearer ${tokenA}`);
-        expect([200, 404, 409]).toContain(downloadA.status);
-        expect(downloadA.status).not.toBe(403);
+        const metaA = await request(app).get(`/api/v1/documents/${cleanA.id}`).set('Authorization', `Bearer ${tokenA}`);
+        expect(metaA.status).toBe(200);
+        const metaB = await request(app).get(`/api/v1/documents/${cleanA.id}`).set('Authorization', `Bearer ${tokenB}`);
+        expect([403, 404]).toContain(metaB.status);
         const downloadB = await request(app).get(`/api/v1/documents/${cleanA.id}/download`).set('Authorization', `Bearer ${tokenB}`);
         expect([403, 404]).toContain(downloadB.status);
         const anon = await request(app).get(`/api/v1/documents/${cleanA.id}/download`);
