@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-22 (Product Leadership accepted #23 Phase B for current stage; completion reconciliation READY FOR PRODUCT LEADERSHIP REVIEW; #12 remains PASS private-testing; commercial production NO-GO)
+**LAST UPDATED:** 2026-09-23 (#23 bounded gap closure implemented + CI SUCCESS; hosted verification BLOCKED by Render pipeline minutes; #12 remains PASS private-testing; commercial production NO-GO)
 
-**CURRENT ITEM:** #23 Insurance Edition — Phase B ACCEPTED FOR CURRENT STAGE. Completion reconciliation under Product Leadership review. Do not start Phase C. Do not start #24, #27, #30, or any other numbered item. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #13–#22 remain at their accepted current-stage positions. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN and are not the pentest PENTEST-H1/H2 labels.
+**CURRENT ITEM:** #23 Insurance Edition — Phase B ACCEPTED FOR CURRENT STAGE. Five bounded gaps implemented on `0f42cba86f42fa9df0399634bceb520036ed82ce`. Hosted verification BLOCKED. Do not start Phase C. Do not start #24, #27, #30, or any other numbered item. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #13–#22 remain at their accepted current-stage positions. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN and are not the pentest PENTEST-H1/H2 labels.
 
-**CURRENT ITEM STATUS:** #23 ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Reconciliation category B — bounded completion gaps. Not PASS. #12 remains PASS — PRIVATE-TESTING RELEASE CANDIDATE. Commercial production remains NO-GO. Cursor does not declare #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #23 ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Bounded gap closure CI-proven; hosted BLOCKED. Not PASS. #12 remains PASS — PRIVATE-TESTING RELEASE CANDIDATE. Commercial production remains NO-GO. Cursor does not declare #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -32,7 +32,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **#22:** ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED (Product Leadership 2026-09-18). Honesty/UI implementation and hosted frontend `7feb92de70cacfc954dc6632dbf862b61549ca53`. Hosted API `340f90818d9278a5173be3ca7be8eabba585f0cd`. Live Slack/Jira remain NOT TESTED. Cursor does not declare #22 PASS.
 
-**#23:** ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Completion reconciliation READY FOR PRODUCT LEADERSHIP REVIEW (category B). Controlling SHA `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. CI 35405219418 SUCCESS. Official walk 38 PASS / 0 FAIL. Supplemental 99 PASS / 0 FAIL / 1 SKIP. Viewer hosted session remains SKIP. Insurance remains a configurable industry layer on Supreme, on Vendor / Third Party identity. Cursor does not declare #23 PASS. No Phase C. #24 / #27 / #30 not started.
+**#23:** ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Bounded completion gaps implemented + CI SUCCESS (`0f42cba86f42fa9df0399634bceb520036ed82ce`, CI 35835067819). Hosted verification BLOCKED — Render `pipeline_minutes_exhausted`; live hosted frontend remains `da9f7de77239f0a354508fe757b1f2291637f20f`, API `ace61c75c8b82623a46bc0d31525a75d00efafc6`. Five gaps are not marked CLOSED. Viewer hosted session remains SKIP. No Phase C. #24 / #27 / #30 not started. Cursor does not declare #23 PASS.
 
 **#12:** PASS — PRIVATE-TESTING RELEASE CANDIDATE. GOLDEN JOURNEY REVAMP CLOSED. PHASE 0 COMPLETE (`e078455`). WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE (`1bece45cb94de832ef40b3d811977a179058f15b`). WAVE 5 ACCEPTED FOR CURRENT STAGE (`88938c263d741365578e874599156096fe5d6276`). Hosted/CI SHA `963953570154616f3a2029e854de339711eb9ea7`. Evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`. WAVE 6 ACCEPTED FOR CURRENT STAGE (`2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`, evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`). WAVE 7 ACCEPTED FOR CURRENT STAGE (`7afd0d5c08a64667f592831509338ab74cf9a7b3`, evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`). WAVE 8 ACCEPTED FOR CURRENT STAGE (`037b8e98dac360e12084bb0de8b66ee666036feb`, hosted API `6b7933ef415d32f58377012344cc68ded32ea36b`, evidence `f168b71cd7df00aaf2a64091446af3c2f81a9390`, CI 35681630112). The failed UI walk on `96765c4` is not controlling. Security remediation ACCEPTED FOR CURRENT STAGE (`da9f7de77239f0a354508fe757b1f2291637f20f`, evidence `4f59f3326781d925570309f041b6971d791be40f`, acceptance/evidence record `87b6b6e996683cb3b13c19c078016df8d26c9698`, hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`, CI 35686586390). Consolidated certification hosted frontend `da9f7de77239f0a354508fe757b1f2291637f20f` / hosted API `ace61c75c8b82623a46bc0d31525a75d00efafc6`. Environment-honesty amendment `ace61c7` proved real PDF/PNG CLEAN upload, API-restart retrieval, authenticated OIDC SSRF, and idempotent bucket bootstrap. Persistent disk `minio-data-live` is now attached to live MinIO `srv-daiep37qj5pc739qfvpg`. Objects survived object-store process restart. Blocker-closure SHA `0e00e6bf12d616d75831e4e3c83295e34a87955f` (CI 35797485969 PASS). Product Leadership final acceptance 2026-09-22: **#12 PASS** for PRIVATE-TESTING RELEASE CANDIDATE scope. Evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`. Wave 8 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`. Wave 7 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`. Wave 6 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`. Wave 5 evidence `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Not commercial GO. Not production deployment.
 
@@ -308,7 +308,7 @@ Do not start #20.
 
 ## NEXT DECISION REQUIRED
 
-Product Leadership review of #23 completion reconciliation (category B — bounded completion gaps). Do not start Phase C. Do not start #24, #27, #30, or any other numbered item. Do not implement more Insurance features until that review. Do not create Wave 9. #12 remains PASS for private-testing release-candidate scope. Commercial production remains NO-GO. #19 remains PARTIAL / review-open.
+Restore Render pipeline minutes and deploy `0f42cba86f42fa9df0399634bceb520036ed82ce` to authorized staging, then run `scripts/hosted-insurance-gap-closure-qa.py`. Do not mark the five gaps CLOSED until hosted proof exists. Do not start Phase C. Do not start #24, #27, #30, or any other numbered item. Do not create Wave 9. #12 remains PASS for private-testing release-candidate scope. Commercial production remains NO-GO. #19 remains PARTIAL / review-open.
 
 ---
 
@@ -350,7 +350,7 @@ Do not invent percentages.
 | 20 | Supreme Automation | PASS — Product Leadership accepted |
 | 21 | Identity / RBAC | ACCEPTED FOR CURRENT STAGE / LIVE FEDERATION DEFERRED |
 | 22 | API / Webhooks / Integrations | ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED |
-| 23 | Insurance Edition | ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE; reconciliation review; not PASS |
+| 23 | Insurance Edition | ACTIVE — PHASE B ACCEPTED; gaps CI-proven; hosted BLOCKED; not PASS |
 | 24–38, 40 | Later modules / GTM / packs | NOT STARTED / NOT AUTHORIZED |
 | 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
 
@@ -363,6 +363,13 @@ Marketing preview pages are not implementation.
 Concise accepted-status history. Do not fabricate unsubstantiated history. Older certification docs used different local numbering; this log uses the **master punch list** numbers.
 
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
+
+### 2026-09-23
+
+**ITEM:** #23 Insurance Edition — bounded completion gap closure  
+**STATUS CHANGE:** Five authorized gaps implemented and CI-proven. Hosted verification BLOCKED (Render pipeline minutes exhausted). Gaps not marked CLOSED. #23 remains ACTIVE / NOT PASS. Phase B remains accepted. No Phase C. #24 / #27 / #30 not started. Viewer SKIP retained. #12 remains PASS (private-testing). Commercial production remains NO-GO. `main` not merged. Production untouched.  
+**SHA:** implementation / CI `0f42cba86f42fa9df0399634bceb520036ed82ce`. Runtime `174c73487b47e525b831aa0e7d53178b74fb5334`. Phase B controlling `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35835067819 SUCCESS.  
+**EVIDENCE:** `docs/private-beta/hosted-ux-qa/insurance-edition/final-gap-closure/`.
 
 ### 2026-09-22
 

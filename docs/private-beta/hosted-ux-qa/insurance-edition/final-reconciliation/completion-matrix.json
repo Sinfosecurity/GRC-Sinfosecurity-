@@ -4,6 +4,8 @@
   "itemStatus": "ACTIVE / NOT PASS",
   "recommendationCategory": "B",
   "controllingSha": "f87038fa160e935ae6b6f890a3124dd383c0b1ec",
+  "gapClosureImplementationSha": "0f42cba86f42fa9df0399634bceb520036ed82ce",
+  "gapClosureHosted": "BLOCKED — Render pipeline_minutes_exhausted",
   "columns": [
     "CAPABILITY",
     "PHASE_A_B_SOURCE",
@@ -67,9 +69,9 @@
       "HOSTED_PROVEN": "PARTIAL — classification and questions, no dedicated statutory pack",
       "SHARED_CORE_REUSED": "Vendor + IRA overlay",
       "KNOWN_LIMITATION": "No dedicated MGA/TPA/Captive statutory pack; obligations are not identical to insurer",
-      "REQUIRED_FOR_23_DONE": "NO — configuration-only is in defined #23 scope",
+      "REQUIRED_FOR_23_DONE": "NO — configuration-only accepted for current #23 (PL 2026-09-23)",
       "OTHER_ROADMAP_OWNER": "#27 for deeper US MGA/TPA/captive packs if Product Leadership later authorizes",
-      "PRODUCT_DECISION_REQUIRED": "YES — confirm configuration-only is enough for #23 Done"
+      "PRODUCT_DECISION_REQUIRED": "NO — accepted limitation B"
     },
     {
       "CAPABILITY": "Organization types — Microinsurance / Takaful",
@@ -96,13 +98,13 @@
     {
       "CAPABILITY": "License / authorization register",
       "PHASE_A_B_SOURCE": "A+B",
-      "IMPLEMENTED": "YES — metadata + honesty",
-      "HOSTED_PROVEN": "YES — expired ≠ illegal",
-      "SHARED_CORE_REUSED": "Audit + Shared Evidence architecture",
-      "KNOWN_LIMITATION": "evidenceObjectId schema-only; create/update/UI do not attach StoredObject; no external registry",
-      "REQUIRED_FOR_23_DONE": "PRODUCT REVIEW — attach Evidence or accept metadata-only",
+      "IMPLEMENTED": "YES — POST attach Shared Evidence; CLEAN required; reuse without duplicate bytes",
+      "HOSTED_PROVEN": "BLOCKED — Render pipeline minutes exhausted",
+      "SHARED_CORE_REUSED": "Audit + Shared Evidence StoredObject",
+      "KNOWN_LIMITATION": "No external registry. Hosted attach walk not run.",
+      "REQUIRED_FOR_23_DONE": "IMPLEMENTED + CI — HOSTED NOT PROVEN — not CLOSED",
       "OTHER_ROADMAP_OWNER": "External registry verification remains later / not #23 unless integrated",
-      "PRODUCT_DECISION_REQUIRED": "YES"
+      "PRODUCT_DECISION_REQUIRED": "NO — PL required attach; code closed; hosted pending"
     },
     {
       "CAPABILITY": "Nigeria reference packs",
@@ -140,13 +142,13 @@
     {
       "CAPABILITY": "Human applicability",
       "PHASE_A_B_SOURCE": "B",
-      "IMPLEMENTED": "YES — who/when/why stored",
-      "HOSTED_PROVEN": "YES — Recommended ≠ Applicable",
+      "IMPLEMENTED": "YES — STATE / DECIDED BY / DECIDED AT / REASON in UI; Recommended remains distinct",
+      "HOSTED_PROVEN": "BLOCKED — Render pipeline minutes exhausted",
       "SHARED_CORE_REUSED": "InsuranceApplicabilityDecision + audit",
-      "KNOWN_LIMITATION": "UI surfaces state/reason; who/when poorly shown",
-      "REQUIRED_FOR_23_DONE": "PRODUCT REVIEW — surface who/when or accept stored-only",
+      "KNOWN_LIMITATION": "Hosted attribution walk not run.",
+      "REQUIRED_FOR_23_DONE": "IMPLEMENTED + CI — HOSTED NOT PROVEN — not CLOSED",
       "OTHER_ROADMAP_OWNER": null,
-      "PRODUCT_DECISION_REQUIRED": "YES"
+      "PRODUCT_DECISION_REQUIRED": "NO — PL required surface; code closed; hosted pending"
     },
     {
       "CAPABILITY": "Regulatory versioning / historical state",
@@ -155,9 +157,9 @@
       "HOSTED_PROVEN": "YES — configuration history table",
       "SHARED_CORE_REUSED": "#16 assessment immutability",
       "KNOWN_LIMITATION": "No separate tenant-frozen full requirement-text object beyond decision snapshot",
-      "REQUIRED_FOR_23_DONE": "PRODUCT REVIEW — accept version+decision history or require frozen snapshots",
+      "REQUIRED_FOR_23_DONE": "YES — existing versioning + applicability/decision history accepted (PL 2026-09-23)",
       "OTHER_ROADMAP_OWNER": null,
-      "PRODUCT_DECISION_REQUIRED": "YES"
+      "PRODUCT_DECISION_REQUIRED": "NO — accepted limitation D"
     },
     {
       "CAPABILITY": "Insurance IRA overlay ins1–ins14",
@@ -195,13 +197,13 @@
     {
       "CAPABILITY": "Reinsurance / counterparty governance",
       "PHASE_A_B_SOURCE": "B",
-      "IMPLEMENTED": "YES — governance view; API vendorId",
-      "HOSTED_PROVEN": "YES — workspace",
+      "IMPLEMENTED": "YES — UI search/select Third Party; persist vendorId; no auto-create Vendor",
+      "HOSTED_PROVEN": "BLOCKED — Render pipeline minutes exhausted",
       "SHARED_CORE_REUSED": "#12 Vendor where attached",
-      "KNOWN_LIMITATION": "UI records name only; does not attach vendorId",
-      "REQUIRED_FOR_23_DONE": "PRODUCT REVIEW — require vendor attach in UI or accept name metadata",
+      "KNOWN_LIMITATION": "Unlinked counterparties remain name-only. Hosted selector walk not run.",
+      "REQUIRED_FOR_23_DONE": "IMPLEMENTED + CI — HOSTED NOT PROVEN — not CLOSED",
       "OTHER_ROADMAP_OWNER": null,
-      "PRODUCT_DECISION_REQUIRED": "YES"
+      "PRODUCT_DECISION_REQUIRED": "NO — PL required vendorId; code closed; hosted pending"
     },
     {
       "CAPABILITY": "Broker / intermediary governance",
@@ -305,24 +307,24 @@
     {
       "CAPABILITY": "Insurance automation",
       "PHASE_A_B_SOURCE": "B",
-      "IMPLEMENTED": "PARTIAL — templates exist; scheduler not wired to license/AI dates",
-      "HOSTED_PROVEN": "PARTIAL — catalog present; date fire not hosted",
-      "SHARED_CORE_REUSED": "#20 Automation catalog",
-      "KNOWN_LIMITATION": "Must not declare applicability, compliance, risk acceptance, or approve licenses",
-      "REQUIRED_FOR_23_DONE": "PRODUCT REVIEW — templates sufficient vs date-triggered tasks",
+      "IMPLEMENTED": "YES — scan() emits scheduled.review and ai.approval.due; calendar-day idempotent",
+      "HOSTED_PROVEN": "BLOCKED — Render pipeline minutes exhausted",
+      "SHARED_CORE_REUSED": "#20 Automation scheduler / run / task / notification / audit",
+      "KNOWN_LIMITATION": "Wording is review-required, not legal invalidity. Hosted fire not run.",
+      "REQUIRED_FOR_23_DONE": "IMPLEMENTED + CI — HOSTED NOT PROVEN — not CLOSED",
       "OTHER_ROADMAP_OWNER": null,
-      "PRODUCT_DECISION_REQUIRED": "YES"
+      "PRODUCT_DECISION_REQUIRED": "NO — PL required date triggers; code closed; hosted pending"
     },
     {
       "CAPABILITY": "Initial reports (6)",
       "PHASE_A_B_SOURCE": "B",
-      "IMPLEMENTED": "PARTIAL — API live tenant data; UI titles only",
-      "HOSTED_PROVEN": "PARTIAL — API honesty; UI does not render report.data",
+      "IMPLEMENTED": "YES — six reports render live report.data; unknown ≠ 0; no fabricated %",
+      "HOSTED_PROVEN": "BLOCKED — Render pipeline minutes exhausted",
       "SHARED_CORE_REUSED": "Overview / licenses / vendors / AI / concentration",
-      "KNOWN_LIMITATION": "No invented percentage; empty states exist on source APIs",
-      "REQUIRED_FOR_23_DONE": "PRODUCT REVIEW — render live report data or accept API-only",
+      "KNOWN_LIMITATION": "Hosted Reports tab walk not run.",
+      "REQUIRED_FOR_23_DONE": "IMPLEMENTED + CI — HOSTED NOT PROVEN — not CLOSED",
       "OTHER_ROADMAP_OWNER": null,
-      "PRODUCT_DECISION_REQUIRED": "YES"
+      "PRODUCT_DECISION_REQUIRED": "NO — PL required UI render; code closed; hosted pending"
     },
     {
       "CAPABILITY": "Exam / regulator readiness",

@@ -1,0 +1,32 @@
+{
+  "item": "#23 Insurance Edition",
+  "instruction": "BOUNDED COMPLETION GAP CLOSURE",
+  "phaseCCreated": false,
+  "twentyThreePass": false,
+  "startingSha": "83a51895df53a9cc3b8a1aef60a36408f984eac1",
+  "implementationSha": "0f42cba86f42fa9df0399634bceb520036ed82ce",
+  "runtimeSha": "174c73487b47e525b831aa0e7d53178b74fb5334",
+  "hostedFrontendSha": "da9f7de77239f0a354508fe757b1f2291637f20f",
+  "hostedApiSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
+  "hostedShaMatch": false,
+  "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35835067819",
+  "ciResult": "SUCCESS",
+  "localJest": "BLOCKED — LOCAL TEST INFRASTRUCTURE (supreme_test auth). CI is controlling.",
+  "gaps": {
+    "licenseEvidence": "CLOSED_IN_CODE_AND_CI",
+    "reportsUi": "CLOSED_IN_CODE_AND_FRONTEND_TESTS",
+    "reinsuranceVendor": "CLOSED_IN_CODE_AND_CI",
+    "automationDateTriggers": "CLOSED_IN_CODE_AND_CI",
+    "applicabilityAttribution": "CLOSED_IN_CODE_AND_CI"
+  },
+  "hosted": {
+    "result": "BLOCKED",
+    "reason": "Render pipeline_minutes_exhausted. Staging API and frontend deploys of 0f42cba build_failed in ~1s. Live hosted SHAs unchanged.",
+    "apiService": "srv-daieg75g1s2s73f0rmig",
+    "frontendService": "srv-daieg7rm8hqs73chg27g"
+  },
+  "viewer": "SKIP — invitation created but hosted session was not issued because email delivery remained degraded. Not rewritten as PASS.",
+  "openBlockers": [
+    "Hosted staging deploy blocked by exhausted Render pipeline minutes. Hosted verification of the five closures has not been performed on the implementation SHA."
+  ]
+}

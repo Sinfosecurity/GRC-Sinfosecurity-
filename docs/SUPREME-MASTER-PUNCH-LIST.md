@@ -415,13 +415,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Edition configuration, not a fork.
 
-**CURRENT STATUS:** ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Completion reconciliation READY FOR PRODUCT LEADERSHIP REVIEW (category B — bounded completion gaps). Not PASS.
+**CURRENT STATUS:** ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Five bounded gaps implemented and CI-proven on `0f42cba86f42fa9df0399634bceb520036ed82ce`. Hosted verification BLOCKED (Render pipeline minutes exhausted). Not PASS.
 
-**CERTIFICATION SHA:** Phase B implementation / hosted frontend / hosted API `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418 SUCCESS. Not a PASS SHA.
+**CERTIFICATION SHA:** Phase B controlling `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. Gap-closure implementation / CI `0f42cba86f42fa9df0399634bceb520036ed82ce`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35835067819 SUCCESS. Not a PASS SHA.
 
-**EVIDENCE:** Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Phase A hosted walk `docs/private-beta/hosted-ux-qa/insurance-edition/`. Phase B evidence `docs/private-beta/hosted-ux-qa/insurance-edition/phase-b/`. Completion reconciliation `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`. Official walk 38 PASS / 0 FAIL. Supplemental hosted proofs 99 PASS / 0 FAIL / 1 SKIP. Viewer hosted session remains SKIP (email degraded) and is not rewritten as PASS. Nigeria and US/NY exist only as #23 reference jurisdictions. #27 and #30 are not started.
+**EVIDENCE:** Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Phase A/B records unchanged. Reconciliation `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`. Gap closure `docs/private-beta/hosted-ux-qa/insurance-edition/final-gap-closure/`. Viewer hosted session remains SKIP. Nigeria and US/NY remain #23 reference jurisdictions only. #27 and #30 are not started.
 
-**NEXT ACTION:** Product Leadership review of the completion reconciliation. Do not start Phase C. Do not start #24–#38, #27, #30, or #40. Do not implement more Insurance features until Product Leadership reviews the reconciliation. Do not declare #23 PASS.
+**NEXT ACTION:** Restore Render pipeline minutes and deploy `0f42cba` to staging, then run `scripts/hosted-insurance-gap-closure-qa.py`. Do not start Phase C. Do not start #24–#38, #27, #30, or #40. Do not declare #23 PASS.
 
 ---
 
