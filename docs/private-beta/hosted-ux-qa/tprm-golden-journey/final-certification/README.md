@@ -2,7 +2,8 @@
 
 This is **not** Wave 9 and **not** a new punch-list number.
 
-**#12 PASS:** NO  
+**#12 PASS:** YES — PRIVATE-TESTING RELEASE CANDIDATE  
+**Acceptance date:** 2026-09-22  
 **Commercial GO:** NO  
 **Production:** untouched  
 **main:** not merged  
@@ -14,11 +15,9 @@ No Wave 9.
 
 ## Result
 
-**#12 CONSOLIDATED GOLDEN JOURNEY CERTIFICATION — EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE**
+**#12 SUPREME THIRD PARTY PRODUCTION v1 — PASS — PRODUCT LEADERSHIP ACCEPTED FOR PRIVATE-TESTING RELEASE-CANDIDATE SCOPE**
 
-Cursor does not declare `#12` PASS.
-
-The prior exact blocker — staging Evidence MinIO had no persistent disk — is closed. See `blocker-closure.md`.
+See `final-acceptance.md`. The prior exact blocker — staging Evidence MinIO had no persistent disk — is closed. See `blocker-closure.md`. Historical FAIL/remediation/retest records are preserved.
 
 ## Lineage
 

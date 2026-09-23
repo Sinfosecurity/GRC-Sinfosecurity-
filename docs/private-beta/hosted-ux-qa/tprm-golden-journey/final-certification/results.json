@@ -2,8 +2,8 @@
   "item": "#12",
   "gate": "consolidated-golden-journey-certification",
   "notWave9": true,
-  "declaredPass": false,
-  "twelvePass": false,
+  "declaredPass": true,
+  "twelvePass": true,
   "productionTouched": false,
   "mainMerged": false,
   "certificationSha": "ace61c75c8b82623a46bc0d31525a75d00efafc6",
@@ -1350,5 +1350,14 @@
     }
   },
   "ciExact": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631",
-  "blockerClosureNote": "Persistence closed. Exact blocker-closure SHA/CI recorded after this commit."
+  "blockerClosureNote": "Persistence closed. Exact blocker-closure SHA/CI recorded after this commit.",
+  "productLeadershipAcceptance": {
+    "date": "2026-09-22",
+    "status": "PASS",
+    "scope": "PRIVATE-TESTING RELEASE CANDIDATE",
+    "commercialProduction": "NO-GO",
+    "acceptedEvidenceSha": "0e00e6bf12d616d75831e4e3c83295e34a87955f",
+    "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35797485969",
+    "record": "docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/final-acceptance.md"
+  }
 }

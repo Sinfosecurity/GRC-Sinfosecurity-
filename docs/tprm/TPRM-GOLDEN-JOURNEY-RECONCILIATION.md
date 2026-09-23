@@ -870,8 +870,8 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Hosted frontend SHA:** `da9f7de77239f0a354508fe757b1f2291637f20f`  
 **Hosted API:** `ace61c75c8b82623a46bc0d31525a75d00efafc6`  
 **Lineage:** Wave 8 accepted implementation `037b8e98dac360e12084bb0de8b66ee666036feb` + accepted pentest remediation `da9f7de` + environment-honesty amendment `ace61c7` + Evidence durability blocker closure.  
-**CI:** honesty amendment https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631 PASS on `ace61c7`. Blocker-closure SHA CI is recorded after that commit.  
-**Result:** EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. `#12` is not PASS. No Wave 9.  
+**CI:** honesty amendment https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35721879631 PASS on `ace61c7`. Blocker-closure https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35797485969 PASS on `0e00e6b`.  
+**Result:** Product Leadership final acceptance 2026-09-22. `#12` PASS for PRIVATE-TESTING RELEASE CANDIDATE scope. No Wave 9. Commercial production remains NO-GO.  
 **Closed blocker:** staging Evidence MinIO (`supreme-risk-staging-minio`, `S3_ENDPOINT` host `supreme-risk-staging-minio.onrender.com`) now has persistent disk `minio-data-live` mounted at `/data` on the live API service. Fresh PDF/PNG CLEAN uploads survived object-store process restart and API restart. Local security regression is BLOCKED — LOCAL TEST INFRASTRUCTURE and is not a product fail.
 
 **Live walk:** Requester `INT-2026-0006` → assignment → information-request round-trip → Microsoft Third Party reuse → new Engagement `ENG-2026-0004` → Version 3 IRA Don’t Know → clarification → human MEDIUM tier → Engagement DD plan.  
@@ -879,4 +879,4 @@ Neither participant enters the other’s workspace. TPRM still sees requester id
 **Authenticated OIDC SSRF:** ORGANIZATION_ADMIN signup; localhost / metadata / RFC1918 rejected 400; Microsoft public issuer 200.  
 **Reused immutable Azure history:** Findings, CE, Cycle 1 residual MEDIUM 58, treatment/acceptance, contract gate, activation, monitoring, reassessment, termination, offboarding, final disposition. Microsoft 365 remained `DUE_DILIGENCE_PLANNING`.
 
-**Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`.
+**Evidence:** `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/` and `final-acceptance.md`.

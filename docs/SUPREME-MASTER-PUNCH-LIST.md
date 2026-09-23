@@ -3,7 +3,7 @@
 **Authority:** permanent controlling numbered roadmap  
 **Numbering:** frozen unless Product Leadership explicitly approves a change  
 **Production-ready claim:** NO  
-**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership accepted #12 on 2026-09-14. On 2026-09-18 Product Leadership recorded **ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED**. That is not commercial production GO, not immutable closure, and not production-deployment authorization. Commercial production remains NO-GO.
+**#12 scope:** Product Leadership authorized a **private-testing release** only. That is not commercial GO. Product Leadership accepted #12 on 2026-09-14. On 2026-09-18 Product Leadership recorded **ACCEPTED FOR CURRENT STAGE / SUBJECT TO FUTURE REVISION IF NEEDED**. On 2026-09-22 Product Leadership final-accepted #12 as **PASS** for **PRIVATE-TESTING RELEASE CANDIDATE** scope. That is not commercial production GO, not production-deployment authorization, and not live Stripe or paid assurance. Commercial production remains NO-GO.
 
 Statuses below are **program acceptance**, not conversational memory. Implementation evidence may exist while status remains PARTIAL pending review.
 
@@ -217,13 +217,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** An invited tester can complete the principal TPRM lifecycle in an isolated tenant; individual tester accounts are administratively controlled; tenant isolation, evidence security, and reports pass; tester feedback and private-beta documentation exist; hosted CI passes the exact implementation SHA; no fake production or certification claims. External pentest, SOC 2, ISO 27001, and paid production infrastructure are **not** required.
 
-**CURRENT STATUS:** ACTIVE — GOLDEN JOURNEY REVAMP. PHASE 0 COMPLETE. WAVE 1 ACCEPTED FOR CURRENT STAGE. WAVE 2 ACCEPTED FOR CURRENT STAGE. WAVE 3 ACCEPTED FOR CURRENT STAGE. WAVE 4 ACCEPTED FOR CURRENT STAGE. WAVE 5 ACCEPTED FOR CURRENT STAGE. WAVE 6 ACCEPTED FOR CURRENT STAGE. WAVE 7 ACCEPTED FOR CURRENT STAGE. WAVE 8 ACCEPTED FOR CURRENT STAGE. Security remediation ACCEPTED FOR CURRENT STAGE. All planned #12 Golden Journey functional waves are complete. No Wave 9. CONSOLIDATED GOLDEN JOURNEY CERTIFICATION — EVIDENCE RESULT PASS — READY FOR PRODUCT LEADERSHIP FINAL ACCEPTANCE. Staging Evidence MinIO now has persistent disk `minio-data-live` on the live API service and objects survived object-store restart. Not commercial GO. Not production deployment. Cursor does not declare #12 PASS.
+**CURRENT STATUS:** PASS — Product Leadership final acceptance 2026-09-22. Scope: PRIVATE-TESTING RELEASE CANDIDATE. Waves 1–8 complete. No Wave 9. Security remediation ACCEPTED FOR CURRENT STAGE. Consolidated Golden Journey certification accepted. Persistent Evidence proven. Not commercial GO. Not production deployment. Not live Stripe. Not SOC 2 / ISO 27001 / paid assurance.
 
-**CERTIFICATION SHA:** Wave 1 accepted-for-current-stage `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`. Wave 2 accepted-for-current-stage `c47020a86feeb0b5b67bc408671159e68d8f2c26`. Wave 3 accepted-for-current-stage `7132c7e09de66bb6a6917d70eb7f9f4958006190`. Wave 4 accepted-for-current-stage `1bece45cb94de832ef40b3d811977a179058f15b`. Wave 5 accepted-for-current-stage `88938c263d741365578e874599156096fe5d6276` (hosted/CI `963953570154616f3a2029e854de339711eb9ea7`, evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`). Wave 6 accepted-for-current-stage `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91` (evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`). Wave 7 accepted-for-current-stage `7afd0d5c08a64667f592831509338ab74cf9a7b3` (evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`). Wave 8 ACCEPTED FOR CURRENT STAGE `037b8e98dac360e12084bb0de8b66ee666036feb` (hosted API `6b7933ef415d32f58377012344cc68ded32ea36b`, evidence `f168b71cd7df00aaf2a64091446af3c2f81a9390`, CI 35681630112 PASS). The failed UI walk on `96765c4` is not controlling evidence. Security remediation ACCEPTED FOR CURRENT STAGE `da9f7de77239f0a354508fe757b1f2291637f20f` (security evidence `4f59f3326781d925570309f041b6971d791be40f`, acceptance/evidence record `87b6b6e996683cb3b13c19c078016df8d26c9698`, hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`, CI 35686586390 PASS). Consolidated certification evidence `8a1cc2e3974b46128319a953e2d34d5ec1a054ac`. Recert after MinIO bucket restore `ee3b5faf83a180913ebdd75e077b2911709131ad`. Environment-honesty amendment `ace61c75c8b82623a46bc0d31525a75d00efafc6` (CI 35721879631 PASS). Evidence durability blocker closure is recorded in `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/blocker-closure.md`. Cursor does not treat certification evidence as a #12 PASS acceptance SHA.
+**CERTIFICATION SHA:** Wave 1 accepted-for-current-stage `83d1f442298bf95cb0ea6c1fdde7aed2e7cea63f`. Wave 2 accepted-for-current-stage `c47020a86feeb0b5b67bc408671159e68d8f2c26`. Wave 3 accepted-for-current-stage `7132c7e09de66bb6a6917d70eb7f9f4958006190`. Wave 4 accepted-for-current-stage `1bece45cb94de832ef40b3d811977a179058f15b`. Wave 5 accepted-for-current-stage `88938c263d741365578e874599156096fe5d6276` (hosted/CI `963953570154616f3a2029e854de339711eb9ea7`, evidence `da0119b12c7ab487cb17468c02e0c216d16a504b`). Wave 6 accepted-for-current-stage `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91` (evidence `7f8127893d142d0d52221c9b7dbd21d830f07d4b`). Wave 7 accepted-for-current-stage `7afd0d5c08a64667f592831509338ab74cf9a7b3` (evidence `598bddfe18c851fbd62a4a6b2cf2c37414bc5baf`). Wave 8 ACCEPTED FOR CURRENT STAGE `037b8e98dac360e12084bb0de8b66ee666036feb` (hosted API `6b7933ef415d32f58377012344cc68ded32ea36b`, evidence `f168b71cd7df00aaf2a64091446af3c2f81a9390`, CI 35681630112 PASS). The failed UI walk on `96765c4` is not controlling evidence. Security remediation ACCEPTED FOR CURRENT STAGE `da9f7de77239f0a354508fe757b1f2291637f20f` (security evidence `4f59f3326781d925570309f041b6971d791be40f`, acceptance/evidence record `87b6b6e996683cb3b13c19c078016df8d26c9698`, hosted API `b5d006599e9a6a93b69d8a73500b9d0159f0229b`, CI 35686586390 PASS). Consolidated certification evidence `8a1cc2e3974b46128319a953e2d34d5ec1a054ac`. Recert after MinIO bucket restore `ee3b5faf83a180913ebdd75e077b2911709131ad`. Environment-honesty amendment `ace61c75c8b82623a46bc0d31525a75d00efafc6` (CI 35721879631 PASS). Evidence durability blocker closure `0e00e6bf12d616d75831e4e3c83295e34a87955f` (CI 35797485969 PASS). Product Leadership final-acceptance record `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/final-acceptance.md`.
 
-**EVIDENCE:** Consolidated certification `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`. Security remediation `docs/private-beta/hosted-ux-qa/pentest-2026-09-22/` and `docs/security/PENTEST-2026-09-22-REMEDIATION.md`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS. Wave 8 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`. Implementation `037b8e98dac360e12084bb0de8b66ee666036feb`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35681630112 PASS. Wave 7 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`. Implementation `7afd0d5c08a64667f592831509338ab74cf9a7b3`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35674087083 PASS. Wave 6 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`. Implementation `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35557647040 PASS. Wave 5 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Implementation `88938c263d741365578e874599156096fe5d6276`. Hosted/CI `963953570154616f3a2029e854de339711eb9ea7`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35517206054 PASS. Starts from accepted Wave 4 checkpoint `1bece45cb94de832ef40b3d811977a179058f15b`. Wave 4 closure `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-4-closure/`. Manual-walk remediation `docs/private-beta/hosted-ux-qa/tprm-golden-journey/manual-walk-remediation/`. Prior Wave 4 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-4/`. Wave 3 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-3/`. Wave 2 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-2/`. Wave 1 persona-isolation `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1-persona-isolation/`. Staging QA personas `docs/private-beta/hosted-ux-qa/tprm-golden-journey/manual-qa-personas/`. Architecture `docs/tprm/TPRM-GOLDEN-JOURNEY-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Provisioned QA requester/lead/analyst can log in on staging; vendor remains invitation-only.
+**EVIDENCE:** Product Leadership final acceptance `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/final-acceptance.md`. Consolidated certification `docs/private-beta/hosted-ux-qa/tprm-golden-journey/final-certification/`. Security remediation `docs/private-beta/hosted-ux-qa/pentest-2026-09-22/` and `docs/security/PENTEST-2026-09-22-REMEDIATION.md`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35686586390 PASS. Wave 8 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-8/`. Implementation `037b8e98dac360e12084bb0de8b66ee666036feb`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35681630112 PASS. Wave 7 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-7/`. Implementation `7afd0d5c08a64667f592831509338ab74cf9a7b3`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35674087083 PASS. Wave 6 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-6/`. Implementation `2d8fe29a8e5ece972e0d2020ee25c474a2ecde91`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35557647040 PASS. Wave 5 `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-5/`. Implementation `88938c263d741365578e874599156096fe5d6276`. Hosted/CI `963953570154616f3a2029e854de339711eb9ea7`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35517206054 PASS. Starts from accepted Wave 4 checkpoint `1bece45cb94de832ef40b3d811977a179058f15b`. Wave 4 closure `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-4-closure/`. Manual-walk remediation `docs/private-beta/hosted-ux-qa/tprm-golden-journey/manual-walk-remediation/`. Prior Wave 4 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-4/`. Wave 3 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-3/`. Wave 2 walk `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-2/`. Wave 1 persona-isolation `docs/private-beta/hosted-ux-qa/tprm-golden-journey/wave-1-persona-isolation/`. Staging QA personas `docs/private-beta/hosted-ux-qa/tprm-golden-journey/manual-qa-personas/`. Architecture `docs/tprm/TPRM-GOLDEN-JOURNEY-RECONCILIATION.md`. Invitation email Queued ≠ Delivered. Provisioned QA requester/lead/analyst can log in on staging; vendor remains invitation-only.
 
-**NEXT ACTION:** Product Leadership final acceptance of the consolidated Golden Journey certification. Do not begin any new roadmap item. Do not create Wave 9. Do not declare #12 PASS. Do not merge `main` or deploy commercial production. Historical program H-5 and H-6 remain OPEN and are not pentest PENTEST-H1/H2 labels. #13–#22 remain accepted at current-stage positions. #23 Insurance Phase A/B remains accepted; do not extend. #24–#38 and #40 remain unauthorized.
+**NEXT ACTION:** STOP. Return the next roadmap decision to Product Leadership. Do not start #23, #24, or any other numbered item. Do not create Wave 9. Do not merge `main` or deploy commercial production. Historical program H-5 and H-6 remain OPEN and are not pentest PENTEST-H1/H2 labels. #13–#22 remain at their accepted current-stage positions. #23 Insurance Phase A/B remains accepted; do not extend. #24–#38 and #40 remain unauthorized.
 
 ---
 
@@ -235,13 +235,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Authoritative graph model with tenant isolation, provenance, temporal relationship state, idempotent TPRM backfill, explainable query APIs, and a professional explorer. No separate graph database. Marketing preview is not done.
 
-**CURRENT STATUS:** Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel.
+**CURRENT STATUS:** Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 is PASS for private-testing release-candidate scope.
 
 **CERTIFICATION SHA:** limiter remediation `b9daaf57a309846dab025a8abd50520d3a4685ae` (hosted CI run `34751123207` PASS). Hosted frontend after mobile workspace fix `1d4bf1bb54f220fafb1db32e2e742ca4a9f9ab85`. First implementation `8ec44343fea25a027bedd048ae7097fca17a06b7` remains the rejected explorer. Program-acceptance docs commit `c1c9948e3cf8c761345082b1467b348582b3b1af`.
 
 **EVIDENCE:** Hosted ordinary session on `/governance-graph` completed with zero unexpected 429s. Screenshots and request counts: `docs/private-beta/hosted-ux-qa/graph-explorer/`. ADR `docs/ADR-GOVERNANCE-GRAPH.md`. Product Leadership accepted the remediated explorer.
 
-**NEXT ACTION:** Keep #13 accepted. Keep #12 PARTIAL. #14 is authorized. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #13 accepted. Keep #12 PASS (private-testing). Commercial production remains NO-GO. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -253,13 +253,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Control catalog and evidence objects are reusable across products without duplicate uploads as the source of truth.
 
-**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel.
+**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 is PASS for private-testing release-candidate scope.
 
 **CERTIFICATION SHA:** UX closure `ce5d01cbb01fe1e96becc03eb3baf308a280c8e9`. CI / API descendant `915ac55049bf68f335ea8ef4a08db87a513a5fce`. Architecture `a743c8a00910fac77d9046a27c2f0eb36d13abd2`. Starting SHA `c1c9948e3cf8c761345082b1467b348582b3b1af`. Hosted CI run `34763715915` PASS.
 
 **EVIDENCE:** ADR `docs/ADR-SHARED-CONTROL-EVIDENCE-LAYER.md`. Certification `docs/SHARED-CONTROL-EVIDENCE-CERTIFICATION.md`. Hosted UX-closure screenshots `docs/private-beta/hosted-ux-qa/shared-control-evidence-ux-closure/`. Do not mark PASS from code or this file alone.
 
-**NEXT ACTION:** Keep #12 PARTIAL. #16 is authorized. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 PASS (private-testing). Commercial production remains NO-GO. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -271,13 +271,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Enterprise risks, ownership, appetite, and explainable residual scores. Preview pages are not implementation.
 
-**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 remains PARTIAL / open in parallel.
+**CURRENT STATUS:** PASS — Product Leadership accepted (2026-09-13). Commercial production remains NO-GO. #12 is PASS for private-testing release-candidate scope.
 
 **CERTIFICATION SHA:** Closure `6542e58484b84591b39863a254560841a639432d`. Hosted frontend `dbc4982c8bb9cff228ad661a01f69f7998a38566` / API `6542e58`. Documentation `bde2d9e20dc50d337e3546183aab7ae4a7a1d512`.
 
 **EVIDENCE:** `docs/ADR-SUPREME-RISK.md`, `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/private-beta/hosted-ux-qa/supreme-risk/`, `docs/private-beta/hosted-ux-qa/supreme-risk-closure/`. Product Leadership accepted the hosted closure.
 
-**NEXT ACTION:** Keep #12 PARTIAL. #16 is authorized. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #12 PASS (private-testing). Commercial production remains NO-GO. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -295,7 +295,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** `docs/ADR-SUPREME-COMPLIANCE.md`, `docs/private-beta/hosted-ux-qa/supreme-compliance/`. Hosted CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/34779911121 PASS. Product Leadership accepted. Legacy `/compliance` mock is not this product; it remains at `/legacy/compliance`.
 
-**NEXT ACTION:** Keep closed unless a later gate finds a regression. #17 is authorized. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep closed unless a later gate finds a regression. #17 is authorized. Keep #12 PASS (private-testing). Commercial production remains NO-GO. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -313,7 +313,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** `docs/ADR-SUPREME-PRIVACY.md`. Hosted walkthrough in `docs/private-beta/hosted-ux-qa/supreme-privacy/`. Native PowerPoint slide renders in `docs/private-beta/hosted-ux-qa/supreme-privacy/native-slides/`. Explicit Product Leadership acceptance 2026-09-13.
 
-**NEXT ACTION:** Keep closed unless a later gate finds a regression. #18 is authorized. Keep #12 PARTIAL. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep closed unless a later gate finds a regression. #18 is authorized. Keep #12 PASS (private-testing). Commercial production remains NO-GO. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -779,7 +779,7 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **PURPOSE:** Platform-wide visual design system and premium experience transformation. Immediately obvious versus the previous Supreme generation. Not a color/radius facelift. Not H-5, H-6, or #21.
 
-**DEPENDENCIES:** C-1, C-2, H-1, H-2, H-3, H-4, H-7 CLOSED. #12-F and #12-V PASS. #12 remains PARTIAL.
+**DEPENDENCIES:** C-1, C-2, H-1, H-2, H-3, H-4, H-7 CLOSED. #12-F and #12-V PASS. #12 is PASS for private-testing release-candidate scope. Commercial production remains NO-GO.
 
 **DEFINITION OF DONE:** Product Leadership independently inspects repository, hosted application, before/after screenshots, seamless approval workflow, CI, and security regression. Cursor may report ENGINEERING COMPLETE or HOSTED UX CERTIFICATION COMPLETE. Cursor does not declare SUPREME UI 2.0 PRODUCT LEADERSHIP ACCEPTED.
 
