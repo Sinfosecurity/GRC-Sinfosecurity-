@@ -842,6 +842,7 @@ export const insuranceAPI = {
     licenses: () => api.get('/insurance/licenses'),
     createLicense: (data: unknown) => api.post('/insurance/licenses', data),
     updateLicense: (publicId: string, data: unknown) => api.patch(`/insurance/licenses/${publicId}`, data),
+    attachLicenseEvidence: (publicId: string, data: unknown) => api.post(`/insurance/licenses/${publicId}/evidence`, data),
     vendors: () => api.get('/insurance/vendors'),
     classifyVendor: (data: unknown) => api.post('/insurance/vendors', data),
     risks: () => api.get('/insurance/risks'),

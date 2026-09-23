@@ -32,6 +32,11 @@ export const insuranceOperations = {
             orderBy: { version: 'desc' },
         });
         const decisions = await prisma.insuranceApplicabilityDecision.findMany({ where: { organizationId }, orderBy: { createdAt: 'desc' } });
+        const actorIds = [...new Set(decisions.map((row) => row.actorUserId).filter((id): id is string => Boolean(id)))];
+        const actors = actorIds.length
+            ? await prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, firstName: true, lastName: true, email: true } })
+            : [];
+        const actorById = new Map(actors.map((row) => [row.id, row]));
         const recommended = recommendPacks({
             organizationType: organizationType || config?.organizationType,
             countries: countries || [config?.domicileCountryCode || '', ...asStringArray(config?.operatingJurisdictions)].map((row) => row.split('-')[0] || row),
@@ -41,12 +46,21 @@ export const insuranceOperations = {
         const packs = REGULATORY_PACKS.map((pack) => {
             const last = latestDecision(decisions, pack.key);
             const rec = recommended.find((row) => row.key === pack.key);
+            const actor = last?.actorUserId ? actorById.get(last.actorUserId) : null;
             return {
                 ...pack,
                 recommended: Boolean(rec),
+                recommendationVsDecision: last
+                    ? 'Human applicability decision. Distinct from the system recommendation.'
+                    : rec
+                        ? 'System recommendation only. Not a human applicability decision.'
+                        : 'Not recommended and no human decision recorded.',
                 whyRecommended: rec?.reason || pack.honesty,
                 applicabilityState: last?.state || (rec ? 'RECOMMENDED' : 'AVAILABLE'),
                 lastReason: last?.reason || null,
+                lastDecidedBy: actor ? [actor.firstName, actor.lastName].filter(Boolean).join(' ') || actor.email : last?.actorUserId || null,
+                lastDecidedByUserId: last?.actorUserId || null,
+                lastDecidedAt: last?.createdAt || null,
                 lastVersion: last?.packVersion || pack.version,
                 requirements: requirementsForPack(pack.key),
                 mappedControls: [...new Set(requirementsForPack(pack.key).flatMap((row) => row.controlKeys))],
@@ -132,11 +146,21 @@ export const insuranceOperations = {
             prisma.insuranceCounterparty.findMany({ where: { organizationId }, orderBy: { createdAt: 'desc' } }),
             prisma.insuranceVendorClassification.findMany({ where: { organizationId, serviceCategory: 'REINSURER' } }),
         ]);
+        const vendorIds = [...new Set(rows.map((row) => row.vendorId).filter((id): id is string => Boolean(id)))];
+        const linkedVendors = vendorIds.length
+            ? await prisma.vendor.findMany({ where: { organizationId, id: { in: vendorIds } }, select: { id: true, name: true } })
+            : [];
+        const vendorName = new Map(linkedVendors.map((row) => [row.id, row.name]));
         const byName = new Map<string, number>();
         for (const row of rows) byName.set(row.name, (byName.get(row.name) || 0) + 1);
         return {
             honesty: 'Counterparty governance metadata. Not placement, ceding, or treaty administration.',
-            counterparties: rows,
+            counterparties: rows.map((row) => ({
+                ...row,
+                vendorName: row.vendorId ? vendorName.get(row.vendorId) || null : null,
+                vendorHref: row.vendorId ? '/vendor-management' : null,
+                identity: row.vendorId ? 'Existing Third Party is authoritative when linked.' : 'Descriptive name only. No Vendor was created from this record.',
+            })),
             classifiedReinsurers: vendors,
             concentration: [...byName.entries()].map(([name, count]) => ({ name, relationshipCount: count, basis: 'Recorded relationships. Not an exposure percentage.' })),
         };
@@ -165,12 +189,18 @@ export const insuranceOperations = {
     },
 
     async createCounterparty(organizationId: string, actorUserId: string, input: Record<string, unknown>) {
+        const vendorId = input.vendorId ? String(input.vendorId).trim() : '';
+        let vendor = null;
+        if (vendorId) {
+            vendor = await prisma.vendor.findFirst({ where: { id: vendorId, organizationId } });
+            if (!vendor) throw new ApiError(404, 'Vendor not found in this organization.');
+        }
         const created = await prisma.insuranceCounterparty.create({
             data: {
                 organizationId,
                 publicId: publicId('rei'),
-                name: String(input.name || '').trim() || 'Unnamed reinsurer',
-                vendorId: input.vendorId ? String(input.vendorId) : null,
+                name: String(input.name || '').trim() || vendor?.name || 'Unnamed reinsurer',
+                vendorId: vendor ? vendor.id : null,
                 relationshipType: String(input.relationshipType || 'TREATY'),
                 entityId: input.entityId ? String(input.entityId) : null,
                 jurisdictionCode: input.jurisdictionCode ? String(input.jurisdictionCode) : null,
@@ -266,13 +296,18 @@ export const insuranceOperations = {
             insuranceService.aiContexts(organizationId),
             insuranceService.vendorClasses(organizationId),
         ]);
+        const vendorIds = vendors.map((row) => row.vendorId);
+        const vendorNames = vendorIds.length
+            ? await prisma.vendor.findMany({ where: { organizationId, id: { in: vendorIds } }, select: { id: true, name: true } })
+            : [];
+        const nameById = new Map(vendorNames.map((row) => [row.id, row.name]));
         return {
-            honesty: 'Live tenant records only. No fabricated compliance percentage.',
+            honesty: 'Live tenant records only. No fabricated compliance percentage. Counts are recorded-relationship counts, not exposure or compliance scores.',
             reports: [
                 { key: 'executive', title: 'Insurance Executive Risk Overview', data: overview },
-                { key: 'third-parties', title: 'Insurance Third-Party Oversight', data: vendors },
+                { key: 'third-parties', title: 'Insurance Third-Party Oversight', data: vendors.map((row) => ({ ...row, vendorName: nameById.get(row.vendorId) || null, href: '/vendor-management' })) },
                 { key: 'licenses', title: 'License & Authorization Register', data: licenses },
-                { key: 'regulatory', title: 'Regulatory Readiness', data: { packs: regulatory.packs.map((pack) => ({ key: pack.key, state: pack.applicabilityState, controls: pack.mappedControls, source: pack.sourceUrl })) } },
+                { key: 'regulatory', title: 'Regulatory Readiness', data: { packs: regulatory.packs.map((pack) => ({ key: pack.key, label: pack.label, state: pack.applicabilityState, decidedBy: pack.lastDecidedBy, decidedAt: pack.lastDecidedAt, reason: pack.lastReason, recommendationVsDecision: pack.recommendationVsDecision, controls: pack.mappedControls, source: pack.sourceUrl })) } },
                 { key: 'models', title: 'Insurance AI / Model Inventory', data: models },
                 { key: 'concentration', title: 'Critical Service / Concentration', data: concentration },
             ],

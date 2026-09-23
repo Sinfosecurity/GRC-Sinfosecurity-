@@ -59,7 +59,8 @@ function sourceHref(model: string, id: string, publicId?: string | null) {
     if (model === 'VendorAssessment') return '/assessments';
     if (model === 'Vendor') return '/vendor-management';
     if (model === 'PrivacyRightsRequest') return '/privacy-ops/rights';
-    if (model === 'AiApproval' || model === 'AiSystem') return '/ai-governance';
+    if (model === 'AiApproval' || model === 'AiSystem' || model === 'InsuranceAiContext') return '/ai-governance';
+    if (model === 'InsuranceLicense') return '/insurance/licenses';
     if (model === 'ComplianceGap') return '/compliance/gaps';
     return '/automation';
 }
@@ -191,6 +192,35 @@ async function loadFacts(input: { organizationId: string; sourceModel: string; s
             sourceHref: sourceHref('AiSystem', row.id, row.publicId),
             sourcePublicId: row.publicId,
             title: row.name,
+        };
+    }
+    if (input.sourceModel === 'InsuranceLicense') {
+        const row = await prisma.insuranceLicense.findFirst({ where: { id: input.sourceId, organizationId: input.organizationId } });
+        if (!row) return {};
+        return {
+            'owner.exists': Boolean(row.ownerUserId),
+            'due.exceeded': Boolean((row.expiryDate && row.expiryDate.getTime() <= now.getTime()) || (row.reviewDueAt && row.reviewDueAt.getTime() <= now.getTime())),
+            ownerUserId: row.ownerUserId,
+            ownerLabel: 'License record owner',
+            sourceHref: sourceHref('InsuranceLicense', row.id, row.publicId),
+            sourcePublicId: row.publicId,
+            title: 'Recorded license expiry/review date is approaching — review required.',
+        };
+    }
+    if (input.sourceModel === 'InsuranceAiContext') {
+        const row = await prisma.insuranceAiContext.findFirst({
+            where: { id: input.sourceId, organizationId: input.organizationId },
+        });
+        if (!row) return {};
+        const system = await prisma.aiSystem.findFirst({ where: { id: row.aiSystemId, organizationId: input.organizationId } });
+        return {
+            'owner.exists': Boolean(system?.businessOwner || system?.riskOwner || system?.technicalOwner || row.nextReviewAt),
+            'due.exceeded': Boolean(row.nextReviewAt && row.nextReviewAt.getTime() <= now.getTime()),
+            ownerUserId: null,
+            ownerLabel: system?.riskOwner || system?.businessOwner || 'Insurance model reviewer',
+            sourceHref: sourceHref('InsuranceAiContext', row.id, system?.publicId),
+            sourcePublicId: system?.publicId || row.aiSystemId,
+            title: system?.name || 'Insurance AI / model context review is due.',
         };
     }
     if (input.sourceModel === 'AiApproval') {
@@ -1095,6 +1125,28 @@ export const supremeAutomationService = {
             });
             for (const row of aiApprovals) {
                 emitted.push(await this.handleEvent({ organizationId: org.id, event: 'ai.approval.due', sourceModel: 'AiApproval', sourceId: row.id }));
+            }
+            const licenseHorizon = new Date(now.getTime() + 90 * 86400000);
+            const licenses = await prisma.insuranceLicense.findMany({
+                where: {
+                    organizationId: org.id,
+                    OR: [
+                        { expiryDate: { lte: licenseHorizon } },
+                        { reviewDueAt: { lte: licenseHorizon } },
+                    ],
+                },
+                take: 100,
+            });
+            for (const row of licenses) {
+                emitted.push(await this.handleEvent({ organizationId: org.id, event: 'scheduled.review', sourceModel: 'InsuranceLicense', sourceId: row.id, sourcePublicId: row.publicId }));
+            }
+            const insuranceAiHorizon = new Date(now.getTime() + 14 * 86400000);
+            const insuranceModels = await prisma.insuranceAiContext.findMany({
+                where: { organizationId: org.id, nextReviewAt: { lte: insuranceAiHorizon } },
+                take: 100,
+            });
+            for (const row of insuranceModels) {
+                emitted.push(await this.handleEvent({ organizationId: org.id, event: 'ai.approval.due', sourceModel: 'InsuranceAiContext', sourceId: row.id }));
             }
             await prisma.automationDefinition.updateMany({
                 where: { organizationId: org.id, status: 'ACTIVE' },

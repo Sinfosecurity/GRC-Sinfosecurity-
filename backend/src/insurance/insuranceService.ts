@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { EditionConfigStatus, EnterpriseRiskCategory, IndustryEditionKey, Prisma } from '@prisma/client';
+import { EditionConfigStatus, EnterpriseRiskCategory, IndustryEditionKey, Prisma, ScanStatus } from '@prisma/client';
 import { prisma } from '../config/database';
 import { ApiError } from '../middleware/errorHandler';
 import { recordAudit } from '../services/auditEventService';
@@ -19,6 +19,23 @@ function publicId(prefix: string) {
 
 function snapshotOf(input: Record<string, unknown>) {
     return JSON.parse(JSON.stringify(input)) as Prisma.InputJsonValue;
+}
+
+function presentEvidence(object: { id: string; filename: string; scanStatus: ScanStatus; uploadedAt: Date; uploadedBy: string; classification: string; ownerType: string } | null) {
+    if (!object) return null;
+    return {
+        id: object.id,
+        filename: object.filename,
+        category: 'insurance-license',
+        scanStatus: object.scanStatus,
+        uploadedAt: object.uploadedAt,
+        owner: object.uploadedBy,
+        source: object.ownerType,
+        usable: object.scanStatus === ScanStatus.CLEAN,
+        honesty: object.scanStatus === ScanStatus.CLEAN
+            ? 'CLEAN shared evidence. Same StoredObject bytes; not a second Insurance file store.'
+            : 'Non-CLEAN evidence is not usable for this license record.',
+    };
 }
 
 async function audit(organizationId: string, actorUserId: string | undefined, action: string, resourceType: string, resourceId?: string, metadata?: Record<string, unknown>) {
@@ -375,7 +392,13 @@ export const insuranceService = {
     },
 
     async licenses(organizationId: string) {
-        return prisma.insuranceLicense.findMany({ where: { organizationId }, include: { entity: true }, orderBy: { createdAt: 'desc' } });
+        const rows = await prisma.insuranceLicense.findMany({ where: { organizationId }, include: { entity: true }, orderBy: { createdAt: 'desc' } });
+        const evidenceIds = rows.map((row) => row.evidenceObjectId).filter((id): id is string => Boolean(id));
+        const objects = evidenceIds.length
+            ? await prisma.storedObject.findMany({ where: { organizationId, id: { in: evidenceIds }, deletedAt: null } })
+            : [];
+        const byId = new Map(objects.map((row) => [row.id, row]));
+        return rows.map((row) => ({ ...row, evidence: presentEvidence(row.evidenceObjectId ? byId.get(row.evidenceObjectId) || null : null) }));
     },
 
     async createLicense(organizationId: string, actorUserId: string, input: Record<string, unknown>) {
@@ -446,6 +469,33 @@ export const insuranceService = {
         });
         await audit(organizationId, actorUserId, 'insurance.license.updated', 'InsuranceLicense', updated.id, { publicId: updated.publicId });
         return updated;
+    },
+
+    async attachLicenseEvidence(organizationId: string, actorUserId: string, publicIdValue: string, input: Record<string, unknown>) {
+        const existing = await prisma.insuranceLicense.findFirst({ where: { organizationId, publicId: publicIdValue } });
+        if (!existing) throw new ApiError(404, 'License not found.');
+        const evidenceObjectId = String(input.evidenceObjectId || '').trim();
+        if (!evidenceObjectId) throw new ApiError(400, 'Choose an existing Shared Evidence object.');
+        const stored = await prisma.storedObject.findFirst({ where: { id: evidenceObjectId, organizationId, deletedAt: null } });
+        if (!stored) throw new ApiError(404, 'Evidence not found.');
+        if (stored.scanStatus !== ScanStatus.CLEAN) {
+            throw new ApiError(403, 'Only files with a CLEAN malware scan can be used as license evidence.');
+        }
+        if (existing.evidenceObjectId === stored.id) {
+            return { ...existing, evidence: presentEvidence(stored), replaced: false };
+        }
+        const updated = await prisma.insuranceLicense.update({
+            where: { id: existing.id },
+            data: { evidenceObjectId: stored.id, verificationBasis: existing.verificationBasis === 'CUSTOMER_RECORDED' ? 'DOCUMENT_VERIFIED' : existing.verificationBasis },
+        });
+        await audit(organizationId, actorUserId, 'insurance.license.evidence.attached', 'InsuranceLicense', updated.id, {
+            publicId: updated.publicId,
+            evidenceObjectId: stored.id,
+            previousEvidenceObjectId: existing.evidenceObjectId,
+            action: existing.evidenceObjectId ? 'replaced' : 'attached',
+            filename: stored.filename,
+        });
+        return { ...updated, evidence: presentEvidence(stored), replaced: Boolean(existing.evidenceObjectId) };
     },
 
     async classifyVendor(organizationId: string, actorUserId: string, input: Record<string, unknown>) {

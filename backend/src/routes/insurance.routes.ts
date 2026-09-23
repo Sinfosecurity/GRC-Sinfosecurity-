@@ -61,6 +61,11 @@ router.patch('/licenses/:publicId', requirePermission(PERMISSIONS['insurance.man
     catch (error) { next(error); }
 });
 
+router.post('/licenses/:publicId/evidence', requirePermission(PERMISSIONS['insurance.manage']), async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try { res.status(201).json({ success: true, data: await insuranceService.attachLicenseEvidence(actor(req).organizationId, actor(req).userId, req.params.publicId, req.body || {}) }); }
+    catch (error) { next(error); }
+});
+
 router.get('/vendors', requirePermission(PERMISSIONS['insurance.read']), async (req: AuthRequest, res: Response, next: NextFunction) => {
     try { res.json({ success: true, data: await insuranceService.vendorClasses(actor(req).organizationId) }); }
     catch (error) { next(error); }

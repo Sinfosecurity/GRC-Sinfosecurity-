@@ -9,7 +9,8 @@ import WorkspaceFrame from '../components/design/WorkspaceFrame';
 import WorkflowStepper from '../components/design/WorkflowStepper';
 import AppTable from '../components/design/AppTable';
 import AttentionStrip from '../components/design/AttentionStrip';
-import { aiGovernanceAPI, insuranceAPI, vendorAPI } from '../services/api';
+import StatusBadge from '../components/design/StatusBadge';
+import { aiGovernanceAPI, insuranceAPI, sccAPI, tprmAPI, vendorAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { canSeeNav } from '../security/navAccess';
 
@@ -46,6 +47,130 @@ function toggle(list: string[], key: string) {
 function metricLabel(row?: { value: number | null; basis?: string }) {
     if (!row || row.value === null || row.basis === 'NOT_CONFIGURED' || row.basis === 'NOT_CALCULATED') return 'Not calculated';
     return String(row.value);
+}
+
+function formatWhen(value?: string | Date | null) {
+    if (!value) return '—';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString();
+}
+
+function ReportSection({ report, navigate }: { report: any; navigate: (path: string) => void }) {
+    const data = report?.data;
+    if (report?.key === 'executive') {
+        const metrics = data?.metrics || {};
+        const items = Object.entries(metrics).map(([key, row]: [string, any]) => ({
+            label: key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()),
+            value: `${metricLabel(row)}${row?.basis ? ` · ${row.basis}` : ''}`,
+        }));
+        return (
+            <Stack spacing={1.5}>
+                <FactList columns={2} items={items.length ? items : [{ label: 'Records', value: 'No live Insurance metrics yet. Activate and record tenant data.' }]} />
+                <AppTable
+                    rowKey={(row: any) => `${row.type}-${row.publicId || row.why}`}
+                    columns={[
+                        { id: 'type', label: 'Attention', render: (row: any) => row.type },
+                        { id: 'why', label: 'Why', render: (row: any) => row.why },
+                    ]}
+                    rows={data?.attention || []}
+                    emptyTitle="No attention items"
+                    emptyBody="Attention comes from recorded license and model dates. Unknown is not zero."
+                />
+            </Stack>
+        );
+    }
+    if (report?.key === 'third-parties') {
+        const rows = Array.isArray(data) ? data : [];
+        return (
+            <AppTable
+                rowKey={(row: any) => `${row.vendorId}-${row.serviceCategory}`}
+                columns={[
+                    { id: 'vendorName', label: 'Third Party', render: (row: any) => row.vendorName || row.vendorId },
+                    { id: 'serviceCategory', label: 'Classification', render: (row: any) => String(row.serviceCategory || '').replace(/_/g, ' ') },
+                    { id: 'criticality', label: 'Criticality', render: (row: any) => row.criticality || '—' },
+                    { id: 'open', label: 'Record', render: () => <Button size="small" onClick={() => navigate('/vendor-management')}>Open Third Party</Button> },
+                ]}
+                rows={rows}
+                emptyTitle="No classified insurance vendors"
+                emptyBody="Classify an existing Third Party. Counts are recorded relationships, not concentration percentages."
+            />
+        );
+    }
+    if (report?.key === 'licenses') {
+        const rows = Array.isArray(data) ? data : [];
+        return (
+            <AppTable
+                rowKey={(row: any) => row.publicId || row.id}
+                columns={[
+                    { id: 'entity', label: 'Entity', render: (row: any) => row.entity?.name || '—' },
+                    { id: 'licenseType', label: 'Type', render: (row: any) => row.licenseType },
+                    { id: 'status', label: 'Status', render: (row: any) => row.status },
+                    { id: 'attention', label: 'Attention', render: (row: any) => row.attention || 'current' },
+                    { id: 'message', label: 'Honesty', render: (row: any) => row.message || row.verificationHonesty || 'Recorded metadata.' },
+                ]}
+                rows={rows}
+                emptyTitle="No license records"
+                emptyBody="The register is empty until license metadata is recorded. Expired metadata is not a finding of illegal operation."
+            />
+        );
+    }
+    if (report?.key === 'regulatory') {
+        const rows = data?.packs || [];
+        return (
+            <AppTable
+                rowKey={(row: any) => row.key}
+                columns={[
+                    { id: 'label', label: 'Pack', render: (row: any) => row.label || row.key },
+                    { id: 'state', label: 'State', render: (row: any) => String(row.state || '').replace(/_/g, ' ') },
+                    { id: 'decidedBy', label: 'Decided by', render: (row: any) => row.decidedBy || '—' },
+                    { id: 'decidedAt', label: 'Decided at', render: (row: any) => formatWhen(row.decidedAt) },
+                    { id: 'reason', label: 'Reason', render: (row: any) => row.reason || '—' },
+                    { id: 'open', label: 'Source', render: () => <Button size="small" onClick={() => navigate('/insurance/regulatory')}>Open pack</Button> },
+                ]}
+                rows={rows}
+                emptyTitle="No regulatory packs"
+                emptyBody="Recommended is not applicable. No compliance percentage is calculated."
+            />
+        );
+    }
+    if (report?.key === 'models') {
+        const rows = Array.isArray(data) ? data : [];
+        return (
+            <AppTable
+                rowKey={(row: any) => row.id || row.aiSystemId}
+                columns={[
+                    { id: 'insuranceUseCase', label: 'Use case', render: (row: any) => row.insuranceUseCase || '—' },
+                    { id: 'nextReviewAt', label: 'Next review', render: (row: any) => formatWhen(row.nextReviewAt) },
+                    { id: 'humanOversight', label: 'Human oversight', render: (row: any) => row.humanOversight || '—' },
+                    { id: 'open', label: 'Record', render: () => <Button size="small" onClick={() => navigate('/ai-governance/systems')}>Open AI system</Button> },
+                ]}
+                rows={rows}
+                emptyTitle="No insurance AI context"
+                emptyBody="Attach context to an existing AI system. This is not a second inventory."
+            />
+        );
+    }
+    if (report?.key === 'concentration') {
+        return (
+            <Stack spacing={1.5}>
+                <FactList columns={2} items={[
+                    { label: 'Recorded reinsurer relationships', value: String(data?.reinsurers ?? 0) },
+                    { label: 'Models influencing UW or claims', value: String(data?.modelsInfluencingUwOrClaims ?? 0) },
+                ]} />
+                <AppTable
+                    rowKey={(row: any) => row.category}
+                    columns={[
+                        { id: 'category', label: 'Recorded classification', render: (row: any) => String(row.category || '').replace(/_/g, ' ') },
+                        { id: 'count', label: 'Count', render: (row: any) => `${row.count} recorded` },
+                    ]}
+                    rows={data?.vendorCategories || []}
+                    emptyTitle="No recorded concentration counts"
+                    emptyBody="These are counts of recorded relationships. Not invented exposure percentages."
+                />
+            </Stack>
+        );
+    }
+    return <Typography variant="body2">No live report body for this key.</Typography>;
 }
 
 function ChipPicker({ items, selected, onToggle }: { items: Array<{ key: string; label: string }>; selected: string[]; onToggle: (key: string) => void }) {
@@ -108,13 +233,15 @@ export default function InsuranceHome() {
     const [aiForm, setAiForm] = useState({ aiSystemId: '', entityId: '', insuranceUseCase: 'CLAIMS', lineOfBusiness: 'MOTOR', jurisdictionCode: 'NG', underwritingInfluence: false, pricingInfluence: false, claimsInfluence: true, fraudInfluence: false, consumerImpact: false, externalData: false, thirdPartyProvider: '', validationStatus: '', biasReviewStatus: '', explainability: '', humanOversight: 'Required', nextReviewAt: '' });
     const [applicabilityForm, setApplicabilityForm] = useState({ packKey: '', state: 'APPLICABLE', reason: '' });
     const [authorityForm, setAuthorityForm] = useState({ kind: 'CLAIMS', delegateName: '', scope: '', limits: '' });
-    const [counterpartyForm, setCounterpartyForm] = useState({ name: '', relationshipType: 'TREATY', jurisdictionCode: 'NG', criticality: 'MATERIAL' });
+    const [counterpartyForm, setCounterpartyForm] = useState({ name: '', vendorId: '', relationshipType: 'TREATY', jurisdictionCode: 'NG', criticality: 'MATERIAL' });
+    const [reusableEvidence, setReusableEvidence] = useState<any[]>([]);
+    const [evidenceForm, setEvidenceForm] = useState({ licensePublicId: '', evidenceObjectId: '' });
 
     const load = async () => {
         setLoading(true);
         setError(null);
         try {
-            const [over, cat, ents, lics, risk, links, classified, regs, clm, uw, rei, watch, sig, reps, models, conc, vendorList, systems] = await Promise.all([
+            const [over, cat, ents, lics, risk, links, classified, regs, clm, uw, rei, watch, sig, reps, models, conc, vendorList, systems, reusable] = await Promise.all([
                 insuranceAPI.overview(),
                 insuranceAPI.catalog(),
                 insuranceAPI.entities().catch(() => ({ data: { data: [] } })),
@@ -133,6 +260,7 @@ export default function InsuranceHome() {
                 insuranceAPI.concentration().catch(() => ({ data: { data: null } })),
                 vendorAPI.getAll().catch(() => ({ data: { vendors: [] } })),
                 aiGovernanceAPI.systems().catch(() => ({ data: { data: [] } })),
+                sccAPI.evidence().catch(() => ({ data: { data: [] } })),
             ]);
             setOverview(over.data.data);
             setCatalog(cat.data.data);
@@ -152,6 +280,7 @@ export default function InsuranceHome() {
             setConcentration(conc.data.data);
             setExistingVendors(vendorList.data.vendors || vendorList.data.data || []);
             setAiSystems(systems.data.data || []);
+            setReusableEvidence(reusable.data.data || []);
         } catch (err: any) {
             setError(err.message || 'Unable to load Insurance Edition');
         } finally {
@@ -259,8 +388,44 @@ export default function InsuranceHome() {
 
     const addCounterparty = async (event: FormEvent) => {
         event.preventDefault();
-        await insuranceAPI.createCounterparty(counterpartyForm);
-        setMessage('Reinsurance relationship recorded. Not placement or treaty administration.');
+        await insuranceAPI.createCounterparty({
+            ...counterpartyForm,
+            vendorId: counterpartyForm.vendorId || undefined,
+            name: counterpartyForm.name || existingVendors.find((row: any) => row.id === counterpartyForm.vendorId)?.name || '',
+        });
+        setMessage('Reinsurance relationship recorded. Not placement or treaty administration. No duplicate Vendor was created.');
+        await load();
+    };
+
+    const attachLicenseEvidence = async (event: FormEvent) => {
+        event.preventDefault();
+        if (!evidenceForm.licensePublicId || !evidenceForm.evidenceObjectId) return;
+        await insuranceAPI.attachLicenseEvidence(evidenceForm.licensePublicId, { evidenceObjectId: evidenceForm.evidenceObjectId });
+        setMessage('Shared Evidence attached to the license record. Bytes were not duplicated.');
+        await load();
+    };
+
+    const uploadLicenseEvidence = async (file: File) => {
+        if (!evidenceForm.licensePublicId) {
+            setError('Select a license before uploading evidence.');
+            return;
+        }
+        const form = new FormData();
+        form.append('file', file);
+        form.append('ownerType', 'organization');
+        const uploaded = await tprmAPI.uploadEvidence(form);
+        const storedId = uploaded.data.data?.id || uploaded.data.data?.storedObjectId;
+        if (!storedId) {
+            setError('Upload did not return a StoredObject id.');
+            return;
+        }
+        if ((uploaded.data.data?.scanStatus || '').toUpperCase() !== 'CLEAN') {
+            setMessage('File uploaded. It is not usable on the license until the malware scan is CLEAN.');
+            await load();
+            return;
+        }
+        await insuranceAPI.attachLicenseEvidence(evidenceForm.licensePublicId, { evidenceObjectId: storedId });
+        setMessage('Uploaded Shared Evidence attached to the license. Same StoredObject; no Insurance file store.');
         await load();
     };
 
@@ -511,11 +676,64 @@ export default function InsuranceHome() {
                                     { id: 'jurisdictionCode', label: 'Jurisdiction', render: (row: any) => row.jurisdictionCode },
                                     { id: 'attention', label: 'Attention', render: (row: any) => (licenseWatch.find((item) => item.publicId === row.publicId)?.attention || 'current').replace(/-/g, ' ') },
                                     { id: 'verification', label: 'Verification', render: (row: any) => (row.verificationBasis || 'CUSTOMER_RECORDED').replace(/_/g, ' ') },
+                                    { id: 'evidence', label: 'Evidence', render: (row: any) => row.evidence
+                                        ? `${row.evidence.filename} · ${row.evidence.scanStatus}${row.evidence.usable ? '' : ' · not usable'}`
+                                        : 'None linked' },
                                 ]}
                                 rows={licenses}
                                 emptyTitle="No license records"
                                 emptyBody="Country packs define license categories. Do not invent licenses."
                             />
+                            {licenses.some((row) => row.evidence) && (
+                                <Stack spacing={1}>
+                                    {licenses.filter((row) => row.evidence).map((row) => (
+                                        <Surface key={`ev-${row.publicId}`}>
+                                            <Typography fontWeight={700}>{row.entity?.name || row.publicId} evidence</Typography>
+                                            <FactList columns={2} items={[
+                                                { label: 'Filename', value: row.evidence.filename },
+                                                { label: 'Category', value: row.evidence.category || 'insurance-license' },
+                                                { label: 'Malware status', value: row.evidence.scanStatus },
+                                                { label: 'Recorded', value: formatWhen(row.evidence.uploadedAt) },
+                                                { label: 'Source / owner', value: row.evidence.owner || row.evidence.source || '—' },
+                                            ]} />
+                                            <StatusBadge kind="plain" tone={row.evidence.usable ? 'success' : 'high'} label={row.evidence.scanStatus} />
+                                            <Button sx={{ mt: 1 }} onClick={() => navigate(`/documents?storedObjectId=${row.evidence.id}`)}>Open Shared Evidence</Button>
+                                        </Surface>
+                                    ))}
+                                </Stack>
+                            )}
+                            {canManageRecords && licenses.length > 0 && (
+                                <Surface>
+                                    <Typography fontWeight={700} sx={{ mb: 1 }}>Attach Shared Evidence</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1.5 }}>Reuse an existing CLEAN StoredObject or upload a new file. This does not create Insurance storage.</Typography>
+                                    <Box component="form" onSubmit={attachLicenseEvidence}>
+                                        <Stack spacing={1.5}>
+                                            <TextField select label="License" value={evidenceForm.licensePublicId} onChange={(e) => setEvidenceForm({ ...evidenceForm, licensePublicId: e.target.value })} required>
+                                                {licenses.map((row) => <MenuItem key={row.publicId} value={row.publicId}>{row.entity?.name || row.publicId} · {row.licenseType}</MenuItem>)}
+                                            </TextField>
+                                            <TextField select label="Reuse existing evidence" value={evidenceForm.evidenceObjectId} onChange={(e) => setEvidenceForm({ ...evidenceForm, evidenceObjectId: e.target.value })}>
+                                                <MenuItem value="">Select CLEAN file</MenuItem>
+                                                {reusableEvidence.map((row: any) => (
+                                                    <MenuItem key={row.id} value={row.id} disabled={row.usable === false && row.scanStatus !== 'CLEAN'}>
+                                                        {row.filename} · {row.scanStatus}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+                                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                                                <Button type="submit" variant="contained">Attach existing evidence</Button>
+                                                <Button component="label" variant="outlined">
+                                                    Upload new evidence
+                                                    <input hidden type="file" onChange={(event) => {
+                                                        const file = event.target.files?.[0];
+                                                        if (file) uploadLicenseEvidence(file);
+                                                        event.target.value = '';
+                                                    }} />
+                                                </Button>
+                                            </Stack>
+                                        </Stack>
+                                    </Box>
+                                </Surface>
+                            )}
                         </Stack>
                     )}
 
@@ -647,7 +865,11 @@ export default function InsuranceHome() {
                                 <Surface>
                                     <Box component="form" onSubmit={addCounterparty}>
                                         <Stack spacing={1.5}>
-                                            <TextField label="Reinsurer / counterparty" value={counterpartyForm.name} onChange={(e) => setCounterpartyForm({ ...counterpartyForm, name: e.target.value })} required />
+                                            <TextField select label="Existing Third Party" value={counterpartyForm.vendorId} onChange={(e) => setCounterpartyForm({ ...counterpartyForm, vendorId: e.target.value, name: existingVendors.find((row: any) => row.id === e.target.value)?.name || counterpartyForm.name })} helperText="Optional. Link an existing Vendor. Free text does not create a Vendor.">
+                                                <MenuItem value="">Not yet onboarded</MenuItem>
+                                                {existingVendors.map((row: any) => <MenuItem key={row.id} value={row.id}>{row.name}</MenuItem>)}
+                                            </TextField>
+                                            <TextField label="Reinsurer / counterparty name" value={counterpartyForm.name} onChange={(e) => setCounterpartyForm({ ...counterpartyForm, name: e.target.value })} helperText="Descriptive name. Vendor identity is authoritative when linked." />
                                             <TextField select label="Relationship type" value={counterpartyForm.relationshipType} onChange={(e) => setCounterpartyForm({ ...counterpartyForm, relationshipType: e.target.value })}>
                                                 {['TREATY', 'FACULTATIVE', 'RETRO', 'OTHER'].map((kind) => <MenuItem key={kind} value={kind}>{kind}</MenuItem>)}
                                             </TextField>
@@ -663,9 +885,11 @@ export default function InsuranceHome() {
                                 rowKey={(row: any) => row.publicId}
                                 columns={[
                                     { id: 'name', label: 'Counterparty', render: (row: any) => row.name },
+                                    { id: 'vendor', label: 'Third Party', render: (row: any) => row.vendorName || (row.vendorId ? 'Linked vendor' : 'Not linked') },
                                     { id: 'relationshipType', label: 'Type', render: (row: any) => row.relationshipType },
                                     { id: 'jurisdictionCode', label: 'Jurisdiction', render: (row: any) => row.jurisdictionCode || '—' },
                                     { id: 'criticality', label: 'Criticality', render: (row: any) => row.criticality || '—' },
+                                    { id: 'open', label: 'Record', render: (row: any) => row.vendorId ? <Button size="small" onClick={() => navigate('/vendor-management')}>Open Third Party</Button> : '—' },
                                 ]}
                                 rows={reinsurance?.counterparties || []}
                                 emptyTitle="No reinsurance relationships"
@@ -785,7 +1009,11 @@ export default function InsuranceHome() {
                                         { label: 'Regulator', value: pack.regulator },
                                         { label: 'Version', value: pack.version },
                                         { label: 'Effective', value: pack.effectiveDate || '—' },
-                                        { label: 'Applicability', value: String(pack.applicabilityState || 'AVAILABLE').replace(/_/g, ' ') },
+                                        { label: 'State', value: String(pack.applicabilityState || 'AVAILABLE').replace(/_/g, ' ') },
+                                        { label: 'Decided by', value: pack.lastDecidedBy || 'No human decision yet' },
+                                        { label: 'Decided at', value: formatWhen(pack.lastDecidedAt) },
+                                        { label: 'Reason', value: pack.lastReason || '—' },
+                                        { label: 'Recommendation vs decision', value: pack.recommendationVsDecision || (pack.recommended ? 'System recommendation only. Not a human applicability decision.' : 'Not recommended.') },
                                         { label: 'Why recommended', value: pack.whyRecommended || pack.honesty },
                                         { label: 'Mapped controls', value: (pack.mappedControls || []).join(', ') || '—' },
                                         { label: 'Evidence categories', value: (pack.evidenceCategories || []).join(', ') || '—' },
@@ -802,10 +1030,17 @@ export default function InsuranceHome() {
                     {TABS[tab]?.path === '/insurance/reports' && (
                         <Stack spacing={2} sx={{ minWidth: 0 }}>
                             <Alert severity="info">{reports?.honesty || 'Live tenant records only. No fabricated compliance percentage.'}</Alert>
+                            {(reports?.reports || []).length === 0 && (
+                                <Surface>
+                                    <Typography fontWeight={700}>No Insurance reports yet</Typography>
+                                    <Typography variant="body2">Reports render live tenant records after Insurance Edition is activated. Empty is not 0%.</Typography>
+                                </Surface>
+                            )}
                             {(reports?.reports || []).map((report: any) => (
                                 <Surface key={report.key}>
                                     <Typography fontWeight={700}>{report.title}</Typography>
-                                    <Typography variant="body2">Built from recorded tenant data. Not a certification score.</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1.5 }}>Built from recorded tenant data. Not a certification score. Unknown is not zero.</Typography>
+                                    <ReportSection report={report} navigate={navigate} />
                                 </Surface>
                             ))}
                         </Stack>
