@@ -1,0 +1,74 @@
+{
+  "item": "#23 Insurance Edition",
+  "instruction": "PHASE B ACCEPTANCE + COMPLETION / RECONCILIATION AUDIT",
+  "notPunchListItem": true,
+  "phaseCCreated": false,
+  "item24Started": false,
+  "item27Started": false,
+  "item30Started": false,
+  "item39DeclaredComplete": false,
+  "twelveRemainsPass": true,
+  "twentyThreePass": false,
+  "phaseBAcceptedForCurrentStage": true,
+  "commercialProduction": "NO-GO",
+  "mainMerged": false,
+  "productionTouched": false,
+  "runtimeCodeChanged": false,
+  "controllingImplementationSha": "f87038fa160e935ae6b6f890a3124dd383c0b1ec",
+  "controllingCi": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35405219418",
+  "controllingCiResult": "SUCCESS",
+  "phaseA": {
+    "walk": "48 PASS / 0 FAIL",
+    "evidence": "docs/private-beta/hosted-ux-qa/insurance-edition/",
+    "implementationSha": "c096ecbb9f614e37e7d28ffd9d5fde7c89d065f2",
+    "hostedFrontendSha": "6a8b0e1514172796e1f4aa9308262b2343274244"
+  },
+  "phaseB": {
+    "officialWalk": "38 PASS / 0 FAIL",
+    "supplemental": "99 PASS / 0 FAIL / 1 SKIP",
+    "evidence": "docs/private-beta/hosted-ux-qa/insurance-edition/phase-b/",
+    "sha": "f87038fa160e935ae6b6f890a3124dd383c0b1ec"
+  },
+  "viewerHosted": {
+    "result": "SKIP",
+    "reason": "Invitation created (201). Hosted Viewer session token not issued because email is degraded. Approved proof requires an invitation-issued session. Creating a password-set Viewer outside invite/auth would weaken architecture and was refused. Unit tests prove Viewer insurance.read 200 and activate/applicability 403. Not rewritten as PASS. Does not block Phase B acceptance."
+  },
+  "examRegulatorReadiness": {
+    "classification": "SUFFICIENT THROUGH SHARED CORE",
+    "dedicatedWorkspace": "FUTURE ROADMAP / REQUIRES PRODUCT DECISION",
+    "doNotBuild": true
+  },
+  "recommendationCategory": "B",
+  "recommendationLabel": "#23 HAS BOUNDED COMPLETION GAPS — READY FOR PRODUCT LEADERSHIP GAP REVIEW",
+  "bounded23Gaps": [
+    "License evidenceObjectId exists but is not attached via API/UI",
+    "Reports API returns live tenant data; Reports tab renders titles only",
+    "Reinsurance API accepts vendorId; UI records name only",
+    "Insurance automation templates exist; scheduler not wired to InsuranceLicense / InsuranceAiContext dates",
+    "Applicability who/when stored; poorly surfaced in UI"
+  ],
+  "productDecisionsRequired": [
+    "Which bounded gaps are required for #23 Done versus accepted known limitations",
+    "Exam workspace: keep shared-core only, or later authorize a workspace (not a new subsystem now)",
+    "Viewer hosted SKIP: retain through #23 PASS, or require email-issued Viewer session first",
+    "MGA/TPA/Captive: configuration-only sufficient for #23, or later packs under #27",
+    "Pack historical state: version+decision history sufficient, or require frozen requirement-text snapshots"
+  ],
+  "knownLimitations": [
+    "Viewer hosted session SKIP (email degraded)",
+    "No external license-registry verification",
+    "Nigeria and US/NY are reference jurisdictions only",
+    "Catalog-ready UK/EU/UAE/SA/ZA/KE/GH/SG/AU packs not implemented",
+    "#12 invitation inbox remains Queued ≠ Delivered",
+    "#21 live IdP federation deferred",
+    "#22 live Slack/Jira deferred",
+    "Intelligence signals are local recorded-fact counts, not a second engine",
+    "Claims / UW / Reinsurance are governance views only"
+  ],
+  "privacyLegalBasisAudit": {
+    "claimsServicingEqualsLegalBasis": false,
+    "insurancePurposeEqualsConsent": false,
+    "flags": []
+  },
+  "screenshots": "None new. Reference Phase A and Phase B packs."
+}

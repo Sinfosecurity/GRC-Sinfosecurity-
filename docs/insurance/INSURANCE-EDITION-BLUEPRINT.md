@@ -2,7 +2,7 @@
 
 Authoritative #23 design. Insurance Edition is a **configurable industry layer** on Supreme. It is not a separate application, tenant model, risk engine, control engine, evidence store, TPRM engine, Privacy module, AI Governance module, Intelligence engine, Automation engine, or API framework.
 
-**Status:** PHASE B READY FOR PRODUCT LEADERSHIP REVIEW. Hosted staging walk recorded. Not #23 PASS. #27 and #30 are not started as independent items. Nigeria and the United States exist only as first #23 reference jurisdictions.
+**Status:** PHASE B ACCEPTED FOR CURRENT STAGE. Completion reconciliation READY FOR PRODUCT LEADERSHIP REVIEW (category B — bounded completion gaps). Not #23 PASS. No Phase C. #27 and #30 are not started as independent items. Nigeria and the United States exist only as first #23 reference jurisdictions. Reconciliation: `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`.
 
 ## Architecture (unchanged)
 
