@@ -199,7 +199,7 @@ describe('Insurance Edition bounded gap closure', () => {
 
         const reports = await request(app).get('/api/v1/insurance/reports').set('Authorization', `Bearer ${tokenA}`);
         expect(reports.status).toBe(200);
-        expect(reports.body.data.honesty).toMatch(/not fabricated/i);
+        expect(reports.body.data.honesty).toMatch(/no fabricated/i);
         expect(JSON.stringify(reports.body.data)).not.toMatch(/100%/);
         const keys = reports.body.data.reports.map((row: { key: string }) => row.key);
         expect(keys).toEqual(['executive', 'third-parties', 'licenses', 'regulatory', 'models', 'concentration']);
