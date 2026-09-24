@@ -349,7 +349,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **EVIDENCE:** ADR `docs/ADR-SUPREME-INTELLIGENCE.md`. Final closure `docs/private-beta/hosted-ux-qa/supreme-intelligence/closure/`. CI `34914149569` PASS on `9ee8529`. Public catalog remains Roadmap.
 
-**NEXT ACTION:** Keep #19 accepted. #20 is accepted. #21 is the current authorized item. Do not merge `main` or deploy commercial production.
+**NEXT ACTION:** Keep #19 accepted. Do not reopen #19 engineering. Stale PARTIAL current-status lines in `docs/SUPREME-PROGRAM-STATE.md` were reconciled; historical hosted-review records remain. Do not merge `main` or deploy commercial production.
 
 ---
 
@@ -613,13 +613,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Public trust pages match actual controls. No fake certifications.
 
-**CURRENT STATUS:** AUTHORIZED — PHASE 0 TRUST FOUNDATION IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001.
+**CURRENT STATUS:** PHASE 0 ACCEPTED FOR CURRENT STAGE. PHASE 1 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001.
 
-**CERTIFICATION SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
+**CERTIFICATION SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Remote program head at Phase 0 acceptance `812d2ea186a0d1175a6a4c6fad3740b93bc7725c`. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
-**EVIDENCE:** `docs/trust/`. Existing draft routes `/trust` `/security` `/status` remain honest and were not rewritten in this phase (docs-first; no Render build). Security mailbox remains NOT CONFIGURED.
+**EVIDENCE:** `docs/trust/` including Phase 1 operational pack (`TRUST-PROGRAM-PHASE-1.md`, claim workflow, public-content mapping, customer security package, questionnaire bank, legal ownership, subprocessor register, contact readiness). Existing draft routes `/trust` `/security` `/status` remain honest and were not rewritten (docs-first; no Render build). Security mailbox remains NOT CONFIGURED.
 
-**NEXT ACTION:** Product Leadership review of Phase 0. Designate a live security mailbox before publishing a report address. Do not claim certification. Do not start #24 or #40. Keep #23 on zero-spend hold.
+**NEXT ACTION:** Product Leadership review of Phase 1. Designate a live security mailbox and confirmed support destination before public trust publication. Do not claim certification. Do not start #24 or #40. Keep #23 on zero-spend hold.
 
 ---
 

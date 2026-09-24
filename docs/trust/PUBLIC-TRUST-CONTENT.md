@@ -1,7 +1,7 @@
-# Public trust content (Phase 0 draft)
+# Public trust content (Phase 0 draft; Phase 1 mapped)
 
 **Visibility:** internal until Product Leadership approves publication.  
-**Runtime:** existing `/trust` `/security` `/status` remain as already shipped. This file is the Phase 0 source of truth for later copy.  
+**Runtime:** existing `/trust` `/security` `/status` remain as already shipped. This file is the copy source; `PUBLIC-CONTENT-MAPPING.md` governs publish class. No runtime change in Phase 1.  
 **Environment:** facts below are for **hosted staging / private-testing**, not commercial production.
 
 Review owner: Product Leadership / Security Admin  
@@ -98,6 +98,6 @@ Do not publish `security@…` until Product Leadership designates a live mailbox
 
 Program go/no-go records the customer support mailbox as **USER ACTION REQUIRED**. Internal guides mention `support@sinfosecurity.com`; that address is **not confirmed as a monitored public mailbox** for this phase. Public copy: **Not configured**.
 
-## #19 reconciliation (not a public claim)
+## #19 (public)
 
-Punch list line for #19 says PASS (2026-09-14). Program-state changelog for 2026-09-14–15 records authorization and PARTIAL hosted review and repeatedly says Cursor does not declare #19 PASS. **Recommendation C:** Product Leadership must decide. Public trust pages must not claim Intelligence certification.
+#19 Supreme Intelligence is **PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14)**. Controlling evidence: implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`, CI `34914149569` PASS. Public copy: Supreme Intelligence is an accepted product module that interprets recorded Supreme facts. It is not a certification and does not invent monitoring events. Historical PARTIAL hosted-review records remain in program-state changelog as history.
