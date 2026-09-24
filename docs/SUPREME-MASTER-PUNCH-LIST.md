@@ -615,7 +615,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PHASE 0 ACCEPTED. PHASE 1 ACCEPTED. PHASE 2 ACCEPTED FOR CURRENT STAGE. PHASE 3 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001. Public trust pages not deployed.
 
-**CERTIFICATION SHA:** Phase 2 accepted `407320e8d2435b1c37c712212b424452cea94b7a`. Phase 1 accepted `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. First Phase 1 pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f` is historical. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
+**CERTIFICATION SHA:** Phase 2 controlling record `cc24dac04b9f0acedce80ada5e9ba3e600478d0a`. Phase 2 pack `407320e8d2435b1c37c712212b424452cea94b7a`. Phase 1 accepted `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. Phase 0 `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
 **EVIDENCE:** `docs/trust/` Phase 3 pre-publication candidate (`TRUST-PROGRAM-PHASE-3.md`, `PUBLICATION-CANDIDATE.md`, `PUBLICATION-MANIFEST.json`, diligence bundle, pre-publication audit). Existing draft routes remain unchanged. Security and support contacts remain NOT CONFIGURED.
 

@@ -2,119 +2,153 @@
 
 **Phase:** 3  
 **Routes in this candidate:** `/trust` `/security` `/status`  
-**Routes not in this candidate:** `/privacy` `/terms` `/subprocessors` (LEGAL REVIEW REQUIRED)  
-**Rule:** Only READY_FOR_PUBLICATION claims. No runtime files. No page deploy.
+**Routes referenced only:** `/privacy` `/terms` `/subprocessors` — LEGAL_REVIEW_REQUIRED  
+**Rule:** Every sentence maps to a claimId on the allowlist. No orphan copy. No runtime files. No page deploy.
 
-Environment labels used: **STAGING / PRIVATE-TESTING**, **PRODUCTION CONFIGURATION**, **LIVE VALIDATION DEFERRED**.
+---
+
+## Claim allowlist
+
+Only these IDs may appear as positive or honest-negative public sentences in this candidate.
+
+| claimId | Allowed sentence role |
+| --- | --- |
+| C-01 | Tenant isolation — STAGING / PRIVATE-TESTING |
+| C-02 | Server-side RBAC |
+| C-03 | Fail-closed malware / evidence download |
+| C-04 | Tenant-scoped audit |
+| C-05 | Hosted staging HTTPS |
+| C-06 | HttpOnly refresh cookie on hosted HTTPS |
+| C-07 | Tested isolated backup/restore; no contractual RTO/RPO |
+| C-08 | Auth/API rate limiting |
+| C-09 | Customer-safe pentest / security-testing summary |
+| C-11 | Exact: SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED |
+| C-12 | Exact: SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED |
+| C-18 | STATUS MONITORING NOT CONFIGURED |
+| C-21 | Supreme Intelligence interprets recorded Supreme data without inventing external threat events. |
+| C-23 | Security reporting address: not configured. |
+| K-SUP | Customer support address: not configured. |
+| C-13 C-14 C-15 C-16 C-17 C-19 C-22 | Honest **non-claims** only (“not certified / not GA / no firm / no SLA”) |
+
+C-10 may appear on `/security` only as an **Authentication limitation** (staging grace; PRODUCTION CONFIGURATION requires privileged MFA). It is not a READY positive claim.
+
+---
+
+## Claim denylist
+
+These statements are prohibited from publication.
+
+- SOC 2 certified
+- SOC 2 compliant
+- ISO 27001 certified
+- FedRAMP authorized
+- HIPAA certified
+- PCI certified
+- production ready
+- commercially live
+- live Stripe
+- production uptime
+- production RTO/RPO
+- live Entra
+- live Okta
+- live Google federation
+- live Slack
+- live Jira
+- live SecurityScorecard
+- live BitSight
+- Insurance Edition PASS
+- Insurance Edition GA
+- working security mailbox
+- working support mailbox
+- live status monitoring
+- All systems operational
+- Integrated with Entra / Okta / Google / Slack / Jira
+- SecurityScorecard integration available
+- BitSight integration available
+
+---
+
+## Route manifest
+
+| route | claimIds | exact candidate sections | blocked sections | environment labels | legal dependency | contact dependency | production dependency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `/trust` | C-01 C-02 C-03 C-04 C-05 C-06 C-07 C-08 C-09 C-11 C-12 C-21 C-23 K-SUP | lede; isolation; RBAC; malware; audit; HTTPS; cookie; restore; rate limits; pentest; Intelligence; deferred architecture; contacts not configured | encryption-at-rest; decision immutability card; addresses; certifications; GA | STAGING / PRIVATE-TESTING; LIVE VALIDATION DEFERRED | none for this candidate | addresses CONTACT_CONFIGURATION_REQUIRED; honest “not configured” is allowed | none for this candidate |
+| `/security` | C-01 C-02 C-03 C-04 C-05 C-06 C-07 C-08 C-09 C-10-limitation C-11 C-12 C-23 | Access Control; Authentication (limitation); Session Security; Evidence Security; Malware Controls; Audit; Rate Limiting; Backup / DR; Vulnerability / Security Testing; Pentest Summary; deferred architecture; mailbox not configured | certification; production assurance; firm attestation; production SLA; working mailbox | STAGING / PRIVATE-TESTING; PRODUCTION CONFIGURATION (MFA limitation only); LIVE VALIDATION DEFERRED | VDP remains draft | C-23 address blocked | C-10 production MFA blocked as a positive claim |
+| `/status` | C-18 | STATUS MONITORING NOT CONFIGURED | All systems operational; uptime %; incident history; live health; production monitoring; availability SLA | not monitored | none | none | live status PRODUCTION_VALIDATION_REQUIRED |
+| `/privacy` | C-20 | status reference only | approved Privacy Notice | n/a | LEGAL_REVIEW_REQUIRED | none | none |
+| `/terms` | C-20 | status reference only | approved Terms | n/a | LEGAL_REVIEW_REQUIRED | none | none |
+| `/subprocessors` | K-PROD-SUB | status reference only | production roster | n/a | LEGAL_REVIEW_REQUIRED | none | PRODUCTION_VALIDATION_REQUIRED |
 
 ---
 
 ## /trust
 
-**Current copy (live `TrustCenter.tsx`, unchanged):**
+**Current copy (live `TrustCenter.tsx`, unchanged):** Trust & Security / Built for enterprise governance. Capability cards including encryption architecture and decision immutability. Explicitly no SOC 2, ISO, SLA, or customer count.
 
-- Kicker: Trust & Security
-- Headline: Built for enterprise governance.
-- Lede: Supreme isolates tenants, records decisions, and fails closed when evidence cannot be safely released. This page describes product capabilities. It does not claim SOC 2 certification, ISO certification, an uptime SLA, or a customer count.
-- Cards: Tenant isolation; Role-based access; Audit logging; Encryption architecture; Evidence integrity; Immutable decision history; Fail-closed evidence policy.
+**Proposed copy (every sentence → claimId):**
 
-**Proposed copy (candidate only):**
+Headline: Product capabilities on hosted STAGING / PRIVATE-TESTING.  
+Lede: This page describes controls that exist on Supreme’s STAGING / PRIVATE-TESTING environment. It does not claim SOC 2 certification, SOC 2 compliance, ISO 27001, FedRAMP, HIPAA, or PCI certification. It is not a production-ready or commercially live statement. `[C-13 C-14 C-15 C-16]`
 
-Kicker: Trust & Security  
-Headline: Product capabilities on hosted staging / private-testing.  
-Lede: This page describes controls that exist on Supreme’s STAGING / PRIVATE-TESTING environment. It does not claim SOC 2, ISO 27001, FedRAMP, HIPAA, or PCI certification. It is not a production-deployment or commercial-availability statement.
-
-1. Tenant isolation is enforced. Cross-tenant reads do not return another tenant’s records. (STAGING / PRIVATE-TESTING)
-2. Role-based access control is enforced on the server.
-3. Evidence download requires a CLEAN malware status. Non-CLEAN files are not downloadable.
-4. Significant actions write tenant-scoped audit events.
-5. Hosted STAGING / PRIVATE-TESTING uses HTTPS.
-6. On hosted HTTPS, the browser refresh token is stored in an HttpOnly cookie.
-7. Isolated restore of the tenant database and evidence objects has been tested. RTO and RPO are not contractually defined.
-8. Rate limiting exists on authentication and API routes.
-9. Supreme Intelligence interprets recorded Supreme data without inventing external threat events.
-10. Entra, Okta, Google, Slack, Jira, and external ratings: SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED.
-11. Security reporting address: not configured.
-12. Customer support address: not configured.
-
-**Dropped from current cards (not READY_FOR_PUBLICATION as standalone public claims):** encryption-at-rest architecture, checksum/tenant-prefix evidence wording beyond fail-closed CLEAN, immutable decision-history card.
-
-| Field | Value |
-| --- | --- |
-| claim IDs | C-01 C-02 C-03 C-04 C-05 C-06 C-07 C-08 C-21 C-11 C-12; honest-not-configured for C-23 / support |
-| evidence | #12 two-tenant; #8; #3; #5; #4; #19 PASS; #21/#22 deferred; CONTACT-READINESS |
-| environment label | STAGING / PRIVATE-TESTING (C-11/C-12: LIVE VALIDATION DEFERRED) |
-| publication class | READY_FOR_PUBLICATION |
+1. Tenant isolation is enforced. Cross-tenant reads do not return another tenant’s records. STAGING / PRIVATE-TESTING. `[C-01]`
+2. Role-based access control is enforced on the server. `[C-02]`
+3. Evidence download requires a CLEAN malware status. Non-CLEAN files are not downloadable. `[C-03]`
+4. Significant actions write tenant-scoped audit events. `[C-04]`
+5. Hosted STAGING / PRIVATE-TESTING uses HTTPS. `[C-05]`
+6. On hosted HTTPS, the browser refresh token is stored in an HttpOnly cookie. `[C-06]`
+7. Isolated restore of the tenant database and evidence objects has been tested. RTO and RPO are not contractually defined. `[C-07]`
+8. Rate limiting exists on authentication and API routes. `[C-08]`
+9. On 2026-09-22, application security testing was performed against the hosted staging frontend and API. Identified findings were remediated and a two-tenant retest on staging was completed. This is security testing, not a certification. `[C-09]`
+10. Supreme Intelligence interprets recorded Supreme data without inventing external threat events. `[C-21]`
+11. Entra, Okta, Google, Slack, Jira, and external ratings: SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED. `[C-11 C-12]`
+12. Security reporting address: not configured. `[C-23]`
+13. Customer support address: not configured. `[K-SUP]`
 
 ---
 
 ## /security
 
-**Current copy (live `SecurityOverview.tsx`, unchanged):**
+**Current copy (live `SecurityOverview.tsx`, unchanged):** Product security as it exists today. Cards for isolation, RBAC, evidence, decision immutability, audit, and “what is not claimed.”
 
-- Headline: Product security as it exists today.
-- Lede: This is a security overview of the running Supreme product. The Trust Center lists the same capabilities without implying an external certification.
-- Cards: Tenant isolation; Role-based access; Evidence integrity; Decision immutability; Audit trail; What is not claimed (no SOC 2, ISO 27001, uptime SLA, or pentest badge).
+**Proposed copy (section → claimId):**
 
-**Proposed copy (candidate only):**
-
-Kicker: Security  
 Headline: Security overview — STAGING / PRIVATE-TESTING.  
-Lede: This is a security overview of the hosted private-testing product. It is not a certification, not a production pentest report, and not a commercial SLA.
+Lede: This is a security overview of the hosted private-testing product. It is not a certification, not a production pentest report, and not a commercial SLA. `[C-13 C-16 C-22]`
 
-1. Tenant isolation: API queries are scoped to the authenticated organization. Cross-tenant reads do not return another tenant’s records. (C-01)
-2. Role-based access control is enforced on the server. (C-02)
-3. Evidence download requires a CLEAN malware status. Non-CLEAN files are not downloadable. (C-03)
-4. Significant actions write tenant-scoped audit events. (C-04)
-5. Hosted STAGING / PRIVATE-TESTING uses HTTPS. Browser refresh uses an HttpOnly cookie on hosted HTTPS. (C-05, C-06)
-6. Isolated restore of the tenant database and evidence objects has been tested. RTO and RPO are not contractually defined. (C-07)
-7. Rate limiting exists on authentication and API routes. (C-08)
-8. Pentest summary (C-09): On 2026-09-22, application security testing was performed against Supreme’s hosted staging frontend and API (private-testing environment). Areas covered included tenant isolation, public health disclosure, session-cookie handling, webhook-sink authentication, and identity-discovery request safety. Identified findings from that exercise were remediated. A two-tenant retest on staging was completed. This is security testing, not a certification, and it is not a production or commercial-assurance report.
-9. Entra, Okta, Google, Slack, Jira, and external ratings: SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED. (C-11, C-12)
-10. Security reporting address: not configured. Vulnerability disclosure remains a draft until a real channel exists. (C-23)
-11. What is not claimed: SOC 2, ISO 27001, FedRAMP, HIPAA, PCI; production MFA proof; production object storage; live Stripe; production DNS; uptime; Insurance Edition PASS.
+**Access Control.** Tenant isolation is enforced. Cross-tenant reads do not return another tenant’s records. Role-based access control is enforced on the server. `[C-01 C-02]`
 
-Do **not** write: Integrated with Entra / Okta / Google / Slack / Jira; SecurityScorecard or BitSight integration available.
+**Authentication.** Password authentication exists. Privileged MFA is required in PRODUCTION CONFIGURATION. STAGING / PRIVATE-TESTING currently uses an audited grace. This is not production MFA proof. `[C-10 limitation]`
 
-| Field | Value |
-| --- | --- |
-| claim IDs | C-01 C-02 C-03 C-04 C-05 C-06 C-07 C-08 C-09 C-11 C-12; C-13–C-19 C-22 C-23 as explicit non-claims |
-| evidence | same as /trust plus `PENTEST-PUBLIC-SUMMARY.md` |
-| environment label | STAGING / PRIVATE-TESTING |
-| publication class | READY_FOR_PUBLICATION |
+**Session Security.** Hosted STAGING / PRIVATE-TESTING uses HTTPS. On hosted HTTPS, the browser refresh token is stored in an HttpOnly cookie. `[C-05 C-06]`
+
+**Evidence Security.** Evidence download requires a CLEAN malware status. Non-CLEAN files are not downloadable. `[C-03]`
+
+**Malware Controls.** Uploads are scanned. Download is fail-closed unless the scan is CLEAN. `[C-03]`
+
+**Audit.** Significant actions write tenant-scoped audit events. `[C-04]`
+
+**Rate Limiting.** Rate limiting exists on authentication and API routes. `[C-08]`
+
+**Backup / DR.** Isolated restore of the tenant database and evidence objects has been tested. RTO and RPO are not contractually defined. `[C-07]`
+
+**Vulnerability / Security Testing.** Identified 2026-09-22 findings were remediated and two-tenant retested on staging. This is not a certified vulnerability-management attestation. `[C-09]`
+
+**Pentest Summary.** On 2026-09-22, application security testing was performed against Supreme’s hosted staging frontend and API (private-testing environment). Areas covered included tenant isolation, public health disclosure, session-cookie handling, webhook-sink authentication, and identity-discovery request safety. Identified findings from that exercise were remediated. A two-tenant retest on staging was completed. This is security testing, not a certification, and it is not a production or commercial-assurance report. `[C-09]`
+
+**Deferred architecture.** Entra, Okta, Google, Slack, Jira, and external ratings: SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED. `[C-11 C-12]`
+
+**Security contact.** Security reporting address: not configured. `[C-23]`
+
+No working security mailbox. No production SLA. No external-firm attestation.
 
 ---
 
 ## /status
 
-**Current copy (live `PublicStatus.tsx`, unchanged):**
+**Current copy (live `PublicStatus.tsx`, unchanged):** Public status reporting is not configured. Provider state NOT_CONFIGURED.
 
-- Headline: Public status reporting is not configured.
-- Lede: No external status provider is connected. Supreme does not display fabricated uptime, incident history, or an SLA meter on this page.
-- Provider state: NOT_CONFIGURED
+**Proposed copy:**
 
-**Proposed copy (candidate only):**
-
-Kicker: Status  
 Headline: STATUS MONITORING NOT CONFIGURED  
-Lede: Status monitoring is not configured. This page does not report uptime, incident history, live health, or “all systems operational.”  
+Lede: Live public status monitoring is not configured. This page does not report uptime, incident history, live service health, production monitoring, an availability SLA, or “All systems operational.” `[C-18]`  
 State: NOT_CONFIGURED / NOT MONITORED
-
-Forbidden on this candidate: 99.9%, any uptime percentage, all systems operational, incident history, live health indicator.
-
-| Field | Value |
-| --- | --- |
-| claim IDs | C-18 as honest NOT_CONFIGURED (READY as a **No**) |
-| evidence | `PublicStatus.tsx`; claim C-18 NOT_SUPPORTED for live status |
-| environment label | not a monitored environment |
-| publication class | READY_FOR_PUBLICATION for the not-configured sentence; DO_NOT_PUBLISH for any live-status claim |
-
----
-
-## Routes that must not change in this candidate
-
-| Route | Action |
-| --- | --- |
-| `/privacy` | Keep draft. LEGAL REVIEW REQUIRED. |
-| `/terms` | Keep draft. LEGAL REVIEW REQUIRED. |
-| `/subprocessors` | Keep empty production list. LEGAL REVIEW REQUIRED + PRODUCTION_VALIDATION_REQUIRED. |

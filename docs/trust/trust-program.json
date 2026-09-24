@@ -16,6 +16,7 @@
   "phase1Sha": "6b01dd2c3cfc78366eeb349792fadee55a8c52a6",
   "phase1FirstPackSha": "4243e0bf99f30a9d1caebf2307fe71708b71f15f",
   "phase2Accepted": true,
+  "phase2ControllingSha": "cc24dac04b9f0acedce80ada5e9ba3e600478d0a",
   "phase2Sha": "407320e8d2435b1c37c712212b424452cea94b7a",
   "frozenTwentyThreeCandidate": "0f42cba86f42fa9df0399634bceb520036ed82ce",
   "twelve": "PASS — PRIVATE-TESTING RELEASE CANDIDATE",

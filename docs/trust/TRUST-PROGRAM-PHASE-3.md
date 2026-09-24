@@ -2,63 +2,74 @@
 
 **Status:** AUTHORIZED / IN PROGRESS — READY FOR PRODUCT LEADERSHIP REVIEW  
 **#34 itself:** ACTIVE / NOT PASS  
-**Phase 0:** ACCEPTED FOR CURRENT STAGE (`a89cf2f746be3bcf272c74eb7ed553623dc062f7`)  
-**Phase 1:** ACCEPTED FOR CURRENT STAGE (`6b01dd2c3cfc78366eeb349792fadee55a8c52a6`)  
-**Phase 1 first pack (historical):** `4243e0bf99f30a9d1caebf2307fe71708b71f15f`  
-**Phase 2:** ACCEPTED FOR CURRENT STAGE (`407320e8d2435b1c37c712212b424452cea94b7a`)  
-**#23 frozen (unchanged):** `0f42cba86f42fa9df0399634bceb520036ed82ce`  
-**Spend:** $0.00. No Render. No page deploy. No Phase 4.
+**Phase 0:** ACCEPTED (`a89cf2f746be3bcf272c74eb7ed553623dc062f7`)  
+**Phase 1:** ACCEPTED (`6b01dd2c3cfc78366eeb349792fadee55a8c52a6`)  
+**Phase 2:** ACCEPTED — controlling record `cc24dac04b9f0acedce80ada5e9ba3e600478d0a`; pack `407320e8d2435b1c37c712212b424452cea94b7a`  
+**#23 frozen:** `0f42cba86f42fa9df0399634bceb520036ed82ce`  
+**Spend:** $0.00. No Render. No page deploy. No Phase 4. No runtime edits.
 
-Phase 3 prepares the **exact publication candidate** in docs only. It does not deploy `/trust` `/security` `/status` and does not approve `/privacy` `/terms`.
+Exact candidate: `PUBLICATION-CANDIDATE.md`. Manifest: `PUBLICATION-MANIFEST.json`.
 
-## Questions this phase answers
+## Answers
 
-| # | Question | Answer |
-| --- | --- | --- |
-| 1 | What exact copy would be published? | `PUBLICATION-CANDIDATE.md` |
-| 2 | What exact routes would change? | `/trust`, `/security`, `/status` only — later, if Product Leadership authorizes a deploy |
-| 3 | What must remain hidden/blocked? | Binding legal pages; addresses; production claims; live integrations; certifications; #23 GA |
-| 4 | What user decisions remain? | Security contact A/B/C; support contact A/B/C — USER ACTION REQUIRED |
-| 5 | Is the candidate internally consistent? | Yes — see `PRE-PUBLICATION-AUDIT.md` |
-| 6 | Can #34 later close with one controlled publication action? | **A** — yes, by deploying this candidate. See final-closure analysis |
+1. `/trust` copy — `PUBLICATION-CANDIDATE.md` § /trust (each sentence mapped to a claimId)  
+2. `/security` copy — same file § /security (named sections)  
+3. `/status` copy — STATUS MONITORING NOT CONFIGURED  
+4. Blocked — legal pages, addresses, production claims, denylist  
+5. User decisions — security A/B/C and support A/B/C, none selected  
+6. One later controlled publication action — **A**
 
-## Companion files
+## Security contact — final decision card
 
-| File | Purpose |
+**SECURITY CONTACT NOT CONFIGURED — USER ACTION REQUIRED**
+
+| Option | Meaning |
 | --- | --- |
-| `PUBLICATION-CANDIDATE.md` | Current vs proposed copy |
-| `PUBLICATION-MANIFEST.json` | Every candidate statement by claimId |
-| `CUSTOMER-DILIGENCE-BUNDLE.md` | NDA pack index |
-| `PRE-PUBLICATION-AUDIT.md` | Contradiction search |
+| A | Dedicated monitored mailbox |
+| B | Confirmed existing monitored mailbox |
+| C | Ticket/form intake |
 
-## Legal inventory (not approved)
+Cursor does not choose. No address created.
 
-| Document | Status |
+## Support contact — final decision card
+
+**SUPPORT CONTACT NOT CONFIGURED — USER ACTION REQUIRED**
+
+| Option | Meaning |
 | --- | --- |
-| Privacy Notice | LEGAL REVIEW REQUIRED |
-| Terms of Service | LEGAL REVIEW REQUIRED |
-| DPA | LEGAL REVIEW REQUIRED |
-| Subprocessor Notice | LEGAL REVIEW REQUIRED |
-| Security Addendum | LEGAL REVIEW REQUIRED |
-| Acceptable Use Policy | LEGAL REVIEW REQUIRED |
-| Cookie Notice | LEGAL REVIEW REQUIRED |
-| Vulnerability Disclosure Policy | LEGAL REVIEW REQUIRED |
+| A | Dedicated monitored mailbox |
+| B | Confirmed existing monitored mailbox |
+| C | Ticket/form intake |
 
-See `LEGAL-DOCUMENT-STATUS.md`. None are APPROVED.
+Do not assume `support@sinfosecurity.com` works. Cursor does not choose.
 
-## Security / support decisions (unselected)
+## Legal publication blocker
 
-Security contact: A dedicated monitored mailbox / B confirmed existing monitored mailbox / C ticket/form intake. **None selected. USER ACTION REQUIRED.**
+| document | current status | owner | review owner | publication dependency |
+| --- | --- | --- | --- | --- |
+| Privacy Notice | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership / Privacy | Legal (unassigned) | counsel approval before `/privacy` is binding |
+| Terms of Service | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership | Legal (unassigned) | counsel approval before `/terms` is binding |
+| DPA | MISSING / LEGAL REVIEW REQUIRED | Product Leadership / Privacy | Legal (unassigned) | counsel-approved DPA |
+| Subprocessor Notice | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership / Legal | Legal (unassigned) | counsel + production roster |
+| Security Addendum | DRAFT / LEGAL REVIEW REQUIRED | Security / Product Leadership | Legal (unassigned) | counsel; SUPPORTED claims only |
+| Acceptable Use Policy | MISSING / LEGAL REVIEW REQUIRED | Product Leadership | Legal (unassigned) | counsel-drafted AUP |
+| Cookie Notice | MISSING / LEGAL REVIEW REQUIRED | Product Leadership / Privacy | Legal (unassigned) | counsel if cookies in scope |
+| Vulnerability Disclosure Policy | DRAFT / LEGAL REVIEW REQUIRED | Security / Product Leadership | Legal (unassigned) | real channel + counsel |
 
-Support contact: same A/B/C. Do not assume `support@sinfosecurity.com` works. **None selected. USER ACTION REQUIRED.**
+None are APPROVED.
+
+## Questionnaire release set (internal)
+
+READY or READY_WITH_LIMITATION only. See `CUSTOMER-DILIGENCE-BUNDLE.md`.
+
+Included: Q-01–Q-16 (Q-16 staging-register limitation), Q-18–Q-24 (Q-21/Q-22/Q-23/Q-24 as honest **No** / not configured; Q-05/Q-20 deferred sentence only).
+
+Excluded from the release set: Q-17 (LEGAL_REVIEW_REQUIRED). Live-SSO / live-Slack “yes” answers excluded.
 
 ## #34 final-closure analysis
 
-**A — READY FOR CONTROLLED PUBLICATION once user decisions are supplied**
+**A — READY FOR CONTROLLED PUBLICATION once Product Leadership supplies the required user decisions**
 
-The three-route candidate uses only READY_FOR_PUBLICATION claims. It does not include addresses, legal documents, or production claims. Remaining user decisions (security/support A/B/C) gate **addresses**, not this candidate. Legal review gates `/privacy` `/terms` `/subprocessors`, which are **not** in this candidate. One later controlled action can replace the live copy on `/trust` `/security` `/status` with this candidate. That action is **not authorized now**.
+The three-route candidate is complete, allowlisted, and internally consistent. Required user decisions are the contact A/B/C cards (addresses). The candidate as written uses “not configured” and can ship without those addresses. Legal pages are out of scope. One later controlled action can deploy this candidate. That action is **not authorized now**.
 
-This is **not** B (no additional bounded #34 engineering is required).  
-This is **not** C (contacts and legal do not block the three-route candidate as written).  
-This is **not** #34 PASS.  
-This is **not** Phase 4.
+Not B. Not C. Not #34 PASS. Not Phase 4.

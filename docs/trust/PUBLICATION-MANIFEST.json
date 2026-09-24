@@ -4,137 +4,78 @@
   "kind": "publication-candidate",
   "deployed": false,
   "runtimeChanged": false,
-  "phase2AcceptedSha": "407320e8d2435b1c37c712212b424452cea94b7a",
+  "phase2ControllingSha": "cc24dac04b9f0acedce80ada5e9ba3e600478d0a",
+  "phase2PackSha": "407320e8d2435b1c37c712212b424452cea94b7a",
   "phase1AcceptedSha": "6b01dd2c3cfc78366eeb349792fadee55a8c52a6",
+  "phase0AcceptedSha": "a89cf2f746be3bcf272c74eb7ed553623dc062f7",
+  "allowlist": ["C-01", "C-02", "C-03", "C-04", "C-05", "C-06", "C-07", "C-08", "C-09", "C-11", "C-12", "C-18", "C-21", "C-23", "K-SUP"],
+  "allowlistNonClaims": ["C-13", "C-14", "C-15", "C-16", "C-17", "C-19", "C-22"],
+  "limitationOnly": ["C-10"],
+  "denylist": [
+    "SOC 2 certified",
+    "SOC 2 compliant",
+    "ISO 27001 certified",
+    "FedRAMP authorized",
+    "HIPAA certified",
+    "PCI certified",
+    "production ready",
+    "commercially live",
+    "live Stripe",
+    "production uptime",
+    "production RTO/RPO",
+    "live Entra",
+    "live Okta",
+    "live Google federation",
+    "live Slack",
+    "live Jira",
+    "live SecurityScorecard",
+    "live BitSight",
+    "Insurance Edition PASS",
+    "Insurance Edition GA",
+    "working security mailbox",
+    "working support mailbox",
+    "live status monitoring"
+  ],
   "routesInCandidate": ["/trust", "/security", "/status"],
   "routesExcluded": ["/privacy", "/terms", "/subprocessors"],
-  "statements": [
-    {
-      "claimId": "C-01",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-02",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-03",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-04",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-05",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-06",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-07",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
+  "routeManifest": {
+    "/trust": {
+      "claimIds": ["C-01", "C-02", "C-03", "C-04", "C-05", "C-06", "C-07", "C-08", "C-09", "C-11", "C-12", "C-21", "C-23", "K-SUP"],
+      "sections": ["lede", "isolation", "rbac", "malware", "audit", "https", "cookie", "restore", "rateLimits", "pentest", "intelligence", "deferredArchitecture", "contactsNotConfigured"],
+      "blockedSections": ["encryptionAtRest", "decisionImmutability", "addresses", "certifications", "ga"],
       "environment": "STAGING / PRIVATE-TESTING",
-      "notes": "no contractual RTO/RPO"
+      "legalDependency": false,
+      "contactDependency": "addresses only",
+      "productionDependency": false
     },
-    {
-      "claimId": "C-08",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "environment": "STAGING / PRIVATE-TESTING"
-    },
-    {
-      "claimId": "C-09",
-      "routes": ["/security"],
-      "class": "READY_FOR_PUBLICATION",
+    "/security": {
+      "claimIds": ["C-01", "C-02", "C-03", "C-04", "C-05", "C-06", "C-07", "C-08", "C-09", "C-11", "C-12", "C-23"],
+      "limitationIds": ["C-10"],
+      "sections": ["accessControl", "authenticationLimitation", "sessionSecurity", "evidenceSecurity", "malwareControls", "audit", "rateLimiting", "backupDr", "vulnerabilityTesting", "pentestSummary"],
+      "blockedSections": ["certification", "productionAssurance", "firmAttestation", "productionSla", "workingMailbox"],
       "environment": "STAGING / PRIVATE-TESTING",
-      "source": "PENTEST-PUBLIC-SUMMARY.md"
+      "legalDependency": false,
+      "contactDependency": "C-23 address",
+      "productionDependency": "C-10 positive MFA claim"
     },
-    {
-      "claimId": "C-11",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "exactWording": "SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED"
-    },
-    {
-      "claimId": "C-12",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "exactWording": "SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED"
-    },
-    {
-      "claimId": "C-21",
-      "routes": ["/trust"],
-      "class": "READY_FOR_PUBLICATION",
-      "exactWording": "Supreme Intelligence interprets recorded Supreme data without inventing external threat events."
-    },
-    {
-      "claimId": "C-18",
-      "routes": ["/status"],
-      "class": "READY_FOR_PUBLICATION",
-      "exactWording": "STATUS MONITORING NOT CONFIGURED",
-      "forbidden": ["99.9%", "uptime percentage", "all systems operational", "incident history", "live health indicator"]
-    },
-    {
-      "claimId": "C-23",
-      "routes": ["/trust", "/security"],
-      "class": "READY_FOR_PUBLICATION",
-      "exactWording": "Security reporting address: not configured.",
-      "address": "CONTACT_CONFIGURATION_REQUIRED"
-    },
-    {
-      "claimId": "K-SUP",
-      "routes": ["/trust"],
-      "class": "READY_FOR_PUBLICATION",
-      "exactWording": "Customer support address: not configured.",
-      "address": "CONTACT_CONFIGURATION_REQUIRED"
+    "/status": {
+      "claimIds": ["C-18"],
+      "sections": ["STATUS MONITORING NOT CONFIGURED"],
+      "blockedSections": ["allSystemsOperational", "uptimePercent", "incidentHistory", "liveHealth", "productionMonitoring", "availabilitySla"],
+      "environment": "NOT MONITORED",
+      "legalDependency": false,
+      "contactDependency": false,
+      "productionDependency": true
     }
-  ],
-  "excludedClaimIds": [
-    "C-10",
-    "C-13",
-    "C-14",
-    "C-15",
-    "C-16",
-    "C-17",
-    "C-19",
-    "C-20",
-    "C-22",
-    "K-PROD-STORE",
-    "K-PROD-HOST",
-    "K-PROD-BAK",
-    "K-PROD-MON",
-    "K-STRIPE",
-    "K-DNS",
-    "K-PROD-SUB",
-    "L-PRIV",
-    "L-TOS",
-    "L-DPA",
-    "L-SUB",
-    "L-SECADD",
-    "L-AUP",
-    "L-COOKIE",
-    "L-VDP",
-    "L-IR-SLA"
-  ],
+  },
+  "questionnaireReleaseSet": {
+    "READY": ["Q-02", "Q-03", "Q-06", "Q-07", "Q-09", "Q-10", "Q-11", "Q-21-no", "Q-22-no", "Q-23-no", "Q-24-not-configured"],
+    "READY_WITH_LIMITATION": ["Q-01", "Q-04", "Q-05-deferred", "Q-08", "Q-12", "Q-13", "Q-14", "Q-15", "Q-16-staging-only", "Q-18", "Q-19", "Q-20-deferred"],
+    "excluded": ["Q-17"]
+  },
   "userDecisions": {
-    "securityContact": "USER ACTION REQUIRED — A dedicated mailbox / B existing mailbox / C ticket-form — none selected",
-    "supportContact": "USER ACTION REQUIRED — A / B / C — none selected — do not assume support@sinfosecurity.com"
+    "securityContact": "USER ACTION REQUIRED — A / B / C — none selected",
+    "supportContact": "USER ACTION REQUIRED — A / B / C — none selected"
   },
   "finalClosureAnalysis": "A"
 }

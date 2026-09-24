@@ -10,7 +10,7 @@
 | Accidental claim | Hits in docs/trust/ | Finding |
 | --- | --- | --- |
 | production ready / commercially available | Appear only as **prohibitions** or honest **No** (C-16, Q-21, Phase 1/2 “what this is not”) | No conflicting positive claim |
-| SOC 2 certified | Only “not SOC 2” / DO_NOT_PUBLISH / C-13 | No conflict |
+| SOC 2 certified / SOC 2 compliant | Only “not SOC 2” / DO_NOT_PUBLISH / C-13; candidate lede forbids both | No conflict |
 | ISO certified | Same pattern C-14 | No conflict |
 | FedRAMP / HIPAA certified / PCI certified | Same pattern C-15 | No conflict |
 | live SSO / Integrated with Entra/Okta/Google | Only LIVE VALIDATION DEFERRED or “do not say live” | No conflict |

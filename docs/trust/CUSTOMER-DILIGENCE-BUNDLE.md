@@ -29,6 +29,21 @@ Contacts must say **NOT CONFIGURED**.
 | Assurance Position | no CERTIFIED / ATTESTED claims | READY |
 | Known Limitations | private-testing RC; commercial NO-GO; #21/#22 deferred; #23 not PASS; contacts NOT CONFIGURED | READY |
 
-**Do not attach as approved:** Privacy Notice, Terms, DPA, Subprocessor Notice, Security Addendum, AUP, Cookie Notice, VDP.
+**Excluded or clearly marked — not approved / not configured / not production:**
 
-**Contacts:** SECURITY CONTACT NOT CONFIGURED. SUPPORT CONTACT NOT CONFIGURED.
+| Item | Mark |
+| --- | --- |
+| Privacy legal drafts (Notice, DPA, Cookie, Terms, AUP, VDP, Security Addendum, Subprocessor Notice) | EXCLUDE as approved; LEGAL REVIEW REQUIRED |
+| Unconfigured contacts | MARK: SECURITY CONTACT NOT CONFIGURED. SUPPORT CONTACT NOT CONFIGURED. |
+| Production-only claims | EXCLUDE (MFA proof, object storage, RTO/RPO, uptime, live Stripe, production roster) |
+| Staging subprocessors | LIMITED — not the final production notice |
+
+## Questionnaire release set
+
+Internal customer-response set = READY + READY_WITH_LIMITATION only.
+
+**READY:** Q-02, Q-03, Q-06, Q-07, Q-09, Q-10, Q-11, Q-21 as No, Q-22 as No, Q-23 as No, Q-24 as not configured.
+
+**READY_WITH_LIMITATION:** Q-01, Q-04, Q-05 deferred sentence, Q-08, Q-12, Q-13, Q-14, Q-15, Q-16 staging register only, Q-18, Q-19, Q-20 deferred sentence.
+
+**Excluded:** Q-17 (LEGAL_REVIEW_REQUIRED). Any live-SSO / live-Slack / live-ratings “yes.”
