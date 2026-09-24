@@ -1,8 +1,10 @@
 {
   "item": "#23 Insurance Edition",
-  "instruction": "BOUNDED COMPLETION GAP CLOSURE",
+  "instruction": "HOSTED GAP-CLOSURE VERIFICATION ONLY",
   "phaseCCreated": false,
   "twentyThreePass": false,
+  "hostedQaRun": false,
+  "hostedQaCommand": "scripts/hosted-insurance-gap-closure-qa.py — not executed (hosted SHA mismatch / deploy failed)",
   "startingSha": "83a51895df53a9cc3b8a1aef60a36408f984eac1",
   "implementationSha": "0f42cba86f42fa9df0399634bceb520036ed82ce",
   "runtimeSha": "174c73487b47e525b831aa0e7d53178b74fb5334",
@@ -11,22 +13,27 @@
   "hostedShaMatch": false,
   "ci": "https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35835067819",
   "ciResult": "SUCCESS",
-  "localJest": "BLOCKED — LOCAL TEST INFRASTRUCTURE (supreme_test auth). CI is controlling.",
   "gaps": {
-    "licenseEvidence": "CLOSED_IN_CODE_AND_CI",
-    "reportsUi": "CLOSED_IN_CODE_AND_FRONTEND_TESTS",
-    "reinsuranceVendor": "CLOSED_IN_CODE_AND_CI",
-    "automationDateTriggers": "CLOSED_IN_CODE_AND_CI",
-    "applicabilityAttribution": "CLOSED_IN_CODE_AND_CI"
+    "licenseEvidence": "NOT_HOSTED_PROVEN",
+    "reportsUi": "NOT_HOSTED_PROVEN",
+    "reinsuranceVendor": "NOT_HOSTED_PROVEN",
+    "automationDateTriggers": "NOT_HOSTED_PROVEN",
+    "applicabilityAttribution": "NOT_HOSTED_PROVEN"
   },
   "hosted": {
     "result": "BLOCKED",
-    "reason": "Render pipeline_minutes_exhausted. Staging API and frontend deploys of 0f42cba build_failed in ~1s. Live hosted SHAs unchanged.",
+    "reason": "pipeline_minutes_exhausted",
+    "retriedAt": "2026-09-24T00:25:40Z",
     "apiService": "srv-daieg75g1s2s73f0rmig",
-    "frontendService": "srv-daieg7rm8hqs73chg27g"
+    "frontendService": "srv-daieg7rm8hqs73chg27g",
+    "apiDeployId": "dep-daq6s10jo6nc73db2qc0",
+    "frontendDeployId": "dep-daq6s149v7es73c1ruo0",
+    "apiDeployStatus": "build_failed",
+    "frontendDeployStatus": "build_failed",
+    "commitAttempted": "0f42cba86f42fa9df0399634bceb520036ed82ce"
   },
   "viewer": "SKIP — invitation created but hosted session was not issued because email delivery remained degraded. Not rewritten as PASS.",
   "openBlockers": [
-    "Hosted staging deploy blocked by exhausted Render pipeline minutes. Hosted verification of the five closures has not been performed on the implementation SHA."
+    "Render pipeline minutes exhausted. Staging API dep-daq6s10jo6nc73db2qc0 and frontend dep-daq6s149v7es73c1ruo0 of 0f42cba build_failed. Live hosted SHAs unchanged. Hosted QA not run."
   ]
 }
