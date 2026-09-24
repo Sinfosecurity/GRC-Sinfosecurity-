@@ -415,13 +415,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Edition configuration, not a fork.
 
-**CURRENT STATUS:** ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. Five bounded gaps implemented and CI-proven on `0f42cba86f42fa9df0399634bceb520036ed82ce`. Hosted verification BLOCKED (Render pipeline minutes exhausted). Not PASS.
+**CURRENT STATUS:** ACTIVE — PHASE B ACCEPTED FOR CURRENT STAGE. ZERO-SPEND HOSTING HOLD. Five bounded gaps implemented and CI-proven on frozen candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`. Hosted verification waiting for included Render pipeline minutes to reset. Not a product failure. Not PASS.
 
-**CERTIFICATION SHA:** Phase B controlling `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. Gap-closure implementation / CI `0f42cba86f42fa9df0399634bceb520036ed82ce`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35835067819 SUCCESS. Not a PASS SHA.
+**CERTIFICATION SHA:** Phase B controlling `f87038fa160e935ae6b6f890a3124dd383c0b1ec`. Frozen gap-closure candidate / CI `0f42cba86f42fa9df0399634bceb520036ed82ce`. CI https://github.com/Sinfosecurity/GRC-Sinfosecurity-/actions/runs/35835067819 SUCCESS. Not a PASS SHA.
 
 **EVIDENCE:** Blueprint `docs/insurance/INSURANCE-EDITION-BLUEPRINT.md`. Phase A/B records unchanged. Reconciliation `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`. Gap closure `docs/private-beta/hosted-ux-qa/insurance-edition/final-gap-closure/`. Viewer hosted session remains SKIP. Nigeria and US/NY remain #23 reference jurisdictions only. #27 and #30 are not started.
 
-**NEXT ACTION:** Restore Render pipeline minutes and deploy `0f42cba` to staging, then run `scripts/hosted-insurance-gap-closure-qa.py`. Do not start Phase C. Do not start #24–#38, #27, #30, or #40. Do not declare #23 PASS.
+**NEXT ACTION:** Wait for included Render pipeline minutes to reset. Do not purchase minutes. Custom pipeline-minute spend limit remains $0.00. Do not retry deploys while exhausted. After included minutes reset: deploy frozen `0f42cba` to staging API and frontend, run `scripts/hosted-insurance-gap-closure-qa.py`, then return for Product Leadership final certification. Do not start Phase C. Do not start #24–#38, #27, #30, or #40. Do not declare #23 PASS. Do not mark the five gaps CLOSED until hosted proof exists.
 
 ---
 

@@ -2,7 +2,7 @@
 
 Authoritative #23 design. Insurance Edition is a **configurable industry layer** on Supreme. It is not a separate application, tenant model, risk engine, control engine, evidence store, TPRM engine, Privacy module, AI Governance module, Intelligence engine, Automation engine, or API framework.
 
-**Status:** PHASE B ACCEPTED FOR CURRENT STAGE. Bounded completion gaps implemented and CI-proven (`0f42cba86f42fa9df0399634bceb520036ed82ce`, CI 35835067819). Hosted verification BLOCKED (Render pipeline minutes). Gaps not marked CLOSED. Not #23 PASS. No Phase C. #27 and #30 are not started. Nigeria and the United States exist only as first #23 reference jurisdictions. Reconciliation: `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`. Gap closure: `docs/private-beta/hosted-ux-qa/insurance-edition/final-gap-closure/`.
+**Status:** PHASE B ACCEPTED FOR CURRENT STAGE. ZERO-SPEND HOSTING HOLD. Frozen candidate `0f42cba86f42fa9df0399634bceb520036ed82ce` (CI 35835067819). Five gaps implemented and CI-proven; not hosted-proven; not CLOSED. Waiting for included Render pipeline minutes. Spend limit remains $0.00. Not a product failure. Not #23 PASS. No Phase C. #27 and #30 are not started. Nigeria and the United States exist only as first #23 reference jurisdictions. Reconciliation: `docs/private-beta/hosted-ux-qa/insurance-edition/final-reconciliation/`. Gap closure: `docs/private-beta/hosted-ux-qa/insurance-edition/final-gap-closure/`.
 
 ## Architecture (unchanged)
 
