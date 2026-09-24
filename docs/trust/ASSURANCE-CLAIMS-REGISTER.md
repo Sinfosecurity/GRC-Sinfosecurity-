@@ -346,7 +346,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
 | reviewBy | 2026-12-23 |
-| publicCopy | Supreme Intelligence is an accepted product module that interprets recorded Supreme facts. It is not a certification and does not invent monitoring events. |
+| publicCopy | Supreme Intelligence interprets recorded Supreme data without inventing external threat events. |
 | internalNotes | Historical PARTIAL lines in SUPREME-PROGRAM-STATE.md were stale documentation and were reconciled. Hosted review records from 2026-09-14/15 are preserved as history. Do not reopen #19 engineering. Do not say “PASS certified product.” The forbidden wording “Supreme Intelligence is a PASS certified product” remains NOT_SUPPORTED. |
 
 ### C-22

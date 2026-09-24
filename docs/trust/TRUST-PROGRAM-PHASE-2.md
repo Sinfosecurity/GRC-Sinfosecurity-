@@ -3,7 +3,7 @@
 **Status:** AUTHORIZED / IN PROGRESS — READY FOR PRODUCT LEADERSHIP REVIEW  
 **#34 itself:** ACTIVE / NOT PASS  
 **Phase 0:** ACCEPTED FOR CURRENT STAGE (`a89cf2f746be3bcf272c74eb7ed553623dc062f7`)  
-**Phase 1:** ACCEPTED FOR CURRENT STAGE (`4243e0bf99f30a9d1caebf2307fe71708b71f15f`)  
+**Phase 1:** ACCEPTED FOR CURRENT STAGE (`6b01dd2c3cfc78366eeb349792fadee55a8c52a6`). First Phase 1 pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f` remains historical.  
 **#19:** PASS — Product Leadership accepted 2026-09-14  
 **#23 frozen (unchanged):** `0f42cba86f42fa9df0399634bceb520036ed82ce`  
 **#39:** ACCEPTED FOR STRATEGIC PLANNING / NOT COMPLETE  

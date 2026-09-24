@@ -8,7 +8,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 **LAST UPDATED:** 2026-09-23 (#34 Phase 1 ACCEPTED FOR CURRENT STAGE; #34 Phase 2 AUTHORIZED / IN PROGRESS; #19 PASS; #23 ZERO-SPEND HOSTING HOLD unchanged; #39 accepted for strategic planning, not complete; #12 remains PASS private-testing; commercial production NO-GO)
 
-**CURRENT ITEM:** #34 Trust Program — PHASE 2 PUBLICATION READINESS (docs-only). Phase 1 ACCEPTED FOR CURRENT STAGE on `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Phase 0 remains ACCEPTED. #23 remains ACTIVE / NOT PASS on zero-spend hold; frozen `0f42cba86f42fa9df0399634bceb520036ed82ce`. Do not purchase Render minutes. Spend limit remains $0.00. Do not deploy public trust pages. Do not start #24 or #40. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #19 is PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). #39 research package ACCEPTED FOR STRATEGIC PLANNING — not complete. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN.
+**CURRENT ITEM:** #34 Trust Program — PHASE 2 PUBLICATION READINESS (docs-only). Phase 1 ACCEPTED FOR CURRENT STAGE on `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. Phase 0 remains ACCEPTED. #23 remains ACTIVE / NOT PASS on zero-spend hold; frozen `0f42cba86f42fa9df0399634bceb520036ed82ce`. Do not purchase Render minutes. Spend limit remains $0.00. Do not deploy public trust pages. Do not start #24 or #40. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #19 is PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). #39 research package ACCEPTED FOR STRATEGIC PLANNING — not complete. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN.
 
 **CURRENT ITEM STATUS:** #34 PHASE 0 ACCEPTED. PHASE 1 ACCEPTED FOR CURRENT STAGE. PHASE 2 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2 / ISO. Public pages not deployed. #19 is PASS — Product Leadership accepted 2026-09-14. #23 remains ACTIVE / NOT PASS. #12 remains PASS — PRIVATE-TESTING RELEASE CANDIDATE. Commercial production remains NO-GO. Cursor does not declare #34 PASS, #23 PASS, commercial GO, or production ready.
 
@@ -268,7 +268,7 @@ Operate #34 Trust Program Phase 2 (docs-only publication readiness) on `supreme-
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#34 Trust Program — Phase 2** — docs/process only. Publication readiness. No public page deploy. No new trust engine. No runtime required. Phase 1 ACCEPTED on `4243e0bf99f30a9d1caebf2307fe71708b71f15f`.
+**#34 Trust Program — Phase 2** — docs/process only. Publication readiness. No public page deploy. No new trust engine. No runtime required. Phase 1 ACCEPTED on `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`.
 
 **#19 Supreme Intelligence** — PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). Implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`. CI `34914149569` PASS. Not current engineering work.
 
@@ -312,7 +312,7 @@ Do not start #24 or #40.
 
 ## NEXT DECISION REQUIRED
 
-#34 Phase 2 is ready for Product Leadership review. Phase 1 is ACCEPTED FOR CURRENT STAGE on `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Do not deploy public trust pages. #19 is PASS — Product Leadership accepted 2026-09-14. #23 remains on zero-spend hold: wait for included Render pipeline minutes to reset. Do not purchase minutes. Custom pipeline-minute spend limit remains $0.00. After included minutes reset: deploy frozen `0f42cba86f42fa9df0399634bceb520036ed82ce` to staging API and frontend, run `scripts/hosted-insurance-gap-closure-qa.py`, then return #23 for Product Leadership final certification. Do not mark the five gaps CLOSED until hosted proof exists. Do not start Phase C. Do not start #24, #27, #30, or #40. Do not create Wave 9. #12 remains PASS for private-testing release-candidate scope. Commercial production remains NO-GO.
+#34 Phase 2 is ready for Product Leadership review. Phase 1 is ACCEPTED FOR CURRENT STAGE on `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. Do not deploy public trust pages. #19 is PASS — Product Leadership accepted 2026-09-14. #23 remains on zero-spend hold: wait for included Render pipeline minutes to reset. Do not purchase minutes. Custom pipeline-minute spend limit remains $0.00. After included minutes reset: deploy frozen `0f42cba86f42fa9df0399634bceb520036ed82ce` to staging API and frontend, run `scripts/hosted-insurance-gap-closure-qa.py`, then return #23 for Product Leadership final certification. Do not mark the five gaps CLOSED until hosted proof exists. Do not start Phase C. Do not start #24, #27, #30, or #40. Do not create Wave 9. #12 remains PASS for private-testing release-candidate scope. Commercial production remains NO-GO.
 
 ---
 
@@ -371,9 +371,14 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 ### 2026-09-23
 
+**ITEM:** #34 Trust Program — Phase 1 accepted SHA + Phase 2 alignment  
+**STATUS CHANGE:** none on numbered status. Phase 1 ACCEPTED FOR CURRENT STAGE is recorded on controlling SHA `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. First Phase 1 pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f` remains historical. Phase 2 remains AUTHORIZED / IN PROGRESS. `/status` remains NOT_CONFIGURED / NOT MONITORED. Not PASS.  
+**SHA:** Phase 1 accepted `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
+**EVIDENCE:** Product Leadership controlled instruction 2026-09-23 (Phase 1 SHA `6b01dd2`).
+
 **ITEM:** #34 Trust Program — Phase 1 acceptance + Phase 2  
 **STATUS CHANGE:** PHASE 1 ACCEPTED FOR CURRENT STAGE → PHASE 2 AUTHORIZED / IN PROGRESS. Docs-only publication readiness. Public trust pages not deployed. Not PASS. Not SOC 2 / ISO. No Render deploy. Spend $0. #23 remains frozen. #24 / #40 not started. #39 remains accepted for strategic planning, not complete.  
-**SHA:** Phase 1 accepted `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
+**SHA:** Phase 1 first pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f`; controlling accepted SHA later recorded as `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
 **EVIDENCE:** `docs/trust/TRUST-PROGRAM-PHASE-2.md` and companion Phase 2 artifacts.
 
 **ITEM:** #34 Trust Program — Phase 1 controlled-instruction alignment  

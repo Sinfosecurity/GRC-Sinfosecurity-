@@ -25,7 +25,7 @@ Review state for recorded statuses: APPROVED (2026-09-23). None are expired. `re
 | --- | --- | --- |
 | `/trust` | Draft capabilities; no certifications | May later receive READY_FOR_PUBLICATION sentences only |
 | `/security` | Product security as it exists | Same + pentest public summary |
-| `/status` | NOT_CONFIGURED | Keep NOT_CONFIGURED. No uptime, incident history, live health, or “all systems operational” |
+| `/status` | NOT_CONFIGURED / NOT MONITORED | Keep NOT_CONFIGURED / NOT MONITORED. No uptime, incident history, live operational status, or “All systems operational” |
 | `/privacy` | Draft | LEGAL_REVIEW_REQUIRED |
 | `/terms` | Draft | LEGAL_REVIEW_REQUIRED |
 | `/subprocessors` | Empty production list | LEGAL_REVIEW_REQUIRED + PRODUCTION_VALIDATION_REQUIRED for a production list |
@@ -195,7 +195,7 @@ Every row is SUPPORTED, APPROVED, not expired, not legally binding, not producti
 | --- | --- |
 | claimId | C-21 |
 | route | `/trust` |
-| proposed wording | Supreme Intelligence is an accepted product module that interprets recorded Supreme data without inventing external threat events. It is not certified AI intelligence, not an external threat feed, and not a live cyber intelligence network. |
+| proposed wording | Supreme Intelligence interprets recorded Supreme data without inventing external threat events. |
 | claim status | SUPPORTED |
 | review state | APPROVED |
 | publish class | READY_FOR_PUBLICATION |

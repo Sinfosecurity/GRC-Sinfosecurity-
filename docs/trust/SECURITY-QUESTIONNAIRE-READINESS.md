@@ -37,7 +37,7 @@
 | Q-20 | Slack / Jira / ratings | PRODUCTION_VALIDATION_REQUIRED as live; READY_WITH_LIMITATION as LIVE VALIDATION DEFERRED |
 | Q-21 | Production / GA | DO_NOT_PUBLISH as yes; READY as **No — private-testing RC, commercial NO-GO** |
 | Q-22 | Certifications | READY as **No** | Supreme is not SOC 2, ISO 27001, FedRAMP, HIPAA, or PCI certified |
-| Q-23 | Status / uptime | READY as **No live status page; no uptime %** | `/status` NOT_CONFIGURED |
+| Q-23 | Status / uptime | READY as **No live status page; no uptime %** | `/status` NOT_CONFIGURED / NOT MONITORED |
 | Q-24 | Security / support contact | CONTACT path: treat as READY as **not configured** | Do not invent addresses |
 
 Q-21 is classified READY only for the honest **No**. A “yes, production-ready” answer is DO_NOT_PUBLISH / PRODUCTION_VALIDATION_REQUIRED.
