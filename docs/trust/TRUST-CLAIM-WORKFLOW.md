@@ -76,7 +76,7 @@ If any condition fails, the claim is not publicly usable.
 
 ### REVIEW REQUIRED (expired)
 
-If `reviewBy` passes without human re-approval, the claim is **REVIEW REQUIRED**. Public pages must treat it as not currently usable. Internally it is treated as PARTIAL for public use until re-reviewed. Do not automatically claim continued compliance.
+If `reviewBy` passes without human re-approval, the claim is **REVIEW REQUIRED**. It is automatically **ineligible for publication** even if it was previously READY_FOR_PUBLICATION. Internally it is treated as PARTIAL for public use until re-reviewed. Do not automatically claim continued compliance. Do not auto-renew.
 
 ## Who does what
 

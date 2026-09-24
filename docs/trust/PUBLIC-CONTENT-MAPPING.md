@@ -1,7 +1,7 @@
 # Public content mapping
 
-**Status:** MAPPING ONLY — no runtime changes in Phase 1  
-**Rule:** Public pages may use **SUPPORTED** claims only, and only when the publish class is SAFE_TO_PUBLISH_NOW.  
+**Status:** PHASE 1 mapping retained. Phase 2 controlling matrix is `PUBLICATION-READINESS-MATRIX.md` (`READY_FOR_PUBLICATION` and the four blocker classes).  
+**Rule:** Public pages may use **SUPPORTED** claims only. Phase 2 does not deploy routes.  
 **Routes already shipped (unchanged):** `/trust` `/security` `/status` `/privacy` `/terms` `/subprocessors`
 
 ## Publish classes

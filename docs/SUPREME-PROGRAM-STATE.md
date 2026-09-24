@@ -6,11 +6,11 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-23 (#34 Phase 0 ACCEPTED FOR CURRENT STAGE; #34 Phase 1 AUTHORIZED / IN PROGRESS; #19 PASS reconciled; #23 ZERO-SPEND HOSTING HOLD unchanged; #39 accepted for strategic planning, not complete; #12 remains PASS private-testing; commercial production NO-GO)
+**LAST UPDATED:** 2026-09-23 (#34 Phase 1 ACCEPTED FOR CURRENT STAGE; #34 Phase 2 AUTHORIZED / IN PROGRESS; #19 PASS; #23 ZERO-SPEND HOSTING HOLD unchanged; #39 accepted for strategic planning, not complete; #12 remains PASS private-testing; commercial production NO-GO)
 
-**CURRENT ITEM:** #34 Trust Program — PHASE 1 OPERATIONALIZATION (docs-only). Phase 0 ACCEPTED FOR CURRENT STAGE on `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. #23 remains ACTIVE / NOT PASS on zero-spend hold; frozen `0f42cba86f42fa9df0399634bceb520036ed82ce`. Do not purchase Render minutes. Spend limit remains $0.00. Do not start #24 or #40. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #19 is PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). #39 research package ACCEPTED FOR STRATEGIC PLANNING — not complete. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN.
+**CURRENT ITEM:** #34 Trust Program — PHASE 2 PUBLICATION READINESS (docs-only). Phase 1 ACCEPTED FOR CURRENT STAGE on `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Phase 0 remains ACCEPTED. #23 remains ACTIVE / NOT PASS on zero-spend hold; frozen `0f42cba86f42fa9df0399634bceb520036ed82ce`. Do not purchase Render minutes. Spend limit remains $0.00. Do not deploy public trust pages. Do not start #24 or #40. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #19 is PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). #39 research package ACCEPTED FOR STRATEGIC PLANNING — not complete. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN.
 
-**CURRENT ITEM STATUS:** #34 PHASE 0 ACCEPTED FOR CURRENT STAGE. PHASE 1 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2 / ISO. #19 is PASS — Product Leadership accepted 2026-09-14. #23 remains ACTIVE / NOT PASS. #12 remains PASS — PRIVATE-TESTING RELEASE CANDIDATE. Commercial production remains NO-GO. Cursor does not declare #34 PASS, #23 PASS, commercial GO, or production ready.
+**CURRENT ITEM STATUS:** #34 PHASE 0 ACCEPTED. PHASE 1 ACCEPTED FOR CURRENT STAGE. PHASE 2 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2 / ISO. Public pages not deployed. #19 is PASS — Product Leadership accepted 2026-09-14. #23 remains ACTIVE / NOT PASS. #12 remains PASS — PRIVATE-TESTING RELEASE CANDIDATE. Commercial production remains NO-GO. Cursor does not declare #34 PASS, #23 PASS, commercial GO, or production ready.
 
 **VERSION 3 CHECKPOINT SHA:** `d7692ab011356c51582e4de89573b9580bb85be9`
 
@@ -262,13 +262,13 @@ See `docs/PRIVATE-BETA-CERTIFICATION.md` and `docs/RISK-METHODOLOGY-WORKSPACE.md
 
 ## CURRENT OBJECTIVE
 
-Operate #34 Trust Program Phase 1 (docs-only diligence package) on `supreme-risk-transformation`. #19 is PASS — Product Leadership accepted 2026-09-14; do not reopen engineering. #12 remains PASS for private-testing release-candidate scope. #23 remains ACTIVE / NOT PASS on zero-spend hold. #39 remains accepted for strategic planning, not complete. Do not start #24 or #40. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
+Operate #34 Trust Program Phase 2 (docs-only publication readiness) on `supreme-risk-transformation`. Do not deploy public trust pages. #19 is PASS — Product Leadership accepted 2026-09-14; do not reopen engineering. #12 remains PASS for private-testing release-candidate scope. #23 remains ACTIVE / NOT PASS on zero-spend hold. #39 remains accepted for strategic planning, not complete. Do not start #24 or #40. Do not invite external testers unless separately approved. Do not commercially launch. Do not deploy production. Do not change DNS. Do not merge `main`.
 
 ---
 
 ## NEXT AUTHORIZED ENGINEERING ITEM
 
-**#34 Trust Program — Phase 1** — docs/process only. No new trust engine. No runtime required.
+**#34 Trust Program — Phase 2** — docs/process only. Publication readiness. No public page deploy. No new trust engine. No runtime required. Phase 1 ACCEPTED on `4243e0bf99f30a9d1caebf2307fe71708b71f15f`.
 
 **#19 Supreme Intelligence** — PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). Implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`. CI `34914149569` PASS. Not current engineering work.
 
@@ -312,7 +312,7 @@ Do not start #24 or #40.
 
 ## NEXT DECISION REQUIRED
 
-#34 Phase 1 is ready for Product Leadership review. #19 is PASS — Product Leadership accepted 2026-09-14; stale PARTIAL current-status documentation is reconciled. #23 remains on zero-spend hold: wait for included Render pipeline minutes to reset. Do not purchase minutes. Custom pipeline-minute spend limit remains $0.00. After included minutes reset: deploy frozen `0f42cba86f42fa9df0399634bceb520036ed82ce` to staging API and frontend, run `scripts/hosted-insurance-gap-closure-qa.py`, then return #23 for Product Leadership final certification. Do not mark the five gaps CLOSED until hosted proof exists. Do not start Phase C. Do not start #24, #27, #30, or #40. Do not create Wave 9. #12 remains PASS for private-testing release-candidate scope. Commercial production remains NO-GO.
+#34 Phase 2 is ready for Product Leadership review. Phase 1 is ACCEPTED FOR CURRENT STAGE on `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Do not deploy public trust pages. #19 is PASS — Product Leadership accepted 2026-09-14. #23 remains on zero-spend hold: wait for included Render pipeline minutes to reset. Do not purchase minutes. Custom pipeline-minute spend limit remains $0.00. After included minutes reset: deploy frozen `0f42cba86f42fa9df0399634bceb520036ed82ce` to staging API and frontend, run `scripts/hosted-insurance-gap-closure-qa.py`, then return #23 for Product Leadership final certification. Do not mark the five gaps CLOSED until hosted proof exists. Do not start Phase C. Do not start #24, #27, #30, or #40. Do not create Wave 9. #12 remains PASS for private-testing release-candidate scope. Commercial production remains NO-GO.
 
 ---
 
@@ -356,7 +356,7 @@ Do not invent percentages.
 | 22 | API / Webhooks / Integrations | ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED |
 | 23 | Insurance Edition | ACTIVE — PHASE B ACCEPTED; ZERO-SPEND HOSTING HOLD; not PASS |
 | 24–33, 35–38, 40 | Later modules / GTM / packs | NOT STARTED / NOT AUTHORIZED |
-| 34 | Trust Program | PHASE 0 ACCEPTED FOR CURRENT STAGE; PHASE 1 AUTHORIZED / IN PROGRESS; not PASS |
+| 34 | Trust Program | PHASE 0 ACCEPTED; PHASE 1 ACCEPTED FOR CURRENT STAGE; PHASE 2 AUTHORIZED / IN PROGRESS; not PASS |
 | 39 | Competitive Capability Matrix | RESEARCH PACKAGE ACCEPTED FOR STRATEGIC PLANNING; not complete |
 
 Marketing preview pages are not implementation.
@@ -370,6 +370,11 @@ Concise accepted-status history. Do not fabricate unsubstantiated history. Older
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
 
 ### 2026-09-23
+
+**ITEM:** #34 Trust Program — Phase 1 acceptance + Phase 2  
+**STATUS CHANGE:** PHASE 1 ACCEPTED FOR CURRENT STAGE → PHASE 2 AUTHORIZED / IN PROGRESS. Docs-only publication readiness. Public trust pages not deployed. Not PASS. Not SOC 2 / ISO. No Render deploy. Spend $0. #23 remains frozen. #24 / #40 not started. #39 remains accepted for strategic planning, not complete.  
+**SHA:** Phase 1 accepted `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
+**EVIDENCE:** `docs/trust/TRUST-PROGRAM-PHASE-2.md` and companion Phase 2 artifacts.
 
 **ITEM:** #34 Trust Program — Phase 1 controlled-instruction alignment  
 **STATUS CHANGE:** none on numbered status. Phase 0 remains ACCEPTED FOR CURRENT STAGE (docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`; formal-label alignment `6a55a4175292b8392430d153db6ac7d72495ae18`). Phase 1 remains AUTHORIZED / IN PROGRESS. Publish classes, claim `evidence` field, contact NOT CONFIGURED labels, and package sections aligned to the Product Leadership Phase 1 instruction. Not PASS.  
