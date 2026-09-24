@@ -1,7 +1,11 @@
 {
   "item": "#34 Trust Program",
   "phase": "3",
-  "status": "PHASE 0 ACCEPTED; PHASE 1 ACCEPTED; PHASE 2 ACCEPTED; PHASE 3 AUTHORIZED / IN PROGRESS — READY FOR PRODUCT LEADERSHIP REVIEW",
+  "status": "PHASES 0–3 ACCEPTED; ZERO-SPEND PUBLICATION HOLD; READY FOR CONTROLLED PUBLICATION WHEN HOSTING CAPACITY RETURNS; NOT PASS",
+  "phase3Accepted": true,
+  "phase3Sha": "de1a2862c77876de9ff1b9a821b907082dfc47e5",
+  "publicationAuthorized": false,
+  "phase4": false,
   "pass": false,
   "soc2": false,
   "iso27001": false,
