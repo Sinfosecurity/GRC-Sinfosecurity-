@@ -615,7 +615,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** AUTHORIZED — PHASE 0 TRUST FOUNDATION IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001.
 
-**CERTIFICATION SHA:** Phase 0 docs package only. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
+**CERTIFICATION SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
 **EVIDENCE:** `docs/trust/`. Existing draft routes `/trust` `/security` `/status` remain honest and were not rewritten in this phase (docs-first; no Render build). Security mailbox remains NOT CONFIGURED.
 
