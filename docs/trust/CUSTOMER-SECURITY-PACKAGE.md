@@ -29,7 +29,15 @@ Organization data is scoped to the authenticated tenant. Cross-tenant access is 
 
 **Do not attach:** internal service diagrams that name private hosts, credentials, or unpublished endpoints.
 
-## 3. Access control
+## 3. Data flow
+
+A tenant user or vendor submits data to the hosted API. The API scopes every read and write to the authenticated organization. Tenant business records persist in Render Postgres. Evidence bytes persist in S3-compatible MinIO. Optional transactional email goes through Resend when configured. Stripe test-mode may receive billing identifiers when test keys are present. ClamAV may receive file bytes during scan when connected.
+
+**Authoritative evidence:** `docs/SECURITY-ARCHITECTURE.md`; `SUBPROCESSOR-REGISTER.md`; #3 / #12 Evidence.
+
+**Honesty:** This describes **staging / private-testing**. Production object storage is not validated. Email delivery is unconfirmed. Live Stripe is not authorized. Do not publish secret values, private IPs, or unpublished endpoints.
+
+## 4. Access control
 
 Role-based access control is enforced on the server. Privileged actions require an authorized role. Viewer and vendor planes are isolated from requester IRA and GRC notes. Support access is customer-approved; there are no default credentials.
 
@@ -37,7 +45,7 @@ Role-based access control is enforced on the server. Privileged actions require 
 
 **Limitation:** Live customer IdP federation is deferred (#21).
 
-## 4. Authentication / MFA
+## 5. Authentication / MFA
 
 Password authentication plus TOTP privileged-MFA architecture. Production configuration (`APP_ENVIRONMENT=production`) is required to enforce customer privileged MFA. Staging currently uses an audited grace so private-testing QA is not locked out. Staging login without MFA is **not** proof that production MFA is off.
 
@@ -45,13 +53,13 @@ Password authentication plus TOTP privileged-MFA architecture. Production config
 
 **Limitation:** Staging grace is not production proof. Live Entra / Okta / Google SSO is **SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED**.
 
-## 5. Tenant isolation
+## 6. Tenant isolation
 
 Tenant isolation is enforced. Cross-tenant reads do not return another tenant’s records. Two-tenant hosted proof exists for the private-testing release candidate, including the 2026-09-22 rem/retest.
 
 **Authoritative evidence:** #12 two-tenant hosted proof; 2026-09-22 rem; claim C-01.
 
-## 6. Encryption
+## 7. Encryption
 
 Hosted staging uses HTTPS in transit. Secrets and stored objects use the platform encryption path described in product security pages.
 
@@ -59,7 +67,7 @@ Hosted staging uses HTTPS in transit. Secrets and stored objects use the platfor
 
 **Limitation:** Do not publish cipher-suite lists or key-location detail. At-rest KMS posture is not a certified claim. Production object storage is **not validated**.
 
-## 7. Evidence security
+## 8. Evidence security
 
 Evidence bytes live in S3-compatible object storage (staging: MinIO with persistent disk). Downloads require malware status CLEAN. Pending, failed, or non-CLEAN evidence is not downloadable (fail-closed). Support cannot mark evidence CLEAN. There is no local-filesystem evidence fallback on the hosted staging evidence path used for #12.
 
@@ -67,29 +75,37 @@ Evidence bytes live in S3-compatible object storage (staging: MinIO with persist
 
 **Limitation:** Production object storage is not validated. Do not imply AWS S3 unless that store is actually contracted.
 
-## 8. Malware controls
+## 9. Malware scanning
 
 Uploads are scanned. Fail-closed if the scanner is absent or the result is not CLEAN. ClamAV is used when connected on staging.
 
 **Authoritative evidence:** #3 PASS; `SUBPROCESSOR-REGISTER.md` ClamAV row.
 
-**Limitation:** Scanner location is TO BE CONFIRMED. Scanner itself is not backed up as a data store.
+**Limitation:** Scanner location is UNKNOWN / TO BE CONFIRMED. Scanner itself is not backed up as a data store.
 
-## 9. Logging / audit
+## 10. Audit logging
 
 Significant actions write tenant-scoped audit events. This is not a SIEM product.
 
 **Authoritative evidence:** #8 / #12; claim C-04.
 
-## 10. Vulnerability management
+## 11. Secure development
 
-Identified findings from 2026-09-22 security testing were remediated and two-tenant retested on staging. Hosted CI includes typecheck, tests, Prisma validate, production build, public-build safety, and secret scan.
+GitHub-hosted CI runs typecheck, tests, Prisma validate, production build, public-build safety, and secret scan. This is not a certified SDLC audit.
+
+**Authoritative evidence:** #6 PASS; questionnaire Q-18.
+
+**Limitation:** Not a certified secure-development attestation. Do not claim ISO or SOC 2 SDLC certification.
+
+## 12. Vulnerability management
+
+Identified findings from 2026-09-22 security testing were remediated and two-tenant retested on staging.
 
 **Authoritative evidence:** `docs/security/PENTEST-2026-09-22-REMEDIATION.md`; #6 PASS; claim C-09.
 
 **Limitation:** No named external firm. No bug bounty. Not a certified vulnerability-management attestation.
 
-## 11. Penetration-testing summary
+## 13. Penetration-testing summary
 
 **Date:** 2026-09-22  
 **Environment:** hosted staging only  
@@ -105,7 +121,7 @@ This summary omits payloads, credentials, internal endpoints, QA accounts, and s
 
 **Current status:** Remediation ACCEPTED FOR CURRENT STAGE as part of #12 private-testing certification. Not a commercial certification.
 
-## 12. Incident response
+## 14. Incident response
 
 Internal runbooks exist for detection, triage, containment, restore, and post-review. The operations console exists (#7).
 
@@ -113,7 +129,7 @@ Internal runbooks exist for detection, triage, containment, restore, and post-re
 
 **Limitation:** No contractual customer-notification hours. Do not publish an incident SLA.
 
-## 13. Backup / DR
+## 15. Backup / DR
 
 Isolated two-tenant PostgreSQL + evidence-object restore was certified (#5 PASS).
 
@@ -121,15 +137,15 @@ Isolated two-tenant PostgreSQL + evidence-object restore was certified (#5 PASS)
 
 **Limitation:** RTO/RPO are **not contractually defined**. Not multi-region HA. Not immutable backups. Render free Postgres noted as expiring 2026-10-12 is **not acceptable for production**. Claim C-19 is NOT_SUPPORTED.
 
-## 14. Subprocessors
+## 16. Subprocessors
 
 Current **staging / private-testing** processors are listed in `SUBPROCESSOR-REGISTER.md`. Production roster is not contracted.
 
 **Authoritative evidence:** `SUBPROCESSOR-REGISTER.md`.
 
-**Limitation:** LEGAL REVIEW REQUIRED before a customer-facing production list. Locations flagged TO BE CONFIRMED must stay that way. Architecture-only providers (Entra/Okta/Google, Slack/Jira) are not live subprocessors.
+**Limitation:** LEGAL REVIEW REQUIRED before a customer-facing production list. Locations flagged UNKNOWN / TO BE CONFIRMED must stay that way. Architecture-only providers (Entra/Okta/Google, Slack/Jira) are not live subprocessors.
 
-## 15. Privacy position
+## 17. Privacy position
 
 The product can record ROPA, rights, transfers, and retention tasks (#17 PASS). Public `/privacy` is a draft pending legal review. No binding DPA is approved.
 
@@ -137,7 +153,7 @@ The product can record ROPA, rights, transfers, and retention tasks (#17 PASS). 
 
 **Limitation:** LEGAL REVIEW REQUIRED. Supreme does not auto-delete customer data from connected external systems.
 
-## 16. Current assurance position
+## 18. Assurance position
 
 | Strength | Supreme today |
 | --- | --- |
@@ -150,7 +166,7 @@ The product can record ROPA, rights, transfers, and retention tasks (#17 PASS). 
 
 **Authoritative evidence:** `ASSURANCE-CLAIMS-REGISTER.md`; punch list #19.
 
-## 17. Known limitations
+## 19. Known limitations
 
 - #12 is private-testing RC only; commercial production NO-GO
 - Production object storage not validated
@@ -167,13 +183,13 @@ The product can record ROPA, rights, transfers, and retention tasks (#17 PASS). 
 - Public legal pages are drafts
 - #24 and #40 NOT STARTED
 
-## 18. Contact information status
+## 20. Contact-readiness status
 
 | Contact | Status |
 | --- | --- |
 | Security | NOT CONFIGURED — USER ACTION REQUIRED |
-| Support | USER ACTION REQUIRED |
-| Status page | NOT_CONFIGURED |
+| Support | NOT CONFIGURED — USER ACTION REQUIRED |
+| Status page | NOT_CONFIGURED / NOT MONITORED |
 
 See `CONTACT-READINESS.md`. Do not invent addresses.
 

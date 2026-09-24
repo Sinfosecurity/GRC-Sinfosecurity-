@@ -615,7 +615,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **CURRENT STATUS:** PHASE 0 ACCEPTED FOR CURRENT STAGE. PHASE 1 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001.
 
-**CERTIFICATION SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Remote program head at Phase 0 acceptance `812d2ea186a0d1175a6a4c6fad3740b93bc7725c`. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
+**CERTIFICATION SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Formal-label alignment `6a55a4175292b8392430d153db6ac7d72495ae18`. Remote program head at Phase 0 acceptance `812d2ea186a0d1175a6a4c6fad3740b93bc7725c`. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
 **EVIDENCE:** `docs/trust/` including Phase 1 operational pack (`TRUST-PROGRAM-PHASE-1.md`, claim workflow, public-content mapping, customer security package, questionnaire bank, legal ownership, subprocessor register, contact readiness). Existing draft routes `/trust` `/security` `/status` remain honest and were not rewritten (docs-first; no Render build). Security mailbox remains NOT CONFIGURED.
 

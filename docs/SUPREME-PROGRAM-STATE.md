@@ -371,9 +371,14 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 ### 2026-09-23
 
+**ITEM:** #34 Trust Program — Phase 1 controlled-instruction alignment  
+**STATUS CHANGE:** none on numbered status. Phase 0 remains ACCEPTED FOR CURRENT STAGE (docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`; formal-label alignment `6a55a4175292b8392430d153db6ac7d72495ae18`). Phase 1 remains AUTHORIZED / IN PROGRESS. Publish classes, claim `evidence` field, contact NOT CONFIGURED labels, and package sections aligned to the Product Leadership Phase 1 instruction. Not PASS.  
+**SHA:** prior Phase 1 pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
+**EVIDENCE:** `docs/trust/`.
+
 **ITEM:** #34 Trust Program — Phase 0 acceptance + Phase 1  
 **STATUS CHANGE:** PHASE 0 ACCEPTED FOR CURRENT STAGE → PHASE 1 AUTHORIZED / IN PROGRESS. Docs-only operationalization. Not PASS. Not SOC 2 / ISO. No Render deploy. Spend $0. #23 remains frozen. #24 / #40 not started. #39 remains accepted for strategic planning, not complete.  
-**SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Remote program head at Phase 0 acceptance `812d2ea186a0d1175a6a4c6fad3740b93bc7725c`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
+**SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Formal-label alignment `6a55a4175292b8392430d153db6ac7d72495ae18`. Remote program head at Phase 0 acceptance `812d2ea186a0d1175a6a4c6fad3740b93bc7725c`. Frozen #23 `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
 **EVIDENCE:** `docs/trust/TRUST-PROGRAM-PHASE-1.md` and companion Phase 1 artifacts.
 
 **ITEM:** #19 Supreme Intelligence — documentation reconciliation  

@@ -4,6 +4,7 @@
 **#34 itself:** ACTIVE / NOT PASS  
 **Phase 0:** ACCEPTED FOR CURRENT STAGE  
 **Phase 0 docs SHA:** `a89cf2f746be3bcf272c74eb7ed553623dc062f7`  
+**Formal-label alignment:** `6a55a4175292b8392430d153db6ac7d72495ae18`  
 **Remote program head at Phase 0 acceptance:** `812d2ea186a0d1175a6a4c6fad3740b93bc7725c`  
 **#23 frozen candidate (unchanged):** `0f42cba86f42fa9df0399634bceb520036ed82ce`  
 **#19:** PASS — PRODUCT LEADERSHIP ACCEPTED (2026-09-14). Implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`. CI `34914149569` PASS. Do not reopen engineering.  
@@ -39,7 +40,7 @@ No new trust engine. No runtime changes. No SOC 2. No ISO 27001. No production d
 
 ## Phase 0 acceptance (recorded)
 
-Product Leadership accepted Phase 0 for the current stage on docs SHA `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Later wording-alignment commit `6a55a4175292b8392430d153db6ac7d72495ae18` did not reopen Phase 0 engineering. #34 remains ACTIVE / NOT PASS.
+Product Leadership accepted Phase 0 for the current stage on docs SHA `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Formal-label alignment `6a55a4175292b8392430d153db6ac7d72495ae18` is recorded and did not reopen Phase 0 engineering. #34 remains ACTIVE / NOT PASS.
 
 ## Phase 1 artifacts
 

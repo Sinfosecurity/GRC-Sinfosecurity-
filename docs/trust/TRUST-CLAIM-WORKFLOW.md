@@ -27,7 +27,7 @@ Allowed statuses remain exactly these five. Do not invent CERTIFIED as a claim s
 | `claim` | Precise statement being governed |
 | `visibility` | public / private / never public |
 | `status` | One of the five allowed statuses |
-| `evidence source` | Authoritative punch-list item, hosted pack, or doc |
+| `evidence` | Authoritative punch-list item, hosted pack, or doc |
 | `owner` | Person/role who maintains the claim |
 | `approver` | Person/role who may mark APPROVED |
 | `lastReviewed` | Last human review date |
@@ -70,7 +70,7 @@ Only when **all** of the following are true:
 2. Review state is APPROVED
 3. `reviewBy` has not passed
 4. `publicCopy` is the sentence to use
-5. Publication class in `PUBLIC-CONTENT-MAPPING.md` is SAFE TO PUBLISH NOW for that surface
+5. Publication class in `PUBLIC-CONTENT-MAPPING.md` is SAFE_TO_PUBLISH_NOW for that surface
 
 If any condition fails, the claim is not publicly usable.
 
@@ -93,9 +93,12 @@ Default owners and approvers are recorded on each claim. Named people are **USER
 
 Phase 1 does **not** add automation code.
 
+Automation **may remind**. Automation **must not** self-approve or republish claims.
+
 Existing #20 Supreme Automation already has scheduled-review primitives (`scheduled.review`, idempotent scan, task + notification + audit). Product Leadership may later map claim `reviewBy` dates onto those primitives **without** a new reminder engine. Until that mapping is explicitly authorized:
 
 - reminders are a human calendar / punch-list review
+- no claim is auto-approved
 - no claim is auto-republished
 - no claim status is auto-upgraded
 

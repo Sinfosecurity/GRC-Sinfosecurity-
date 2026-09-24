@@ -151,7 +151,7 @@ If a questionnaire asks whether Supreme is SOC 2 or ISO 27001 certified, the ans
 | evidence | #3 PASS; subprocessor register |
 | owner | Security |
 | lastReviewed | 2026-09-23 |
-| limitations | Scanner location TO BE CONFIRMED. Fail-closed if disconnected. |
+| limitations | Scanner location UNKNOWN / TO BE CONFIRMED. Fail-closed if disconnected. |
 | customer-safe wording | Uploads are malware-scanned. Download is fail-closed unless the scan is CLEAN. |
 
 ### Q-11 — Logging and audit
@@ -235,7 +235,7 @@ If a questionnaire asks whether Supreme is SOC 2 or ISO 27001 certified, the ans
 | evidence | `SUBPROCESSOR-REGISTER.md` |
 | owner | Legal |
 | lastReviewed | 2026-09-23 |
-| limitations | Locations TO BE CONFIRMED where unknown; architecture-only tools are not live subprocessors |
+| limitations | Locations UNKNOWN / TO BE CONFIRMED where unknown; architecture-only tools are not live subprocessors |
 | customer-safe wording | Supreme maintains a staging / private-testing processor register. A production customer subprocessor notice requires legal review. |
 
 ### Q-17 — Data protection / DPA

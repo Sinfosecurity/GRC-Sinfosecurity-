@@ -27,23 +27,28 @@ These are options for Product Leadership. None is configured by this document.
 | Support / security ticket intake | Existing ticketing path with a security queue | Working intake URL or mailbox, SLA honesty (no invented hours), routing owner |
 | Named operational mailbox | An already-monitored human mailbox | Confirmation it is monitored, written owner, after-hours coverage honesty |
 
-### Must be true before the address is public
+### Must be configured before publication
 
-1. A real working destination exists (mailbox or ticket intake).
-2. A named owner monitors it.
-3. Vulnerability disclosure wording is legally reviewed.
-4. Product Leadership approves publication on `/security` and the customer package.
-5. No bug bounty, payment promise, or unsupported safe-harbor language is attached.
+| Requirement | Status |
+| --- | --- |
+| Working mailbox or ticket intake | USER ACTION REQUIRED |
+| Named owner | USER ACTION REQUIRED |
+| Monitoring responsibility | USER ACTION REQUIRED |
+| Response process (acknowledgement path; no invented SLA hours) | USER ACTION REQUIRED |
+| Legal review of disclosure wording | NOT STARTED |
+| Product Leadership publication approval | NOT STARTED |
 
-Until then: **USER ACTION REQUIRED.** Acknowledgement SLAs are not operationally supportable.
+No bug bounty, payment promise, or unsupported safe-harbor language.
+
+Until then: **SECURITY CONTACT NOT CONFIGURED — USER ACTION REQUIRED.** Acknowledgement SLAs are not operationally supportable.
 
 ---
 
 ## Support contact
 
 **Decision ID:** TR-CONTACT-SUPPORT-001  
-**Current status:** SUPPORT CONTACT — USER ACTION REQUIRED  
-**Public copy today:** Do not publish a public support mailbox.
+**Current status:** SUPPORT CONTACT NOT CONFIGURED — USER ACTION REQUIRED  
+**Public copy today:** Do not publish a public support mailbox. Do not invent `support@`.
 
 `user-guide.md` and some backend notes mention `support@sinfosecurity.com`. Production go/no-go and this Trust Program treat that mailbox as **unconfirmed for public use**. Phase 1 does not promote it.
 
@@ -74,9 +79,9 @@ A published support address on a host that cannot reliably receive mail is a fal
 
 | Surface | Security contact | Support contact |
 | --- | --- | --- |
-| `/trust` | SAFE ONLY AFTER CONTACT CONFIGURATION if a report address is shown | SAFE ONLY AFTER CONTACT CONFIGURATION if a support address is shown |
+| `/trust` | CONTACT_CONFIGURATION_REQUIRED if a report address is shown | CONTACT_CONFIGURATION_REQUIRED if a support address is shown |
 | `/security` | Same | Same |
-| `/status` | NOT_CONFIGURED — no contact implied | NOT_CONFIGURED |
+| `/status` | NOT_CONFIGURED / NOT MONITORED — no contact implied | NOT_CONFIGURED / NOT MONITORED |
 | Customer security package | Record “not configured” until chosen | Record “not configured” until chosen |
 | Vulnerability disclosure | Blocked | N/A |
 

@@ -21,7 +21,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Tenant isolation is enforced; cross-tenant reads do not return another tenant’s records |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | #12 two-tenant hosted proof; 2026-09-22 rem |
+| evidence | #12 two-tenant hosted proof; 2026-09-22 rem |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -37,7 +37,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | RBAC is enforced on the server |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | #8 PASS |
+| evidence | #8 PASS |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -53,7 +53,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Evidence download requires CLEAN malware status (fail-closed) |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | #3 PASS; #12 Evidence |
+| evidence | #3 PASS; #12 Evidence |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -69,7 +69,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Significant actions are audited in-tenant |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | #8 / #12 |
+| evidence | #8 / #12 |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -85,7 +85,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Hosted staging uses HTTPS |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | staging hosts |
+| evidence | staging hosts |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -101,7 +101,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Browser refresh token is HttpOnly cookie on hosted HTTPS |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | 2026-09-22 PENTEST-M3 rem |
+| evidence | 2026-09-22 PENTEST-M3 rem |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -117,7 +117,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Isolated backup/restore of PostgreSQL + evidence objects was tested |
 | visibility | public (no SLA) |
 | status | SUPPORTED |
-| evidence source | #5 PASS |
+| evidence | #5 PASS |
 | owner | Operations |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -133,7 +133,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Rate limiting exists on auth and API |
 | visibility | public |
 | status | SUPPORTED |
-| evidence source | #4 PASS |
+| evidence | #4 PASS |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -149,7 +149,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | 2026-09-22 identified security findings were remediated and two-tenant retested |
 | visibility | public (summary only) |
 | status | SUPPORTED |
-| evidence source | pentest rem docs |
+| evidence | pentest rem docs |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -165,13 +165,13 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Privileged MFA is enforced in production configuration |
 | visibility | private / careful public |
 | status | PARTIAL |
-| evidence source | staging grace; production policy |
+| evidence | staging grace; production policy |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
 | reviewBy | 2026-12-23 |
 | publicCopy | DO NOT PUBLISH as “MFA enforced for all hosted users today.” Internal: production config requires privileged MFA; staging uses an audited grace. |
-| internalNotes | SAFE ONLY AFTER PRODUCTION VALIDATION if stated as live enforcement on the current host. |
+| internalNotes | PRODUCTION_VALIDATION_REQUIRED if stated as live enforcement on the current host. |
 
 ### C-11
 
@@ -181,7 +181,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Live Entra / Okta / Google SSO |
 | visibility | public as SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED |
 | status | DEFERRED |
-| evidence source | #21 |
+| evidence | #21 |
 | owner | Identity |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -197,7 +197,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Live Slack / Jira / external ratings |
 | visibility | public as SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED |
 | status | DEFERRED |
-| evidence source | #22 |
+| evidence | #22 |
 | owner | Integrations |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -213,7 +213,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | SOC 2 certified / compliant |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | none |
+| evidence | none |
 | owner | Trust |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -229,7 +229,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | ISO 27001 certified |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | none |
+| evidence | none |
 | owner | Trust |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -245,7 +245,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | FedRAMP / HIPAA / PCI certified |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | none |
+| evidence | none |
 | owner | Trust |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -261,7 +261,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Commercially production-ready / GA |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | #11 NO-GO |
+| evidence | #11 NO-GO |
 | owner | Program |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -277,7 +277,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Insurance Edition generally available / PASS |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | #23 ACTIVE / NOT PASS |
+| evidence | #23 ACTIVE / NOT PASS |
 | owner | Program |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -293,12 +293,12 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Live public status / uptime % |
 | visibility | `/status` says NOT_CONFIGURED |
 | status | NOT_SUPPORTED |
-| evidence source | PublicStatus.tsx |
+| evidence | PublicStatus.tsx |
 | owner | Operations |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
 | reviewBy | 2026-12-23 |
-| publicCopy | DO NOT PUBLISH uptime. Page must remain NOT_CONFIGURED until a real status source exists. |
+| publicCopy | DO_NOT_PUBLISH uptime. Page must remain NOT_CONFIGURED / NOT MONITORED until a real status source exists. |
 | internalNotes | Future requirements in PUBLIC-CONTENT-MAPPING.md. |
 
 ### C-19
@@ -309,7 +309,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Contractual RTO / RPO / multi-region HA |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | #5 is isolated restore, not SLA |
+| evidence | #5 is isolated restore, not SLA |
 | owner | Operations |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -325,7 +325,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Binding DPA / Privacy Notice |
 | visibility | draft only |
 | status | LEGAL_REVIEW_REQUIRED |
-| evidence source | LegalDraft.tsx; LEGAL-DOCUMENT-STATUS.md |
+| evidence | LegalDraft.tsx; LEGAL-DOCUMENT-STATUS.md |
 | owner | Legal |
 | approver | Legal (unassigned) / Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -341,7 +341,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Supreme Intelligence (#19) is Product Leadership accepted as a product module (2026-09-14) |
 | visibility | public only as product module, not as a certification |
 | status | SUPPORTED |
-| evidence source | Punch list #19 PASS; implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`; CI `34914149569` PASS |
+| evidence | Punch list #19 PASS; implementation `9ee8529d806f17fdef6f736fb179cd8fc8e89327`; CI `34914149569` PASS |
 | owner | Program |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -357,7 +357,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Named external pentest firm attestation |
 | visibility | never public |
 | status | NOT_SUPPORTED |
-| evidence source | no firm recorded |
+| evidence | no firm recorded |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |
@@ -373,7 +373,7 @@ Review state for all rows below as of 2026-09-23: **APPROVED for recorded status
 | claim | Public security mailbox is live |
 | visibility | public as not configured |
 | status | NOT_SUPPORTED |
-| evidence source | CONTACT-READINESS.md; #9 leftover |
+| evidence | CONTACT-READINESS.md; #9 leftover |
 | owner | Security |
 | approver | Product Leadership |
 | lastReviewed | 2026-09-23 |

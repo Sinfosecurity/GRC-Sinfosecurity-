@@ -12,7 +12,7 @@ Named people are USER ACTION REQUIRED until Product Leadership assigns them. Rol
 | Privacy Notice | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership / Privacy | Legal (unassigned) | Counsel-approved notice on `/privacy` | Legal review; no binding language before approval |
 | Terms of Service | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership | Legal (unassigned) | Counsel-approved terms on `/terms` | Legal review; not an MSA or SLA until drafted as such and approved |
 | DPA | MISSING / LEGAL REVIEW REQUIRED | Product Leadership / Privacy | Legal (unassigned) | Counsel-approved DPA for customer execution | Do not publish a binding DPA from this phase |
-| Subprocessor Notice | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership / Legal | Legal (unassigned) | Counsel-approved customer notice | Staging register exists; production roster not contracted; locations TO BE CONFIRMED stay flagged |
+| Subprocessor Notice | DRAFT / LEGAL REVIEW REQUIRED | Product Leadership / Legal | Legal (unassigned) | Counsel-approved customer notice | Staging register exists; production roster not contracted; locations UNKNOWN / TO BE CONFIRMED stay flagged |
 | Security Addendum | DRAFT / LEGAL REVIEW REQUIRED | Security / Product Leadership | Legal (unassigned) | Counsel-approved addendum aligned to SUPPORTED claims only | Must not claim SOC 2 / ISO / SLAs that do not exist |
 | Acceptable Use Policy | MISSING / LEGAL REVIEW REQUIRED | Product Leadership | Legal (unassigned) | Counsel-approved AUP | Not invented in this phase |
 | Cookie Notice | MISSING | Product Leadership / Privacy | Legal (unassigned) | Counsel-approved notice if cookies/trackers are in scope | Product consent page is not a cookie platform |
