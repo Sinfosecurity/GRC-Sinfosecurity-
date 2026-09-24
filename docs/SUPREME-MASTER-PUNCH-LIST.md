@@ -731,7 +731,7 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **PRIORITY INTERPRETATION:** After current #12 / UI 2.0 closure, the competitive audit reinforces #21 then #22 as the most immediate existing roadmap gaps. #22 is now the authorized active item. #39 should maintain evidence-based competitor mapping; #40 should later operationalize continuous measurement. This statement does not authorize #40.
 
-**CERTIFICATION SHA:** Research package only. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
+**CERTIFICATION SHA:** Remote research package `31c2ae7a6dadd0034b3b4d1e8a0834829eec7e42` on `supreme-risk-transformation`. Research only. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
 **EVIDENCE:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` (canonical #39), `docs/competitive/competitive-matrix.json`, `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`, `docs/competitive/PRODUCT-PRIORITY-DECISION-MEMO.md`. Legacy module matrix `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` is historical/supporting only. Initial ProcessUnity benchmark (2026-09-18) remains historical. This is strategic comparison evidence, not product certification and not a claim of feature parity.
 

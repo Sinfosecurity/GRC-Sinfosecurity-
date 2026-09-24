@@ -368,7 +368,7 @@ Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git hist
 
 **ITEM:** #39 Competitive Capability Matrix  
 **STATUS CHANGE:** Research package ready for Product Leadership review. Not complete. No implementation. #40 not started. #24 not started. #23 frozen candidate unchanged. Commercial production remains NO-GO.  
-**SHA:** docs-only research package (does not modify `0f42cba86f42fa9df0399634bceb520036ed82ce`).  
+**SHA:** remote research + priority memo `31c2ae7a6dadd0034b3b4d1e8a0834829eec7e42` on `supreme-risk-transformation`. Does not modify `0f42cba86f42fa9df0399634bceb520036ed82ce`.  
 **EVIDENCE:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/competitive/competitive-matrix.json`, `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`, `docs/competitive/PRODUCT-PRIORITY-DECISION-MEMO.md`. Legacy `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` is historical/supporting only.
 
 ### 2026-09-23
