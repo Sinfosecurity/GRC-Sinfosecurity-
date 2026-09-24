@@ -37,12 +37,16 @@ Supreme is a multi-tenant governance platform. Organization data is scoped to th
 
 ## Assurance position
 
-| Kind | Supreme may say | Supreme must not say |
+Formal strength labels for this program:
+
+| Strength | Meaning | Supreme today |
 | --- | --- | --- |
-| INTERNAL CONTROL | Tenant isolation, RBAC, fail-closed evidence, audit | Certified / compliant |
-| SECURITY TESTING | 2026-09-22 findings remediated where evidence supports it | Named external audit firm (none recorded) |
-| PENTEST | Security testing and hosted retest performed; not a formal named-firm attestation | SOC 2 / ISO pentest badge |
-| CERTIFICATION | None | SOC 2, ISO 27001, FedRAMP, HIPAA, PCI |
+| IMPLEMENTED CONTROL | Code/config exists | Tenant isolation, RBAC, fail-closed evidence, audit, rate limits |
+| TESTED CONTROL | Hosted or certified test evidence | Two-tenant isolation; #5 isolated restore; #12 Evidence |
+| PENETRATION TESTED | 2026-09-22 findings remediated and retested | Staging application security only; no named external firm |
+| CERTIFIED / ATTESTED | Independent certification | **None.** Not SOC 2, ISO 27001, FedRAMP, HIPAA, or PCI |
+
+Do not upgrade IMPLEMENTED or TESTED into CERTIFIED / ATTESTED.
 
 ## Pentest summary (customer-safe)
 
@@ -70,8 +74,8 @@ No binding DPA is approved in this phase.
 
 ## #21 / #22 honesty (public)
 
-Supreme identity architecture can support corporate SSO/SCIM. **Live Entra, Okta, and Google federation are not validated.**  
-Supreme has a public API and webhook design. **Live Slack and Jira integrations are not validated.**
+SSO/SCIM: **SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED.** Do not imply live Entra, Okta, or Google federation.  
+API / webhooks / Slack / Jira / external ratings: **SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED.**
 
 ## #23 honesty (public)
 

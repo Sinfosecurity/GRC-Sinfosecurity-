@@ -4,7 +4,9 @@
 **Rule:** Public pages may use **SUPPORTED** claims only.  
 **Review cadence:** each claim has `reviewBy`. Humans approve updates. Automation may remind; it may not republish.
 
-Statuses: `SUPPORTED` | `PARTIAL` | `DEFERRED` | `NOT SUPPORTED` | `LEGAL REVIEW REQUIRED`
+Claim statuses: `SUPPORTED` | `PARTIAL` | `DEFERRED` | `NOT_SUPPORTED` | `LEGAL_REVIEW_REQUIRED`  
+Strength (separate from claim status): `IMPLEMENTED CONTROL` | `TESTED CONTROL` | `PENETRATION TESTED` | `CERTIFIED / ATTESTED`  
+Public-facing material may use only **SUPPORTED** claims. No claim is CERTIFIED / ATTESTED.
 
 | ID | Claim | Status | Visibility | Source | Owner | Last reviewed | Review by |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -18,18 +20,18 @@ Statuses: `SUPPORTED` | `PARTIAL` | `DEFERRED` | `NOT SUPPORTED` | `LEGAL REVIEW
 | C-08 | Rate limiting exists on auth and API | SUPPORTED | public | #4 PASS | Security | 2026-09-23 | 2026-12-23 |
 | C-09 | 2026-09-22 identified security findings were remediated and two-tenant retested | SUPPORTED | public (summary only) | pentest rem docs | Security | 2026-09-23 | 2026-12-23 |
 | C-10 | Privileged MFA is enforced in production configuration | PARTIAL | private / careful public | staging grace; production policy | Security | 2026-09-23 | 2026-12-23 |
-| C-11 | Live Entra / Okta / Google SSO | DEFERRED | public as deferred | #21 | Identity | 2026-09-23 | 2026-12-23 |
-| C-12 | Live Slack / Jira integrations | DEFERRED | public as deferred | #22 | Integrations | 2026-09-23 | 2026-12-23 |
-| C-13 | SOC 2 certified / compliant | NOT SUPPORTED | never public | none | Trust | 2026-09-23 | 2026-12-23 |
-| C-14 | ISO 27001 certified | NOT SUPPORTED | never public | none | Trust | 2026-09-23 | 2026-12-23 |
-| C-15 | FedRAMP / HIPAA / PCI certified | NOT SUPPORTED | never public | none | Trust | 2026-09-23 | 2026-12-23 |
-| C-16 | Commercially production-ready / GA | NOT SUPPORTED | never public | #11 NO-GO | Program | 2026-09-23 | 2026-12-23 |
-| C-17 | Insurance Edition generally available / PASS | NOT SUPPORTED | never public | #23 ACTIVE / NOT PASS | Program | 2026-09-23 | 2026-12-23 |
-| C-18 | Live public status / uptime % | NOT SUPPORTED | `/status` says NOT_CONFIGURED | PublicStatus.tsx | Operations | 2026-09-23 | 2026-12-23 |
-| C-19 | Contractual RTO / RPO / multi-region HA | NOT SUPPORTED | never public | #5 is isolated restore, not SLA | Operations | 2026-09-23 | 2026-12-23 |
-| C-20 | Binding DPA / Privacy Notice | LEGAL REVIEW REQUIRED | draft only | LegalDraft.tsx | Legal | 2026-09-23 | 2026-12-23 |
+| C-11 | Live Entra / Okta / Google SSO | DEFERRED | public as SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED | #21 | Identity | 2026-09-23 | 2026-12-23 |
+| C-12 | Live Slack / Jira / external ratings | DEFERRED | public as SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED | #22 | Integrations | 2026-09-23 | 2026-12-23 |
+| C-13 | SOC 2 certified / compliant | NOT_SUPPORTED | never public | none | Trust | 2026-09-23 | 2026-12-23 |
+| C-14 | ISO 27001 certified | NOT_SUPPORTED | never public | none | Trust | 2026-09-23 | 2026-12-23 |
+| C-15 | FedRAMP / HIPAA / PCI certified | NOT_SUPPORTED | never public | none | Trust | 2026-09-23 | 2026-12-23 |
+| C-16 | Commercially production-ready / GA | NOT_SUPPORTED | never public | #11 NO-GO | Program | 2026-09-23 | 2026-12-23 |
+| C-17 | Insurance Edition generally available / PASS | NOT_SUPPORTED | never public | #23 ACTIVE / NOT PASS | Program | 2026-09-23 | 2026-12-23 |
+| C-18 | Live public status / uptime % | NOT_SUPPORTED | `/status` says NOT_CONFIGURED | PublicStatus.tsx | Operations | 2026-09-23 | 2026-12-23 |
+| C-19 | Contractual RTO / RPO / multi-region HA | NOT_SUPPORTED | never public | #5 is isolated restore, not SLA | Operations | 2026-09-23 | 2026-12-23 |
+| C-20 | Binding DPA / Privacy Notice | LEGAL_REVIEW_REQUIRED | draft only | LegalDraft.tsx | Legal | 2026-09-23 | 2026-12-23 |
 | C-21 | Supreme Intelligence is a PASS certified product | DEFERRED | not public | #19 conflict — recommendation C | Program | 2026-09-23 | 2026-12-23 |
-| C-22 | Named external pentest firm attestation | NOT SUPPORTED | never public | no firm recorded | Security | 2026-09-23 | 2026-12-23 |
-| C-23 | Public security mailbox is live | NOT SUPPORTED | public as not configured | #9 leftover | Security | 2026-09-23 | 2026-12-23 |
+| C-22 | Named external pentest firm attestation | NOT_SUPPORTED | never public | no firm recorded | Security | 2026-09-23 | 2026-12-23 |
+| C-23 | Public security mailbox is live | NOT_SUPPORTED | public as not configured | #9 leftover | Security | 2026-09-23 | 2026-12-23 |
 
 Stale-claim control: if `reviewBy` passes without human re-approval, the claim becomes **PARTIAL** for public use until re-reviewed. Do not automatically claim continued compliance.
