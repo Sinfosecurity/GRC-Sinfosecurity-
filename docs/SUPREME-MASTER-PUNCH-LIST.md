@@ -733,7 +733,7 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **CERTIFICATION SHA:** Research package only. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
-**EVIDENCE:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/competitive/competitive-matrix.json`, `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`. Initial ProcessUnity benchmark (2026-09-18) remains historical. This is strategic comparison evidence, not product certification and not a claim of feature parity.
+**EVIDENCE:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` (canonical #39), `docs/competitive/competitive-matrix.json`, `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`, `docs/competitive/PRODUCT-PRIORITY-DECISION-MEMO.md`. Legacy module matrix `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` is historical/supporting only. Initial ProcessUnity benchmark (2026-09-18) remains historical. This is strategic comparison evidence, not product certification and not a claim of feature parity.
 
 **NEXT ACTION:** Product Leadership review of the research package. Do not implement competitive gaps from this review. Do not start #40. Do not start #24. Keep #23 on zero-spend hold.
 

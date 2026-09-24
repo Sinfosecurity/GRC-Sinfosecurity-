@@ -14,7 +14,9 @@ This package does **not** claim Supreme superiority. It records what Supreme has
 Historical module matrices in `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` (2026-09-13, #15/#16/#18) remain historical. This file is the #39 controlling research package.
 
 Machine-readable companion: `docs/competitive/competitive-matrix.json`  
-Gap ownership: `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`
+Gap ownership: `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`  
+Priority memo: `docs/competitive/PRODUCT-PRIORITY-DECISION-MEMO.md`  
+Legacy 2026-09-13 module matrix: `docs/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md` (historical / supporting only)
 
 ---
 

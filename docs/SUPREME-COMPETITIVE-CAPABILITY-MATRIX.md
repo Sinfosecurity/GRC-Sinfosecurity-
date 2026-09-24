@@ -1,5 +1,16 @@
 # Supreme Competitive Capability Matrix
 
+**Status:** HISTORICAL / SUPPORTING — not the #39 controlling matrix.
+
+**Canonical #39 research:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`  
+**Gap ownership:** `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`  
+**Priority memo:** `docs/competitive/PRODUCT-PRIORITY-DECISION-MEMO.md`  
+**Machine-readable:** `docs/competitive/competitive-matrix.json`
+
+This 2026-09-13 file remains evidence for #15 / #16 / #18 module capability notes. Do not treat it as the Product Leadership #39 package.
+
+---
+
 **Item:** #16 Supreme Compliance (extends #15 matrix); #18 Supreme AI Governance section appended  
 **Date:** 2026-09-13  
 **Honesty rule:** Competitor names identify market categories only. This document does not copy proprietary UI, help text, control content, or code. Status is Supreme’s current implementation, not a claim that Supreme is better.
