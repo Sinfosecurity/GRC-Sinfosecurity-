@@ -613,13 +613,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Public trust pages match actual controls. No fake certifications.
 
-**CURRENT STATUS:** NOT STARTED
+**CURRENT STATUS:** AUTHORIZED — PHASE 0 TRUST FOUNDATION IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Phase 0 docs package only. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
-**EVIDENCE:** Draft `/trust` `/security` `/status` routes exist; they are not a completed Trust Program.
+**EVIDENCE:** `docs/trust/`. Existing draft routes `/trust` `/security` `/status` remain honest and were not rewritten in this phase (docs-first; no Render build). Security mailbox remains NOT CONFIGURED.
 
-**NEXT ACTION:** Not authorized as a program item.
+**NEXT ACTION:** Product Leadership review of Phase 0. Designate a live security mailbox before publishing a report address. Do not claim certification. Do not start #24 or #40. Keep #23 on zero-spend hold.
 
 ---
 
@@ -715,7 +715,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 Each row is an outcome or capability Supreme claims or declines, with evidence, not a feature-count contest. Do not copy competitor UI, terminology lock-in, or content.
 
-**CURRENT STATUS:** RESEARCH PACKAGE READY FOR PRODUCT LEADERSHIP REVIEW. Not complete. Not #40. Does not authorize implementation of competitive gaps.
+**CURRENT STATUS:** RESEARCH PACKAGE ACCEPTED FOR STRATEGIC PLANNING. Not complete. Not PASS. Not #40. Must not become an implementation shadow backlog.
 
 **PROCESSUNITY GAP BASELINE — 2026-09-18:** Product Leadership reviewed ProcessUnity TPRM pricing/capability material as an external benchmark. This does **not** create new punch-list numbers and does **not** change authorization or acceptance status. Gaps are mapped to existing roadmap items:
 
