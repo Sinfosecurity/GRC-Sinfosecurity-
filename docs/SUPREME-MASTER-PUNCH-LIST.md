@@ -715,7 +715,7 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 Each row is an outcome or capability Supreme claims or declines, with evidence, not a feature-count contest. Do not copy competitor UI, terminology lock-in, or content.
 
-**CURRENT STATUS:** STRATEGIC WORK REQUIRED
+**CURRENT STATUS:** RESEARCH PACKAGE READY FOR PRODUCT LEADERSHIP REVIEW. Not complete. Not #40. Does not authorize implementation of competitive gaps.
 
 **PROCESSUNITY GAP BASELINE — 2026-09-18:** Product Leadership reviewed ProcessUnity TPRM pricing/capability material as an external benchmark. This does **not** create new punch-list numbers and does **not** change authorization or acceptance status. Gaps are mapped to existing roadmap items:
 
@@ -731,11 +731,11 @@ Each row is an outcome or capability Supreme claims or declines, with evidence, 
 
 **PRIORITY INTERPRETATION:** After current #12 / UI 2.0 closure, the competitive audit reinforces #21 then #22 as the most immediate existing roadmap gaps. #22 is now the authorized active item. #39 should maintain evidence-based competitor mapping; #40 should later operationalize continuous measurement. This statement does not authorize #40.
 
-**CERTIFICATION SHA:** —
+**CERTIFICATION SHA:** Research package only. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
-**EVIDENCE:** Initial ProcessUnity benchmark completed by Product Leadership on 2026-09-18 from public pricing/capability material. This is strategic comparison evidence, not product certification and not a claim of feature parity.
+**EVIDENCE:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/competitive/competitive-matrix.json`, `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`. Initial ProcessUnity benchmark (2026-09-18) remains historical. This is strategic comparison evidence, not product certification and not a claim of feature parity.
 
-**NEXT ACTION:** Maintain the first evidence-based matrix using columns: Capability | Supreme | Competitor | Evidence | Gap | Existing Punch-List Item | Priority. Add ProcessUnity to the formal competitor set. Do not invent scores or percentages. Do not start #40 without explicit Product Leadership authorization.
+**NEXT ACTION:** Product Leadership review of the research package. Do not implement competitive gaps from this review. Do not start #40. Do not start #24. Keep #23 on zero-spend hold.
 
 ---
 

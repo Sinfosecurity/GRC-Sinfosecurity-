@@ -6,7 +6,7 @@ This file records **program acceptance**. Engineering may return hosted evidence
 
 ---
 
-**LAST UPDATED:** 2026-09-23 (#23 ZERO-SPEND HOSTING HOLD; frozen candidate `0f42cba`; waiting for included Render pipeline minutes; #12 remains PASS private-testing; commercial production NO-GO)
+**LAST UPDATED:** 2026-09-23 (#23 ZERO-SPEND HOSTING HOLD unchanged; #39 research package READY FOR PRODUCT LEADERSHIP REVIEW; #12 remains PASS private-testing; commercial production NO-GO)
 
 **CURRENT ITEM:** #23 Insurance Edition — Phase B ACCEPTED FOR CURRENT STAGE. ZERO-SPEND HOSTING HOLD. Frozen candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`. Do not purchase Render minutes. Spend limit remains $0.00. Do not retry deploys while exhausted. Do not start Phase C. Do not start #24, #27, #30, or any other numbered item. No Wave 9. #12 remains PASS for private-testing release-candidate scope. #13–#22 remain at their accepted current-stage positions. Unnumbered Supreme UI 2.0 remains Product Leadership review open. Historical H-5 and H-6 remain OPEN and are not the pentest PENTEST-H1/H2 labels.
 
@@ -352,7 +352,7 @@ Do not invent percentages.
 | 22 | API / Webhooks / Integrations | ACCEPTED FOR CURRENT STAGE / LIVE PROVIDER VALIDATION DEFERRED |
 | 23 | Insurance Edition | ACTIVE — PHASE B ACCEPTED; ZERO-SPEND HOSTING HOLD; not PASS |
 | 24–38, 40 | Later modules / GTM / packs | NOT STARTED / NOT AUTHORIZED |
-| 39 | Competitive Capability Matrix | STRATEGIC WORK REQUIRED |
+| 39 | Competitive Capability Matrix | RESEARCH PACKAGE READY FOR PRODUCT LEADERSHIP REVIEW; not complete |
 
 Marketing preview pages are not implementation.
 
@@ -363,6 +363,13 @@ Marketing preview pages are not implementation.
 Concise accepted-status history. Do not fabricate unsubstantiated history. Older certification docs used different local numbering; this log uses the **master punch list** numbers.
 
 Historical #7–#12 entries through the 2026-09-13 #12 reopen remain in git history on this file’s prior revisions. They are not deleted as program facts.
+
+### 2026-09-23
+
+**ITEM:** #39 Competitive Capability Matrix  
+**STATUS CHANGE:** Research package ready for Product Leadership review. Not complete. No implementation. #40 not started. #24 not started. #23 frozen candidate unchanged. Commercial production remains NO-GO.  
+**SHA:** docs-only research package (does not modify `0f42cba86f42fa9df0399634bceb520036ed82ce`).  
+**EVIDENCE:** `docs/competitive/SUPREME-COMPETITIVE-CAPABILITY-MATRIX.md`, `docs/competitive/competitive-matrix.json`, `docs/competitive/COMPETITIVE-GAP-ROADMAP.md`.
 
 ### 2026-09-23
 
