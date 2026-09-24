@@ -613,13 +613,13 @@ Statuses below are **program acceptance**, not conversational memory. Implementa
 
 **DEFINITION OF DONE:** Public trust pages match actual controls. No fake certifications.
 
-**CURRENT STATUS:** PHASE 0 ACCEPTED FOR CURRENT STAGE. PHASE 1 ACCEPTED FOR CURRENT STAGE. PHASE 2 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001. Public trust pages not deployed.
+**CURRENT STATUS:** PHASE 0 ACCEPTED. PHASE 1 ACCEPTED. PHASE 2 ACCEPTED FOR CURRENT STAGE. PHASE 3 AUTHORIZED / IN PROGRESS. Not PASS. Not SOC 2. Not ISO 27001. Public trust pages not deployed.
 
-**CERTIFICATION SHA:** Phase 0 docs `a89cf2f746be3bcf272c74eb7ed553623dc062f7`. Phase 1 accepted `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. First Phase 1 pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f` is historical. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
+**CERTIFICATION SHA:** Phase 2 accepted `407320e8d2435b1c37c712212b424452cea94b7a`. Phase 1 accepted `6b01dd2c3cfc78366eeb349792fadee55a8c52a6`. First Phase 1 pack `4243e0bf99f30a9d1caebf2307fe71708b71f15f` is historical. Not a PASS SHA. Does not change frozen #23 candidate `0f42cba86f42fa9df0399634bceb520036ed82ce`.
 
-**EVIDENCE:** `docs/trust/` Phase 2 publication-readiness pack (`TRUST-PROGRAM-PHASE-2.md`, publication matrix, contact decision sheets, package/questionnaire/subprocessor readiness, pentest public summary). Existing draft routes remain unchanged. Security and support contacts remain NOT CONFIGURED.
+**EVIDENCE:** `docs/trust/` Phase 3 pre-publication candidate (`TRUST-PROGRAM-PHASE-3.md`, `PUBLICATION-CANDIDATE.md`, `PUBLICATION-MANIFEST.json`, diligence bundle, pre-publication audit). Existing draft routes remain unchanged. Security and support contacts remain NOT CONFIGURED.
 
-**NEXT ACTION:** Product Leadership review of Phase 2. Do not deploy public trust pages. Do not claim certification. Do not start #24 or #40. Keep #23 on zero-spend hold.
+**NEXT ACTION:** Product Leadership review of Phase 3. Do not deploy public trust pages. Do not invent Phase 4. Do not declare #34 PASS. Do not start #24 or #40. Keep #23 on zero-spend hold.
 
 ---
 

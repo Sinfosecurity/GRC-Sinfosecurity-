@@ -1,0 +1,140 @@
+{
+  "item": "#34 Trust Program",
+  "phase": "3",
+  "kind": "publication-candidate",
+  "deployed": false,
+  "runtimeChanged": false,
+  "phase2AcceptedSha": "407320e8d2435b1c37c712212b424452cea94b7a",
+  "phase1AcceptedSha": "6b01dd2c3cfc78366eeb349792fadee55a8c52a6",
+  "routesInCandidate": ["/trust", "/security", "/status"],
+  "routesExcluded": ["/privacy", "/terms", "/subprocessors"],
+  "statements": [
+    {
+      "claimId": "C-01",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-02",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-03",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-04",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-05",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-06",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-07",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING",
+      "notes": "no contractual RTO/RPO"
+    },
+    {
+      "claimId": "C-08",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING"
+    },
+    {
+      "claimId": "C-09",
+      "routes": ["/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "environment": "STAGING / PRIVATE-TESTING",
+      "source": "PENTEST-PUBLIC-SUMMARY.md"
+    },
+    {
+      "claimId": "C-11",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "exactWording": "SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED"
+    },
+    {
+      "claimId": "C-12",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "exactWording": "SUPPORTED ARCHITECTURE — LIVE VALIDATION DEFERRED"
+    },
+    {
+      "claimId": "C-21",
+      "routes": ["/trust"],
+      "class": "READY_FOR_PUBLICATION",
+      "exactWording": "Supreme Intelligence interprets recorded Supreme data without inventing external threat events."
+    },
+    {
+      "claimId": "C-18",
+      "routes": ["/status"],
+      "class": "READY_FOR_PUBLICATION",
+      "exactWording": "STATUS MONITORING NOT CONFIGURED",
+      "forbidden": ["99.9%", "uptime percentage", "all systems operational", "incident history", "live health indicator"]
+    },
+    {
+      "claimId": "C-23",
+      "routes": ["/trust", "/security"],
+      "class": "READY_FOR_PUBLICATION",
+      "exactWording": "Security reporting address: not configured.",
+      "address": "CONTACT_CONFIGURATION_REQUIRED"
+    },
+    {
+      "claimId": "K-SUP",
+      "routes": ["/trust"],
+      "class": "READY_FOR_PUBLICATION",
+      "exactWording": "Customer support address: not configured.",
+      "address": "CONTACT_CONFIGURATION_REQUIRED"
+    }
+  ],
+  "excludedClaimIds": [
+    "C-10",
+    "C-13",
+    "C-14",
+    "C-15",
+    "C-16",
+    "C-17",
+    "C-19",
+    "C-20",
+    "C-22",
+    "K-PROD-STORE",
+    "K-PROD-HOST",
+    "K-PROD-BAK",
+    "K-PROD-MON",
+    "K-STRIPE",
+    "K-DNS",
+    "K-PROD-SUB",
+    "L-PRIV",
+    "L-TOS",
+    "L-DPA",
+    "L-SUB",
+    "L-SECADD",
+    "L-AUP",
+    "L-COOKIE",
+    "L-VDP",
+    "L-IR-SLA"
+  ],
+  "userDecisions": {
+    "securityContact": "USER ACTION REQUIRED — A dedicated mailbox / B existing mailbox / C ticket-form — none selected",
+    "supportContact": "USER ACTION REQUIRED — A / B / C — none selected — do not assume support@sinfosecurity.com"
+  },
+  "finalClosureAnalysis": "A"
+}
